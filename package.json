@@ -1,0 +1,57 @@
+{
+  "author": "Yamagishi Kazutoshi",
+  "bugs": {
+    "url": "https://github.com/ykzts/bingify/issues"
+  },
+  "dependencies": {
+    "@supabase/ssr": "0.8.0",
+    "@supabase/supabase-js": "2.89.0",
+    "clsx": "2.1.1",
+    "date-fns": "4.1.0",
+    "lucide-react": "0.562.0",
+    "motion": "12.23.26",
+    "next": "16.1.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "tailwind-merge": "3.4.0",
+    "use-debounce": "10.0.6",
+    "zod": "4.2.1"
+  },
+  "description": "Real-time bingo application for streamers and communities.",
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.18",
+    "@types/node": "24.10.4",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "eslint": "9.39.2",
+    "eslint-config-next": "16.1.1",
+    "postcss-load-config": "6.0.1",
+    "prettier": "3.7.4",
+    "supabase": "2.70.5",
+    "tailwindcss": "4.1.18",
+    "typescript": "5.9.3"
+  },
+  "homepage": "https://bingify.space/",
+  "license": "MIT",
+  "name": "bingify",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ykzts/bingify.git"
+  },
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint",
+    "local:setup": "pnpm supabase:start",
+    "local:stop": "pnpm supabase:stop",
+    "start": "next start",
+    "supabase:start": "supabase start",
+    "supabase:status": "supabase status",
+    "supabase:stop": "supabase stop",
+    "type-check": "tsc --noEmit"
+  },
+  "version": "0.1.0"
+}
