@@ -1,10 +1,22 @@
+# Dependencies
 node_modules
+pnpm-lock.yaml
+*.lock
+
+# Build output
 .next
 .pnpm
 dist
 build
+out
+
+# Testing
 coverage
-*.lock
+
+# Vercel
+.vercel
+
+# Misc
 .DS_Store
 .env*
 .branches

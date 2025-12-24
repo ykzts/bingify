@@ -33,6 +33,7 @@ pnpm dev
 コミットメッセージと Pull Request は以下の形式に従ってください。GitHub Web UI でも見やすいようにシンプルで簡潔な英文を使用します。
 
 **形式:**
+
 ```
 type(scope): brief subject
 
@@ -40,6 +41,7 @@ optional detailed explanation
 ```
 
 **type の例:**
+
 - `feat`: 新機能
 - `fix`: バグ修正
 - `docs`: ドキュメント更新
@@ -50,18 +52,21 @@ optional detailed explanation
 - `chore`: その他の変更（依存関係など）
 
 **scope の例:**
+
 - `dashboard`: ダッシュボード機能
 - `space`: スペース関連
 - `auth`: 認証処理
 - `db`: Supabase スキーマ
 
 **例:**
+
 - `feat(dashboard): add space creation form`
 - `fix(space): resolve slug validation error`
 - `docs: update setup instructions`
 - `chore(deps): update tailwindcss to latest`
 
 **Pull Request との対応:**
+
 - PR タイトル = `type(scope): subject`
 - PR description = 詳細説明（body）
 - マージ時のコミットメッセージ = PR タイトル + description
