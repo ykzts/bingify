@@ -4,11 +4,11 @@ import { useState } from 'react'
 import { motion } from 'motion/react'
 
 interface Particle {
+  delay: number
+  duration: number
   id: number
   left: string
   size: number
-  delay: number
-  duration: number
 }
 
 function generateParticles(): Particle[] {
