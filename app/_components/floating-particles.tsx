@@ -11,8 +11,10 @@ interface Particle {
   size: number
 }
 
+const PARTICLE_COUNT = 20
+
 function generateParticles(): Particle[] {
-  return Array.from({ length: 20 }, (_, i) => ({
+  return Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
     delay: Math.random() * 5,
     duration: 10 + Math.random() * 10,
     id: i,
