@@ -44,11 +44,13 @@ pnpm dev
 すべてのコミットメッセージと Pull Request タイトルは Conventional Commits に準拠します。
 
 **形式:**
+
 ```
 type(scope): brief subject
 ```
 
 **type:**
+
 - `feat`: 新機能
 - `fix`: バグ修正
 - `docs`: ドキュメント
@@ -59,13 +61,16 @@ type(scope): brief subject
 - `chore`: その他
 
 **scope（例）:**
+
 - `dashboard`, `space`, `auth`, `db`, `deps`, `config`
 
 **subject:**
+
 - 命令形で、50文字以内。
 - 平易な英文（GitHub Web UI で見やすさ優先）。
 
 **例:**
+
 - `feat(dashboard): add space creation form`
 - `fix(space): resolve slug validation error`
 - `docs: update setup instructions`
