@@ -14,8 +14,8 @@ interface Particle {
 const PARTICLE_COUNT = 20
 const PARTICLE_COUNT_MOBILE = 10
 
-function generateParticles(count: number): Particle[] {
-  return Array.from({ length: count }, (_, i) => ({
+function generateParticles(): Particle[] {
+  return Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
     delay: Math.random() * 5,
     duration: 10 + Math.random() * 10,
     id: i,
@@ -24,26 +24,22 @@ function generateParticles(count: number): Particle[] {
   }))
 }
 
-function getIsMobile(): boolean {
-  return typeof window !== 'undefined' && window.innerWidth < 768
-}
-
 export function FloatingParticles() {
   const shouldReduceMotion = useReducedMotion()
-  const [isMobile, setIsMobile] = useState(getIsMobile)
+  // Start with desktop count, will adjust on client
+  const [particleCount, setParticleCount] = useState(PARTICLE_COUNT)
   const [isVisible, setIsVisible] = useState(true)
-
-  // Generate particles based on maximum count
-  const particleCount = isMobile ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT
-  const [particles] = useState<Particle[]>(() => generateParticles(PARTICLE_COUNT))
+  const [particles] = useState<Particle[]>(generateParticles)
 
   useEffect(() => {
     // Adjust particle count based on screen size
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768)
+    const updateParticleCount = () => {
+      setParticleCount(window.innerWidth < 768 ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT)
     }
 
-    window.addEventListener('resize', handleResize)
+    // Initial check and set up resize listener
+    updateParticleCount()
+    window.addEventListener('resize', updateParticleCount)
 
     // Pause animations when page is not visible
     const handleVisibilityChange = () => {
@@ -53,7 +49,7 @@ export function FloatingParticles() {
     document.addEventListener('visibilitychange', handleVisibilityChange)
 
     return () => {
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('resize', updateParticleCount)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [])
