@@ -24,19 +24,25 @@ function generateParticles(count: number): Particle[] {
   }))
 }
 
+function getIsMobile(): boolean {
+  return typeof window !== 'undefined' && window.innerWidth < 768
+}
+
 export function FloatingParticles() {
   const shouldReduceMotion = useReducedMotion()
-  const [particleCount, setParticleCount] = useState(PARTICLE_COUNT)
-  const [particles] = useState<Particle[]>(() => generateParticles(particleCount))
+  const [isMobile, setIsMobile] = useState(getIsMobile)
   const [isVisible, setIsVisible] = useState(true)
+
+  // Generate particles based on maximum count
+  const particleCount = isMobile ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT
+  const [particles] = useState<Particle[]>(() => generateParticles(PARTICLE_COUNT))
 
   useEffect(() => {
     // Adjust particle count based on screen size
     const handleResize = () => {
-      setParticleCount(window.innerWidth < 768 ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT)
+      setIsMobile(window.innerWidth < 768)
     }
 
-    handleResize()
     window.addEventListener('resize', handleResize)
 
     // Pause animations when page is not visible
