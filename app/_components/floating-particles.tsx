@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { motion } from 'motion/react'
+import { useEffect, useState } from 'react'
+import { motion, useReducedMotion } from 'motion/react'
 
 interface Particle {
   delay: number
@@ -12,9 +12,10 @@ interface Particle {
 }
 
 const PARTICLE_COUNT = 20
+const PARTICLE_COUNT_MOBILE = 10
 
-function generateParticles(): Particle[] {
-  return Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
+function generateParticles(count: number): Particle[] {
+  return Array.from({ length: count }, (_, i) => ({
     delay: Math.random() * 5,
     duration: 10 + Math.random() * 10,
     id: i,
@@ -24,11 +25,41 @@ function generateParticles(): Particle[] {
 }
 
 export function FloatingParticles() {
-  const [particles] = useState<Particle[]>(generateParticles)
+  const shouldReduceMotion = useReducedMotion()
+  const [particleCount, setParticleCount] = useState(PARTICLE_COUNT)
+  const [particles] = useState<Particle[]>(() => generateParticles(particleCount))
+  const [isVisible, setIsVisible] = useState(true)
+
+  useEffect(() => {
+    // Adjust particle count based on screen size
+    const handleResize = () => {
+      setParticleCount(window.innerWidth < 768 ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT)
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+
+    // Pause animations when page is not visible
+    const handleVisibilityChange = () => {
+      setIsVisible(!document.hidden)
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
+
+  // Don't render particles if reduced motion is preferred
+  if (shouldReduceMotion) {
+    return null
+  }
 
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden">
-      {particles.map((particle) => (
+      {particles.slice(0, particleCount).map((particle) => (
         <motion.div
           key={particle.id}
           className="absolute rounded-full bg-primary/20"
@@ -38,10 +69,14 @@ export function FloatingParticles() {
             top: '100%',
             width: particle.size,
           }}
-          animate={{
-            opacity: [0, 0.6, 0],
-            y: ['0vh', '-120vh'],
-          }}
+          animate={
+            isVisible
+              ? {
+                  opacity: [0, 0.6, 0],
+                  y: ['0vh', '-120vh'],
+                }
+              : {}
+          }
           transition={{
             delay: particle.delay,
             duration: particle.duration,

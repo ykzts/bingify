@@ -4,8 +4,10 @@ import { Hero } from './_components/hero'
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background font-sans" suppressHydrationWarning>
-      <FloatingParticles />
+    <div className="relative min-h-screen overflow-hidden bg-background font-sans">
+      <div suppressHydrationWarning>
+        <FloatingParticles />
+      </div>
       <main>
         <Hero />
         <Features />

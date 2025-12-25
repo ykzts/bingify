@@ -1,10 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
 import { ArrowRight } from 'lucide-react'
 
 export function Hero() {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <section className="relative flex min-h-[80vh] flex-col items-center justify-center px-6 py-20 text-center">
       <motion.div
@@ -46,9 +48,12 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.6 }}
         >
-          <Link href="/dashboard">
-            <motion.button
-              className="group inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground shadow-lg"
+          <Link
+            href="/dashboard"
+            className="group inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground shadow-lg"
+          >
+            <motion.span
+              className="inline-flex items-center gap-2"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{
@@ -60,7 +65,7 @@ export function Hero() {
               ビンゴ会場を作る
               <motion.span
                 className="inline-block"
-                animate={{ x: [0, 4, 0] }}
+                animate={shouldReduceMotion ? {} : { x: [0, 4, 0] }}
                 transition={{
                   duration: 1.5,
                   ease: 'easeInOut',
@@ -69,7 +74,7 @@ export function Hero() {
               >
                 <ArrowRight className="h-5 w-5" />
               </motion.span>
-            </motion.button>
+            </motion.span>
           </Link>
         </motion.div>
 
