@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { getMDXMetadata, MDXContent } from "@/lib/components/mdx-content";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -16,32 +17,12 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-
-  const titles: Record<string, string> = {
-    en: "Terms of Service - Bingify",
-    ja: "利用規約 - Bingify",
-  };
-
-  return {
-    title: titles[locale] || titles.en,
-  };
+  return getMDXMetadata(locale, "terms");
 }
 
 export default async function TermsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const TermsContent = await import(`@/content/${locale}/terms.mdx`).then(
-    (mod) => mod.default
-  );
-
-  return (
-    <div className="min-h-screen bg-background px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="prose prose-slate lg:prose-lg mx-auto">
-          <TermsContent />
-        </div>
-      </div>
-    </div>
-  );
+  return <MDXContent contentPath="terms" locale={locale} />;
 }

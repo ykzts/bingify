@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { getMDXMetadata, MDXContent } from "@/lib/components/mdx-content";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -16,32 +17,12 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-
-  const titles: Record<string, string> = {
-    en: "Privacy Policy - Bingify",
-    ja: "プライバシーポリシー - Bingify",
-  };
-
-  return {
-    title: titles[locale] || titles.en,
-  };
+  return getMDXMetadata(locale, "privacy");
 }
 
 export default async function PrivacyPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const PrivacyContent = await import(`@/content/${locale}/privacy.mdx`).then(
-    (mod) => mod.default
-  );
-
-  return (
-    <div className="min-h-screen bg-background px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="prose prose-slate lg:prose-lg mx-auto">
-          <PrivacyContent />
-        </div>
-      </div>
-    </div>
-  );
+  return <MDXContent contentPath="privacy" locale={locale} />;
 }
