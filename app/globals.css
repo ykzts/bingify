@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@plugin "@tailwindcss/typography";
+
 @theme {
   /* Font */
   --font-sans: var(--font-nunito), ui-sans-serif, system-ui;

@@ -13,6 +13,11 @@
     "realtimeTitle": "Realtime Sync",
     "subheading": "シンプルで、パワフル。誰でも使える新しいビンゴ体験。"
   },
+  "Footer": {
+    "backToHome": "ホームに戻る",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約"
+  },
   "Hero": {
     "badge1": "無料で始める",
     "badge2": "登録不要",
