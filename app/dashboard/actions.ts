@@ -5,6 +5,8 @@ import { format } from "date-fns";
 import { spaceSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 
+const MAX_SLUG_SUGGESTIONS = 10;
+
 export interface CreateSpaceState {
   success: boolean;
   error?: string;
@@ -37,8 +39,6 @@ async function findAvailableSlug(
   dateSuffix: string,
   supabase: Awaited<ReturnType<typeof createClient>>
 ): Promise<string | null> {
-  const MAX_SLUG_SUGGESTIONS = 10;
-
   // Try suggestions with incrementing numbers
   for (let i = 2; i <= MAX_SLUG_SUGGESTIONS; i++) {
     const suggestion = `${baseSlug}-${i}-${dateSuffix}`;
