@@ -6,6 +6,9 @@ import { routing } from "./i18n/routing";
 
 const handleI18n = createMiddleware(routing);
 
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 function createUnauthorizedResponse() {
   return new NextResponse("Unauthorized", {
     headers: { "WWW-Authenticate": 'Basic realm="Secure Area"' },
@@ -64,7 +67,7 @@ function checkBasicAuth(req: NextRequest): NextResponse | null {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // --- 1. Basic Auth Check (最優先) ---
+  // --- 1. Basic Auth Check (Highest Priority) ---
   const authResponse = checkBasicAuth(request);
   if (authResponse) {
     return authResponse;
@@ -87,6 +90,12 @@ export async function proxy(request: NextRequest) {
         .single();
 
       if (error || !data) {
+        return NextResponse.redirect(new URL("/404", request.url));
+      }
+
+      // Validate UUID format for security
+      if (!UUID_REGEX.test(data.id)) {
+        console.error("Invalid UUID format:", data.id);
         return NextResponse.redirect(new URL("/404", request.url));
       }
 
