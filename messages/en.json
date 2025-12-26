@@ -23,6 +23,10 @@
     "title": "Turn Every Screen Into",
     "titleHighlight": "A Venue of Excitement."
   },
+  "LanguageSwitcher": {
+    "label": "Language",
+    "selectLanguage": "Select language"
+  },
   "Login": {
     "description": "Sign in to access the dashboard and manage your bingo spaces.",
     "errorMessage": "An error occurred during sign-in. Please try again.",

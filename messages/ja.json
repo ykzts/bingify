@@ -23,6 +23,10 @@
     "title": "すべての画面を、",
     "titleHighlight": "熱狂の会場に。"
   },
+  "LanguageSwitcher": {
+    "label": "言語",
+    "selectLanguage": "言語を選択"
+  },
   "Login": {
     "description": "ダッシュボードにアクセスして、ビンゴスペースを管理するにはサインインしてください。",
     "errorMessage": "サインイン中にエラーが発生しました。もう一度お試しください。",
