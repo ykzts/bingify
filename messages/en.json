@@ -23,6 +23,13 @@
     "title": "Turn Every Screen Into",
     "titleHighlight": "A Venue of Excitement."
   },
+  "Login": {
+    "description": "Sign in to access the dashboard and manage your bingo spaces.",
+    "errorMessage": "An error occurred during sign-in. Please try again.",
+    "googleButton": "Sign in with Google",
+    "title": "Sign in to Dashboard",
+    "twitchButton": "Sign in with Twitch"
+  },
   "Metadata": {
     "description": "Experience a new kind of bingo that brings everyone together in real-time. No app needed—just share a URL and everyone can join.",
     "title": "Bingify - Turn Every Screen Into A Venue of Excitement."

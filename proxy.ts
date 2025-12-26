@@ -7,6 +7,7 @@ import {
   handleShareKeyRewrite,
   validateShareKey,
 } from "./lib/middleware/share-key";
+import { createClient } from "./lib/supabase/middleware";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -19,7 +20,26 @@ export async function proxy(request: NextRequest) {
     return authResponse;
   }
 
-  // --- 2. Share Key Rewrite Logic ---
+  // --- 2. Supabase Auth Check for /dashboard routes ---
+  if (pathname.includes("/dashboard")) {
+    const response = NextResponse.next();
+    const supabase = await createClient(request, response);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      // Extract locale from pathname if present
+      const localeMatch = pathname.match(/^\/(en|ja)\//);
+      const locale = localeMatch ? localeMatch[1] : routing.defaultLocale;
+      const loginUrl = new URL(`/${locale}/login`, request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    return response;
+  }
+
+  // --- 3. Share Key Rewrite Logic ---
   if (pathname.startsWith("/@")) {
     const shareKey = pathname.slice(2);
 
@@ -55,7 +75,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // --- 3. Internationalization Routing ---
+  // --- 4. Internationalization Routing ---
   return intlMiddleware(request);
 }
 
