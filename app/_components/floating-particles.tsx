@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
+import { useEffect, useState } from 'react'
 
 interface Particle {
   delay: number

@@ -3,7 +3,7 @@ export default async function AdminSpacePage({ params }: { params: Promise<{ id:
 
   return (
     <div className="min-h-screen p-8">
-      <h1 className="text-3xl font-bold mb-4">管理画面</h1>
+      <h1 className="mb-4 font-bold text-3xl">管理画面</h1>
       <p>Space ID: {id}</p>
     </div>
   )

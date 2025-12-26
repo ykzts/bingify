@@ -1,8 +1,8 @@
 'use client'
 
-import Link from 'next/link'
-import { motion, useReducedMotion } from 'motion/react'
 import { ArrowRight } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
+import Link from 'next/link'
 
 export function Hero() {
   const shouldReduceMotion = useReducedMotion()
@@ -16,7 +16,7 @@ export function Hero() {
         className="max-w-4xl"
       >
         <motion.h1
-          className="mb-6 text-4xl font-bold text-text-main sm:text-5xl md:text-6xl"
+          className="mb-6 font-bold text-4xl text-text-main sm:text-5xl md:text-6xl"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{
@@ -50,7 +50,7 @@ export function Hero() {
         >
           <Link
             href="/dashboard"
-            className="group inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground shadow-lg"
+            className="group inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 font-semibold text-lg text-primary-foreground shadow-lg"
           >
             <motion.span
               className="inline-flex items-center gap-2"

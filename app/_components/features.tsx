@@ -1,7 +1,7 @@
 'use client'
 
+import { Globe, Users, Zap } from 'lucide-react'
 import { motion } from 'motion/react'
-import { Zap, Users, Globe } from 'lucide-react'
 
 const features = [
   {
@@ -33,7 +33,7 @@ export function Features() {
           transition={{ duration: 0.6 }}
           className="mb-12 text-center"
         >
-          <h2 className="mb-4 text-3xl font-bold text-text-main sm:text-4xl">
+          <h2 className="mb-4 font-bold text-3xl text-text-main sm:text-4xl">
             なぜ Bingify を選ぶのか
           </h2>
           <p className="text-lg text-text-muted">
@@ -67,14 +67,14 @@ export function Features() {
                   <Icon className="h-7 w-7 text-primary" />
                 </motion.div>
 
-                <h3 className="mb-3 text-xl font-bold text-text-main" id={`feature-title-${index}`}>
+                <h3 className="mb-3 font-bold text-text-main text-xl" id={`feature-title-${index}`}>
                   {feature.title}
                 </h3>
-                <p className="leading-relaxed text-text-muted">{feature.description}</p>
+                <p className="text-text-muted leading-relaxed">{feature.description}</p>
 
                 {/* Accent corner decoration */}
                 <motion.div
-                  className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-secondary/10"
+                  className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-secondary/10"
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
                   viewport={{ once: true }}

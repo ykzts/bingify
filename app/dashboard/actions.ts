@@ -1,9 +1,9 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { spaceSchema } from '@/lib/schemas/space'
+import { randomUUID } from 'node:crypto'
 import { format } from 'date-fns'
-import { randomUUID } from 'crypto'
+import { spaceSchema } from '@/lib/schemas/space'
+import { createClient } from '@/lib/supabase/server'
 
 export type CreateSpaceState = {
   success: boolean
@@ -28,7 +28,7 @@ export async function checkSlugAvailability(slug: string) {
 }
 
 export async function createSpace(
-  prevState: CreateSpaceState,
+  _prevState: CreateSpaceState,
   formData: FormData
 ): Promise<CreateSpaceState> {
   try {

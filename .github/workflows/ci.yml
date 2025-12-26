@@ -26,14 +26,11 @@ jobs:
 
       - run: pnpm install
 
-      - run: pnpm lint
-        name: Run ESLint
+      - run: pnpm check
+        name: Run Biome checks
 
       - run: pnpm type-check
         name: Type check
-
-      - run: pnpm format:check
-        name: Format check
 
       - run: pnpm build
         name: Build
