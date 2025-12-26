@@ -1,20 +1,8 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "extends": ["ultracite/core", "ultracite/next", "ultracite/react"],
-  "formatter": {
-    "lineWidth": 100
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "single",
-      "semicolons": "asNeeded"
-    }
-  },
   "linter": {
     "rules": {
-      "complexity": {
-        "noForEach": "off"
-      },
       "nursery": {
         "useSortedClasses": {
           "level": "warn",
@@ -23,19 +11,6 @@
             "functions": ["cn", "clsx", "twMerge"]
           }
         }
-      },
-      "style": {
-        "noNonNullAssertion": "off"
-      },
-      "suspicious": {
-        "useIterableCallbackReturn": "off"
-      }
-    }
-  },
-  "assist": {
-    "actions": {
-      "source": {
-        "useSortedAttributes": "off"
       }
     }
   }
