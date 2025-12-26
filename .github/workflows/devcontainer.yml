@@ -22,9 +22,6 @@ jobs:
         uses: devcontainers/ci@a56d055efecd725e8cfe370543b6071b79989cc8 # v0.3.2000000349
         with:
           runCmd: |
-            pnpm --version
-            node --version
-            supabase --version
-            supabase start
-            supabase db reset --db-url postgresql://postgres:postgres@127.0.0.1:54322/postgres
-            supabase stop
+            pnpm exec supabase start
+            pnpm exec supabase db reset
+            pnpm exec supabase stop
