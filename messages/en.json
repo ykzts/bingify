@@ -1,4 +1,8 @@
 {
+  "AdminSpace": {
+    "heading": "Admin Dashboard",
+    "spaceId": "Space ID"
+  },
   "Features": {
     "communityDescription": "Perfect for community events, streams, and parties. Easy for everyone to join and enjoy together.",
     "communityTitle": "Community First",
@@ -22,5 +26,9 @@
   "Metadata": {
     "description": "Experience a new kind of bingo that brings everyone together in real-time. No app needed—just share a URL and everyone can join.",
     "title": "Bingify - Turn Every Screen Into A Venue of Excitement."
+  },
+  "UserSpace": {
+    "heading": "Bingo Card",
+    "spaceId": "Space ID"
   }
 }

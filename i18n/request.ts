@@ -1,15 +1,26 @@
 import { getRequestConfig } from "next-intl/server";
+import enMessages from "../messages/en.json";
+import jaMessages from "../messages/ja.json";
 import { routing } from "./routing";
 
-export default getRequestConfig(async ({ requestLocale }) => {
-  let locale = await requestLocale;
+const messages = {
+  en: enMessages,
+  ja: jaMessages,
+} as const;
 
-  if (!(locale && routing.locales.includes(locale as "en" | "ja"))) {
-    locale = routing.defaultLocale;
-  }
+type Locale = keyof typeof messages;
+
+function isValidLocale(locale: string | undefined): locale is Locale {
+  return locale !== undefined && (locale === "en" || locale === "ja");
+}
+
+export default getRequestConfig(async ({ requestLocale }) => {
+  const locale = await requestLocale;
+
+  const validLocale = isValidLocale(locale) ? locale : routing.defaultLocale;
 
   return {
-    locale,
-    messages: (await import(`../messages/${locale}.json`)).default,
+    locale: validLocale,
+    messages: messages[validLocale],
   };
 });

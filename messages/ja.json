@@ -1,4 +1,8 @@
 {
+  "AdminSpace": {
+    "heading": "管理画面",
+    "spaceId": "スペースID"
+  },
   "Features": {
     "communityDescription": "コミュニティイベント、配信、パーティーに最適。誰でも簡単に参加でき、みんなで盛り上がれます。",
     "communityTitle": "Community First",
@@ -22,5 +26,9 @@
   "Metadata": {
     "description": "リアルタイムで盛り上がる、新しいビンゴ体験。アプリ不要、URLを共有するだけで誰でも参加できます。",
     "title": "Bingify - すべての画面を、熱狂の会場に。"
+  },
+  "UserSpace": {
+    "heading": "ビンゴカード",
+    "spaceId": "スペースID"
   }
 }
