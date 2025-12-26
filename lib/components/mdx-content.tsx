@@ -111,30 +111,6 @@ export async function MDXContent({ contentPath, locale }: MDXContentProps) {
           </div>
         </div>
       </div>
-      <footer className="border-gray-200 border-t bg-white py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
-            <Link
-              className="text-gray-600 transition-colors hover:text-gray-900"
-              href="/"
-            >
-              {t("backToHome")}
-            </Link>
-            <Link
-              className="text-gray-600 transition-colors hover:text-gray-900"
-              href="/terms"
-            >
-              {t("terms")}
-            </Link>
-            <Link
-              className="text-gray-600 transition-colors hover:text-gray-900"
-              href="/privacy"
-            >
-              {t("privacy")}
-            </Link>
-          </nav>
-        </div>
-      </footer>
     </div>
   );
 }
