@@ -1,0 +1,26 @@
+{
+  "Features": {
+    "communityDescription": "コミュニティイベント、配信、パーティーに最適。誰でも簡単に参加でき、みんなで盛り上がれます。",
+    "communityTitle": "Community First",
+    "heading": "なぜ Bingify を選ぶのか",
+    "noAppDescription": "アプリのインストール不要。URLを共有するだけで、ブラウザから即座に参加できます。",
+    "noAppTitle": "No App Required",
+    "realtimeDescription": "リアルタイム通信で、全員の画面が同時に更新。遅延なく一体感を演出します。",
+    "realtimeTitle": "Realtime Sync",
+    "subheading": "シンプルで、パワフル。誰でも使える新しいビンゴ体験。"
+  },
+  "Hero": {
+    "badge1": "無料で始める",
+    "badge2": "登録不要",
+    "badge3": "リアルタイム同期",
+    "ctaButton": "ビンゴ会場を作る",
+    "description": "リアルタイムで盛り上がる、新しいビンゴ体験。",
+    "descriptionLine2": "アプリ不要、URLを共有するだけで誰でも参加できます。",
+    "title": "すべての画面を、",
+    "titleHighlight": "熱狂の会場に。"
+  },
+  "Metadata": {
+    "description": "リアルタイムで盛り上がる、新しいビンゴ体験。アプリ不要、URLを共有するだけで誰でも参加できます。",
+    "title": "Bingify - すべての画面を、熱狂の会場に。"
+  }
+}

@@ -1,10 +1,14 @@
+import createIntlMiddleware from "next-intl/middleware";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { routing } from "./i18n/routing";
 import { checkBasicAuth } from "./lib/auth/basic-auth";
 import {
   handleShareKeyRewrite,
   validateShareKey,
 } from "./lib/middleware/share-key";
+
+const intlMiddleware = createIntlMiddleware(routing);
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -25,14 +29,16 @@ export async function proxy(request: NextRequest) {
     }
 
     try {
-      return await handleShareKeyRewrite(request, shareKey);
+      const response = await handleShareKeyRewrite(request, shareKey);
+      return response;
     } catch (error) {
       console.error("Middleware lookup error:", error);
       return new NextResponse("Internal Server Error", { status: 500 });
     }
   }
 
-  return NextResponse.next();
+  // --- 3. Internationalization Routing ---
+  return intlMiddleware(request);
 }
 
 export const config = {

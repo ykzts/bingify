@@ -2,29 +2,29 @@
 
 import { Globe, Users, Zap } from "lucide-react";
 import { motion } from "motion/react";
-
-const features = [
-  {
-    description:
-      "リアルタイム通信で、全員の画面が同時に更新。遅延なく一体感を演出します。",
-    icon: Zap,
-    title: "Realtime Sync",
-  },
-  {
-    description:
-      "コミュニティイベント、配信、パーティーに最適。誰でも簡単に参加でき、みんなで盛り上がれます。",
-    icon: Users,
-    title: "Community First",
-  },
-  {
-    description:
-      "アプリのインストール不要。URLを共有するだけで、ブラウザから即座に参加できます。",
-    icon: Globe,
-    title: "No App Required",
-  },
-];
+import { useTranslations } from "next-intl";
 
 export function Features() {
+  const t = useTranslations("Features");
+
+  const features = [
+    {
+      descriptionKey: "realtimeDescription",
+      icon: Zap,
+      titleKey: "realtimeTitle",
+    },
+    {
+      descriptionKey: "communityDescription",
+      icon: Users,
+      titleKey: "communityTitle",
+    },
+    {
+      descriptionKey: "noAppDescription",
+      icon: Globe,
+      titleKey: "noAppTitle",
+    },
+  ];
+
   return (
     <section className="px-6 py-20">
       <div className="mx-auto max-w-6xl">
@@ -36,11 +36,9 @@ export function Features() {
           whileInView={{ opacity: 1, y: 0 }}
         >
           <h2 className="mb-4 font-bold text-3xl text-text-main sm:text-4xl">
-            なぜ Bingify を選ぶのか
+            {t("heading")}
           </h2>
-          <p className="text-lg text-text-muted">
-            シンプルで、パワフル。誰でも使える新しいビンゴ体験。
-          </p>
+          <p className="text-lg text-text-muted">{t("subheading")}</p>
         </motion.div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -51,7 +49,7 @@ export function Features() {
                 aria-labelledby={`feature-title-${index}`}
                 className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-shadow hover:shadow-xl"
                 initial={{ opacity: 0, y: 20 }}
-                key={feature.title}
+                key={feature.titleKey}
                 role="article"
                 transition={{ delay: index * 0.2, duration: 0.6 }}
                 viewport={{ once: true }}
@@ -73,13 +71,12 @@ export function Features() {
                   className="mb-3 font-bold text-text-main text-xl"
                   id={`feature-title-${index}`}
                 >
-                  {feature.title}
+                  {t(feature.titleKey)}
                 </h3>
                 <p className="text-text-muted leading-relaxed">
-                  {feature.description}
+                  {t(feature.descriptionKey)}
                 </p>
 
-                {/* Accent corner decoration */}
                 <motion.div
                   className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-secondary/10"
                   initial={{ scale: 0 }}

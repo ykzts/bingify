@@ -35,7 +35,8 @@ export async function handleShareKeyRewrite(
   }
 
   const url = request.nextUrl.clone();
-  url.pathname = `/spaces/${data.id}`;
+  const locale = request.headers.get("x-next-intl-locale") || "en";
+  url.pathname = `/${locale}/spaces/${data.id}`;
   return NextResponse.rewrite(url);
 }
 

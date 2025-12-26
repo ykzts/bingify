@@ -1,0 +1,26 @@
+{
+  "Features": {
+    "communityDescription": "Perfect for community events, streams, and parties. Easy for everyone to join and enjoy together.",
+    "communityTitle": "Community First",
+    "heading": "Why Choose Bingify",
+    "noAppDescription": "No app installation required. Join instantly from your browser just by sharing a URL.",
+    "noAppTitle": "No App Required",
+    "realtimeDescription": "Real-time communication ensures all screens update simultaneously. Experience unity without delay.",
+    "realtimeTitle": "Realtime Sync",
+    "subheading": "Simple, powerful. A new bingo experience for everyone."
+  },
+  "Hero": {
+    "badge1": "Start for free",
+    "badge2": "No registration required",
+    "badge3": "Real-time sync",
+    "ctaButton": "Create Bingo Space",
+    "description": "Experience a new kind of bingo that brings everyone together in real-time.",
+    "descriptionLine2": "No app needed—just share a URL and everyone can join.",
+    "title": "Turn Every Screen Into",
+    "titleHighlight": "A Venue of Excitement."
+  },
+  "Metadata": {
+    "description": "Experience a new kind of bingo that brings everyone together in real-time. No app needed—just share a URL and everyone can join.",
+    "title": "Bingify - Turn Every Screen Into A Venue of Excitement."
+  }
+}
