@@ -2,26 +2,43 @@
 
 import { Globe, Users, Zap } from "lucide-react";
 import { motion } from "motion/react";
-import { useTranslations } from "next-intl";
 
-export function Features() {
-  const t = useTranslations("Features");
+interface FeaturesProps {
+  communityDescription: string;
+  communityTitle: string;
+  heading: string;
+  noAppDescription: string;
+  noAppTitle: string;
+  realtimeDescription: string;
+  realtimeTitle: string;
+  subheading: string;
+}
 
+export function Features({
+  communityDescription,
+  communityTitle,
+  heading,
+  noAppDescription,
+  noAppTitle,
+  realtimeDescription,
+  realtimeTitle,
+  subheading,
+}: FeaturesProps) {
   const features = [
     {
-      descriptionKey: "realtimeDescription",
+      description: realtimeDescription,
       icon: Zap,
-      titleKey: "realtimeTitle",
+      title: realtimeTitle,
     },
     {
-      descriptionKey: "communityDescription",
+      description: communityDescription,
       icon: Users,
-      titleKey: "communityTitle",
+      title: communityTitle,
     },
     {
-      descriptionKey: "noAppDescription",
+      description: noAppDescription,
       icon: Globe,
-      titleKey: "noAppTitle",
+      title: noAppTitle,
     },
   ];
 
@@ -36,9 +53,9 @@ export function Features() {
           whileInView={{ opacity: 1, y: 0 }}
         >
           <h2 className="mb-4 font-bold text-3xl text-text-main sm:text-4xl">
-            {t("heading")}
+            {heading}
           </h2>
-          <p className="text-lg text-text-muted">{t("subheading")}</p>
+          <p className="text-lg text-text-muted">{subheading}</p>
         </motion.div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -49,7 +66,7 @@ export function Features() {
                 aria-labelledby={`feature-title-${index}`}
                 className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-shadow hover:shadow-xl"
                 initial={{ opacity: 0, y: 20 }}
-                key={feature.titleKey}
+                key={feature.title}
                 role="article"
                 transition={{ delay: index * 0.2, duration: 0.6 }}
                 viewport={{ once: true }}
@@ -71,10 +88,10 @@ export function Features() {
                   className="mb-3 font-bold text-text-main text-xl"
                   id={`feature-title-${index}`}
                 >
-                  {t(feature.titleKey)}
+                  {feature.title}
                 </h3>
                 <p className="text-text-muted leading-relaxed">
-                  {t(feature.descriptionKey)}
+                  {feature.description}
                 </p>
 
                 <motion.div
