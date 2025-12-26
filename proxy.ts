@@ -10,8 +10,9 @@ import {
 import { createClient } from "./lib/supabase/middleware";
 
 const intlMiddleware = createIntlMiddleware(routing);
+const LOCALE_PATTERN = /^\/(en|ja)\//;
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // --- 1. Basic Auth Check (Highest Priority) ---
@@ -23,14 +24,14 @@ export async function proxy(request: NextRequest) {
   // --- 2. Supabase Auth Check for /dashboard routes ---
   if (pathname.includes("/dashboard")) {
     const response = NextResponse.next();
-    const supabase = await createClient(request, response);
+    const supabase = createClient(request, response);
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
       // Extract locale from pathname if present
-      const localeMatch = pathname.match(/^\/(en|ja)\//);
+      const localeMatch = pathname.match(LOCALE_PATTERN);
       const locale = localeMatch ? localeMatch[1] : routing.defaultLocale;
       const loginUrl = new URL(`/${locale}/login`, request.url);
       return NextResponse.redirect(loginUrl);

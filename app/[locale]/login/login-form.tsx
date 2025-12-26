@@ -32,7 +32,9 @@ export function LoginForm() {
 
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p className="text-center text-red-800 text-sm">{t("errorMessage")}</p>
+          <p className="text-center text-red-800 text-sm">
+            {t("errorMessage")}
+          </p>
         </div>
       )}
 
@@ -42,7 +44,8 @@ export function LoginForm() {
           onClick={() => handleOAuthLogin("google")}
           type="button"
         >
-          <svg className="h-5 w-5" viewBox="0 0 24 24">
+          <svg aria-label="Google" className="h-5 w-5" viewBox="0 0 24 24">
+            <title>Google</title>
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
               fill="#4285F4"
@@ -68,7 +71,12 @@ export function LoginForm() {
           onClick={() => handleOAuthLogin("twitch")}
           type="button"
         >
-          <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+          <svg
+            aria-label="Twitch"
+            className="h-5 w-5 fill-current"
+            viewBox="0 0 24 24"
+          >
+            <title>Twitch</title>
             <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
           </svg>
           {t("twitchButton")}

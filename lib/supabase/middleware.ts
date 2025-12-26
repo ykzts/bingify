@@ -1,10 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import type { NextRequest, NextResponse } from "next/server";
 
-export async function createClient(
-  request: NextRequest,
-  response: NextResponse,
-) {
+export function createClient(request: NextRequest, response: NextResponse) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
