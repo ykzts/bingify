@@ -5,11 +5,14 @@ import { format } from "date-fns";
 import { spaceSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 
+const MAX_SLUG_SUGGESTIONS = 10;
+
 export interface CreateSpaceState {
   success: boolean;
   error?: string;
   spaceId?: string;
   shareKey?: string;
+  suggestion?: string;
 }
 
 export async function checkSlugAvailability(slug: string) {
@@ -29,6 +32,29 @@ export async function checkSlugAvailability(slug: string) {
     console.error("Slug check error:", error);
     return { available: false };
   }
+}
+
+async function findAvailableSlug(
+  baseSlug: string,
+  dateSuffix: string,
+  supabase: Awaited<ReturnType<typeof createClient>>
+): Promise<string | null> {
+  // Try suggestions with incrementing numbers
+  for (let i = 2; i <= MAX_SLUG_SUGGESTIONS; i++) {
+    const suggestion = `${baseSlug}-${i}-${dateSuffix}`;
+    const { data } = await supabase
+      .from("spaces")
+      .select("id")
+      .eq("share_key", suggestion)
+      .single();
+
+    if (!data) {
+      return suggestion;
+    }
+  }
+
+  // If no suggestion found within max attempts, return null
+  return null;
 }
 
 export async function createSpace(
@@ -60,9 +86,21 @@ export async function createSpace(
       .single();
 
     if (existing) {
+      // Find an available suggestion
+      const suggestion = await findAvailableSlug(slug, dateSuffix, supabase);
+
+      if (!suggestion) {
+        return {
+          error:
+            "利用可能なスラグが見つかりませんでした。別の名前をお試しください。",
+          success: false,
+        };
+      }
+
       return {
         error: "このスラグは既に使用されています",
         success: false,
+        suggestion,
       };
     }
 

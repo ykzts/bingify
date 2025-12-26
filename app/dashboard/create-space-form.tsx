@@ -34,6 +34,20 @@ export function CreateSpaceForm() {
     }
   };
 
+  const handleAcceptSuggestion = () => {
+    if (state.suggestion) {
+      // Extract the slug part from suggestion
+      // Format: "slug-2-20251226" or "my-party-3-20251226"
+      // Remove the last part (date suffix): "-20251226"
+      const suggestionWithoutDate = state.suggestion.replace(
+        `-${dateSuffix}`,
+        ""
+      );
+      setSlug(suggestionWithoutDate);
+      setAvailable(null);
+    }
+  };
+
   useEffect(() => {
     if (!debouncedSlug || debouncedSlug.length < 3) {
       return;
@@ -125,8 +139,27 @@ export function CreateSpaceForm() {
         </div>
 
         {state.error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">
-            {state.error}
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+            <p className="text-red-800">{state.error}</p>
+            {state.suggestion && (
+              <div className="mt-3">
+                <p className="mb-2 text-red-700 text-sm">
+                  代わりにこちらを使用できます:
+                </p>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 rounded bg-white px-3 py-2 font-mono text-sm">
+                    {state.suggestion}
+                  </code>
+                  <button
+                    className="rounded-lg bg-red-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-red-700"
+                    onClick={handleAcceptSuggestion}
+                    type="button"
+                  >
+                    使用する
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
