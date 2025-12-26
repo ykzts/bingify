@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { LanguageSwitcher } from "./_components/language-switcher";
 import "../globals.css";
 
 const nunito = Nunito({
+  display: "swap",
   subsets: ["latin"],
   variable: "--font-nunito",
 });
@@ -36,9 +43,18 @@ export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const messages = await getMessages();
+
   return (
     <html lang={locale}>
-      <body className={`${nunito.variable} antialiased`}>{children}</body>
+      <body className={`${nunito.variable} antialiased`}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <div className="fixed top-4 right-4 z-50">
+            <LanguageSwitcher />
+          </div>
+          {children}
+        </NextIntlClientProvider>
+      </body>
     </html>
   );
 }

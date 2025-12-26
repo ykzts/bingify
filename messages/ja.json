@@ -23,6 +23,10 @@
     "title": "すべての画面を、",
     "titleHighlight": "熱狂の会場に。"
   },
+  "LanguageSwitcher": {
+    "label": "言語",
+    "selectLanguage": "言語を選択"
+  },
   "Metadata": {
     "description": "リアルタイムで盛り上がる、新しいビンゴ体験。アプリ不要、URLを共有するだけで誰でも参加できます。",
     "title": "Bingify - すべての画面を、熱狂の会場に。"
