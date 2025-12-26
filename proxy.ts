@@ -10,8 +10,10 @@ import {
 import { createClient } from "./lib/supabase/middleware";
 
 const intlMiddleware = createIntlMiddleware(routing);
-const LOCALE_PATTERN = /^\/(en|ja)\//;
-const DASHBOARD_PATTERN = /^\/(en|ja)\/dashboard(\/|$)/;
+const LOCALE_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/`);
+const DASHBOARD_PATTERN = new RegExp(
+  `^/(${routing.locales.join("|")})/dashboard(/|$)`
+);
 
 function isDashboardPath(pathname: string): boolean {
   return (
@@ -23,7 +25,7 @@ function isDashboardPath(pathname: string): boolean {
 
 async function handleDashboardAuth(
   request: NextRequest,
-  pathname: string,
+  pathname: string
 ): Promise<NextResponse> {
   // Run intl middleware first to handle locale detection
   const intlResponse = intlMiddleware(request);
