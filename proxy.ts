@@ -8,6 +8,7 @@ const handleI18n = createMiddleware(routing);
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const SHARE_KEY_REGEX = /^[a-zA-Z0-9-]+$/;
 
 function createUnauthorizedResponse() {
   return new NextResponse("Unauthorized", {
@@ -23,6 +24,14 @@ function isValidLocale(locale: string): boolean {
 function checkBasicAuth(req: NextRequest): NextResponse | null {
   if (process.env.ENABLE_BASIC_AUTH !== "true") {
     return null;
+  }
+
+  // Validate required environment variables
+  if (!(process.env.BASIC_AUTH_USER && process.env.BASIC_AUTH_PASSWORD)) {
+    console.error(
+      "BASIC_AUTH_USER and BASIC_AUTH_PASSWORD must be set when ENABLE_BASIC_AUTH is true"
+    );
+    return createUnauthorizedResponse();
   }
 
   const basicAuth = req.headers.get("authorization");
@@ -64,6 +73,53 @@ function checkBasicAuth(req: NextRequest): NextResponse | null {
   return null;
 }
 
+async function handleShareKeyRewrite(
+  request: NextRequest,
+  shareKey: string
+): Promise<NextResponse> {
+  // Validate required Supabase credentials
+  if (
+    !(
+      process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    )
+  ) {
+    console.error("Supabase credentials are not configured");
+    return NextResponse.redirect(new URL("/500", request.url));
+  }
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+
+  const { data, error } = await supabase
+    .from("spaces")
+    .select("id")
+    .eq("share_key", shareKey)
+    .single();
+
+  if (error || !data) {
+    return NextResponse.redirect(new URL("/404", request.url));
+  }
+
+  // Validate UUID format for security
+  if (!UUID_REGEX.test(data.id)) {
+    console.error("Invalid UUID format:", data.id);
+    return NextResponse.redirect(new URL("/404", request.url));
+  }
+
+  const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
+  const locale =
+    cookieLocale && isValidLocale(cookieLocale)
+      ? cookieLocale
+      : routing.defaultLocale;
+
+  const url = request.nextUrl.clone();
+  url.pathname = `/${locale}/spaces/${data.id}`;
+  return NextResponse.rewrite(url);
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -77,37 +133,13 @@ export async function proxy(request: NextRequest) {
   if (pathname.startsWith("/@")) {
     const shareKey = pathname.slice(2);
 
+    // Validate share key format
+    if (!(shareKey && SHARE_KEY_REGEX.test(shareKey))) {
+      return NextResponse.redirect(new URL("/404", request.url));
+    }
+
     try {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-      );
-
-      const { data, error } = await supabase
-        .from("spaces")
-        .select("id")
-        .eq("share_key", shareKey)
-        .single();
-
-      if (error || !data) {
-        return NextResponse.redirect(new URL("/404", request.url));
-      }
-
-      // Validate UUID format for security
-      if (!UUID_REGEX.test(data.id)) {
-        console.error("Invalid UUID format:", data.id);
-        return NextResponse.redirect(new URL("/404", request.url));
-      }
-
-      const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
-      const locale =
-        cookieLocale && isValidLocale(cookieLocale)
-          ? cookieLocale
-          : routing.defaultLocale;
-
-      const url = request.nextUrl.clone();
-      url.pathname = `/${locale}/spaces/${data.id}`;
-      return NextResponse.rewrite(url);
+      return await handleShareKeyRewrite(request, shareKey);
     } catch (error) {
       console.error("Middleware lookup error:", error);
       return NextResponse.redirect(new URL("/500", request.url));
