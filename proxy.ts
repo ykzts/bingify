@@ -1,10 +1,14 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import createIntlMiddleware from "next-intl/middleware";
+import { routing } from "./i18n/routing";
 import { checkBasicAuth } from "./lib/auth/basic-auth";
 import {
   handleShareKeyRewrite,
   validateShareKey,
 } from "./lib/middleware/share-key";
+
+const intlMiddleware = createIntlMiddleware(routing);
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -25,14 +29,34 @@ export async function proxy(request: NextRequest) {
     }
 
     try {
-      return await handleShareKeyRewrite(request, shareKey);
+      // Run intl middleware first to detect locale and set headers/cookies
+      const intlResponse = intlMiddleware(request);
+
+      // Get the locale from the intl middleware response
+      const locale =
+        intlResponse.cookies.get("NEXT_LOCALE")?.value || routing.defaultLocale;
+
+      // Now handle the share key rewrite with the detected locale
+      const response = await handleShareKeyRewrite(request, shareKey, locale);
+
+      // Copy locale cookie from intl response to our rewrite response
+      const localeCookie = intlResponse.cookies.get("NEXT_LOCALE");
+      if (localeCookie) {
+        response.cookies.set("NEXT_LOCALE", localeCookie.value, {
+          path: "/",
+          sameSite: "lax",
+        });
+      }
+
+      return response;
     } catch (error) {
       console.error("Middleware lookup error:", error);
       return new NextResponse("Internal Server Error", { status: 500 });
     }
   }
 
-  return NextResponse.next();
+  // --- 3. Internationalization Routing ---
+  return intlMiddleware(request);
 }
 
 export const config = {

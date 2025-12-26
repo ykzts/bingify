@@ -3,28 +3,45 @@
 import { Globe, Users, Zap } from "lucide-react";
 import { motion } from "motion/react";
 
-const features = [
-  {
-    description:
-      "リアルタイム通信で、全員の画面が同時に更新。遅延なく一体感を演出します。",
-    icon: Zap,
-    title: "Realtime Sync",
-  },
-  {
-    description:
-      "コミュニティイベント、配信、パーティーに最適。誰でも簡単に参加でき、みんなで盛り上がれます。",
-    icon: Users,
-    title: "Community First",
-  },
-  {
-    description:
-      "アプリのインストール不要。URLを共有するだけで、ブラウザから即座に参加できます。",
-    icon: Globe,
-    title: "No App Required",
-  },
-];
+interface FeaturesProps {
+  communityDescription: string;
+  communityTitle: string;
+  heading: string;
+  noAppDescription: string;
+  noAppTitle: string;
+  realtimeDescription: string;
+  realtimeTitle: string;
+  subheading: string;
+}
 
-export function Features() {
+export function Features({
+  communityDescription,
+  communityTitle,
+  heading,
+  noAppDescription,
+  noAppTitle,
+  realtimeDescription,
+  realtimeTitle,
+  subheading,
+}: FeaturesProps) {
+  const features = [
+    {
+      description: realtimeDescription,
+      icon: Zap,
+      title: realtimeTitle,
+    },
+    {
+      description: communityDescription,
+      icon: Users,
+      title: communityTitle,
+    },
+    {
+      description: noAppDescription,
+      icon: Globe,
+      title: noAppTitle,
+    },
+  ];
+
   return (
     <section className="px-6 py-20">
       <div className="mx-auto max-w-6xl">
@@ -36,11 +53,9 @@ export function Features() {
           whileInView={{ opacity: 1, y: 0 }}
         >
           <h2 className="mb-4 font-bold text-3xl text-text-main sm:text-4xl">
-            なぜ Bingify を選ぶのか
+            {heading}
           </h2>
-          <p className="text-lg text-text-muted">
-            シンプルで、パワフル。誰でも使える新しいビンゴ体験。
-          </p>
+          <p className="text-lg text-text-muted">{subheading}</p>
         </motion.div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -79,7 +94,6 @@ export function Features() {
                   {feature.description}
                 </p>
 
-                {/* Accent corner decoration */}
                 <motion.div
                   className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-secondary/10"
                   initial={{ scale: 0 }}

@@ -6,7 +6,8 @@ const SHARE_KEY_REGEX = /^[a-zA-Z0-9-]+$/;
 
 export async function handleShareKeyRewrite(
   request: NextRequest,
-  shareKey: string
+  shareKey: string,
+  locale: string
 ): Promise<NextResponse> {
   // Validate required Supabase credentials
   if (
@@ -35,7 +36,7 @@ export async function handleShareKeyRewrite(
   }
 
   const url = request.nextUrl.clone();
-  url.pathname = `/spaces/${data.id}`;
+  url.pathname = `/${locale}/spaces/${data.id}`;
   return NextResponse.rewrite(url);
 }
 

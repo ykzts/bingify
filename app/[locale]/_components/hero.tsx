@@ -4,7 +4,27 @@ import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 
-export function Hero() {
+interface HeroProps {
+  badge1: string;
+  badge2: string;
+  badge3: string;
+  ctaButton: string;
+  description: string;
+  descriptionLine2: string;
+  title: string;
+  titleHighlight: string;
+}
+
+export function Hero({
+  badge1,
+  badge2,
+  badge3,
+  ctaButton,
+  description,
+  descriptionLine2,
+  title,
+  titleHighlight,
+}: HeroProps) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -25,10 +45,10 @@ export function Hero() {
             type: "spring",
           }}
         >
-          すべての画面を、
+          {title}
           <br />
           <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            熱狂の会場に。
+            {titleHighlight}
           </span>
         </motion.h1>
 
@@ -38,9 +58,9 @@ export function Hero() {
           initial={{ opacity: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
         >
-          リアルタイムで盛り上がる、新しいビンゴ体験。
+          {description}
           <br />
-          アプリ不要、URLを共有するだけで誰でも参加できます。
+          {descriptionLine2}
         </motion.p>
 
         <motion.div
@@ -62,7 +82,7 @@ export function Hero() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              ビンゴ会場を作る
+              {ctaButton}
               <motion.span
                 animate={shouldReduceMotion ? {} : { x: [0, 4, 0] }}
                 className="inline-block"
@@ -86,15 +106,15 @@ export function Hero() {
         >
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 rounded-full bg-accent" />
-            無料で始める
+            {badge1}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 rounded-full bg-secondary" />
-            登録不要
+            {badge2}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 rounded-full bg-primary" />
-            リアルタイム同期
+            {badge3}
           </span>
         </motion.div>
       </motion.div>
