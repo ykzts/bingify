@@ -56,7 +56,7 @@
   - データベーステーブル: `spaces`
   - 型定義: `Space`（未明示的定義）
   - ルートパラメータ: `[id]`
-- **関連用語**: Share Key, Space ID, Slug
+- **関連用語**: Share Key, Space ID
 
 ### 2.2 Share Key（共有キー）
 - **定義**: スペースを一意に識別するための人間が読める文字列。URLに含まれ、外部に共有される
@@ -64,22 +64,13 @@
 - **日本語**: 共有キー / シェアキー
 - **コード上の命名**: 
   - データベースカラム: `spaces.share_key`
-  - Zod スキーマ: `spaceSchema.slug`
-- **形式**: `<user-input-slug>-<YYYYMMDD>` （例: `my-party-20251224`）
-- **制約**: 小文字の英数字とハイフンのみ、3〜30文字
-- **関連用語**: Slug
-
-### 2.3 Slug
-- **定義**: ユーザーが入力する、スペースを識別するための短い文字列。日付サフィックスと組み合わせて Share Key になる
-- **英語**: Slug
-- **日本語**: スラグ
-- **コード上の命名**: 
   - フォームフィールド: `slug`
   - Zod スキーマ: `spaceSchema.slug`
-- **形式**: 小文字の英数字とハイフン、3〜30文字
-- **例**: `my-party` → Share Key: `my-party-20251224`
+- **形式**: `<user-input>-<YYYYMMDD>` （例: `my-party-20251224`）
+- **制約**: 小文字の英数字とハイフンのみ、3〜30文字
+- **備考**: 将来的に日付サフィックスは有料オプションなどで省略可能となる可能性がある
 
-### 2.4 Space ID
+### 2.3 Space ID
 - **定義**: スペースを一意に識別するためのUUID。内部的なルーティングやデータベースの主キーとして使用される
 - **英語**: Space ID
 - **日本語**: スペースID
@@ -89,7 +80,7 @@
 - **形式**: UUID v4
 - **例**: `550e8400-e29b-41d4-a716-446655440000`
 
-### 2.5 Bingo Card（ビンゴカード）
+### 2.4 Bingo Card（ビンゴカード）
 - **定義**: 参加者が持つビンゴの数字カード
 - **英語**: Bingo Card
 - **日本語**: ビンゴカード
@@ -98,7 +89,7 @@
   - 型定義: `BingoCard`（未明示的定義）
 - **関連フィールド**: `space_id`, `user_id`, `numbers`
 
-### 2.6 Called Numbers（抽選済み番号）
+### 2.5 Called Numbers（抽選済み番号）
 - **定義**: ビンゴで既に抽選された番号
 - **英語**: Called Numbers
 - **日本語**: 抽選済み番号 / コール済み番号
@@ -107,14 +98,14 @@
   - 型定義: `CalledNumber`（未明示的定義）
 - **関連フィールド**: `space_id`, `value`, `called_at`
 
-### 2.7 View Token（閲覧トークン）
+### 2.6 View Token（閲覧トークン）
 - **定義**: 特定のスペースを閲覧するための一時的なトークン（将来実装予定）
 - **英語**: View Token
 - **日本語**: 閲覧トークン
 - **コード上の命名**: 未実装
 - **用途**: 限定公開スペースへのアクセス制御
 
-### 2.8 Gatekeeper（ゲートキーパー）
+### 2.7 Gatekeeper（ゲートキーパー）
 - **定義**: アクセス制御を行う機能（将来実装予定）
 - **英語**: Gatekeeper
 - **日本語**: ゲートキーパー
@@ -168,16 +159,17 @@
   - 環境変数: `ENABLE_BASIC_AUTH`, `BASIC_AUTH_USER`, `BASIC_AUTH_PASSWORD`
 - **用途**: 公開前の制限、ステージング環境保護
 
-### 3.6 Middleware（ミドルウェア）
-- **定義**: Next.js のミドルウェア。リクエストを処理し、URL書き換えやアクセス制御を行う
-- **英語**: Middleware
-- **日本語**: ミドルウェア
+### 3.6 Proxy（プロキシ）
+- **定義**: Next.js の Proxy（旧 Middleware）。リクエストを処理し、URL書き換えやアクセス制御を行う
+- **英語**: Proxy
+- **日本語**: プロキシ
 - **コード上の命名**: 
   - ファイルパス: `lib/middleware/share-key.ts`
   - 関数: `handleShareKeyRewrite`, `validateShareKey`
 - **主要機能**: 
   - `/@<share_key>` → `/[locale]/spaces/[id]` への内部書き換え
   - Share Key のバリデーション
+- **参考**: https://nextjs.org/docs/app/api-reference/file-conventions/proxy
 
 ### 3.7 Zod Schema（Zodスキーマ）
 - **定義**: Zod ライブラリを使用した、データバリデーションとTypeScript型推論のためのスキーマ定義
@@ -197,7 +189,7 @@
 - **形式**: `/@<share_key>`
 - **例**: `/@my-party-20251224`
 - **用途**: 参加者がビンゴカードを表示するための公開URL
-- **内部動作**: ミドルウェアで `/[locale]/spaces/[id]` に書き換え
+- **内部動作**: Proxy で `/[locale]/spaces/[id]` に書き換え
 
 ### 4.2 内部URL
 - **形式**: `/[locale]/spaces/[id]`
