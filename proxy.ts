@@ -29,7 +29,16 @@ function checkBasicAuth(req: NextRequest): NextResponse | null {
   }
 
   try {
-    const [user, pwd] = atob(authValue).split(":");
+    const decodedAuth = atob(authValue);
+    const colonIndex = decodedAuth.indexOf(":");
+
+    if (colonIndex === -1) {
+      return createUnauthorizedResponse();
+    }
+
+    const user = decodedAuth.substring(0, colonIndex);
+    const pwd = decodedAuth.substring(colonIndex + 1);
+
     if (
       user !== process.env.BASIC_AUTH_USER ||
       pwd !== process.env.BASIC_AUTH_PASSWORD
@@ -73,8 +82,11 @@ export async function proxy(request: NextRequest) {
       }
 
       const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
+      const isValidLocale = (locale: string): boolean => {
+        return routing.locales.some((l) => l === locale);
+      };
       const locale =
-        cookieLocale && routing.locales.includes(cookieLocale as never)
+        cookieLocale && isValidLocale(cookieLocale)
           ? cookieLocale
           : routing.defaultLocale;
 
