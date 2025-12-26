@@ -22,14 +22,20 @@
   "devDependencies": {
     "@biomejs/biome": "2.3.10",
     "@tailwindcss/postcss": "4.1.18",
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.1",
     "@types/node": "24.10.4",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.1.2",
+    "jsdom": "27.4.0",
     "postcss-load-config": "6.0.1",
     "supabase": "2.70.5",
     "tailwindcss": "4.1.18",
     "typescript": "5.9.3",
-    "ultracite": "6.5.0"
+    "ultracite": "6.5.0",
+    "vitest": "4.0.16"
   },
   "homepage": "https://bingify.space/",
   "license": "MIT",
@@ -53,6 +59,9 @@
     "supabase:start": "supabase start",
     "supabase:status": "supabase status",
     "supabase:stop": "supabase stop",
+    "test": "vitest",
+    "test:ci": "vitest run",
+    "test:ui": "vitest --ui",
     "type-check": "tsc --noEmit"
   },
   "version": "0.1.0"
