@@ -2,7 +2,6 @@
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
     'github>ykzts/ykzts//renovate-config/default.json5',
-    ':reviewer(ykzts)',
-    'helpers:pinGitHubActionDigests'
+    ':reviewer(ykzts)'
   ]
 }
