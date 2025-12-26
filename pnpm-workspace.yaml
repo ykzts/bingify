@@ -2,4 +2,7 @@ ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
 
+onlyBuiltDependencies:
+  - supabase
+
 savePrefix: ''
