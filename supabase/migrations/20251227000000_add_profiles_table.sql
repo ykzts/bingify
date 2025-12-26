@@ -21,7 +21,14 @@ CREATE POLICY "Users can read their own profile"
 CREATE POLICY "Users can update their own profile"
   ON profiles
   FOR UPDATE
-  USING (auth.uid() = id);
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
+
+-- Create policy to allow users to insert their own profile
+CREATE POLICY "Users can insert their own profile"
+  ON profiles
+  FOR INSERT
+  WITH CHECK (auth.uid() = id);
 
 -- Function to handle new user creation
 CREATE OR REPLACE FUNCTION handle_new_user()
@@ -33,7 +40,12 @@ BEGIN
     NEW.email,
     NEW.raw_user_meta_data->>'full_name',
     NEW.raw_user_meta_data->>'avatar_url'
-  );
+  )
+  ON CONFLICT (id) DO UPDATE
+    SET email = EXCLUDED.email,
+        full_name = EXCLUDED.full_name,
+        avatar_url = EXCLUDED.avatar_url,
+        updated_at = NOW();
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

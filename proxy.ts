@@ -11,6 +11,37 @@ import { createClient } from "./lib/supabase/middleware";
 
 const intlMiddleware = createIntlMiddleware(routing);
 const LOCALE_PATTERN = /^\/(en|ja)\//;
+const DASHBOARD_PATTERN = /^\/(en|ja)\/dashboard(\/|$)/;
+
+function isDashboardPath(pathname: string): boolean {
+  return (
+    pathname === "/dashboard" ||
+    pathname.startsWith("/dashboard/") ||
+    Boolean(pathname.match(DASHBOARD_PATTERN))
+  );
+}
+
+async function handleDashboardAuth(
+  request: NextRequest,
+  pathname: string,
+): Promise<NextResponse> {
+  // Run intl middleware first to handle locale detection
+  const intlResponse = intlMiddleware(request);
+  const supabase = createClient(request, intlResponse);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    // Extract locale from pathname if present; default to unprefixed login
+    const localeMatch = pathname.match(LOCALE_PATTERN);
+    const loginPath = localeMatch ? `/${localeMatch[1]}/login` : "/login";
+    const loginUrl = new URL(loginPath, request.url);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return intlResponse;
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -22,22 +53,8 @@ export async function proxy(request: NextRequest) {
   }
 
   // --- 2. Supabase Auth Check for /dashboard routes ---
-  if (pathname.includes("/dashboard")) {
-    const response = NextResponse.next();
-    const supabase = createClient(request, response);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      // Extract locale from pathname if present
-      const localeMatch = pathname.match(LOCALE_PATTERN);
-      const locale = localeMatch ? localeMatch[1] : routing.defaultLocale;
-      const loginUrl = new URL(`/${locale}/login`, request.url);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    return response;
+  if (isDashboardPath(pathname)) {
+    return handleDashboardAuth(request, pathname);
   }
 
   // --- 3. Share Key Rewrite Logic ---

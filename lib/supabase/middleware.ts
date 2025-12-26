@@ -16,7 +16,6 @@ export function createClient(request: NextRequest, response: NextResponse) {
       },
       setAll(cookiesToSet) {
         for (const { name, value, options } of cookiesToSet) {
-          request.cookies.set(name, value);
           response.cookies.set(name, value, options);
         }
       },

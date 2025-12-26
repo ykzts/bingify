@@ -2,14 +2,17 @@
 
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export function LoginForm() {
   const t = useTranslations("Login");
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
+  const [oauthError, setOauthError] = useState<string | null>(null);
 
   const handleOAuthLogin = async (provider: "google" | "twitch") => {
+    setOauthError(null);
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
       options: {
@@ -20,8 +23,11 @@ export function LoginForm() {
 
     if (error) {
       console.error("OAuth error:", error);
+      setOauthError(error.message);
     }
   };
+
+  const displayError = error || oauthError;
 
   return (
     <div className="mx-auto max-w-md space-y-6 p-8">
@@ -30,21 +36,22 @@ export function LoginForm() {
         <p className="text-gray-600">{t("description")}</p>
       </div>
 
-      {error && (
+      {displayError && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4">
           <p className="text-center text-red-800 text-sm">
-            {t("errorMessage")}
+            {error ? t("errorMessage") : displayError}
           </p>
         </div>
       )}
 
       <div className="space-y-3">
         <button
+          aria-label={t("googleButton")}
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition hover:bg-gray-50"
           onClick={() => handleOAuthLogin("google")}
           type="button"
         >
-          <svg aria-label="Google" className="h-5 w-5" viewBox="0 0 24 24">
+          <svg className="h-5 w-5" viewBox="0 0 24 24">
             <title>Google</title>
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -67,15 +74,12 @@ export function LoginForm() {
         </button>
 
         <button
+          aria-label={t("twitchButton")}
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#9146FF] px-6 py-3 font-medium text-white transition hover:bg-[#7D3BE6]"
           onClick={() => handleOAuthLogin("twitch")}
           type="button"
         >
-          <svg
-            aria-label="Twitch"
-            className="h-5 w-5 fill-current"
-            viewBox="0 0 24 24"
-          >
+          <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
             <title>Twitch</title>
             <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
           </svg>
