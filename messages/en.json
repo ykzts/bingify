@@ -13,6 +13,11 @@
     "realtimeTitle": "Realtime Sync",
     "subheading": "Simple, powerful. A new bingo experience for everyone."
   },
+  "Footer": {
+    "backToHome": "Back to Home",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
   "Hero": {
     "badge1": "Start for free",
     "badge2": "No registration required",

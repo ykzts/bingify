@@ -7,6 +7,7 @@ import {
   setRequestLocale,
 } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { Footer } from "./_components/footer";
 import { LanguageSwitcher } from "./_components/language-switcher";
 import "../globals.css";
 
@@ -35,7 +36,10 @@ export async function generateMetadata({
 
   return {
     description: t("description"),
-    title: t("title"),
+    title: {
+      default: t("title"),
+      template: "%s | Bingify",
+    },
   };
 }
 
@@ -49,10 +53,13 @@ export default async function LocaleLayout({ children, params }: Props) {
     <html lang={locale}>
       <body className={`${nunito.variable} antialiased`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <div className="fixed top-4 right-4 z-50">
-            <LanguageSwitcher />
+          <div className="flex min-h-screen flex-col">
+            <div className="fixed top-4 right-4 z-50">
+              <LanguageSwitcher />
+            </div>
+            <main className="flex-1">{children}</main>
+            <Footer />
           </div>
-          {children}
         </NextIntlClientProvider>
       </body>
     </html>
