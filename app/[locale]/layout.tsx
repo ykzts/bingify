@@ -51,8 +51,8 @@ export default async function LocaleLayout({ children, params }: Props) {
           <div className="fixed top-4 right-4 z-50">
             <LanguageSwitcher />
           </div>
+          {children}
         </NextIntlClientProvider>
-        {children}
       </body>
     </html>
   );
