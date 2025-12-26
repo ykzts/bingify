@@ -39,7 +39,6 @@
         "editor.formatOnPaste": true,
         "editor.formatOnSave": true,
         "emmet.showExpandedAbbreviation": "never",
-        "tailwindCSS.experimental.configFile": null,
         "typescript.tsdk": "node_modules/typescript/lib"
       }
     }
