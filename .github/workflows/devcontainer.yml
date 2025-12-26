@@ -1,0 +1,24 @@
+name: Dev Container CI
+
+on:
+  pull_request:
+    paths:
+      - '.devcontainer/**'
+  push:
+    branches: [main]
+    paths:
+      - '.devcontainer/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and test Dev Container
+        uses: devcontainers/ci@v0.3
+        with:
+          runCmd: |
+            pnpm --version
+            node --version
