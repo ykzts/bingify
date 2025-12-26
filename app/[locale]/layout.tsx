@@ -11,6 +11,7 @@ import { LanguageSwitcher } from "./_components/language-switcher";
 import "../globals.css";
 
 const nunito = Nunito({
+  display: "swap",
   subsets: ["latin"],
   variable: "--font-nunito",
 });
