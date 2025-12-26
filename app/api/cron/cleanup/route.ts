@@ -10,6 +10,12 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
 
+    if (!cronSecret) {
+      console.warn(
+        "CRON_SECRET is not set. Authentication is bypassed for cleanup endpoint."
+      );
+    }
+
     if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -18,9 +24,16 @@ export async function GET(request: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!(supabaseUrl && supabaseServiceKey)) {
+    if (!supabaseUrl) {
       return NextResponse.json(
-        { error: "Missing Supabase configuration" },
+        { error: "Missing NEXT_PUBLIC_SUPABASE_URL" },
+        { status: 500 }
+      );
+    }
+
+    if (!supabaseServiceKey) {
+      return NextResponse.json(
+        { error: "Missing SUPABASE_SERVICE_ROLE_KEY" },
         { status: 500 }
       );
     }
@@ -49,9 +62,11 @@ export async function GET(request: NextRequest) {
     const deletedCount = deletedSpaces?.length || 0;
 
     return NextResponse.json({
-      deletedCount,
+      data: {
+        deletedCount,
+        retentionDays: RETENTION_DAYS,
+      },
       message: `Successfully deleted ${deletedCount} archived record(s) older than ${RETENTION_DAYS} days`,
-      success: true,
     });
   } catch (error) {
     console.error("Cleanup cron error:", error);
