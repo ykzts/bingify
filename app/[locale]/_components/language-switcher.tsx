@@ -37,7 +37,6 @@ export function LanguageSwitcher() {
           className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-500"
         />
         <select
-          aria-label={t("selectLanguage")}
           className="appearance-none rounded-md border border-gray-300 bg-white py-2 pr-8 pl-10 font-medium text-gray-700 text-sm transition-colors hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:focus:border-blue-400 dark:focus:ring-blue-400 dark:hover:border-gray-500"
           disabled={isPending}
           id="language-select"
