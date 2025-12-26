@@ -1,0 +1,25 @@
+{
+  "tasks": [
+    {
+      "args": [
+        "-c",
+        "pnpm exec supabase status > /dev/null 2>&1 || pnpm exec supabase start"
+      ],
+      "command": "sh",
+      "label": "Supabase: Ensure Running",
+      "presentation": {
+        "panel": "shared",
+        "reveal": "silent"
+      },
+      "type": "shell"
+    },
+    {
+      "command": "pnpm build",
+      "group": "build",
+      "label": "build",
+      "problemMatcher": ["$next-compile"],
+      "type": "shell"
+    }
+  ],
+  "version": "2.0.0"
+}

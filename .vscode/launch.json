@@ -1,0 +1,20 @@
+{
+  "configurations": [
+    {
+      "console": "integratedTerminal",
+      "name": "Next.js: Dev",
+      "preLaunchTask": "Supabase: Ensure Running",
+      "request": "launch",
+      "runtimeArgs": ["dev"],
+      "runtimeExecutable": "pnpm",
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s"
+      },
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    }
+  ],
+  "version": "0.2.0"
+}
