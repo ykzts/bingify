@@ -1,0 +1,17 @@
+{
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "biomejs.biome",
+        "bradlc.vscode-tailwindcss",
+        "supabase.supabase-vscode"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2.13.0": {}
+  },
+  "forwardPorts": [3000, 54321, 54322, 54323, 54324],
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:4.0.4-24-bookworm",
+  "postCreateCommand": "pnpm install"
+}
