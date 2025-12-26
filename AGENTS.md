@@ -74,3 +74,17 @@ type(scope): brief subject
 - `feat(dashboard): add space creation form`
 - `fix(space): resolve slug validation error`
 - `docs: update setup instructions`
+
+## GitHub Actions
+
+GitHub Actions でアクションを使用する際は、以下のルールに従ってください。
+
+- タグ指定（例: `@v4`）ではなく、**フルコミットSHA** を使用すること。
+- 末尾に `# vX.Y.Z` の形式でバージョンコメントを付与すること。
+- Renovate が `helpers:pinGitHubActionDigests` プリセットを使用して自動的に更新を行います。
+
+**例:**
+
+```yaml
+- uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+```
