@@ -35,7 +35,10 @@ export async function generateMetadata({
 
   return {
     description: t("description"),
-    title: t("title"),
+    title: {
+      default: t("title"),
+      template: "%s | Bingify",
+    },
   };
 }
 
