@@ -5,7 +5,7 @@ import { format } from 'date-fns'
 import { spaceSchema } from '@/lib/schemas/space'
 import { createClient } from '@/lib/supabase/server'
 
-export type CreateSpaceState = {
+export interface CreateSpaceState {
   success: boolean
   error?: string
   spaceId?: string

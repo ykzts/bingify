@@ -1,54 +1,19 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
-  },
-  "files": {
-    "ignoreUnknown": false,
-    "includes": [
-      "**/*",
-      "!!**/node_modules",
-      "!!**/pnpm-lock.yaml",
-      "!!**/*.lock",
-      "!!**/.next",
-      "!!**/.pnpm",
-      "!!**/dist",
-      "!!**/build",
-      "!!**/out",
-      "!!**/coverage",
-      "!!**/.vercel",
-      "!!**/.DS_Store",
-      "!!**/.env*",
-      "!!**/.branches",
-      "!!**/.temp",
-      "!!**/next-env.d.ts"
-    ]
-  },
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["ultracite/core", "ultracite/next", "ultracite/react"],
   "formatter": {
-    "enabled": true,
-    "formatWithErrors": false,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineEnding": "lf",
-    "lineWidth": 100,
-    "attributePosition": "auto",
-    "bracketSameLine": false,
-    "bracketSpacing": true,
-    "useEditorconfig": true
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "asNeeded"
+    }
   },
   "linter": {
-    "enabled": true,
     "rules": {
-      "recommended": true,
       "complexity": {
-        "useSimplifiedLogicExpression": "warn",
-        "noExcessiveCognitiveComplexity": "warn"
-      },
-      "correctness": {
-        "noUnusedImports": "warn",
-        "useHookAtTopLevel": "error"
+        "noForEach": "off"
       },
       "nursery": {
         "useSortedClasses": {
@@ -60,55 +25,17 @@
         }
       },
       "style": {
-        "noNegationElse": "off",
-        "noNonNullAssertion": "off",
-        "useBlockStatements": "off",
-        "useCollapsedElseIf": "warn",
-        "useConsistentArrayType": {
-          "fix": "safe",
-          "level": "warn",
-          "options": {
-            "syntax": "shorthand"
-          }
-        },
-        "useFilenamingConvention": "off",
-        "useForOf": "warn",
-        "useFragmentSyntax": "warn",
-        "useNamingConvention": "off",
-        "useNodejsImportProtocol": "warn",
-        "useShorthandAssign": "warn"
+        "noNonNullAssertion": "off"
       },
       "suspicious": {
-        "noConsole": "off",
-        "noExplicitAny": "off",
         "useIterableCallbackReturn": "off"
       }
     }
   },
-  "css": {
-    "parser": {
-      "cssModules": false,
-      "tailwindDirectives": true
-    }
-  },
-  "javascript": {
-    "formatter": {
-      "arrowParentheses": "always",
-      "attributePosition": "auto",
-      "bracketSameLine": false,
-      "bracketSpacing": true,
-      "jsxQuoteStyle": "double",
-      "quoteProperties": "asNeeded",
-      "quoteStyle": "single",
-      "semicolons": "asNeeded",
-      "trailingCommas": "es5"
-    }
-  },
   "assist": {
-    "enabled": true,
     "actions": {
       "source": {
-        "organizeImports": "on"
+        "useSortedAttributes": "off"
       }
     }
   }

@@ -27,7 +27,8 @@
     "postcss-load-config": "6.0.1",
     "supabase": "2.70.5",
     "tailwindcss": "4.1.18",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "ultracite": "6.5.0"
   },
   "homepage": "https://bingify.space/",
   "license": "MIT",

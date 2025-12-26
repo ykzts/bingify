@@ -69,7 +69,7 @@ export function Hero() {
                 transition={{
                   duration: 1.5,
                   ease: 'easeInOut',
-                  repeat: Infinity,
+                  repeat: Number.POSITIVE_INFINITY,
                 }}
               >
                 <ArrowRight className="h-5 w-5" />

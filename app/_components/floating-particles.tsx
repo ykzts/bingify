@@ -83,7 +83,7 @@ export function FloatingParticles() {
             delay: particle.delay,
             duration: particle.duration,
             ease: 'linear',
-            repeat: Infinity,
+            repeat: Number.POSITIVE_INFINITY,
           }}
         />
       ))}
