@@ -1,5 +1,5 @@
-import { CreateSpaceForm } from './create-space-form'
+import { CreateSpaceForm } from "./create-space-form";
 
 export default function DashboardPage() {
-  return <CreateSpaceForm />
+  return <CreateSpaceForm />;
 }
