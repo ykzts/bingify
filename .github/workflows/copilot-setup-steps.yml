@@ -1,0 +1,38 @@
+name: Copilot Setup Steps
+
+on:
+  workflow_call:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Install CJK fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-cjk
+
+      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+
+      - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - uses: supabase/setup-cli@aab6f94cf41a96f0e7daa5ab9e95ff39e10d1141 # v1.6.0
+        with:
+          version: latest
+
+      - name: Start Supabase
+        run: pnpm exec supabase start
+
+      - name: Verify setup
+        run: |
+          pnpm exec supabase status
+          echo "Setup completed successfully"
