@@ -44,14 +44,15 @@
 
 **認証:**
 - `Authorization` ヘッダーに `Bearer <CRON_SECRET>` を指定
-- `CRON_SECRET` 環境変数が設定されている場合のみ認証が必要
+- 本番環境では `CRON_SECRET` 環境変数を必ず設定し、すべてのリクエストでこのシークレットによる認証を行うこと
+- 開発環境では `CRON_SECRET` が未設定の場合、認証がバイパスされます（警告ログが出力されます）
 
 **レスポンス:**
 ```json
 {
-  "message": "Successfully deleted 5 archived record(s) older than 90 days",
   "data": {
     "deletedCount": 5,
+    "message": "Successfully deleted 5 archived record(s) older than 90 days",
     "retentionDays": 90
   }
 }

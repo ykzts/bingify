@@ -37,7 +37,8 @@ BEGIN
     OLD.updated_at,
     NOW(),
     NOW()
-  );
+  )
+  ON CONFLICT (id) DO NOTHING;
   RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;

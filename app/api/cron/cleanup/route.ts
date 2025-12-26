@@ -11,12 +11,20 @@ export async function GET(request: NextRequest) {
     const cronSecret = process.env.CRON_SECRET;
 
     if (!cronSecret) {
-      console.warn(
-        "CRON_SECRET is not set. Authentication is bypassed for cleanup endpoint."
-      );
-    }
+      if (process.env.NODE_ENV !== "development") {
+        console.error(
+          "CRON_SECRET is not set. Cleanup endpoint is disabled in non-development environments."
+        );
+        return NextResponse.json(
+          { error: "Missing CRON_SECRET" },
+          { status: 500 }
+        );
+      }
 
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+      console.warn(
+        "CRON_SECRET is not set. Authentication is bypassed for cleanup endpoint in development."
+      );
+    } else if (authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -61,12 +69,16 @@ export async function GET(request: NextRequest) {
 
     const deletedCount = deletedSpaces?.length || 0;
 
+    console.log(
+      `Cleanup completed: deleted ${deletedCount} archived record(s) older than ${RETENTION_DAYS} days (cutoff: ${cutoffDate.toISOString()})`
+    );
+
     return NextResponse.json({
       data: {
         deletedCount,
+        message: `Successfully deleted ${deletedCount} archived record(s) older than ${RETENTION_DAYS} days`,
         retentionDays: RETENTION_DAYS,
       },
-      message: `Successfully deleted ${deletedCount} archived record(s) older than ${RETENTION_DAYS} days`,
     });
   } catch (error) {
     console.error("Cleanup cron error:", error);
