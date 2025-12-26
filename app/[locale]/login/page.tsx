@@ -1,5 +1,5 @@
-import { Suspense } from "react";
 import { setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
 import { LoginForm } from "./login-form";
 
 interface Props {
