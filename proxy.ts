@@ -13,6 +13,10 @@ function createUnauthorizedResponse() {
   });
 }
 
+function isValidLocale(locale: string): boolean {
+  return routing.locales.some((l) => l === locale);
+}
+
 function checkBasicAuth(req: NextRequest): NextResponse | null {
   if (process.env.ENABLE_BASIC_AUTH !== "true") {
     return null;
@@ -23,7 +27,12 @@ function checkBasicAuth(req: NextRequest): NextResponse | null {
     return createUnauthorizedResponse();
   }
 
-  const authValue = basicAuth.split(" ")[1];
+  const parts = basicAuth.split(" ");
+  if (parts.length !== 2 || parts[0] !== "Basic") {
+    return createUnauthorizedResponse();
+  }
+
+  const authValue = parts[1];
   if (!authValue) {
     return createUnauthorizedResponse();
   }
@@ -82,9 +91,6 @@ export async function proxy(request: NextRequest) {
       }
 
       const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
-      const isValidLocale = (locale: string): boolean => {
-        return routing.locales.some((l) => l === locale);
-      };
       const locale =
         cookieLocale && isValidLocale(cookieLocale)
           ? cookieLocale
@@ -104,5 +110,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)", "/@:path*"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
