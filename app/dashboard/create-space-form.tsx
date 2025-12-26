@@ -36,7 +36,9 @@ export function CreateSpaceForm() {
 
   const handleAcceptSuggestion = () => {
     if (state.suggestion) {
-      // Extract the slug part from suggestion (remove date suffix)
+      // Extract the slug part from suggestion
+      // Format: "slug-2-20251226" or "my-party-3-20251226"
+      // Remove the last part (date suffix): "-20251226"
       const suggestionWithoutDate = state.suggestion.replace(
         `-${dateSuffix}`,
         ""

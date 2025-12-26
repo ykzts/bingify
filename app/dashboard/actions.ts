@@ -36,9 +36,11 @@ async function findAvailableSlug(
   baseSlug: string,
   dateSuffix: string,
   supabase: Awaited<ReturnType<typeof createClient>>
-): Promise<string> {
+): Promise<string | null> {
+  const MAX_SLUG_SUGGESTIONS = 10;
+
   // Try suggestions with incrementing numbers
-  for (let i = 2; i <= 10; i++) {
+  for (let i = 2; i <= MAX_SLUG_SUGGESTIONS; i++) {
     const suggestion = `${baseSlug}-${i}-${dateSuffix}`;
     const { data } = await supabase
       .from("spaces")
@@ -51,8 +53,8 @@ async function findAvailableSlug(
     }
   }
 
-  // If no suggestion found within 10 attempts, return the last one
-  return `${baseSlug}-10-${dateSuffix}`;
+  // If no suggestion found within max attempts, return null
+  return null;
 }
 
 export async function createSpace(
@@ -86,6 +88,15 @@ export async function createSpace(
     if (existing) {
       // Find an available suggestion
       const suggestion = await findAvailableSlug(slug, dateSuffix, supabase);
+
+      if (!suggestion) {
+        return {
+          error:
+            "利用可能なスラグが見つかりませんでした。別の名前をお試しください。",
+          success: false,
+        };
+      }
+
       return {
         error: "このスラグは既に使用されています",
         success: false,
