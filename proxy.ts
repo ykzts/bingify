@@ -1,10 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import createMiddleware from "next-intl/middleware";
-import { routing } from "./i18n/routing";
-
-const handleI18n = createMiddleware(routing);
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -15,10 +11,6 @@ function createUnauthorizedResponse() {
     headers: { "WWW-Authenticate": 'Basic realm="Secure Area"' },
     status: 401,
   });
-}
-
-function isValidLocale(locale: string): boolean {
-  return routing.locales.some((l) => l === locale);
 }
 
 function checkBasicAuth(req: NextRequest): NextResponse | null {
@@ -109,14 +101,8 @@ async function handleShareKeyRewrite(
     return NextResponse.redirect(new URL("/404", request.url));
   }
 
-  const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
-  const locale =
-    cookieLocale && isValidLocale(cookieLocale)
-      ? cookieLocale
-      : routing.defaultLocale;
-
   const url = request.nextUrl.clone();
-  url.pathname = `/${locale}/spaces/${data.id}`;
+  url.pathname = `/spaces/${data.id}`;
   return NextResponse.rewrite(url);
 }
 
@@ -146,10 +132,9 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // --- 3. i18n Handling (Default) ---
-  return handleI18n(request);
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)", "/@:path*"],
 };
