@@ -10,6 +10,7 @@ export interface CreateSpaceState {
   error?: string;
   spaceId?: string;
   shareKey?: string;
+  suggestion?: string;
 }
 
 export async function checkSlugAvailability(slug: string) {
@@ -29,6 +30,29 @@ export async function checkSlugAvailability(slug: string) {
     console.error("Slug check error:", error);
     return { available: false };
   }
+}
+
+async function findAvailableSlug(
+  baseSlug: string,
+  dateSuffix: string,
+  supabase: Awaited<ReturnType<typeof createClient>>
+): Promise<string> {
+  // Try suggestions with incrementing numbers
+  for (let i = 2; i <= 10; i++) {
+    const suggestion = `${baseSlug}-${i}-${dateSuffix}`;
+    const { data } = await supabase
+      .from("spaces")
+      .select("id")
+      .eq("share_key", suggestion)
+      .single();
+
+    if (!data) {
+      return suggestion;
+    }
+  }
+
+  // If no suggestion found within 10 attempts, return the last one
+  return `${baseSlug}-10-${dateSuffix}`;
 }
 
 export async function createSpace(
@@ -60,9 +84,12 @@ export async function createSpace(
       .single();
 
     if (existing) {
+      // Find an available suggestion
+      const suggestion = await findAvailableSlug(slug, dateSuffix, supabase);
       return {
         error: "このスラグは既に使用されています",
         success: false,
+        suggestion,
       };
     }
 
