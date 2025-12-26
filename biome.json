@@ -1,17 +1,4 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["ultracite/core", "ultracite/next", "ultracite/react"],
-  "linter": {
-    "rules": {
-      "nursery": {
-        "useSortedClasses": {
-          "level": "warn",
-          "fix": "safe",
-          "options": {
-            "functions": ["cn", "clsx", "twMerge"]
-          }
-        }
-      }
-    }
-  }
+  "extends": ["ultracite/core", "ultracite/next", "ultracite/react"]
 }
