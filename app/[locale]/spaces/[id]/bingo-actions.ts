@@ -17,12 +17,18 @@ export interface BingoCardResult {
   success: boolean;
 }
 
+const BINGO_CARD_SIZE = 5;
+const NUMBERS_PER_COLUMN = 15;
+const FREE_SPACE_ROW = 2;
+const FREE_SPACE_COL = 2;
+const FREE_SPACE_VALUE = 0;
+
 function generateBingoCard(): number[][] {
   const card: number[][] = [];
 
-  for (let col = 0; col < 5; col++) {
-    const min = col * 15 + 1;
-    const max = col * 15 + 15;
+  for (let col = 0; col < BINGO_CARD_SIZE; col++) {
+    const min = col * NUMBERS_PER_COLUMN + 1;
+    const max = col * NUMBERS_PER_COLUMN + NUMBERS_PER_COLUMN;
 
     const availableNumbers = Array.from(
       { length: max - min + 1 },
@@ -37,9 +43,9 @@ function generateBingoCard(): number[][] {
       ];
     }
 
-    const columnNumbers = availableNumbers.slice(0, 5);
+    const columnNumbers = availableNumbers.slice(0, BINGO_CARD_SIZE);
 
-    for (let row = 0; row < 5; row++) {
+    for (let row = 0; row < BINGO_CARD_SIZE; row++) {
       if (!card[row]) {
         card[row] = [];
       }
@@ -47,7 +53,7 @@ function generateBingoCard(): number[][] {
     }
   }
 
-  card[2][2] = 0;
+  card[FREE_SPACE_ROW][FREE_SPACE_COL] = FREE_SPACE_VALUE;
 
   return card;
 }

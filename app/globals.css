@@ -22,7 +22,7 @@
   --color-twitch-hover: #7d3be6;
 }
 
-@utility grid-cols-15 {
+.grid-cols-15 {
   grid-template-columns: repeat(15, minmax(0, 1fr));
 }
 

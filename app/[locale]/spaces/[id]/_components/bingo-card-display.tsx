@@ -18,6 +18,8 @@ interface CalledNumber {
   value: number;
 }
 
+const FREE_SPACE_VALUE = 0;
+
 export function BingoCardDisplay({ spaceId }: Props) {
   const t = useTranslations("UserSpace");
   const [bingoCard, setBingoCard] = useState<BingoCard | null>(null);
@@ -112,7 +114,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
   }
 
   const isNumberCalled = (number: number) => {
-    if (number === 0) {
+    if (number === FREE_SPACE_VALUE) {
       return true;
     }
     return calledNumbers.includes(number);
@@ -140,7 +142,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
           {bingoCard.numbers.map((row, rowIndex) =>
             row.map((number, colIndex) => {
               const isCalled = isNumberCalled(number);
-              const isFreeSpace = number === 0;
+              const isFreeSpace = number === FREE_SPACE_VALUE;
               const key = `${rowIndex}-${colIndex}`;
 
               return (
