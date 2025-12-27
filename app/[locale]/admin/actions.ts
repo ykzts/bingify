@@ -90,6 +90,9 @@ export async function forceDeleteSpace(
 
 /**
  * Ban a user (delete their account)
+ * Note: This will delete the user's auth account and profile.
+ * Bingo cards with matching user_id will remain in the database as orphaned records.
+ * Consider implementing additional cleanup logic if needed.
  */
 export async function banUser(userId: string): Promise<AdminActionResult> {
   try {
