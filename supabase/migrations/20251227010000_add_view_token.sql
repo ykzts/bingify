@@ -1,11 +1,14 @@
 -- Add view_token and owner_id columns to spaces table
+-- Note: This migration assumes the spaces table is empty or will be reset.
+-- For production migrations with existing data, add columns as nullable first,
+-- backfill with generated tokens, then add NOT NULL constraint.
 
 -- Add owner_id column (references auth.users)
 ALTER TABLE spaces
 ADD COLUMN owner_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
 
 -- Add view_token column (NOT NULL, UNIQUE)
--- No DEFAULT is set - application must provide the token
+-- No DEFAULT is set - application must provide the token to ensure data integrity
 ALTER TABLE spaces
 ADD COLUMN view_token TEXT NOT NULL UNIQUE;
 
@@ -56,7 +59,12 @@ CREATE POLICY "Owners can manage their spaces"
   USING (auth.uid() = owner_id)
   WITH CHECK (auth.uid() = owner_id);
 
--- Policy: Anyone can read spaces if they know the view_token (public access for streaming)
+-- Policy: Public read access for streaming/display
+-- Note: This allows SELECT without authentication, but the application
+-- must filter by view_token. RLS policies don't have access to query parameters,
+-- so security relies on: 1) view_token being unguessable (256-bit entropy),
+-- 2) application always filtering by view_token in queries, and
+-- 3) view_token not being exposed in public APIs
 CREATE POLICY "Public can view with valid token"
   ON spaces
   FOR SELECT

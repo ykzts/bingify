@@ -11,7 +11,7 @@ interface Props {
   viewToken: string;
 }
 
-export function ObsUrlManager({ locale, spaceId, viewToken }: Props) {
+export function ViewingUrlManager({ locale, spaceId, viewToken }: Props) {
   const t = useTranslations("AdminSpace");
   const [currentToken, setCurrentToken] = useState(viewToken);
   const [isRegenerating, setIsRegenerating] = useState(false);
@@ -20,16 +20,16 @@ export function ObsUrlManager({ locale, spaceId, viewToken }: Props) {
     type: "success" | "error";
   } | null>(null);
 
-  const obsUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/${locale}/screen/${currentToken}`;
+  const viewingUrl = `${window.location.origin}/${locale}/screen/${currentToken}`;
 
   const handleCopyUrl = async () => {
     try {
-      await navigator.clipboard.writeText(obsUrl);
+      await navigator.clipboard.writeText(viewingUrl);
       setMessage({ text: t("copyUrlSuccess"), type: "success" });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
       console.error("Failed to copy:", error);
-      setMessage({ text: "Failed to copy URL", type: "error" });
+      setMessage({ text: t("copyUrlError"), type: "error" });
       setTimeout(() => setMessage(null), 3000);
     }
   };
@@ -69,15 +69,18 @@ export function ObsUrlManager({ locale, spaceId, viewToken }: Props) {
   return (
     <div className="space-y-4">
       <div>
-        <label className="mb-2 block font-medium text-sm" htmlFor="obs-url">
-          {t("obsUrlLabel")}
+        <label className="mb-2 block font-medium text-sm" htmlFor="viewing-url">
+          {t("viewingUrlLabel")}
         </label>
+        <p className="mb-2 text-gray-600 text-sm">
+          {t("viewingUrlDescription")}
+        </p>
         <div className="flex gap-2">
           <input
             className="flex-1 rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 font-mono text-sm"
-            id="obs-url"
+            id="viewing-url"
             readOnly
-            value={obsUrl}
+            value={viewingUrl}
           />
           <button
             className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-blue-700"

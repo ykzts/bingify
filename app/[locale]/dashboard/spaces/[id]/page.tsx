@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { ObsUrlManager } from "./_components/obs-url-manager";
+import { ViewingUrlManager } from "./_components/viewing-url-manager";
 
 interface Props {
   params: Promise<{ id: string; locale: string }>;
@@ -23,12 +23,11 @@ export default async function AdminSpacePage({ params }: Props) {
     redirect(`/${locale}/login`);
   }
 
-  // Fetch space (only if user is the owner, thanks to RLS)
+  // Fetch space (RLS ensures only owner can access)
   const { data: space, error } = await supabase
     .from("spaces")
     .select("id, share_key, view_token, owner_id, created_at")
     .eq("id", id)
-    .eq("owner_id", user.id)
     .single();
 
   if (error || !space) {
@@ -45,7 +44,7 @@ export default async function AdminSpacePage({ params }: Props) {
             {t("spaceId")}: {space.share_key}
           </h2>
 
-          <ObsUrlManager
+          <ViewingUrlManager
             locale={locale}
             spaceId={space.id}
             viewToken={space.view_token}

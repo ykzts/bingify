@@ -1,14 +1,24 @@
 {
   "AdminSpace": {
-    "copyUrlButton": "OBS用URLをコピー",
+    "copyUrlButton": "閲覧用URLをコピー",
+    "copyUrlError": "URLのコピーに失敗しました",
     "copyUrlSuccess": "URLをクリップボードにコピーしました",
     "heading": "管理画面",
-    "obsUrlLabel": "OBS閲覧用URL",
     "regenerateConfirm": "古いURLは無効になります。続行してもよろしいですか？",
     "regenerateError": "URLの再生成に失敗しました",
     "regenerateSuccess": "URLを再生成しました",
     "regenerateUrlButton": "URLを再生成する",
-    "spaceId": "スペースID"
+    "spaceId": "スペースID",
+    "viewingUrlDescription": "このURLを共有して、画面、配信ソフト、その他の表示アプリケーションにビンゴボードを表示できます。",
+    "viewingUrlLabel": "公開閲覧用URL"
+  },
+  "Errors": {
+    "authRequired": "認証が必要です",
+    "notFound": "スペースが見つかりません",
+    "permissionDenied": "このスペースの編集権限がありません",
+    "spaceCreationFailed": "スペースの作成に失敗しました",
+    "tokenRegenerationFailed": "トークンの再生成に失敗しました",
+    "unexpectedError": "予期しないエラーが発生しました"
   },
   "Features": {
     "communityDescription": "コミュニティイベント、配信、パーティーに最適。誰でも簡単に参加でき、みんなで盛り上がれます。",

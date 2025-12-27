@@ -2,9 +2,9 @@
 
 import { randomUUID } from "node:crypto";
 import { format } from "date-fns";
+import { generateSecureToken } from "@/lib/crypto";
 import { spaceSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
-import { generateSecureToken } from "@/lib/utils/crypto";
 
 const MAX_SLUG_SUGGESTIONS = 10;
 
@@ -116,7 +116,7 @@ export async function createSpace(
 
     if (!user) {
       return {
-        error: "認証が必要です",
+        error: "Authentication required",
         success: false,
       };
     }
@@ -137,7 +137,7 @@ export async function createSpace(
     if (error) {
       console.error("Database error:", error);
       return {
-        error: "スペースの作成に失敗しました",
+        error: "Failed to create space",
         success: false,
       };
     }
@@ -150,7 +150,7 @@ export async function createSpace(
   } catch (error) {
     console.error("Error creating space:", error);
     return {
-      error: "予期しないエラーが発生しました",
+      error: "An unexpected error occurred",
       success: false,
     };
   }
@@ -175,28 +175,7 @@ export async function regenerateViewToken(
 
     if (!user) {
       return {
-        error: "認証が必要です",
-        success: false,
-      };
-    }
-
-    // Check if user is the owner
-    const { data: space } = await supabase
-      .from("spaces")
-      .select("owner_id")
-      .eq("id", spaceId)
-      .single();
-
-    if (!space) {
-      return {
-        error: "スペースが見つかりません",
-        success: false,
-      };
-    }
-
-    if (space.owner_id !== user.id) {
-      return {
-        error: "このスペースの編集権限がありません",
+        error: "Authentication required",
         success: false,
       };
     }
@@ -205,15 +184,25 @@ export async function regenerateViewToken(
     const newToken = generateSecureToken();
 
     // Update the space with new token
-    const { error } = await supabase
+    // RLS policy ensures only the owner can update
+    const { error, count } = await supabase
       .from("spaces")
       .update({ view_token: newToken })
-      .eq("id", spaceId);
+      .eq("id", spaceId)
+      .eq("owner_id", user.id);
 
     if (error) {
       console.error("Database error:", error);
       return {
-        error: "トークンの再生成に失敗しました",
+        error: "Failed to regenerate token",
+        success: false,
+      };
+    }
+
+    // Check if any row was updated (user must be owner)
+    if (count === 0) {
+      return {
+        error: "Space not found or access denied",
         success: false,
       };
     }
@@ -225,7 +214,7 @@ export async function regenerateViewToken(
   } catch (error) {
     console.error("Error regenerating token:", error);
     return {
-      error: "予期しないエラーが発生しました",
+      error: "An unexpected error occurred",
       success: false,
     };
   }
