@@ -7,8 +7,43 @@ import {
   handleShareKeyRewrite,
   validateShareKey,
 } from "./lib/middleware/share-key";
+import { createClient } from "./lib/supabase/middleware";
 
 const intlMiddleware = createIntlMiddleware(routing);
+const LOCALE_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/`);
+const DASHBOARD_PATTERN = new RegExp(
+  `^/(${routing.locales.join("|")})/dashboard(/|$)`
+);
+
+function isDashboardPath(pathname: string): boolean {
+  return (
+    pathname === "/dashboard" ||
+    pathname.startsWith("/dashboard/") ||
+    Boolean(pathname.match(DASHBOARD_PATTERN))
+  );
+}
+
+async function handleDashboardAuth(
+  request: NextRequest,
+  pathname: string
+): Promise<NextResponse> {
+  // Run intl middleware first to handle locale detection
+  const intlResponse = intlMiddleware(request);
+  const supabase = createClient(request, intlResponse);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    // Extract locale from pathname if present; default to unprefixed login
+    const localeMatch = pathname.match(LOCALE_PATTERN);
+    const loginPath = localeMatch ? `/${localeMatch[1]}/login` : "/login";
+    const loginUrl = new URL(loginPath, request.url);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return intlResponse;
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -19,7 +54,12 @@ export async function proxy(request: NextRequest) {
     return authResponse;
   }
 
-  // --- 2. Share Key Rewrite Logic ---
+  // --- 2. Supabase Auth Check for /dashboard routes ---
+  if (isDashboardPath(pathname)) {
+    return handleDashboardAuth(request, pathname);
+  }
+
+  // --- 3. Share Key Rewrite Logic ---
   if (pathname.startsWith("/@")) {
     const shareKey = pathname.slice(2);
 
@@ -55,7 +95,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // --- 3. Internationalization Routing ---
+  // --- 4. Internationalization Routing ---
   return intlMiddleware(request);
 }
 
