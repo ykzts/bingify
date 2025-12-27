@@ -22,10 +22,6 @@
   --color-twitch-hover: #7d3be6;
 }
 
-.grid-cols-15 {
-  grid-template-columns: repeat(15, minmax(0, 1fr));
-}
-
 body {
   background-color: var(--color-background);
   color: var(--color-text-main);

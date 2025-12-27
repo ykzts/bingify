@@ -23,6 +23,15 @@ const FREE_SPACE_ROW = 2;
 const FREE_SPACE_COL = 2;
 const FREE_SPACE_VALUE = 0;
 
+/**
+ * Generates a bingo card following American bingo specification:
+ * - B column (col 0): numbers 1-15
+ * - I column (col 1): numbers 16-30
+ * - N column (col 2): numbers 31-45 with FREE space at center [2][2]
+ * - G column (col 3): numbers 46-60
+ * - O column (col 4): numbers 61-75
+ * Each column contains 5 randomly selected numbers from its range.
+ */
 function generateBingoCard(): number[][] {
   const card: number[][] = [];
 
@@ -78,6 +87,20 @@ export async function getOrCreateBingoCard(
     if (!user) {
       return {
         error: "Authentication required",
+        success: false,
+      };
+    }
+
+    const { data: participant } = await supabase
+      .from("participants")
+      .select("id")
+      .eq("space_id", spaceId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (!participant) {
+      return {
+        error: "You must join the space before getting a bingo card",
         success: false,
       };
     }

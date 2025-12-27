@@ -20,45 +20,66 @@ export function BingoGameManager({ spaceId }: Props) {
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadCalledNumbers = async () => {
+    let isMounted = true;
+    const supabase = createClient();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    const init = async () => {
       const numbers = await getCalledNumbers(spaceId);
+      if (!isMounted) {
+        return;
+      }
       setCalledNumbers(numbers);
+
+      channel = supabase
+        .channel(`space-${spaceId}-called-numbers`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            filter: `space_id=eq.${spaceId}`,
+            schema: "public",
+            table: "called_numbers",
+          },
+          (payload) => {
+            const newNumber = payload.new as CalledNumber;
+            if (!isMounted) {
+              return;
+            }
+            setCalledNumbers((prev) => {
+              const alreadyExists = prev.some((n) => n.id === newNumber.id);
+              return alreadyExists ? prev : [...prev, newNumber];
+            });
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "DELETE",
+            filter: `space_id=eq.${spaceId}`,
+            schema: "public",
+            table: "called_numbers",
+          },
+          (payload) => {
+            if (!isMounted) {
+              return;
+            }
+            const deletedNumber = payload.old as CalledNumber;
+            setCalledNumbers((prev) =>
+              prev.filter((n) => n.id !== deletedNumber.id)
+            );
+          }
+        )
+        .subscribe();
     };
 
-    loadCalledNumbers();
-
-    const supabase = createClient();
-    const channel = supabase
-      .channel(`space-${spaceId}-called-numbers`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          filter: `space_id=eq.${spaceId}`,
-          schema: "public",
-          table: "called_numbers",
-        },
-        (payload) => {
-          const newNumber = payload.new as CalledNumber;
-          setCalledNumbers((prev) => [...prev, newNumber]);
-        }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "DELETE",
-          filter: `space_id=eq.${spaceId}`,
-          schema: "public",
-          table: "called_numbers",
-        },
-        () => {
-          setCalledNumbers([]);
-        }
-      )
-      .subscribe();
+    init();
 
     return () => {
-      channel.unsubscribe();
+      isMounted = false;
+      if (channel) {
+        channel.unsubscribe();
+      }
     };
   }, [spaceId]);
 
@@ -115,7 +136,7 @@ export function BingoGameManager({ spaceId }: Props) {
     setIsResetting(false);
   };
 
-  const calledValues = calledNumbers.map((n) => n.value);
+  const calledValuesSet = new Set(calledNumbers.map((n) => n.value));
 
   return (
     <div className="space-y-6">
@@ -137,7 +158,7 @@ export function BingoGameManager({ spaceId }: Props) {
         <div className="mb-4 flex gap-3">
           <button
             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={isCalling || isResetting || calledValues.length >= 75}
+            disabled={isCalling || isResetting || calledValuesSet.size >= 75}
             onClick={handleCallNumber}
             type="button"
           >
@@ -158,15 +179,15 @@ export function BingoGameManager({ spaceId }: Props) {
         </div>
 
         <div className="text-gray-600 text-sm">
-          {t("calledNumbersCount", { count: calledValues.length, total: 75 })}
+          {t("calledNumbersCount", { count: calledValuesSet.size, total: 75 })}
         </div>
       </div>
 
       <div>
         <h3 className="mb-3 font-medium text-gray-900">{t("calledNumbers")}</h3>
-        <div className="grid max-h-96 grid-cols-10 gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-4 md:grid-cols-15">
+        <div className="grid max-h-96 grid-cols-10 gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-4 md:grid-cols-[repeat(15,minmax(0,1fr))]">
           {Array.from({ length: 75 }, (_, i) => i + 1).map((number) => {
-            const isCalled = calledValues.includes(number);
+            const isCalled = calledValuesSet.has(number);
             return (
               <div
                 className={`flex aspect-square items-center justify-center rounded font-bold text-sm ${

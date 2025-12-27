@@ -27,9 +27,9 @@ export async function callNumber(
       };
     }
 
-    if (number < 1 || number > 75) {
+    if (!Number.isInteger(number) || number < 1 || number > 75) {
       return {
-        error: "Number must be between 1 and 75",
+        error: "Number must be an integer between 1 and 75",
         success: false,
       };
     }

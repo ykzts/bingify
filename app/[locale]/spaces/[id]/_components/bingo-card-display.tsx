@@ -19,11 +19,15 @@ interface CalledNumber {
 }
 
 const FREE_SPACE_VALUE = 0;
+const BINGO_BLUE = "#2563eb";
+const BINGO_WHITE = "#ffffff";
+const BINGO_BLACK = "#000000";
+const BINGO_BORDER_GRAY = "#d1d5db";
 
 export function BingoCardDisplay({ spaceId }: Props) {
   const t = useTranslations("UserSpace");
   const [bingoCard, setBingoCard] = useState<BingoCard | null>(null);
-  const [calledNumbers, setCalledNumbers] = useState<number[]>([]);
+  const [calledNumbers, setCalledNumbers] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,53 +51,73 @@ export function BingoCardDisplay({ spaceId }: Props) {
   }, [spaceId, t]);
 
   useEffect(() => {
+    let isMounted = true;
     const supabase = createClient();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    const loadCalledNumbers = async () => {
+    const init = async () => {
       const { data } = await supabase
         .from("called_numbers")
         .select("value")
         .eq("space_id", spaceId)
         .order("called_at", { ascending: true });
 
-      if (data) {
-        setCalledNumbers(data.map((n) => n.value));
+      if (!isMounted) {
+        return;
       }
+
+      if (data) {
+        setCalledNumbers(new Set(data.map((n) => n.value)));
+      }
+
+      channel = supabase
+        .channel(`space-${spaceId}-bingo-participant`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            filter: `space_id=eq.${spaceId}`,
+            schema: "public",
+            table: "called_numbers",
+          },
+          (payload) => {
+            if (!isMounted) {
+              return;
+            }
+            const newNumber = payload.new as CalledNumber;
+            setCalledNumbers((prev) => new Set([...prev, newNumber.value]));
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "DELETE",
+            filter: `space_id=eq.${spaceId}`,
+            schema: "public",
+            table: "called_numbers",
+          },
+          (payload) => {
+            if (!isMounted) {
+              return;
+            }
+            const deletedNumber = payload.old as CalledNumber;
+            setCalledNumbers((prev) => {
+              const newSet = new Set(prev);
+              newSet.delete(deletedNumber.value);
+              return newSet;
+            });
+          }
+        )
+        .subscribe();
     };
 
-    loadCalledNumbers();
-
-    const channel = supabase
-      .channel(`space-${spaceId}-bingo-participant`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          filter: `space_id=eq.${spaceId}`,
-          schema: "public",
-          table: "called_numbers",
-        },
-        (payload) => {
-          const newNumber = payload.new as CalledNumber;
-          setCalledNumbers((prev) => [...prev, newNumber.value]);
-        }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "DELETE",
-          filter: `space_id=eq.${spaceId}`,
-          schema: "public",
-          table: "called_numbers",
-        },
-        () => {
-          setCalledNumbers([]);
-        }
-      )
-      .subscribe();
+    init();
 
     return () => {
-      channel.unsubscribe();
+      isMounted = false;
+      if (channel) {
+        channel.unsubscribe();
+      }
     };
   }, [spaceId]);
 
@@ -117,7 +141,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
     if (number === FREE_SPACE_VALUE) {
       return true;
     }
-    return calledNumbers.includes(number);
+    return calledNumbers.has(number);
   };
 
   return (
@@ -150,19 +174,19 @@ export function BingoCardDisplay({ spaceId }: Props) {
                   animate={
                     isCalled
                       ? {
-                          backgroundColor: "#2563eb",
-                          color: "#ffffff",
+                          backgroundColor: BINGO_BLUE,
+                          color: BINGO_WHITE,
                           scale: [1, 1.1, 1],
                         }
                       : {
-                          backgroundColor: "#ffffff",
-                          color: "#000000",
+                          backgroundColor: BINGO_WHITE,
+                          color: BINGO_BLACK,
                         }
                   }
                   className="flex aspect-square items-center justify-center rounded border-2 font-bold text-xl"
                   key={key}
                   style={{
-                    borderColor: isCalled ? "#2563eb" : "#d1d5db",
+                    borderColor: isCalled ? BINGO_BLUE : BINGO_BORDER_GRAY,
                   }}
                   transition={{ duration: 0.3 }}
                 >
@@ -179,23 +203,26 @@ export function BingoCardDisplay({ spaceId }: Props) {
           {t("recentCalledNumbers")}
         </h3>
         <div className="mx-auto max-w-md">
-          {calledNumbers.length === 0 ? (
+          {calledNumbers.size === 0 ? (
             <p className="text-center text-gray-500 text-sm">
               {t("noNumbersCalled")}
             </p>
           ) : (
             <div className="flex flex-wrap justify-center gap-2">
-              {calledNumbers.slice(-10).reverse().map((number, index) => (
-                <motion.div
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 font-bold text-white"
-                  initial={{ opacity: 0, scale: 0 }}
-                  key={`${number}-${calledNumbers.length - index}`}
-                  transition={{ duration: 0.3 }}
-                >
-                  {number}
-                </motion.div>
-              ))}
+              {Array.from(calledNumbers)
+                .slice(-10)
+                .reverse()
+                .map((number) => (
+                  <motion.div
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 font-bold text-white"
+                    initial={{ opacity: 0, scale: 0 }}
+                    key={number}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {number}
+                  </motion.div>
+                ))}
             </div>
           )}
         </div>
