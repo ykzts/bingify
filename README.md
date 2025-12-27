@@ -18,7 +18,7 @@ Bingify は **Supabase Auth** を使用した認証システムを実装して�
 - **認証方法**: OAuth（Google、Twitch）
 - **認証が必須の機能**:
   - スペースの作成・管理 (`/dashboard/*`)
-  - ビンゴカードの表示・参加 (`/spaces/*`, `/@<slug>`)
+  - ビンゴカードの表示・参加 (`/spaces/*`, `/@<share_key>`)
   - 管理者機能 (`/admin/*`)
 - **認証不要の機能**:
   - 表示専用画面 (`/screen/[token]`) - ストリーミング配信用
@@ -65,15 +65,15 @@ pnpm local:stop
 
 - 管理画面 (`/dashboard`) でビンゴスペースを作成
 - **認証必須**: OAuth（Google、Twitch）によるログインが必要
-- Slug形式: `[ユーザー入力]-[日付YYYYMMDD]`（例: `my-party-20251224`）
+- 共有キー形式: `[ユーザー入力]-[日付YYYYMMDD]`（例: `my-party-20251224`）
 - リアルタイムで重複チェック
 
 ### 2. URL解決（Middleware）
 
-- 公開URL: `/@<slug>`
+- 公開URL: `/@<share_key>`
 - **認証必須**: アクセスには認証が必要
 - Supabase の `share_key` で UUID を検索
-- `/spaces/<uuid>` に内部 rewrite（URLは `/@<slug>` のまま表示）
+- `/spaces/<uuid>` に内部 rewrite（URLは `/@<share_key>` のまま表示）
 
 ### 3. 管理画面
 
@@ -83,7 +83,7 @@ pnpm local:stop
 
 ### 4. 参加者画面
 
-- `/spaces/<uuid>` または `/@<slug>`: ビンゴカード表示
+- `/spaces/<uuid>` または `/@<share_key>`: ビンゴカード表示
 - **認証必須**: 認証されたユーザーのみアクセス可能
 - Supabase Realtime でリアルタイム同期
 
