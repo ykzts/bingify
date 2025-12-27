@@ -64,12 +64,15 @@ export default async function LocaleLayout({ children, params }: Props) {
   } | null = null;
 
   if (user) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("profiles")
       .select("avatar_url, email, full_name")
       .eq("id", user.id)
       .single();
-    profile = data;
+
+    if (!error) {
+      profile = data;
+    }
   }
 
   return (

@@ -59,7 +59,7 @@ BEGIN
   FROM participants p
   JOIN spaces s ON s.id = p.space_id
   WHERE p.space_id = NEW.space_id
-  GROUP BY s.max_participants;
+  GROUP BY s.id, s.max_participants;
 
   -- If no participants yet, get max_participants from spaces
   IF current_count IS NULL THEN
@@ -72,7 +72,7 @@ BEGIN
   -- Check if adding this participant would exceed the limit
   IF current_count >= max_count THEN
     RAISE EXCEPTION 'Space participant limit reached. Maximum % participants allowed.', max_count
-      USING ERRCODE = 'check_violation';
+      USING ERRCODE = 'P0001';
   END IF;
 
   RETURN NEW;

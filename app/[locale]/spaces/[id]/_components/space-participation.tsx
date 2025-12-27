@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import type { JoinSpaceState } from "../../actions";
-import { getParticipantCount, joinSpace, leaveSpace } from "../../actions";
+import {
+  checkUserParticipation,
+  getParticipantCount,
+  joinSpace,
+  leaveSpace,
+} from "../../actions";
 
 interface SpaceParticipationProps {
   spaceId: string;
@@ -22,15 +27,27 @@ export function SpaceParticipation({ spaceId }: SpaceParticipationProps) {
     maxParticipants: number;
   } | null>(null);
   const [hasJoined, setHasJoined] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load participant count on mount
+  // Load participant info and check if user has joined
   useEffect(() => {
-    const loadParticipantInfo = async () => {
-      const info = await getParticipantCount(spaceId);
+    const loadInitialData = async () => {
+      setIsLoading(true);
+      const [info, joined] = await Promise.all([
+        getParticipantCount(spaceId),
+        checkUserParticipation(spaceId),
+      ]);
       setParticipantInfo(info);
+      setHasJoined(joined);
+      setIsLoading(false);
     };
-    loadParticipantInfo();
+    loadInitialData();
   }, [spaceId]);
+
+  const refreshParticipantInfo = async () => {
+    const info = await getParticipantCount(spaceId);
+    setParticipantInfo(info);
+  };
 
   const handleJoin = async () => {
     setIsJoining(true);
@@ -40,9 +57,7 @@ export function SpaceParticipation({ spaceId }: SpaceParticipationProps) {
 
     if (result.success) {
       setHasJoined(true);
-      // Refresh participant count
-      const info = await getParticipantCount(spaceId);
-      setParticipantInfo(info);
+      await refreshParticipantInfo();
       router.refresh();
     } else {
       setError(result.error || "参加に失敗しました");
@@ -59,9 +74,7 @@ export function SpaceParticipation({ spaceId }: SpaceParticipationProps) {
 
     if (result.success) {
       setHasJoined(false);
-      // Refresh participant count
-      const info = await getParticipantCount(spaceId);
-      setParticipantInfo(info);
+      await refreshParticipantInfo();
       router.refresh();
     } else {
       setError(result.error || "退出に失敗しました");
@@ -69,6 +82,14 @@ export function SpaceParticipation({ spaceId }: SpaceParticipationProps) {
 
     setIsLeaving(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

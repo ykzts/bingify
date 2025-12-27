@@ -150,3 +150,32 @@ export async function getParticipantCount(
     return null;
   }
 }
+
+export async function checkUserParticipation(
+  spaceId: string
+): Promise<boolean> {
+  try {
+    const supabase = await createClient();
+
+    // Get the authenticated user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return false;
+    }
+
+    // Check if user has already joined
+    const { data } = await supabase
+      .from("participants")
+      .select("id")
+      .eq("space_id", spaceId)
+      .eq("user_id", user.id)
+      .single();
+
+    return !!data;
+  } catch (_error) {
+    return false;
+  }
+}
