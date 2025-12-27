@@ -1,10 +1,11 @@
 "use client";
 
-import { LogOut, User } from "lucide-react";
+import { LogOut, Settings, User } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 interface UserHeaderProps {
@@ -50,6 +51,14 @@ export function UserHeader({ user }: UserHeaderProps) {
         )}
         <span className="text-sm">{user.full_name || user.email}</span>
       </div>
+      <Link
+        aria-label={t("settings")}
+        className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm transition hover:bg-gray-50"
+        href="/settings/account"
+      >
+        <Settings className="h-4 w-4" />
+        {t("settings")}
+      </Link>
       <button
         aria-label={t("logout")}
         className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
