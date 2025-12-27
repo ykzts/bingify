@@ -125,7 +125,7 @@ export function AccountLinkingForm({ user }: AccountLinkingFormProps) {
         setSuccess(t("unlinkSuccess"));
         router.refresh();
       } else {
-        setError(result.error || t("errorGeneric"));
+        setError(result.errorKey ? t(result.errorKey) : t("errorGeneric"));
       }
     } catch (err) {
       console.error("Unexpected error:", err);
@@ -180,6 +180,11 @@ export function AccountLinkingForm({ user }: AccountLinkingFormProps) {
                 </div>
 
                 <button
+                  aria-label={
+                    linked
+                      ? `${t("disconnect")} ${provider.label}`
+                      : `${t("connect")} ${provider.label}`
+                  }
                   className={`flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-sm transition disabled:cursor-not-allowed disabled:opacity-50 ${
                     linked
                       ? "border border-red-200 bg-white text-red-600 hover:bg-red-50"

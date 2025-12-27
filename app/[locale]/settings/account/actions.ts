@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export interface UnlinkIdentityState {
   error?: string;
+  errorKey?: string;
   success: boolean;
 }
 
@@ -19,7 +20,7 @@ export async function unlinkIdentity(
 
     if (!user) {
       return {
-        error: "認証が必要です",
+        errorKey: "errorUnauthorized",
         success: false,
       };
     }
@@ -28,7 +29,7 @@ export async function unlinkIdentity(
 
     if (identities.length <= 1) {
       return {
-        error: "最低1つのログイン手段を残す必要があります",
+        errorKey: "errorMinimumIdentity",
         success: false,
       };
     }
@@ -37,7 +38,7 @@ export async function unlinkIdentity(
 
     if (!identity) {
       return {
-        error: "指定されたプロバイダーは連携されていません",
+        errorKey: "errorProviderNotLinked",
         success: false,
       };
     }
@@ -47,7 +48,7 @@ export async function unlinkIdentity(
     if (error) {
       console.error("Unlink identity error:", error);
       return {
-        error: "連携解除に失敗しました",
+        errorKey: "errorUnlinkFailed",
         success: false,
       };
     }
@@ -58,7 +59,7 @@ export async function unlinkIdentity(
   } catch (error) {
     console.error("Error unlinking identity:", error);
     return {
-      error: "予期しないエラーが発生しました",
+      errorKey: "errorGeneric",
       success: false,
     };
   }

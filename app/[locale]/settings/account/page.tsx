@@ -1,6 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AccountLinkingForm } from "./_components/account-linking-form";
 
@@ -8,17 +8,17 @@ interface Props {
   params: Promise<{ locale: string }>;
 }
 
-async function AccountSettingsContent() {
+async function AccountSettingsContent({ locale }: { locale: string }) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect({ href: "/login", locale });
   }
 
-  return <AccountLinkingForm user={user} />;
+  return <AccountLinkingForm user={user!} />;
 }
 
 export default async function AccountSettingsPage({ params }: Props) {
@@ -34,7 +34,7 @@ export default async function AccountSettingsPage({ params }: Props) {
           </div>
         }
       >
-        <AccountSettingsContent />
+        <AccountSettingsContent locale={locale} />
       </Suspense>
     </div>
   );
