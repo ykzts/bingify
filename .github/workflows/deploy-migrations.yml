@@ -36,7 +36,7 @@ jobs:
           ls -lh supabase/migrations/
           echo ""
           echo "=== Migration count ==="
-          ls supabase/migrations/*.sql 2>/dev/null | wc -l
+          find supabase/migrations -name "*.sql" -type f | wc -l
 
       - name: Link to Supabase project
         env:
