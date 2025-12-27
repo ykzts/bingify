@@ -16,6 +16,8 @@ ADD COLUMN view_token TEXT NOT NULL UNIQUE;
 
 -- Add same columns to spaces_archive table
 -- Note: owner_id may already exist from previous migration (20251226000000_add_archive_tables.sql)
+-- Archive tables intentionally lack foreign key constraints to preserve historical data
+-- even if referenced records (like users) are deleted
 ALTER TABLE spaces_archive
 ADD COLUMN IF NOT EXISTS owner_id UUID,
 ADD COLUMN IF NOT EXISTS view_token TEXT;
