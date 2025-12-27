@@ -23,7 +23,14 @@ function isDashboardPath(pathname: string): boolean {
   );
 }
 
-async function handleDashboardAuth(
+function isSpacesPath(pathname: string): boolean {
+  const SPACES_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/spaces/`);
+  return (
+    pathname.startsWith("/spaces/") || Boolean(pathname.match(SPACES_PATTERN))
+  );
+}
+
+async function handleAuthenticatedRoute(
   request: NextRequest,
   pathname: string
 ): Promise<NextResponse> {
@@ -39,6 +46,7 @@ async function handleDashboardAuth(
     const localeMatch = pathname.match(LOCALE_PATTERN);
     const loginPath = localeMatch ? `/${localeMatch[1]}/login` : "/login";
     const loginUrl = new URL(loginPath, request.url);
+    loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -54,9 +62,9 @@ export async function proxy(request: NextRequest) {
     return authResponse;
   }
 
-  // --- 2. Supabase Auth Check for /dashboard routes ---
-  if (isDashboardPath(pathname)) {
-    return handleDashboardAuth(request, pathname);
+  // --- 2. Supabase Auth Check for /dashboard and /spaces routes ---
+  if (isDashboardPath(pathname) || isSpacesPath(pathname)) {
+    return handleAuthenticatedRoute(request, pathname);
   }
 
   // --- 3. Share Key Rewrite Logic ---

@@ -5,6 +5,22 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        hostname: "lh3.googleusercontent.com",
+        protocol: "https",
+      },
+      {
+        hostname: "*.googleusercontent.com",
+        protocol: "https",
+      },
+      {
+        hostname: "static-cdn.jtvnw.net",
+        protocol: "https",
+      },
+    ],
+  },
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
 };
 

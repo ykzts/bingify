@@ -64,8 +64,22 @@
     "invalidToken": "このURLは無効か、再生成されています。",
     "loading": "読み込み中..."
   },
+  "UserHeader": {
+    "logout": "ログアウト"
+  },
   "UserSpace": {
+    "errorGeneric": "予期しないエラーが発生しました",
+    "errorInvalidSpace": "無効なスペースIDです",
+    "errorJoinFailed": "スペースへの参加に失敗しました",
+    "errorLeaveFailed": "スペースからの退出に失敗しました",
+    "errorQuotaReached": "スペースの参加者数が上限に達しています",
+    "errorUnauthorized": "認証が必要です。ログインしてください。",
     "heading": "ビンゴカード",
+    "joinButton": "スペースに参加",
+    "joining": "参加中...",
+    "leaveButton": "スペースから退出",
+    "leaving": "退出中...",
+    "participantCount": "{count} / {max} 人が参加中",
     "spaceId": "スペースID"
   }
 }
