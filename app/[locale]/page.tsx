@@ -49,6 +49,7 @@ export default async function Home({ params }: Props) {
           answer2={tFaq("answer2")}
           answer3={tFaq("answer3")}
           heading={tFaq("heading")}
+          maxParticipants={50}
           question1={tFaq("question1")}
           question2={tFaq("question2")}
           question3={tFaq("question3")}

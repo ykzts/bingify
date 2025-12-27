@@ -3,13 +3,14 @@
 import { motion } from "motion/react";
 
 interface FaqProps {
-  heading: string;
-  question1: string;
   answer1: string;
-  question2: string;
   answer2: string;
-  question3: string;
   answer3: string;
+  heading: string;
+  maxParticipants: number;
+  question1: string;
+  question2: string;
+  question3: string;
 }
 
 export function Faq({
@@ -17,14 +18,37 @@ export function Faq({
   answer2,
   answer3,
   heading,
+  maxParticipants,
   question1,
   question2,
   question3,
 }: FaqProps) {
   const faqs = [
-    { answer: answer1, question: question1 },
-    { answer: answer2, question: question2 },
-    { answer: answer3, question: question3 },
+    {
+      answer: answer1.replace("{maxParticipants}", maxParticipants.toString()),
+      id: "usage-limits",
+      question: question1,
+    },
+    {
+      answer: (
+        <>
+          {answer2.split("GitHub")[0]}
+          <a
+            aria-label="View source code on GitHub (opens in a new window)"
+            className="text-primary underline hover:text-primary/80"
+            href="https://github.com/ykzts/bingify"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            GitHub
+          </a>
+          {answer2.split("GitHub")[1]}
+        </>
+      ),
+      id: "source-code",
+      question: question2,
+    },
+    { answer: answer3, id: "funding", question: question3 },
   ];
 
   return (
@@ -45,9 +69,9 @@ export function Faq({
         <div className="space-y-6">
           {faqs.map((faq, index) => (
             <motion.div
-              key={faq.question}
               className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
               initial={{ opacity: 0, y: 20 }}
+              key={faq.id}
               transition={{ delay: index * 0.1, duration: 0.6 }}
               viewport={{ once: true }}
               whileInView={{ opacity: 1, y: 0 }}

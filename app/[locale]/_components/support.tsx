@@ -51,6 +51,7 @@ export function Support({ description, heading, sponsorButton }: SupportProps) {
           </motion.p>
 
           <motion.a
+            aria-label={`${sponsorButton} (opens in a new window)`}
             className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 font-semibold text-lg text-primary-foreground shadow-lg transition-transform hover:scale-105"
             href="https://github.com/sponsors/ykzts"
             initial={{ opacity: 0, y: 20 }}
