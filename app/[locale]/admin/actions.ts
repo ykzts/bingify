@@ -1,5 +1,6 @@
 "use server";
 
+import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -27,14 +28,11 @@ interface User {
   updated_at: string | null;
 }
 
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 /**
- * Validate UUID format
+ * Validate UUID format using Zod
  */
 function isValidUuid(uuid: string): boolean {
-  return UUID_REGEX.test(uuid);
+  return z.string().uuid().safeParse(uuid).success;
 }
 
 /**
