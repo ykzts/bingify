@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
@@ -6,6 +7,37 @@ import { SpaceJoin } from "./space-join";
 
 interface Props {
   params: Promise<{ id: string; locale: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const { data: space } = await supabase
+    .from("spaces")
+    .select("share_key")
+    .eq("id", id)
+    .single();
+
+  if (space) {
+    return {
+      description: `Join the bingo space @${space.share_key} on Bingify`,
+      openGraph: {
+        description: `Join the bingo space @${space.share_key} on Bingify`,
+        title: `Bingify - @${space.share_key}`,
+      },
+      title: `Bingify - @${space.share_key}`,
+      twitter: {
+        card: "summary_large_image",
+        description: `Join the bingo space @${space.share_key} on Bingify`,
+        title: `Bingify - @${space.share_key}`,
+      },
+    };
+  }
+
+  return {
+    title: "Bingify - Space",
+  };
 }
 
 export default async function UserSpacePage({ params }: Props) {
