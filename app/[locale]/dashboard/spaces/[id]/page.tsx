@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { BingoGameManager } from "./_components/bingo-game-manager";
 import { ViewingUrlManager } from "./_components/viewing-url-manager";
 
 interface Props {
@@ -49,6 +50,10 @@ export default async function AdminSpacePage({ params }: Props) {
             spaceId={space.id}
             viewToken={space.view_token}
           />
+        </div>
+
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <BingoGameManager spaceId={space.id} />
         </div>
       </div>
     </div>

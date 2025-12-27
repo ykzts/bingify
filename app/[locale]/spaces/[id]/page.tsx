@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { checkUserParticipation, getSpaceById } from "../actions";
+import { BingoCardDisplay } from "./_components/bingo-card-display";
 import { SpaceParticipation } from "./_components/space-participation";
 
 interface Props {
@@ -82,24 +83,30 @@ export default async function UserSpacePage({ params }: Props) {
           </Link>
         </div>
 
-        {/* Main Space Content - Bingo Game Placeholder */}
+        {/* Main Space Content - Bingo Game */}
         <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
-          <div className="text-center">
-            <h2 className="mb-4 font-bold text-xl">{t("bingoGameTitle")}</h2>
-            <p className="mb-6 text-gray-600">{t("bingoGamePlaceholder")}</p>
+          {isParticipant ? (
+            <BingoCardDisplay spaceId={id} />
+          ) : (
+            <div className="text-center">
+              <h2 className="mb-4 font-bold text-xl">{t("bingoGameTitle")}</h2>
+              <p className="mb-6 text-gray-600">{t("bingoGamePlaceholder")}</p>
 
-            {/* Placeholder for bingo card/game */}
-            <div className="mx-auto grid max-w-md grid-cols-5 gap-2">
-              {Array.from({ length: 25 }, (_, i) => i + 1).map((cellNumber) => (
-                <div
-                  className="flex aspect-square items-center justify-center rounded border border-gray-300 bg-gray-50 font-bold text-gray-400"
-                  key={cellNumber}
-                >
-                  {cellNumber}
-                </div>
-              ))}
+              {/* Placeholder for bingo card/game */}
+              <div className="mx-auto grid max-w-md grid-cols-5 gap-2">
+                {Array.from({ length: 25 }, (_, i) => i + 1).map(
+                  (cellNumber) => (
+                    <div
+                      className="flex aspect-square items-center justify-center rounded border border-gray-300 bg-gray-50 font-bold text-gray-400"
+                      key={cellNumber}
+                    >
+                      {cellNumber}
+                    </div>
+                  )
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Participant Info Section */}
