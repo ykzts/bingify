@@ -16,9 +16,10 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
 
   if (!user) {
     redirect({ href: "/login", locale });
+    return null;
   }
 
-  return <AccountLinkingForm user={user!} />;
+  return <AccountLinkingForm user={user} />;
 }
 
 export default async function AccountSettingsPage({ params }: Props) {
