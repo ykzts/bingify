@@ -1,7 +1,10 @@
 -- Add owner_id and max_participants columns to spaces_archive table
--- These columns were incorrectly added to 20251226000000_add_archive_tables.sql
--- in a previous commit, but that migration had already been applied to production.
--- This migration properly adds them as a new change.
+-- These columns (owner_id and max_participants) were incorrectly added to 
+-- 20251226000000_add_archive_tables.sql in a previous commit, but that migration 
+-- had already been applied to production. This migration properly adds them as a new change.
+-- 
+-- Note: view_token was correctly added in 20251227010000_add_view_token.sql.
+-- This migration updates the trigger function to include all columns including view_token.
 
 -- Add columns to spaces_archive table
 ALTER TABLE spaces_archive
