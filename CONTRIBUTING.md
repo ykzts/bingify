@@ -26,6 +26,26 @@ pnpm dev
 - **スタイリング**: Tailwind CSS（CSS-first、`tailwind.config.ts` 不要）。
 - **型安全**: `z.infer<typeof schema>` で型を推論し、手動定義を避ける。
 
+## データベースマイグレーション
+
+### ⚠️ 重要なルール
+
+**既存のマイグレーションファイルは絶対に編集しないでください。**
+
+- 既に `main` ブランチにマージされたマイグレーションファイルは、一度適用されると再実行されません
+- 既存ファイルを編集すると、既存環境には変更が反映されず、新規環境とのスキーマ不整合が発生します
+- **変更が必要な場合は、必ず新しいマイグレーションファイルを作成してください**
+
+```bash
+# ✅ 正しい方法: 新しいマイグレーションファイルを作成
+supabase migration new fix_archive_table_schema
+
+# ❌ 間違った方法: 既存ファイルを編集
+# vim supabase/migrations/20251226000000_add_archive_tables.sql
+```
+
+詳細は [docs/MIGRATIONS.md](docs/MIGRATIONS.md) を参照してください。
+
 ## PR / コミット
 
 ### Conventional Commits に準拠
