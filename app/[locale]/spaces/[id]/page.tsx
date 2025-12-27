@@ -16,7 +16,9 @@ export default async function UserSpacePage({ params }: Props) {
   const supabase = await createClient();
 
   // Check if user is authenticated
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     // Redirect to login with redirectTo parameter
@@ -53,9 +55,7 @@ export default async function UserSpacePage({ params }: Props) {
       <p>
         {t("spaceId")}: {id}
       </p>
-      <p className="mt-2 text-gray-600">
-        Share key: @{space.share_key}
-      </p>
+      <p className="mt-2 text-gray-600">Share key: @{space.share_key}</p>
     </div>
   );
 }

@@ -8,15 +8,16 @@ export interface JoinSpaceState {
   success: boolean;
 }
 
-export async function joinSpace(
-  spaceId: string
-): Promise<JoinSpaceState> {
+export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
   try {
     const supabase = await createClient();
-    
+
     // Check if user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
     if (authError || !user) {
       return {
         error: "認証が必要です",
@@ -61,13 +62,11 @@ export async function joinSpace(
     }
 
     // Add user as member
-    const { error: insertError } = await supabase
-      .from("space_members")
-      .insert({
-        role: "member",
-        space_id: spaceId,
-        user_id: user.id,
-      });
+    const { error: insertError } = await supabase.from("space_members").insert({
+      role: "member",
+      space_id: spaceId,
+      user_id: user.id,
+    });
 
     if (insertError) {
       console.error("Error joining space:", insertError);
@@ -95,7 +94,7 @@ export async function joinSpace(
 export async function getSpaceByShareKey(shareKey: string) {
   try {
     const supabase = await createClient();
-    
+
     const { data: space, error } = await supabase
       .from("spaces")
       .select("id, share_key, status, created_at")
@@ -117,9 +116,12 @@ export async function getSpaceByShareKey(shareKey: string) {
 export async function checkSpaceMembership(spaceId: string) {
   try {
     const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
     if (authError || !user) {
       return { isMember: false, isAuthenticated: false };
     }

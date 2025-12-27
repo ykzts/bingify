@@ -17,13 +17,13 @@ export function LoginForm() {
     setOauthError(null);
     setIsLoading(true);
     const supabase = createClient();
-    
+
     // Build callback URL with redirectTo if present
     let callbackUrl = `${window.location.origin}/auth/callback`;
     if (redirectTo) {
       callbackUrl += `?redirectTo=${encodeURIComponent(redirectTo)}`;
     }
-    
+
     const { error } = await supabase.auth.signInWithOAuth({
       options: {
         redirectTo: callbackUrl,
