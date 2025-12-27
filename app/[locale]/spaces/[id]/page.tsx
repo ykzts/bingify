@@ -52,38 +52,59 @@ export default async function UserSpacePage({ params }: Props) {
   const isParticipant = await checkUserParticipation(id);
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-8">
-      <div className="w-full max-w-md space-y-6">
-        {/* Space Header */}
-        <div className="text-center">
-          <h1 className="mb-2 font-bold text-3xl">{space.share_key}</h1>
-          <p className="text-gray-600">{t("joinPrompt")}</p>
-        </div>
-
-        {/* Participation Component */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          {isParticipant ? (
-            <div className="space-y-4">
-              <div className="rounded-lg bg-green-50 p-4">
-                <p className="text-center font-medium text-green-800">
-                  {t("alreadyJoined")}
-                </p>
-              </div>
-              <SpaceParticipation spaceId={id} spaceInfo={space} />
+    <div className="min-h-screen bg-gray-50">
+      {/* Join Banner for non-participants */}
+      {!isParticipant && (
+        <div className="border-yellow-200 border-b bg-yellow-50 px-4 py-3">
+          <div className="mx-auto flex max-w-4xl items-center justify-between gap-4">
+            <div className="flex-1">
+              <p className="font-medium text-gray-900 text-sm">
+                {t("notParticipantBanner")}
+              </p>
             </div>
-          ) : (
-            <SpaceParticipation spaceId={id} spaceInfo={space} />
-          )}
+            <SpaceParticipation compact spaceId={id} spaceInfo={space} />
+          </div>
         </div>
+      )}
 
-        {/* Back Link */}
-        <div className="text-center">
+      {/* Space Content */}
+      <div className="mx-auto max-w-4xl p-6">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="mb-1 font-bold text-2xl">{space.share_key}</h1>
+            <p className="text-gray-600 text-sm">{t("spaceSubtitle")}</p>
+          </div>
           <Link
             className="text-gray-600 text-sm hover:text-gray-900 hover:underline"
             href="/"
           >
             {t("backToHome")}
           </Link>
+        </div>
+
+        {/* Main Space Content - Bingo Game Placeholder */}
+        <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+          <div className="text-center">
+            <h2 className="mb-4 font-bold text-xl">{t("bingoGameTitle")}</h2>
+            <p className="mb-6 text-gray-600">{t("bingoGamePlaceholder")}</p>
+
+            {/* Placeholder for bingo card/game */}
+            <div className="mx-auto grid max-w-md grid-cols-5 gap-2">
+              {Array.from({ length: 25 }, (_, i) => i + 1).map((cellNumber) => (
+                <div
+                  className="flex aspect-square items-center justify-center rounded border border-gray-300 bg-gray-50 font-bold text-gray-400"
+                  key={cellNumber}
+                >
+                  {cellNumber}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Participant Info Section */}
+        <div className="mt-6">
+          <SpaceParticipation spaceId={id} spaceInfo={space} />
         </div>
       </div>
     </div>
