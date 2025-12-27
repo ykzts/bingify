@@ -8,6 +8,7 @@ const LOCALE_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/`);
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
+  const redirectTo = requestUrl.searchParams.get("redirectTo");
   const origin = requestUrl.origin;
 
   if (code) {
@@ -30,6 +31,27 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.redirect(`${origin}${loginPath}`);
     }
+  }
+
+  // Check if there's a redirectTo parameter from login
+  if (redirectTo) {
+    // Extract locale from referer or use default
+    const referer = request.headers.get("referer");
+    let locale = routing.defaultLocale;
+    
+    if (referer) {
+      const refererUrl = new URL(referer);
+      const localeMatch = refererUrl.pathname.match(LOCALE_PATTERN);
+      if (localeMatch) {
+        locale = localeMatch[1];
+      }
+    }
+
+    // If redirectTo already has locale, use as is, otherwise prepend locale
+    const hasLocale = LOCALE_PATTERN.test(redirectTo);
+    const finalRedirect = hasLocale ? redirectTo : `/${locale}${redirectTo}`;
+    
+    return NextResponse.redirect(`${origin}${finalRedirect}`);
   }
 
   // Extract locale from referer or default to root dashboard

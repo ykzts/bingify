@@ -43,6 +43,21 @@
     "description": "Experience a new kind of bingo that brings everyone together in real-time. No app needed—just share a URL and everyone can join.",
     "title": "Bingify - Turn Every Screen Into A Venue of Excitement."
   },
+  "SpaceJoin": {
+    "alreadyMember": "Already a member",
+    "cancelButton": "Cancel",
+    "enterSpace": "Enter Space",
+    "errorInvalidLink": "Invalid invitation link",
+    "errorLoadingSpace": "Failed to load space information",
+    "joinButton": "Join",
+    "joinError": "Failed to join. Please try again.",
+    "joining": "Joining...",
+    "loadingSpace": "Loading...",
+    "loginRequired": "Login required to join",
+    "loginToJoin": "Login to Join",
+    "spaceInactive": "This space is not available",
+    "title": "Join this space?"
+  },
   "UserSpace": {
     "heading": "Bingo Card",
     "spaceId": "Space ID"

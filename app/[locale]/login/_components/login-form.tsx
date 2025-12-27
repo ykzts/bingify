@@ -9,6 +9,7 @@ export function LoginForm() {
   const t = useTranslations("Login");
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
+  const redirectTo = searchParams.get("redirectTo");
   const [oauthError, setOauthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -16,9 +17,16 @@ export function LoginForm() {
     setOauthError(null);
     setIsLoading(true);
     const supabase = createClient();
+    
+    // Build callback URL with redirectTo if present
+    let callbackUrl = `${window.location.origin}/auth/callback`;
+    if (redirectTo) {
+      callbackUrl += `?redirectTo=${encodeURIComponent(redirectTo)}`;
+    }
+    
     const { error } = await supabase.auth.signInWithOAuth({
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: callbackUrl,
       },
       provider,
     });
