@@ -20,6 +20,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
