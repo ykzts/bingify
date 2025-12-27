@@ -53,21 +53,22 @@ DECLARE
   current_count INTEGER;
   max_count INTEGER;
 BEGIN
-  -- Get current participant count and max participants for the space
-  SELECT COUNT(*), s.max_participants
-  INTO current_count, max_count
-  FROM participants p
-  JOIN spaces s ON s.id = p.space_id
-  WHERE p.space_id = NEW.space_id
-  GROUP BY s.id, s.max_participants;
+  -- Get max_participants from spaces
+  SELECT max_participants INTO max_count
+  FROM spaces
+  WHERE id = NEW.space_id;
 
-  -- If no participants yet, get max_participants from spaces
-  IF current_count IS NULL THEN
-    SELECT max_participants INTO max_count
-    FROM spaces
-    WHERE id = NEW.space_id;
-    current_count := 0;
+  -- If space doesn't exist, PostgreSQL FK constraint will handle it
+  IF max_count IS NULL THEN
+    RAISE EXCEPTION 'Space does not exist'
+      USING ERRCODE = 'foreign_key_violation';
   END IF;
+
+  -- Get current participant count for the space
+  SELECT COUNT(*)
+  INTO current_count
+  FROM participants
+  WHERE space_id = NEW.space_id;
 
   -- Check if adding this participant would exceed the limit
   IF current_count >= max_count THEN
