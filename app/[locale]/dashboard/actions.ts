@@ -79,6 +79,19 @@ export async function createSpace(
 
     // Check availability
     const supabase = await createClient();
+
+    // Get the authenticated user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "認証が必要です。ログインしてください。",
+        success: false,
+      };
+    }
+
     const { data: existing } = await supabase
       .from("spaces")
       .select("id")
@@ -111,6 +124,7 @@ export async function createSpace(
       .from("spaces")
       .insert({
         id: uuid,
+        owner_id: user.id,
         settings: {},
         share_key: fullSlug,
         status: "active",
