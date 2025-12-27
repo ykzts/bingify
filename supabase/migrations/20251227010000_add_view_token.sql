@@ -4,8 +4,10 @@
 -- backfill with generated tokens, then add NOT NULL constraint.
 
 -- Add owner_id column (references auth.users)
+-- Note: owner_id may already exist from previous migration (20251227000001_add_participants_and_quota.sql)
+-- Using IF NOT EXISTS to ensure idempotency
 ALTER TABLE spaces
-ADD COLUMN owner_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
+ADD COLUMN IF NOT EXISTS owner_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
 
 -- Add view_token column (NOT NULL, UNIQUE)
 -- No DEFAULT is set - application must provide the token to ensure data integrity
@@ -13,9 +15,10 @@ ALTER TABLE spaces
 ADD COLUMN view_token TEXT NOT NULL UNIQUE;
 
 -- Add same columns to spaces_archive table
+-- Note: owner_id may already exist from previous migration (20251226000000_add_archive_tables.sql)
 ALTER TABLE spaces_archive
-ADD COLUMN owner_id UUID,
-ADD COLUMN view_token TEXT;
+ADD COLUMN IF NOT EXISTS owner_id UUID,
+ADD COLUMN IF NOT EXISTS view_token TEXT;
 
 -- Update archive trigger function to include new columns
 CREATE OR REPLACE FUNCTION archive_deleted_space()
