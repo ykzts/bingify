@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS space_members (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   space_id UUID NOT NULL REFERENCES spaces(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  role TEXT DEFAULT 'member',
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('owner', 'member')),
   joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(space_id, user_id)
 );
@@ -27,13 +27,16 @@ CREATE POLICY "Users can read members of their spaces"
     )
   );
 
--- Policy: Users can insert themselves as members
+-- Policy: Users can insert themselves as members only (not as owner)
 CREATE POLICY "Users can join spaces"
   ON space_members
   FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (
+    auth.uid() = user_id
+    AND COALESCE(role, 'member') = 'member'
+  );
 
--- Policy: Space creators (first member) can delete other members
+-- Policy: Space creators (owners) can delete members, but not the last owner
 CREATE POLICY "Space creators can remove members"
   ON space_members
   FOR DELETE
@@ -44,16 +47,68 @@ CREATE POLICY "Space creators can remove members"
       AND sm.user_id = auth.uid()
       AND sm.role = 'owner'
     )
+    AND (
+      space_members.role <> 'owner'
+      OR EXISTS (
+        SELECT 1
+        FROM space_members sm_owners
+        WHERE sm_owners.space_id = space_members.space_id
+          AND sm_owners.role = 'owner'
+          AND sm_owners.user_id <> space_members.user_id
+      )
+    )
   );
 
--- Update spaces RLS to allow public read of basic info (name, share_key) for join page
-ALTER TABLE spaces ENABLE ROW LEVEL SECURITY;
+-- Policy: Space owners can update member roles
+CREATE POLICY "Space owners can update members"
+  ON space_members
+  FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM space_members sm
+      WHERE sm.space_id = space_members.space_id
+      AND sm.user_id = auth.uid()
+      AND sm.role = 'owner'
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM space_members sm
+      WHERE sm.space_id = space_members.space_id
+      AND sm.user_id = auth.uid()
+      AND sm.role = 'owner'
+    )
+  );
 
--- Policy: Anyone can read basic space info by share_key for join page
-CREATE POLICY "Anyone can read space info by share key"
+-- Enable RLS on spaces table
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_tables 
+    WHERE schemaname = 'public' 
+    AND tablename = 'spaces' 
+    AND rowsecurity = true
+  ) THEN
+    ALTER TABLE spaces ENABLE ROW LEVEL SECURITY;
+  END IF;
+END $$;
+
+-- Drop existing policies if they exist to ensure idempotency
+DROP POLICY IF EXISTS "Space members can read their space" ON spaces;
+DROP POLICY IF EXISTS "Authenticated users can create spaces" ON spaces;
+DROP POLICY IF EXISTS "Space members can update their space" ON spaces;
+
+-- Policy: Space members can read their space
+CREATE POLICY "Space members can read their space"
   ON spaces
   FOR SELECT
-  USING (true);
+  USING (
+    EXISTS (
+      SELECT 1 FROM space_members sm
+      WHERE sm.space_id = spaces.id
+      AND sm.user_id = auth.uid()
+    )
+  );
 
 -- Policy: Only authenticated users can create spaces
 CREATE POLICY "Authenticated users can create spaces"

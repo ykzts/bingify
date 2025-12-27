@@ -15,16 +15,33 @@ function extractLocaleFromReferer(referer: string | null): string | null {
   return localeMatch ? localeMatch[1] : null;
 }
 
+function sanitizeRedirectPath(redirectTo: string | null): string | null {
+  if (!redirectTo) {
+    return null;
+  }
+
+  // Only allow relative paths on the current origin (e.g. "/foo" but not "//evil.com")
+  if (!redirectTo.startsWith("/") || redirectTo.startsWith("//")) {
+    return null;
+  }
+
+  return redirectTo;
+}
+
 function buildRedirectUrl(
   origin: string,
   redirectTo: string | null,
   referer: string | null
 ): string {
+  const safeRedirectTo = sanitizeRedirectPath(redirectTo);
+
   // Handle redirectTo parameter
-  if (redirectTo) {
+  if (safeRedirectTo) {
     const locale = extractLocaleFromReferer(referer) || routing.defaultLocale;
-    const hasLocale = LOCALE_PATTERN.test(redirectTo);
-    const finalRedirect = hasLocale ? redirectTo : `/${locale}${redirectTo}`;
+    const hasLocale = LOCALE_PATTERN.test(safeRedirectTo);
+    const finalRedirect = hasLocale
+      ? safeRedirectTo
+      : `/${locale}${safeRedirectTo}`;
     return `${origin}${finalRedirect}`;
   }
 

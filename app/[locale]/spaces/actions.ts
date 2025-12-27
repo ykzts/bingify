@@ -47,12 +47,21 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
     }
 
     // Check if user is already a member
-    const { data: existingMember } = await supabase
+    const { data: existingMember, error: memberCheckError } = await supabase
       .from("space_members")
       .select("id")
       .eq("space_id", spaceId)
       .eq("user_id", user.id)
       .single();
+
+    if (memberCheckError && memberCheckError.code !== "PGRST116") {
+      // PGRST116 is "not found", which is expected for non-members
+      console.error("Error checking membership:", memberCheckError);
+      return {
+        error: "メンバーシップの確認に失敗しました",
+        success: false,
+      };
+    }
 
     if (existingMember) {
       // Already a member, this is success
@@ -126,12 +135,18 @@ export async function checkSpaceMembership(spaceId: string) {
       return { isMember: false, isAuthenticated: false };
     }
 
-    const { data: member } = await supabase
+    const { data: member, error: memberError } = await supabase
       .from("space_members")
       .select("id, role")
       .eq("space_id", spaceId)
       .eq("user_id", user.id)
       .single();
+
+    // Log error if it's not just "not found"
+    if (memberError && memberError.code !== "PGRST116") {
+      console.error("Error checking membership:", memberError);
+      return { error: true, isAuthenticated: true, isMember: false };
+    }
 
     return {
       isAuthenticated: true,
@@ -140,6 +155,6 @@ export async function checkSpaceMembership(spaceId: string) {
     };
   } catch (error) {
     console.error("Error checking membership:", error);
-    return { isMember: false, isAuthenticated: false };
+    return { error: true, isAuthenticated: false, isMember: false };
   }
 }

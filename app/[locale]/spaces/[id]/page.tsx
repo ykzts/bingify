@@ -10,34 +10,48 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const supabase = await createClient();
+  try {
+    const { id } = await params;
+    const supabase = await createClient();
 
-  const { data: space } = await supabase
-    .from("spaces")
-    .select("share_key")
-    .eq("id", id)
-    .single();
+    const { data: space, error } = await supabase
+      .from("spaces")
+      .select("share_key")
+      .eq("id", id)
+      .single();
 
-  if (space) {
+    if (error) {
+      console.error("Error fetching space for metadata:", error);
+      return {
+        title: "Bingify - Space",
+      };
+    }
+
+    if (space) {
+      return {
+        description: `Join the bingo space @${space.share_key} on Bingify`,
+        openGraph: {
+          description: `Join the bingo space @${space.share_key} on Bingify`,
+          title: `Bingify - @${space.share_key}`,
+        },
+        title: `Bingify - @${space.share_key}`,
+        twitter: {
+          card: "summary_large_image",
+          description: `Join the bingo space @${space.share_key} on Bingify`,
+          title: `Bingify - @${space.share_key}`,
+        },
+      };
+    }
+
     return {
-      description: `Join the bingo space @${space.share_key} on Bingify`,
-      openGraph: {
-        description: `Join the bingo space @${space.share_key} on Bingify`,
-        title: `Bingify - @${space.share_key}`,
-      },
-      title: `Bingify - @${space.share_key}`,
-      twitter: {
-        card: "summary_large_image",
-        description: `Join the bingo space @${space.share_key} on Bingify`,
-        title: `Bingify - @${space.share_key}`,
-      },
+      title: "Bingify - Space",
+    };
+  } catch (error) {
+    console.error("Error generating metadata:", error);
+    return {
+      title: "Bingify - Space",
     };
   }
-
-  return {
-    title: "Bingify - Space",
-  };
 }
 
 export default async function UserSpacePage({ params }: Props) {

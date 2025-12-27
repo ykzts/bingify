@@ -20,7 +20,8 @@ export function LoginForm() {
 
     // Build callback URL with redirectTo if present
     let callbackUrl = `${window.location.origin}/auth/callback`;
-    if (redirectTo) {
+    if (redirectTo?.startsWith("/") && !redirectTo.startsWith("//")) {
+      // Validate redirectTo is a safe relative path
       callbackUrl += `?redirectTo=${encodeURIComponent(redirectTo)}`;
     }
 
