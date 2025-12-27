@@ -10,39 +10,45 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get("code");
   const origin = requestUrl.origin;
 
-  if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-    if (error) {
-      console.error("Error exchanging code for session:", error);
-      // Extract locale from referer for error redirect
-      const referer = request.headers.get("referer");
-      let loginPath = "/login?error=auth_failed";
-
-      if (referer) {
-        const refererUrl = new URL(referer);
-        const localeMatch = refererUrl.pathname.match(LOCALE_PATTERN);
-        if (localeMatch) {
-          loginPath = `/${localeMatch[1]}/login?error=auth_failed`;
-        }
+  // Helper function to extract locale from referer
+  const getLocaleFromReferer = (): string | null => {
+    const referer = request.headers.get("referer");
+    if (referer) {
+      const refererUrl = new URL(referer);
+      const localeMatch = refererUrl.pathname.match(LOCALE_PATTERN);
+      if (localeMatch?.[1]) {
+        return localeMatch[1];
       }
-
-      return NextResponse.redirect(`${origin}${loginPath}`);
     }
+    return null;
+  };
+
+  // Helper function to build path with optional locale
+  const buildPath = (path: string, locale: string | null): string => {
+    return locale ? `/${locale}${path}` : path;
+  };
+
+  // Code parameter is required for authentication
+  if (!code) {
+    console.error("Auth callback called without code parameter");
+    const locale = getLocaleFromReferer();
+    const loginPath = buildPath("/login?error=auth_failed", locale);
+    return NextResponse.redirect(`${origin}${loginPath}`);
   }
 
-  // Extract locale from referer or default to root dashboard
-  const referer = request.headers.get("referer");
-  let redirectPath = "/dashboard";
+  // Exchange code for session
+  const supabase = await createClient();
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-  if (referer) {
-    const refererUrl = new URL(referer);
-    const localeMatch = refererUrl.pathname.match(LOCALE_PATTERN);
-    if (localeMatch) {
-      redirectPath = `/${localeMatch[1]}/dashboard`;
-    }
+  if (error) {
+    console.error("Error exchanging code for session:", error);
+    const locale = getLocaleFromReferer();
+    const loginPath = buildPath("/login?error=auth_failed", locale);
+    return NextResponse.redirect(`${origin}${loginPath}`);
   }
 
+  // Successfully authenticated, redirect to dashboard
+  const locale = getLocaleFromReferer();
+  const redirectPath = buildPath("/dashboard", locale);
   return NextResponse.redirect(`${origin}${redirectPath}`);
 }
