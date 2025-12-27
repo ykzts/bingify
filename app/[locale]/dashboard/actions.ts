@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { format } from "date-fns";
+import { generateSecureToken } from "@/lib/crypto";
 import { spaceSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 
@@ -119,6 +120,7 @@ export async function createSpace(
 
     // Create space in database
     const uuid = randomUUID();
+    const viewToken = generateSecureToken();
 
     const { error } = await supabase
       .from("spaces")
@@ -128,6 +130,7 @@ export async function createSpace(
         settings: {},
         share_key: fullSlug,
         status: "active",
+        view_token: viewToken,
       })
       .select()
       .single();
@@ -135,7 +138,7 @@ export async function createSpace(
     if (error) {
       console.error("Database error:", error);
       return {
-        error: "スペースの作成に失敗しました",
+        error: "Failed to create space",
         success: false,
       };
     }
@@ -148,7 +151,71 @@ export async function createSpace(
   } catch (error) {
     console.error("Error creating space:", error);
     return {
-      error: "予期しないエラーが発生しました",
+      error: "An unexpected error occurred",
+      success: false,
+    };
+  }
+}
+
+export interface RegenerateViewTokenState {
+  error?: string;
+  success: boolean;
+  viewToken?: string;
+}
+
+export async function regenerateViewToken(
+  spaceId: string
+): Promise<RegenerateViewTokenState> {
+  try {
+    const supabase = await createClient();
+
+    // Get current user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "Authentication required",
+        success: false,
+      };
+    }
+
+    // Generate new token
+    const newToken = generateSecureToken();
+
+    // Update the space with new token
+    // RLS policy ensures only the owner can update
+    const { error, count } = await supabase
+      .from("spaces")
+      .update({ view_token: newToken })
+      .eq("id", spaceId)
+      .eq("owner_id", user.id);
+
+    if (error) {
+      console.error("Database error:", error);
+      return {
+        error: "Failed to regenerate token",
+        success: false,
+      };
+    }
+
+    // Check if any row was updated (user must be owner)
+    if (count === 0) {
+      return {
+        error: "Space not found or access denied",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+      viewToken: newToken,
+    };
+  } catch (error) {
+    console.error("Error regenerating token:", error);
+    return {
+      error: "An unexpected error occurred",
       success: false,
     };
   }

@@ -44,8 +44,25 @@
     "usersTitle": "User Management"
   },
   "AdminSpace": {
+    "copyUrlButton": "Copy Viewing URL",
+    "copyUrlError": "Failed to copy URL",
+    "copyUrlSuccess": "URL copied to clipboard",
     "heading": "Admin Dashboard",
-    "spaceId": "Space ID"
+    "regenerateConfirm": "The old URL will become invalid. Are you sure you want to continue?",
+    "regenerateError": "Failed to regenerate URL",
+    "regenerateSuccess": "URL regenerated successfully",
+    "regenerateUrlButton": "Regenerate URL",
+    "spaceId": "Space ID",
+    "viewingUrlDescription": "Share this URL to display the bingo board on screens, in streaming software, or other display applications.",
+    "viewingUrlLabel": "Public Viewing URL"
+  },
+  "Errors": {
+    "authRequired": "Authentication required",
+    "notFound": "Space not found",
+    "permissionDenied": "You don't have permission to edit this space",
+    "spaceCreationFailed": "Failed to create space",
+    "tokenRegenerationFailed": "Failed to regenerate token",
+    "unexpectedError": "An unexpected error occurred"
   },
   "Features": {
     "communityDescription": "Perfect for community events, streams, and parties. Easy for everyone to join and enjoy together.",
@@ -86,6 +103,10 @@
   "Metadata": {
     "description": "Experience a new kind of bingo that brings everyone together in real-time. No app needed—just share a URL and everyone can join.",
     "title": "Bingify - Turn Every Screen Into A Venue of Excitement."
+  },
+  "ScreenView": {
+    "invalidToken": "This URL is invalid or has been regenerated.",
+    "loading": "Loading..."
   },
   "UserHeader": {
     "logout": "Sign out"
