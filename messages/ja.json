@@ -86,6 +86,15 @@
     "tokenRegenerationFailed": "トークンの再生成に失敗しました",
     "unexpectedError": "予期しないエラーが発生しました"
   },
+  "Faq": {
+    "answer1": "無料版は1つのスペースにつき最大50人まで同時参加できます。大規模イベントや商用利用については、お問い合わせください。",
+    "answer2": "はい！BingifyはMITライセンスのオープンソースプロジェクトです。GitHubでソースコードの閲覧、改変、貢献が可能です。",
+    "answer3": "このプロジェクトはボランティアによって運営されています。GitHub Sponsorsを通じたサポートは、ホスティング費用や開発時間の確保に役立ちます。",
+    "heading": "よくある質問",
+    "question1": "利用制限はありますか？",
+    "question2": "ソースコードは公開されていますか？",
+    "question3": "このプロジェクトはどのように運営されていますか？"
+  },
   "Features": {
     "communityDescription": "コミュニティイベント、配信、パーティーに最適。誰でも簡単に参加でき、みんなで盛り上がれます。",
     "communityTitle": "Community First",
@@ -99,6 +108,7 @@
   "Footer": {
     "backToHome": "ホームに戻る",
     "privacy": "プライバシーポリシー",
+    "sourceCode": "ソースコード",
     "terms": "利用規約"
   },
   "Hero": {
@@ -131,6 +141,11 @@
   "ScreenView": {
     "invalidToken": "このURLは無効か、再生成されています。",
     "loading": "読み込み中..."
+  },
+  "Support": {
+    "description": "Bingifyはボランティアによって運営されているオープンソースプロジェクトです。あなたのサポートが、ホスティング費用や継続的な開発を支えます。",
+    "heading": "開発を支援する",
+    "sponsorButton": "GitHub Sponsorsで支援"
   },
   "UserHeader": {
     "logout": "ログアウト",
