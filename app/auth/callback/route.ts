@@ -14,10 +14,21 @@ export async function GET(request: NextRequest) {
   const getLocaleFromReferer = (): string | null => {
     const referer = request.headers.get("referer");
     if (referer) {
-      const refererUrl = new URL(referer);
-      const localeMatch = refererUrl.pathname.match(LOCALE_PATTERN);
-      if (localeMatch?.[1]) {
-        return localeMatch[1];
+      try {
+        const refererUrl = new URL(referer);
+        const localeMatch = refererUrl.pathname.match(LOCALE_PATTERN);
+        if (localeMatch?.[1]) {
+          const locale = localeMatch[1];
+          // Validate locale against configured locales
+          if (
+            routing.locales.includes(locale as (typeof routing.locales)[number])
+          ) {
+            return locale;
+          }
+        }
+      } catch {
+        // Invalid URL in referer header, return null
+        return null;
       }
     }
     return null;

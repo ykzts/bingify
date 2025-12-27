@@ -108,14 +108,11 @@ describe("Auth Callback Route", () => {
       },
     } as any);
 
-    const request = new NextRequest(
-      `${origin}/auth/callback?code=valid_code`,
-      {
-        headers: {
-          referer: `${origin}/login`,
-        },
-      }
-    );
+    const request = new NextRequest(`${origin}/auth/callback?code=valid_code`, {
+      headers: {
+        referer: `${origin}/login`,
+      },
+    });
 
     const response = await GET(request);
 
@@ -131,14 +128,11 @@ describe("Auth Callback Route", () => {
       },
     } as any);
 
-    const request = new NextRequest(
-      `${origin}/auth/callback?code=valid_code`,
-      {
-        headers: {
-          referer: `${origin}/ja/login`,
-        },
-      }
-    );
+    const request = new NextRequest(`${origin}/auth/callback?code=valid_code`, {
+      headers: {
+        referer: `${origin}/ja/login`,
+      },
+    });
 
     const response = await GET(request);
 
@@ -154,13 +148,81 @@ describe("Auth Callback Route", () => {
       },
     } as any);
 
-    const request = new NextRequest(
-      `${origin}/auth/callback?code=valid_code`
-    );
+    const request = new NextRequest(`${origin}/auth/callback?code=valid_code`);
 
     const response = await GET(request);
 
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+  });
+
+  it("should handle malformed referer URL gracefully", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(`${origin}/auth/callback?code=valid_code`, {
+      headers: {
+        referer: "not-a-valid-url",
+      },
+    });
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+  });
+
+  it("should ignore invalid locale in referer and redirect to non-localized path", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(`${origin}/auth/callback?code=valid_code`, {
+      headers: {
+        referer: `${origin}/xyz/login`,
+      },
+    });
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+  });
+
+  it("should handle malformed referer URL on authentication error", async () => {
+    const request = new NextRequest(`${origin}/auth/callback`, {
+      headers: {
+        referer: "invalid-url-format",
+      },
+    });
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/login?error=auth_failed`
+    );
+  });
+
+  it("should ignore invalid locale in referer on authentication error", async () => {
+    const request = new NextRequest(`${origin}/auth/callback`, {
+      headers: {
+        referer: `${origin}/xyz/login`,
+      },
+    });
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/login?error=auth_failed`
+    );
   });
 });
