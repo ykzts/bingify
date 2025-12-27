@@ -27,17 +27,30 @@ interface User {
   updated_at: string | null;
 }
 
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Validate UUID format
+ */
+function isValidUuid(uuid: string): boolean {
+  return UUID_REGEX.test(uuid);
+}
+
 /**
  * Verify that the current user has admin role
  */
-async function verifyAdminRole(): Promise<boolean> {
+async function verifyAdminRole(): Promise<{
+  isAdmin: boolean;
+  userId?: string;
+}> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return false;
+    return { isAdmin: false };
   }
 
   const { data: profile } = await supabase
@@ -46,7 +59,10 @@ async function verifyAdminRole(): Promise<boolean> {
     .eq("id", user.id)
     .single();
 
-  return profile?.role === "admin";
+  return {
+    isAdmin: profile?.role === "admin",
+    userId: user.id,
+  };
 }
 
 /**
@@ -56,22 +72,33 @@ export async function forceDeleteSpace(
   spaceId: string
 ): Promise<AdminActionResult> {
   try {
+    // Validate UUID format
+    if (!isValidUuid(spaceId)) {
+      return {
+        error: "errorInvalidUuid",
+        success: false,
+      };
+    }
+
     // Verify admin role
-    const isAdmin = await verifyAdminRole();
+    const { isAdmin } = await verifyAdminRole();
     if (!isAdmin) {
       return {
-        error: "管理者権限が必要です",
+        error: "errorNoPermission",
         success: false,
       };
     }
 
     const adminClient = createAdminClient();
-    const { error } = await adminClient.from("spaces").delete().eq("id", spaceId);
+    const { error } = await adminClient
+      .from("spaces")
+      .delete()
+      .eq("id", spaceId);
 
     if (error) {
       console.error("Failed to delete space:", error);
       return {
-        error: "スペースの削除に失敗しました",
+        error: "deleteError",
         success: false,
       };
     }
@@ -82,7 +109,7 @@ export async function forceDeleteSpace(
   } catch (error) {
     console.error("Error in forceDeleteSpace:", error);
     return {
-      error: "予期しないエラーが発生しました",
+      error: "errorGeneric",
       success: false,
     };
   }
@@ -96,22 +123,52 @@ export async function forceDeleteSpace(
  */
 export async function banUser(userId: string): Promise<AdminActionResult> {
   try {
-    // Verify admin role
-    const isAdmin = await verifyAdminRole();
-    if (!isAdmin) {
+    // Validate UUID format
+    if (!isValidUuid(userId)) {
       return {
-        error: "管理者権限が必要です",
+        error: "errorInvalidUuid",
         success: false,
       };
     }
 
+    // Verify admin role and get current user ID
+    const { isAdmin, userId: currentUserId } = await verifyAdminRole();
+    if (!isAdmin) {
+      return {
+        error: "errorNoPermission",
+        success: false,
+      };
+    }
+
+    // Prevent self-banning
+    if (userId === currentUserId) {
+      return {
+        error: "errorNoPermission",
+        success: false,
+      };
+    }
+
+    // Check target user's role - prevent banning other admins
     const adminClient = createAdminClient();
+    const { data: targetProfile } = await adminClient
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .single();
+
+    if (targetProfile?.role === "admin") {
+      return {
+        error: "errorNoPermission",
+        success: false,
+      };
+    }
+
     const { error } = await adminClient.auth.admin.deleteUser(userId);
 
     if (error) {
       console.error("Failed to ban user:", error);
       return {
-        error: "ユーザーのBANに失敗しました",
+        error: "banError",
         success: false,
       };
     }
@@ -122,88 +179,106 @@ export async function banUser(userId: string): Promise<AdminActionResult> {
   } catch (error) {
     console.error("Error in banUser:", error);
     return {
-      error: "予期しないエラーが発生しました",
+      error: "errorGeneric",
       success: false,
     };
   }
 }
 
 /**
- * Get all spaces (for admin dashboard)
+ * Get all spaces (for admin dashboard) with pagination
  */
-export async function getAllSpaces(): Promise<{
+export async function getAllSpaces(
+  page = 1,
+  perPage = 50
+): Promise<{
   error?: string;
+  hasMore?: boolean;
   spaces?: Space[];
 }> {
   try {
     // Verify admin role
-    const isAdmin = await verifyAdminRole();
+    const { isAdmin } = await verifyAdminRole();
     if (!isAdmin) {
       return {
-        error: "管理者権限が必要です",
+        error: "errorNoPermission",
       };
     }
 
     const adminClient = createAdminClient();
+    const from = (page - 1) * perPage;
+    const to = from + perPage;
+
     const { data, error } = await adminClient
       .from("spaces")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(from, to - 1);
 
     if (error) {
       console.error("Failed to fetch spaces:", error);
       return {
-        error: "スペースの取得に失敗しました",
+        error: "errorGeneric",
       };
     }
 
     return {
+      hasMore: (data?.length || 0) === perPage,
       spaces: data || [],
     };
   } catch (error) {
     console.error("Error in getAllSpaces:", error);
     return {
-      error: "予期しないエラーが発生しました",
+      error: "errorGeneric",
     };
   }
 }
 
 /**
- * Get all users (for admin dashboard)
+ * Get all users (for admin dashboard) with pagination
  */
-export async function getAllUsers(): Promise<{
+export async function getAllUsers(
+  page = 1,
+  perPage = 50
+): Promise<{
   error?: string;
+  hasMore?: boolean;
   users?: User[];
 }> {
   try {
     // Verify admin role
-    const isAdmin = await verifyAdminRole();
+    const { isAdmin } = await verifyAdminRole();
     if (!isAdmin) {
       return {
-        error: "管理者権限が必要です",
+        error: "errorNoPermission",
       };
     }
 
     const adminClient = createAdminClient();
+    const from = (page - 1) * perPage;
+    const to = from + perPage;
+
     const { data, error } = await adminClient
       .from("profiles")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(from, to - 1);
 
     if (error) {
       console.error("Failed to fetch users:", error);
       return {
-        error: "ユーザーの取得に失敗しました",
+        error: "errorGeneric",
       };
     }
 
     return {
+      hasMore: (data?.length || 0) === perPage,
       users: data || [],
     };
   } catch (error) {
     console.error("Error in getAllUsers:", error);
     return {
-      error: "予期しないエラーが発生しました",
+      error: "errorGeneric",
     };
   }
 }

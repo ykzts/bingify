@@ -18,7 +18,7 @@ CREATE POLICY "Users can update their own profile"
   USING (auth.uid() = id)
   WITH CHECK (auth.uid() = id);
 
--- Add trigger to prevent users from changing their own role
+-- Add trigger to prevent users from changing their own role or setting admin role on insert
 CREATE OR REPLACE FUNCTION prevent_role_change()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -27,9 +27,18 @@ BEGIN
     RETURN NEW;
   END IF;
   
-  -- For regular users, prevent role changes
-  IF OLD.role IS DISTINCT FROM NEW.role THEN
-    RAISE EXCEPTION 'Cannot change role';
+  -- For INSERT operations, prevent setting role to anything other than 'user'
+  IF TG_OP = 'INSERT' THEN
+    IF NEW.role IS DISTINCT FROM 'user' THEN
+      RAISE EXCEPTION 'Cannot set elevated role on insert';
+    END IF;
+  END IF;
+  
+  -- For UPDATE operations, prevent role changes
+  IF TG_OP = 'UPDATE' THEN
+    IF OLD.role IS DISTINCT FROM NEW.role THEN
+      RAISE EXCEPTION 'Cannot change role';
+    END IF;
   END IF;
   
   RETURN NEW;
@@ -38,7 +47,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 DROP TRIGGER IF EXISTS trigger_prevent_role_change ON profiles;
 CREATE TRIGGER trigger_prevent_role_change
-  BEFORE UPDATE ON profiles
+  BEFORE INSERT OR UPDATE ON profiles
   FOR EACH ROW
   EXECUTE FUNCTION prevent_role_change();
 

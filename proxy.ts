@@ -74,11 +74,16 @@ async function handleAdminAuth(
   }
 
   // Check if user has admin role
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
+
+  if (profileError) {
+    console.error("Error fetching profile for admin check:", profileError);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
 
   if (!profile || profile.role !== "admin") {
     // Redirect to home if not admin

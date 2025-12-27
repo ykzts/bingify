@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { forceDeleteSpace } from "../actions";
 
@@ -17,15 +18,14 @@ interface SpaceListProps {
 }
 
 export function SpaceList({ initialSpaces }: SpaceListProps) {
+  const t = useTranslations("Admin");
   const [spaces, setSpaces] = useState(initialSpaces);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   const handleDelete = async (spaceId: string) => {
     if (
       // biome-ignore lint/suspicious/noAlert: Admin panel using simple confirmation dialog
-      !confirm(
-        "このスペースを削除しますか？この操作は元に戻せません。（アーカイブには保存されます）"
-      )
+      !confirm(t("deleteConfirm"))
     ) {
       return;
     }
@@ -36,10 +36,10 @@ export function SpaceList({ initialSpaces }: SpaceListProps) {
     if (result.success) {
       setSpaces((prev) => prev.filter((space) => space.id !== spaceId));
       // biome-ignore lint/suspicious/noAlert: Admin panel using simple notification
-      alert("スペースを削除しました");
+      alert(t("deleteSuccess"));
     } else {
       // biome-ignore lint/suspicious/noAlert: Admin panel using simple error notification
-      alert(`エラー: ${result.error}`);
+      alert(t(result.error || "errorGeneric"));
     }
 
     setDeleting(null);
@@ -50,25 +50,37 @@ export function SpaceList({ initialSpaces }: SpaceListProps) {
       <table className="min-w-full border border-gray-200 bg-white">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">
-              Share Key
+            <th
+              className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+              scope="col"
+            >
+              {t("shareKey")}
             </th>
-            <th className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">
-              ステータス
+            <th
+              className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+              scope="col"
+            >
+              {t("status")}
             </th>
-            <th className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">
-              作成日
+            <th
+              className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+              scope="col"
+            >
+              {t("createDate")}
             </th>
-            <th className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">
-              アクション
+            <th
+              className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+              scope="col"
+            >
+              {t("deleteAction")}
             </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
           {spaces.length === 0 ? (
             <tr>
-              <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
-                スペースがありません
+              <td className="px-6 py-4 text-center text-gray-500" colSpan={4}>
+                {t("noSpaces")}
               </td>
             </tr>
           ) : (
@@ -76,10 +88,10 @@ export function SpaceList({ initialSpaces }: SpaceListProps) {
               <tr key={space.id}>
                 <td className="whitespace-nowrap px-6 py-4">
                   <a
-                    href={`/@${space.share_key}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="text-blue-600 hover:underline"
+                    href={`/@${space.share_key}`}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     {space.share_key}
                   </a>
@@ -97,17 +109,19 @@ export function SpaceList({ initialSpaces }: SpaceListProps) {
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-gray-500 text-sm">
                   {space.created_at
-                    ? new Date(space.created_at).toLocaleDateString("ja-JP")
+                    ? new Date(space.created_at).toLocaleDateString()
                     : "N/A"}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm">
                   <button
-                    type="button"
-                    onClick={() => handleDelete(space.id)}
-                    disabled={deleting === space.id}
                     className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                    disabled={deleting === space.id}
+                    onClick={() => handleDelete(space.id)}
+                    type="button"
                   >
-                    {deleting === space.id ? "削除中..." : "削除"}
+                    {deleting === space.id
+                      ? t("deleteInProgress")
+                      : t("deleteAction")}
                   </button>
                 </td>
               </tr>

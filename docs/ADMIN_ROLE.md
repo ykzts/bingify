@@ -1,36 +1,36 @@
-# Admin Role Implementation
+# 管理者権限の実装
 
-This document describes the admin role functionality and how to use it.
+このドキュメントでは、管理者権限の機能とその使用方法について説明します。
 
-## Overview
+## 概要
 
-The admin role provides site administrators with special privileges to manage spaces and users across the entire application.
+管理者権限は、サイト管理者にアプリケーション全体のスペースとユーザーを管理する特別な権限を提供します。
 
-## Features
+## 機能
 
-### 1. Admin Role Management
-- Users have a `role` field in the `profiles` table that can be either 'user' or 'admin'
-- Default role is 'user' for all new users
-- Role can only be changed by using the service role key (not through the UI)
+### 1. 管理者ロール管理
+- ユーザーは`profiles`テーブルに'user'または'admin'のいずれかの`role`フィールドを持ちます
+- すべての新規ユーザーのデフォルトロールは'user'です
+- ロールの変更はサービスロールキーを使用してのみ可能です（UIからは変更不可）
 
-### 2. Access Control
-- Admin routes are protected by middleware at `/admin/*`
-- Only users with `role='admin'` can access admin pages
-- Non-admin users are redirected to the home page
+### 2. アクセス制御
+- 管理者ルートは`/admin/*`でミドルウェアにより保護されています
+- `role='admin'`を持つユーザーのみが管理者ページにアクセスできます
+- 管理者以外のユーザーはホームページにリダイレクトされます
 
-### 3. Admin Dashboard
-Access the admin dashboard at: `/admin`
+### 3. 管理ダッシュボード
+管理ダッシュボードへのアクセス: `/admin`
 
-Features:
-- **Overview**: Dashboard with warnings and information
-- **Space Management**: View and delete any space
-- **User Management**: View and ban users
+機能:
+- **概要**: 警告と情報を含むダッシュボード
+- **スペース管理**: すべてのスペースの閲覧と削除
+- **ユーザー管理**: ユーザーの閲覧とBAN
 
-## Setting Up Admin Users
+## 管理者ユーザーの設定
 
-To make a user an admin, you need to update their role using the service role key.
+ユーザーを管理者にするには、サービスロールキーを使用してロールを更新する必要があります。
 
-### Method 1: Using SQL (Local Development)
+### 方法1: SQLを使用（ローカル開発）
 
 ```bash
 psql postgresql://postgres:postgres@127.0.0.1:54322/postgres << 'EOF'
@@ -41,18 +41,18 @@ COMMIT;
 EOF
 ```
 
-### Method 2: Using Supabase Dashboard
+### 方法2: Supabaseダッシュボードを使用
 
-1. Open Supabase Studio (http://127.0.0.1:54323 for local)
-2. Navigate to Table Editor → profiles
-3. Find the user by email
-4. Click Edit Row
-5. Change `role` from 'user' to 'admin'
-6. Save
+1. Supabase Studioを開く（ローカルは http://127.0.0.1:54323）
+2. テーブルエディタ → profiles に移動
+3. メールアドレスでユーザーを検索
+4. 行を編集をクリック
+5. `role`を'user'から'admin'に変更
+6. 保存
 
-### Method 3: Using API (Production)
+### 方法3: APIを使用（本番環境）
 
-Create a secure admin endpoint or script that uses the service role key:
+サービスロールキーを使用する安全な管理者エンドポイントまたはスクリプトを作成:
 
 ```typescript
 import { createClient } from '@supabase/supabase-js';
@@ -72,32 +72,32 @@ async function makeAdmin(userId: string) {
 }
 ```
 
-## Security Considerations
+## セキュリティに関する考慮事項
 
-1. **Service Role Key Protection**
-   - The service role key bypasses all RLS policies
-   - Never expose it to the client
-   - Only use it in server-side code
-   - Store it securely in environment variables
+1. **サービスロールキーの保護**
+   - サービスロールキーはすべてのRLSポリシーをバイパスします
+   - クライアントに公開しないでください
+   - サーバーサイドのコードでのみ使用してください
+   - 環境変数に安全に保管してください
 
-2. **Role Change Protection**
-   - A database trigger prevents users from changing their own role
-   - Only operations with `service_role` JWT claim can change roles
-   - This prevents privilege escalation attacks
+2. **ロール変更の保護**
+   - データベーストリガーがユーザー自身によるロール変更を防ぎます
+   - `service_role` JWTクレームを持つ操作のみがロールを変更できます
+   - これにより権限昇格攻撃を防ぎます
 
-3. **Admin Action Verification**
-   - All admin actions verify the user's role before executing
-   - Role check is done server-side on every request
-   - Consider caching role in JWT for better performance
+3. **管理者アクション検証**
+   - すべての管理者アクションは実行前にユーザーのロールを検証します
+   - ロールチェックはリクエストごとにサーバーサイドで実行されます
+   - パフォーマンス向上のためJWTにロールをキャッシュすることを検討してください
 
-4. **Data Cleanup**
-   - Deleting a space moves it to `spaces_archive` table
-   - Banning a user deletes their auth account and profile
-   - Bingo cards remain as orphaned records (consider cleanup)
+4. **データのクリーンアップ**
+   - スペースの削除は`spaces_archive`テーブルに移動されます
+   - ユーザーのBANは認証アカウントとプロフィールを削除します
+   - ビンゴカードは孤立レコードとして残ります（クリーンアップを検討）
 
-## Database Schema
+## データベーススキーマ
 
-### profiles Table
+### profilesテーブル
 ```sql
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -111,64 +111,64 @@ CREATE TABLE profiles (
 );
 ```
 
-### Trigger
+### トリガー
 ```sql
 CREATE TRIGGER trigger_prevent_role_change
-  BEFORE UPDATE ON profiles
+  BEFORE INSERT OR UPDATE ON profiles
   FOR EACH ROW
   EXECUTE FUNCTION prevent_role_change();
 ```
 
-## Testing Admin Functionality
+## 管理者機能のテスト
 
-### Test Admin Access
-1. Create a test user account
-2. Make them admin using one of the methods above
-3. Log in with that account
-4. Navigate to `/admin`
-5. Verify you can access the admin dashboard
+### 管理者アクセステスト
+1. テストユーザーアカウントを作成
+2. 上記のいずれかの方法で管理者にする
+3. そのアカウントでログイン
+4. `/admin`に移動
+5. 管理ダッシュボードにアクセスできることを確認
 
-### Test Space Deletion
-1. Create a test space
-2. Navigate to `/admin/spaces`
-3. Click "削除" (Delete) on the test space
-4. Confirm deletion
-5. Verify space is removed from the list
-6. Check `spaces_archive` table to confirm it was archived
+### スペース削除のテスト
+1. テストスペースを作成
+2. `/admin/spaces`に移動
+3. テストスペースの「削除」をクリック
+4. 削除を確認
+5. リストからスペースが削除されたことを確認
+6. `spaces_archive`テーブルでアーカイブされたことを確認
 
-### Test User Ban
-1. Create a test user account
-2. Navigate to `/admin/users`
-3. Click "BAN" on the test user
-4. Confirm the action
-5. Verify user is removed from the list
-6. Verify user cannot log in anymore
+### ユーザーBANのテスト
+1. テストユーザーアカウントを作成
+2. `/admin/users`に移動
+3. テストユーザーの「BAN」をクリック
+4. アクションを確認
+5. リストからユーザーが削除されたことを確認
+6. ユーザーがログインできなくなったことを確認
 
-## Troubleshooting
+## トラブルシューティング
 
-### Cannot Access Admin Routes
-- Verify your user has `role='admin'` in the profiles table
-- Clear browser cookies and log in again
-- Check browser console for any errors
+### 管理者ルートにアクセスできない
+- profilesテーブルでユーザーが`role='admin'`を持っていることを確認
+- ブラウザのCookieをクリアして再度ログイン
+- ブラウザコンソールでエラーを確認
 
-### Role Update Fails
-- Ensure you're using service role key
-- Check that the JWT claim is set correctly
-- Verify the trigger function exists in the database
+### ロール更新が失敗する
+- サービスロールキーを使用していることを確認
+- JWTクレームが正しく設定されていることを確認
+- データベースにトリガー関数が存在することを確認
 
-### Delete/Ban Actions Fail
-- Check server logs for error messages
-- Verify SUPABASE_SERVICE_ROLE_KEY is set in environment variables
-- Ensure the admin client is being used (not regular client)
+### 削除/BAN アクションが失敗する
+- サーバーログでエラーメッセージを確認
+- 環境変数にSUPABASE_SERVICE_ROLE_KEYが設定されていることを確認
+- 管理クライアントが使用されていることを確認（通常のクライアントではない）
 
-## Future Improvements
+## 今後の改善
 
-Consider implementing:
-- [ ] Activity logs for admin actions
-- [ ] Soft ban (disable account instead of delete)
-- [ ] Batch operations (delete multiple spaces/users)
-- [ ] Search and filter functionality
-- [ ] Pagination for large datasets
-- [ ] Toast notifications instead of alert()
-- [ ] Role caching in JWT claims for better performance
-- [ ] Cleanup of orphaned bingo cards when banning users
+以下の実装を検討してください:
+- [ ] 管理者アクションのアクティビティログ
+- [ ] ソフトBAN（アカウント削除ではなく無効化）
+- [ ] バッチ操作（複数のスペース/ユーザーの削除）
+- [ ] 検索とフィルター機能
+- [ ] 大規模データセットのページネーション
+- [ ] alert()の代わりにトースト通知
+- [ ] パフォーマンス向上のためJWTクレームにロールをキャッシュ
+- [ ] ユーザーBAN時の孤立ビンゴカードのクリーンアップ

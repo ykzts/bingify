@@ -1,6 +1,6 @@
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { SpaceList } from "../_components/space-list";
 import { getAllSpaces } from "../actions";
-import { SpaceList } from "./space-list";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -10,12 +10,13 @@ export default async function AdminSpacesPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const { spaces, error } = await getAllSpaces();
+  const t = await getTranslations("Admin");
+  const { error, spaces } = await getAllSpaces();
 
   if (error) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-        <p className="text-red-800">エラー: {error}</p>
+        <p className="text-red-800">{t(error)}</p>
       </div>
     );
   }
@@ -23,9 +24,9 @@ export default async function AdminSpacesPage({ params }: Props) {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="font-bold text-2xl">スペース管理</h2>
+        <h2 className="font-bold text-2xl">{t("spacesTitle")}</h2>
         <p className="mt-2 text-gray-600">
-          全{spaces?.length || 0}件のスペース
+          {t("spacesCount", { count: spaces?.length || 0 })}
         </p>
       </div>
 
