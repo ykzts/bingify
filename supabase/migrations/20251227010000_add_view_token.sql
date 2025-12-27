@@ -5,9 +5,9 @@
 
 -- Add owner_id column (references auth.users)
 -- Note: owner_id may already exist from previous migration (20251227000001_add_participants_and_quota.sql)
--- Using IF NOT EXISTS to ensure idempotency
+-- Using IF NOT EXISTS to ensure idempotency. Constraint matches 20251227000001 (ON DELETE SET NULL)
 ALTER TABLE spaces
-ADD COLUMN IF NOT EXISTS owner_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
+ADD COLUMN IF NOT EXISTS owner_id UUID REFERENCES auth.users(id) ON DELETE SET NULL;
 
 -- Add view_token column (NOT NULL, UNIQUE)
 -- No DEFAULT is set - application must provide the token to ensure data integrity
