@@ -26,6 +26,15 @@ export function Footer() {
           >
             {t("privacy")}
           </Link>
+          <a
+            aria-label={`${t("sourceCode")} (MIT, opens in a new window)`}
+            className="text-gray-600 transition-colors hover:text-gray-900"
+            href="https://github.com/ykzts/bingify"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            {t("sourceCode")} (MIT)
+          </a>
         </nav>
       </div>
     </footer>

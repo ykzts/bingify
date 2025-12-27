@@ -86,6 +86,15 @@
     "tokenRegenerationFailed": "Failed to regenerate token",
     "unexpectedError": "An unexpected error occurred"
   },
+  "Faq": {
+    "answer1": "The free version allows up to {maxParticipants} concurrent participants per space. For larger events or commercial use, please contact us.",
+    "answer2": "Yes! Bingify is open source under the MIT License. You can view, modify, and contribute to the source code on GitHub.",
+    "answer3": "This project is maintained by volunteers. You can support development through GitHub Sponsors, which helps cover hosting costs and development time.",
+    "heading": "Frequently Asked Questions",
+    "question1": "What are the usage limits?",
+    "question2": "Is the source code available?",
+    "question3": "How is this project funded?"
+  },
   "Features": {
     "communityDescription": "Perfect for community events, streams, and parties. Easy for everyone to join and enjoy together.",
     "communityTitle": "Community First",
@@ -99,6 +108,7 @@
   "Footer": {
     "backToHome": "Back to Home",
     "privacy": "Privacy Policy",
+    "sourceCode": "Source Code",
     "terms": "Terms of Service"
   },
   "Hero": {
@@ -131,6 +141,11 @@
   "ScreenView": {
     "invalidToken": "This URL is invalid or has been regenerated.",
     "loading": "Loading..."
+  },
+  "Support": {
+    "description": "Bingify is an open-source project maintained by volunteers. Your support helps cover hosting costs and enables continued development.",
+    "heading": "Support Development",
+    "sponsorButton": "Sponsor on GitHub"
   },
   "UserHeader": {
     "logout": "Sign out",

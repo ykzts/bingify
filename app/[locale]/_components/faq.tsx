@@ -1,0 +1,89 @@
+"use client";
+
+import { motion } from "motion/react";
+
+interface FaqProps {
+  answer1: string;
+  answer2: string;
+  answer3: string;
+  heading: string;
+  maxParticipants: number;
+  question1: string;
+  question2: string;
+  question3: string;
+}
+
+export function Faq({
+  answer1,
+  answer2,
+  answer3,
+  heading,
+  maxParticipants: _maxParticipants,
+  question1,
+  question2,
+  question3,
+}: FaqProps) {
+  const faqs = [
+    {
+      answer: answer1,
+      id: "usage-limits",
+      question: question1,
+    },
+    {
+      answer: (
+        <>
+          {answer2.split("GitHub")[0]}
+          <a
+            aria-label="View source code on GitHub (opens in a new window)"
+            className="text-primary underline hover:text-primary/80"
+            href="https://github.com/ykzts/bingify"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            GitHub
+          </a>
+          {answer2.split("GitHub")[1]}
+        </>
+      ),
+      id: "source-code",
+      question: question2,
+    },
+    { answer: answer3, id: "funding", question: question3 },
+  ];
+
+  return (
+    <section className="px-6 py-20">
+      <div className="mx-auto max-w-4xl">
+        <motion.div
+          className="mb-12 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          whileInView={{ opacity: 1, y: 0 }}
+        >
+          <h2 className="mb-4 font-bold text-3xl text-text-main sm:text-4xl">
+            {heading}
+          </h2>
+        </motion.div>
+
+        <div className="space-y-6">
+          {faqs.map((faq, index) => (
+            <motion.div
+              className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+              initial={{ opacity: 0, y: 20 }}
+              key={faq.id}
+              transition={{ delay: index * 0.1, duration: 0.6 }}
+              viewport={{ once: true }}
+              whileInView={{ opacity: 1, y: 0 }}
+            >
+              <h3 className="mb-3 font-bold text-lg text-text-main">
+                {faq.question}
+              </h3>
+              <p className="text-text-muted leading-relaxed">{faq.answer}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
