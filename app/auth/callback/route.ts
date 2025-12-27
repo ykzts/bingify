@@ -46,8 +46,8 @@ function buildRedirectUrl(
   }
 
   // Default to dashboard
-  const locale = extractLocaleFromReferer(referer);
-  const redirectPath = locale ? `/${locale}/dashboard` : "/dashboard";
+  const locale = extractLocaleFromReferer(referer) || routing.defaultLocale;
+  const redirectPath = `/${locale}/dashboard`;
   return `${origin}${redirectPath}`;
 }
 
@@ -64,10 +64,8 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error("Error exchanging code for session:", error);
-      const locale = extractLocaleFromReferer(referer);
-      const loginPath = locale
-        ? `/${locale}/login?error=auth_failed`
-        : "/login?error=auth_failed";
+      const locale = extractLocaleFromReferer(referer) || routing.defaultLocale;
+      const loginPath = `/${locale}/login?error=auth_failed`;
       return NextResponse.redirect(`${origin}${loginPath}`);
     }
   }

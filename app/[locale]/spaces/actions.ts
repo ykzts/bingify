@@ -111,7 +111,13 @@ export async function getSpaceByShareKey(shareKey: string) {
       .eq("status", "active")
       .single();
 
-    if (error || !space) {
+    if (error) {
+      // PGRST116 is "not found", which means the share key is invalid
+      if (error.code === "PGRST116") {
+        return null;
+      }
+      // For other errors, log and return null
+      console.error("Error getting space by share key:", error);
       return null;
     }
 

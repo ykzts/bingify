@@ -33,7 +33,7 @@ CREATE POLICY "Users can join spaces"
   FOR INSERT
   WITH CHECK (
     auth.uid() = user_id
-    AND COALESCE(role, 'member') = 'member'
+    AND role = 'member'
   );
 
 -- Policy: Space creators (owners) can delete members, but not the last owner
@@ -95,20 +95,16 @@ END $$;
 
 -- Drop existing policies if they exist to ensure idempotency
 DROP POLICY IF EXISTS "Space members can read their space" ON spaces;
+DROP POLICY IF EXISTS "Public can read space by share key" ON spaces;
+DROP POLICY IF EXISTS "Authenticated users can read space by ID" ON spaces;
 DROP POLICY IF EXISTS "Authenticated users can create spaces" ON spaces;
 DROP POLICY IF EXISTS "Space members can update their space" ON spaces;
 
--- Policy: Space members can read their space
-CREATE POLICY "Space members can read their space"
+-- Policy: Public can read minimal space info by share_key (for join flow and middleware)
+CREATE POLICY "Public can read space by share key"
   ON spaces
   FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM space_members sm
-      WHERE sm.space_id = spaces.id
-      AND sm.user_id = auth.uid()
-    )
-  );
+  USING (true);
 
 -- Policy: Only authenticated users can create spaces
 CREATE POLICY "Authenticated users can create spaces"
