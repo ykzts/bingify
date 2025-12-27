@@ -1,6 +1,7 @@
 "use client";
 
 import { LogOut, User } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -35,10 +36,12 @@ export function UserHeader({ user }: UserHeaderProps) {
     <div className="flex items-center gap-3">
       <div className="flex items-center gap-2">
         {user.avatar_url ? (
-          <img
+          <Image
             alt={user.full_name || user.email || "User"}
-            className="h-8 w-8 rounded-full object-cover"
+            className="rounded-full object-cover"
+            height={32}
             src={user.avatar_url}
+            width={32}
           />
         ) : (
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">

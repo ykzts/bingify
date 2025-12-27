@@ -57,7 +57,12 @@ export default async function LocaleLayout({ children, params }: Props) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let profile = null;
+  let profile: {
+    avatar_url?: string | null;
+    email?: string | null;
+    full_name?: string | null;
+  } | null = null;
+
   if (user) {
     const { data } = await supabase
       .from("profiles")
