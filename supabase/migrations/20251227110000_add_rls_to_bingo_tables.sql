@@ -76,10 +76,11 @@ CREATE POLICY "Owners can delete called numbers"
 -- Enable RLS on spaces_archive table
 ALTER TABLE spaces_archive ENABLE ROW LEVEL SECURITY;
 
--- Policy: Only service role can manage archived spaces
--- Note: Regular users should not have access to archived data
--- This policy effectively blocks all user access; only service role (via bypass RLS) can access
-CREATE POLICY "Service role only for archived spaces"
+-- Policy: Block all regular user access to archived spaces
+-- Note: This policy blocks all user access to archived data
+-- Service role bypasses RLS entirely and can still access the table
+-- Only the cron cleanup job (using service role) should access this table
+CREATE POLICY "Block all user access to archived spaces"
   ON spaces_archive
   FOR ALL
   USING (false)
