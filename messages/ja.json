@@ -91,6 +91,8 @@
     "logout": "ログアウト"
   },
   "UserSpace": {
+    "alreadyJoined": "あなたは既にこのスペースのメンバーです",
+    "backToHome": "ホームに戻る",
     "errorGeneric": "予期しないエラーが発生しました",
     "errorInvalidSpace": "無効なスペースIDです",
     "errorJoinFailed": "スペースへの参加に失敗しました",
@@ -99,6 +101,7 @@
     "errorUnauthorized": "認証が必要です。ログインしてください。",
     "heading": "ビンゴカード",
     "joinButton": "スペースに参加",
+    "joinPrompt": "このビンゴスペースに参加して楽しみましょう",
     "joining": "参加中...",
     "leaveButton": "スペースから退出",
     "leaving": "退出中...",

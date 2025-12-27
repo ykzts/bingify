@@ -4,7 +4,7 @@ import { Loader2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import type { JoinSpaceState } from "../../actions";
+import type { JoinSpaceState, SpaceInfo } from "../../actions";
 import {
   checkUserParticipation,
   getParticipantCount,
@@ -14,9 +14,13 @@ import {
 
 interface SpaceParticipationProps {
   spaceId: string;
+  spaceInfo: SpaceInfo;
 }
 
-export function SpaceParticipation({ spaceId }: SpaceParticipationProps) {
+export function SpaceParticipation({
+  spaceId,
+  spaceInfo,
+}: SpaceParticipationProps) {
   const t = useTranslations("UserSpace");
   const router = useRouter();
   const [isJoining, setIsJoining] = useState(false);
@@ -25,7 +29,10 @@ export function SpaceParticipation({ spaceId }: SpaceParticipationProps) {
   const [participantInfo, setParticipantInfo] = useState<{
     count: number;
     maxParticipants: number;
-  } | null>(null);
+  } | null>({
+    count: 0,
+    maxParticipants: spaceInfo.max_participants,
+  });
   const [hasJoined, setHasJoined] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 

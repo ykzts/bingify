@@ -91,6 +91,8 @@
     "logout": "Sign out"
   },
   "UserSpace": {
+    "alreadyJoined": "You are already a member of this space",
+    "backToHome": "Back to Home",
     "errorGeneric": "An error occurred",
     "errorInvalidSpace": "Invalid space ID",
     "errorJoinFailed": "Failed to join space",
@@ -99,6 +101,7 @@
     "errorUnauthorized": "Authentication required. Please sign in.",
     "heading": "Bingo Card",
     "joinButton": "Join Space",
+    "joinPrompt": "Join this bingo space to participate",
     "joining": "Joining...",
     "leaveButton": "Leave Space",
     "leaving": "Leaving...",
