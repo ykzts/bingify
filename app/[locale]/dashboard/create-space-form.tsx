@@ -12,9 +12,7 @@ import { checkSlugAvailability, createSpace } from "./actions";
 export function CreateSpaceForm() {
   const router = useRouter();
   const [slug, setSlug] = useState("");
-  const [shareKey, setShareKey] = useState("");
   const [debouncedSlug] = useDebounce(slug, 500);
-  const [debouncedShareKey] = useDebounce(shareKey, 500);
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState<boolean | null>(null);
 
@@ -37,19 +35,9 @@ export function CreateSpaceForm() {
     }
   };
 
-  const handleShareKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newShareKey = e.target.value.toLowerCase();
-    setShareKey(newShareKey);
-
-    // Reset validation state when share key changes and is too short
-    if (!newShareKey || newShareKey.length < 3) {
-      setAvailable(null);
-    }
-  };
-
   const handleGenerateRandomKey = () => {
     const randomKey = generateRandomKey();
-    setShareKey(randomKey);
+    setSlug(randomKey);
     setAvailable(null);
   };
 
@@ -68,15 +56,14 @@ export function CreateSpaceForm() {
   };
 
   useEffect(() => {
-    const keyToCheck = debouncedShareKey || debouncedSlug;
-    if (!keyToCheck || keyToCheck.length < 3) {
+    if (!debouncedSlug || debouncedSlug.length < 3) {
       return;
     }
 
     const check = async () => {
       setChecking(true);
       try {
-        const result = await checkSlugAvailability(keyToCheck);
+        const result = await checkSlugAvailability(debouncedSlug);
         setAvailable(result.available);
       } finally {
         setChecking(false);
@@ -84,7 +71,7 @@ export function CreateSpaceForm() {
     };
 
     check();
-  }, [debouncedSlug, debouncedShareKey]);
+  }, [debouncedSlug]);
 
   useEffect(() => {
     if (state.success && state.spaceId) {
@@ -99,7 +86,7 @@ export function CreateSpaceForm() {
       <form action={formAction} className="space-y-6">
         <div>
           <label className="mb-2 block font-medium text-sm" htmlFor="slug">
-            スペースURL
+            共有キー
           </label>
 
           <div className="mb-2 flex items-center gap-2">
@@ -117,38 +104,6 @@ export function CreateSpaceForm() {
               type="text"
               value={slug}
             />
-            <span className="font-mono text-gray-500">-{dateSuffix}</span>
-          </div>
-
-          <p className="mb-2 text-gray-500 text-sm">
-            公開URL:{" "}
-            <span className="font-mono">
-              @{slug || "..."}-{dateSuffix}
-            </span>
-          </p>
-        </div>
-
-        <div>
-          <label className="mb-2 block font-medium text-sm" htmlFor="share-key">
-            参加用共有キー（オプション）
-          </label>
-          <p className="mb-2 text-gray-600 text-sm">
-            ※ 空欄の場合は「スペースURL」が使用されます
-          </p>
-
-          <div className="mb-2 flex items-center gap-2">
-            <input
-              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 font-mono focus:border-transparent focus:ring-2 focus:ring-primary"
-              disabled={isPending}
-              id="share-key"
-              maxLength={30}
-              name="share_key"
-              onChange={handleShareKeyChange}
-              pattern="[a-z0-9-]+"
-              placeholder="ランダム生成を推奨"
-              type="text"
-              value={shareKey}
-            />
             <button
               className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-blue-700"
               disabled={isPending}
@@ -158,23 +113,24 @@ export function CreateSpaceForm() {
               <Dices className="h-4 w-4" />
               ランダム生成
             </button>
+            <span className="font-mono text-gray-500">-{dateSuffix}</span>
           </div>
 
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+          <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
             <p className="text-amber-800 text-sm">
               ⚠️ この共有キーを知っているユーザーは誰でも参加できます
             </p>
           </div>
 
-          <p className="mt-2 text-gray-500 text-sm">
-            参加URL:{" "}
+          <p className="mb-2 text-gray-500 text-sm">
+            公開URL:{" "}
             <span className="font-mono">
-              @{shareKey || `${slug || "..."}-${dateSuffix}`}
+              @{slug || "..."}-{dateSuffix}
             </span>
           </p>
 
           {/* Status indicator */}
-          {(slug.length >= 3 || shareKey.length >= 3) && (
+          {slug.length >= 3 && (
             <div className="mt-2 flex items-center gap-2">
               {checking && (
                 <>
@@ -187,7 +143,7 @@ export function CreateSpaceForm() {
                 <>
                   <Check className="h-4 w-4 text-green-600" />
                   <span className="text-green-600 text-sm">
-                    このスラグは使用可能です
+                    この共有キーは使用可能です
                   </span>
                 </>
               )}
@@ -196,7 +152,7 @@ export function CreateSpaceForm() {
                 <>
                   <AlertCircle className="h-4 w-4 text-amber-600" />
                   <span className="text-amber-600 text-sm">
-                    このスラグは既に使用されています
+                    この共有キーは既に使用されています
                   </span>
                 </>
               )}
@@ -231,11 +187,7 @@ export function CreateSpaceForm() {
 
         <button
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={
-            isPending ||
-            available === false ||
-            (slug.length < 3 && shareKey.length < 3)
-          }
+          disabled={isPending || available === false || slug.length < 3}
           type="submit"
         >
           {isPending && <Loader2 className="h-4 w-4 animate-spin" />}

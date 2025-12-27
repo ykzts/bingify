@@ -64,7 +64,6 @@ export async function createSpace(
 ): Promise<CreateSpaceState> {
   try {
     const slug = formData.get("slug") as string;
-    const shareKey = (formData.get("share_key") as string) || "";
 
     // Validate input with Zod
     const validation = spaceSchema.safeParse({ slug });
@@ -75,23 +74,9 @@ export async function createSpace(
       };
     }
 
-    // Validate shareKey if provided
-    if (shareKey.trim()) {
-      const shareKeyValidation = spaceSchema.safeParse({
-        slug: shareKey.trim(),
-      });
-      if (!shareKeyValidation.success) {
-        return {
-          error: `共有キー: ${shareKeyValidation.error.issues[0].message}`,
-          success: false,
-        };
-      }
-    }
-
-    // Determine the final share key
-    // If shareKey is provided, use it; otherwise, use slug with date suffix
+    // Generate full slug with date suffix
     const dateSuffix = format(new Date(), "yyyyMMdd");
-    const fullSlug = shareKey.trim() || `${slug}-${dateSuffix}`;
+    const fullSlug = `${slug}-${dateSuffix}`;
 
     // Check availability
     const supabase = await createClient();
