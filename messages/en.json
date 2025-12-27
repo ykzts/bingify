@@ -95,9 +95,11 @@
   },
   "Login": {
     "description": "Sign in to access the dashboard and manage your bingo spaces.",
+    "descriptionSpace": "Sign in to join this bingo space and participate in the game.",
     "errorMessage": "An error occurred during sign-in. Please try again.",
     "googleButton": "Sign in with Google",
     "title": "Sign in to Dashboard",
+    "titleSpace": "Sign in to Join Space",
     "twitchButton": "Sign in with Twitch"
   },
   "Metadata": {
@@ -112,6 +114,10 @@
     "logout": "Sign out"
   },
   "UserSpace": {
+    "alreadyJoined": "You are already a member of this space",
+    "backToHome": "Back to Home",
+    "bingoGamePlaceholder": "The bingo game will appear here. Join to participate!",
+    "bingoGameTitle": "Bingo Game",
     "errorGeneric": "An error occurred",
     "errorInvalidSpace": "Invalid space ID",
     "errorJoinFailed": "Failed to join space",
@@ -120,10 +126,13 @@
     "errorUnauthorized": "Authentication required. Please sign in.",
     "heading": "Bingo Card",
     "joinButton": "Join Space",
+    "joinPrompt": "Join this bingo space to participate",
     "joining": "Joining...",
     "leaveButton": "Leave Space",
     "leaving": "Leaving...",
+    "notParticipantBanner": "You're viewing this space. Join to participate in the bingo game!",
     "participantCount": "{count} / {max} participants",
-    "spaceId": "Space ID"
+    "spaceId": "Space ID",
+    "spaceSubtitle": "Bingo Space"
   }
 }

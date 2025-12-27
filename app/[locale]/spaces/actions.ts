@@ -9,6 +9,38 @@ export interface JoinSpaceState {
   success: boolean;
 }
 
+export interface SpaceInfo {
+  id: string;
+  max_participants: number;
+  owner_id: string | null;
+  share_key: string;
+  status: string | null;
+}
+
+export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
+  try {
+    if (!isValidUUID(spaceId)) {
+      return null;
+    }
+
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("spaces")
+      .select("id, share_key, status, owner_id, max_participants")
+      .eq("id", spaceId)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return data;
+  } catch (_error) {
+    return null;
+  }
+}
+
 export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
   try {
     // Validate UUID format

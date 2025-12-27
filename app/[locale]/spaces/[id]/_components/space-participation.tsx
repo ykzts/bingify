@@ -4,7 +4,7 @@ import { Loader2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import type { JoinSpaceState } from "../../actions";
+import type { JoinSpaceState, SpaceInfo } from "../../actions";
 import {
   checkUserParticipation,
   getParticipantCount,
@@ -13,10 +13,75 @@ import {
 } from "../../actions";
 
 interface SpaceParticipationProps {
+  compact?: boolean;
   spaceId: string;
+  spaceInfo: SpaceInfo;
 }
 
-export function SpaceParticipation({ spaceId }: SpaceParticipationProps) {
+interface JoinButtonProps {
+  compact?: boolean;
+  isJoining: boolean;
+  onClick: () => void;
+  text: string;
+  textLoading: string;
+}
+
+function JoinButton({
+  compact,
+  isJoining,
+  onClick,
+  text,
+  textLoading,
+}: JoinButtonProps) {
+  const buttonClass = compact
+    ? "flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+    : "flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50";
+  const loaderClass = compact ? "h-3 w-3 animate-spin" : "h-4 w-4 animate-spin";
+
+  return (
+    <button
+      className={buttonClass}
+      disabled={isJoining}
+      onClick={onClick}
+      type="button"
+    >
+      {isJoining && <Loader2 className={loaderClass} />}
+      {isJoining ? textLoading : text}
+    </button>
+  );
+}
+
+interface LeaveButtonProps {
+  isLeaving: boolean;
+  onClick: () => void;
+  text: string;
+  textLoading: string;
+}
+
+function LeaveButton({
+  isLeaving,
+  onClick,
+  text,
+  textLoading,
+}: LeaveButtonProps) {
+  return (
+    <button
+      className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+      disabled={isLeaving}
+      onClick={onClick}
+      type="button"
+    >
+      {isLeaving && <Loader2 className="h-4 w-4 animate-spin" />}
+      {isLeaving ? textLoading : text}
+    </button>
+  );
+}
+
+export function SpaceParticipation({
+  compact = false,
+  spaceId,
+  spaceInfo,
+}: SpaceParticipationProps) {
   const t = useTranslations("UserSpace");
   const router = useRouter();
   const [isJoining, setIsJoining] = useState(false);
@@ -25,7 +90,10 @@ export function SpaceParticipation({ spaceId }: SpaceParticipationProps) {
   const [participantInfo, setParticipantInfo] = useState<{
     count: number;
     maxParticipants: number;
-  } | null>(null);
+  } | null>({
+    count: 0,
+    maxParticipants: spaceInfo.max_participants,
+  });
   const [hasJoined, setHasJoined] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -85,8 +153,30 @@ export function SpaceParticipation({ spaceId }: SpaceParticipationProps) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+      <div
+        className={`flex items-center justify-center ${compact ? "py-2" : "py-8"}`}
+      >
+        <Loader2
+          className={`animate-spin text-gray-400 ${compact ? "h-4 w-4" : "h-6 w-6"}`}
+        />
+      </div>
+    );
+  }
+
+  // Compact mode for banner (join button only)
+  if (compact) {
+    return (
+      <div className="flex items-center gap-3">
+        {error && <p className="text-red-800 text-sm">{error}</p>}
+        {!hasJoined && (
+          <JoinButton
+            compact
+            isJoining={isJoining}
+            onClick={handleJoin}
+            text={t("joinButton")}
+            textLoading={t("joining")}
+          />
+        )}
       </div>
     );
   }
@@ -115,25 +205,19 @@ export function SpaceParticipation({ spaceId }: SpaceParticipationProps) {
 
       {/* Join/Leave Button */}
       {hasJoined ? (
-        <button
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isLeaving}
+        <LeaveButton
+          isLeaving={isLeaving}
           onClick={handleLeave}
-          type="button"
-        >
-          {isLeaving && <Loader2 className="h-4 w-4 animate-spin" />}
-          {isLeaving ? t("leaving") : t("leaveButton")}
-        </button>
+          text={t("leaveButton")}
+          textLoading={t("leaving")}
+        />
       ) : (
-        <button
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isJoining}
+        <JoinButton
+          isJoining={isJoining}
           onClick={handleJoin}
-          type="button"
-        >
-          {isJoining && <Loader2 className="h-4 w-4 animate-spin" />}
-          {isJoining ? t("joining") : t("joinButton")}
-        </button>
+          text={t("joinButton")}
+          textLoading={t("joining")}
+        />
       )}
     </div>
   );
