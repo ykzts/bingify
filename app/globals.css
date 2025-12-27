@@ -16,6 +16,10 @@
 
   --color-text-main: #334155; /* Slate 700 */
   --color-text-muted: #94a3b8; /* Slate 400 */
+
+  /* Brand Colors for OAuth */
+  --color-twitch: #9146ff;
+  --color-twitch-hover: #7d3be6;
 }
 
 body {

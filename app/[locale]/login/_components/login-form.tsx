@@ -84,7 +84,7 @@ export function LoginForm() {
 
         <button
           aria-label={t("twitchButton")}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#9146FF] px-6 py-3 font-medium text-white transition hover:bg-[#7D3BE6] disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-twitch px-6 py-3 font-medium text-white transition hover:bg-twitch-hover disabled:cursor-not-allowed disabled:opacity-50"
           disabled={isLoading}
           onClick={() => handleOAuthLogin("twitch")}
           type="button"
