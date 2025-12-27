@@ -1,6 +1,13 @@
 {
   "AdminSpace": {
+    "copyUrlButton": "OBS用URLをコピー",
+    "copyUrlSuccess": "URLをクリップボードにコピーしました",
     "heading": "管理画面",
+    "obsUrlLabel": "OBS閲覧用URL",
+    "regenerateConfirm": "古いURLは無効になります。続行してもよろしいですか？",
+    "regenerateError": "URLの再生成に失敗しました",
+    "regenerateSuccess": "URLを再生成しました",
+    "regenerateUrlButton": "URLを再生成する",
     "spaceId": "スペースID"
   },
   "Features": {
@@ -42,6 +49,10 @@
   "Metadata": {
     "description": "リアルタイムで盛り上がる、新しいビンゴ体験。アプリ不要、URLを共有するだけで誰でも参加できます。",
     "title": "Bingify - すべての画面を、熱狂の会場に。"
+  },
+  "ScreenView": {
+    "invalidToken": "このURLは無効か、再生成されています。",
+    "loading": "読み込み中..."
   },
   "UserSpace": {
     "heading": "ビンゴカード",
