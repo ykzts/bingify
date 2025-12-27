@@ -112,3 +112,59 @@ lib/
 ## 環境変数
 
 ローカル開発時は `.env.local.example` に記載されている値を参照してください。本番環境では Supabase Cloud を使用します。
+
+## データベースマイグレーション
+
+### 自動デプロイ
+
+`supabase/migrations` ディレクトリ配下の `.sql` マイグレーションファイルは、`main` ブランチへのマージ時に自動的に Cloud Supabase へデプロイされます。
+
+**重要:** マイグレーションファイルをリポジトリから削除しても、Cloud Supabase に適用済みのマイグレーションは削除されません。ロールバックが必要な場合は、新しいマイグレーションファイルで明示的にロールバック SQL を記述してください。
+
+**動作フロー:**
+
+1. `supabase/migrations/**/*.sql` に変更を含む PR を作成
+2. PR がレビュー・承認される
+3. `main` ブランチへマージ
+4. GitHub Actions が自動的にマイグレーションを Cloud Supabase に適用
+5. デプロイ前後の検証ステップで安全性を確保
+
+**必要な GitHub Secrets:**
+
+- `SUPABASE_ACCESS_TOKEN` — Supabase の Personal Access Token（[Settings > Access Tokens](https://supabase.com/dashboard/account/tokens) から取得）
+- `SUPABASE_PROJECT_ID` — Supabase プロジェクトの Project Reference ID（プロジェクト設定から確認可能）
+
+### 手動デプロイ
+
+緊急時や特定の環境へのデプロイが必要な場合は、GitHub Actions の `workflow_dispatch` から手動実行できます。
+
+1. GitHub リポジトリの **Actions** タブを開く
+2. **Deploy Migrations** ワークフローを選択
+3. **Run workflow** をクリックし、デプロイ先の環境を選択
+
+### ローカルでのマイグレーション
+
+```bash
+# ローカル Supabase インスタンスにマイグレーションを適用
+pnpm local:setup
+
+# 新しいマイグレーションファイルを作成
+supabase migration new <migration_name>
+```
+
+### トラブルシューティング
+
+**マイグレーションが失敗した場合:**
+
+1. GitHub Actions のログで詳細なエラーメッセージを確認
+2. マイグレーションファイルの SQL 構文を確認
+3. Supabase Dashboard で現在のデータベーススキーマを確認
+4. 必要に応じて、手動でロールバック SQL を実行
+
+**ロールバックが必要な場合:**
+
+マイグレーションの自動ロールバックは実装されていません。問題が発生した場合は、以下の手順で手動対応してください：
+
+1. Supabase Dashboard の SQL Editor を開く
+2. 問題のあるマイグレーションを元に戻す SQL を実行
+3. 修正したマイグレーションファイルを再度 PR として作成
