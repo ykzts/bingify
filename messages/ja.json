@@ -48,6 +48,11 @@
   },
   "UserSpace": {
     "heading": "ビンゴカード",
+    "joinButton": "スペースに参加",
+    "joining": "参加中...",
+    "leaveButton": "スペースから退出",
+    "leaving": "退出中...",
+    "participantCount": "{count} / {max} 人が参加中",
     "spaceId": "スペースID"
   }
 }

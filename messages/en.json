@@ -48,6 +48,11 @@
   },
   "UserSpace": {
     "heading": "Bingo Card",
+    "joinButton": "Join Space",
+    "joining": "Joining...",
+    "leaveButton": "Leave Space",
+    "leaving": "Leaving...",
+    "participantCount": "{count} / {max} participants",
     "spaceId": "Space ID"
   }
 }
