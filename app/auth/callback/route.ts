@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
   };
 
   // Code parameter is required for authentication
-  if (!code) {
+  if (!code || code.trim() === "") {
     console.error("Auth callback called without code parameter");
     const locale = getLocaleFromReferer();
     const loginPath = buildPath("/login?error=auth_failed", locale);

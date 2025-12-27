@@ -43,6 +43,21 @@ describe("Auth Callback Route", () => {
     );
   });
 
+  it("should redirect to login with error when code parameter contains only whitespace", async () => {
+    const request = new NextRequest(`${origin}/auth/callback?code=%20`, {
+      headers: {
+        referer: `${origin}/login`,
+      },
+    });
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/login?error=auth_failed`
+    );
+  });
+
   it("should redirect to localized login with error when code is missing and referer has locale", async () => {
     const request = new NextRequest(`${origin}/auth/callback`, {
       headers: {
