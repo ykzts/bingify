@@ -6,9 +6,24 @@
 
 - **Next.js** (App Router, React)
 - **Tailwind CSS** (CSS-first configuration)
-- **Supabase** (Database, Realtime)
+- **Supabase** (Database, Realtime, Authentication)
+- **OAuth** (Google, Twitch)
 - **Zod** (Validation)
 - **pnpm** (Package Manager)
+
+## 認証について
+
+Bingify は **Supabase Auth** を使用した認証システムを実装しています。
+
+- **認証方法**: OAuth（Google、Twitch）
+- **認証が必須の機能**:
+  - スペースの作成・管理 (`/dashboard/*`)
+  - ビンゴカードの表示・参加 (`/spaces/*`, `/@<slug>`)
+  - 管理者機能 (`/admin/*`)
+- **認証不要の機能**:
+  - 表示専用画面 (`/screen/[token]`) - ストリーミング配信用
+
+OAuth プロバイダーの設定については [docs/OAUTH_SETUP.md](docs/OAUTH_SETUP.md) を参照してください。
 
 ## セットアップ手順
 
@@ -49,24 +64,34 @@ pnpm local:stop
 ### 1. スペース作成
 
 - 管理画面 (`/dashboard`) でビンゴスペースを作成
+- **認証必須**: OAuth（Google、Twitch）によるログインが必要
 - Slug形式: `[ユーザー入力]-[日付YYYYMMDD]`（例: `my-party-20251224`）
 - リアルタイムで重複チェック
 
 ### 2. URL解決（Middleware）
 
 - 公開URL: `/@<slug>`
+- **認証必須**: アクセスには認証が必要
 - Supabase の `share_key` で UUID を検索
 - `/spaces/<uuid>` に内部 rewrite（URLは `/@<slug>` のまま表示）
 
 ### 3. 管理画面
 
 - `/dashboard/spaces/<uuid>`: スペース管理・ビンゴ抽選実行
+- **認証必須**: スペース所有者のみアクセス可能
 - リアルタイム同期
 
 ### 4. 参加者画面
 
 - `/spaces/<uuid>` または `/@<slug>`: ビンゴカード表示
+- **認証必須**: 認証されたユーザーのみアクセス可能
 - Supabase Realtime でリアルタイム同期
+
+### 5. 表示専用画面（認証不要）
+
+- `/screen/[token]`: `view_token` を使用した公開表示画面
+- **認証不要**: ストリーミング配信などで使用する表示専用画面
+- リアルタイムで抽選結果を表示
 
 ## 開発ガイドライン
 
