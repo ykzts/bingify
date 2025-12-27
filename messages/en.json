@@ -47,6 +47,12 @@
     "logout": "Sign out"
   },
   "UserSpace": {
+    "errorGeneric": "An error occurred",
+    "errorInvalidSpace": "Invalid space ID",
+    "errorJoinFailed": "Failed to join space",
+    "errorLeaveFailed": "Failed to leave space",
+    "errorQuotaReached": "Space is full. Maximum capacity reached.",
+    "errorUnauthorized": "Authentication required. Please sign in.",
     "heading": "Bingo Card",
     "joinButton": "Join Space",
     "joining": "Joining...",

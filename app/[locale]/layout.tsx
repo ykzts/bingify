@@ -7,10 +7,9 @@ import {
   setRequestLocale,
 } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { createClient } from "@/lib/supabase/server";
 import { Footer } from "./_components/footer";
 import { LanguageSwitcher } from "./_components/language-switcher";
-import { UserHeader } from "./_components/user-header";
+import { UserHeaderWrapper } from "./_components/user-header-wrapper";
 import "../globals.css";
 
 const nunito = Nunito({
@@ -51,37 +50,13 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   const messages = await getMessages();
 
-  // Get user profile if logged in
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  let profile: {
-    avatar_url?: string | null;
-    email?: string | null;
-    full_name?: string | null;
-  } | null = null;
-
-  if (user) {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("avatar_url, email, full_name")
-      .eq("id", user.id)
-      .single();
-
-    if (!error) {
-      profile = data;
-    }
-  }
-
   return (
     <html lang={locale}>
       <body className={`${nunito.variable} antialiased`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <div className="flex min-h-screen flex-col">
             <header className="fixed top-4 right-4 z-50 flex items-center gap-4">
-              {profile && <UserHeader user={profile} />}
+              <UserHeaderWrapper />
               <LanguageSwitcher />
             </header>
             <main className="flex-1">{children}</main>

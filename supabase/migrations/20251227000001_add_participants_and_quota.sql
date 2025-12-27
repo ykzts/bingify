@@ -22,15 +22,23 @@ CREATE INDEX IF NOT EXISTS idx_participants_user_id ON participants(user_id);
 -- Enable RLS on participants table
 ALTER TABLE participants ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can read participants of spaces they've joined
-CREATE POLICY "Users can read participants of joined spaces"
+-- Policy: Users can read participants of spaces they've joined or own
+CREATE POLICY "Users can read participants of joined or owned spaces"
   ON participants
   FOR SELECT
   USING (
+    -- User is a participant in the space
     EXISTS (
       SELECT 1 FROM participants p
       WHERE p.space_id = participants.space_id
         AND p.user_id = auth.uid()
+    )
+    OR
+    -- User is the owner of the space
+    EXISTS (
+      SELECT 1 FROM spaces s
+      WHERE s.id = participants.space_id
+        AND s.owner_id = auth.uid()
     )
   );
 
@@ -53,10 +61,11 @@ DECLARE
   current_count INTEGER;
   max_count INTEGER;
 BEGIN
-  -- Get max_participants from spaces
+  -- Get max_participants from spaces with row lock to prevent race conditions
   SELECT max_participants INTO max_count
   FROM spaces
-  WHERE id = NEW.space_id;
+  WHERE id = NEW.space_id
+  FOR UPDATE;
 
   -- If space doesn't exist, PostgreSQL FK constraint will handle it
   IF max_count IS NULL THEN

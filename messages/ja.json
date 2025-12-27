@@ -47,6 +47,12 @@
     "logout": "ログアウト"
   },
   "UserSpace": {
+    "errorGeneric": "予期しないエラーが発生しました",
+    "errorInvalidSpace": "無効なスペースIDです",
+    "errorJoinFailed": "スペースへの参加に失敗しました",
+    "errorLeaveFailed": "スペースからの退出に失敗しました",
+    "errorQuotaReached": "スペースの参加者数が上限に達しています",
+    "errorUnauthorized": "認証が必要です。ログインしてください。",
     "heading": "ビンゴカード",
     "joinButton": "スペースに参加",
     "joining": "参加中...",

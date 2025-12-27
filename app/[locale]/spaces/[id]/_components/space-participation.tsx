@@ -60,7 +60,7 @@ export function SpaceParticipation({ spaceId }: SpaceParticipationProps) {
       await refreshParticipantInfo();
       router.refresh();
     } else {
-      setError(result.error || "参加に失敗しました");
+      setError(result.errorKey ? t(result.errorKey) : t("errorJoinFailed"));
     }
 
     setIsJoining(false);
@@ -77,7 +77,7 @@ export function SpaceParticipation({ spaceId }: SpaceParticipationProps) {
       await refreshParticipantInfo();
       router.refresh();
     } else {
-      setError(result.error || "退出に失敗しました");
+      setError(result.errorKey ? t(result.errorKey) : t("errorLeaveFailed"));
     }
 
     setIsLeaving(false);
