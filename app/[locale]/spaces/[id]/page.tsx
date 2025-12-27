@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { checkUserParticipation, getSpaceById } from "../actions";
@@ -77,12 +78,12 @@ export default async function UserSpacePage({ params }: Props) {
 
         {/* Back Link */}
         <div className="text-center">
-          <a
+          <Link
             className="text-gray-600 text-sm hover:text-gray-900 hover:underline"
             href="/"
           >
             {t("backToHome")}
-          </a>
+          </Link>
         </div>
       </div>
     </div>
