@@ -122,18 +122,6 @@ export async function createSpace(
     const uuid = randomUUID();
     const viewToken = generateSecureToken();
 
-    // Get current user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return {
-        error: "Authentication required",
-        success: false,
-      };
-    }
-
     const { error } = await supabase
       .from("spaces")
       .insert({
