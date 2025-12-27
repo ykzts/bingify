@@ -68,8 +68,8 @@ jobs:
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
-          echo "=== Verifying database connectivity and authentication ==="
-          supabase db remote commit
+          echo "=== Checking connectivity with dry-run ==="
+          supabase db push --dry-run
 
       - name: Deploy migrations
         env:
