@@ -1,4 +1,19 @@
 {
+  "AccountSettings": {
+    "connect": "Connect",
+    "description": "Link multiple accounts to access your spaces from different providers.",
+    "disconnect": "Disconnect",
+    "errorGeneric": "An unexpected error occurred",
+    "errorMinimumIdentity": "You must keep at least one linked account",
+    "linkedAccounts": "Linked Accounts",
+    "note": "After linking accounts, you can sign in with any of them. You must keep at least one account linked.",
+    "processing": "Processing...",
+    "statusLinked": "Linked",
+    "statusNotLinked": "Not linked",
+    "title": "Account Settings",
+    "unlinkConfirm": "Are you sure you want to unlink your {provider} account?",
+    "unlinkSuccess": "Account unlinked successfully"
+  },
   "Admin": {
     "banAction": "BAN",
     "banConfirm": "Are you sure you want to BAN user {email}? This action cannot be undone.",
@@ -111,7 +126,8 @@
     "loading": "Loading..."
   },
   "UserHeader": {
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "settings": "Settings"
   },
   "UserSpace": {
     "alreadyJoined": "You are already a member of this space",
