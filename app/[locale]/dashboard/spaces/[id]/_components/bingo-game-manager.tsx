@@ -164,7 +164,7 @@ export function BingoGameManager({ spaceId }: Props) {
 
       <div>
         <h3 className="mb-3 font-medium text-gray-900">{t("calledNumbers")}</h3>
-        <div className="grid max-h-96 grid-cols-15 gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <div className="grid max-h-96 grid-cols-10 gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-4 md:grid-cols-15">
           {Array.from({ length: 75 }, (_, i) => i + 1).map((number) => {
             const isCalled = calledValues.includes(number);
             return (
