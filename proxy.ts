@@ -14,12 +14,21 @@ const LOCALE_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/`);
 const DASHBOARD_PATTERN = new RegExp(
   `^/(${routing.locales.join("|")})/dashboard(/|$)`
 );
+const ADMIN_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/admin(/|$)`);
 
 function isDashboardPath(pathname: string): boolean {
   return (
     pathname === "/dashboard" ||
     pathname.startsWith("/dashboard/") ||
     Boolean(pathname.match(DASHBOARD_PATTERN))
+  );
+}
+
+function isAdminPath(pathname: string): boolean {
+  return (
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/") ||
+    Boolean(pathname.match(ADMIN_PATTERN))
   );
 }
 
@@ -45,6 +54,43 @@ async function handleDashboardAuth(
   return intlResponse;
 }
 
+async function handleAdminAuth(
+  request: NextRequest,
+  pathname: string
+): Promise<NextResponse> {
+  // Run intl middleware first to handle locale detection
+  const intlResponse = intlMiddleware(request);
+  const supabase = createClient(request, intlResponse);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    // Redirect to login if not authenticated
+    const localeMatch = pathname.match(LOCALE_PATTERN);
+    const loginPath = localeMatch ? `/${localeMatch[1]}/login` : "/login";
+    const loginUrl = new URL(loginPath, request.url);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Check if user has admin role
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || profile.role !== "admin") {
+    // Redirect to home if not admin
+    const localeMatch = pathname.match(LOCALE_PATTERN);
+    const homePath = localeMatch ? `/${localeMatch[1]}` : "/";
+    const homeUrl = new URL(homePath, request.url);
+    return NextResponse.redirect(homeUrl);
+  }
+
+  return intlResponse;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -59,7 +105,12 @@ export async function proxy(request: NextRequest) {
     return handleDashboardAuth(request, pathname);
   }
 
-  // --- 3. Share Key Rewrite Logic ---
+  // --- 3. Admin Auth Check for /admin routes ---
+  if (isAdminPath(pathname)) {
+    return handleAdminAuth(request, pathname);
+  }
+
+  // --- 4. Share Key Rewrite Logic ---
   if (pathname.startsWith("/@")) {
     const shareKey = pathname.slice(2);
 
@@ -95,7 +146,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // --- 4. Internationalization Routing ---
+  // --- 5. Internationalization Routing ---
   return intlMiddleware(request);
 }
 
