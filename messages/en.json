@@ -108,10 +108,10 @@
     "question3": "How is this project funded?"
   },
   "Features": {
-    "communityDescription": "Perfect for community events, streams, and parties. Easy for everyone to join and enjoy together.",
+    "communityDescription": "Perfect for community events, streams, and parties. Easy to join with OAuth sign-in and enjoy together.",
     "communityTitle": "Community First",
     "heading": "Why Choose Bingify",
-    "noAppDescription": "No app installation required. Join instantly from your browser just by sharing a URL.",
+    "noAppDescription": "No app installation required. Share a URL and sign in from your browser to join instantly.",
     "noAppTitle": "No App Required",
     "realtimeDescription": "Real-time communication ensures all screens update simultaneously. Experience unity without delay.",
     "realtimeTitle": "Realtime Sync",
@@ -125,11 +125,11 @@
   },
   "Hero": {
     "badge1": "Start for free",
-    "badge2": "No registration required",
+    "badge2": "OAuth Sign-in",
     "badge3": "Real-time sync",
     "ctaButton": "Create Bingo Space",
     "description": "Experience a new kind of bingo that brings everyone together in real-time.",
-    "descriptionLine2": "No app needed—just share a URL and everyone can join.",
+    "descriptionLine2": "Sign in with Google or Twitch and get started instantly.",
     "title": "Turn Every Screen Into",
     "titleHighlight": "A Venue of Excitement."
   },
@@ -147,7 +147,7 @@
     "twitchButton": "Sign in with Twitch"
   },
   "Metadata": {
-    "description": "Experience a new kind of bingo that brings everyone together in real-time. No app needed—just share a URL and everyone can join.",
+    "description": "Experience a new kind of bingo that brings everyone together in real-time. Sign in with OAuth and get started easily.",
     "title": "Bingify - Turn Every Screen Into A Venue of Excitement."
   },
   "ScreenView": {
