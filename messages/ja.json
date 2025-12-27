@@ -56,6 +56,10 @@
     "viewingUrlDescription": "このURLを共有して、画面、配信ソフト、その他の表示アプリケーションにビンゴボードを表示できます。",
     "viewingUrlLabel": "公開閲覧用URL"
   },
+  "CreateSpace": {
+    "generateRandomButton": "ランダム生成",
+    "generateRandomButtonAriaLabel": "共有キーをランダムに生成"
+  },
   "Errors": {
     "authRequired": "認証が必要です",
     "notFound": "スペースが見つかりません",

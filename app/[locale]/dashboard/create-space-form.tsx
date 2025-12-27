@@ -3,6 +3,7 @@
 import { format } from "date-fns";
 import { AlertCircle, Check, Dices, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { generateRandomKey } from "@/lib/utils/random-key";
@@ -11,6 +12,7 @@ import { checkSlugAvailability, createSpace } from "./actions";
 
 export function CreateSpaceForm() {
   const router = useRouter();
+  const t = useTranslations("CreateSpace");
   const [slug, setSlug] = useState("");
   const [debouncedSlug] = useDebounce(slug, 500);
   const [checking, setChecking] = useState(false);
@@ -85,18 +87,28 @@ export function CreateSpaceForm() {
 
       <form action={formAction} className="space-y-6">
         <div>
-          <label className="mb-2 block font-medium text-sm" htmlFor="slug">
+          <label className="mb-2 block font-medium text-sm" htmlFor="share_key">
             共有キー
           </label>
 
           <div className="mb-2 flex items-center gap-2">
+            <button
+              aria-label={t("generateRandomButtonAriaLabel")}
+              className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-blue-700"
+              disabled={isPending}
+              onClick={handleGenerateRandomKey}
+              type="button"
+            >
+              <Dices className="h-4 w-4" />
+              {t("generateRandomButton")}
+            </button>
             <input
               className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
               disabled={isPending}
-              id="slug"
+              id="share_key"
               maxLength={30}
               minLength={3}
-              name="slug"
+              name="share_key"
               onChange={handleSlugChange}
               pattern="[a-z0-9-]+"
               placeholder="my-party"
@@ -104,15 +116,6 @@ export function CreateSpaceForm() {
               type="text"
               value={slug}
             />
-            <button
-              className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-blue-700"
-              disabled={isPending}
-              onClick={handleGenerateRandomKey}
-              type="button"
-            >
-              <Dices className="h-4 w-4" />
-              ランダム生成
-            </button>
             <span className="font-mono text-gray-500">-{dateSuffix}</span>
           </div>
 

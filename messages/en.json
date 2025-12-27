@@ -56,6 +56,10 @@
     "viewingUrlDescription": "Share this URL to display the bingo board on screens, in streaming software, or other display applications.",
     "viewingUrlLabel": "Public Viewing URL"
   },
+  "CreateSpace": {
+    "generateRandomButton": "Generate Random",
+    "generateRandomButtonAriaLabel": "Generate random share key"
+  },
   "Errors": {
     "authRequired": "Authentication required",
     "notFound": "Space not found",
