@@ -14,6 +14,7 @@ export function CreateSpaceForm() {
   const [slug, setSlug] = useState("");
   const [shareKey, setShareKey] = useState("");
   const [debouncedSlug] = useDebounce(slug, 500);
+  const [debouncedShareKey] = useDebounce(shareKey, 500);
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState<boolean | null>(null);
 
@@ -67,7 +68,7 @@ export function CreateSpaceForm() {
   };
 
   useEffect(() => {
-    const keyToCheck = shareKey || debouncedSlug;
+    const keyToCheck = debouncedShareKey || debouncedSlug;
     if (!keyToCheck || keyToCheck.length < 3) {
       return;
     }
@@ -83,7 +84,7 @@ export function CreateSpaceForm() {
     };
 
     check();
-  }, [debouncedSlug, shareKey]);
+  }, [debouncedSlug, debouncedShareKey]);
 
   useEffect(() => {
     if (state.success && state.spaceId) {
