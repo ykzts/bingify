@@ -18,14 +18,14 @@ export function Faq({
   answer2,
   answer3,
   heading,
-  maxParticipants,
+  maxParticipants: _maxParticipants,
   question1,
   question2,
   question3,
 }: FaqProps) {
   const faqs = [
     {
-      answer: answer1.replace("{maxParticipants}", maxParticipants.toString()),
+      answer: answer1,
       id: "usage-limits",
       question: question1,
     },

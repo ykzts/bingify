@@ -45,7 +45,7 @@ export default async function Home({ params }: Props) {
           subheading={tFeatures("subheading")}
         />
         <Faq
-          answer1={tFaq("answer1")}
+          answer1={tFaq("answer1", { maxParticipants: 50 })}
           answer2={tFaq("answer2")}
           answer3={tFaq("answer3")}
           heading={tFaq("heading")}
