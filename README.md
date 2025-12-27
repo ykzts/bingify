@@ -117,14 +117,17 @@ lib/
 
 ### 自動デプロイ
 
-`supabase/migrations` ディレクトリ配下のマイグレーションファイルは、`main` ブランチへのマージ時に自動的に Cloud Supabase へデプロイされます。
+`supabase/migrations` ディレクトリ配下の `.sql` マイグレーションファイルは、`main` ブランチへのマージ時に自動的に Cloud Supabase へデプロイされます。
+
+**重要:** マイグレーションファイルをリポジトリから削除しても、Cloud Supabase に適用済みのマイグレーションは削除されません。ロールバックが必要な場合は、新しいマイグレーションファイルで明示的にロールバック SQL を記述してください。
 
 **動作フロー:**
 
-1. `supabase/migrations/**` に変更を含む PR を作成
+1. `supabase/migrations/**/*.sql` に変更を含む PR を作成
 2. PR がレビュー・承認される
 3. `main` ブランチへマージ
 4. GitHub Actions が自動的にマイグレーションを Cloud Supabase に適用
+5. デプロイ前後の検証ステップで安全性を確保
 
 **必要な GitHub Secrets:**
 
