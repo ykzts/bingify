@@ -39,6 +39,58 @@ function isSpacesPath(pathname: string): boolean {
   );
 }
 
+async function handleShareKeyRoute(
+  request: NextRequest,
+  shareKey: string
+): Promise<NextResponse> {
+  // Validate share key format
+  if (!validateShareKey(shareKey)) {
+    return new NextResponse("Not Found", { status: 404 });
+  }
+
+  try {
+    // Run intl middleware first to detect locale and set headers/cookies
+    const intlResponse = intlMiddleware(request);
+
+    // Check authentication before allowing access
+    const supabase = createClient(request, intlResponse);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      // Redirect to login if not authenticated
+      const pathname = request.nextUrl.pathname;
+      const localeMatch = pathname.match(LOCALE_PATTERN);
+      const loginPath = localeMatch ? `/${localeMatch[1]}/login` : "/login";
+      const loginUrl = new URL(loginPath, request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Get the locale from the intl middleware response
+    const locale =
+      intlResponse.cookies.get("NEXT_LOCALE")?.value || routing.defaultLocale;
+
+    // Now handle the share key rewrite with the detected locale
+    const response = await handleShareKeyRewrite(request, shareKey, locale);
+
+    // Copy locale cookie from intl response to our rewrite response
+    const localeCookie = intlResponse.cookies.get("NEXT_LOCALE");
+    if (localeCookie) {
+      response.cookies.set("NEXT_LOCALE", localeCookie.value, {
+        path: "/",
+        sameSite: "lax",
+      });
+    }
+
+    return response;
+  } catch (error) {
+    console.error("Middleware lookup error:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
+
 async function handleAuthenticatedRoute(
   request: NextRequest,
   pathname: string
@@ -115,48 +167,18 @@ export async function proxy(request: NextRequest) {
 
   // --- 2. Supabase Auth Check for /dashboard and /spaces routes ---
   if (isDashboardPath(pathname) || isSpacesPath(pathname)) {
-    return handleAuthenticatedRoute(request, pathname);
+    return await handleAuthenticatedRoute(request, pathname);
   }
 
   // --- 3. Admin Auth Check for /admin routes ---
   if (isAdminPath(pathname)) {
-    return handleAdminAuth(request, pathname);
+    return await handleAdminAuth(request, pathname);
   }
 
-  // --- 4. Share Key Rewrite Logic ---
+  // --- 4. Share Key Rewrite Logic with Auth Check ---
   if (pathname.startsWith("/@")) {
     const shareKey = pathname.slice(2);
-
-    // Validate share key format
-    if (!validateShareKey(shareKey)) {
-      return new NextResponse("Not Found", { status: 404 });
-    }
-
-    try {
-      // Run intl middleware first to detect locale and set headers/cookies
-      const intlResponse = intlMiddleware(request);
-
-      // Get the locale from the intl middleware response
-      const locale =
-        intlResponse.cookies.get("NEXT_LOCALE")?.value || routing.defaultLocale;
-
-      // Now handle the share key rewrite with the detected locale
-      const response = await handleShareKeyRewrite(request, shareKey, locale);
-
-      // Copy locale cookie from intl response to our rewrite response
-      const localeCookie = intlResponse.cookies.get("NEXT_LOCALE");
-      if (localeCookie) {
-        response.cookies.set("NEXT_LOCALE", localeCookie.value, {
-          path: "/",
-          sameSite: "lax",
-        });
-      }
-
-      return response;
-    } catch (error) {
-      console.error("Middleware lookup error:", error);
-      return new NextResponse("Internal Server Error", { status: 500 });
-    }
+    return await handleShareKeyRoute(request, shareKey);
   }
 
   // --- 5. Internationalization Routing ---
