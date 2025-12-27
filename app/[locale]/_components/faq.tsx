@@ -45,9 +45,9 @@ export function Faq({
         <div className="space-y-6">
           {faqs.map((faq, index) => (
             <motion.div
+              key={faq.question}
               className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
               initial={{ opacity: 0, y: 20 }}
-              key={faq.question}
               transition={{ delay: index * 0.1, duration: 0.6 }}
               viewport={{ once: true }}
               whileInView={{ opacity: 1, y: 0 }}
