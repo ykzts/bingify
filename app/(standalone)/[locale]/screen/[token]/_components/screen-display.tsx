@@ -243,7 +243,12 @@ export function ScreenDisplay({
             {/* QR Code */}
             <div className="flex flex-col items-center gap-2">
               <div className="rounded-lg bg-white p-3">
-                <QRCodeSVG size={120} value={participationUrl} />
+                <QRCodeSVG
+                  aria-label={t("scanToJoin")}
+                  size={120}
+                  title={t("scanToJoin")}
+                  value={participationUrl}
+                />
               </div>
               <p className="text-center text-white text-xs">
                 {t("scanToJoin")}
