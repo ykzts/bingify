@@ -96,7 +96,9 @@
   },
   "CreateSpace": {
     "generateRandomButton": "Generate Random",
-    "generateRandomButtonAriaLabel": "Generate random share key"
+    "generateRandomButtonAriaLabel": "Generate random share key",
+    "youtubeChannelIdHelp": "Enter a YouTube channel ID to require participants to subscribe to that channel before joining.",
+    "youtubeChannelIdLabel": "YouTube Channel ID (Optional)"
   },
   "Errors": {
     "authRequired": "Authentication required",

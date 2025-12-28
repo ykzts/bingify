@@ -96,7 +96,9 @@
   },
   "CreateSpace": {
     "generateRandomButton": "ランダム生成",
-    "generateRandomButtonAriaLabel": "共有キーをランダムに生成"
+    "generateRandomButtonAriaLabel": "共有キーをランダムに生成",
+    "youtubeChannelIdHelp": "参加者に特定のYouTubeチャンネルの登録を必須にする場合は、チャンネルIDを入力してください。",
+    "youtubeChannelIdLabel": "YouTube チャンネルID（オプション）"
   },
   "Errors": {
     "authRequired": "認証が必要です",

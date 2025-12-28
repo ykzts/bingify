@@ -61,6 +61,13 @@ async function verifyYouTubeSubscription(
     youtubeChannelId
   );
 
+  if (result.error) {
+    return {
+      errorKey: "errorYouTubeVerificationFailed",
+      success: false,
+    };
+  }
+
   if (!result.isSubscribed) {
     return {
       errorKey: "errorYouTubeNotSubscribed",

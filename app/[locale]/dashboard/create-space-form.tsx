@@ -169,7 +169,7 @@ export function CreateSpaceForm() {
             className="mb-2 block font-medium text-sm"
             htmlFor="youtube_channel_id"
           >
-            YouTube チャンネルID（オプション）
+            {t("youtubeChannelIdLabel")}
           </label>
           <input
             className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
@@ -182,7 +182,7 @@ export function CreateSpaceForm() {
             value={youtubeChannelId}
           />
           <p className="mt-2 text-gray-500 text-sm">
-            参加者に特定のYouTubeチャンネルの登録を必須にする場合は、チャンネルIDを入力してください。
+            {t("youtubeChannelIdHelp")}
           </p>
         </div>
 

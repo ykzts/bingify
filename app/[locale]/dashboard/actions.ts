@@ -3,16 +3,16 @@
 import { randomUUID } from "node:crypto";
 import { format } from "date-fns";
 import { generateSecureToken } from "@/lib/crypto";
-import { spaceSchema } from "@/lib/schemas/space";
+import { spaceSchema, youtubeChannelIdSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 
 const MAX_SLUG_SUGGESTIONS = 10;
 
 export interface CreateSpaceState {
-  error?: string;
-  shareKey?: string;
-  spaceId?: string;
   success: boolean;
+  error?: string;
+  spaceId?: string;
+  shareKey?: string;
   suggestion?: string;
 }
 
@@ -64,8 +64,8 @@ export async function createSpace(
 ): Promise<CreateSpaceState> {
   try {
     const shareKey = formData.get("share_key") as string;
-    const youtubeChannelId =
-      (formData.get("youtube_channel_id") as string) || null;
+    const youtubeChannelIdRaw =
+      (formData.get("youtube_channel_id") as string) || "";
 
     // Validate input with Zod
     const validation = spaceSchema.safeParse({ slug: shareKey });
@@ -74,6 +74,20 @@ export async function createSpace(
         error: validation.error.issues[0].message,
         success: false,
       };
+    }
+
+    // Validate YouTube Channel ID if provided
+    let youtubeChannelId: string | null = null;
+    if (youtubeChannelIdRaw.trim()) {
+      const channelIdValidation =
+        youtubeChannelIdSchema.safeParse(youtubeChannelIdRaw);
+      if (!channelIdValidation.success) {
+        return {
+          error: channelIdValidation.error.issues[0].message,
+          success: false,
+        };
+      }
+      youtubeChannelId = youtubeChannelIdRaw.trim();
     }
 
     // Generate full slug with date suffix

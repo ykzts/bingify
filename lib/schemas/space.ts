@@ -8,4 +8,14 @@ export const spaceSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "小文字の英数字とハイフンのみ使用できます"),
 });
 
+export const youtubeChannelIdSchema = z
+  .string()
+  .trim()
+  .regex(
+    /^UC[a-zA-Z0-9_-]{22}$/,
+    "Invalid YouTube Channel ID format. Channel IDs start with 'UC' followed by 22 characters."
+  )
+  .optional()
+  .or(z.literal(""));
+
 export type SpaceFormData = z.infer<typeof spaceSchema>;
