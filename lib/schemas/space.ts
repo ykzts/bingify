@@ -63,6 +63,95 @@ export const twitchRequirementSchema = z.enum([
 
 export type SpaceFormData = z.infer<typeof spaceSchema>;
 
+// Space status enum
+export const spaceStatusSchema = z.enum(["draft", "active", "archived"]);
+
+export type SpaceStatus = z.infer<typeof spaceStatusSchema>;
+
+// Schema for space update (settings page)
+export const updateSpaceFormSchema = z
+  .object({
+    title: z.string().max(100, "タイトルは100文字以内で入力してください").optional(),
+    description: z.string().max(500, "説明は500文字以内で入力してください").optional(),
+    max_participants: z
+      .number()
+      .int("整数を入力してください")
+      .min(1, "1人以上を指定してください")
+      .max(1000, "最大1000人までです"),
+    youtube_requirement: z.enum(["none", "subscriber"]),
+    youtube_channel_id: z.string().trim().optional(),
+    twitch_requirement: z.enum(["none", "follower", "subscriber"]),
+    twitch_broadcaster_id: z.string().trim().optional(),
+    email_allowlist: z.string().trim().optional(),
+  })
+  .refine(
+    (data) => {
+      // If YouTube requirement is set, channel ID must be provided
+      if (data.youtube_requirement !== "none") {
+        return (
+          data.youtube_channel_id &&
+          data.youtube_channel_id.trim() !== "" &&
+          YOUTUBE_CHANNEL_ID_REGEX.test(data.youtube_channel_id)
+        );
+      }
+      return true;
+    },
+    {
+      message:
+        "YouTube要件を設定する場合、有効なチャンネルID（'UC'で始まる24文字）が必要です",
+      path: ["youtube_channel_id"],
+    }
+  )
+  .refine(
+    (data) => {
+      // If Twitch requirement is set, broadcaster ID must be provided
+      if (data.twitch_requirement !== "none") {
+        return (
+          data.twitch_broadcaster_id &&
+          data.twitch_broadcaster_id.trim() !== "" &&
+          TWITCH_BROADCASTER_ID_REGEX.test(data.twitch_broadcaster_id)
+        );
+      }
+      return true;
+    },
+    {
+      message: "Twitch要件を設定する場合、有効な配信者ID（数字のみ）が必要です",
+      path: ["twitch_broadcaster_id"],
+    }
+  )
+  .refine(
+    (data) => {
+      // Validate email allowlist format if provided
+      if (!data.email_allowlist || data.email_allowlist.trim() === "") {
+        return true;
+      }
+      const patterns = parseEmailAllowlist(data.email_allowlist);
+      return patterns.every((pattern) => {
+        return (
+          DOMAIN_FORMAT_REGEX.test(pattern) || EMAIL_FORMAT_REGEX.test(pattern)
+        );
+      });
+    },
+    {
+      message:
+        "メールアドレスまたはドメインの形式が正しくありません。例: @example.com, user@example.com, example.com",
+      path: ["email_allowlist"],
+    }
+  )
+  .transform((data) => {
+    // Transform email allowlist to array
+    const emailAllowlist = data.email_allowlist
+      ? parseEmailAllowlist(data.email_allowlist)
+      : [];
+
+    return {
+      ...data,
+      email_allowlist: emailAllowlist,
+    };
+  });
+
+export type UpdateSpaceFormData = z.infer<typeof updateSpaceFormSchema>;
+
 // Comprehensive schema for space creation including gatekeeper settings
 export const createSpaceFormSchema = z
   .object({

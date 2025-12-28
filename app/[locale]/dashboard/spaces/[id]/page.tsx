@@ -41,10 +41,36 @@ export default async function AdminSpacePage({ params }: Props) {
       <h1 className="mb-8 font-bold text-3xl">{t("heading")}</h1>
 
       <div className="mx-auto max-w-3xl space-y-8">
+        {/* Status Banner */}
+        {space.status === "draft" && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 shadow-sm">
+            <h2 className="mb-2 font-semibold text-amber-900 text-xl">
+              {t("draftStatusTitle")}
+            </h2>
+            <p className="mb-4 text-amber-800 text-sm">
+              {t("draftStatusMessage")}
+            </p>
+            <Link
+              className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-amber-700"
+              href={`/${locale}/dashboard/spaces/${space.id}/settings`}
+            >
+              {t("goToSettings")}
+            </Link>
+          </div>
+        )}
+
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 font-semibold text-xl">
-            {t("spaceId")}: {space.share_key}
-          </h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-semibold text-xl">
+              {t("spaceId")}: {space.share_key}
+            </h2>
+            <Link
+              className="text-purple-600 text-sm hover:underline"
+              href={`/${locale}/dashboard/spaces/${space.id}/settings`}
+            >
+              {t("settingsLink")}
+            </Link>
+          </div>
 
           <ViewingUrlManager
             locale={locale}
@@ -53,9 +79,11 @@ export default async function AdminSpacePage({ params }: Props) {
           />
         </div>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <BingoGameManager spaceId={space.id} />
-        </div>
+        {space.status === "active" && (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <BingoGameManager spaceId={space.id} />
+          </div>
+        )}
 
         {space.status === "active" && (
           <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">

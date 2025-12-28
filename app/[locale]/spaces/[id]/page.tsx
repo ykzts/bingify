@@ -44,8 +44,33 @@ export default async function UserSpacePage({ params }: Props) {
   // Fetch space information
   const space = await getSpaceById(id);
 
-  // If space doesn't exist or is inactive, show 404
-  if (!space || space.status !== "active") {
+  // If space doesn't exist, show 404
+  if (!space) {
+    notFound();
+  }
+
+  // If space is draft, show waiting screen
+  if (space.status === "draft") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <h1 className="mb-4 font-bold text-2xl text-gray-900">
+            {t("draftTitle")}
+          </h1>
+          <p className="mb-6 text-gray-600">{t("draftMessage")}</p>
+          <Link
+            className="text-purple-600 hover:underline"
+            href={`/${locale}`}
+          >
+            {t("backToHome")}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // If space is not active, show 404
+  if (space.status !== "active") {
     notFound();
   }
 
