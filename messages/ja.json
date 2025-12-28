@@ -183,6 +183,7 @@
     "errorLeaveFailed": "スペースからの退出に失敗しました",
     "errorLoadingCard": "ビンゴカードの読み込みに失敗しました",
     "errorQuotaReached": "スペースの参加者数が上限に達しています",
+    "errorSpaceClosed": "このスペースは閉鎖されています",
     "errorUnauthorized": "認証が必要です。ログインしてください。",
     "freeSpace": "FREE",
     "heading": "ビンゴカード",

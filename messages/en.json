@@ -183,6 +183,7 @@
     "errorLeaveFailed": "Failed to leave space",
     "errorLoadingCard": "Failed to load bingo card",
     "errorQuotaReached": "Space is full. Maximum capacity reached.",
+    "errorSpaceClosed": "This space has been closed",
     "errorUnauthorized": "Authentication required. Please sign in.",
     "freeSpace": "FREE",
     "heading": "Bingo Card",

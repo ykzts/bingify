@@ -65,6 +65,27 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
       };
     }
 
+    // Check if space exists and is active
+    const { data: space } = await supabase
+      .from("spaces")
+      .select("id, status")
+      .eq("id", spaceId)
+      .single();
+
+    if (!space) {
+      return {
+        errorKey: "errorInvalidSpace",
+        success: false,
+      };
+    }
+
+    if (space.status !== "active") {
+      return {
+        errorKey: "errorSpaceClosed",
+        success: false,
+      };
+    }
+
     // Try to join the space - rely on unique constraint for duplicate prevention
     const { error } = await supabase.from("participants").insert({
       space_id: spaceId,
