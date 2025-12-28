@@ -89,7 +89,7 @@ export function CreateSpaceForm() {
           共有キー
         </label>
 
-        <div className="mb-2 flex items-center gap-2">
+        <div className="mb-2 flex items-center">
           <div className="relative flex-1">
             <input
               className="flex h-10 w-full rounded-lg rounded-r-none border border-gray-300 border-r-0 bg-background px-3 py-2 pr-10 font-mono text-sm ring-offset-background focus:z-10 focus:border-transparent focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
