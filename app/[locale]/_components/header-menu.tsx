@@ -1,20 +1,20 @@
 "use client";
 
-import {
-  Content as DropdownMenuContent,
-  Item as DropdownMenuItem,
-  Portal as DropdownMenuPortal,
-  Root as DropdownMenuRoot,
-  Separator as DropdownMenuSeparator,
-  Sub as DropdownMenuSub,
-  SubContent as DropdownMenuSubContent,
-  SubTrigger as DropdownMenuSubTrigger,
-  Trigger as DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
 import { Globe, LogOut, Settings, User } from "lucide-react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/client";
@@ -68,7 +68,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
   if (!user) {
     return (
       <div className="flex items-center gap-3">
-        <DropdownMenuRoot onOpenChange={setOpen} open={open}>
+        <DropdownMenu onOpenChange={setOpen} open={open}>
           <DropdownMenuTrigger asChild>
             <button
               aria-label={tLang("label")}
@@ -82,15 +82,12 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
           <DropdownMenuPortal>
             <DropdownMenuContent
               align="end"
-              className="z-[100] min-w-[200px] rounded-md border border-gray-200 bg-white p-1 shadow-lg"
+              className="z-[100] min-w-[200px]"
               sideOffset={8}
             >
               {routing.locales.map((loc) => (
                 <DropdownMenuItem
-                  className={cn(
-                    "flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors hover:bg-gray-100",
-                    locale === loc && "bg-gray-50 font-medium"
-                  )}
+                  className={cn(locale === loc && "bg-gray-50 font-medium")}
                   disabled={isPending}
                   key={loc}
                   onSelect={() => handleLocaleChange(loc)}
@@ -100,7 +97,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
               ))}
             </DropdownMenuContent>
           </DropdownMenuPortal>
-        </DropdownMenuRoot>
+        </DropdownMenu>
 
         <Link
           className="rounded-md border border-gray-300 bg-white px-4 py-1.5 font-medium text-sm transition hover:bg-gray-50"
@@ -113,7 +110,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
   }
 
   return (
-    <DropdownMenuRoot onOpenChange={setOpen} open={open}>
+    <DropdownMenu onOpenChange={setOpen} open={open}>
       <DropdownMenuTrigger asChild>
         <button
           aria-label={t("menu")}
@@ -139,7 +136,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
       <DropdownMenuPortal>
         <DropdownMenuContent
           align="end"
-          className="z-[100] min-w-[240px] rounded-md border border-gray-200 bg-white p-1 shadow-lg"
+          className="z-[100] min-w-[240px]"
           sideOffset={8}
         >
           <div className="px-3 py-2">
@@ -151,11 +148,11 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
             )}
           </div>
 
-          <DropdownMenuSeparator className="my-1 h-px bg-gray-200" />
+          <DropdownMenuSeparator />
 
           <DropdownMenuItem asChild>
             <Link
-              className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors hover:bg-gray-100"
+              className="flex cursor-pointer items-center gap-2"
               href="/settings/account"
             >
               <Settings className="h-4 w-4" />
@@ -164,21 +161,18 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
           </DropdownMenuItem>
 
           <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors hover:bg-gray-100 data-[state=open]:bg-gray-100">
+            <DropdownMenuSubTrigger>
               <Globe className="h-4 w-4" />
               {t("language")}
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
-                className="z-[100] min-w-[180px] rounded-md border border-gray-200 bg-white p-1 shadow-lg"
+                className="z-[100] min-w-[180px]"
                 sideOffset={8}
               >
                 {routing.locales.map((loc) => (
                   <DropdownMenuItem
-                    className={cn(
-                      "flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors hover:bg-gray-100",
-                      locale === loc && "bg-gray-50 font-medium"
-                    )}
+                    className={cn(locale === loc && "bg-gray-50 font-medium")}
                     disabled={isPending}
                     key={loc}
                     onSelect={() => handleLocaleChange(loc)}
@@ -190,10 +184,10 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
             </DropdownMenuPortal>
           </DropdownMenuSub>
 
-          <DropdownMenuSeparator className="my-1 h-px bg-gray-200" />
+          <DropdownMenuSeparator />
 
           <DropdownMenuItem
-            className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="disabled:cursor-not-allowed disabled:opacity-50"
             disabled={isLoggingOut}
             onSelect={handleLogout}
           >
@@ -202,6 +196,6 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenuPortal>
-    </DropdownMenuRoot>
+    </DropdownMenu>
   );
 }
