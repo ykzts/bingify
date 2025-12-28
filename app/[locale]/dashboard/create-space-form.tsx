@@ -207,9 +207,7 @@ export function CreateSpaceForm() {
         {isPending ? t("creatingButton") : t("createButton")}
       </Button>
 
-      <p className="text-center text-gray-500 text-sm">
-        作成後、詳細設定画面で参加人数制限やその他の設定を行えます
-      </p>
+      <p className="text-center text-gray-500 text-sm">{t("settingsNotice")}</p>
     </form>
   );
 }

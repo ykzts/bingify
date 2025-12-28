@@ -142,7 +142,8 @@
     "youtubeRequirementLabel": "YouTube要件",
     "youtubeRequirementMember": "メンバー限定",
     "youtubeRequirementNone": "制限なし",
-    "youtubeRequirementSubscriber": "登録者限定"
+    "youtubeRequirementSubscriber": "登録者限定",
+    "settingsNotice": "作成後、詳細設定画面で参加人数制限やその他の設定を行えます"
   },
   "Dashboard": {
     "activeSpaceBackToAdmin": "管理画面へ戻る",

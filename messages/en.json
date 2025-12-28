@@ -142,7 +142,8 @@
     "youtubeRequirementLabel": "YouTube Requirement",
     "youtubeRequirementMember": "Members only",
     "youtubeRequirementNone": "No restriction",
-    "youtubeRequirementSubscriber": "Subscribers only"
+    "youtubeRequirementSubscriber": "Subscribers only",
+    "settingsNotice": "After creation, you can configure participant limits and other settings on the settings page"
   },
   "Dashboard": {
     "activeSpaceBackToAdmin": "Back to Admin",

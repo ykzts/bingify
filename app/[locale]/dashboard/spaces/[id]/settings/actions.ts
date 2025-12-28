@@ -232,7 +232,7 @@ export interface PublishSpaceState {
 
 export async function publishSpace(
   spaceId: string,
-  _prevState: UpdateSpaceState,
+  _prevState: PublishSpaceState,
   formData: FormData
 ): Promise<PublishSpaceState> {
   try {

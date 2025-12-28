@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { UpdateSpaceState } from "../actions";
+import type { PublishSpaceState, UpdateSpaceState } from "../actions";
 import { publishSpace, updateSpaceSettings } from "../actions";
 
 interface Space {
@@ -76,7 +76,7 @@ export function SpaceSettingsForm({
   });
 
   const [publishState, publishAction, isPublishing] = useActionState<
-    UpdateSpaceState,
+    PublishSpaceState,
     FormData
   >(publishSpace.bind(null, space.id), {
     success: false,
