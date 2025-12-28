@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format } from "date-fns/format";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getUserSpaces } from "./actions";
@@ -14,6 +14,9 @@ export default async function DashboardPage({ params }: Props) {
 
   const t = await getTranslations("Dashboard");
   const { activeSpace, spaces } = await getUserSpaces();
+
+  // Locale-specific date format
+  const dateFormat = locale === "ja" ? "yyyy/MM/dd" : "MMM dd, yyyy";
 
   return (
     <div className="mx-auto max-w-4xl space-y-12 px-4 py-8">
@@ -111,7 +114,7 @@ export default async function DashboardPage({ params }: Props) {
                       {space.share_key}
                     </td>
                     <td className="px-4 py-3 text-gray-500">
-                      {format(new Date(space.created_at), "yyyy/MM/dd")}
+                      {format(new Date(space.created_at), dateFormat)}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link

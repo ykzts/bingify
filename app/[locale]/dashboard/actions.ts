@@ -310,7 +310,7 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       // Get participant count
       const { count } = await supabase
         .from("participants")
-        .select("*", { count: "exact", head: true })
+        .select("id", { count: "exact", head: true })
         .eq("space_id", activeSpaceData.id);
 
       activeSpace = {
