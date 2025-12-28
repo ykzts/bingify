@@ -8,6 +8,39 @@ export interface TwitchSubCheckResult {
   isSubscribed: boolean;
 }
 
+interface ValidationResult {
+  error?: string;
+  valid: boolean;
+}
+
+/**
+ * Validate common parameters for Twitch API calls
+ */
+function validateTwitchParameters(
+  userAccessToken: string,
+  userId: string,
+  broadcasterId: string
+): ValidationResult {
+  if (!userAccessToken) {
+    return { error: "Missing required parameters", valid: false };
+  }
+
+  if (!userId) {
+    return { error: "Missing required parameters", valid: false };
+  }
+
+  if (!broadcasterId) {
+    return { error: "Missing required parameters", valid: false };
+  }
+
+  const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+  if (!clientId) {
+    return { error: "Twitch client ID not configured", valid: false };
+  }
+
+  return { valid: true };
+}
+
 /**
  * Check if a user follows a broadcaster on Twitch
  * @param userAccessToken - User's Twitch access token
@@ -21,21 +54,19 @@ export async function checkFollowStatus(
   broadcasterId: string
 ): Promise<TwitchFollowCheckResult> {
   try {
-    if (!(userAccessToken && userId && broadcasterId)) {
+    const validation = validateTwitchParameters(
+      userAccessToken,
+      userId,
+      broadcasterId
+    );
+    if (!validation.valid) {
       return {
-        error: "Missing required parameters",
+        error: validation.error,
         isFollowing: false,
       };
     }
 
     const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-    if (!clientId) {
-      return {
-        error: "Twitch client ID not configured",
-        isFollowing: false,
-      };
-    }
-
     const url = new URL("https://api.twitch.tv/helix/channels/followers");
     url.searchParams.append("user_id", userId);
     url.searchParams.append("broadcaster_id", broadcasterId);
@@ -43,7 +74,7 @@ export async function checkFollowStatus(
     const response = await fetch(url.toString(), {
       headers: {
         Authorization: `Bearer ${userAccessToken}`,
-        "Client-Id": clientId,
+        "Client-Id": clientId as string,
       },
     });
 
@@ -81,21 +112,19 @@ export async function checkSubStatus(
   broadcasterId: string
 ): Promise<TwitchSubCheckResult> {
   try {
-    if (!(userAccessToken && userId && broadcasterId)) {
+    const validation = validateTwitchParameters(
+      userAccessToken,
+      userId,
+      broadcasterId
+    );
+    if (!validation.valid) {
       return {
-        error: "Missing required parameters",
+        error: validation.error,
         isSubscribed: false,
       };
     }
 
     const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-    if (!clientId) {
-      return {
-        error: "Twitch client ID not configured",
-        isSubscribed: false,
-      };
-    }
-
     const url = new URL("https://api.twitch.tv/helix/subscriptions/user");
     url.searchParams.append("user_id", userId);
     url.searchParams.append("broadcaster_id", broadcasterId);
@@ -103,7 +132,7 @@ export async function checkSubStatus(
     const response = await fetch(url.toString(), {
       headers: {
         Authorization: `Bearer ${userAccessToken}`,
-        "Client-Id": clientId,
+        "Client-Id": clientId as string,
       },
     });
 

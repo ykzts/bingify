@@ -180,8 +180,8 @@ async function verifyGatekeeperRules(
       twitchAccessToken,
       twitchUserId,
       gatekeeperRules.twitch.broadcasterId,
-      gatekeeperRules.twitch.requireFollow,
-      gatekeeperRules.twitch.requireSub
+      Boolean(gatekeeperRules.twitch.requireFollow),
+      Boolean(gatekeeperRules.twitch.requireSub)
     );
     if (verificationResult) {
       return verificationResult;
