@@ -53,9 +53,17 @@ export function CloseSpaceButton({ spaceId }: CloseSpaceButtonProps) {
 
       {/* Confirmation Dialog */}
       {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div
+          aria-labelledby="close-space-dialog-title"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          role="dialog"
+        >
           <div className="mx-4 max-w-md rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="mb-4 font-semibold text-lg">
+            <h3
+              className="mb-4 font-semibold text-lg"
+              id="close-space-dialog-title"
+            >
               {t("closeSpaceButton")}
             </h3>
             <p className="mb-6 text-gray-700 text-sm">
@@ -83,12 +91,18 @@ export function CloseSpaceButton({ spaceId }: CloseSpaceButtonProps) {
 
       {/* Success Dialog */}
       {showSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="mx-4 max-w-md rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="mb-4 font-semibold text-green-600 text-lg">
+        <div
+          aria-live="polite"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+        >
+          <output className="mx-4 max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <h3
+              className="mb-4 font-semibold text-green-600 text-lg"
+              id="close-space-success-title"
+            >
               {t("closeSpaceSuccess")}
             </h3>
-          </div>
+          </output>
         </div>
       )}
     </div>

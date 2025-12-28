@@ -8,8 +8,9 @@ DECLARE
   max_count INTEGER;
   max_from_settings INTEGER;
 BEGIN
-  -- Get max_participants from spaces table with row lock to prevent race conditions
-  SELECT max_participants INTO max_count
+  -- Get max_participants and settings in a single query with row lock to prevent race conditions
+  SELECT max_participants, (settings->>'maxParticipants')::INTEGER
+  INTO max_count, max_from_settings
   FROM spaces
   WHERE id = NEW.space_id
   FOR UPDATE;
@@ -20,20 +21,15 @@ BEGIN
       USING ERRCODE = 'foreign_key_violation';
   END IF;
 
-  -- Check if settings has a custom maxParticipants override
-  SELECT (settings->>'maxParticipants')::INTEGER INTO max_from_settings
-  FROM spaces
-  WHERE id = NEW.space_id;
-
   -- Use settings value if it exists, otherwise use max_participants column
   IF max_from_settings IS NOT NULL THEN
     max_count := max_from_settings;
   END IF;
 
-  -- Get current bingo card count for the space
+  -- Get current participant count for the space
   SELECT COUNT(*)
   INTO current_count
-  FROM bingo_cards
+  FROM participants
   WHERE space_id = NEW.space_id;
 
   -- Check if adding this card would exceed the limit

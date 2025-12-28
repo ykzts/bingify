@@ -206,20 +206,7 @@ export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
       };
     }
 
-    const { data: space } = await supabase
-      .from("spaces")
-      .select("owner_id")
-      .eq("id", spaceId)
-      .single();
-
-    if (!space || space.owner_id !== user.id) {
-      return {
-        error: "Permission denied",
-        success: false,
-      };
-    }
-
-    const { error } = await supabase
+    const { error, count } = await supabase
       .from("spaces")
       .update({ status: "archived" })
       .eq("id", spaceId)
@@ -229,6 +216,13 @@ export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
       console.error("Database error:", error);
       return {
         error: "Failed to close space",
+        success: false,
+      };
+    }
+
+    if (count === 0) {
+      return {
+        error: "Space not found or permission denied",
         success: false,
       };
     }
