@@ -49,9 +49,13 @@ export async function GET(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Step 1: Mark expired spaces based on system settings
-    const { data: expirationResult } = await supabase.rpc(
-      "cleanup_expired_spaces"
-    );
+    const { data: expirationResult, error: expirationError } =
+      await supabase.rpc("cleanup_expired_spaces");
+
+    if (expirationError) {
+      console.error("Error marking expired spaces:", expirationError);
+      // Continue with archive cleanup even if expiration marking fails
+    }
 
     const expiredCount = expirationResult?.[0]?.expired_count || 0;
 

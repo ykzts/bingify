@@ -151,6 +151,7 @@
   },
   "Errors": {
     "authRequired": "Authentication required",
+    "failedToCountSpaces": "Failed to verify space count",
     "maxSpacesReached": "You have reached the maximum limit of {max} spaces. Please delete unused spaces.",
     "notFound": "Space not found",
     "permissionDenied": "You don't have permission to edit this space",

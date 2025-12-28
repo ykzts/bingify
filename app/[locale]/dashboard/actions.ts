@@ -124,18 +124,29 @@ export async function createSpace(
     }
 
     // Check system settings for max spaces per user
-    const { data: systemSettings } = await supabase
+    const { data: systemSettings, error: settingsError } = await supabase
       .from("system_settings")
       .select("max_spaces_per_user")
       .eq("id", 1)
       .single();
 
-    if (systemSettings) {
+    if (settingsError) {
+      console.error("Failed to fetch system settings:", settingsError);
+      // Continue with space creation if settings fetch fails (graceful degradation)
+    } else if (systemSettings) {
       // Count user's existing spaces
-      const { count: userSpaceCount } = await supabase
+      const { count: userSpaceCount, error: countError } = await supabase
         .from("spaces")
         .select("*", { count: "exact", head: true })
         .eq("owner_id", user.id);
+
+      if (countError) {
+        console.error("Failed to count user spaces:", countError);
+        return {
+          error: "failedToCountSpaces",
+          success: false,
+        };
+      }
 
       if (
         userSpaceCount !== null &&

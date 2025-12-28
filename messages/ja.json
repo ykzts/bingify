@@ -151,6 +151,7 @@
   },
   "Errors": {
     "authRequired": "認証が必要です",
+    "failedToCountSpaces": "スペース数の確認に失敗しました",
     "maxSpacesReached": "作成できるスペースの上限（{max}個）に達しています。不要なスペースを削除してください。",
     "notFound": "スペースが見つかりません",
     "permissionDenied": "このスペースの編集権限がありません",
