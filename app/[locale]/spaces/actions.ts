@@ -1,5 +1,6 @@
 "use server";
 
+import { checkEmailAllowed } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import { checkFollowStatus, checkSubStatus } from "@/lib/twitch";
 import { isValidUUID } from "@/lib/utils/uuid";
@@ -12,6 +13,10 @@ export interface JoinSpaceState {
 }
 
 export interface GatekeeperRules {
+  email?: {
+    allowed?: string[];
+    blocked?: string[];
+  };
   twitch?: {
     broadcasterId: string;
     requireFollow?: boolean;
@@ -154,12 +159,56 @@ async function verifyTwitchRequirements(
   return null;
 }
 
+function verifyEmailAllowlist(
+  userEmail: string,
+  allowedPatterns: string[],
+  blockedPatterns?: string[]
+): JoinSpaceState | null {
+  // Check blocked list first (if both allowed and blocked have same pattern, blocked takes priority)
+  if (
+    blockedPatterns &&
+    blockedPatterns.length > 0 &&
+    checkEmailAllowed(userEmail, blockedPatterns)
+  ) {
+    return {
+      errorKey: "errorEmailBlocked",
+      success: false,
+    };
+  }
+
+  // Check allowed list
+  if (!checkEmailAllowed(userEmail, allowedPatterns)) {
+    return {
+      errorKey: "errorEmailNotAllowed",
+      success: false,
+    };
+  }
+
+  return null;
+}
+
 async function verifyGatekeeperRules(
   gatekeeperRules: GatekeeperRules | null,
+  userEmail: string,
   youtubeAccessToken: string | undefined,
   twitchAccessToken: string | undefined,
   twitchUserId: string | undefined
 ): Promise<JoinSpaceState | null> {
+  // Check email allowlist if configured
+  if (
+    gatekeeperRules?.email?.allowed &&
+    gatekeeperRules.email.allowed.length > 0
+  ) {
+    const verificationResult = verifyEmailAllowlist(
+      userEmail,
+      gatekeeperRules.email.allowed,
+      gatekeeperRules.email.blocked
+    );
+    if (verificationResult) {
+      return verificationResult;
+    }
+  }
+
   // Check YouTube subscription requirement if configured
   if (gatekeeperRules?.youtube?.required && gatekeeperRules.youtube.channelId) {
     const verificationResult = await verifyYouTubeSubscription(
@@ -220,6 +269,15 @@ export async function joinSpace(
       };
     }
 
+    // Get user email for verification
+    const userEmail = user.email;
+    if (!userEmail) {
+      return {
+        errorKey: "errorUnauthorized",
+        success: false,
+      };
+    }
+
     // Check if space exists and is active
     const { data: space } = await supabase
       .from("spaces")
@@ -245,6 +303,7 @@ export async function joinSpace(
     const gatekeeperRules = space.gatekeeper_rules as GatekeeperRules | null;
     const verificationResult = await verifyGatekeeperRules(
       gatekeeperRules,
+      userEmail,
       youtubeAccessToken,
       twitchAccessToken,
       twitchUserId

@@ -15,6 +15,7 @@ export function CreateSpaceForm() {
   const t = useTranslations("CreateSpace");
   const [shareKey, setShareKey] = useState("");
   const [youtubeChannelId, setYoutubeChannelId] = useState("");
+  const [emailAllowlist, setEmailAllowlist] = useState("");
   const [debouncedShareKey] = useDebounce(shareKey, 500);
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState<boolean | null>(null);
@@ -185,6 +186,26 @@ export function CreateSpaceForm() {
         <p className="mt-2 text-gray-500 text-sm">
           {t("youtubeChannelIdHelp")}
         </p>
+      </div>
+
+      <div>
+        <label
+          className="mb-2 block font-medium text-sm"
+          htmlFor="email_allowlist"
+        >
+          {t("emailAllowlistLabel")}
+        </label>
+        <textarea
+          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+          disabled={isPending}
+          id="email_allowlist"
+          name="email_allowlist"
+          onChange={(e) => setEmailAllowlist(e.target.value)}
+          placeholder="@example.com, user@test.org"
+          rows={3}
+          value={emailAllowlist}
+        />
+        <p className="mt-2 text-gray-500 text-sm">{t("emailAllowlistHelp")}</p>
       </div>
 
       {state.error && (
