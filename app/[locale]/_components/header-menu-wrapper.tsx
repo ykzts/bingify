@@ -20,11 +20,27 @@ async function HeaderMenuData() {
 
   if (error) {
     console.error("Failed to fetch user profile:", error);
-    return <HeaderMenu user={null} />;
+    return (
+      <HeaderMenu
+        user={{
+          avatar_url: null,
+          email: user.email || null,
+          full_name: null,
+        }}
+      />
+    );
   }
 
   if (!data) {
-    return <HeaderMenu user={null} />;
+    return (
+      <HeaderMenu
+        user={{
+          avatar_url: null,
+          email: user.email || null,
+          full_name: null,
+        }}
+      />
+    );
   }
 
   return <HeaderMenu user={data} />;
@@ -32,7 +48,14 @@ async function HeaderMenuData() {
 
 export function HeaderMenuWrapper() {
   return (
-    <Suspense fallback={null}>
+    <Suspense
+      fallback={
+        <div
+          aria-hidden="true"
+          className="flex h-8 w-8 animate-pulse items-center justify-center rounded-full bg-gray-200"
+        />
+      }
+    >
       <HeaderMenuData />
     </Suspense>
   );

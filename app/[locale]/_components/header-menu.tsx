@@ -54,6 +54,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
     } catch (error) {
       console.error("Logout error:", error);
       setIsLoggingOut(false);
+      setOpen(true);
     }
   };
 
@@ -67,7 +68,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
   if (!user) {
     return (
       <div className="flex items-center gap-3">
-        <DropdownMenuRoot open={open} onOpenChange={setOpen}>
+        <DropdownMenuRoot onOpenChange={setOpen} open={open}>
           <DropdownMenuTrigger asChild>
             <button
               aria-label={tLang("label")}
@@ -86,12 +87,12 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
             >
               {routing.locales.map((loc) => (
                 <DropdownMenuItem
-                  key={loc}
                   className={cn(
                     "flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors hover:bg-gray-100",
-                    locale === loc && "bg-gray-50 font-medium",
+                    locale === loc && "bg-gray-50 font-medium"
                   )}
                   disabled={isPending}
+                  key={loc}
                   onSelect={() => handleLocaleChange(loc)}
                 >
                   {localeNames[loc] || loc.toUpperCase()}
@@ -112,7 +113,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
   }
 
   return (
-    <DropdownMenuRoot open={open} onOpenChange={setOpen}>
+    <DropdownMenuRoot onOpenChange={setOpen} open={open}>
       <DropdownMenuTrigger asChild>
         <button
           aria-label={t("menu")}
@@ -121,7 +122,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
         >
           {user.avatar_url ? (
             <Image
-              alt={user.full_name || user.email || "User"}
+              alt={user.full_name || user.email || t("userAvatar")}
               className="rounded-full object-cover"
               height={32}
               src={user.avatar_url}
@@ -174,12 +175,12 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
               >
                 {routing.locales.map((loc) => (
                   <DropdownMenuItem
-                    key={loc}
                     className={cn(
                       "flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors hover:bg-gray-100",
-                      locale === loc && "bg-gray-50 font-medium",
+                      locale === loc && "bg-gray-50 font-medium"
                     )}
                     disabled={isPending}
+                    key={loc}
                     onSelect={() => handleLocaleChange(loc)}
                   >
                     {localeNames[loc] || loc.toUpperCase()}

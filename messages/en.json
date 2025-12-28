@@ -128,7 +128,8 @@
     "login": "Sign in",
     "logout": "Sign out",
     "menu": "Menu",
-    "settings": "Settings"
+    "settings": "Settings",
+    "userAvatar": "User"
   },
   "Hero": {
     "badge1": "Start for free",
