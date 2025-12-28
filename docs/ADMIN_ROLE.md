@@ -9,19 +9,23 @@
 ## 機能
 
 ### 1. 管理者ロール管理
+
 - ユーザーは`profiles`テーブルに'user'または'admin'のいずれかの`role`フィールドを持ちます
 - すべての新規ユーザーのデフォルトロールは'user'です
 - ロールの変更はサービスロールキーを使用してのみ可能です（UIからは変更不可）
 
 ### 2. アクセス制御
+
 - 管理者ルートは`/admin/*`でミドルウェアにより保護されています
 - `role='admin'`を持つユーザーのみが管理者ページにアクセスできます
 - 管理者以外のユーザーはホームページにリダイレクトされます
 
 ### 3. 管理ダッシュボード
+
 管理ダッシュボードへのアクセス: `/admin`
 
 機能:
+
 - **概要**: 警告と情報を含むダッシュボード
 - **スペース管理**: すべてのスペースの閲覧と削除
 - **ユーザー管理**: ユーザーの閲覧とBAN
@@ -38,6 +42,7 @@
 4. 管理者ダッシュボードにリダイレクトされます
 
 **セキュリティに関する注意事項:**
+
 - セットアップウィザードはシステムに管理者が存在しない場合のみ有効です
 - 管理者が1人以上存在する場合、セットアップページは403エラーを返します
 - ダブルチェックパターンにより競合状態が防止されます
@@ -72,7 +77,7 @@ EOF
 サービスロールキーを使用する安全な管理者エンドポイントまたはスクリプトを作成:
 
 ```typescript
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -81,10 +86,10 @@ const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
 async function makeAdmin(userId: string) {
   const { data, error } = await adminClient
-    .from('profiles')
-    .update({ role: 'admin' })
-    .eq('id', userId);
-  
+    .from("profiles")
+    .update({ role: "admin" })
+    .eq("id", userId);
+
   return { data, error };
 }
 ```
@@ -121,6 +126,7 @@ async function makeAdmin(userId: string) {
 ## データベーススキーマ
 
 ### profilesテーブル
+
 ```sql
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -135,6 +141,7 @@ CREATE TABLE profiles (
 ```
 
 ### トリガー
+
 ```sql
 CREATE TRIGGER trigger_prevent_role_change
   BEFORE INSERT OR UPDATE ON profiles
@@ -145,6 +152,7 @@ CREATE TRIGGER trigger_prevent_role_change
 ## 管理者機能のテスト
 
 ### 管理者アクセステスト
+
 1. テストユーザーアカウントを作成
 2. 上記のいずれかの方法で管理者にする
 3. そのアカウントでログイン
@@ -152,6 +160,7 @@ CREATE TRIGGER trigger_prevent_role_change
 5. 管理ダッシュボードにアクセスできることを確認
 
 ### スペース削除のテスト
+
 1. テストスペースを作成
 2. `/admin/spaces`に移動
 3. テストスペースの「削除」をクリック
@@ -160,6 +169,7 @@ CREATE TRIGGER trigger_prevent_role_change
 6. `spaces_archive`テーブルでアーカイブされたことを確認
 
 ### ユーザーBANのテスト
+
 1. テストユーザーアカウントを作成
 2. `/admin/users`に移動
 3. テストユーザーの「BAN」をクリック
@@ -170,16 +180,19 @@ CREATE TRIGGER trigger_prevent_role_change
 ## トラブルシューティング
 
 ### 管理者ルートにアクセスできない
+
 - profilesテーブルでユーザーが`role='admin'`を持っていることを確認
 - ブラウザのCookieをクリアして再度ログイン
 - ブラウザコンソールでエラーを確認
 
 ### ロール更新が失敗する
+
 - サービスロールキーを使用していることを確認
 - JWTクレームが正しく設定されていることを確認
 - データベースにトリガー関数が存在することを確認
 
 ### 削除/BAN アクションが失敗する
+
 - サーバーログでエラーメッセージを確認
 - 環境変数にSUPABASE_SERVICE_ROLE_KEYが設定されていることを確認
 - 管理クライアントが使用されていることを確認（通常のクライアントではない）
@@ -187,6 +200,7 @@ CREATE TRIGGER trigger_prevent_role_change
 ## 今後の改善
 
 以下の実装を検討してください:
+
 - [ ] 管理者アクションのアクティビティログ
 - [ ] ソフトBAN（アカウント削除ではなく無効化）
 - [ ] バッチ操作（複数のスペース/ユーザーの削除）

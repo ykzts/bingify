@@ -7,6 +7,7 @@
 このプロジェクトでは、`supabase/migrations` ディレクトリに配置されたマイグレーションファイルを自動的に Cloud Supabase に適用する GitHub Actions ワークフローを使用しています。
 
 **重要な注意事項:**
+
 - ワークフローは `.sql` ファイルの追加・変更時に自動実行されます
 - **⚠️ 既に適用済みのマイグレーションファイルは絶対に編集しないでください**
   - Supabase は一度適用されたマイグレーションを再実行しません
@@ -37,6 +38,7 @@ Supabase の Personal Access Token です。
 7. GitHub リポジトリの Secrets に `SUPABASE_ACCESS_TOKEN` として保存
 
 **注意事項:**
+
 - このトークンはプロジェクトの管理権限を持つため、厳重に管理してください
 - トークンが漏洩した場合は、すぐに Supabase Dashboard から無効化してください
 
@@ -108,6 +110,7 @@ git diff supabase/migrations/20251226000000_add_archive_tables.sql
 ```
 
 **影響:**
+
 - ✅ **新規環境（ローカルやCI/CD）**: 変更後の内容でマイグレーションが実行される
 - ❌ **既存環境（Cloud Supabase）**: マイグレーションは既に適用済みとしてスキップされ、変更が反映されない
 - 🚨 **結果**: 環境間でスキーマの不整合が発生し、アプリケーションが正しく動作しなくなる
@@ -188,6 +191,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE user_profiles;
 ```
 
 **注意点:**
+
 - `IF NOT EXISTS` や `IF EXISTS` を使用して、冪等性を確保する
 - 削除操作は慎重に行い、必ずバックアップを取る
 - 外部キー制約は必ず `ON DELETE` 句を指定する
@@ -343,10 +347,12 @@ ALTER TABLE spaces DROP COLUMN IF EXISTS new_column;
 #### `Error: Failed to link project`
 
 **原因:**
+
 - `SUPABASE_ACCESS_TOKEN` が無効または期限切れ
 - `SUPABASE_PROJECT_ID` が間違っている
 
 **対処:**
+
 1. Supabase Dashboard でトークンを再生成
 2. GitHub Secrets を更新
 3. ワークフローを再実行
@@ -354,10 +360,12 @@ ALTER TABLE spaces DROP COLUMN IF EXISTS new_column;
 #### `Error: Database connection failed`
 
 **原因:**
+
 - Supabase プロジェクトが一時停止している
 - ネットワークの問題
 
 **対処:**
+
 1. Supabase Dashboard でプロジェクトの状態を確認
 2. プロジェクトが停止している場合は再開
 3. ワークフローを再実行
