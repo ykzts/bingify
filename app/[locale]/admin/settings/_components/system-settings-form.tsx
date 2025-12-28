@@ -50,6 +50,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             defaultValue={initialSettings?.max_participants_per_space ?? 50}
             disabled={isPending}
             id="max_participants_per_space"
+            max={10_000}
             min={1}
             name="max_participants_per_space"
             required
@@ -67,6 +68,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             defaultValue={initialSettings?.max_spaces_per_user ?? 5}
             disabled={isPending}
             id="max_spaces_per_user"
+            max={100}
             min={1}
             name="max_spaces_per_user"
             required
@@ -84,6 +86,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             defaultValue={initialSettings?.space_expiration_hours ?? 48}
             disabled={isPending}
             id="space_expiration_hours"
+            max={8760}
             min={0}
             name="space_expiration_hours"
             required
@@ -97,7 +100,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
       {state.error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-3">
           <p className="text-red-800 text-sm">
-            {t(`errors.${state.error}`, { default: t("errors.errorGeneric") })}
+            {t(state.error, { default: t("errorGeneric") })}
           </p>
         </div>
       )}

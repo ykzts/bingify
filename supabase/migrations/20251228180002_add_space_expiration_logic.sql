@@ -4,6 +4,11 @@ RETURNS BOOLEAN AS $$
 DECLARE
   expiration_hours INTEGER;
 BEGIN
+  -- Handle NULL created_at (should never happen, but defensive programming)
+  IF space_created_at IS NULL THEN
+    RETURN FALSE;
+  END IF;
+
   -- Get expiration hours from system settings
   SELECT space_expiration_hours INTO expiration_hours
   FROM system_settings
@@ -19,12 +24,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Create view for active (non-expired) spaces
+-- Create view for active (non-expired) spaces using JOIN for better performance
 CREATE OR REPLACE VIEW active_spaces AS
 SELECT s.*
 FROM spaces s
+JOIN system_settings ss ON ss.id = 1
 WHERE s.status = 'active'
-  AND NOT is_space_expired(s.created_at);
+  AND s.created_at IS NOT NULL
+  AND (
+    ss.space_expiration_hours = 0
+    OR (s.created_at + (ss.space_expiration_hours || ' hours')::INTERVAL) >= NOW()
+  );
 
 -- Create function to mark expired spaces as inactive (for cleanup cron)
 CREATE OR REPLACE FUNCTION cleanup_expired_spaces()
@@ -53,6 +63,7 @@ BEGIN
     UPDATE spaces
     SET status = 'expired', updated_at = NOW()
     WHERE status = 'active'
+      AND created_at IS NOT NULL
       AND (created_at + (expiration_hours || ' hours')::INTERVAL) < NOW()
     RETURNING id
   )

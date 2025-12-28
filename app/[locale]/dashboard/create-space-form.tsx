@@ -347,7 +347,7 @@ export function CreateSpaceForm() {
           {state.suggestion && (
             <div className="mt-3">
               <p className="mb-2 text-red-700 text-sm">
-                代わりにこちらを使用できます:
+                {t("suggestionPrefix")}
               </p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 rounded bg-white px-3 py-2 font-mono text-sm">
@@ -358,7 +358,7 @@ export function CreateSpaceForm() {
                   onClick={handleAcceptSuggestion}
                   type="button"
                 >
-                  使用する
+                  {t("useSuggestionButton")}
                 </button>
               </div>
             </div>
@@ -372,7 +372,7 @@ export function CreateSpaceForm() {
         type="submit"
       >
         {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-        {isPending ? "作成中..." : "スペースを作成"}
+        {isPending ? t("creatingButton") : t("createButton")}
       </Button>
     </form>
   );
