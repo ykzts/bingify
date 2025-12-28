@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
+import { checkSubscriptionStatus } from "@/lib/youtube";
 
 export interface JoinSpaceState {
   error?: string;
@@ -9,13 +10,20 @@ export interface JoinSpaceState {
   success: boolean;
 }
 
+export interface GatekeeperRules {
+  youtube?: {
+    channelId: string;
+    required: boolean;
+  };
+}
+
 export interface SpaceInfo {
+  gatekeeper_rules: GatekeeperRules | null;
   id: string;
   max_participants: number;
   owner_id: string | null;
   share_key: string;
   status: string | null;
-  youtube_channel_id: string | null;
 }
 
 export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
@@ -29,7 +37,7 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
     const { data, error } = await supabase
       .from("spaces")
       .select(
-        "id, share_key, status, owner_id, max_participants, youtube_channel_id"
+        "id, share_key, status, owner_id, max_participants, gatekeeper_rules"
       )
       .eq("id", spaceId)
       .single();
@@ -55,7 +63,6 @@ async function verifyYouTubeSubscription(
     };
   }
 
-  const { checkSubscriptionStatus } = await import("@/lib/youtube");
   const result = await checkSubscriptionStatus(
     youtubeAccessToken,
     youtubeChannelId
@@ -108,7 +115,7 @@ export async function joinSpace(
     // Check if space exists and is active
     const { data: space } = await supabase
       .from("spaces")
-      .select("id, status, youtube_channel_id")
+      .select("id, status, gatekeeper_rules")
       .eq("id", spaceId)
       .single();
 
@@ -127,10 +134,14 @@ export async function joinSpace(
     }
 
     // Check YouTube subscription requirement if configured
-    if (space.youtube_channel_id) {
+    const gatekeeperRules = space.gatekeeper_rules as GatekeeperRules | null;
+    if (
+      gatekeeperRules?.youtube?.required &&
+      gatekeeperRules.youtube.channelId
+    ) {
       const verificationResult = await verifyYouTubeSubscription(
         youtubeAccessToken,
-        space.youtube_channel_id
+        gatekeeperRules.youtube.channelId
       );
       if (verificationResult) {
         return verificationResult;

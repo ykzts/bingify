@@ -177,7 +177,7 @@ export function CreateSpaceForm() {
             id="youtube_channel_id"
             name="youtube_channel_id"
             onChange={(e) => setYoutubeChannelId(e.target.value)}
-            placeholder="UCxxxxxxxxxxxxxxxxxx"
+            placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
             type="text"
             value={youtubeChannelId}
           />

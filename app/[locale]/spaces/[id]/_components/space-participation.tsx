@@ -184,7 +184,7 @@ export function SpaceParticipation({
   return (
     <div className="space-y-4">
       {/* YouTube Requirement Notice */}
-      {spaceInfo.youtube_channel_id && !hasJoined && (
+      {spaceInfo.gatekeeper_rules?.youtube?.required && !hasJoined && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
           <p className="text-blue-800 text-sm">
             {t("errorYouTubeVerificationRequired")}

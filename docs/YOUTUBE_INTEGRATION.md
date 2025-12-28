@@ -1,91 +1,77 @@
-# YouTube Integration for Participation Requirements - Implementation Summary
+# YouTube連携による参加条件判定 - 実装概要
 
-## Overview
+## 概要
 
-This implementation adds YouTube channel subscription verification as a participation requirement for bingo spaces. Space owners can specify a YouTube channel ID, and participants must be subscribed to that channel to join the space.
+この実装は、ビンゴスペースへの参加条件としてYouTubeチャンネル登録の確認機能を追加します。スペースオーナーはYouTubeチャンネルIDを指定でき、参加者はそのチャンネルに登録していることを確認してからスペースに参加できます。
 
-## What Has Been Implemented
+## 実装済みの内容
 
-### 1. Backend Infrastructure
+### 1. バックエンド基盤
 
-#### Database Schema (`supabase/migrations/20251228040000_add_youtube_channel_requirement.sql`)
-- Added `youtube_channel_id` column to `spaces` table
-- Column is nullable (NULL = no YouTube verification required)
+#### データベーススキーマ (`supabase/migrations/20251228040000_add_gatekeeper_rules.sql`)
+- `spaces`テーブルに`gatekeeper_rules` JSONB列を追加
+- YouTube要件の構造: `{"youtube": {"channelId": "UCxxxxx", "required": true}}`
+- NULL = 参加条件なし
 
-#### YouTube API Integration (`lib/youtube.ts`)
-- `checkSubscriptionStatus()` function that verifies YouTube channel subscriptions
-- Uses YouTube Data API v3 subscriptions endpoint
-- Returns `{ isSubscribed: boolean, error?: string }`
-- Proper error handling for API failures
+#### YouTube API連携 (`lib/youtube.ts`)
+- `@googleapis/youtube`公式ライブラリを使用
+- `checkSubscriptionStatus()`関数でYouTubeチャンネル登録を確認
+- YouTube Data API v3のsubscriptionsエンドポイントを使用
+- `{ isSubscribed: boolean, error?: string }`を返却
+- APIエラーの適切なハンドリング
 
-#### Server Actions (`app/[locale]/spaces/actions.ts`)
-- Updated `SpaceInfo` interface to include `youtube_channel_id`
-- Modified `joinSpace()` action to accept optional `youtubeAccessToken` parameter
-- Added `verifyYouTubeSubscription()` helper function
-- Validates subscription before allowing participant to join
+#### サーバーアクション (`app/[locale]/spaces/actions.ts`)
+- `SpaceInfo`インターフェースに`gatekeeper_rules`を追加
+- `joinSpace()`アクションで任意の`youtubeAccessToken`パラメータを受け付け
+- `verifyYouTubeSubscription()`ヘルパー関数を追加
+- 参加者のINSERT前に登録状態を検証
 
-#### Dashboard Actions (`app/[locale]/dashboard/actions.ts`)
-- Updated `createSpace()` to accept `youtube_channel_id` from form data
-- Stores YouTube channel ID when creating new spaces
+#### ダッシュボードアクション (`app/[locale]/dashboard/actions.ts`)
+- `createSpace()`でフォームデータから`youtube_channel_id`を受け取り
+- 新規スペース作成時に`gatekeeper_rules`にYouTubeチャンネルIDを保存
 
-### 2. User Interface
+### 2. ユーザーインターフェース
 
-#### Space Participation Component (`app/[locale]/spaces/[id]/_components/space-participation.tsx`)
-- Shows blue info banner when YouTube verification is required
-- Displays appropriate error messages for verification failures
+#### スペース参加コンポーネント (`app/[locale]/spaces/[id]/_components/space-participation.tsx`)
+- YouTube確認が必要な場合に青色の情報バナーを表示
+- 確認失敗時の適切なエラーメッセージ表示
 
-#### Create Space Form (`app/[locale]/dashboard/create-space-form.tsx`)
-- Added YouTube Channel ID input field (optional)
-- Help text explaining the feature
-- Integrated with createSpace action
+#### スペース作成フォーム (`app/[locale]/dashboard/create-space-form.tsx`)
+- YouTubeチャンネルID入力欄を追加（オプション）
+- 機能説明のヘルプテキスト
+- createSpaceアクションと統合
 
-### 3. Translations
+### 3. 翻訳
 
-Added translation keys for both English and Japanese:
+英語と日本語の翻訳キーを追加:
 - `errorYouTubeVerificationRequired`
 - `errorYouTubeNotSubscribed`
 - `errorYouTubeVerificationFailed`
 - `verifyYouTubeButton`
 - `verifyingYouTube`
 
-### 4. Tests
+### 4. テスト
 
-Created comprehensive tests for YouTube API integration (`lib/__tests__/youtube.test.ts`):
-- Subscription exists scenario
-- No subscription scenario
-- Missing parameters
-- API errors
-- Network errors
-- Parameter validation
+YouTube API連携の包括的なテスト (`lib/__tests__/youtube.test.ts`):
+- 登録済みの場合
+- 未登録の場合
+- パラメータ不足
+- APIエラー
+- ネットワークエラー
+- パラメータ検証
 
-### 5. Documentation
+## 実装が必要な残りの作業
 
-Updated `.env.local.example` with YouTube API configuration:
-- `NEXT_PUBLIC_YOUTUBE_API_KEY`
-- `NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID`
+### YouTubeトークン取得のためのOAuthフロー
 
-## What Remains to be Implemented
+現在の実装ではバックエンドロジックが整っていますが、YouTubeアクセストークンを取得するためのクライアント側OAuthフローが必要です。実装手順は以下の通りです:
 
-### OAuth Flow for YouTube Token Acquisition
+#### 1. Google OAuthの設定
+既存のSupabase OAuth設定を使用します（`SUPABASE_AUTH_EXTERNAL_GOOGLE_*`環境変数）。
 
-The current implementation has the backend logic in place, but requires a client-side OAuth flow to obtain YouTube access tokens. Here's what needs to be done:
+#### 2. クライアント側のアクセストークン取得
 
-#### 1. Google OAuth Setup
-1. Enable YouTube Data API v3 in Google Cloud Console
-2. Create OAuth 2.0 Client ID for web application
-3. Configure authorized redirect URIs
-4. Add client ID to environment variables
-
-#### 2. Client-Side OAuth Implementation
-
-Add Google Identity Services to the application:
-
-```html
-<!-- In app layout or _document -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-```
-
-Create a YouTube verification button component:
+Supabaseセッションから既存のGoogle OAuthトークンを取得:
 
 ```tsx
 // app/[locale]/spaces/[id]/_components/youtube-verification-button.tsx
@@ -93,6 +79,7 @@ Create a YouTube verification button component:
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { createClient } from "@/lib/supabase/client";
 
 export function YouTubeVerificationButton({ 
   onTokenReceived 
@@ -102,21 +89,30 @@ export function YouTubeVerificationButton({
   const t = useTranslations("UserSpace");
   const [isVerifying, setIsVerifying] = useState(false);
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     setIsVerifying(true);
     
-    const client = google.accounts.oauth2.initTokenClient({
-      client_id: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID!,
-      scope: 'https://www.googleapis.com/auth/youtube.readonly',
-      callback: (response) => {
-        if (response.access_token) {
-          onTokenReceived(response.access_token);
-        }
-        setIsVerifying(false);
-      },
-    });
-
-    client.requestAccessToken();
+    try {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.provider_token) {
+        onTokenReceived(session.provider_token);
+      } else {
+        // Google OAuth でログインする必要がある
+        await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            scopes: 'https://www.googleapis.com/auth/youtube.readonly',
+            redirectTo: window.location.href,
+          },
+        });
+      }
+    } catch (error) {
+      console.error('YouTube verification error:', error);
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   return (
@@ -131,14 +127,14 @@ export function YouTubeVerificationButton({
 }
 ```
 
-#### 3. Integration with Space Participation
+#### 3. スペース参加との統合
 
-Update `space-participation.tsx` to:
-1. Show YouTube verification button when required
-2. Call `joinSpace()` with the access token after verification
-3. Handle verification flow errors
+`space-participation.tsx`を更新:
+1. YouTube確認が必要な場合にYouTube確認ボタンを表示
+2. 確認後、アクセストークンを使用して`joinSpace()`を呼び出し
+3. 確認フローのエラーを処理
 
-Example flow:
+実装例:
 ```tsx
 const handleYouTubeVerify = async (token: string) => {
   setIsJoining(true);
@@ -152,81 +148,82 @@ const handleYouTubeVerify = async (token: string) => {
   setIsJoining(false);
 };
 
-// In render
-{spaceInfo.youtube_channel_id && !hasJoined && (
+// レンダリング内
+{spaceInfo.gatekeeper_rules?.youtube?.required && !hasJoined && (
   <YouTubeVerificationButton onTokenReceived={handleYouTubeVerify} />
 )}
 ```
 
-## Testing the Implementation
+## 実装のテスト
 
-### Manual Testing Steps
+### 手動テスト手順
 
-1. **Create a Space with YouTube Requirement**
-   - Go to dashboard
-   - Create new space
-   - Enter a YouTube Channel ID (e.g., `UCxxxxxxxxxxxxxx`)
-   - Create the space
+1. **YouTube要件付きスペースの作成**
+   - ダッシュボードに移動
+   - 新規スペースを作成
+   - YouTubeチャンネルIDを入力（例: `UCxxxxxxxxxxxxxx`）
+   - スペースを作成
 
-2. **Attempt to Join Without Verification**
-   - Navigate to the space as a different user
-   - Try to join
-   - Should see error: "YouTube account verification is required"
+2. **確認なしでの参加試行**
+   - 別のユーザーとしてスペースに移動
+   - 参加を試行
+   - エラーが表示される: "YouTubeアカウントの確認が必要です"
 
-3. **Join with Verification** (once OAuth is implemented)
-   - Click "Verify YouTube Account" button
-   - Authorize with Google
-   - If subscribed: Successfully join the space
-   - If not subscribed: See error message
+3. **確認付きでの参加** (OAuth実装後)
+   - "YouTubeアカウントを確認する"ボタンをクリック
+   - Googleで認証
+   - 登録済み: スペースに正常に参加
+   - 未登録: エラーメッセージを表示
 
-### Database Verification
+### データベース確認
 
 ```sql
--- Check spaces with YouTube requirements
-SELECT id, share_key, youtube_channel_id 
+-- YouTube要件付きスペースの確認
+SELECT id, share_key, gatekeeper_rules 
 FROM spaces 
-WHERE youtube_channel_id IS NOT NULL;
+WHERE gatekeeper_rules->>'youtube' IS NOT NULL;
 
--- Check participants
+-- 参加者の確認
 SELECT * FROM participants WHERE space_id = '<space_id>';
 ```
 
-## Security Considerations
+## セキュリティに関する考慮事項
 
-1. **Access Token Handling**
-   - Access tokens are not stored in the database
-   - Tokens are only used transiently for verification
-   - Tokens are passed via server actions (not exposed in URLs)
+1. **アクセストークンの扱い**
+   - アクセストークンはデータベースに保存しない
+   - トークンは検証時のみ一時的に使用
+   - トークンはサーバーアクション経由で渡す（URLには公開しない）
 
-2. **API Rate Limits**
-   - YouTube Data API has quota limits
-   - Consider caching subscription status for a short period
-   - Implement retry logic for transient failures
+2. **APIレート制限**
+   - YouTube Data APIにはクォータ制限がある
+   - 短時間の登録ステータスのキャッシュを検討
+   - 一時的な障害に対するリトライロジックの実装
 
-3. **Channel ID Validation**
-   - Add input validation for channel ID format
-   - Verify channel exists before saving
+3. **チャンネルIDの検証**
+   - チャンネルID形式の入力検証を追加済み
+   - 保存前にチャンネルの存在を確認することを推奨
 
-## Future Enhancements
+## 今後の機能拡張
 
-1. **Membership Level Verification**
-   - Extend to check for channel memberships (requires `members` API access)
-   - Add membership tier requirements
+1. **メンバーシップレベルの確認**
+   - チャンネルメンバーシップの確認まで拡張（`members` API アクセスが必要）
+   - メンバーシップ階層の要件を追加
 
-2. **Multiple Channel Support**
-   - Allow requiring subscription to any of multiple channels
-   - Useful for collaborative streams
+2. **複数チャンネルのサポート**
+   - 複数チャンネルのいずれかへの登録を要求
+   - コラボレーション配信に便利
 
-3. **Subscription Caching**
-   - Cache subscription status for authenticated users
-   - Reduce API calls and improve performance
+3. **登録ステータスのキャッシュ**
+   - 認証済みユーザーの登録ステータスをキャッシュ
+   - API呼び出しを削減し、パフォーマンスを向上
 
-4. **Admin Interface**
-   - Show subscription requirements in space management
-   - Allow editing after creation
+4. **管理インターフェース**
+   - スペース管理画面で登録要件を表示
+   - 作成後の編集を許可
 
-## References
+## 参考資料
 
-- [YouTube Data API v3 Documentation](https://developers.google.com/youtube/v3)
+- [YouTube Data API v3 ドキュメント](https://developers.google.com/youtube/v3)
 - [YouTube Subscriptions API](https://developers.google.com/youtube/v3/docs/subscriptions)
-- [Google Identity Services](https://developers.google.com/identity/gsi/web/guides/overview)
+- [Supabase Auth](https://supabase.com/docs/guides/auth)
+- [@googleapis/youtube NPMパッケージ](https://www.npmjs.com/package/@googleapis/youtube)

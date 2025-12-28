@@ -1,7 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { checkSubscriptionStatus } from "../youtube";
 
-global.fetch = vi.fn();
+// Create shared mock functions
+const mockList = vi.fn();
+
+// Mock the YouTube API module
+vi.mock("@googleapis/youtube", () => ({
+  youtube_v3: {
+    Youtube: class {
+      subscriptions = {
+        list: mockList,
+      };
+    },
+  },
+}));
 
 describe("checkSubscriptionStatus", () => {
   beforeEach(() => {
@@ -9,8 +21,8 @@ describe("checkSubscriptionStatus", () => {
   });
 
   it("should return isSubscribed true when subscription exists", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      json: async () => ({
+    mockList.mockResolvedValue({
+      data: {
         items: [
           {
             snippet: {
@@ -19,8 +31,7 @@ describe("checkSubscriptionStatus", () => {
             },
           },
         ],
-      }),
-      ok: true,
+      },
     });
 
     const result = await checkSubscriptionStatus(
@@ -30,24 +41,18 @@ describe("checkSubscriptionStatus", () => {
 
     expect(result.isSubscribed).toBe(true);
     expect(result.error).toBeUndefined();
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "https://www.googleapis.com/youtube/v3/subscriptions"
-      ),
-      expect.objectContaining({
-        headers: {
-          Authorization: "Bearer test_access_token",
-        },
-      })
-    );
+    expect(mockList).toHaveBeenCalledWith({
+      forChannelId: "UC_test_channel",
+      mine: true,
+      part: ["snippet"],
+    });
   });
 
   it("should return isSubscribed false when subscription does not exist", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      json: async () => ({
+    mockList.mockResolvedValue({
+      data: {
         items: [],
-      }),
-      ok: true,
+      },
     });
 
     const result = await checkSubscriptionStatus(
@@ -64,7 +69,6 @@ describe("checkSubscriptionStatus", () => {
 
     expect(result.isSubscribed).toBe(false);
     expect(result.error).toBe("Missing required parameters");
-    expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it("should return error when channel ID is missing", async () => {
@@ -72,20 +76,10 @@ describe("checkSubscriptionStatus", () => {
 
     expect(result.isSubscribed).toBe(false);
     expect(result.error).toBe("Missing required parameters");
-    expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it("should return error when API request fails", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      json: async () => ({
-        error: {
-          code: 401,
-          message: "Invalid credentials",
-        },
-      }),
-      ok: false,
-      status: 401,
-    });
+    mockList.mockRejectedValue(new Error("API Error: Invalid credentials"));
 
     const result = await checkSubscriptionStatus(
       "invalid_token",
@@ -93,13 +87,11 @@ describe("checkSubscriptionStatus", () => {
     );
 
     expect(result.isSubscribed).toBe(false);
-    expect(result.error).toBe("YouTube API error: 401");
+    expect(result.error).toBe("API Error: Invalid credentials");
   });
 
   it("should handle network errors gracefully", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-      new Error("Network error")
-    );
+    mockList.mockRejectedValue(new Error("Network error"));
 
     const result = await checkSubscriptionStatus(
       "test_access_token",
@@ -110,18 +102,17 @@ describe("checkSubscriptionStatus", () => {
     expect(result.error).toBe("Network error");
   });
 
-  it("should include correct query parameters in API request", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      json: async () => ({ items: [] }),
-      ok: true,
+  it("should call YouTube API with correct parameters", async () => {
+    mockList.mockResolvedValue({
+      data: { items: [] },
     });
 
     await checkSubscriptionStatus("test_access_token", "UC_test_channel");
 
-    const callArgs = (global.fetch as ReturnType<typeof vi.fn>).mock
-      .calls[0][0];
-    expect(callArgs).toContain("part=snippet");
-    expect(callArgs).toContain("mine=true");
-    expect(callArgs).toContain("forChannelId=UC_test_channel");
+    expect(mockList).toHaveBeenCalledWith({
+      forChannelId: "UC_test_channel",
+      mine: true,
+      part: ["snippet"],
+    });
   });
 });

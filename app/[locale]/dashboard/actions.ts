@@ -77,7 +77,7 @@ export async function createSpace(
     }
 
     // Validate YouTube Channel ID if provided
-    let youtubeChannelId: string | null = null;
+    let youtubeChannelId: string | undefined;
     if (youtubeChannelIdRaw.trim()) {
       const channelIdValidation =
         youtubeChannelIdSchema.safeParse(youtubeChannelIdRaw);
@@ -87,7 +87,7 @@ export async function createSpace(
           success: false,
         };
       }
-      youtubeChannelId = youtubeChannelIdRaw.trim();
+      youtubeChannelId = channelIdValidation.data;
     }
 
     // Generate full slug with date suffix
@@ -142,16 +142,27 @@ export async function createSpace(
     const uuid = randomUUID();
     const viewToken = generateSecureToken();
 
+    // Build gatekeeper_rules if YouTube channel ID is provided
+    const gatekeeperRules: {
+      youtube?: { channelId: string; required: boolean };
+    } = {};
+    if (youtubeChannelId) {
+      gatekeeperRules.youtube = {
+        channelId: youtubeChannelId,
+        required: true,
+      };
+    }
+
     const { error } = await supabase
       .from("spaces")
       .insert({
+        gatekeeper_rules: gatekeeperRules,
         id: uuid,
         owner_id: user.id,
         settings: {},
         share_key: fullSlug,
         status: "active",
         view_token: viewToken,
-        youtube_channel_id: youtubeChannelId,
       })
       .select()
       .single();

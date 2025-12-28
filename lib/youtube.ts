@@ -1,6 +1,8 @@
+import { youtube_v3 } from "@googleapis/youtube";
+
 export interface YouTubeSubscriptionCheckResult {
-  isSubscribed: boolean;
   error?: string;
+  isSubscribed: boolean;
 }
 
 export async function checkSubscriptionStatus(
@@ -15,29 +17,19 @@ export async function checkSubscriptionStatus(
       };
     }
 
-    const url = new URL("https://www.googleapis.com/youtube/v3/subscriptions");
-    url.searchParams.set("part", "snippet");
-    url.searchParams.set("mine", "true");
-    url.searchParams.set("forChannelId", channelId);
-
-    const response = await fetch(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${userAccessToken}`,
-      },
+    const youtube = new youtube_v3.Youtube({
+      auth: userAccessToken,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error("YouTube API error:", errorData);
-      return {
-        error: `YouTube API error: ${response.status}`,
-        isSubscribed: false,
-      };
-    }
+    const response = await youtube.subscriptions.list({
+      forChannelId: channelId,
+      mine: true,
+      part: ["snippet"],
+    });
 
-    const data = await response.json();
-
-    const isSubscribed = data.items && data.items.length > 0;
+    const isSubscribed = Boolean(
+      response.data.items && response.data.items.length > 0
+    );
 
     return {
       isSubscribed,
