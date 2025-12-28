@@ -93,31 +93,35 @@ export function CreateSpaceForm() {
           </label>
 
           <div className="mb-2 flex items-center gap-2">
-            <button
-              aria-label={t("generateRandomButtonAriaLabel")}
-              className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-blue-700"
-              disabled={isPending}
-              onClick={handleGenerateRandomKey}
-              type="button"
-            >
-              <Dices className="h-4 w-4" />
-              {t("generateRandomButton")}
-            </button>
-            <input
-              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
-              disabled={isPending}
-              id="share_key"
-              maxLength={30}
-              minLength={3}
-              name="share_key"
-              onChange={handleSlugChange}
-              pattern="[a-z0-9-]+"
-              placeholder="my-party"
-              required
-              type="text"
-              value={slug}
-            />
-            <span className="font-mono text-gray-500">-{dateSuffix}</span>
+            <div className="relative flex-1">
+              <input
+                className="flex h-10 w-full rounded-lg border border-gray-300 bg-background px-3 py-2 pr-10 font-mono text-sm ring-offset-background focus:border-transparent focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={isPending}
+                id="share_key"
+                maxLength={30}
+                minLength={3}
+                name="share_key"
+                onChange={handleSlugChange}
+                pattern="[a-z0-9-]+"
+                placeholder="my-party"
+                required
+                type="text"
+                value={slug}
+              />
+              <button
+                aria-label={t("generateRandomButtonAriaLabel")}
+                className="absolute top-1 right-1 flex h-8 w-8 items-center justify-center rounded-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                disabled={isPending}
+                onClick={handleGenerateRandomKey}
+                title={t("generateRandomButton")}
+                type="button"
+              >
+                <Dices className="h-4 w-4" />
+              </button>
+            </div>
+            <span className="select-none whitespace-nowrap font-mono text-gray-500 text-sm">
+              -{dateSuffix}
+            </span>
           </div>
 
           <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
