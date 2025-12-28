@@ -32,6 +32,59 @@ export function ScreenDisplay({ initialMode = "full", initialBg = "default", sha
   const [bg, setBg] = useState<BackgroundType>(initialBg as BackgroundType);
   const [showSettings, setShowSettings] = useState(false);
 
+  // Hide header and footer on mount
+  useEffect(() => {
+    const header = document.querySelector("header");
+    const footer = document.querySelector("footer");
+    const originalHeaderDisplay = header?.style.display || "";
+    const originalFooterDisplay = footer?.style.display || "";
+
+    if (header) {
+      header.style.display = "none";
+    }
+    if (footer) {
+      footer.style.display = "none";
+    }
+
+    return () => {
+      if (header) {
+        header.style.display = originalHeaderDisplay;
+      }
+      if (footer) {
+        footer.style.display = originalFooterDisplay;
+      }
+    };
+  }, []);
+
+  // Apply background to body
+  useEffect(() => {
+    const body = document.body;
+    const parent = body.parentElement; // html element
+    const originalBodyBg = body.style.backgroundColor;
+    const originalParentBg = parent?.style.backgroundColor || "";
+    
+    let bgColor = "#020617"; // slate-950
+    if (bg === "transparent") {
+      bgColor = "transparent";
+    } else if (bg === "green") {
+      bgColor = "#00FF00";
+    } else if (bg === "blue") {
+      bgColor = "#0000FF";
+    }
+
+    body.style.backgroundColor = bgColor;
+    if (parent) {
+      parent.style.backgroundColor = bgColor;
+    }
+
+    return () => {
+      body.style.backgroundColor = originalBodyBg;
+      if (parent) {
+        parent.style.backgroundColor = originalParentBg;
+      }
+    };
+  }, [bg]);
+
   useEffect(() => {
     let isMounted = true;
     const supabase = createClient();
@@ -110,23 +163,10 @@ export function ScreenDisplay({ initialMode = "full", initialBg = "default", sha
     ? `${window.location.origin}/spaces/${shareKey}`
     : "";
 
-  const getBgClass = () => {
-    switch (bg) {
-      case "transparent":
-        return "bg-transparent";
-      case "green":
-        return "bg-[#00FF00]";
-      case "blue":
-        return "bg-[#0000FF]";
-      default:
-        return "bg-slate-950";
-    }
-  };
-
   const isMinimal = mode === "minimal";
 
   return (
-    <div className={cn("min-h-screen w-full overflow-hidden transition-colors duration-300", getBgClass())}>
+    <div className="fixed inset-0 min-h-screen w-full overflow-hidden transition-colors duration-300">
       {/* Current Number Display */}
       <div className={cn(
         "flex items-center justify-center",
@@ -203,16 +243,21 @@ export function ScreenDisplay({ initialMode = "full", initialBg = "default", sha
       )}
 
       {/* Settings Menu */}
-      <button
-        type="button"
+      {/* biome-ignore lint/a11y/useSemanticElements: Settings panel with nested interactive buttons */}
+      <div
+        role="button"
+        tabIndex={0}
         className={cn(
           "fixed top-4 right-4 z-50 transition-opacity duration-200",
           showSettings ? "opacity-100" : "opacity-0 hover:opacity-100"
         )}
         onMouseEnter={() => setShowSettings(true)}
         onMouseLeave={() => setShowSettings(false)}
-        onFocus={() => setShowSettings(true)}
-        onBlur={() => setShowSettings(false)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            setShowSettings(!showSettings);
+          }
+        }}
       >
         <div className="rounded-lg border border-gray-600 bg-black/90 p-3 text-white backdrop-blur-sm">
           <div className="mb-2 flex items-center gap-2">
@@ -294,7 +339,7 @@ export function ScreenDisplay({ initialMode = "full", initialBg = "default", sha
             </div>
           </div>
         </div>
-      </button>
+      </div>
     </div>
   );
 }
