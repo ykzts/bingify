@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { closeSpace } from "../actions";
 
 interface CloseSpaceButtonProps {
@@ -16,6 +16,7 @@ export function CloseSpaceButton({ spaceId }: CloseSpaceButtonProps) {
   const [error, setError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleClose = () => {
     setShowConfirm(true);
@@ -39,6 +40,38 @@ export function CloseSpaceButton({ spaceId }: CloseSpaceButtonProps) {
     });
   };
 
+  const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    // Only close if clicking the backdrop itself, not the dialog content
+    if (event.target === event.currentTarget) {
+      setShowConfirm(false);
+    }
+  };
+
+  // Focus management for confirmation modal
+  useEffect(() => {
+    if (showConfirm && cancelButtonRef.current) {
+      cancelButtonRef.current.focus();
+    }
+  }, [showConfirm]);
+
+  // Escape key handler for confirmation modal
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (showConfirm) {
+          setShowConfirm(false);
+        } else if (showSuccess) {
+          setShowSuccess(false);
+        }
+      }
+    };
+
+    if (showConfirm || showSuccess) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  }, [showConfirm, showSuccess]);
+
   return (
     <div>
       <button
@@ -53,10 +86,17 @@ export function CloseSpaceButton({ spaceId }: CloseSpaceButtonProps) {
 
       {/* Confirmation Dialog */}
       {showConfirm && (
+        // biome-ignore lint/a11y/noNoninteractiveElementInteractions: Dialog backdrop needs click handler to close on outside click
         <div
           aria-labelledby="close-space-dialog-title"
           aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={handleBackdropClick}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              setShowConfirm(false);
+            }
+          }}
           role="dialog"
         >
           <div className="mx-4 max-w-md rounded-lg bg-white p-6 shadow-xl">
@@ -73,6 +113,7 @@ export function CloseSpaceButton({ spaceId }: CloseSpaceButtonProps) {
               <button
                 className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"
                 onClick={() => setShowConfirm(false)}
+                ref={cancelButtonRef}
                 type="button"
               >
                 {t("cancel")}
@@ -92,17 +133,22 @@ export function CloseSpaceButton({ spaceId }: CloseSpaceButtonProps) {
       {/* Success Dialog */}
       {showSuccess && (
         <div
-          aria-live="polite"
+          aria-labelledby="close-space-success-title"
+          aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          role="dialog"
         >
-          <output className="mx-4 max-w-md rounded-lg bg-white p-6 shadow-xl">
-            <h3
-              className="mb-4 font-semibold text-green-600 text-lg"
+          <div className="mx-auto max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <output
+              aria-live="polite"
+              className="block"
               id="close-space-success-title"
             >
-              {t("closeSpaceSuccess")}
-            </h3>
-          </output>
+              <h3 className="mb-4 font-semibold text-green-600 text-lg">
+                {t("closeSpaceSuccess")}
+              </h3>
+            </output>
+          </div>
         </div>
       )}
     </div>
