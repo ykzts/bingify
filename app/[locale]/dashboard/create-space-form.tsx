@@ -234,7 +234,9 @@ export function CreateSpaceForm() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">{t("youtubeRequirementNone")}</SelectItem>
+                <SelectItem value="none">
+                  {t("youtubeRequirementNone")}
+                </SelectItem>
                 <SelectItem value="subscriber">
                   {t("youtubeRequirementSubscriber")}
                 </SelectItem>
@@ -282,8 +284,12 @@ export function CreateSpaceForm() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">{t("twitchRequirementNone")}</SelectItem>
-                <SelectItem value="follower">{t("twitchRequirementFollower")}</SelectItem>
+                <SelectItem value="none">
+                  {t("twitchRequirementNone")}
+                </SelectItem>
+                <SelectItem value="follower">
+                  {t("twitchRequirementFollower")}
+                </SelectItem>
                 <SelectItem value="subscriber">
                   {t("twitchRequirementSubscriber")}
                 </SelectItem>

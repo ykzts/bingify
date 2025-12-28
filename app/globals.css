@@ -4,31 +4,31 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 215 25% 27%;
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 27%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
-    --primary: 263 70% 76%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 45 93% 57%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 158 64% 52%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 348 83% 61%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 263 70% 76%;
     --radius: 0.5rem;
-    --chart-1: 263 70% 76%;
-    --chart-2: 158 64% 52%;
-    --chart-3: 45 93% 57%;
-    --chart-4: 348 83% 61%;
-    --chart-5: 215 16% 47%;
+    --background: oklch(0.988 0.002 264);
+    --foreground: oklch(0.347 0.026 264);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.347 0.026 264);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.347 0.026 264);
+    --primary: oklch(0.76 0.141 285);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.809 0.171 85);
+    --secondary-foreground: oklch(0.205 0.057 264);
+    --muted: oklch(0.961 0.004 264);
+    --muted-foreground: oklch(0.556 0.016 264);
+    --accent: oklch(0.733 0.128 166);
+    --accent-foreground: oklch(0.205 0.057 264);
+    --destructive: oklch(0.608 0.207 15);
+    --destructive-foreground: oklch(0.98 0 0);
+    --border: oklch(0.922 0.004 264);
+    --input: oklch(0.922 0.004 264);
+    --ring: oklch(0.76 0.141 285);
+    --chart-1: oklch(0.76 0.141 285);
+    --chart-2: oklch(0.733 0.128 166);
+    --chart-3: oklch(0.809 0.171 85);
+    --chart-4: oklch(0.608 0.207 15);
+    --chart-5: oklch(0.556 0.016 264);
   }
 }
 
@@ -78,6 +78,10 @@
 @theme {
   /* Font */
   --font-sans: var(--font-nunito), ui-sans-serif, system-ui;
+
+  /* Legacy color mappings for existing classes */
+  --color-text-main: var(--color-foreground);
+  --color-text-muted: var(--color-muted-foreground);
 
   /* Special-purpose colors */
   --background-color-chroma-key-green: #00ff00; /* Chroma Key Green */
