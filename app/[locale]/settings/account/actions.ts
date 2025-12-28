@@ -66,9 +66,17 @@ export async function unlinkIdentity(
   }
 }
 
+export type UsernameErrorKey =
+  | "errorUsernameRequired"
+  | "errorUsernameTooLong"
+  | "errorInvalidUsername"
+  | "errorUnauthorized"
+  | "errorUpdateFailed"
+  | "errorGeneric";
+
 export interface UpdateUsernameState {
   error?: string;
-  errorKey?: string;
+  errorKey?: UsernameErrorKey;
   success: boolean;
 }
 
