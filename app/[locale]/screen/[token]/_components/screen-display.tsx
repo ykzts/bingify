@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "motion/react";
 import { Settings } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
+import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
+import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -17,8 +17,9 @@ interface CalledNumber {
 
 interface Props {
   baseUrl: string;
-  initialMode?: string;
   initialBg?: string;
+  initialMode?: string;
+  locale: string;
   shareKey: string;
   spaceId: string;
 }
@@ -26,11 +27,42 @@ interface Props {
 type DisplayMode = "full" | "minimal";
 type BackgroundType = "default" | "transparent" | "green" | "blue";
 
-export function ScreenDisplay({ baseUrl, initialMode = "full", initialBg = "default", shareKey, spaceId }: Props) {
+// Validation helpers
+function normalizeDisplayMode(value?: string): DisplayMode {
+  if (value === "full" || value === "minimal") {
+    return value;
+  }
+  return "full";
+}
+
+function normalizeBackgroundType(value?: string): BackgroundType {
+  if (
+    value === "default" ||
+    value === "transparent" ||
+    value === "green" ||
+    value === "blue"
+  ) {
+    return value;
+  }
+  return "default";
+}
+
+export function ScreenDisplay({
+  baseUrl,
+  initialBg = "default",
+  initialMode = "full",
+  locale,
+  shareKey,
+  spaceId,
+}: Props) {
   const t = useTranslations("ScreenView");
   const [calledNumbers, setCalledNumbers] = useState<CalledNumber[]>([]);
-  const [mode, setMode] = useState<DisplayMode>(initialMode as DisplayMode);
-  const [bg, setBg] = useState<BackgroundType>(initialBg as BackgroundType);
+  const [mode, setMode] = useState<DisplayMode>(
+    normalizeDisplayMode(initialMode)
+  );
+  const [bg, setBg] = useState<BackgroundType>(
+    normalizeBackgroundType(initialBg)
+  );
   const [showSettings, setShowSettings] = useState(false);
 
   // Hide header and footer on mount
@@ -63,21 +95,28 @@ export function ScreenDisplay({ baseUrl, initialMode = "full", initialBg = "defa
     const parent = body.parentElement; // html element
     const originalBodyBg = body.style.backgroundColor;
     const originalParentBg = parent?.style.backgroundColor || "";
-    
-    let bgColor = "#020617"; // slate-950
-    if (bg === "transparent") {
-      bgColor = "transparent";
-    } else if (bg === "green") {
-      bgColor = "#00FF00";
-    } else if (bg === "blue") {
-      bgColor = "#0000FF";
-    }
 
-    body.style.backgroundColor = bgColor;
-    if (parent) {
-      parent.style.backgroundColor = bgColor;
-    }
+    // Update function to apply current background
+    const applyBackground = (bgType: BackgroundType) => {
+      let bgColor = "#020617"; // slate-950
+      if (bgType === "transparent") {
+        bgColor = "transparent";
+      } else if (bgType === "green") {
+        bgColor = "#00FF00";
+      } else if (bgType === "blue") {
+        bgColor = "#0000FF";
+      }
 
+      body.style.backgroundColor = bgColor;
+      if (parent) {
+        parent.style.backgroundColor = bgColor;
+      }
+    };
+
+    // Apply current background
+    applyBackground(bg);
+
+    // Cleanup: restore original values
     return () => {
       body.style.backgroundColor = originalBodyBg;
       if (parent) {
@@ -92,13 +131,19 @@ export function ScreenDisplay({ baseUrl, initialMode = "full", initialBg = "defa
     let channel: ReturnType<typeof supabase.channel> | null = null;
 
     const init = async () => {
-      const { data } = await supabase
+      const { data, error: queryError } = await supabase
         .from("called_numbers")
         .select("id, space_id, value, called_at")
         .eq("space_id", spaceId)
         .order("called_at", { ascending: true });
 
       if (!isMounted) {
+        return;
+      }
+
+      if (queryError) {
+        console.error("Error fetching called numbers:", queryError);
+        // Silently fail - just show no numbers
         return;
       }
 
@@ -145,7 +190,22 @@ export function ScreenDisplay({ baseUrl, initialMode = "full", initialBg = "defa
             );
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          if (!isMounted) {
+            return;
+          }
+          // Handle subscription status
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+            console.error(
+              `Supabase subscription error for screen-${spaceId}:`,
+              status
+            );
+          } else if (status === "SUBSCRIBED") {
+            console.info(
+              `Supabase subscription established for screen-${spaceId}`
+            );
+          }
+        });
     };
 
     init();
@@ -158,33 +218,37 @@ export function ScreenDisplay({ baseUrl, initialMode = "full", initialBg = "defa
     };
   }, [spaceId]);
 
-  const currentNumber = calledNumbers.length > 0 ? calledNumbers.at(-1)?.value ?? null : null;
+  const currentNumber =
+    calledNumbers.length > 0 ? (calledNumbers.at(-1)?.value ?? null) : null;
   const history = calledNumbers.map((n) => n.value);
-  const participationUrl = `${baseUrl}/spaces/${shareKey}`;
+  const historySet = new Set(history); // For O(1) lookup performance
+  const participationUrl = `${baseUrl}/${locale}/spaces/${shareKey}`;
 
   const isMinimal = mode === "minimal";
 
   return (
     <div className="fixed inset-0 min-h-screen w-full overflow-hidden transition-colors duration-300">
       {/* Current Number Display */}
-      <div className={cn(
-        "flex items-center justify-center",
-        isMinimal ? "h-screen w-full" : "h-[60vh]"
-      )}>
+      <div
+        className={cn(
+          "flex items-center justify-center",
+          isMinimal ? "h-screen w-full" : "h-[60vh]"
+        )}
+      >
         {currentNumber !== null ? (
           <motion.h1
-            key={currentNumber}
-            initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
+            className="font-black text-[clamp(8rem,20vw,16rem)] text-white drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)]"
+            initial={{ scale: 0, opacity: 0 }}
+            key={currentNumber}
+            style={{
+              WebkitTextStroke: "3px black",
+              textShadow: "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
+            }}
             transition={{
               type: "spring",
               stiffness: 260,
-              damping: 20
-            }}
-            className="font-black text-[clamp(8rem,20vw,16rem)] text-white drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)]"
-            style={{
-              WebkitTextStroke: "3px black",
-              textShadow: "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)"
+              damping: 20,
             }}
           >
             {currentNumber}
@@ -207,19 +271,21 @@ export function ScreenDisplay({ baseUrl, initialMode = "full", initialBg = "defa
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             {/* History Grid */}
             <div className="flex-1">
-              <h2 className="mb-3 font-bold text-white text-xl">{t("calledNumbers")}</h2>
+              <h2 className="mb-3 font-bold text-white text-xl">
+                {t("calledNumbers")}
+              </h2>
               <div className="grid grid-cols-10 gap-1.5 md:grid-cols-[repeat(15,minmax(0,1fr))] md:gap-2">
                 {Array.from({ length: 75 }, (_, i) => i + 1).map((number) => {
-                  const isCalled = history.includes(number);
+                  const isCalled = historySet.has(number);
                   return (
                     <div
-                      key={number}
                       className={cn(
                         "flex aspect-square items-center justify-center rounded font-bold text-xs md:text-sm",
                         isCalled
                           ? "bg-blue-600 text-white"
                           : "border border-gray-500 bg-gray-800/50 text-gray-500"
                       )}
+                      key={number}
                     >
                       {number}
                     </div>
@@ -229,61 +295,59 @@ export function ScreenDisplay({ baseUrl, initialMode = "full", initialBg = "defa
             </div>
 
             {/* QR Code */}
-            {participationUrl && (
-              <div className="flex flex-col items-center gap-2">
-                <div className="rounded-lg bg-white p-3">
-                  <QRCodeSVG value={participationUrl} size={120} />
-                </div>
-                <p className="text-center text-white text-xs">{t("scanToJoin")}</p>
+            <div className="flex flex-col items-center gap-2">
+              <div className="rounded-lg bg-white p-3">
+                <QRCodeSVG size={120} value={participationUrl} />
               </div>
-            )}
+              <p className="text-center text-white text-xs">
+                {t("scanToJoin")}
+              </p>
+            </div>
           </div>
         </div>
       )}
 
       {/* Settings Menu */}
-      {/* biome-ignore lint/a11y/useSemanticElements: Settings panel with nested interactive buttons */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: Hover-only panel without primary interaction */}
+      {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: Hover-only panel without primary interaction */}
       <div
-        role="button"
-        tabIndex={0}
         className={cn(
           "fixed top-4 right-4 z-50 transition-opacity duration-200",
           showSettings ? "opacity-100" : "opacity-0 hover:opacity-100"
         )}
         onMouseEnter={() => setShowSettings(true)}
         onMouseLeave={() => setShowSettings(false)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            setShowSettings(!showSettings);
-          }
-        }}
       >
         <div className="rounded-lg border border-gray-600 bg-black/90 p-3 text-white backdrop-blur-sm">
           <div className="mb-2 flex items-center gap-2">
             <Settings className="h-4 w-4" />
             <p className="font-semibold text-sm">{t("displaySettings")}</p>
           </div>
-          
+
           <div className="space-y-2 text-xs">
             <div>
               <p className="mb-1 text-gray-400">{t("displayMode")}</p>
               <div className="flex gap-2">
                 <button
-                  onClick={() => setMode("full")}
                   className={cn(
                     "rounded px-2 py-1 transition",
-                    mode === "full" ? "bg-blue-600" : "bg-gray-700 hover:bg-gray-600"
+                    mode === "full"
+                      ? "bg-blue-600"
+                      : "bg-gray-700 hover:bg-gray-600"
                   )}
+                  onClick={() => setMode("full")}
                   type="button"
                 >
                   {t("modeFull")}
                 </button>
                 <button
-                  onClick={() => setMode("minimal")}
                   className={cn(
                     "rounded px-2 py-1 transition",
-                    mode === "minimal" ? "bg-blue-600" : "bg-gray-700 hover:bg-gray-600"
+                    mode === "minimal"
+                      ? "bg-blue-600"
+                      : "bg-gray-700 hover:bg-gray-600"
                   )}
+                  onClick={() => setMode("minimal")}
                   type="button"
                 >
                   {t("modeMinimal")}
@@ -295,41 +359,49 @@ export function ScreenDisplay({ baseUrl, initialMode = "full", initialBg = "defa
               <p className="mb-1 text-gray-400">{t("background")}</p>
               <div className="grid grid-cols-2 gap-2">
                 <button
-                  onClick={() => setBg("default")}
                   className={cn(
                     "rounded px-2 py-1 transition",
-                    bg === "default" ? "bg-blue-600" : "bg-gray-700 hover:bg-gray-600"
+                    bg === "default"
+                      ? "bg-blue-600"
+                      : "bg-gray-700 hover:bg-gray-600"
                   )}
+                  onClick={() => setBg("default")}
                   type="button"
                 >
                   {t("bgDefault")}
                 </button>
                 <button
-                  onClick={() => setBg("transparent")}
                   className={cn(
                     "rounded px-2 py-1 transition",
-                    bg === "transparent" ? "bg-blue-600" : "bg-gray-700 hover:bg-gray-600"
+                    bg === "transparent"
+                      ? "bg-blue-600"
+                      : "bg-gray-700 hover:bg-gray-600"
                   )}
+                  onClick={() => setBg("transparent")}
                   type="button"
                 >
                   {t("bgTransparent")}
                 </button>
                 <button
-                  onClick={() => setBg("green")}
                   className={cn(
                     "rounded px-2 py-1 transition",
-                    bg === "green" ? "bg-blue-600" : "bg-gray-700 hover:bg-gray-600"
+                    bg === "green"
+                      ? "bg-blue-600"
+                      : "bg-gray-700 hover:bg-gray-600"
                   )}
+                  onClick={() => setBg("green")}
                   type="button"
                 >
                   {t("bgGreen")}
                 </button>
                 <button
-                  onClick={() => setBg("blue")}
                   className={cn(
                     "rounded px-2 py-1 transition",
-                    bg === "blue" ? "bg-blue-600" : "bg-gray-700 hover:bg-gray-600"
+                    bg === "blue"
+                      ? "bg-blue-600"
+                      : "bg-gray-700 hover:bg-gray-600"
                   )}
+                  onClick={() => setBg("blue")}
                   type="button"
                 >
                   {t("bgBlue")}

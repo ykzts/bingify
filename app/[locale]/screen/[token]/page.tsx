@@ -1,5 +1,5 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
 import { headers } from "next/headers";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ScreenDisplay } from "./_components/screen-display";
 
@@ -10,8 +10,26 @@ interface Props {
 
 export default async function ScreenViewPage({ params, searchParams }: Props) {
   const { locale, token } = await params;
-  const { bg = "default", mode = "full" } = await searchParams;
-  
+  const rawSearchParams = await searchParams;
+
+  // Validate query parameters
+  const ALLOWED_MODES = ["full", "minimal"] as const;
+  const ALLOWED_BGS = ["default", "transparent", "green", "blue"] as const;
+
+  const mode =
+    typeof rawSearchParams.mode === "string" &&
+    ALLOWED_MODES.includes(
+      rawSearchParams.mode as (typeof ALLOWED_MODES)[number]
+    )
+      ? rawSearchParams.mode
+      : "full";
+
+  const bg =
+    typeof rawSearchParams.bg === "string" &&
+    ALLOWED_BGS.includes(rawSearchParams.bg as (typeof ALLOWED_BGS)[number])
+      ? rawSearchParams.bg
+      : "default";
+
   setRequestLocale(locale);
 
   const t = await getTranslations("ScreenView");
@@ -44,10 +62,11 @@ export default async function ScreenViewPage({ params, searchParams }: Props) {
   const baseUrl = `${protocol}://${host}`;
 
   return (
-    <ScreenDisplay 
+    <ScreenDisplay
       baseUrl={baseUrl}
       initialBg={bg}
       initialMode={mode}
+      locale={locale}
       shareKey={space.share_key}
       spaceId={space.id}
     />
