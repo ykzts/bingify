@@ -64,6 +64,11 @@
   },
   "AdminSettings": {
     "description": "サーバーリソース管理とスペース制限の設定",
+    "errorFetchFailed": "システム設定の取得に失敗しました",
+    "errorGeneric": "予期しないエラーが発生しました",
+    "errorNoPermission": "管理者権限が必要です",
+    "errorUnauthorized": "認証が必要です",
+    "errorUpdateFailed": "設定の更新に失敗しました",
     "maxParticipantsHelp": "1つのスペースに参加できる最大人数を設定します",
     "maxParticipantsLabel": "スペースあたりの最大参加者数",
     "maxSpacesPerUserHelp": "1人のユーザーが作成できる最大スペース数を設定します",
@@ -146,6 +151,7 @@
   },
   "Errors": {
     "authRequired": "認証が必要です",
+    "maxSpacesReached": "作成できるスペースの上限（{max}個）に達しています。不要なスペースを削除してください。",
     "notFound": "スペースが見つかりません",
     "permissionDenied": "このスペースの編集権限がありません",
     "spaceCreationFailed": "スペースの作成に失敗しました",

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
 import {
@@ -20,6 +21,7 @@ const initialState: UpdateSystemSettingsState = {
 };
 
 export function SystemSettingsForm({ initialSettings }: Props) {
+  const router = useRouter();
   const t = useTranslations("AdminSettings");
   const [state, formAction, isPending] = useActionState(
     updateSystemSettings,
@@ -28,13 +30,13 @@ export function SystemSettingsForm({ initialSettings }: Props) {
 
   useEffect(() => {
     if (state.success) {
-      // Show success message briefly
+      // Show success message briefly, then refresh
       const timer = setTimeout(() => {
-        window.location.reload();
+        router.refresh();
       }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [state.success]);
+  }, [state.success, router]);
 
   return (
     <form action={formAction} className="space-y-6">

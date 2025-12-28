@@ -64,6 +64,11 @@
   },
   "AdminSettings": {
     "description": "Configure server resource management and space limits",
+    "errorFetchFailed": "Failed to fetch system settings",
+    "errorGeneric": "An unexpected error occurred",
+    "errorNoPermission": "Admin permission required",
+    "errorUnauthorized": "Authentication required",
+    "errorUpdateFailed": "Failed to update settings",
     "maxParticipantsHelp": "Set the maximum number of participants allowed in a single space",
     "maxParticipantsLabel": "Max Participants per Space",
     "maxSpacesPerUserHelp": "Set the maximum number of spaces a user can create",
@@ -146,6 +151,7 @@
   },
   "Errors": {
     "authRequired": "Authentication required",
+    "maxSpacesReached": "You have reached the maximum limit of {max} spaces. Please delete unused spaces.",
     "notFound": "Space not found",
     "permissionDenied": "You don't have permission to edit this space",
     "spaceCreationFailed": "Failed to create space",

@@ -9,10 +9,13 @@ import { createClient } from "@/lib/supabase/server";
 const MAX_SLUG_SUGGESTIONS = 10;
 
 export interface CreateSpaceState {
-  success: boolean;
   error?: string;
-  spaceId?: string;
+  errorData?: {
+    max?: number;
+  };
   shareKey?: string;
+  spaceId?: string;
+  success: boolean;
   suggestion?: string;
 }
 
@@ -139,7 +142,8 @@ export async function createSpace(
         userSpaceCount >= systemSettings.max_spaces_per_user
       ) {
         return {
-          error: `作成できるスペースの上限（${systemSettings.max_spaces_per_user}個）に達しています。不要なスペースを削除してください。`,
+          error: "maxSpacesReached",
+          errorData: { max: systemSettings.max_spaces_per_user },
           success: false,
         };
       }
