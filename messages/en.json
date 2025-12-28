@@ -170,6 +170,22 @@
     "invalidToken": "This URL is invalid or has been regenerated.",
     "loading": "Loading..."
   },
+  "Setup": {
+    "claimButton": "Claim Admin Role",
+    "claimingButton": "Processing...",
+    "description1": "You are about to become the first administrator of this Bingify instance.",
+    "description2": "As an admin, you will have full control over all spaces and users.",
+    "errors": {
+      "errorGeneric": "An unexpected error occurred. Please try again.",
+      "errorSetupCompleted": "Setup has already been completed. An admin user already exists.",
+      "errorUnauthorized": "You must be signed in to claim admin role."
+    },
+    "subtitle": "Initial Administrator Setup",
+    "title": "Welcome to Bingify",
+    "warningMessage": "This action can only be performed once. After claiming admin role, this setup page will no longer be accessible.",
+    "warningTitle": "⚠️ Important",
+    "welcomeMessage": "Welcome! No administrator has been set up yet. Click the button below to register yourself as the first administrator."
+  },
   "Support": {
     "description": "Bingify is an open-source project maintained by volunteers. Your support helps cover hosting costs and enables continued development.",
     "heading": "Support Development",

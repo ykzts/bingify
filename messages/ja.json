@@ -170,6 +170,22 @@
     "invalidToken": "このURLは無効か、再生成されています。",
     "loading": "読み込み中..."
   },
+  "Setup": {
+    "claimButton": "管理者権限を取得",
+    "claimingButton": "処理中...",
+    "description1": "あなたは、このBingifyインスタンスの最初の管理者になります。",
+    "description2": "管理者として、すべてのスペースとユーザーを完全に管理できます。",
+    "errors": {
+      "errorGeneric": "予期しないエラーが発生しました。もう一度お試しください。",
+      "errorSetupCompleted": "セットアップは既に完了しています。管理者ユーザーが既に存在します。",
+      "errorUnauthorized": "管理者権限を取得するにはサインインが必要です。"
+    },
+    "subtitle": "初回管理者セットアップ",
+    "title": "Bingifyへようこそ",
+    "warningMessage": "この操作は一度だけ実行できます。管理者権限を取得すると、このセットアップページにはアクセスできなくなります。",
+    "warningTitle": "⚠️ 重要",
+    "welcomeMessage": "ようこそ！まだ管理者が設定されていません。下のボタンをクリックして、最初の管理者として登録してください。"
+  },
   "Support": {
     "description": "Bingifyはボランティアによって運営されているオープンソースプロジェクトです。あなたのサポートが、ホスティング費用や継続的な開発を支えます。",
     "heading": "開発を支援する",

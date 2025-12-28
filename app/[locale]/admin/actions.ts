@@ -64,6 +64,100 @@ async function verifyAdminRole(): Promise<{
 }
 
 /**
+ * Check if any admin user exists in the system
+ * @throws Error if unable to determine admin existence
+ */
+export async function hasAdminUser(): Promise<boolean> {
+  const adminClient = createAdminClient();
+  const { count, error } = await adminClient
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("role", "admin");
+
+  if (error) {
+    console.error("Failed to check admin existence:", error);
+    throw new Error("Failed to determine admin existence");
+  }
+
+  return (count ?? 0) > 0;
+}
+
+/**
+ * Claim admin role for the current user (only allowed when no admin exists)
+ */
+export async function claimAdmin(): Promise<AdminActionResult> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "errorUnauthorized",
+        success: false,
+      };
+    }
+
+    // Double-check that no admin exists using admin client
+    const adminClient = createAdminClient();
+    const { count: adminCount, error: countError } = await adminClient
+      .from("profiles")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "admin");
+
+    if (countError) {
+      console.error("Failed to check admin count:", countError);
+      return {
+        error: "errorGeneric",
+        success: false,
+      };
+    }
+
+    // If an admin already exists, prevent setup
+    if ((adminCount ?? 0) > 0) {
+      return {
+        error: "errorSetupCompleted",
+        success: false,
+      };
+    }
+
+    // Grant admin role to the current user
+    const { error: updateError, count: updateCount } = await adminClient
+      .from("profiles")
+      .update({ role: "admin" })
+      .eq("id", user.id);
+
+    if (updateError) {
+      console.error("Failed to grant admin role:", updateError);
+      return {
+        error: "errorGeneric",
+        success: false,
+      };
+    }
+
+    // Verify that the profile was actually updated
+    if (updateCount === 0) {
+      console.error("User profile not found:", user.id);
+      return {
+        error: "errorGeneric",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error in claimAdmin:", error);
+    return {
+      error: "errorGeneric",
+      success: false,
+    };
+  }
+}
+
+/**
  * Force delete a space (bypassing RLS)
  */
 export async function forceDeleteSpace(
