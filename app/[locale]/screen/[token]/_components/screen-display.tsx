@@ -65,63 +65,32 @@ export function ScreenDisplay({
   );
   const [showSettings, setShowSettings] = useState(false);
 
-  // Hide header and footer on mount
-  useEffect(() => {
-    const header = document.querySelector("header");
-    const footer = document.querySelector("footer");
-    const originalHeaderDisplay = header?.style.display || "";
-    const originalFooterDisplay = footer?.style.display || "";
-
-    if (header) {
-      header.style.display = "none";
-    }
-    if (footer) {
-      footer.style.display = "none";
-    }
-
-    return () => {
-      if (header) {
-        header.style.display = originalHeaderDisplay;
-      }
-      if (footer) {
-        footer.style.display = originalFooterDisplay;
-      }
-    };
-  }, []);
-
-  // Apply background to body
+  // Apply background color to body element
   useEffect(() => {
     const body = document.body;
-    const parent = body.parentElement; // html element
+    const html = document.documentElement;
+
+    let bgColor = "#020617"; // slate-950
+    if (bg === "transparent") {
+      bgColor = "transparent";
+    } else if (bg === "green") {
+      bgColor = "#00FF00";
+    } else if (bg === "blue") {
+      bgColor = "#0000FF";
+    }
+
+    // Store original values
     const originalBodyBg = body.style.backgroundColor;
-    const originalParentBg = parent?.style.backgroundColor || "";
+    const originalHtmlBg = html.style.backgroundColor;
 
-    // Update function to apply current background
-    const applyBackground = (bgType: BackgroundType) => {
-      let bgColor = "#020617"; // slate-950
-      if (bgType === "transparent") {
-        bgColor = "transparent";
-      } else if (bgType === "green") {
-        bgColor = "#00FF00";
-      } else if (bgType === "blue") {
-        bgColor = "#0000FF";
-      }
+    // Apply background
+    body.style.backgroundColor = bgColor;
+    html.style.backgroundColor = bgColor;
 
-      body.style.backgroundColor = bgColor;
-      if (parent) {
-        parent.style.backgroundColor = bgColor;
-      }
-    };
-
-    // Apply current background
-    applyBackground(bg);
-
-    // Cleanup: restore original values
+    // Cleanup on unmount
     return () => {
       body.style.backgroundColor = originalBodyBg;
-      if (parent) {
-        parent.style.backgroundColor = originalParentBg;
-      }
+      html.style.backgroundColor = originalHtmlBg;
     };
   }, [bg]);
 
