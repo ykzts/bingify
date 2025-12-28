@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { checkFollowStatus, checkSubStatus } from "@/lib/twitch";
 import { isValidUUID } from "@/lib/utils/uuid";
 import { checkSubscriptionStatus } from "@/lib/youtube";
 
@@ -11,6 +12,11 @@ export interface JoinSpaceState {
 }
 
 export interface GatekeeperRules {
+  twitch?: {
+    broadcasterId: string;
+    requireFollow?: boolean;
+    requireSub?: boolean;
+  };
   youtube?: {
     channelId: string;
     required: boolean;
@@ -85,9 +91,111 @@ async function verifyYouTubeSubscription(
   return null;
 }
 
+async function verifyTwitchRequirements(
+  twitchAccessToken: string | undefined,
+  twitchUserId: string | undefined,
+  broadcasterId: string,
+  requireFollow: boolean,
+  requireSub: boolean
+): Promise<JoinSpaceState | null> {
+  if (!(twitchAccessToken && twitchUserId)) {
+    return {
+      errorKey: "errorTwitchVerificationRequired",
+      success: false,
+    };
+  }
+
+  // Check follow requirement
+  if (requireFollow) {
+    const followResult = await checkFollowStatus(
+      twitchAccessToken,
+      twitchUserId,
+      broadcasterId
+    );
+
+    if (followResult.error) {
+      return {
+        errorKey: "errorTwitchVerificationFailed",
+        success: false,
+      };
+    }
+
+    if (!followResult.isFollowing) {
+      return {
+        errorKey: "errorTwitchNotFollowing",
+        success: false,
+      };
+    }
+  }
+
+  // Check subscription requirement
+  if (requireSub) {
+    const subResult = await checkSubStatus(
+      twitchAccessToken,
+      twitchUserId,
+      broadcasterId
+    );
+
+    if (subResult.error) {
+      return {
+        errorKey: "errorTwitchVerificationFailed",
+        success: false,
+      };
+    }
+
+    if (!subResult.isSubscribed) {
+      return {
+        errorKey: "errorTwitchNotSubscribed",
+        success: false,
+      };
+    }
+  }
+
+  return null;
+}
+
+async function verifyGatekeeperRules(
+  gatekeeperRules: GatekeeperRules | null,
+  youtubeAccessToken: string | undefined,
+  twitchAccessToken: string | undefined,
+  twitchUserId: string | undefined
+): Promise<JoinSpaceState | null> {
+  // Check YouTube subscription requirement if configured
+  if (gatekeeperRules?.youtube?.required && gatekeeperRules.youtube.channelId) {
+    const verificationResult = await verifyYouTubeSubscription(
+      youtubeAccessToken,
+      gatekeeperRules.youtube.channelId
+    );
+    if (verificationResult) {
+      return verificationResult;
+    }
+  }
+
+  // Check Twitch requirements if configured
+  if (
+    gatekeeperRules?.twitch?.broadcasterId &&
+    (gatekeeperRules.twitch.requireFollow || gatekeeperRules.twitch.requireSub)
+  ) {
+    const verificationResult = await verifyTwitchRequirements(
+      twitchAccessToken,
+      twitchUserId,
+      gatekeeperRules.twitch.broadcasterId,
+      gatekeeperRules.twitch.requireFollow,
+      gatekeeperRules.twitch.requireSub
+    );
+    if (verificationResult) {
+      return verificationResult;
+    }
+  }
+
+  return null;
+}
+
 export async function joinSpace(
   spaceId: string,
-  youtubeAccessToken?: string
+  youtubeAccessToken?: string,
+  twitchAccessToken?: string,
+  twitchUserId?: string
 ): Promise<JoinSpaceState> {
   try {
     // Validate UUID format
@@ -133,19 +241,16 @@ export async function joinSpace(
       };
     }
 
-    // Check YouTube subscription requirement if configured
+    // Verify gatekeeper requirements
     const gatekeeperRules = space.gatekeeper_rules as GatekeeperRules | null;
-    if (
-      gatekeeperRules?.youtube?.required &&
-      gatekeeperRules.youtube.channelId
-    ) {
-      const verificationResult = await verifyYouTubeSubscription(
-        youtubeAccessToken,
-        gatekeeperRules.youtube.channelId
-      );
-      if (verificationResult) {
-        return verificationResult;
-      }
+    const verificationResult = await verifyGatekeeperRules(
+      gatekeeperRules,
+      youtubeAccessToken,
+      twitchAccessToken,
+      twitchUserId
+    );
+    if (verificationResult) {
+      return verificationResult;
     }
 
     // Try to join the space - rely on unique constraint for duplicate prevention
