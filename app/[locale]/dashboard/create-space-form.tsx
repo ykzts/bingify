@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
+import { Button } from "@/components/ui/button";
 import { generateRandomKey } from "@/lib/utils/random-key";
 import type { CreateSpaceState } from "./actions";
 import { checkSlugAvailability, createSpace } from "./actions";
@@ -362,14 +363,14 @@ export function CreateSpaceForm() {
         </div>
       )}
 
-      <button
-        className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+      <Button
+        className="w-full"
         disabled={isPending || available === false || shareKey.length < 3}
         type="submit"
       >
         {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
         {isPending ? "作成中..." : "スペースを作成"}
-      </button>
+      </Button>
     </form>
   );
 }

@@ -2,6 +2,7 @@
 
 import { Heart } from "lucide-react";
 import { motion } from "motion/react";
+import { Button } from "@/components/ui/button";
 
 interface SupportProps {
   description: string;
@@ -50,20 +51,21 @@ export function Support({ description, heading, sponsorButton }: SupportProps) {
             {description}
           </motion.p>
 
-          <motion.a
-            aria-label={`${sponsorButton} (opens in a new window)`}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 font-semibold text-lg text-primary-foreground shadow-lg transition-transform hover:scale-105"
-            href="https://github.com/sponsors/ykzts"
-            initial={{ opacity: 0, y: 20 }}
-            rel="noopener noreferrer"
-            target="_blank"
-            transition={{ delay: 0.5, duration: 0.6 }}
-            viewport={{ once: true }}
-            whileInView={{ opacity: 1, y: 0 }}
-          >
-            <Heart className="h-5 w-5" />
-            {sponsorButton}
-          </motion.a>
+          <Button asChild className="rounded-full px-8 py-4 text-lg" size="lg">
+            <motion.a
+              aria-label={`${sponsorButton} (opens in a new window)`}
+              href="https://github.com/sponsors/ykzts"
+              initial={{ opacity: 0, y: 20 }}
+              rel="noopener noreferrer"
+              target="_blank"
+              transition={{ delay: 0.5, duration: 0.6 }}
+              viewport={{ once: true }}
+              whileInView={{ opacity: 1, y: 0 }}
+            >
+              <Heart className="h-5 w-5" />
+              {sponsorButton}
+            </motion.a>
+          </Button>
         </motion.div>
       </div>
     </section>

@@ -3,6 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface HeroProps {
   badge1: string;
@@ -68,34 +69,33 @@ export function Hero({
           initial={{ opacity: 0, y: 20 }}
           transition={{ delay: 0.7, duration: 0.6 }}
         >
-          <Link
-            className="group inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 font-semibold text-lg text-primary-foreground shadow-lg"
-            href="/dashboard"
-          >
-            <motion.span
-              className="inline-flex items-center gap-2"
-              transition={{
-                damping: 10,
-                stiffness: 300,
-                type: "spring",
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {ctaButton}
+          <Button asChild className="rounded-full px-8 py-4 text-lg" size="lg">
+            <Link href="/dashboard">
               <motion.span
-                animate={shouldReduceMotion ? {} : { x: [0, 4, 0] }}
-                className="inline-block"
+                className="inline-flex items-center gap-2"
                 transition={{
-                  duration: 1.5,
-                  ease: "easeInOut",
-                  repeat: Number.POSITIVE_INFINITY,
+                  damping: 10,
+                  stiffness: 300,
+                  type: "spring",
                 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <ArrowRight className="h-5 w-5" />
+                {ctaButton}
+                <motion.span
+                  animate={shouldReduceMotion ? {} : { x: [0, 4, 0] }}
+                  className="inline-block"
+                  transition={{
+                    duration: 1.5,
+                    ease: "easeInOut",
+                    repeat: Number.POSITIVE_INFINITY,
+                  }}
+                >
+                  <ArrowRight className="h-5 w-5" />
+                </motion.span>
               </motion.span>
-            </motion.span>
-          </Link>
+            </Link>
+          </Button>
         </motion.div>
 
         <motion.div
