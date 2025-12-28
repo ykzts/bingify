@@ -4,85 +4,86 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --background: 210 20% 98%;
+    --foreground: 215 25% 27%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 215 25% 27%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    --popover-foreground: 215 25% 27%;
     --primary: 263 70% 76%;
     --primary-foreground: 0 0% 100%;
     --secondary: 45 93% 57%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
     --accent: 158 64% 52%;
-    --accent-foreground: 240 5.9% 10%;
+    --accent-foreground: 222 47% 11%;
     --destructive: 348 83% 61%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
     --ring: 263 70% 76%;
     --radius: 0.5rem;
     --chart-1: 263 70% 76%;
     --chart-2: 158 64% 52%;
     --chart-3: 45 93% 57%;
     --chart-4: 348 83% 61%;
-    --chart-5: 240 3.8% 46.1%;
+    --chart-5: 215 16% 47%;
   }
+}
 
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 263 70% 76%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 348 83% 61%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 263 70% 76%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
 }
 
 @theme {
   /* Font */
   --font-sans: var(--font-nunito), ui-sans-serif, system-ui;
 
-  /* Colors: Punchy Pastels */
-  --color-background: #f8fafc; /* Snow White */
-  --color-primary: #a78bfa; /* Electric Lavender */
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #fbbf24; /* Sunshine Pop */
-  --color-accent: #34d399; /* Minty Fresh */
-  --color-destructive: #f43f5e; /* Rose */
-
-  --color-text-main: #334155; /* Slate 700 */
-  --color-text-muted: #94a3b8; /* Slate 400 */
-
+  /* Special-purpose colors */
   --background-color-chroma-key-green: #00ff00; /* Chroma Key Green */
   --background-color-chroma-key-blue: #0000ff; /* Chroma Key Blue */
 
   /* Brand Colors for OAuth */
   --color-twitch: #9146ff;
   --color-twitch-hover: #7d3be6;
-}
-
-body {
-  background-color: var(--color-background);
-  color: var(--color-text-main);
 }

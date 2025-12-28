@@ -7,6 +7,16 @@ import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { generateRandomKey } from "@/lib/utils/random-key";
 import type { CreateSpaceState } from "./actions";
 import { checkSlugAvailability, createSpace } from "./actions";
@@ -91,14 +101,14 @@ export function CreateSpaceForm() {
   return (
     <form action={formAction} className="space-y-6">
       <div>
-        <label className="mb-2 block font-medium text-sm" htmlFor="share_key">
+        <Label className="mb-2" htmlFor="share_key">
           共有キー
-        </label>
+        </Label>
 
         <div className="mb-2 flex items-center">
           <div className="relative flex-1">
-            <input
-              className="flex h-10 w-full rounded-lg rounded-r-none border border-gray-300 border-r-0 bg-background px-3 py-2 pr-10 font-mono text-sm ring-offset-background focus:z-10 focus:border-transparent focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+            <Input
+              className="rounded-r-none border-r-0 pr-10 font-mono"
               disabled={isPending}
               id="share_key"
               maxLength={30}
@@ -113,7 +123,7 @@ export function CreateSpaceForm() {
             />
             <button
               aria-label={t("generateRandomButtonAriaLabel")}
-              className="absolute top-1 right-1 z-10 flex h-8 w-8 items-center justify-center rounded-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+              className="absolute top-1 right-1 z-10 flex h-7 w-7 items-center justify-center rounded-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
               disabled={isPending}
               onClick={handleGenerateRandomKey}
               title={t("generateRandomButton")}
@@ -122,7 +132,7 @@ export function CreateSpaceForm() {
               <Dices className="h-4 w-4" />
             </button>
           </div>
-          <span className="flex h-10 select-none items-center rounded-lg rounded-l-none border border-gray-300 border-l-0 bg-gray-50 px-3 font-mono text-gray-500 text-sm">
+          <span className="flex h-9 select-none items-center rounded-lg rounded-l-none border border-gray-300 border-l-0 bg-gray-50 px-3 font-mono text-gray-500 text-sm">
             -{dateSuffix}
           </span>
         </div>
@@ -176,14 +186,10 @@ export function CreateSpaceForm() {
           {t("capacitySectionTitle")}
         </h3>
         <div>
-          <label
-            className="mb-2 block font-medium text-sm"
-            htmlFor="max_participants"
-          >
+          <Label className="mb-2" htmlFor="max_participants">
             {t("maxParticipantsLabel")}
-          </label>
-          <input
-            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+          </Label>
+          <Input
             disabled={isPending}
             id="max_participants"
             max={1000}
@@ -210,19 +216,13 @@ export function CreateSpaceForm() {
 
         <div className="space-y-4">
           <div>
-            <label
-              className="mb-2 block font-medium text-sm"
-              htmlFor="youtube_requirement"
-            >
+            <Label className="mb-2" htmlFor="youtube_requirement">
               {t("youtubeRequirementLabel")}
-            </label>
-            <select
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+            </Label>
+            <Select
               disabled={isPending}
-              id="youtube_requirement"
               name="youtube_requirement"
-              onChange={(e) => {
-                const value = e.target.value;
+              onValueChange={(value) => {
                 setYoutubeRequirement(value);
                 if (value === "none") {
                   setYoutubeChannelId("");
@@ -230,23 +230,24 @@ export function CreateSpaceForm() {
               }}
               value={youtubeRequirement}
             >
-              <option value="none">{t("youtubeRequirementNone")}</option>
-              <option value="subscriber">
-                {t("youtubeRequirementSubscriber")}
-              </option>
-            </select>
+              <SelectTrigger id="youtube_requirement">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">{t("youtubeRequirementNone")}</SelectItem>
+                <SelectItem value="subscriber">
+                  {t("youtubeRequirementSubscriber")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {youtubeRequirement !== "none" && (
             <div>
-              <label
-                className="mb-2 block font-medium text-sm"
-                htmlFor="youtube_channel_id"
-              >
+              <Label className="mb-2" htmlFor="youtube_channel_id">
                 {t("youtubeChannelIdLabel")}
-              </label>
-              <input
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+              </Label>
+              <Input
                 disabled={isPending}
                 id="youtube_channel_id"
                 name="youtube_channel_id"
@@ -263,19 +264,13 @@ export function CreateSpaceForm() {
           )}
 
           <div>
-            <label
-              className="mb-2 block font-medium text-sm"
-              htmlFor="twitch_requirement"
-            >
+            <Label className="mb-2" htmlFor="twitch_requirement">
               {t("twitchRequirementLabel")}
-            </label>
-            <select
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+            </Label>
+            <Select
               disabled={isPending}
-              id="twitch_requirement"
               name="twitch_requirement"
-              onChange={(e) => {
-                const value = e.target.value;
+              onValueChange={(value) => {
                 setTwitchRequirement(value);
                 if (value === "none") {
                   setTwitchBroadcasterId("");
@@ -283,24 +278,25 @@ export function CreateSpaceForm() {
               }}
               value={twitchRequirement}
             >
-              <option value="none">{t("twitchRequirementNone")}</option>
-              <option value="follower">{t("twitchRequirementFollower")}</option>
-              <option value="subscriber">
-                {t("twitchRequirementSubscriber")}
-              </option>
-            </select>
+              <SelectTrigger id="twitch_requirement">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">{t("twitchRequirementNone")}</SelectItem>
+                <SelectItem value="follower">{t("twitchRequirementFollower")}</SelectItem>
+                <SelectItem value="subscriber">
+                  {t("twitchRequirementSubscriber")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {twitchRequirement !== "none" && (
             <div>
-              <label
-                className="mb-2 block font-medium text-sm"
-                htmlFor="twitch_broadcaster_id"
-              >
+              <Label className="mb-2" htmlFor="twitch_broadcaster_id">
                 {t("twitchBroadcasterIdLabel")}
-              </label>
-              <input
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+              </Label>
+              <Input
                 disabled={isPending}
                 id="twitch_broadcaster_id"
                 name="twitch_broadcaster_id"
@@ -319,14 +315,10 @@ export function CreateSpaceForm() {
       </div>
 
       <div>
-        <label
-          className="mb-2 block font-medium text-sm"
-          htmlFor="email_allowlist"
-        >
+        <Label className="mb-2" htmlFor="email_allowlist">
           {t("emailAllowlistLabel")}
-        </label>
-        <textarea
-          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+        </Label>
+        <Textarea
           disabled={isPending}
           id="email_allowlist"
           name="email_allowlist"
