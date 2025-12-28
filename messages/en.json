@@ -100,6 +100,19 @@
     "youtubeChannelIdHelp": "Enter a YouTube channel ID to require participants to subscribe to that channel before joining.",
     "youtubeChannelIdLabel": "YouTube Channel ID (Optional)"
   },
+  "Dashboard": {
+    "activeSpaceBackToAdmin": "Back to Admin",
+    "activeSpaceLabel": "Active",
+    "activeSpaceParticipants": "{count} participants",
+    "createFormDescription": "Fill in the required information to start your bingo event right away.",
+    "createFormTitle": "Create New Space",
+    "dividerText": "Dashboard & History",
+    "historyDate": "Date",
+    "historyDetails": "Details",
+    "historyNoSpaces": "No spaces created yet",
+    "historySpaceName": "Space Name",
+    "historyTitle": "History"
+  },
   "Errors": {
     "authRequired": "Authentication required",
     "notFound": "Space not found",
