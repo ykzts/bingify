@@ -36,6 +36,7 @@
     "errorNoPermission": "管理者権限が必要です",
     "fullName": "名前",
     "navOverview": "概要",
+    "navSettings": "システム設定",
     "navSpaces": "スペース管理",
     "navUsers": "ユーザー管理",
     "noSpaces": "スペースがありません",
@@ -60,6 +61,20 @@
     "subtitle": "サイト管理者用のコントロールパネル",
     "usersCount": "全{count}名のユーザー",
     "usersTitle": "ユーザー管理"
+  },
+  "AdminSettings": {
+    "description": "サーバーリソース管理とスペース制限の設定",
+    "maxParticipantsHelp": "1つのスペースに参加できる最大人数を設定します",
+    "maxParticipantsLabel": "スペースあたりの最大参加者数",
+    "maxSpacesPerUserHelp": "1人のユーザーが作成できる最大スペース数を設定します",
+    "maxSpacesPerUserLabel": "ユーザーあたりの最大スペース数",
+    "resourceLimitsTitle": "リソース制限設定",
+    "saveButton": "設定を保存",
+    "saving": "保存中...",
+    "spaceExpirationHelp": "スペース作成から何時間で有効期限切れとするか設定します（0は無期限）",
+    "spaceExpirationLabel": "スペース有効期限（時間）",
+    "title": "システム設定",
+    "updateSuccess": "設定を更新しました"
   },
   "AdminSpace": {
     "allNumbersCalled": "すべての番号が呼ばれました",

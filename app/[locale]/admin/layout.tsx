@@ -95,6 +95,14 @@ function AdminNav({ locale }: { locale: string }) {
             {t("navUsers")}
           </Link>
         </li>
+        <li>
+          <Link
+            className="inline-block border-transparent border-b-2 pb-4 hover:border-blue-500"
+            href={`/${locale}/admin/settings`}
+          >
+            {t("navSettings")}
+          </Link>
+        </li>
       </ul>
     </nav>
   );

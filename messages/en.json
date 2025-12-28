@@ -36,6 +36,7 @@
     "errorNoPermission": "Admin permission required",
     "fullName": "Name",
     "navOverview": "Overview",
+    "navSettings": "System Settings",
     "navSpaces": "Space Management",
     "navUsers": "User Management",
     "noSpaces": "No spaces",
@@ -60,6 +61,20 @@
     "subtitle": "Site administrator control panel",
     "usersCount": "{count} users total",
     "usersTitle": "User Management"
+  },
+  "AdminSettings": {
+    "description": "Configure server resource management and space limits",
+    "maxParticipantsHelp": "Set the maximum number of participants allowed in a single space",
+    "maxParticipantsLabel": "Max Participants per Space",
+    "maxSpacesPerUserHelp": "Set the maximum number of spaces a user can create",
+    "maxSpacesPerUserLabel": "Max Spaces per User",
+    "resourceLimitsTitle": "Resource Limit Settings",
+    "saveButton": "Save Settings",
+    "saving": "Saving...",
+    "spaceExpirationHelp": "Set how many hours after creation a space expires (0 for unlimited)",
+    "spaceExpirationLabel": "Space Expiration (Hours)",
+    "title": "System Settings",
+    "updateSuccess": "Settings updated successfully"
   },
   "AdminSpace": {
     "allNumbersCalled": "All numbers have been called",
