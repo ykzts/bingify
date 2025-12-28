@@ -3,15 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { format } from "date-fns";
 import { generateSecureToken } from "@/lib/crypto";
-import {
-  emailAllowlistSchema,
-  maxParticipantsSchema,
-  spaceSchema,
-  twitchBroadcasterIdSchema,
-  twitchRequirementSchema,
-  youtubeChannelIdSchema,
-  youtubeRequirementSchema,
-} from "@/lib/schemas/space";
+import { createSpaceFormSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 
 const MAX_SLUG_SUGGESTIONS = 10;
@@ -66,26 +58,32 @@ async function findAvailableSlug(
   return null;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Form validation and space creation require multiple checks
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Space creation requires slug uniqueness checks and conditional gatekeeper rule construction
 export async function createSpace(
   _prevState: CreateSpaceState,
   formData: FormData
 ): Promise<CreateSpaceState> {
   try {
-    const shareKey = formData.get("share_key") as string;
+    // Extract and parse form data
     const maxParticipantsRaw = formData.get("max_participants") as string;
-    const youtubeChannelIdRaw =
-      (formData.get("youtube_channel_id") as string) || "";
-    const youtubeRequirementRaw =
-      (formData.get("youtube_requirement") as string) || "none";
-    const twitchBroadcasterIdRaw =
-      (formData.get("twitch_broadcaster_id") as string) || "";
-    const twitchRequirementRaw =
-      (formData.get("twitch_requirement") as string) || "none";
-    const emailAllowlistRaw = (formData.get("email_allowlist") as string) || "";
+    const maxParticipants = Number.parseInt(maxParticipantsRaw, 10);
 
-    // Validate input with Zod
-    const validation = spaceSchema.safeParse({ slug: shareKey });
+    // Validate all inputs with unified schema
+    const validation = createSpaceFormSchema.safeParse({
+      slug: formData.get("share_key") as string,
+      max_participants: Number.isNaN(maxParticipants)
+        ? undefined
+        : maxParticipants,
+      youtube_requirement:
+        (formData.get("youtube_requirement") as string) || "none",
+      youtube_channel_id: (formData.get("youtube_channel_id") as string) || "",
+      twitch_requirement:
+        (formData.get("twitch_requirement") as string) || "none",
+      twitch_broadcaster_id:
+        (formData.get("twitch_broadcaster_id") as string) || "",
+      email_allowlist: (formData.get("email_allowlist") as string) || "",
+    });
+
     if (!validation.success) {
       return {
         error: validation.error.issues[0].message,
@@ -93,99 +91,15 @@ export async function createSpace(
       };
     }
 
-    // Validate max participants
-    const maxParticipants = Number.parseInt(maxParticipantsRaw, 10);
-    if (Number.isNaN(maxParticipants)) {
-      return {
-        error: "最大参加人数は数値で入力してください",
-        success: false,
-      };
-    }
-    const maxParticipantsValidation =
-      maxParticipantsSchema.safeParse(maxParticipants);
-    if (!maxParticipantsValidation.success) {
-      return {
-        error: maxParticipantsValidation.error.issues[0].message,
-        success: false,
-      };
-    }
-
-    // Validate YouTube requirement
-    const youtubeRequirementValidation = youtubeRequirementSchema.safeParse(
-      youtubeRequirementRaw
-    );
-    if (!youtubeRequirementValidation.success) {
-      return {
-        error: youtubeRequirementValidation.error.issues[0].message,
-        success: false,
-      };
-    }
-    const youtubeRequirement = youtubeRequirementValidation.data;
-
-    // Validate YouTube Channel ID if requirement is not "none"
-    let youtubeChannelId: string | undefined;
-    if (youtubeRequirement !== "none") {
-      if (!youtubeChannelIdRaw.trim()) {
-        return {
-          error: "YouTube要件を設定する場合、チャンネルIDが必要です",
-          success: false,
-        };
-      }
-      const channelIdValidation =
-        youtubeChannelIdSchema.safeParse(youtubeChannelIdRaw);
-      if (!channelIdValidation.success) {
-        return {
-          error: channelIdValidation.error.issues[0].message,
-          success: false,
-        };
-      }
-      youtubeChannelId = channelIdValidation.data;
-    }
-
-    // Validate Twitch requirement
-    const twitchRequirementValidation =
-      twitchRequirementSchema.safeParse(twitchRequirementRaw);
-    if (!twitchRequirementValidation.success) {
-      return {
-        error: twitchRequirementValidation.error.issues[0].message,
-        success: false,
-      };
-    }
-    const twitchRequirement = twitchRequirementValidation.data;
-
-    // Validate Twitch Broadcaster ID if requirement is not "none"
-    let twitchBroadcasterId: string | undefined;
-    if (twitchRequirement !== "none") {
-      if (!twitchBroadcasterIdRaw.trim()) {
-        return {
-          error: "Twitch要件を設定する場合、配信者IDが必要です",
-          success: false,
-        };
-      }
-      const broadcasterIdValidation = twitchBroadcasterIdSchema.safeParse(
-        twitchBroadcasterIdRaw
-      );
-      if (!broadcasterIdValidation.success) {
-        return {
-          error: broadcasterIdValidation.error.issues[0].message,
-          success: false,
-        };
-      }
-      twitchBroadcasterId = broadcasterIdValidation.data;
-    }
-
-    // Validate email allowlist if provided
-    let emailAllowlist: string[] = [];
-    if (emailAllowlistRaw.trim()) {
-      const emailValidation = emailAllowlistSchema.safeParse(emailAllowlistRaw);
-      if (!emailValidation.success) {
-        return {
-          error: emailValidation.error.issues[0].message,
-          success: false,
-        };
-      }
-      emailAllowlist = emailValidation.data;
-    }
+    const {
+      slug: shareKey,
+      max_participants: maxParticipantsValue,
+      youtube_requirement: youtubeRequirement,
+      youtube_channel_id: youtubeChannelId,
+      twitch_requirement: twitchRequirement,
+      twitch_broadcaster_id: twitchBroadcasterId,
+      email_allowlist: emailAllowlist,
+    } = validation.data;
 
     // Generate full slug with date suffix
     const dateSuffix = format(new Date(), "yyyyMMdd");
@@ -282,7 +196,7 @@ export async function createSpace(
       .insert({
         gatekeeper_rules: gatekeeperRules,
         id: uuid,
-        max_participants: maxParticipantsValidation.data,
+        max_participants: maxParticipantsValue,
         owner_id: user.id,
         settings: {},
         share_key: fullSlug,
