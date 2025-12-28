@@ -9,10 +9,10 @@ import { createClient } from "@/lib/supabase/server";
 const MAX_SLUG_SUGGESTIONS = 10;
 
 export interface CreateSpaceState {
-  success: boolean;
   error?: string;
-  spaceId?: string;
   shareKey?: string;
+  spaceId?: string;
+  success: boolean;
   suggestion?: string;
 }
 
@@ -64,6 +64,8 @@ export async function createSpace(
 ): Promise<CreateSpaceState> {
   try {
     const shareKey = formData.get("share_key") as string;
+    const youtubeChannelId =
+      (formData.get("youtube_channel_id") as string) || null;
 
     // Validate input with Zod
     const validation = spaceSchema.safeParse({ slug: shareKey });
@@ -135,6 +137,7 @@ export async function createSpace(
         share_key: fullSlug,
         status: "active",
         view_token: viewToken,
+        youtube_channel_id: youtubeChannelId,
       })
       .select()
       .single();
