@@ -192,6 +192,18 @@ export function SpaceParticipation({
         </div>
       )}
 
+      {/* Twitch Requirement Notice */}
+      {spaceInfo.gatekeeper_rules?.twitch &&
+        (spaceInfo.gatekeeper_rules.twitch.requireFollow ||
+          spaceInfo.gatekeeper_rules.twitch.requireSub) &&
+        !hasJoined && (
+          <div className="rounded-lg border border-purple-200 bg-purple-50 p-4">
+            <p className="text-purple-800 text-sm">
+              {t("errorTwitchVerificationRequired")}
+            </p>
+          </div>
+        )}
+
       {/* Participant Count */}
       {participantInfo && (
         <div className="flex items-center gap-2 text-gray-600">

@@ -12,6 +12,8 @@
     "@supabase/ssr": "0.8.0",
     "@supabase/supabase-js": "2.89.0",
     "@tailwindcss/typography": "0.5.19",
+    "@twurple/api": "8.0.2",
+    "@twurple/auth": "8.0.2",
     "clsx": "2.1.1",
     "date-fns": "4.1.0",
     "lucide-react": "0.562.0",
