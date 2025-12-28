@@ -16,6 +16,7 @@ interface CalledNumber {
 }
 
 interface Props {
+  baseUrl: string;
   initialMode?: string;
   initialBg?: string;
   shareKey: string;
@@ -25,7 +26,7 @@ interface Props {
 type DisplayMode = "full" | "minimal";
 type BackgroundType = "default" | "transparent" | "green" | "blue";
 
-export function ScreenDisplay({ initialMode = "full", initialBg = "default", shareKey, spaceId }: Props) {
+export function ScreenDisplay({ baseUrl, initialMode = "full", initialBg = "default", shareKey, spaceId }: Props) {
   const t = useTranslations("ScreenView");
   const [calledNumbers, setCalledNumbers] = useState<CalledNumber[]>([]);
   const [mode, setMode] = useState<DisplayMode>(initialMode as DisplayMode);
@@ -159,9 +160,7 @@ export function ScreenDisplay({ initialMode = "full", initialBg = "default", sha
 
   const currentNumber = calledNumbers.length > 0 ? calledNumbers.at(-1)?.value ?? null : null;
   const history = calledNumbers.map((n) => n.value);
-  const participationUrl = typeof window !== "undefined" 
-    ? `${window.location.origin}/spaces/${shareKey}`
-    : "";
+  const participationUrl = `${baseUrl}/spaces/${shareKey}`;
 
   const isMinimal = mode === "minimal";
 
