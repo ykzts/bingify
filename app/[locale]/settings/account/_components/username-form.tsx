@@ -59,7 +59,11 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
         {(state.error || state.errorKey) && (
           <div className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-red-800 text-sm">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
-            <span>{state.errorKey ? t(state.errorKey) : state.error}</span>
+            <span>
+              {state.errorKey
+                ? t(state.errorKey, { defaultValue: t("errorGeneric") })
+                : state.error}
+            </span>
           </div>
         )}
 

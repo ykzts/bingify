@@ -81,14 +81,15 @@ export async function updateUsername(
 
     const validation = usernameSchema.safeParse({ username });
     if (!validation.success) {
-      const errorMessage = validation.error.issues[0].message;
-      if (errorMessage.includes("required")) {
+      const issue = validation.error.issues[0];
+      // Map Zod error codes to i18n keys
+      if (issue.code === "too_small") {
         return {
           errorKey: "errorUsernameRequired",
           success: false,
         };
       }
-      if (errorMessage.includes("50")) {
+      if (issue.code === "too_big") {
         return {
           errorKey: "errorUsernameTooLong",
           success: false,
