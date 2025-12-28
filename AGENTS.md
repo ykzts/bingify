@@ -10,6 +10,14 @@
 - バリデーション・フォーム処理：Zod + Server Functions + `useActionState`。
 - 新規パッケージ追加時は npm registry を確認し、最新バージョンを必ず使用する（例：`pnpm add <pkg>@latest`）。バージョンは `savePrefix: ''` により正確に固定されるため、`^` や `~` は付与しない。
 
+## UI Framework
+
+- **Shadcn/ui** + **Tailwind CSS** を使用。
+- Theme Color: **Purple** (Primary: `#a78bfa`)。
+- Icons: **Lucide React**。
+- コンポーネントは `@/components/ui` に配置。
+- メインアクションのボタンには `primary` バリアント（デフォルト）を使用し、ブランド一貫性を保つ。
+
 ## 環境 / サービス
 
 - Supabase: `lib/supabase/server.ts` / `client.ts` を利用。
