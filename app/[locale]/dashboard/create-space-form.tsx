@@ -47,7 +47,7 @@ export function CreateSpaceForm() {
   const handleAcceptSuggestion = () => {
     if (state.suggestion) {
       // Extract the shareKey part from suggestion
-      // Format: "shareKey-2-20251226" or "my-party-3-20251226"
+      // Format: "my-party-2-20251226" or "my-party-3-20251226"
       // Remove the last part (date suffix): "-20251226"
       const suggestionWithoutDate = state.suggestion.replace(
         `-${dateSuffix}`,
