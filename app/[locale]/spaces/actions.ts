@@ -24,7 +24,8 @@ export interface GatekeeperRules {
   };
   youtube?: {
     channelId: string;
-    required: boolean;
+    requirement?: string; // "subscriber" or "member"
+    required?: boolean; // Legacy format, for backward compatibility
   };
 }
 
@@ -210,13 +211,21 @@ async function verifyGatekeeperRules(
   }
 
   // Check YouTube subscription requirement if configured
-  if (gatekeeperRules?.youtube?.required && gatekeeperRules.youtube.channelId) {
-    const verificationResult = await verifyYouTubeSubscription(
-      youtubeAccessToken,
-      gatekeeperRules.youtube.channelId
-    );
-    if (verificationResult) {
-      return verificationResult;
+  if (gatekeeperRules?.youtube?.channelId) {
+    // Support both new format (requirement) and legacy format (required)
+    const hasRequirement =
+      gatekeeperRules.youtube.requirement === "subscriber" ||
+      gatekeeperRules.youtube.requirement === "member" ||
+      gatekeeperRules.youtube.required;
+
+    if (hasRequirement) {
+      const verificationResult = await verifyYouTubeSubscription(
+        youtubeAccessToken,
+        gatekeeperRules.youtube.channelId
+      );
+      if (verificationResult) {
+        return verificationResult;
+      }
     }
   }
 

@@ -8,6 +8,14 @@ export const spaceSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "小文字の英数字とハイフンのみ使用できます"),
 });
 
+// Max participants validation
+export const maxParticipantsSchema = z
+  .number()
+  .int("整数を入力してください")
+  .min(1, "1人以上を指定してください")
+  .max(1000, "最大1000人までです")
+  .default(50);
+
 const YOUTUBE_CHANNEL_ID_REGEX = /^UC[a-zA-Z0-9_-]{22}$/;
 
 export const youtubeChannelIdSchema = z
@@ -24,6 +32,36 @@ export const youtubeChannelIdSchema = z
         "YouTubeチャンネルIDの形式が正しくありません。'UC'で始まる24文字である必要があります。",
     }
   );
+
+// Twitch broadcaster ID validation (numeric string)
+export const twitchBroadcasterIdSchema = z
+  .string()
+  .trim()
+  .optional()
+  .refine(
+    (value) =>
+      value === undefined || value === "" || /^\d+$/.test(value),
+    {
+      message:
+        "Twitch配信者IDの形式が正しくありません。数字のみで入力してください。",
+    }
+  );
+
+// YouTube requirement levels
+export const youtubeRequirementSchema = z.enum(
+  ["none", "subscriber", "member"],
+  {
+    errorMap: () => ({ message: "有効な要件レベルを選択してください" }),
+  }
+);
+
+// Twitch requirement levels
+export const twitchRequirementSchema = z.enum(
+  ["none", "follower", "subscriber"],
+  {
+    errorMap: () => ({ message: "有効な要件レベルを選択してください" }),
+  }
+);
 
 export type SpaceFormData = z.infer<typeof spaceSchema>;
 

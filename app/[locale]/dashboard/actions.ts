@@ -5,8 +5,12 @@ import { format } from "date-fns";
 import { generateSecureToken } from "@/lib/crypto";
 import {
   emailAllowlistSchema,
+  maxParticipantsSchema,
   spaceSchema,
+  twitchBroadcasterIdSchema,
+  twitchRequirementSchema,
   youtubeChannelIdSchema,
+  youtubeRequirementSchema,
 } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 
@@ -69,8 +73,15 @@ export async function createSpace(
 ): Promise<CreateSpaceState> {
   try {
     const shareKey = formData.get("share_key") as string;
+    const maxParticipantsRaw = formData.get("max_participants") as string;
     const youtubeChannelIdRaw =
       (formData.get("youtube_channel_id") as string) || "";
+    const youtubeRequirementRaw =
+      (formData.get("youtube_requirement") as string) || "none";
+    const twitchBroadcasterIdRaw =
+      (formData.get("twitch_broadcaster_id") as string) || "";
+    const twitchRequirementRaw =
+      (formData.get("twitch_requirement") as string) || "none";
     const emailAllowlistRaw = (formData.get("email_allowlist") as string) || "";
 
     // Validate input with Zod
@@ -82,9 +93,37 @@ export async function createSpace(
       };
     }
 
-    // Validate YouTube Channel ID if provided
+    // Validate max participants
+    const maxParticipants = Number(maxParticipantsRaw);
+    const maxParticipantsValidation =
+      maxParticipantsSchema.safeParse(maxParticipants);
+    if (!maxParticipantsValidation.success) {
+      return {
+        error: maxParticipantsValidation.error.issues[0].message,
+        success: false,
+      };
+    }
+
+    // Validate YouTube requirement
+    const youtubeRequirementValidation =
+      youtubeRequirementSchema.safeParse(youtubeRequirementRaw);
+    if (!youtubeRequirementValidation.success) {
+      return {
+        error: youtubeRequirementValidation.error.issues[0].message,
+        success: false,
+      };
+    }
+    const youtubeRequirement = youtubeRequirementValidation.data;
+
+    // Validate YouTube Channel ID if requirement is not "none"
     let youtubeChannelId: string | undefined;
-    if (youtubeChannelIdRaw.trim()) {
+    if (youtubeRequirement !== "none") {
+      if (!youtubeChannelIdRaw.trim()) {
+        return {
+          error: "YouTube要件を設定する場合、チャンネルIDが必要です",
+          success: false,
+        };
+      }
       const channelIdValidation =
         youtubeChannelIdSchema.safeParse(youtubeChannelIdRaw);
       if (!channelIdValidation.success) {
@@ -94,6 +133,37 @@ export async function createSpace(
         };
       }
       youtubeChannelId = channelIdValidation.data;
+    }
+
+    // Validate Twitch requirement
+    const twitchRequirementValidation =
+      twitchRequirementSchema.safeParse(twitchRequirementRaw);
+    if (!twitchRequirementValidation.success) {
+      return {
+        error: twitchRequirementValidation.error.issues[0].message,
+        success: false,
+      };
+    }
+    const twitchRequirement = twitchRequirementValidation.data;
+
+    // Validate Twitch Broadcaster ID if requirement is not "none"
+    let twitchBroadcasterId: string | undefined;
+    if (twitchRequirement !== "none") {
+      if (!twitchBroadcasterIdRaw.trim()) {
+        return {
+          error: "Twitch要件を設定する場合、配信者IDが必要です",
+          success: false,
+        };
+      }
+      const broadcasterIdValidation =
+        twitchBroadcasterIdSchema.safeParse(twitchBroadcasterIdRaw);
+      if (!broadcasterIdValidation.success) {
+        return {
+          error: broadcasterIdValidation.error.issues[0].message,
+          success: false,
+        };
+      }
+      twitchBroadcasterId = broadcasterIdValidation.data;
     }
 
     // Validate email allowlist if provided
@@ -161,21 +231,40 @@ export async function createSpace(
     const uuid = randomUUID();
     const viewToken = generateSecureToken();
 
-    // Build gatekeeper_rules if YouTube channel ID or email allowlist is provided
+    // Build gatekeeper_rules
     let gatekeeperRules: {
       email?: { allowed: string[] };
-      youtube?: { channelId: string; required: boolean };
+      twitch?: {
+        broadcasterId: string;
+        requireFollow?: boolean;
+        requireSub?: boolean;
+      };
+      youtube?: { channelId: string; requirement: string };
     } | null = null;
 
-    if (youtubeChannelId || emailAllowlist.length > 0) {
+    const hasYouTubeRule = youtubeRequirement !== "none" && youtubeChannelId;
+    const hasTwitchRule = twitchRequirement !== "none" && twitchBroadcasterId;
+    const hasEmailRule = emailAllowlist.length > 0;
+
+    if (hasYouTubeRule || hasTwitchRule || hasEmailRule) {
       gatekeeperRules = {};
-      if (youtubeChannelId) {
+
+      if (hasYouTubeRule) {
         gatekeeperRules.youtube = {
-          channelId: youtubeChannelId,
-          required: true,
+          channelId: youtubeChannelId as string,
+          requirement: youtubeRequirement,
         };
       }
-      if (emailAllowlist.length > 0) {
+
+      if (hasTwitchRule) {
+        gatekeeperRules.twitch = {
+          broadcasterId: twitchBroadcasterId as string,
+          requireFollow: twitchRequirement === "follower",
+          requireSub: twitchRequirement === "subscriber",
+        };
+      }
+
+      if (hasEmailRule) {
         gatekeeperRules.email = {
           allowed: emailAllowlist,
         };
@@ -187,6 +276,7 @@ export async function createSpace(
       .insert({
         gatekeeper_rules: gatekeeperRules,
         id: uuid,
+        max_participants: maxParticipantsValidation.data,
         owner_id: user.id,
         settings: {},
         share_key: fullSlug,
