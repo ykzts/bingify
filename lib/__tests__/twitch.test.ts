@@ -1,59 +1,58 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { checkFollowStatus, checkSubStatus } from "../twitch";
 
-// Mock fetch globally
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+// Mock the twurple modules
+const mockGetChannelFollowers = vi.fn();
+const mockCheckUserSubscription = vi.fn();
+
+vi.mock("@twurple/api", () => ({
+  ApiClient: class {
+    channels = {
+      getChannelFollowers: mockGetChannelFollowers,
+    };
+    subscriptions = {
+      checkUserSubscription: mockCheckUserSubscription,
+    };
+  },
+}));
+
+vi.mock("@twurple/auth", () => ({
+  StaticAuthProvider: class {},
+}));
 
 describe("checkFollowStatus", () => {
-  const originalClientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+  const originalClientId = process.env.TWITCH_CLIENT_ID;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID = "test_client_id";
+    process.env.TWITCH_CLIENT_ID = "test_client_id";
   });
 
   afterEach(() => {
-    process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID = originalClientId;
+    process.env.TWITCH_CLIENT_ID = originalClientId;
   });
 
   it("should return isFollowing true when user follows broadcaster", async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: [
-          {
-            followed_at: "2024-01-01T00:00:00Z",
-            user_id: "123",
-            user_name: "testuser",
-          },
-        ],
-      }),
+    mockGetChannelFollowers.mockResolvedValue({
+      data: [
+        {
+          followDate: new Date("2024-01-01T00:00:00Z"),
+          userId: "123",
+          userName: "testuser",
+        },
+      ],
     });
 
     const result = await checkFollowStatus("test_access_token", "123", "456");
 
     expect(result.isFollowing).toBe(true);
     expect(result.error).toBeUndefined();
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "https://api.twitch.tv/helix/channels/followers?user_id=123&broadcaster_id=456"
-      ),
-      expect.objectContaining({
-        headers: {
-          Authorization: "Bearer test_access_token",
-          "Client-Id": "test_client_id",
-        },
-      })
-    );
+    expect(mockGetChannelFollowers).toHaveBeenCalledWith("456", "123");
   });
 
   it("should return isFollowing false when user does not follow broadcaster", async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: [],
-      }),
+    mockGetChannelFollowers.mockResolvedValue({
+      data: [],
     });
 
     const result = await checkFollowStatus("test_access_token", "123", "456");
@@ -67,7 +66,7 @@ describe("checkFollowStatus", () => {
 
     expect(result.isFollowing).toBe(false);
     expect(result.error).toBe("Missing required parameters");
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(mockGetChannelFollowers).not.toHaveBeenCalled();
   });
 
   it("should return error when user ID is missing", async () => {
@@ -75,7 +74,7 @@ describe("checkFollowStatus", () => {
 
     expect(result.isFollowing).toBe(false);
     expect(result.error).toBe("Missing required parameters");
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(mockGetChannelFollowers).not.toHaveBeenCalled();
   });
 
   it("should return error when broadcaster ID is missing", async () => {
@@ -83,38 +82,36 @@ describe("checkFollowStatus", () => {
 
     expect(result.isFollowing).toBe(false);
     expect(result.error).toBe("Missing required parameters");
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(mockGetChannelFollowers).not.toHaveBeenCalled();
   });
 
   it("should return error when client ID is not configured", async () => {
-    const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-    process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID = "";
+    const clientId = process.env.TWITCH_CLIENT_ID;
+    process.env.TWITCH_CLIENT_ID = "";
 
     const result = await checkFollowStatus("test_access_token", "123", "456");
 
     expect(result.isFollowing).toBe(false);
     expect(result.error).toBe("Twitch client ID not configured");
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(mockGetChannelFollowers).not.toHaveBeenCalled();
 
     // Restore
-    process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID = clientId;
+    process.env.TWITCH_CLIENT_ID = clientId;
   });
 
   it("should return error when API request fails", async () => {
-    mockFetch.mockResolvedValue({
-      ok: false,
-      status: 401,
-      statusText: "Unauthorized",
-    });
+    mockGetChannelFollowers.mockRejectedValue(
+      new Error("API Error: Invalid credentials")
+    );
 
     const result = await checkFollowStatus("invalid_token", "123", "456");
 
     expect(result.isFollowing).toBe(false);
-    expect(result.error).toBe("Twitch API error: 401 Unauthorized");
+    expect(result.error).toBe("API Error: Invalid credentials");
   });
 
   it("should handle network errors gracefully", async () => {
-    mockFetch.mockRejectedValue(new Error("Network error"));
+    mockGetChannelFollowers.mockRejectedValue(new Error("Network error"));
 
     const result = await checkFollowStatus("test_access_token", "123", "456");
 
@@ -124,55 +121,34 @@ describe("checkFollowStatus", () => {
 });
 
 describe("checkSubStatus", () => {
-  const originalClientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+  const originalClientId = process.env.TWITCH_CLIENT_ID;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID = "test_client_id";
+    process.env.TWITCH_CLIENT_ID = "test_client_id";
   });
 
   afterEach(() => {
-    process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID = originalClientId;
+    process.env.TWITCH_CLIENT_ID = originalClientId;
   });
 
   it("should return isSubscribed true when user is subscribed", async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: [
-          {
-            broadcaster_id: "456",
-            broadcaster_name: "testbroadcaster",
-            is_gift: false,
-            tier: "1000",
-          },
-        ],
-      }),
+    mockCheckUserSubscription.mockResolvedValue({
+      broadcasterId: "456",
+      broadcasterName: "testbroadcaster",
+      isGift: false,
+      tier: "1000",
     });
 
     const result = await checkSubStatus("test_access_token", "123", "456");
 
     expect(result.isSubscribed).toBe(true);
     expect(result.error).toBeUndefined();
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "https://api.twitch.tv/helix/subscriptions/user?user_id=123&broadcaster_id=456"
-      ),
-      expect.objectContaining({
-        headers: {
-          Authorization: "Bearer test_access_token",
-          "Client-Id": "test_client_id",
-        },
-      })
-    );
+    expect(mockCheckUserSubscription).toHaveBeenCalledWith("123", "456");
   });
 
-  it("should return isSubscribed false when API returns 404", async () => {
-    mockFetch.mockResolvedValue({
-      ok: false,
-      status: 404,
-      statusText: "Not Found",
-    });
+  it("should return isSubscribed false when checkUserSubscription returns null", async () => {
+    mockCheckUserSubscription.mockResolvedValue(null);
 
     const result = await checkSubStatus("test_access_token", "123", "456");
 
@@ -180,13 +156,8 @@ describe("checkSubStatus", () => {
     expect(result.error).toBeUndefined();
   });
 
-  it("should return isSubscribed false when data is empty", async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: [],
-      }),
-    });
+  it("should return isSubscribed false when API throws 404 error", async () => {
+    mockCheckUserSubscription.mockRejectedValue(new Error("404 Not Found"));
 
     const result = await checkSubStatus("test_access_token", "123", "456");
 
@@ -199,7 +170,7 @@ describe("checkSubStatus", () => {
 
     expect(result.isSubscribed).toBe(false);
     expect(result.error).toBe("Missing required parameters");
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(mockCheckUserSubscription).not.toHaveBeenCalled();
   });
 
   it("should return error when user ID is missing", async () => {
@@ -207,7 +178,7 @@ describe("checkSubStatus", () => {
 
     expect(result.isSubscribed).toBe(false);
     expect(result.error).toBe("Missing required parameters");
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(mockCheckUserSubscription).not.toHaveBeenCalled();
   });
 
   it("should return error when broadcaster ID is missing", async () => {
@@ -215,38 +186,34 @@ describe("checkSubStatus", () => {
 
     expect(result.isSubscribed).toBe(false);
     expect(result.error).toBe("Missing required parameters");
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(mockCheckUserSubscription).not.toHaveBeenCalled();
   });
 
   it("should return error when client ID is not configured", async () => {
-    const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-    process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID = "";
+    const clientId = process.env.TWITCH_CLIENT_ID;
+    process.env.TWITCH_CLIENT_ID = "";
 
     const result = await checkSubStatus("test_access_token", "123", "456");
 
     expect(result.isSubscribed).toBe(false);
     expect(result.error).toBe("Twitch client ID not configured");
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(mockCheckUserSubscription).not.toHaveBeenCalled();
 
     // Restore
-    process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID = clientId;
+    process.env.TWITCH_CLIENT_ID = clientId;
   });
 
   it("should return error when API returns non-404 error", async () => {
-    mockFetch.mockResolvedValue({
-      ok: false,
-      status: 401,
-      statusText: "Unauthorized",
-    });
+    mockCheckUserSubscription.mockRejectedValue(new Error("401 Unauthorized"));
 
     const result = await checkSubStatus("invalid_token", "123", "456");
 
     expect(result.isSubscribed).toBe(false);
-    expect(result.error).toBe("Twitch API error: 401 Unauthorized");
+    expect(result.error).toBe("401 Unauthorized");
   });
 
   it("should handle network errors gracefully", async () => {
-    mockFetch.mockRejectedValue(new Error("Network error"));
+    mockCheckUserSubscription.mockRejectedValue(new Error("Network error"));
 
     const result = await checkSubStatus("test_access_token", "123", "456");
 

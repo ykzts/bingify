@@ -1,3 +1,6 @@
+import { ApiClient } from "@twurple/api";
+import { StaticAuthProvider } from "@twurple/auth";
+
 export interface TwitchFollowCheckResult {
   error?: string;
   isFollowing: boolean;
@@ -8,11 +11,6 @@ export interface TwitchSubCheckResult {
   isSubscribed: boolean;
 }
 
-interface ValidationResult {
-  error?: string;
-  valid: boolean;
-}
-
 /**
  * Validate common parameters for Twitch API calls
  */
@@ -20,7 +18,7 @@ function validateTwitchParameters(
   userAccessToken: string,
   userId: string,
   broadcasterId: string
-): ValidationResult {
+): { error?: string; valid: boolean } {
   if (!userAccessToken) {
     return { error: "Missing required parameters", valid: false };
   }
@@ -33,12 +31,25 @@ function validateTwitchParameters(
     return { error: "Missing required parameters", valid: false };
   }
 
-  const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+  const clientId = process.env.TWITCH_CLIENT_ID;
   if (!clientId) {
     return { error: "Twitch client ID not configured", valid: false };
   }
 
   return { valid: true };
+}
+
+/**
+ * Create Twurple API client with user access token
+ */
+function createApiClient(userAccessToken: string): ApiClient {
+  const clientId = process.env.TWITCH_CLIENT_ID;
+  if (!clientId) {
+    throw new Error("Twitch client ID not configured");
+  }
+
+  const authProvider = new StaticAuthProvider(clientId, userAccessToken);
+  return new ApiClient({ authProvider });
 }
 
 /**
@@ -66,30 +77,14 @@ export async function checkFollowStatus(
       };
     }
 
-    const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-    const url = new URL("https://api.twitch.tv/helix/channels/followers");
-    url.searchParams.append("user_id", userId);
-    url.searchParams.append("broadcaster_id", broadcasterId);
-
-    const response = await fetch(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${userAccessToken}`,
-        "Client-Id": clientId as string,
-      },
-    });
-
-    if (!response.ok) {
-      return {
-        error: `Twitch API error: ${response.status} ${response.statusText}`,
-        isFollowing: false,
-      };
-    }
-
-    const data = await response.json();
-    const isFollowing = Boolean(data.data && data.data.length > 0);
+    const apiClient = createApiClient(userAccessToken);
+    const follow = await apiClient.channels.getChannelFollowers(
+      broadcasterId,
+      userId
+    );
 
     return {
-      isFollowing,
+      isFollowing: follow.data.length > 0,
     };
   } catch (error) {
     return {
@@ -124,39 +119,23 @@ export async function checkSubStatus(
       };
     }
 
-    const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-    const url = new URL("https://api.twitch.tv/helix/subscriptions/user");
-    url.searchParams.append("user_id", userId);
-    url.searchParams.append("broadcaster_id", broadcasterId);
+    const apiClient = createApiClient(userAccessToken);
+    const subscription = await apiClient.subscriptions.checkUserSubscription(
+      userId,
+      broadcasterId
+    );
 
-    const response = await fetch(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${userAccessToken}`,
-        "Client-Id": clientId as string,
-      },
-    });
-
-    if (!response.ok) {
-      // 404 means not subscribed
-      if (response.status === 404) {
-        return {
-          isSubscribed: false,
-        };
-      }
-
+    return {
+      isSubscribed: subscription !== null,
+    };
+  } catch (error) {
+    // Twurple throws an error if not subscribed
+    if (error instanceof Error && error.message.includes("404")) {
       return {
-        error: `Twitch API error: ${response.status} ${response.statusText}`,
         isSubscribed: false,
       };
     }
 
-    const data = await response.json();
-    const isSubscribed = Boolean(data.data && data.data.length > 0);
-
-    return {
-      isSubscribed,
-    };
-  } catch (error) {
     return {
       error: error instanceof Error ? error.message : "Unknown error",
       isSubscribed: false,
