@@ -188,7 +188,10 @@ export function CreateSpaceForm() {
             max={1000}
             min={1}
             name="max_participants"
-            onChange={(e) => setMaxParticipants(Number(e.target.value))}
+            onChange={(e) => {
+              const value = e.target.valueAsNumber;
+              setMaxParticipants(Number.isNaN(value) ? 50 : value);
+            }}
             required
             type="number"
             value={maxParticipants}

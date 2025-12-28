@@ -94,7 +94,13 @@ export async function createSpace(
     }
 
     // Validate max participants
-    const maxParticipants = Number(maxParticipantsRaw);
+    const maxParticipants = Number.parseInt(maxParticipantsRaw, 10);
+    if (Number.isNaN(maxParticipants)) {
+      return {
+        error: "最大参加人数は数値で入力してください",
+        success: false,
+      };
+    }
     const maxParticipantsValidation =
       maxParticipantsSchema.safeParse(maxParticipants);
     if (!maxParticipantsValidation.success) {
