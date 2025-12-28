@@ -18,7 +18,12 @@ async function HeaderMenuData() {
     .eq("id", user.id)
     .single();
 
-  if (error || !data) {
+  if (error) {
+    console.error("Failed to fetch user profile:", error);
+    return <HeaderMenu user={null} />;
+  }
+
+  if (!data) {
     return <HeaderMenu user={null} />;
   }
 
