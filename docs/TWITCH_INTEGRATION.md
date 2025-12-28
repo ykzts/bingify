@@ -147,11 +147,14 @@ export function TwitchVerificationButton({
         data: { session },
       } = await supabase.auth.getSession();
 
-      if (session?.provider_token && session?.user?.user_metadata?.provider_id) {
+      if (
+        session?.provider_token &&
+        session?.user?.user_metadata?.provider_id
+      ) {
         // Twitchでログイン済み
         onTokenReceived(
           session.provider_token,
-          session.user.user_metadata.provider_id
+          session.user.user_metadata.provider_id,
         );
       } else {
         // Twitch OAuth でログインする必要がある
@@ -195,7 +198,7 @@ const handleTwitchVerify = async (token: string, userId: string) => {
     spaceId,
     undefined, // youtubeAccessToken
     token, // twitchAccessToken
-    userId // twitchUserId
+    userId, // twitchUserId
   );
   if (result.success) {
     setHasJoined(true);
@@ -211,7 +214,9 @@ const handleTwitchVerify = async (token: string, userId: string) => {
   spaceInfo.gatekeeper_rules?.twitch &&
     (spaceInfo.gatekeeper_rules.twitch.requireFollow ||
       spaceInfo.gatekeeper_rules.twitch.requireSub) &&
-    !hasJoined && <TwitchVerificationButton onTokenReceived={handleTwitchVerify} />;
+    !hasJoined && (
+      <TwitchVerificationButton onTokenReceived={handleTwitchVerify} />
+    );
 }
 ```
 

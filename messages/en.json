@@ -112,7 +112,11 @@
     "resetGameSuccess": "Game reset successfully",
     "spaceId": "Space ID",
     "viewingUrlDescription": "Share this URL to display the bingo board on screens, in streaming software, or other display applications.",
-    "viewingUrlLabel": "Public Viewing URL"
+    "viewingUrlLabel": "Public Viewing URL",
+    "draftStatusTitle": "Space in Draft",
+    "draftStatusMessage": "This space is not yet published. Review the settings and publish it when ready.",
+    "goToSettings": "Go to Settings",
+    "settingsLink": "Settings"
   },
   "CreateSpace": {
     "capacitySectionTitle": "Participant Capacity",
@@ -305,7 +309,9 @@
     "verifyTwitchButton": "Verify Twitch Account",
     "verifyingTwitch": "Verifying...",
     "verifyYouTubeButton": "Verify YouTube Account",
-    "verifyingYouTube": "Verifying..."
+    "verifyingYouTube": "Verifying...",
+    "draftTitle": "Preparing",
+    "draftMessage": "The host is currently preparing. Please wait."
   },
   "UsernameSettings": {
     "description": "Set the name that will be displayed in the app.",
@@ -322,5 +328,34 @@
     "usernameHelp": "Maximum 50 characters",
     "usernameLabel": "Username",
     "usernamePlaceholder": "Enter your name"
+  },
+  "SpaceSettings": {
+    "heading": "Space Settings",
+    "statusDraft": "Draft (Preparation)",
+    "statusActive": "Active (In Progress)",
+    "basicInfoTitle": "Basic Information",
+    "titleLabel": "Space Title (Optional)",
+    "titlePlaceholder": "e.g., New Year Bingo Event",
+    "titleHelp": "Set a display name for the space",
+    "descriptionLabel": "Description (Optional)",
+    "descriptionPlaceholder": "Enter a description for this bingo space",
+    "descriptionHelp": "Add details or messages for participants",
+    "capacityTitle": "Participant Limit",
+    "maxParticipantsLabel": "Maximum Participants",
+    "maxParticipantsHelp": "Current participants: {current} / System limit: {max}",
+    "gatekeeperTitle": "Participation Requirements",
+    "youtubeRequirementLabel": "YouTube Requirement",
+    "requirementNone": "None",
+    "youtubeSubscriber": "Subscribers only",
+    "youtubeChannelIdLabel": "YouTube Channel ID",
+    "twitchRequirementLabel": "Twitch Requirement",
+    "twitchFollower": "Followers only",
+    "twitchSubscriber": "Subscribers only",
+    "twitchBroadcasterIdLabel": "Twitch Broadcaster ID",
+    "emailAllowlistLabel": "Email Restrictions",
+    "emailAllowlistHelp": "Allow only specific email addresses or domains to join",
+    "updateSuccess": "Settings updated successfully",
+    "updateButton": "Update Settings",
+    "publishButton": "Publish and Start"
   }
 }
