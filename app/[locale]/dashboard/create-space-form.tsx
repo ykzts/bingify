@@ -14,7 +14,11 @@ export function CreateSpaceForm() {
   const router = useRouter();
   const t = useTranslations("CreateSpace");
   const [shareKey, setShareKey] = useState("");
+  const [maxParticipants, setMaxParticipants] = useState(50);
   const [youtubeChannelId, setYoutubeChannelId] = useState("");
+  const [youtubeRequirement, setYoutubeRequirement] = useState("none");
+  const [twitchBroadcasterId, setTwitchBroadcasterId] = useState("");
+  const [twitchRequirement, setTwitchRequirement] = useState("none");
   const [emailAllowlist, setEmailAllowlist] = useState("");
   const [debouncedShareKey] = useDebounce(shareKey, 500);
   const [checking, setChecking] = useState(false);
@@ -167,25 +171,150 @@ export function CreateSpaceForm() {
       </div>
 
       <div>
-        <label
-          className="mb-2 block font-medium text-sm"
-          htmlFor="youtube_channel_id"
-        >
-          {t("youtubeChannelIdLabel")}
-        </label>
-        <input
-          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
-          disabled={isPending}
-          id="youtube_channel_id"
-          name="youtube_channel_id"
-          onChange={(e) => setYoutubeChannelId(e.target.value)}
-          placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
-          type="text"
-          value={youtubeChannelId}
-        />
-        <p className="mt-2 text-gray-500 text-sm">
-          {t("youtubeChannelIdHelp")}
-        </p>
+        <h3 className="mb-4 font-medium text-lg">
+          {t("capacitySectionTitle")}
+        </h3>
+        <div>
+          <label
+            className="mb-2 block font-medium text-sm"
+            htmlFor="max_participants"
+          >
+            {t("maxParticipantsLabel")}
+          </label>
+          <input
+            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+            disabled={isPending}
+            id="max_participants"
+            max={1000}
+            min={1}
+            name="max_participants"
+            onChange={(e) => {
+              const value = e.target.valueAsNumber;
+              setMaxParticipants(Number.isNaN(value) ? 50 : value);
+            }}
+            required
+            type="number"
+            value={maxParticipants}
+          />
+          <p className="mt-2 text-gray-500 text-sm">
+            {t("maxParticipantsHelp")}
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-4 font-medium text-lg">
+          {t("permissionsSectionTitle")}
+        </h3>
+
+        <div className="space-y-4">
+          <div>
+            <label
+              className="mb-2 block font-medium text-sm"
+              htmlFor="youtube_requirement"
+            >
+              {t("youtubeRequirementLabel")}
+            </label>
+            <select
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+              disabled={isPending}
+              id="youtube_requirement"
+              name="youtube_requirement"
+              onChange={(e) => {
+                const value = e.target.value;
+                setYoutubeRequirement(value);
+                if (value === "none") {
+                  setYoutubeChannelId("");
+                }
+              }}
+              value={youtubeRequirement}
+            >
+              <option value="none">{t("youtubeRequirementNone")}</option>
+              <option value="subscriber">
+                {t("youtubeRequirementSubscriber")}
+              </option>
+            </select>
+          </div>
+
+          {youtubeRequirement !== "none" && (
+            <div>
+              <label
+                className="mb-2 block font-medium text-sm"
+                htmlFor="youtube_channel_id"
+              >
+                {t("youtubeChannelIdLabel")}
+              </label>
+              <input
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+                disabled={isPending}
+                id="youtube_channel_id"
+                name="youtube_channel_id"
+                onChange={(e) => setYoutubeChannelId(e.target.value)}
+                placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
+                required={youtubeRequirement !== "none"}
+                type="text"
+                value={youtubeChannelId}
+              />
+              <p className="mt-2 text-gray-500 text-sm">
+                {t("youtubeChannelIdHelp")}
+              </p>
+            </div>
+          )}
+
+          <div>
+            <label
+              className="mb-2 block font-medium text-sm"
+              htmlFor="twitch_requirement"
+            >
+              {t("twitchRequirementLabel")}
+            </label>
+            <select
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+              disabled={isPending}
+              id="twitch_requirement"
+              name="twitch_requirement"
+              onChange={(e) => {
+                const value = e.target.value;
+                setTwitchRequirement(value);
+                if (value === "none") {
+                  setTwitchBroadcasterId("");
+                }
+              }}
+              value={twitchRequirement}
+            >
+              <option value="none">{t("twitchRequirementNone")}</option>
+              <option value="follower">{t("twitchRequirementFollower")}</option>
+              <option value="subscriber">
+                {t("twitchRequirementSubscriber")}
+              </option>
+            </select>
+          </div>
+
+          {twitchRequirement !== "none" && (
+            <div>
+              <label
+                className="mb-2 block font-medium text-sm"
+                htmlFor="twitch_broadcaster_id"
+              >
+                {t("twitchBroadcasterIdLabel")}
+              </label>
+              <input
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+                disabled={isPending}
+                id="twitch_broadcaster_id"
+                name="twitch_broadcaster_id"
+                onChange={(e) => setTwitchBroadcasterId(e.target.value)}
+                placeholder="123456789"
+                required={twitchRequirement !== "none"}
+                type="text"
+                value={twitchBroadcasterId}
+              />
+              <p className="mt-2 text-gray-500 text-sm">
+                {t("twitchBroadcasterIdHelp")}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
       <div>

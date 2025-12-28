@@ -95,12 +95,26 @@
     "viewingUrlLabel": "公開閲覧用URL"
   },
   "CreateSpace": {
+    "capacitySectionTitle": "参加人数制限",
     "emailAllowlistHelp": "参加者のメールアドレスを制限する場合は、許可するドメイン（@example.com または example.com）やメールアドレス（user@example.com）をカンマや改行で区切って入力してください。空欄の場合は制限なしです。",
     "emailAllowlistLabel": "許可メールアドレス・ドメイン（オプション）",
     "generateRandomButton": "ランダム生成",
     "generateRandomButtonAriaLabel": "共有キーをランダムに生成",
+    "maxParticipantsHelp": "スペースに参加できる最大人数を設定します（1〜1000人）",
+    "maxParticipantsLabel": "最大参加人数",
+    "permissionsSectionTitle": "参加条件設定",
+    "twitchBroadcasterIdHelp": "配信者ID（数字）を入力してください。空欄の場合は制限なしです。",
+    "twitchBroadcasterIdLabel": "Twitch 配信者ID（オプション）",
+    "twitchRequirementFollower": "フォロワー限定",
+    "twitchRequirementLabel": "Twitch要件",
+    "twitchRequirementNone": "制限なし",
+    "twitchRequirementSubscriber": "サブスクライバー限定",
     "youtubeChannelIdHelp": "参加者に特定のYouTubeチャンネルの登録を必須にする場合は、チャンネルIDを入力してください。",
-    "youtubeChannelIdLabel": "YouTube チャンネルID（オプション）"
+    "youtubeChannelIdLabel": "YouTube チャンネルID（オプション）",
+    "youtubeRequirementLabel": "YouTube要件",
+    "youtubeRequirementMember": "メンバー限定",
+    "youtubeRequirementNone": "制限なし",
+    "youtubeRequirementSubscriber": "登録者限定"
   },
   "Dashboard": {
     "activeSpaceBackToAdmin": "管理画面へ戻る",

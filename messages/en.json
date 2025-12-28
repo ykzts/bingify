@@ -95,12 +95,26 @@
     "viewingUrlLabel": "Public Viewing URL"
   },
   "CreateSpace": {
+    "capacitySectionTitle": "Participant Capacity",
     "emailAllowlistHelp": "To restrict participants by email address, enter allowed domains (@example.com or example.com) or email addresses (user@example.com) separated by commas or newlines. Leave empty for no restrictions.",
     "emailAllowlistLabel": "Allowed Email Addresses/Domains (Optional)",
     "generateRandomButton": "Generate Random",
     "generateRandomButtonAriaLabel": "Generate random share key",
+    "maxParticipantsHelp": "Set the maximum number of participants allowed to join the space (1-1000 people)",
+    "maxParticipantsLabel": "Maximum Participants",
+    "permissionsSectionTitle": "Participation Requirements",
+    "twitchBroadcasterIdHelp": "Enter the broadcaster ID (numeric). Leave empty for no restrictions.",
+    "twitchBroadcasterIdLabel": "Twitch Broadcaster ID (Optional)",
+    "twitchRequirementFollower": "Followers only",
+    "twitchRequirementLabel": "Twitch Requirement",
+    "twitchRequirementNone": "No restriction",
+    "twitchRequirementSubscriber": "Subscribers only",
     "youtubeChannelIdHelp": "Enter a YouTube channel ID to require participants to subscribe to that channel before joining.",
-    "youtubeChannelIdLabel": "YouTube Channel ID (Optional)"
+    "youtubeChannelIdLabel": "YouTube Channel ID (Optional)",
+    "youtubeRequirementLabel": "YouTube Requirement",
+    "youtubeRequirementMember": "Members only",
+    "youtubeRequirementNone": "No restriction",
+    "youtubeRequirementSubscriber": "Subscribers only"
   },
   "Dashboard": {
     "activeSpaceBackToAdmin": "Back to Admin",
