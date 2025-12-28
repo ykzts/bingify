@@ -79,7 +79,6 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
           <div
             aria-live="polite"
             className="flex items-center gap-2 rounded-md bg-green-50 p-3 text-green-800 text-sm"
-            role="status"
           >
             <CheckCircle className="h-4 w-4 flex-shrink-0" />
             <span>{t("updateSuccess")}</span>
