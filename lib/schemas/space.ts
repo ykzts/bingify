@@ -33,6 +33,8 @@ export const youtubeChannelIdSchema = z
     }
   );
 
+const TWITCH_BROADCASTER_ID_REGEX = /^\d+$/;
+
 // Twitch broadcaster ID validation (numeric string)
 export const twitchBroadcasterIdSchema = z
   .string()
@@ -40,7 +42,9 @@ export const twitchBroadcasterIdSchema = z
   .optional()
   .refine(
     (value) =>
-      value === undefined || value === "" || /^\d+$/.test(value),
+      value === undefined ||
+      value === "" ||
+      TWITCH_BROADCASTER_ID_REGEX.test(value),
     {
       message:
         "Twitch配信者IDの形式が正しくありません。数字のみで入力してください。",
@@ -48,20 +52,18 @@ export const twitchBroadcasterIdSchema = z
   );
 
 // YouTube requirement levels
-export const youtubeRequirementSchema = z.enum(
-  ["none", "subscriber", "member"],
-  {
-    errorMap: () => ({ message: "有効な要件レベルを選択してください" }),
-  }
-);
+export const youtubeRequirementSchema = z.enum([
+  "none",
+  "subscriber",
+  "member",
+]);
 
 // Twitch requirement levels
-export const twitchRequirementSchema = z.enum(
-  ["none", "follower", "subscriber"],
-  {
-    errorMap: () => ({ message: "有効な要件レベルを選択してください" }),
-  }
-);
+export const twitchRequirementSchema = z.enum([
+  "none",
+  "follower",
+  "subscriber",
+]);
 
 export type SpaceFormData = z.infer<typeof spaceSchema>;
 

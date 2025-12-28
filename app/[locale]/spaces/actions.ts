@@ -188,6 +188,7 @@ function verifyEmailAllowlist(
   return null;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Gatekeeper verification requires multiple conditional checks
 async function verifyGatekeeperRules(
   gatekeeperRules: GatekeeperRules | null,
   userEmail: string,

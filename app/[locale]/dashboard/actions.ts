@@ -105,8 +105,9 @@ export async function createSpace(
     }
 
     // Validate YouTube requirement
-    const youtubeRequirementValidation =
-      youtubeRequirementSchema.safeParse(youtubeRequirementRaw);
+    const youtubeRequirementValidation = youtubeRequirementSchema.safeParse(
+      youtubeRequirementRaw
+    );
     if (!youtubeRequirementValidation.success) {
       return {
         error: youtubeRequirementValidation.error.issues[0].message,
@@ -155,8 +156,9 @@ export async function createSpace(
           success: false,
         };
       }
-      const broadcasterIdValidation =
-        twitchBroadcasterIdSchema.safeParse(twitchBroadcasterIdRaw);
+      const broadcasterIdValidation = twitchBroadcasterIdSchema.safeParse(
+        twitchBroadcasterIdRaw
+      );
       if (!broadcasterIdValidation.success) {
         return {
           error: broadcasterIdValidation.error.issues[0].message,

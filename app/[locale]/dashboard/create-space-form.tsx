@@ -171,7 +171,9 @@ export function CreateSpaceForm() {
       </div>
 
       <div>
-        <h3 className="mb-4 font-medium text-lg">{t("capacitySectionTitle")}</h3>
+        <h3 className="mb-4 font-medium text-lg">
+          {t("capacitySectionTitle")}
+        </h3>
         <div>
           <label
             className="mb-2 block font-medium text-sm"
