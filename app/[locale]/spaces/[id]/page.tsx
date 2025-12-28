@@ -58,10 +58,7 @@ export default async function UserSpacePage({ params }: Props) {
             {t("draftTitle")}
           </h1>
           <p className="mb-6 text-gray-600">{t("draftMessage")}</p>
-          <Link
-            className="text-purple-600 hover:underline"
-            href={`/${locale}`}
-          >
+          <Link className="text-purple-600 hover:underline" href={`/${locale}`}>
             {t("backToHome")}
           </Link>
         </div>

@@ -1,6 +1,5 @@
 "use server";
 
-import { z } from "zod";
 import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
@@ -133,11 +132,10 @@ export async function updateSpaceSettings(
     }
 
     // Validation 2: Check current participant count
-    const { count: currentParticipantCount, error: countError } =
-      await supabase
-        .from("participants")
-        .select("*", { count: "exact", head: true })
-        .eq("space_id", spaceId);
+    const { count: currentParticipantCount, error: countError } = await supabase
+      .from("participants")
+      .select("*", { count: "exact", head: true })
+      .eq("space_id", spaceId);
 
     if (countError) {
       console.error("Failed to count participants:", countError);

@@ -71,8 +71,14 @@ export type SpaceStatus = z.infer<typeof spaceStatusSchema>;
 // Schema for space update (settings page)
 export const updateSpaceFormSchema = z
   .object({
-    title: z.string().max(100, "タイトルは100文字以内で入力してください").optional(),
-    description: z.string().max(500, "説明は500文字以内で入力してください").optional(),
+    title: z
+      .string()
+      .max(100, "タイトルは100文字以内で入力してください")
+      .optional(),
+    description: z
+      .string()
+      .max(500, "説明は500文字以内で入力してください")
+      .optional(),
     max_participants: z
       .number()
       .int("整数を入力してください")

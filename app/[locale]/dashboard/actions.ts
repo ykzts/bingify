@@ -70,7 +70,6 @@ async function findAvailableSlug(
   return null;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Space creation requires slug uniqueness checks
 export async function createSpace(
   _prevState: CreateSpaceState,
   formData: FormData

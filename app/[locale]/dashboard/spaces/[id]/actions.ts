@@ -63,7 +63,8 @@ export async function callNumber(
     // Block number calling if space is in draft status
     if (space.status === "draft") {
       return {
-        error: "スペースが準備中のため、番号を呼び出せません。設定画面で公開してください。",
+        error:
+          "スペースが準備中のため、番号を呼び出せません。設定画面で公開してください。",
         success: false,
       };
     }

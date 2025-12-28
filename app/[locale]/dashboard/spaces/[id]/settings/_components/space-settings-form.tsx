@@ -38,6 +38,7 @@ interface Props {
   systemMaxParticipants: number;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Settings form requires comprehensive state management
 export function SpaceSettingsForm({
   space,
   currentParticipantCount,

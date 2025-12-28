@@ -55,7 +55,8 @@ export default async function SpaceSettingsPage({ params }: Props) {
         <div className="mb-8">
           <h1 className="mb-2 font-bold text-3xl">{t("heading")}</h1>
           <p className="text-gray-600">
-            {space.share_key} - {space.status === "draft" ? t("statusDraft") : t("statusActive")}
+            {space.share_key} -{" "}
+            {space.status === "draft" ? t("statusDraft") : t("statusActive")}
           </p>
         </div>
 
