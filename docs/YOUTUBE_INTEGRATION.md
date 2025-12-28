@@ -9,11 +9,13 @@
 ### 1. バックエンド基盤
 
 #### データベーススキーマ (`supabase/migrations/20251228040000_add_gatekeeper_rules.sql`)
+
 - `spaces`テーブルに`gatekeeper_rules` JSONB列を追加
 - YouTube要件の構造: `{"youtube": {"channelId": "UCxxxxx", "required": true}}`
 - NULL = 参加条件なし
 
 #### YouTube API連携 (`lib/youtube.ts`)
+
 - `@googleapis/youtube`公式ライブラリを使用
 - `checkSubscriptionStatus()`関数でYouTubeチャンネル登録を確認
 - YouTube Data API v3のsubscriptionsエンドポイントを使用
@@ -21,22 +23,26 @@
 - APIエラーの適切なハンドリング
 
 #### サーバーアクション (`app/[locale]/spaces/actions.ts`)
+
 - `SpaceInfo`インターフェースに`gatekeeper_rules`を追加
 - `joinSpace()`アクションで任意の`youtubeAccessToken`パラメータを受け付け
 - `verifyYouTubeSubscription()`ヘルパー関数を追加
 - 参加者のINSERT前に登録状態を検証
 
 #### ダッシュボードアクション (`app/[locale]/dashboard/actions.ts`)
+
 - `createSpace()`でフォームデータから`youtube_channel_id`を受け取り
 - 新規スペース作成時に`gatekeeper_rules`にYouTubeチャンネルIDを保存
 
 ### 2. ユーザーインターフェース
 
 #### スペース参加コンポーネント (`app/[locale]/spaces/[id]/_components/space-participation.tsx`)
+
 - YouTube確認が必要な場合に青色の情報バナーを表示
 - 確認失敗時の適切なエラーメッセージ表示
 
 #### スペース作成フォーム (`app/[locale]/dashboard/create-space-form.tsx`)
+
 - YouTubeチャンネルID入力欄を追加（オプション）
 - 機能説明のヘルプテキスト
 - createSpaceアクションと統合
@@ -44,6 +50,7 @@
 ### 3. 翻訳
 
 英語と日本語の翻訳キーを追加:
+
 - `errorYouTubeVerificationRequired`
 - `errorYouTubeNotSubscribed`
 - `errorYouTubeVerificationFailed`
@@ -53,6 +60,7 @@
 ### 4. テスト
 
 YouTube API連携の包括的なテスト (`lib/__tests__/youtube.test.ts`):
+
 - 登録済みの場合
 - 未登録の場合
 - パラメータ不足
@@ -67,6 +75,7 @@ YouTube API連携の包括的なテスト (`lib/__tests__/youtube.test.ts`):
 現在の実装ではバックエンドロジックが整っていますが、YouTubeアクセストークンを取得するためのクライアント側OAuthフローが必要です。実装手順は以下の通りです:
 
 #### 1. Google OAuthの設定
+
 既存のSupabase OAuth設定を使用します（`SUPABASE_AUTH_EXTERNAL_GOOGLE_*`環境変数）。
 
 #### 2. クライアント側のアクセストークン取得
@@ -81,46 +90,44 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 
-export function YouTubeVerificationButton({ 
-  onTokenReceived 
-}: { 
-  onTokenReceived: (token: string) => void 
+export function YouTubeVerificationButton({
+  onTokenReceived,
+}: {
+  onTokenReceived: (token: string) => void;
 }) {
   const t = useTranslations("UserSpace");
   const [isVerifying, setIsVerifying] = useState(false);
 
   const handleVerify = async () => {
     setIsVerifying(true);
-    
+
     try {
       const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (session?.provider_token) {
         onTokenReceived(session.provider_token);
       } else {
         // Google OAuth でログインする必要がある
         await supabase.auth.signInWithOAuth({
-          provider: 'google',
+          provider: "google",
           options: {
-            scopes: 'https://www.googleapis.com/auth/youtube.readonly',
+            scopes: "https://www.googleapis.com/auth/youtube.readonly",
             redirectTo: window.location.href,
           },
         });
       }
     } catch (error) {
-      console.error('YouTube verification error:', error);
+      console.error("YouTube verification error:", error);
     } finally {
       setIsVerifying(false);
     }
   };
 
   return (
-    <button
-      onClick={handleVerify}
-      disabled={isVerifying}
-      className="..."
-    >
+    <button onClick={handleVerify} disabled={isVerifying} className="...">
       {isVerifying ? t("verifyingYouTube") : t("verifyYouTubeButton")}
     </button>
   );
@@ -130,11 +137,13 @@ export function YouTubeVerificationButton({
 #### 3. スペース参加との統合
 
 `space-participation.tsx`を更新:
+
 1. YouTube確認が必要な場合にYouTube確認ボタンを表示
 2. 確認後、アクセストークンを使用して`joinSpace()`を呼び出し
 3. 確認フローのエラーを処理
 
 実装例:
+
 ```tsx
 const handleYouTubeVerify = async (token: string) => {
   setIsJoining(true);
@@ -149,9 +158,11 @@ const handleYouTubeVerify = async (token: string) => {
 };
 
 // レンダリング内
-{spaceInfo.gatekeeper_rules?.youtube?.required && !hasJoined && (
-  <YouTubeVerificationButton onTokenReceived={handleYouTubeVerify} />
-)}
+{
+  spaceInfo.gatekeeper_rules?.youtube?.required && !hasJoined && (
+    <YouTubeVerificationButton onTokenReceived={handleYouTubeVerify} />
+  );
+}
 ```
 
 ## 実装のテスト
@@ -179,8 +190,8 @@ const handleYouTubeVerify = async (token: string) => {
 
 ```sql
 -- YouTube要件付きスペースの確認
-SELECT id, share_key, gatekeeper_rules 
-FROM spaces 
+SELECT id, share_key, gatekeeper_rules
+FROM spaces
 WHERE gatekeeper_rules->>'youtube' IS NOT NULL;
 
 -- 参加者の確認

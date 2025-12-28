@@ -1,0 +1,24 @@
+# Biomeが管理するファイル形式を除外
+*.ts
+*.tsx
+*.js
+*.jsx
+*.json
+*.jsonc
+*.css
+*.graphql
+
+# ビルド成果物・依存関係
+node_modules
+.next
+dist
+build
+coverage
+
+# ロックファイル
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# その他
+.git

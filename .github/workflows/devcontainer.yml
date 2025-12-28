@@ -3,11 +3,11 @@ name: Dev Container CI
 on:
   pull_request:
     paths:
-      - '.devcontainer/**'
+      - ".devcontainer/**"
   push:
     branches: [main]
     paths:
-      - '.devcontainer/**'
+      - ".devcontainer/**"
 
 jobs:
   test:

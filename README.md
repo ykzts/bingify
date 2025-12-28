@@ -100,8 +100,12 @@ pnpm local:stop
 動的ルートのパラメータは必ず `await` してください。
 
 ```typescript
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   // ...
 }
 ```
@@ -145,6 +149,7 @@ lib/
 `supabase/migrations` ディレクトリ配下の `.sql` マイグレーションファイルは、`main` ブランチへのマージ時に自動的に Cloud Supabase へデプロイされます。
 
 **⚠️ 重要な運用ルール:**
+
 - **既に適用済みのマイグレーションファイル（main ブランチに存在するファイル）は絶対に編集しないでください**
 - Supabase は一度適用されたマイグレーションを再実行しないため、既存ファイルの編集は新規環境にのみ反映され、環境間の不整合を引き起こします
 - 変更が必要な場合は、必ず新しいマイグレーションファイルを作成してください（詳細は [docs/MIGRATIONS.md](docs/MIGRATIONS.md) を参照）

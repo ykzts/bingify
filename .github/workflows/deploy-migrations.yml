@@ -4,13 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'supabase/migrations/**/*.sql'
+      - "supabase/migrations/**/*.sql"
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy to'
+        description: "Environment to deploy to"
         required: true
-        default: 'production'
+        default: "production"
         type: choice
         options:
           - production
@@ -24,7 +24,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'production' }}
-    
+
     permissions:
       contents: read
 
