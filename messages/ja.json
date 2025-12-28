@@ -234,8 +234,11 @@
   "UsernameSettings": {
     "description": "アプリ内で表示される名前を設定します。",
     "errorGeneric": "予期しないエラーが発生しました",
+    "errorInvalidUsername": "ユーザー名が無効です",
     "errorUnauthorized": "認証が必要です",
     "errorUpdateFailed": "ユーザー名の更新に失敗しました",
+    "errorUsernameRequired": "ユーザー名を入力してください",
+    "errorUsernameTooLong": "ユーザー名は50文字以内で入力してください",
     "saveButton": "保存",
     "saving": "保存中...",
     "title": "ユーザー名設定",

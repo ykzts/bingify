@@ -81,8 +81,21 @@ export async function updateUsername(
 
     const validation = usernameSchema.safeParse({ username });
     if (!validation.success) {
+      const errorMessage = validation.error.issues[0].message;
+      if (errorMessage.includes("required")) {
+        return {
+          errorKey: "errorUsernameRequired",
+          success: false,
+        };
+      }
+      if (errorMessage.includes("50")) {
+        return {
+          errorKey: "errorUsernameTooLong",
+          success: false,
+        };
+      }
       return {
-        error: validation.error.issues[0].message,
+        errorKey: "errorInvalidUsername",
         success: false,
       };
     }
