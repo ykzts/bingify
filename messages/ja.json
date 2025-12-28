@@ -123,6 +123,13 @@
     "sourceCode": "ソースコード",
     "terms": "利用規約"
   },
+  "HeaderMenu": {
+    "language": "言語設定",
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "menu": "メニュー",
+    "settings": "設定"
+  },
   "Hero": {
     "badge1": "無料で始める",
     "badge2": "OAuth ログイン",

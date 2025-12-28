@@ -123,6 +123,13 @@
     "sourceCode": "Source Code",
     "terms": "Terms of Service"
   },
+  "HeaderMenu": {
+    "language": "Language",
+    "login": "Sign in",
+    "logout": "Sign out",
+    "menu": "Menu",
+    "settings": "Settings"
+  },
   "Hero": {
     "badge1": "Start for free",
     "badge2": "OAuth Sign-in",

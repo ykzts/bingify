@@ -8,8 +8,7 @@ import {
 } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { Footer } from "./_components/footer";
-import { LanguageSwitcher } from "./_components/language-switcher";
-import { UserHeaderWrapper } from "./_components/user-header-wrapper";
+import { HeaderMenuWrapper } from "./_components/header-menu-wrapper";
 import "../globals.css";
 
 const nunito = Nunito({
@@ -55,9 +54,8 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body className={`${nunito.variable} antialiased`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <div className="flex min-h-screen flex-col">
-            <header className="fixed top-4 right-4 z-50 flex items-center gap-4">
-              <UserHeaderWrapper />
-              <LanguageSwitcher />
+            <header className="fixed top-4 right-4 z-50">
+              <HeaderMenuWrapper />
             </header>
             <main className="flex-1">{children}</main>
             <Footer />
