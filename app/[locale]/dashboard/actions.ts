@@ -120,6 +120,31 @@ export async function createSpace(
       };
     }
 
+    // Check system settings for max spaces per user
+    const { data: systemSettings } = await supabase
+      .from("system_settings")
+      .select("max_spaces_per_user")
+      .eq("id", 1)
+      .single();
+
+    if (systemSettings) {
+      // Count user's existing spaces
+      const { count: userSpaceCount } = await supabase
+        .from("spaces")
+        .select("*", { count: "exact", head: true })
+        .eq("owner_id", user.id);
+
+      if (
+        userSpaceCount !== null &&
+        userSpaceCount >= systemSettings.max_spaces_per_user
+      ) {
+        return {
+          error: `作成できるスペースの上限（${systemSettings.max_spaces_per_user}個）に達しています。不要なスペースを削除してください。`,
+          success: false,
+        };
+      }
+    }
+
     const { data: existing } = await supabase
       .from("spaces")
       .select("id")

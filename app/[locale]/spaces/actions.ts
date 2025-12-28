@@ -297,10 +297,10 @@ export async function joinSpace(
       };
     }
 
-    // Check if space exists and is active
+    // Check if space exists and is active (and not expired)
     const { data: space } = await supabase
       .from("spaces")
-      .select("id, status, gatekeeper_rules")
+      .select("id, status, gatekeeper_rules, created_at")
       .eq("id", spaceId)
       .single();
 
@@ -316,6 +316,27 @@ export async function joinSpace(
         errorKey: "errorSpaceClosed",
         success: false,
       };
+    }
+
+    // Check if space has expired based on system settings
+    const { data: systemSettings } = await supabase
+      .from("system_settings")
+      .select("space_expiration_hours")
+      .eq("id", 1)
+      .single();
+
+    if (systemSettings && systemSettings.space_expiration_hours > 0) {
+      const createdAt = new Date(space.created_at);
+      const expirationDate = new Date(
+        createdAt.getTime() +
+          systemSettings.space_expiration_hours * 60 * 60 * 1000
+      );
+      if (new Date() > expirationDate) {
+        return {
+          errorKey: "errorSpaceExpired",
+          success: false,
+        };
+      }
     }
 
     // Verify gatekeeper requirements

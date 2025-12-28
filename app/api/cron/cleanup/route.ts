@@ -48,7 +48,19 @@ export async function GET(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Calculate cutoff date
+    // Step 1: Mark expired spaces based on system settings
+    const { data: expirationResult } = await supabase.rpc(
+      "cleanup_expired_spaces"
+    );
+
+    const expiredCount = expirationResult?.[0]?.expired_count || 0;
+    const expiredSpaceIds = expirationResult?.[0]?.expired_space_ids || [];
+
+    console.log(
+      `Marked ${expiredCount} space(s) as expired based on system settings`
+    );
+
+    // Step 2: Calculate cutoff date for archived spaces
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - RETENTION_DAYS);
 
@@ -76,7 +88,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       data: {
         deletedCount,
-        message: `Successfully deleted ${deletedCount} archived record(s) older than ${RETENTION_DAYS} days`,
+        expiredCount,
+        message: `Successfully marked ${expiredCount} space(s) as expired and deleted ${deletedCount} archived record(s) older than ${RETENTION_DAYS} days`,
         retentionDays: RETENTION_DAYS,
       },
     });

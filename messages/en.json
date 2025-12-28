@@ -268,6 +268,7 @@
     "errorLoadingCard": "Failed to load bingo card",
     "errorQuotaReached": "Space is full. Maximum capacity reached.",
     "errorSpaceClosed": "This space has been closed",
+    "errorSpaceExpired": "This space has expired",
     "errorTwitchNotFollowing": "You must follow the specified Twitch broadcaster to join this space",
     "errorTwitchNotSubscribed": "You must be subscribed to the specified Twitch broadcaster to join this space",
     "errorTwitchVerificationFailed": "Twitch verification failed. Please try again.",

@@ -268,6 +268,7 @@
     "errorLoadingCard": "ビンゴカードの読み込みに失敗しました",
     "errorQuotaReached": "スペースの参加者数が上限に達しています",
     "errorSpaceClosed": "このスペースは閉鎖されています",
+    "errorSpaceExpired": "このスペースは有効期限が切れています",
     "errorTwitchNotFollowing": "このスペースに参加するには、指定されたTwitch配信者をフォローする必要があります",
     "errorTwitchNotSubscribed": "このスペースに参加するには、指定されたTwitch配信者のサブスクライバーである必要があります",
     "errorTwitchVerificationFailed": "Twitch連携の確認に失敗しました。もう一度お試しください。",
