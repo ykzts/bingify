@@ -24,6 +24,7 @@ import { checkSlugAvailability, createSpace } from "./actions";
 export function CreateSpaceForm() {
   const router = useRouter();
   const t = useTranslations("CreateSpace");
+  const tErrors = useTranslations("Errors");
   const [shareKey, setShareKey] = useState("");
   const [maxParticipants, setMaxParticipants] = useState(50);
   const [youtubeChannelId, setYoutubeChannelId] = useState("");
@@ -338,11 +339,15 @@ export function CreateSpaceForm() {
 
       {state.error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p className="text-red-800">{state.error}</p>
+          <p className="text-red-800">
+            {state.error === "maxSpacesReached" && state.errorData?.max
+              ? tErrors("maxSpacesReached", { max: state.errorData.max })
+              : state.error}
+          </p>
           {state.suggestion && (
             <div className="mt-3">
               <p className="mb-2 text-red-700 text-sm">
-                代わりにこちらを使用できます:
+                {t("suggestionPrefix")}
               </p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 rounded bg-white px-3 py-2 font-mono text-sm">
@@ -353,7 +358,7 @@ export function CreateSpaceForm() {
                   onClick={handleAcceptSuggestion}
                   type="button"
                 >
-                  使用する
+                  {t("useSuggestionButton")}
                 </button>
               </div>
             </div>
@@ -367,7 +372,7 @@ export function CreateSpaceForm() {
         type="submit"
       >
         {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-        {isPending ? "作成中..." : "スペースを作成"}
+        {isPending ? t("creatingButton") : t("createButton")}
       </Button>
     </form>
   );

@@ -259,6 +259,7 @@ async function verifyGatekeeperRules(
   return null;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Space joining requires expiration check, gatekeeper verification, and quota validation
 export async function joinSpace(
   spaceId: string,
   youtubeAccessToken?: string,
@@ -297,10 +298,10 @@ export async function joinSpace(
       };
     }
 
-    // Check if space exists and is active
+    // Check if space exists and is active (and not expired)
     const { data: space } = await supabase
       .from("spaces")
-      .select("id, status, gatekeeper_rules")
+      .select("id, status, gatekeeper_rules, created_at")
       .eq("id", spaceId)
       .single();
 
@@ -316,6 +317,36 @@ export async function joinSpace(
         errorKey: "errorSpaceClosed",
         success: false,
       };
+    }
+
+    // Check if space has expired based on system settings
+    const { data: systemSettings } = await supabase
+      .from("system_settings")
+      .select("space_expiration_hours")
+      .eq("id", 1)
+      .single();
+
+    if (systemSettings && systemSettings.space_expiration_hours > 0) {
+      // Defensive null check for created_at
+      if (!space.created_at) {
+        console.error("Space created_at is null:", space.id);
+        return {
+          errorKey: "errorInvalidSpace",
+          success: false,
+        };
+      }
+
+      const createdAt = new Date(space.created_at);
+      const expirationDate = new Date(
+        createdAt.getTime() +
+          systemSettings.space_expiration_hours * 60 * 60 * 1000
+      );
+      if (new Date() > expirationDate) {
+        return {
+          errorKey: "errorSpaceExpired",
+          success: false,
+        };
+      }
     }
 
     // Verify gatekeeper requirements

@@ -9,10 +9,13 @@ import { createClient } from "@/lib/supabase/server";
 const MAX_SLUG_SUGGESTIONS = 10;
 
 export interface CreateSpaceState {
-  success: boolean;
   error?: string;
-  spaceId?: string;
+  errorData?: {
+    max?: number;
+  };
   shareKey?: string;
+  spaceId?: string;
+  success: boolean;
   suggestion?: string;
 }
 
@@ -118,6 +121,43 @@ export async function createSpace(
         error: "認証が必要です。ログインしてください。",
         success: false,
       };
+    }
+
+    // Check system settings for max spaces per user
+    const { data: systemSettings, error: settingsError } = await supabase
+      .from("system_settings")
+      .select("max_spaces_per_user")
+      .eq("id", 1)
+      .single();
+
+    if (settingsError) {
+      console.error("Failed to fetch system settings:", settingsError);
+      // Continue with space creation if settings fetch fails (graceful degradation)
+    } else if (systemSettings) {
+      // Count user's existing spaces
+      const { count: userSpaceCount, error: countError } = await supabase
+        .from("spaces")
+        .select("*", { count: "exact", head: true })
+        .eq("owner_id", user.id);
+
+      if (countError) {
+        console.error("Failed to count user spaces:", countError);
+        return {
+          error: "failedToCountSpaces",
+          success: false,
+        };
+      }
+
+      if (
+        userSpaceCount !== null &&
+        userSpaceCount >= systemSettings.max_spaces_per_user
+      ) {
+        return {
+          error: "maxSpacesReached",
+          errorData: { max: systemSettings.max_spaces_per_user },
+          success: false,
+        };
+      }
     }
 
     const { data: existing } = await supabase
