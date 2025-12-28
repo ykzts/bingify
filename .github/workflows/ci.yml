@@ -22,7 +22,7 @@ jobs:
 
       - run: pnpm install
 
-      - run: pnpm check:ci
+      - run: pnpm check:ci --reporter=github
         name: Run Biome checks
 
       - run: pnpm type-check
