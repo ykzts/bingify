@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AccountLinkingForm } from "./_components/account-linking-form";
+import { UsernameForm } from "./_components/username-form";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -19,7 +20,18 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
     return null;
   }
 
-  return <AccountLinkingForm user={user} />;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("id", user.id)
+    .single();
+
+  return (
+    <div className="space-y-8">
+      <UsernameForm currentUsername={profile?.full_name} />
+      <AccountLinkingForm user={user} />
+    </div>
+  );
 }
 
 export default async function AccountSettingsPage({ params }: Props) {

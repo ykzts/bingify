@@ -230,5 +230,18 @@
     "spaceSubtitle": "ビンゴスペース",
     "verifyYouTubeButton": "YouTubeアカウントを確認する",
     "verifyingYouTube": "確認中..."
+  },
+  "UsernameSettings": {
+    "description": "アプリ内で表示される名前を設定します。",
+    "errorGeneric": "予期しないエラーが発生しました",
+    "errorUnauthorized": "認証が必要です",
+    "errorUpdateFailed": "ユーザー名の更新に失敗しました",
+    "saveButton": "保存",
+    "saving": "保存中...",
+    "title": "ユーザー名設定",
+    "updateSuccess": "ユーザー名を更新しました",
+    "usernameHelp": "最大50文字まで入力できます",
+    "usernameLabel": "ユーザー名",
+    "usernamePlaceholder": "名前を入力してください"
   }
 }

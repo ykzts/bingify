@@ -230,5 +230,18 @@
     "spaceSubtitle": "Bingo Space",
     "verifyYouTubeButton": "Verify YouTube Account",
     "verifyingYouTube": "Verifying..."
+  },
+  "UsernameSettings": {
+    "description": "Set the name that will be displayed in the app.",
+    "errorGeneric": "An unexpected error occurred",
+    "errorUnauthorized": "Authentication required",
+    "errorUpdateFailed": "Failed to update username",
+    "saveButton": "Save",
+    "saving": "Saving...",
+    "title": "Username Settings",
+    "updateSuccess": "Username updated successfully",
+    "usernameHelp": "Maximum 50 characters",
+    "usernameLabel": "Username",
+    "usernamePlaceholder": "Enter your name"
   }
 }
