@@ -103,7 +103,7 @@
   "Dashboard": {
     "activeSpaceBackToAdmin": "管理画面へ戻る",
     "activeSpaceLabel": "進行中",
-    "activeSpaceParticipants": "👥 {count}人が参加中",
+    "activeSpaceParticipants": "{count}人が参加中",
     "createFormDescription": "必要な情報を入力して、すぐにビンゴ大会を始めましょう。",
     "createFormTitle": "新しいスペースを作成",
     "dividerText": "Dashboard & History",
@@ -111,7 +111,7 @@
     "historyDetails": "詳細",
     "historyNoSpaces": "まだスペースを作成していません",
     "historySpaceName": "スペース名",
-    "historyTitle": "📄 過去の履歴"
+    "historyTitle": "過去の履歴"
   },
   "Errors": {
     "authRequired": "認証が必要です",

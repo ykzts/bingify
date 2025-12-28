@@ -103,7 +103,7 @@
   "Dashboard": {
     "activeSpaceBackToAdmin": "Back to Admin",
     "activeSpaceLabel": "Active",
-    "activeSpaceParticipants": "👥 {count} participants",
+    "activeSpaceParticipants": "{count} participants",
     "createFormDescription": "Fill in the required information to start your bingo event right away.",
     "createFormTitle": "Create New Space",
     "dividerText": "Dashboard & History",
@@ -111,7 +111,7 @@
     "historyDetails": "Details",
     "historyNoSpaces": "No spaces created yet",
     "historySpaceName": "Space Name",
-    "historyTitle": "📄 History"
+    "historyTitle": "History"
   },
   "Errors": {
     "authRequired": "Authentication required",

@@ -304,13 +304,21 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
 
     // Find active space
     let activeSpace: UserSpace | null = null;
-    const activeSpaceData = spaces?.find((s) => s.status === "active");
+    const allActiveSpaces = (spaces ?? []).filter((s) => s.status === "active");
+    const activeSpaceData = allActiveSpaces[0] ?? null;
+
+    if (allActiveSpaces.length > 1) {
+      // Multiple active spaces found; using the most recently created (first in list)
+      console.warn(
+        `Multiple active spaces found for user ${user.id}; using the most recently created one.`
+      );
+    }
 
     if (activeSpaceData) {
       // Get participant count
       const { count } = await supabase
         .from("participants")
-        .select("id", { count: "exact", head: true })
+        .select("*", { count: "exact", head: true })
         .eq("space_id", activeSpaceData.id);
 
       activeSpace = {

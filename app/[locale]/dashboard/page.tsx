@@ -1,4 +1,5 @@
-import { format } from "date-fns/format";
+import { format } from "date-fns";
+import { FileText, Users } from "lucide-react";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getUserSpaces } from "./actions";
@@ -13,7 +14,7 @@ export default async function DashboardPage({ params }: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations("Dashboard");
-  const { activeSpace, spaces } = await getUserSpaces();
+  const { activeSpace, spaces, error } = await getUserSpaces();
 
   // Locale-specific date format
   const dateFormat = locale === "ja" ? "yyyy/MM/dd" : "MMM dd, yyyy";
@@ -37,7 +38,7 @@ export default async function DashboardPage({ params }: Props) {
 
       {/* --- Divider --- */}
       <div className="relative">
-        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+        <div aria-hidden="true" className="absolute inset-0 flex items-center">
           <div className="w-full border-gray-200 border-t" />
         </div>
         <div className="relative flex justify-center">
@@ -47,13 +48,24 @@ export default async function DashboardPage({ params }: Props) {
         </div>
       </div>
 
+      {/* Show error if data fetch failed */}
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-red-800 text-sm">{error}</p>
+        </div>
+      )}
+
       {/* --- SECTION 2: Active Space (conditional) --- */}
       {activeSpace && (
         <section className="space-y-4">
           <div className="flex flex-col items-center justify-between gap-4 rounded-lg border border-green-200 bg-green-50 p-4 shadow-sm sm:flex-row">
             <div className="flex items-center gap-4">
               {/* Pulse Animation Icon */}
-              <span className="relative flex h-3 w-3">
+              <span
+                aria-hidden="true"
+                className="relative flex h-3 w-3"
+                title="Active space indicator"
+              >
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
                 <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500" />
               </span>
@@ -64,7 +76,8 @@ export default async function DashboardPage({ params }: Props) {
                     ({t("activeSpaceLabel")})
                   </span>
                 </p>
-                <p className="text-green-700 text-xs">
+                <p className="flex items-center gap-1 text-green-700 text-xs">
+                  <Users className="h-3 w-3" />
                   {t("activeSpaceParticipants", {
                     count: activeSpace.participant_count || 0,
                   })}
@@ -83,7 +96,8 @@ export default async function DashboardPage({ params }: Props) {
 
       {/* --- SECTION 3: History --- */}
       <section>
-        <h2 className="mb-4 font-bold text-gray-800 text-lg">
+        <h2 className="mb-4 flex items-center gap-2 font-bold text-gray-800 text-lg">
+          <FileText className="h-5 w-5" />
           {t("historyTitle")}
         </h2>
         {spaces.length === 0 ? (
@@ -107,14 +121,19 @@ export default async function DashboardPage({ params }: Props) {
               <tbody className="divide-y divide-gray-100">
                 {spaces.map((space) => (
                   <tr
-                    key={space.id}
                     className="transition-colors hover:bg-gray-50"
+                    key={space.id}
                   >
                     <td className="px-4 py-3 font-medium text-gray-900">
                       {space.share_key}
                     </td>
                     <td className="px-4 py-3 text-gray-500">
-                      {format(new Date(space.created_at), dateFormat)}
+                      {(() => {
+                        const date = new Date(space.created_at);
+                        return Number.isNaN(date.getTime())
+                          ? "-"
+                          : format(date, dateFormat);
+                      })()}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link
