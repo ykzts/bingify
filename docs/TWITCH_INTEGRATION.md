@@ -28,24 +28,21 @@
 
 #### Twitch API連携 (`lib/twitch.ts`)
 
-- Twitch Helix APIを使用した2つの検証関数:
+- **Twurpleライブラリを使用**: `@twurple/api`および`@twurple/auth`（v8.0.2）
+- 2つの検証関数:
   - `checkFollowStatus()`: フォロー状態を確認
   - `checkSubStatus()`: サブスクリプション状態を確認
-- 環境変数`NEXT_PUBLIC_TWITCH_CLIENT_ID`を使用
+- 環境変数`TWITCH_CLIENT_ID`を使用（サーバーサイドのみ）
 - 各関数は `{ isFollowing/isSubscribed: boolean, error?: string }` を返却
 - 共通のバリデーション関数でコード重複を削減
+- `createApiClient()`ヘルパー関数でAPIクライアントを作成
 
-##### API エンドポイント
+##### Twurple使用の利点
 
-1. **フォロー確認**
-   - エンドポイント: `https://api.twitch.tv/helix/channels/followers`
-   - パラメータ: `user_id`, `broadcaster_id`
-   - 戻り値: フォローしている場合は配列に1件以上のデータ
-
-2. **サブスク確認**
-   - エンドポイント: `https://api.twitch.tv/helix/subscriptions/user`
-   - パラメータ: `user_id`, `broadcaster_id`
-   - 戻り値: サブスクしている場合は配列に1件以上のデータ（404=未登録）
+1. **型安全性**: TypeScriptの完全な型定義
+2. **エラーハンドリング**: 自動的なエラーハンドリングとリトライ
+3. **メンテナンス性**: Twitch公式の変更に追従
+4. **コード削減**: fetch実装より簡潔
 
 #### サーバーアクション (`app/[locale]/spaces/actions.ts`)
 
@@ -105,9 +102,11 @@ Twitch API連携の包括的なテスト (`lib/__tests__/twitch.test.ts`):
 `.env.local.example`に以下を追加:
 
 ```env
-# Twitch API設定
-NEXT_PUBLIC_TWITCH_CLIENT_ID=
+# Twitch API設定（サーバーサイドのみ）
+TWITCH_CLIENT_ID=
 ```
+
+**セキュリティ注意**: `NEXT_PUBLIC_`プレフィックスを使用しないことで、クライアントサイドのバンドルにClient IDが含まれないようにしています。
 
 ## 実装が必要な残りの作業
 
