@@ -83,14 +83,11 @@ export function CreateSpaceForm() {
   }, [state, router]);
 
   return (
-    <div className="mx-auto max-w-2xl p-8">
-      <h1 className="mb-8 font-bold text-3xl">新しいスペースを作成</h1>
-
-      <form action={formAction} className="space-y-6">
-        <div>
-          <label className="mb-2 block font-medium text-sm" htmlFor="share_key">
-            共有キー
-          </label>
+    <form action={formAction} className="space-y-6">
+      <div>
+        <label className="mb-2 block font-medium text-sm" htmlFor="share_key">
+          共有キー
+        </label>
 
           <div className="mb-2 flex items-center gap-2">
             <div className="relative flex-1">
@@ -224,6 +221,5 @@ export function CreateSpaceForm() {
           {isPending ? "作成中..." : "スペースを作成"}
         </button>
       </form>
-    </div>
   );
 }

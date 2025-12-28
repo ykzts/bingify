@@ -254,3 +254,81 @@ export async function regenerateViewToken(
     };
   }
 }
+
+export interface UserSpace {
+  created_at: string;
+  id: string;
+  participant_count?: number;
+  share_key: string;
+  status: string;
+}
+
+export interface UserSpacesResult {
+  activeSpace: UserSpace | null;
+  error?: string;
+  spaces: UserSpace[];
+}
+
+export async function getUserSpaces(): Promise<UserSpacesResult> {
+  try {
+    const supabase = await createClient();
+
+    // Get current user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        activeSpace: null,
+        error: "Authentication required",
+        spaces: [],
+      };
+    }
+
+    // Fetch user's spaces ordered by creation date
+    const { data: spaces, error } = await supabase
+      .from("spaces")
+      .select("id, share_key, status, created_at")
+      .eq("owner_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching spaces:", error);
+      return {
+        activeSpace: null,
+        error: "Failed to fetch spaces",
+        spaces: [],
+      };
+    }
+
+    // Find active space
+    let activeSpace: UserSpace | null = null;
+    const activeSpaceData = spaces?.find((s) => s.status === "active");
+
+    if (activeSpaceData) {
+      // Get participant count
+      const { count } = await supabase
+        .from("participants")
+        .select("*", { count: "exact", head: true })
+        .eq("space_id", activeSpaceData.id);
+
+      activeSpace = {
+        ...activeSpaceData,
+        participant_count: count || 0,
+      };
+    }
+
+    return {
+      activeSpace,
+      spaces: spaces || [],
+    };
+  } catch (error) {
+    console.error("Error in getUserSpaces:", error);
+    return {
+      activeSpace: null,
+      error: "An unexpected error occurred",
+      spaces: [],
+    };
+  }
+}
