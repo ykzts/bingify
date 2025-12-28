@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
 import { claimAdmin } from "@/app/[locale]/admin/actions";
+import { useRouter } from "@/i18n/navigation";
 
 export function ClaimAdminButton() {
   const t = useTranslations("Setup");
