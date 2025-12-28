@@ -143,13 +143,15 @@ export async function createSpace(
     const viewToken = generateSecureToken();
 
     // Build gatekeeper_rules if YouTube channel ID is provided
-    const gatekeeperRules: {
+    let gatekeeperRules: {
       youtube?: { channelId: string; required: boolean };
-    } = {};
+    } | null = null;
     if (youtubeChannelId) {
-      gatekeeperRules.youtube = {
-        channelId: youtubeChannelId,
-        required: true,
+      gatekeeperRules = {
+        youtube: {
+          channelId: youtubeChannelId,
+          required: true,
+        },
       };
     }
 

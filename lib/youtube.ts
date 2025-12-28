@@ -35,7 +35,6 @@ export async function checkSubscriptionStatus(
       isSubscribed,
     };
   } catch (error) {
-    console.error("Error checking YouTube subscription:", error);
     return {
       error: error instanceof Error ? error.message : "Unknown error",
       isSubscribed: false,

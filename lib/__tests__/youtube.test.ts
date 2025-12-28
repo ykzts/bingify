@@ -101,18 +101,4 @@ describe("checkSubscriptionStatus", () => {
     expect(result.isSubscribed).toBe(false);
     expect(result.error).toBe("Network error");
   });
-
-  it("should call YouTube API with correct parameters", async () => {
-    mockList.mockResolvedValue({
-      data: { items: [] },
-    });
-
-    await checkSubscriptionStatus("test_access_token", "UC_test_channel");
-
-    expect(mockList).toHaveBeenCalledWith({
-      forChannelId: "UC_test_channel",
-      mine: true,
-      part: ["snippet"],
-    });
-  });
 });

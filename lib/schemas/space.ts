@@ -21,7 +21,7 @@ export const youtubeChannelIdSchema = z
       YOUTUBE_CHANNEL_ID_REGEX.test(value),
     {
       message:
-        "Invalid YouTube Channel ID format. Channel IDs start with 'UC' followed by 22 characters.",
+        "YouTubeチャンネルIDの形式が正しくありません。'UC'で始まる24文字である必要があります。",
     }
   );
 
