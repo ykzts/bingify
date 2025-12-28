@@ -1,11 +1,10 @@
+import "../../../globals.css";
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
-import {
-  BackgroundApplier,
-  BackgroundProvider,
-} from "./_context/background-context";
+import { cn } from "@/lib/utils";
+import { BackgroundProvider, ColoredHtml } from "./_context/background-context";
 
 const nunito = Nunito({
   display: "swap",
@@ -31,15 +30,14 @@ export default async function ScreenLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
-      <body className={`${nunito.variable} antialiased`}>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <BackgroundProvider>
-            <BackgroundApplier />
+    <BackgroundProvider>
+      <ColoredHtml className={cn("antialiased", nunito.variable)} lang={locale}>
+        <body className="bg-transparent">
+          <NextIntlClientProvider locale={locale} messages={messages}>
             {children}
-          </BackgroundProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+          </NextIntlClientProvider>
+        </body>
+      </ColoredHtml>
+    </BackgroundProvider>
   );
 }
