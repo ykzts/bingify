@@ -64,6 +64,95 @@ async function verifyAdminRole(): Promise<{
 }
 
 /**
+ * Check if any admin user exists in the system
+ */
+export async function hasAdminUser(): Promise<boolean> {
+  try {
+    const adminClient = createAdminClient();
+    const { count, error } = await adminClient
+      .from("profiles")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "admin");
+
+    if (error) {
+      console.error("Failed to check admin existence:", error);
+      return false;
+    }
+
+    return (count ?? 0) > 0;
+  } catch (error) {
+    console.error("Error in hasAdminUser:", error);
+    return false;
+  }
+}
+
+/**
+ * Claim admin role for the current user (only allowed when no admin exists)
+ */
+export async function claimAdmin(): Promise<AdminActionResult> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "errorUnauthorized",
+        success: false,
+      };
+    }
+
+    // Double-check that no admin exists using admin client
+    const adminClient = createAdminClient();
+    const { count: adminCount, error: countError } = await adminClient
+      .from("profiles")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "admin");
+
+    if (countError) {
+      console.error("Failed to check admin count:", countError);
+      return {
+        error: "errorGeneric",
+        success: false,
+      };
+    }
+
+    // If an admin already exists, prevent setup
+    if ((adminCount ?? 0) > 0) {
+      return {
+        error: "errorSetupCompleted",
+        success: false,
+      };
+    }
+
+    // Grant admin role to the current user
+    const { error: updateError } = await adminClient
+      .from("profiles")
+      .update({ role: "admin" })
+      .eq("id", user.id);
+
+    if (updateError) {
+      console.error("Failed to grant admin role:", updateError);
+      return {
+        error: "errorGeneric",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error in claimAdmin:", error);
+    return {
+      error: "errorGeneric",
+      success: false,
+    };
+  }
+}
+
+/**
  * Force delete a space (bypassing RLS)
  */
 export async function forceDeleteSpace(
