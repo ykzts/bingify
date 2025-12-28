@@ -21,10 +21,10 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground shadow hover:opacity-90",
         destructive: "bg-destructive text-white shadow-sm hover:opacity-90",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        ghost: "hover:bg-gray-100",
         link: "text-primary underline-offset-4 hover:underline",
-        outline: "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground shadow-sm hover:opacity-80",
+        outline: "border border-gray-300 bg-white shadow-sm hover:bg-gray-50",
+        secondary: "bg-secondary text-gray-900 shadow-sm hover:opacity-80",
       },
     },
   }
