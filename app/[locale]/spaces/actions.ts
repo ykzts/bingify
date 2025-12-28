@@ -15,6 +15,7 @@ export interface SpaceInfo {
   owner_id: string | null;
   share_key: string;
   status: string | null;
+  youtube_channel_id: string | null;
 }
 
 export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
@@ -27,7 +28,9 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
 
     const { data, error } = await supabase
       .from("spaces")
-      .select("id, share_key, status, owner_id, max_participants")
+      .select(
+        "id, share_key, status, owner_id, max_participants, youtube_channel_id"
+      )
       .eq("id", spaceId)
       .single();
 
@@ -41,7 +44,37 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
   }
 }
 
-export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
+async function verifyYouTubeSubscription(
+  youtubeAccessToken: string | undefined,
+  youtubeChannelId: string
+): Promise<JoinSpaceState | null> {
+  if (!youtubeAccessToken) {
+    return {
+      errorKey: "errorYouTubeVerificationRequired",
+      success: false,
+    };
+  }
+
+  const { checkSubscriptionStatus } = await import("@/lib/youtube");
+  const result = await checkSubscriptionStatus(
+    youtubeAccessToken,
+    youtubeChannelId
+  );
+
+  if (!result.isSubscribed) {
+    return {
+      errorKey: "errorYouTubeNotSubscribed",
+      success: false,
+    };
+  }
+
+  return null;
+}
+
+export async function joinSpace(
+  spaceId: string,
+  youtubeAccessToken?: string
+): Promise<JoinSpaceState> {
   try {
     // Validate UUID format
     if (!isValidUUID(spaceId)) {
@@ -68,7 +101,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
     // Check if space exists and is active
     const { data: space } = await supabase
       .from("spaces")
-      .select("id, status")
+      .select("id, status, youtube_channel_id")
       .eq("id", spaceId)
       .single();
 
@@ -84,6 +117,17 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
         errorKey: "errorSpaceClosed",
         success: false,
       };
+    }
+
+    // Check YouTube subscription requirement if configured
+    if (space.youtube_channel_id) {
+      const verificationResult = await verifyYouTubeSubscription(
+        youtubeAccessToken,
+        space.youtube_channel_id
+      );
+      if (verificationResult) {
+        return verificationResult;
+      }
     }
 
     // Try to join the space - rely on unique constraint for duplicate prevention

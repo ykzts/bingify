@@ -183,6 +183,15 @@ export function SpaceParticipation({
 
   return (
     <div className="space-y-4">
+      {/* YouTube Requirement Notice */}
+      {spaceInfo.youtube_channel_id && !hasJoined && (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+          <p className="text-blue-800 text-sm">
+            {t("errorYouTubeVerificationRequired")}
+          </p>
+        </div>
+      )}
+
       {/* Participant Count */}
       {participantInfo && (
         <div className="flex items-center gap-2 text-gray-600">
