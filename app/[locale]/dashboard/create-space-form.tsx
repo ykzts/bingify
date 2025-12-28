@@ -231,7 +231,7 @@ export function CreateSpaceForm() {
               value={youtubeRequirement}
             >
               <SelectTrigger id="youtube_requirement">
-                <SelectValue />
+                <SelectValue placeholder={t("youtubeRequirementNone")} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">
@@ -281,7 +281,7 @@ export function CreateSpaceForm() {
               value={twitchRequirement}
             >
               <SelectTrigger id="twitch_requirement">
-                <SelectValue />
+                <SelectValue placeholder={t("twitchRequirementNone")} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">

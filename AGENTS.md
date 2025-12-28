@@ -13,7 +13,7 @@
 ## UI Framework
 
 - **Shadcn/ui** + **Tailwind CSS** を使用。
-- Theme Color: **Purple** (Primary: `#a78bfa` / HSL: `263 70% 76%`)。
+- Theme Color: **Purple** (Primary: `#a78bfa`)。
 - Icons: **Lucide React**。
 - コンポーネントは `@/components/ui` に配置。
 - メインアクションのボタンには `primary` バリアント（デフォルト）を使用し、ブランド一貫性を保つ。
