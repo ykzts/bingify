@@ -259,6 +259,7 @@ async function verifyGatekeeperRules(
   return null;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Space joining requires expiration check, gatekeeper verification, and quota validation
 export async function joinSpace(
   spaceId: string,
   youtubeAccessToken?: string,

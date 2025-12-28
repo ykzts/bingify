@@ -1,15 +1,15 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import type { SystemSettings } from "@/lib/schemas/system-settings";
+import { useActionState, useEffect } from "react";
 import {
   type UpdateSystemSettingsState,
   updateSystemSettings,
 } from "@/app/[locale]/admin/settings/actions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { SystemSettings } from "@/lib/schemas/system-settings";
 
 interface Props {
   initialSettings?: SystemSettings;

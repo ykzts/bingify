@@ -54,7 +54,6 @@ export async function GET(request: NextRequest) {
     );
 
     const expiredCount = expirationResult?.[0]?.expired_count || 0;
-    const expiredSpaceIds = expirationResult?.[0]?.expired_space_ids || [];
 
     console.log(
       `Marked ${expiredCount} space(s) as expired based on system settings`

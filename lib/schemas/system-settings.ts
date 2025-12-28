@@ -5,7 +5,7 @@ export const systemSettingsSchema = z.object({
     .number()
     .int("整数を入力してください")
     .min(1, "1人以上を指定してください")
-    .max(10000, "最大10000人までです"),
+    .max(10_000, "最大10000人までです"),
   max_spaces_per_user: z
     .number()
     .int("整数を入力してください")

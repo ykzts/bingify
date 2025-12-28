@@ -17,7 +17,9 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
 
     const { data, error } = await supabase
       .from("system_settings")
-      .select("max_participants_per_space, max_spaces_per_user, space_expiration_hours")
+      .select(
+        "max_participants_per_space, max_spaces_per_user, space_expiration_hours"
+      )
       .eq("id", 1)
       .single();
 
@@ -77,7 +79,9 @@ export async function updateSystemSettings(
     }
 
     // Parse and validate form data
-    const maxParticipantsRaw = formData.get("max_participants_per_space") as string;
+    const maxParticipantsRaw = formData.get(
+      "max_participants_per_space"
+    ) as string;
     const maxSpacesRaw = formData.get("max_spaces_per_user") as string;
     const expirationHoursRaw = formData.get("space_expiration_hours") as string;
 
@@ -94,7 +98,7 @@ export async function updateSystemSettings(
       };
     }
 
-    const { data: settings, error } = await supabase
+    const { error } = await supabase
       .from("system_settings")
       .update(validation.data)
       .eq("id", 1)

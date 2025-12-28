@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import { getSystemSettings } from "@/app/[locale]/admin/settings/actions";
 import { SystemSettingsForm } from "@/app/[locale]/admin/settings/_components/system-settings-form";
+import { getSystemSettings } from "@/app/[locale]/admin/settings/actions";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -31,7 +31,9 @@ export default async function AdminSettingsPage({ params }: Props) {
       </div>
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h3 className="mb-4 font-semibold text-lg">{t("resourceLimitsTitle")}</h3>
+        <h3 className="mb-4 font-semibold text-lg">
+          {t("resourceLimitsTitle")}
+        </h3>
         <SystemSettingsForm initialSettings={settings} />
       </div>
     </div>
