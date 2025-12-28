@@ -184,8 +184,20 @@
     "title": "Bingify - Turn Every Screen Into A Venue of Excitement."
   },
   "ScreenView": {
+    "background": "Background",
+    "bgBlue": "Blue",
+    "bgDefault": "Default",
+    "bgGreen": "Green",
+    "bgTransparent": "Transparent",
+    "calledNumbers": "Called Numbers",
+    "displayMode": "Display Mode",
+    "displaySettings": "Display Settings",
     "invalidToken": "This URL is invalid or has been regenerated.",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "modeFull": "Full",
+    "modeMinimal": "Minimal",
+    "scanToJoin": "Scan to Join",
+    "waitingForNumbers": "Waiting for numbers..."
   },
   "Setup": {
     "claimButton": "Claim Admin Role",

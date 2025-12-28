@@ -184,8 +184,20 @@
     "title": "Bingify - すべての画面を、熱狂の会場に。"
   },
   "ScreenView": {
+    "background": "背景",
+    "bgBlue": "青",
+    "bgDefault": "デフォルト",
+    "bgGreen": "緑",
+    "bgTransparent": "透過",
+    "calledNumbers": "呼ばれた番号",
+    "displayMode": "表示モード",
+    "displaySettings": "表示設定",
     "invalidToken": "このURLは無効か、再生成されています。",
-    "loading": "読み込み中..."
+    "loading": "読み込み中...",
+    "modeFull": "フル",
+    "modeMinimal": "最小",
+    "scanToJoin": "スキャンして参加",
+    "waitingForNumbers": "番号の呼び出しを待っています..."
   },
   "Setup": {
     "claimButton": "管理者権限を取得",

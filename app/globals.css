@@ -17,6 +17,9 @@
   --color-text-main: #334155; /* Slate 700 */
   --color-text-muted: #94a3b8; /* Slate 400 */
 
+  --background-color-chroma-key-green: #00ff00; /* Chroma Key Green */
+  --background-color-chroma-key-blue: #0000ff; /* Chroma Key Blue */
+
   /* Brand Colors for OAuth */
   --color-twitch: #9146ff;
   --color-twitch-hover: #7d3be6;
