@@ -65,25 +65,21 @@ async function verifyAdminRole(): Promise<{
 
 /**
  * Check if any admin user exists in the system
+ * @throws Error if unable to determine admin existence
  */
 export async function hasAdminUser(): Promise<boolean> {
-  try {
-    const adminClient = createAdminClient();
-    const { count, error } = await adminClient
-      .from("profiles")
-      .select("id", { count: "exact", head: true })
-      .eq("role", "admin");
+  const adminClient = createAdminClient();
+  const { count, error } = await adminClient
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("role", "admin");
 
-    if (error) {
-      console.error("Failed to check admin existence:", error);
-      return false;
-    }
-
-    return (count ?? 0) > 0;
-  } catch (error) {
-    console.error("Error in hasAdminUser:", error);
-    return false;
+  if (error) {
+    console.error("Failed to check admin existence:", error);
+    throw new Error("Failed to determine admin existence");
   }
+
+  return (count ?? 0) > 0;
 }
 
 /**
@@ -127,13 +123,22 @@ export async function claimAdmin(): Promise<AdminActionResult> {
     }
 
     // Grant admin role to the current user
-    const { error: updateError } = await adminClient
+    const { error: updateError, count: updateCount } = await adminClient
       .from("profiles")
       .update({ role: "admin" })
       .eq("id", user.id);
 
     if (updateError) {
       console.error("Failed to grant admin role:", updateError);
+      return {
+        error: "errorGeneric",
+        success: false,
+      };
+    }
+
+    // Verify that the profile was actually updated
+    if (updateCount === 0) {
+      console.error("User profile not found:", user.id);
       return {
         error: "errorGeneric",
         success: false,

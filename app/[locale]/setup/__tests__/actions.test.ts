@@ -52,7 +52,7 @@ describe("Setup Actions", () => {
       expect(result).toBe(false);
     });
 
-    it("should return false on error", async () => {
+    it("should throw error on database error", async () => {
       const mockAdminClient = {
         from: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
@@ -66,8 +66,9 @@ describe("Setup Actions", () => {
 
       vi.mocked(createAdminClient).mockReturnValue(mockAdminClient as any);
 
-      const result = await hasAdminUser();
-      expect(result).toBe(false);
+      await expect(hasAdminUser()).rejects.toThrow(
+        "Failed to determine admin existence"
+      );
     });
   });
 
@@ -95,6 +96,7 @@ describe("Setup Actions", () => {
               }),
               update: vi.fn().mockReturnValue({
                 eq: vi.fn().mockResolvedValue({
+                  count: 1,
                   error: null,
                 }),
               }),
@@ -181,6 +183,46 @@ describe("Setup Actions", () => {
               update: vi.fn().mockReturnValue({
                 eq: vi.fn().mockResolvedValue({
                   error: new Error("Update failed"),
+                }),
+              }),
+            };
+          }
+        }),
+      };
+
+      vi.mocked(createClient).mockResolvedValue(mockClient as any);
+      vi.mocked(createAdminClient).mockReturnValue(mockAdminClient as any);
+
+      const result = await claimAdmin();
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("errorGeneric");
+    });
+
+    it("should return error when profile does not exist", async () => {
+      const userId = "test-user-id";
+
+      const mockClient = {
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: userId } },
+          }),
+        },
+      };
+
+      const mockAdminClient = {
+        from: vi.fn().mockImplementation((table: string) => {
+          if (table === "profiles") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({
+                  count: 0,
+                  error: null,
+                }),
+              }),
+              update: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({
+                  count: 0,
+                  error: null,
                 }),
               }),
             };
