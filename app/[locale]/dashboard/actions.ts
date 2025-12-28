@@ -3,7 +3,11 @@
 import { randomUUID } from "node:crypto";
 import { format } from "date-fns";
 import { generateSecureToken } from "@/lib/crypto";
-import { spaceSchema, youtubeChannelIdSchema } from "@/lib/schemas/space";
+import {
+  emailAllowlistSchema,
+  spaceSchema,
+  youtubeChannelIdSchema,
+} from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 
 const MAX_SLUG_SUGGESTIONS = 10;
@@ -58,6 +62,7 @@ async function findAvailableSlug(
   return null;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Form validation and space creation require multiple checks
 export async function createSpace(
   _prevState: CreateSpaceState,
   formData: FormData
@@ -66,6 +71,7 @@ export async function createSpace(
     const shareKey = formData.get("share_key") as string;
     const youtubeChannelIdRaw =
       (formData.get("youtube_channel_id") as string) || "";
+    const emailAllowlistRaw = (formData.get("email_allowlist") as string) || "";
 
     // Validate input with Zod
     const validation = spaceSchema.safeParse({ slug: shareKey });
@@ -88,6 +94,19 @@ export async function createSpace(
         };
       }
       youtubeChannelId = channelIdValidation.data;
+    }
+
+    // Validate email allowlist if provided
+    let emailAllowlist: string[] = [];
+    if (emailAllowlistRaw.trim()) {
+      const emailValidation = emailAllowlistSchema.safeParse(emailAllowlistRaw);
+      if (!emailValidation.success) {
+        return {
+          error: emailValidation.error.issues[0].message,
+          success: false,
+        };
+      }
+      emailAllowlist = emailValidation.data;
     }
 
     // Generate full slug with date suffix
@@ -142,17 +161,25 @@ export async function createSpace(
     const uuid = randomUUID();
     const viewToken = generateSecureToken();
 
-    // Build gatekeeper_rules if YouTube channel ID is provided
+    // Build gatekeeper_rules if YouTube channel ID or email allowlist is provided
     let gatekeeperRules: {
+      email?: { allowed: string[] };
       youtube?: { channelId: string; required: boolean };
     } | null = null;
-    if (youtubeChannelId) {
-      gatekeeperRules = {
-        youtube: {
+
+    if (youtubeChannelId || emailAllowlist.length > 0) {
+      gatekeeperRules = {};
+      if (youtubeChannelId) {
+        gatekeeperRules.youtube = {
           channelId: youtubeChannelId,
           required: true,
-        },
-      };
+        };
+      }
+      if (emailAllowlist.length > 0) {
+        gatekeeperRules.email = {
+          allowed: emailAllowlist,
+        };
+      }
     }
 
     const { error } = await supabase
