@@ -7,6 +7,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { useBackground } from "../../_context/background-context";
 
 interface CalledNumber {
   called_at: string;
@@ -60,39 +61,15 @@ export function ScreenDisplay({
   const [mode, setMode] = useState<DisplayMode>(
     normalizeDisplayMode(initialMode)
   );
-  const [bg, setBg] = useState<BackgroundType>(
-    normalizeBackgroundType(initialBg)
-  );
   const [showSettings, setShowSettings] = useState(false);
 
-  // Apply background color to body element
+  // Use background context instead of local state
+  const { background, setBackground } = useBackground();
+
+  // Initialize background from props
   useEffect(() => {
-    const body = document.body;
-    const html = document.documentElement;
-
-    let bgColor = "#020617"; // slate-950
-    if (bg === "transparent") {
-      bgColor = "transparent";
-    } else if (bg === "green") {
-      bgColor = "#00FF00";
-    } else if (bg === "blue") {
-      bgColor = "#0000FF";
-    }
-
-    // Store original values
-    const originalBodyBg = body.style.backgroundColor;
-    const originalHtmlBg = html.style.backgroundColor;
-
-    // Apply background
-    body.style.backgroundColor = bgColor;
-    html.style.backgroundColor = bgColor;
-
-    // Cleanup on unmount
-    return () => {
-      body.style.backgroundColor = originalBodyBg;
-      html.style.backgroundColor = originalHtmlBg;
-    };
-  }, [bg]);
+    setBackground(normalizeBackgroundType(initialBg));
+  }, [initialBg, setBackground]);
 
   useEffect(() => {
     let isMounted = true;
@@ -330,11 +307,11 @@ export function ScreenDisplay({
                 <button
                   className={cn(
                     "rounded px-2 py-1 transition",
-                    bg === "default"
+                    background === "default"
                       ? "bg-blue-600"
                       : "bg-gray-700 hover:bg-gray-600"
                   )}
-                  onClick={() => setBg("default")}
+                  onClick={() => setBackground("default")}
                   type="button"
                 >
                   {t("bgDefault")}
@@ -342,11 +319,11 @@ export function ScreenDisplay({
                 <button
                   className={cn(
                     "rounded px-2 py-1 transition",
-                    bg === "transparent"
+                    background === "transparent"
                       ? "bg-blue-600"
                       : "bg-gray-700 hover:bg-gray-600"
                   )}
-                  onClick={() => setBg("transparent")}
+                  onClick={() => setBackground("transparent")}
                   type="button"
                 >
                   {t("bgTransparent")}
@@ -354,11 +331,11 @@ export function ScreenDisplay({
                 <button
                   className={cn(
                     "rounded px-2 py-1 transition",
-                    bg === "green"
+                    background === "green"
                       ? "bg-blue-600"
                       : "bg-gray-700 hover:bg-gray-600"
                   )}
-                  onClick={() => setBg("green")}
+                  onClick={() => setBackground("green")}
                   type="button"
                 >
                   {t("bgGreen")}
@@ -366,11 +343,11 @@ export function ScreenDisplay({
                 <button
                   className={cn(
                     "rounded px-2 py-1 transition",
-                    bg === "blue"
+                    background === "blue"
                       ? "bg-blue-600"
                       : "bg-gray-700 hover:bg-gray-600"
                   )}
-                  onClick={() => setBg("blue")}
+                  onClick={() => setBackground("blue")}
                   type="button"
                 >
                   {t("bgBlue")}
