@@ -77,7 +77,14 @@ export async function updateUsername(
   formData: FormData
 ): Promise<UpdateUsernameState> {
   try {
-    const username = formData.get("username") as string;
+    const rawUsername = formData.get("username");
+    if (typeof rawUsername !== "string") {
+      return {
+        errorKey: "errorUsernameRequired",
+        success: false,
+      };
+    }
+    const username = rawUsername;
 
     const validation = usernameSchema.safeParse({ username });
     if (!validation.success) {
@@ -118,7 +125,6 @@ export async function updateUsername(
       .from("profiles")
       .update({
         full_name: validation.data.username,
-        updated_at: new Date().toISOString(),
       })
       .eq("id", user.id);
 

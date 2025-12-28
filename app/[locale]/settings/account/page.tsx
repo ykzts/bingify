@@ -20,11 +20,15 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
     return null;
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("full_name")
     .eq("id", user.id)
     .single();
+
+  if (profileError) {
+    console.error("Error fetching profile for user", user.id, profileError);
+  }
 
   return (
     <div className="space-y-8">

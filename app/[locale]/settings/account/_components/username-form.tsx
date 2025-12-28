@@ -23,6 +23,10 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
   });
 
   useEffect(() => {
+    setUsername(currentUsername || "");
+  }, [currentUsername]);
+
+  useEffect(() => {
     if (state.success) {
       router.refresh();
     }
@@ -57,7 +61,11 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
         </div>
 
         {(state.error || state.errorKey) && (
-          <div className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-red-800 text-sm">
+          <div
+            aria-live="polite"
+            className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-red-800 text-sm"
+            role="alert"
+          >
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span>
               {state.errorKey
@@ -68,7 +76,11 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
         )}
 
         {state.success && (
-          <div className="flex items-center gap-2 rounded-md bg-green-50 p-3 text-green-800 text-sm">
+          <div
+            aria-live="polite"
+            className="flex items-center gap-2 rounded-md bg-green-50 p-3 text-green-800 text-sm"
+            role="status"
+          >
             <CheckCircle className="h-4 w-4 flex-shrink-0" />
             <span>{t("updateSuccess")}</span>
           </div>
