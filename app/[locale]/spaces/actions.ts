@@ -19,8 +19,9 @@ export interface GatekeeperRules {
   };
   twitch?: {
     broadcasterId: string;
-    requireFollow?: boolean;
-    requireSub?: boolean;
+    requirement?: string; // "follower" or "subscriber"
+    requireFollow?: boolean; // Legacy format, for backward compatibility
+    requireSub?: boolean; // Legacy format, for backward compatibility
   };
   youtube?: {
     channelId: string;
@@ -231,19 +232,27 @@ async function verifyGatekeeperRules(
   }
 
   // Check Twitch requirements if configured
-  if (
-    gatekeeperRules?.twitch?.broadcasterId &&
-    (gatekeeperRules.twitch.requireFollow || gatekeeperRules.twitch.requireSub)
-  ) {
-    const verificationResult = await verifyTwitchRequirements(
-      twitchAccessToken,
-      twitchUserId,
-      gatekeeperRules.twitch.broadcasterId,
-      Boolean(gatekeeperRules.twitch.requireFollow),
-      Boolean(gatekeeperRules.twitch.requireSub)
-    );
-    if (verificationResult) {
-      return verificationResult;
+  if (gatekeeperRules?.twitch?.broadcasterId) {
+    // Support both new format (requirement) and legacy format (requireFollow/requireSub)
+    const requirement = gatekeeperRules.twitch.requirement;
+    const requireFollow =
+      requirement === "follower" ||
+      Boolean(gatekeeperRules.twitch.requireFollow);
+    const requireSub =
+      requirement === "subscriber" ||
+      Boolean(gatekeeperRules.twitch.requireSub);
+
+    if (requireFollow || requireSub) {
+      const verificationResult = await verifyTwitchRequirements(
+        twitchAccessToken,
+        twitchUserId,
+        gatekeeperRules.twitch.broadcasterId,
+        requireFollow,
+        requireSub
+      );
+      if (verificationResult) {
+        return verificationResult;
+      }
     }
   }
 

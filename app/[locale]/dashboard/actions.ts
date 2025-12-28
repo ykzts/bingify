@@ -244,8 +244,7 @@ export async function createSpace(
       email?: { allowed: string[] };
       twitch?: {
         broadcasterId: string;
-        requireFollow?: boolean;
-        requireSub?: boolean;
+        requirement: string;
       };
       youtube?: { channelId: string; requirement: string };
     } | null = null;
@@ -267,8 +266,7 @@ export async function createSpace(
       if (hasTwitchRule) {
         gatekeeperRules.twitch = {
           broadcasterId: twitchBroadcasterId as string,
-          requireFollow: twitchRequirement === "follower",
-          requireSub: twitchRequirement === "subscriber",
+          requirement: twitchRequirement,
         };
       }
 

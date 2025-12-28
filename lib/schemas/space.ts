@@ -52,11 +52,7 @@ export const twitchBroadcasterIdSchema = z
   );
 
 // YouTube requirement levels
-export const youtubeRequirementSchema = z.enum([
-  "none",
-  "subscriber",
-  "member",
-]);
+export const youtubeRequirementSchema = z.enum(["none", "subscriber"]);
 
 // Twitch requirement levels
 export const twitchRequirementSchema = z.enum([

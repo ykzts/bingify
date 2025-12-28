@@ -220,14 +220,19 @@ export function CreateSpaceForm() {
               disabled={isPending}
               id="youtube_requirement"
               name="youtube_requirement"
-              onChange={(e) => setYoutubeRequirement(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setYoutubeRequirement(value);
+                if (value === "none") {
+                  setYoutubeChannelId("");
+                }
+              }}
               value={youtubeRequirement}
             >
               <option value="none">{t("youtubeRequirementNone")}</option>
               <option value="subscriber">
                 {t("youtubeRequirementSubscriber")}
               </option>
-              <option value="member">{t("youtubeRequirementMember")}</option>
             </select>
           </div>
 
@@ -268,7 +273,13 @@ export function CreateSpaceForm() {
               disabled={isPending}
               id="twitch_requirement"
               name="twitch_requirement"
-              onChange={(e) => setTwitchRequirement(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setTwitchRequirement(value);
+                if (value === "none") {
+                  setTwitchBroadcasterId("");
+                }
+              }}
               value={twitchRequirement}
             >
               <option value="none">{t("twitchRequirementNone")}</option>
