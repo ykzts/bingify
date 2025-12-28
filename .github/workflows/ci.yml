@@ -22,7 +22,7 @@ jobs:
 
       - run: pnpm install
 
-      - run: pnpm check
+      - run: pnpm check:ci
         name: Run Biome checks
 
       - run: pnpm type-check

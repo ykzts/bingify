@@ -57,6 +57,7 @@
   "scripts": {
     "build": "next build",
     "check": "biome check .",
+    "check:ci": "biome ci .",
     "dev": "next dev",
     "format": "biome format --write .",
     "format:check": "biome format .",
