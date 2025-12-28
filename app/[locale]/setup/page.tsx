@@ -5,6 +5,8 @@ import { hasAdminUser } from "@/app/[locale]/admin/actions";
 import { createClient } from "@/lib/supabase/server";
 import { ClaimAdminButton } from "./_components/claim-admin-button";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ locale: string }>;
 }
