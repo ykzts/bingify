@@ -1,12 +1,16 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { ScreenDisplay } from "./_components/screen-display";
 
 interface Props {
   params: Promise<{ locale: string; token: string }>;
+  searchParams: Promise<{ bg?: string; mode?: string }>;
 }
 
-export default async function ScreenViewPage({ params }: Props) {
+export default async function ScreenViewPage({ params, searchParams }: Props) {
   const { locale, token } = await params;
+  const { bg = "default", mode = "full" } = await searchParams;
+  
   setRequestLocale(locale);
 
   const t = await getTranslations("ScreenView");
@@ -32,17 +36,12 @@ export default async function ScreenViewPage({ params }: Props) {
     );
   }
 
-  // TODO: Subscribe to realtime updates for called numbers
-  // TODO: Display bingo board with large numbers
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black">
-      <div className="text-center">
-        <h1 className="mb-4 font-bold text-6xl text-white">
-          {space.share_key}
-        </h1>
-        <p className="text-2xl text-gray-400">{t("loading")}</p>
-      </div>
-    </div>
+    <ScreenDisplay 
+      initialBg={bg}
+      initialMode={mode}
+      shareKey={space.share_key}
+      spaceId={space.id}
+    />
   );
 }
