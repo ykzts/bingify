@@ -178,3 +178,63 @@ export async function resetGame(spaceId: string): Promise<CallNumberResult> {
     };
   }
 }
+
+export interface CloseSpaceResult {
+  error?: string;
+  success: boolean;
+}
+
+export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
+  try {
+    if (!isValidUUID(spaceId)) {
+      return {
+        error: "Invalid space ID",
+        success: false,
+      };
+    }
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "Authentication required",
+        success: false,
+      };
+    }
+
+    const { error, count } = await supabase
+      .from("spaces")
+      .update({ status: "archived" })
+      .eq("id", spaceId)
+      .eq("owner_id", user.id);
+
+    if (error) {
+      console.error("Database error:", error);
+      return {
+        error: "Failed to close space",
+        success: false,
+      };
+    }
+
+    if (count === 0) {
+      return {
+        error: "Space not found or permission denied",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error closing space:", error);
+    return {
+      error: "An error occurred",
+      success: false,
+    };
+  }
+}

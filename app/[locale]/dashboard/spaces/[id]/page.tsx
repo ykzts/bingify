@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { BingoGameManager } from "./_components/bingo-game-manager";
+import { CloseSpaceButton } from "./_components/close-space-button";
 import { ViewingUrlManager } from "./_components/viewing-url-manager";
 
 interface Props {
@@ -27,7 +28,7 @@ export default async function AdminSpacePage({ params }: Props) {
   // Fetch space (RLS ensures only owner can access)
   const { data: space, error } = await supabase
     .from("spaces")
-    .select("id, share_key, view_token, owner_id, created_at")
+    .select("id, share_key, view_token, owner_id, status, created_at")
     .eq("id", id)
     .single();
 
@@ -55,6 +56,18 @@ export default async function AdminSpacePage({ params }: Props) {
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <BingoGameManager spaceId={space.id} />
         </div>
+
+        {space.status === "active" && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
+            <h2 className="mb-4 font-semibold text-xl">
+              {t("closeSpaceTitle")}
+            </h2>
+            <p className="mb-4 text-gray-700 text-sm">
+              {t("closeSpaceDescription")}
+            </p>
+            <CloseSpaceButton spaceId={space.id} />
+          </div>
+        )}
       </div>
     </div>
   );
