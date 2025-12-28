@@ -327,6 +327,15 @@ export async function joinSpace(
       .single();
 
     if (systemSettings && systemSettings.space_expiration_hours > 0) {
+      // Defensive null check for created_at
+      if (!space.created_at) {
+        console.error("Space created_at is null:", space.id);
+        return {
+          errorKey: "errorInvalidSpace",
+          success: false,
+        };
+      }
+
       const createdAt = new Date(space.created_at);
       const expirationDate = new Date(
         createdAt.getTime() +

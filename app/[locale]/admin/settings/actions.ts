@@ -26,7 +26,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
     if (error) {
       console.error("Error fetching system settings:", error);
       return {
-        error: "システム設定の取得に失敗しました",
+        error: "errorFetchFailed",
       };
     }
 
@@ -36,7 +36,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
   } catch (error) {
     console.error("Error in getSystemSettings:", error);
     return {
-      error: "予期しないエラーが発生しました",
+      error: "errorGeneric",
     };
   }
 }
@@ -60,7 +60,7 @@ export async function updateSystemSettings(
 
     if (!user) {
       return {
-        error: "認証が必要です",
+        error: "errorUnauthorized",
         success: false,
       };
     }
@@ -73,7 +73,7 @@ export async function updateSystemSettings(
 
     if (profile?.role !== "admin") {
       return {
-        error: "管理者権限が必要です",
+        error: "errorNoPermission",
         success: false,
       };
     }
@@ -108,7 +108,7 @@ export async function updateSystemSettings(
     if (error) {
       console.error("Error updating system settings:", error);
       return {
-        error: "設定の更新に失敗しました",
+        error: "errorUpdateFailed",
         success: false,
       };
     }
@@ -119,7 +119,7 @@ export async function updateSystemSettings(
   } catch (error) {
     console.error("Error in updateSystemSettings:", error);
     return {
-      error: "予期しないエラーが発生しました",
+      error: "errorGeneric",
       success: false,
     };
   }

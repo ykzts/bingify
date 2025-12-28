@@ -18,7 +18,9 @@ export default async function AdminSettingsPage({ params }: Props) {
   if (error) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-        <p className="text-red-800">{error}</p>
+        <p className="text-red-800">
+          {t(`errors.${error}`, { default: t("errors.errorGeneric") })}
+        </p>
       </div>
     );
   }

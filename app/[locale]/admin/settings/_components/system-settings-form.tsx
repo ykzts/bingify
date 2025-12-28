@@ -96,7 +96,9 @@ export function SystemSettingsForm({ initialSettings }: Props) {
       {/* Error Message */}
       {state.error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-          <p className="text-red-800 text-sm">{state.error}</p>
+          <p className="text-red-800 text-sm">
+            {t(`errors.${state.error}`, { default: t("errors.errorGeneric") })}
+          </p>
         </div>
       )}
 
