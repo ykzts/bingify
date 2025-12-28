@@ -96,7 +96,9 @@
   },
   "CreateSpace": {
     "generateRandomButton": "Generate Random",
-    "generateRandomButtonAriaLabel": "Generate random share key"
+    "generateRandomButtonAriaLabel": "Generate random share key",
+    "youtubeChannelIdHelp": "Enter a YouTube channel ID to require participants to subscribe to that channel before joining.",
+    "youtubeChannelIdLabel": "YouTube Channel ID (Optional)"
   },
   "Errors": {
     "authRequired": "Authentication required",
@@ -209,6 +211,9 @@
     "errorQuotaReached": "Space is full. Maximum capacity reached.",
     "errorSpaceClosed": "This space has been closed",
     "errorUnauthorized": "Authentication required. Please sign in.",
+    "errorYouTubeNotSubscribed": "You must subscribe to the specified YouTube channel to join this space",
+    "errorYouTubeVerificationFailed": "YouTube verification failed. Please try again.",
+    "errorYouTubeVerificationRequired": "YouTube account verification is required to join this space",
     "freeSpace": "FREE",
     "heading": "Bingo Card",
     "joinButton": "Join Space",
@@ -222,6 +227,8 @@
     "participantCount": "{count} / {max} participants",
     "recentCalledNumbers": "Recently Called Numbers",
     "spaceId": "Space ID",
-    "spaceSubtitle": "Bingo Space"
+    "spaceSubtitle": "Bingo Space",
+    "verifyYouTubeButton": "Verify YouTube Account",
+    "verifyingYouTube": "Verifying..."
   }
 }

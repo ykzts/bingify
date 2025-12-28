@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
+import { checkSubscriptionStatus } from "@/lib/youtube";
 
 export interface JoinSpaceState {
   error?: string;
@@ -9,7 +10,15 @@ export interface JoinSpaceState {
   success: boolean;
 }
 
+export interface GatekeeperRules {
+  youtube?: {
+    channelId: string;
+    required: boolean;
+  };
+}
+
 export interface SpaceInfo {
+  gatekeeper_rules: GatekeeperRules | null;
   id: string;
   max_participants: number;
   owner_id: string | null;
@@ -27,7 +36,9 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
 
     const { data, error } = await supabase
       .from("spaces")
-      .select("id, share_key, status, owner_id, max_participants")
+      .select(
+        "id, share_key, status, owner_id, max_participants, gatekeeper_rules"
+      )
       .eq("id", spaceId)
       .single();
 
@@ -41,7 +52,43 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
   }
 }
 
-export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
+async function verifyYouTubeSubscription(
+  youtubeAccessToken: string | undefined,
+  youtubeChannelId: string
+): Promise<JoinSpaceState | null> {
+  if (!youtubeAccessToken) {
+    return {
+      errorKey: "errorYouTubeVerificationRequired",
+      success: false,
+    };
+  }
+
+  const result = await checkSubscriptionStatus(
+    youtubeAccessToken,
+    youtubeChannelId
+  );
+
+  if (result.error) {
+    return {
+      errorKey: "errorYouTubeVerificationFailed",
+      success: false,
+    };
+  }
+
+  if (!result.isSubscribed) {
+    return {
+      errorKey: "errorYouTubeNotSubscribed",
+      success: false,
+    };
+  }
+
+  return null;
+}
+
+export async function joinSpace(
+  spaceId: string,
+  youtubeAccessToken?: string
+): Promise<JoinSpaceState> {
   try {
     // Validate UUID format
     if (!isValidUUID(spaceId)) {
@@ -68,7 +115,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
     // Check if space exists and is active
     const { data: space } = await supabase
       .from("spaces")
-      .select("id, status")
+      .select("id, status, gatekeeper_rules")
       .eq("id", spaceId)
       .single();
 
@@ -84,6 +131,21 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
         errorKey: "errorSpaceClosed",
         success: false,
       };
+    }
+
+    // Check YouTube subscription requirement if configured
+    const gatekeeperRules = space.gatekeeper_rules as GatekeeperRules | null;
+    if (
+      gatekeeperRules?.youtube?.required &&
+      gatekeeperRules.youtube.channelId
+    ) {
+      const verificationResult = await verifyYouTubeSubscription(
+        youtubeAccessToken,
+        gatekeeperRules.youtube.channelId
+      );
+      if (verificationResult) {
+        return verificationResult;
+      }
     }
 
     // Try to join the space - rely on unique constraint for duplicate prevention

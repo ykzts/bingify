@@ -14,6 +14,7 @@ export function CreateSpaceForm() {
   const router = useRouter();
   const t = useTranslations("CreateSpace");
   const [slug, setSlug] = useState("");
+  const [youtubeChannelId, setYoutubeChannelId] = useState("");
   const [debouncedSlug] = useDebounce(slug, 500);
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState<boolean | null>(null);
@@ -161,6 +162,28 @@ export function CreateSpaceForm() {
               )}
             </div>
           )}
+        </div>
+
+        <div>
+          <label
+            className="mb-2 block font-medium text-sm"
+            htmlFor="youtube_channel_id"
+          >
+            {t("youtubeChannelIdLabel")}
+          </label>
+          <input
+            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
+            disabled={isPending}
+            id="youtube_channel_id"
+            name="youtube_channel_id"
+            onChange={(e) => setYoutubeChannelId(e.target.value)}
+            placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
+            type="text"
+            value={youtubeChannelId}
+          />
+          <p className="mt-2 text-gray-500 text-sm">
+            {t("youtubeChannelIdHelp")}
+          </p>
         </div>
 
         {state.error && (

@@ -96,7 +96,9 @@
   },
   "CreateSpace": {
     "generateRandomButton": "ランダム生成",
-    "generateRandomButtonAriaLabel": "共有キーをランダムに生成"
+    "generateRandomButtonAriaLabel": "共有キーをランダムに生成",
+    "youtubeChannelIdHelp": "参加者に特定のYouTubeチャンネルの登録を必須にする場合は、チャンネルIDを入力してください。",
+    "youtubeChannelIdLabel": "YouTube チャンネルID（オプション）"
   },
   "Errors": {
     "authRequired": "認証が必要です",
@@ -209,6 +211,9 @@
     "errorQuotaReached": "スペースの参加者数が上限に達しています",
     "errorSpaceClosed": "このスペースは閉鎖されています",
     "errorUnauthorized": "認証が必要です。ログインしてください。",
+    "errorYouTubeNotSubscribed": "このスペースに参加するには、指定されたYouTubeチャンネルを登録する必要があります",
+    "errorYouTubeVerificationFailed": "YouTube連携の確認に失敗しました。もう一度お試しください。",
+    "errorYouTubeVerificationRequired": "このスペースに参加するには、YouTubeアカウントの確認が必要です",
     "freeSpace": "FREE",
     "heading": "ビンゴカード",
     "joinButton": "スペースに参加",
@@ -222,6 +227,8 @@
     "participantCount": "{count} / {max} 人が参加中",
     "recentCalledNumbers": "最近呼ばれた番号",
     "spaceId": "スペースID",
-    "spaceSubtitle": "ビンゴスペース"
+    "spaceSubtitle": "ビンゴスペース",
+    "verifyYouTubeButton": "YouTubeアカウントを確認する",
+    "verifyingYouTube": "確認中..."
   }
 }

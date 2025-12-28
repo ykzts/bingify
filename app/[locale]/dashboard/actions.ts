@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { format } from "date-fns";
 import { generateSecureToken } from "@/lib/crypto";
-import { spaceSchema } from "@/lib/schemas/space";
+import { spaceSchema, youtubeChannelIdSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 
 const MAX_SLUG_SUGGESTIONS = 10;
@@ -64,6 +64,8 @@ export async function createSpace(
 ): Promise<CreateSpaceState> {
   try {
     const shareKey = formData.get("share_key") as string;
+    const youtubeChannelIdRaw =
+      (formData.get("youtube_channel_id") as string) || "";
 
     // Validate input with Zod
     const validation = spaceSchema.safeParse({ slug: shareKey });
@@ -72,6 +74,20 @@ export async function createSpace(
         error: validation.error.issues[0].message,
         success: false,
       };
+    }
+
+    // Validate YouTube Channel ID if provided
+    let youtubeChannelId: string | undefined;
+    if (youtubeChannelIdRaw.trim()) {
+      const channelIdValidation =
+        youtubeChannelIdSchema.safeParse(youtubeChannelIdRaw);
+      if (!channelIdValidation.success) {
+        return {
+          error: channelIdValidation.error.issues[0].message,
+          success: false,
+        };
+      }
+      youtubeChannelId = channelIdValidation.data;
     }
 
     // Generate full slug with date suffix
@@ -126,9 +142,23 @@ export async function createSpace(
     const uuid = randomUUID();
     const viewToken = generateSecureToken();
 
+    // Build gatekeeper_rules if YouTube channel ID is provided
+    let gatekeeperRules: {
+      youtube?: { channelId: string; required: boolean };
+    } | null = null;
+    if (youtubeChannelId) {
+      gatekeeperRules = {
+        youtube: {
+          channelId: youtubeChannelId,
+          required: true,
+        },
+      };
+    }
+
     const { error } = await supabase
       .from("spaces")
       .insert({
+        gatekeeper_rules: gatekeeperRules,
         id: uuid,
         owner_id: user.id,
         settings: {},
