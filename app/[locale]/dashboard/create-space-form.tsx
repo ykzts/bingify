@@ -13,9 +13,9 @@ import { checkSlugAvailability, createSpace } from "./actions";
 export function CreateSpaceForm() {
   const router = useRouter();
   const t = useTranslations("CreateSpace");
-  const [slug, setSlug] = useState("");
+  const [shareKey, setShareKey] = useState("");
   const [youtubeChannelId, setYoutubeChannelId] = useState("");
-  const [debouncedSlug] = useDebounce(slug, 500);
+  const [debouncedShareKey] = useDebounce(shareKey, 500);
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState<boolean | null>(null);
 
@@ -28,45 +28,45 @@ export function CreateSpaceForm() {
     success: false,
   });
 
-  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSlug = e.target.value.toLowerCase();
-    setSlug(newSlug);
+  const handleShareKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newShareKey = e.target.value.toLowerCase();
+    setShareKey(newShareKey);
 
-    // Reset validation state when slug changes and is too short
-    if (!newSlug || newSlug.length < 3) {
+    // Reset validation state when shareKey changes and is too short
+    if (!newShareKey || newShareKey.length < 3) {
       setAvailable(null);
     }
   };
 
   const handleGenerateRandomKey = () => {
     const randomKey = generateRandomKey();
-    setSlug(randomKey);
+    setShareKey(randomKey);
     setAvailable(null);
   };
 
   const handleAcceptSuggestion = () => {
     if (state.suggestion) {
-      // Extract the slug part from suggestion
-      // Format: "slug-2-20251226" or "my-party-3-20251226"
+      // Extract the shareKey part from suggestion
+      // Format: "my-party-2-20251226" or "my-party-3-20251226"
       // Remove the last part (date suffix): "-20251226"
       const suggestionWithoutDate = state.suggestion.replace(
         `-${dateSuffix}`,
         ""
       );
-      setSlug(suggestionWithoutDate);
+      setShareKey(suggestionWithoutDate);
       setAvailable(null);
     }
   };
 
   useEffect(() => {
-    if (!debouncedSlug || debouncedSlug.length < 3) {
+    if (!debouncedShareKey || debouncedShareKey.length < 3) {
       return;
     }
 
     const check = async () => {
       setChecking(true);
       try {
-        const result = await checkSlugAvailability(debouncedSlug);
+        const result = await checkSlugAvailability(debouncedShareKey);
         setAvailable(result.available);
       } finally {
         setChecking(false);
@@ -74,7 +74,7 @@ export function CreateSpaceForm() {
     };
 
     check();
-  }, [debouncedSlug]);
+  }, [debouncedShareKey]);
 
   useEffect(() => {
     if (state.success && state.spaceId) {
@@ -93,31 +93,35 @@ export function CreateSpaceForm() {
           </label>
 
           <div className="mb-2 flex items-center gap-2">
-            <button
-              aria-label={t("generateRandomButtonAriaLabel")}
-              className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-blue-700"
-              disabled={isPending}
-              onClick={handleGenerateRandomKey}
-              type="button"
-            >
-              <Dices className="h-4 w-4" />
-              {t("generateRandomButton")}
-            </button>
-            <input
-              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
-              disabled={isPending}
-              id="share_key"
-              maxLength={30}
-              minLength={3}
-              name="share_key"
-              onChange={handleSlugChange}
-              pattern="[a-z0-9-]+"
-              placeholder="my-party"
-              required
-              type="text"
-              value={slug}
-            />
-            <span className="font-mono text-gray-500">-{dateSuffix}</span>
+            <div className="relative flex-1">
+              <input
+                className="flex h-10 w-full rounded-lg rounded-r-none border border-gray-300 border-r-0 bg-background px-3 py-2 pr-10 font-mono text-sm ring-offset-background focus:z-10 focus:border-transparent focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={isPending}
+                id="share_key"
+                maxLength={30}
+                minLength={3}
+                name="share_key"
+                onChange={handleShareKeyChange}
+                pattern="[a-z0-9-]+"
+                placeholder="my-party"
+                required
+                type="text"
+                value={shareKey}
+              />
+              <button
+                aria-label={t("generateRandomButtonAriaLabel")}
+                className="absolute top-1 right-1 z-10 flex h-8 w-8 items-center justify-center rounded-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                disabled={isPending}
+                onClick={handleGenerateRandomKey}
+                title={t("generateRandomButton")}
+                type="button"
+              >
+                <Dices className="h-4 w-4" />
+              </button>
+            </div>
+            <span className="flex h-10 select-none items-center rounded-lg rounded-l-none border border-gray-300 border-l-0 bg-gray-50 px-3 font-mono text-gray-500 text-sm">
+              -{dateSuffix}
+            </span>
           </div>
 
           <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
@@ -129,12 +133,12 @@ export function CreateSpaceForm() {
           <p className="mb-2 text-gray-500 text-sm">
             公開URL:{" "}
             <span className="font-mono">
-              @{slug || "..."}-{dateSuffix}
+              @{shareKey || "..."}-{dateSuffix}
             </span>
           </p>
 
           {/* Status indicator */}
-          {slug.length >= 3 && (
+          {shareKey.length >= 3 && (
             <div className="mt-2 flex items-center gap-2">
               {checking && (
                 <>
@@ -213,7 +217,7 @@ export function CreateSpaceForm() {
 
         <button
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isPending || available === false || slug.length < 3}
+          disabled={isPending || available === false || shareKey.length < 3}
           type="submit"
         >
           {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
