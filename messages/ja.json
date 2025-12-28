@@ -95,6 +95,8 @@
     "viewingUrlLabel": "公開閲覧用URL"
   },
   "CreateSpace": {
+    "emailAllowlistHelp": "参加者のメールアドレスを制限する場合は、許可するドメイン（@example.com または example.com）やメールアドレス（user@example.com）をカンマや改行で区切って入力してください。空欄の場合は制限なしです。",
+    "emailAllowlistLabel": "許可メールアドレス・ドメイン（オプション）",
     "generateRandomButton": "ランダム生成",
     "generateRandomButtonAriaLabel": "共有キーをランダムに生成",
     "youtubeChannelIdHelp": "参加者に特定のYouTubeチャンネルの登録を必須にする場合は、チャンネルIDを入力してください。",
@@ -228,6 +230,8 @@
     "bingoCardTitle": "あなたのビンゴカード",
     "bingoGamePlaceholder": "ビンゴゲームがここに表示されます。参加して楽しみましょう！",
     "bingoGameTitle": "ビンゴゲーム",
+    "errorEmailBlocked": "このメールアドレスは参加が制限されています",
+    "errorEmailNotAllowed": "このメールアドレスではスペースに参加できません。許可されたドメイン・アドレスをご確認ください。",
     "errorGeneric": "予期しないエラーが発生しました",
     "errorInvalidSpace": "無効なスペースIDです",
     "errorJoinFailed": "スペースへの参加に失敗しました",

@@ -95,6 +95,8 @@
     "viewingUrlLabel": "Public Viewing URL"
   },
   "CreateSpace": {
+    "emailAllowlistHelp": "To restrict participants by email address, enter allowed domains (@example.com or example.com) or email addresses (user@example.com) separated by commas or newlines. Leave empty for no restrictions.",
+    "emailAllowlistLabel": "Allowed Email Addresses/Domains (Optional)",
     "generateRandomButton": "Generate Random",
     "generateRandomButtonAriaLabel": "Generate random share key",
     "youtubeChannelIdHelp": "Enter a YouTube channel ID to require participants to subscribe to that channel before joining.",
@@ -228,6 +230,8 @@
     "bingoCardTitle": "Your Bingo Card",
     "bingoGamePlaceholder": "The bingo game will appear here. Join to participate!",
     "bingoGameTitle": "Bingo Game",
+    "errorEmailBlocked": "This email address is not allowed to participate",
+    "errorEmailNotAllowed": "Your email address is not allowed to join this space. Please check the allowed domains/addresses.",
     "errorGeneric": "An error occurred",
     "errorInvalidSpace": "Invalid space ID",
     "errorJoinFailed": "Failed to join space",
