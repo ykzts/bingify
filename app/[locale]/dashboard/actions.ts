@@ -120,7 +120,9 @@ export async function createSpace(
       // Continue with space creation if settings fetch fails (graceful degradation)
     } else if (systemSettings) {
       // Count user's existing spaces
-      // Note: Using regular SELECT for consistency with other count queries
+      // Note: The spaces table RLS policy does not have recursion issues,
+      // so we can use count: "exact" directly. The participants table uses
+      // a different approach (fetching rows then using array length) due to RLS recursion.
       const { count: userSpaceCount, error: countError } = await supabase
         .from("spaces")
         .select("id", { count: "exact" })
