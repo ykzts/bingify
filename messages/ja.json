@@ -358,5 +358,10 @@
     "updateSuccess": "設定を更新しました",
     "updateButton": "設定を更新",
     "publishButton": "公開して開始する"
+  },
+  "NotFound": {
+    "title": "ページが見つかりません",
+    "description": "お探しのページは存在しないか、移動した可能性があります。",
+    "backHome": "ホームに戻る"
   }
 }
