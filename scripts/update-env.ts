@@ -9,10 +9,27 @@ try {
   const output = execSync("pnpm exec supabase status -o json").toString();
   const supabaseConfig = JSON.parse(output);
 
+  const { API_URL, ANON_KEY, SERVICE_ROLE_KEY } = supabaseConfig ?? {};
+  if (!(API_URL && ANON_KEY && SERVICE_ROLE_KEY)) {
+    const missing: string[] = [];
+    if (!API_URL) {
+      missing.push("API_URL");
+    }
+    if (!ANON_KEY) {
+      missing.push("ANON_KEY");
+    }
+    if (!SERVICE_ROLE_KEY) {
+      missing.push("SERVICE_ROLE_KEY");
+    }
+    throw new Error(
+      `Missing required keys in Supabase status output: ${missing.join(", ")}`
+    );
+  }
+
   const updates: Record<string, string> = {
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseConfig.ANON_KEY,
-    NEXT_PUBLIC_SUPABASE_URL: supabaseConfig.API_URL,
-    SUPABASE_SERVICE_ROLE_KEY: supabaseConfig.SERVICE_ROLE_KEY,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: ANON_KEY,
+    NEXT_PUBLIC_SUPABASE_URL: API_URL,
+    SUPABASE_SERVICE_ROLE_KEY: SERVICE_ROLE_KEY,
   };
 
   let envContent = "";
@@ -34,7 +51,7 @@ try {
       return line;
     }
 
-    const key = trimmed.slice(0, eqIndex);
+    const key = trimmed.slice(0, eqIndex).trim();
     if (updates[key]) {
       usedKeys.add(key);
       return `${key}=${updates[key]}`;
@@ -51,7 +68,11 @@ try {
     }
   }
 
-  fs.writeFileSync(ENV_FILE, `${lines.join("\n").trim()}\n`);
+  const newContent = lines.join("\n");
+  fs.writeFileSync(
+    ENV_FILE,
+    newContent.endsWith("\n") ? newContent : `${newContent}\n`
+  );
   console.log("✅ .env.local has been updated with local Supabase keys.");
 } catch (error) {
   console.error(

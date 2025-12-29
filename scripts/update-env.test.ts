@@ -45,7 +45,7 @@ describe("update-env script", () => {
         return line;
       }
 
-      const key = trimmed.slice(0, eqIndex);
+      const key = trimmed.slice(0, eqIndex).trim();
       if (updates[key]) {
         usedKeys.add(key);
         return `${key}=${updates[key]}`;
@@ -62,7 +62,11 @@ describe("update-env script", () => {
       }
     }
 
-    fs.writeFileSync(TEST_ENV_FILE, `${lines.join("\n").trim()}\n`);
+    const newContent = lines.join("\n");
+    fs.writeFileSync(
+      TEST_ENV_FILE,
+      newContent.endsWith("\n") ? newContent : `${newContent}\n`
+    );
 
     const content = fs.readFileSync(TEST_ENV_FILE, "utf8");
     expect(content).toContain(
@@ -112,7 +116,7 @@ ANOTHER_VAR=also-preserved
         return line;
       }
 
-      const key = trimmed.slice(0, eqIndex);
+      const key = trimmed.slice(0, eqIndex).trim();
       if (updates[key]) {
         usedKeys.add(key);
         return `${key}=${updates[key]}`;
@@ -129,7 +133,11 @@ ANOTHER_VAR=also-preserved
       }
     }
 
-    fs.writeFileSync(TEST_ENV_FILE, `${lines.join("\n").trim()}\n`);
+    const newContent = lines.join("\n");
+    fs.writeFileSync(
+      TEST_ENV_FILE,
+      newContent.endsWith("\n") ? newContent : `${newContent}\n`
+    );
 
     const content = fs.readFileSync(TEST_ENV_FILE, "utf8");
     expect(content).toContain("# Comment");
@@ -180,7 +188,7 @@ NEXT_PUBLIC_SUPABASE_URL=http://old-url
         return line;
       }
 
-      const key = trimmed.slice(0, eqIndex);
+      const key = trimmed.slice(0, eqIndex).trim();
       if (updates[key]) {
         usedKeys.add(key);
         return `${key}=${updates[key]}`;
@@ -197,7 +205,11 @@ NEXT_PUBLIC_SUPABASE_URL=http://old-url
       }
     }
 
-    fs.writeFileSync(TEST_ENV_FILE, `${lines.join("\n").trim()}\n`);
+    const newContent = lines.join("\n");
+    fs.writeFileSync(
+      TEST_ENV_FILE,
+      newContent.endsWith("\n") ? newContent : `${newContent}\n`
+    );
 
     const content = fs.readFileSync(TEST_ENV_FILE, "utf8");
     expect(content).toContain("BASE64_KEY=aGVsbG8=d29ybGQ=");
