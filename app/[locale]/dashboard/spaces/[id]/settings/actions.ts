@@ -89,7 +89,7 @@ export async function updateSpaceSettings(
     // Get current space data
     const { data: space, error: spaceError } = await supabase
       .from("spaces")
-      .select("owner_id, max_participants")
+      .select("owner_id, max_participants, settings")
       .eq("id", spaceId)
       .single();
 
@@ -203,6 +203,7 @@ export async function updateSpaceSettings(
         gatekeeper_rules: gatekeeperRules,
         max_participants: maxParticipantsValue,
         settings: {
+          ...(space.settings as Record<string, unknown>),
           hide_metadata_before_join: hideMetadataBeforeJoin,
         },
         title: title || null,
