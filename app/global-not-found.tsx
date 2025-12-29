@@ -1,5 +1,6 @@
 import "./globals.css";
 import { FileQuestion } from "lucide-react";
+import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,10 @@ const nunito = Nunito({
   subsets: ["latin"],
   variable: "--font-nunito",
 });
+
+export const metadata: Metadata = {
+  title: "404 Not Found | Bingify",
+};
 
 export default function GlobalNotFound() {
   return (
