@@ -133,9 +133,10 @@ export async function updateSpaceSettings(
     }
 
     // Validation 2: Check current participant count
+    // Note: Using regular SELECT instead of HEAD to ensure RLS policy works correctly
     const { count: currentParticipantCount, error: countError } = await supabase
       .from("participants")
-      .select("*", { count: "exact", head: true })
+      .select("id", { count: "exact" })
       .eq("space_id", spaceId);
 
     if (countError) {

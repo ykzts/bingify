@@ -467,9 +467,10 @@ export async function getParticipantCount(
     const supabase = await createClient();
 
     // Get participant count and max participants
+    // Note: Using regular SELECT instead of HEAD to ensure RLS policy works correctly
     const { count, error: countError } = await supabase
       .from("participants")
-      .select("*", { count: "exact", head: true })
+      .select("id", { count: "exact" })
       .eq("space_id", spaceId);
 
     if (countError) {
