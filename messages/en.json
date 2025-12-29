@@ -312,8 +312,7 @@
     "verifyYouTubeButton": "Verify YouTube Account",
     "verifyingYouTube": "Verifying...",
     "draftMessage": "The host is currently preparing. Please wait.",
-    "draftTitle": "Preparing",
-    "privateSpace": "Private Space"
+    "draftTitle": "Preparing"
   },
   "UsernameSettings": {
     "description": "Set the name that will be displayed in the app.",

@@ -312,8 +312,7 @@
     "verifyYouTubeButton": "YouTubeアカウントを確認する",
     "verifyingYouTube": "確認中...",
     "draftMessage": "ホストが現在準備中です。しばらくお待ちください。",
-    "draftTitle": "準備中",
-    "privateSpace": "非公開スペース"
+    "draftTitle": "準備中"
   },
   "UsernameSettings": {
     "description": "アプリ内で表示される名前を設定します。",
