@@ -36,6 +36,9 @@ jobs:
       - name: Start Supabase
         run: pnpm exec supabase start
 
+      - name: Sync environment variables
+        run: pnpm dev:env
+
       - name: Verify setup
         run: |
           pnpm exec supabase status
