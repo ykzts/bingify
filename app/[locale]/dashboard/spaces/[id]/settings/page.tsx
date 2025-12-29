@@ -34,6 +34,14 @@ export default async function SpaceSettingsPage({ params }: Props) {
       .select("*", { count: "exact", head: true })
       .eq("space_id", id);
 
+  if (participantCountError) {
+    console.error(
+      "Failed to fetch participant count for space",
+      id,
+      participantCountError
+    );
+  }
+
   // Get system settings
   const { data: systemSettings } = await supabase
     .from("system_settings")
@@ -53,8 +61,8 @@ export default async function SpaceSettingsPage({ params }: Props) {
         </div>
 
         {participantCountError && (
-          <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-            <p className="text-yellow-800">{t("errorFetchParticipantCount")}</p>
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+            <p className="text-red-800">{t("errorFetchParticipantCount")}</p>
           </div>
         )}
 

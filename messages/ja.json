@@ -362,6 +362,7 @@
     "maxParticipantsLabel": "最大参加人数",
     "privacyTitle": "プライバシー設定",
     "publishButton": "公開して開始する",
+    "requirementNone": "なし",
     "statusActive": "進行中（公開）",
     "statusDraft": "準備中（非公開）",
     "titleHelp": "スペースの表示名を設定できます",
@@ -373,7 +374,6 @@
     "twitchSubscriber": "サブスクライバーのみ",
     "updateButton": "設定を更新",
     "updateSuccess": "設定を更新しました",
-    "requirementNone": "なし",
     "youtubeChannelIdLabel": "YouTubeチャンネルID",
     "youtubeRequirementLabel": "YouTube要件",
     "youtubeSubscriber": "チャンネル登録者のみ"
