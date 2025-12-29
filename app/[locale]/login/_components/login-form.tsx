@@ -13,9 +13,6 @@ export function LoginForm() {
   const [oauthError, setOauthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check if redirecting from a space (share-key URL)
-  const isFromSpace = redirect?.startsWith("/@");
-
   const handleOAuthLogin = async (provider: "google" | "twitch") => {
     setOauthError(null);
     setIsLoading(true);
@@ -47,12 +44,8 @@ export function LoginForm() {
   return (
     <div className="mx-auto max-w-md space-y-6 p-8">
       <div className="space-y-2 text-center">
-        <h1 className="font-bold text-3xl">
-          {isFromSpace ? t("titleSpace") : t("title")}
-        </h1>
-        <p className="text-gray-600">
-          {isFromSpace ? t("descriptionSpace") : t("description")}
-        </p>
+        <h1 className="font-bold text-3xl">{t("title")}</h1>
+        <p className="text-gray-600">{t("description")}</p>
       </div>
 
       {displayError && (
