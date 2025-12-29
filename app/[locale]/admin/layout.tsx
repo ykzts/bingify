@@ -25,7 +25,7 @@ export default async function AdminLayout({ children, params }: Props) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}/login`);
+    redirect(`/${locale}/login?redirect=/admin`);
   }
 
   // Check if any admin exists in the system

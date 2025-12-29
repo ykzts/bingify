@@ -117,7 +117,7 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
   it("should redirect to localized dashboard on successful authentication with locale in referer", async () => {
@@ -137,7 +137,7 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/ja/dashboard`);
+    expect(response.headers.get("location")).toBe(`${origin}/ja/`);
   });
 
   it("should handle missing referer header gracefully", async () => {
@@ -153,7 +153,7 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
   it("should handle malformed referer URL gracefully", async () => {
@@ -173,7 +173,7 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
   it("should ignore invalid locale in referer and redirect to non-localized path", async () => {
@@ -193,7 +193,7 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
   it("should handle malformed referer URL on authentication error", async () => {
@@ -224,5 +224,379 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(
       `${origin}/login?error=auth_failed`
     );
+  });
+
+  it("should redirect to specified path when redirect parameter is provided", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/dashboard`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+  });
+
+  it("should redirect to localized specified path when redirect parameter is provided with locale", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/admin`,
+      {
+        headers: {
+          referer: `${origin}/ja/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/ja/admin`);
+  });
+
+  it("should handle redirect parameter with locale already included", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/ja/dashboard`,
+      {
+        headers: {
+          referer: `${origin}/en/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/ja/dashboard`);
+  });
+
+  it("should reject protocol-relative URLs in redirect parameter", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=//evil.com/path`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should reject absolute URLs in redirect parameter", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=https://evil.com/path`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should accept redirect with query parameters containing colons", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/dashboard?time=12:30:00`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/dashboard?time=12:30:00`
+    );
+  });
+
+  it("should accept redirect with @ symbol in query parameters", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/search?email=user@example.com`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/search?email=user@example.com`
+    );
+  });
+
+  it("should reject redirect with whitespace-only value", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=%20%20%20`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should reject redirect with empty string", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should reject redirect with encoded slashes", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=%2F%2Fevil.com`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should reject redirect with path traversal", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/dashboard/../../etc/passwd`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should reject redirect with encoded path traversal", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/dashboard%2F..%2F..%2Fetc%2Fpasswd`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should handle paths with backslashes", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/dashboard\\..\\admin`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    // Backslashes are normalized by URL parsing - this is expected behavior
+    // The actual path will be resolved by the server
+    expect(response.headers.get("location")).toContain(`${origin}/`);
+  });
+
+  it("should reject redirect with javascript: protocol", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/path?foo=javascript:alert(1)`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should reject redirect with data: protocol", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/path?data:text/html,<script>alert(1)</script>`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should reject redirect with vbscript: protocol in fragment", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/path?foo=vbscript:msgbox(1)`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 });

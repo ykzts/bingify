@@ -16,7 +16,7 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect({ href: "/login", locale });
+    redirect({ href: "/login?redirect=/settings/account", locale });
     return null;
   }
 
