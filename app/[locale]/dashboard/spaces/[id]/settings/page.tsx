@@ -28,10 +28,11 @@ export default async function SpaceSettingsPage({ params }: Props) {
   }
 
   // Get current participant count
-  const { count: participantCount } = await supabase
-    .from("participants")
-    .select("*", { count: "exact", head: true })
-    .eq("space_id", id);
+  const { count: participantCount, error: participantCountError } =
+    await supabase
+      .from("participants")
+      .select("*", { count: "exact", head: true })
+      .eq("space_id", id);
 
   // Get system settings
   const { data: systemSettings } = await supabase
@@ -50,6 +51,12 @@ export default async function SpaceSettingsPage({ params }: Props) {
             {space.status === "draft" ? t("statusDraft") : t("statusActive")}
           </p>
         </div>
+
+        {participantCountError && (
+          <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+            <p className="text-yellow-800">{t("errorFetchParticipantCount")}</p>
+          </div>
+        )}
 
         <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
           <SpaceSettingsForm
