@@ -112,7 +112,11 @@
     "resetGameSuccess": "ゲームをリセットしました",
     "spaceId": "スペースID",
     "viewingUrlDescription": "このURLを共有して、画面、配信ソフト、その他の表示アプリケーションにビンゴボードを表示できます。",
-    "viewingUrlLabel": "公開閲覧用URL"
+    "viewingUrlLabel": "公開閲覧用URL",
+    "draftStatusTitle": "準備中のスペース",
+    "draftStatusMessage": "このスペースはまだ公開されていません。設定画面で内容を確認し、公開してください。",
+    "goToSettings": "設定画面へ",
+    "settingsLink": "設定"
   },
   "CreateSpace": {
     "capacitySectionTitle": "参加人数制限",
@@ -138,7 +142,8 @@
     "youtubeRequirementLabel": "YouTube要件",
     "youtubeRequirementMember": "メンバー限定",
     "youtubeRequirementNone": "制限なし",
-    "youtubeRequirementSubscriber": "登録者限定"
+    "youtubeRequirementSubscriber": "登録者限定",
+    "settingsNotice": "作成後、詳細設定画面で参加人数制限やその他の設定を行えます"
   },
   "Dashboard": {
     "activeSpaceBackToAdmin": "管理画面へ戻る",
@@ -305,7 +310,9 @@
     "verifyTwitchButton": "Twitchアカウントを確認する",
     "verifyingTwitch": "確認中...",
     "verifyYouTubeButton": "YouTubeアカウントを確認する",
-    "verifyingYouTube": "確認中..."
+    "verifyingYouTube": "確認中...",
+    "draftTitle": "準備中",
+    "draftMessage": "ホストが現在準備中です。しばらくお待ちください。"
   },
   "UsernameSettings": {
     "description": "アプリ内で表示される名前を設定します。",
@@ -322,5 +329,34 @@
     "usernameHelp": "最大50文字まで入力できます",
     "usernameLabel": "ユーザー名",
     "usernamePlaceholder": "名前を入力してください"
+  },
+  "SpaceSettings": {
+    "heading": "スペース設定",
+    "statusDraft": "準備中（非公開）",
+    "statusActive": "進行中（公開）",
+    "basicInfoTitle": "基本情報",
+    "titleLabel": "スペースタイトル（任意）",
+    "titlePlaceholder": "例：新年ビンゴ大会",
+    "titleHelp": "スペースの表示名を設定できます",
+    "descriptionLabel": "説明（任意）",
+    "descriptionPlaceholder": "このビンゴスペースについての説明を入力してください",
+    "descriptionHelp": "スペースの詳細や参加者へのメッセージを記入できます",
+    "capacityTitle": "参加人数制限",
+    "maxParticipantsLabel": "最大参加人数",
+    "maxParticipantsHelp": "現在の参加者数: {current}人 / システム上限: {max}人",
+    "gatekeeperTitle": "参加条件設定",
+    "youtubeRequirementLabel": "YouTube要件",
+    "requirementNone": "なし",
+    "youtubeSubscriber": "チャンネル登録者のみ",
+    "youtubeChannelIdLabel": "YouTubeチャンネルID",
+    "twitchRequirementLabel": "Twitch要件",
+    "twitchFollower": "フォロワーのみ",
+    "twitchSubscriber": "サブスクライバーのみ",
+    "twitchBroadcasterIdLabel": "Twitch配信者ID",
+    "emailAllowlistLabel": "メールアドレス制限",
+    "emailAllowlistHelp": "特定のメールアドレスやドメインのみ参加を許可できます",
+    "updateSuccess": "設定を更新しました",
+    "updateButton": "設定を更新",
+    "publishButton": "公開して開始する"
   }
 }

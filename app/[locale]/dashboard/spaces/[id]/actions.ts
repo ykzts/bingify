@@ -49,13 +49,21 @@ export async function callNumber(
 
     const { data: space } = await supabase
       .from("spaces")
-      .select("owner_id")
+      .select("owner_id, status")
       .eq("id", spaceId)
       .single();
 
     if (!space || space.owner_id !== user.id) {
       return {
         error: "Permission denied",
+        success: false,
+      };
+    }
+
+    // Block number calling if space is in draft status
+    if (space.status === "draft") {
+      return {
+        error: "Cannot call numbers while space is in draft status",
         success: false,
       };
     }

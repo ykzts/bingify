@@ -9,14 +9,6 @@ import { useDebounce } from "use-debounce";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { generateRandomKey } from "@/lib/utils/random-key";
 import type { CreateSpaceState } from "./actions";
 import { checkSlugAvailability, createSpace } from "./actions";
@@ -26,12 +18,6 @@ export function CreateSpaceForm() {
   const t = useTranslations("CreateSpace");
   const tErrors = useTranslations("Errors");
   const [shareKey, setShareKey] = useState("");
-  const [maxParticipants, setMaxParticipants] = useState(50);
-  const [youtubeChannelId, setYoutubeChannelId] = useState("");
-  const [youtubeRequirement, setYoutubeRequirement] = useState("none");
-  const [twitchBroadcasterId, setTwitchBroadcasterId] = useState("");
-  const [twitchRequirement, setTwitchRequirement] = useState("none");
-  const [emailAllowlist, setEmailAllowlist] = useState("");
   const [debouncedShareKey] = useDebounce(shareKey, 500);
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState<boolean | null>(null);
@@ -95,7 +81,8 @@ export function CreateSpaceForm() {
 
   useEffect(() => {
     if (state.success && state.spaceId) {
-      router.push(`/dashboard/spaces/${state.spaceId}`);
+      // Redirect to settings page after creation
+      router.push(`/dashboard/spaces/${state.spaceId}/settings`);
     }
   }, [state, router]);
 
@@ -182,161 +169,6 @@ export function CreateSpaceForm() {
         )}
       </div>
 
-      <div>
-        <h3 className="mb-4 font-medium text-lg">
-          {t("capacitySectionTitle")}
-        </h3>
-        <div>
-          <Label className="mb-2" htmlFor="max_participants">
-            {t("maxParticipantsLabel")}
-          </Label>
-          <Input
-            disabled={isPending}
-            id="max_participants"
-            max={1000}
-            min={1}
-            name="max_participants"
-            onChange={(e) => {
-              const value = e.target.valueAsNumber;
-              setMaxParticipants(Number.isNaN(value) ? 50 : value);
-            }}
-            required
-            type="number"
-            value={maxParticipants}
-          />
-          <p className="mt-2 text-gray-500 text-sm">
-            {t("maxParticipantsHelp")}
-          </p>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="mb-4 font-medium text-lg">
-          {t("permissionsSectionTitle")}
-        </h3>
-
-        <div className="space-y-4">
-          <div>
-            <Label className="mb-2" htmlFor="youtube_requirement">
-              {t("youtubeRequirementLabel")}
-            </Label>
-            <Select
-              disabled={isPending}
-              name="youtube_requirement"
-              onValueChange={(value) => {
-                setYoutubeRequirement(value);
-                if (value === "none") {
-                  setYoutubeChannelId("");
-                }
-              }}
-              value={youtubeRequirement}
-            >
-              <SelectTrigger id="youtube_requirement">
-                <SelectValue placeholder={t("youtubeRequirementNone")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">
-                  {t("youtubeRequirementNone")}
-                </SelectItem>
-                <SelectItem value="subscriber">
-                  {t("youtubeRequirementSubscriber")}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {youtubeRequirement !== "none" && (
-            <div>
-              <Label className="mb-2" htmlFor="youtube_channel_id">
-                {t("youtubeChannelIdLabel")}
-              </Label>
-              <Input
-                disabled={isPending}
-                id="youtube_channel_id"
-                name="youtube_channel_id"
-                onChange={(e) => setYoutubeChannelId(e.target.value)}
-                placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
-                required={youtubeRequirement !== "none"}
-                type="text"
-                value={youtubeChannelId}
-              />
-              <p className="mt-2 text-gray-500 text-sm">
-                {t("youtubeChannelIdHelp")}
-              </p>
-            </div>
-          )}
-
-          <div>
-            <Label className="mb-2" htmlFor="twitch_requirement">
-              {t("twitchRequirementLabel")}
-            </Label>
-            <Select
-              disabled={isPending}
-              name="twitch_requirement"
-              onValueChange={(value) => {
-                setTwitchRequirement(value);
-                if (value === "none") {
-                  setTwitchBroadcasterId("");
-                }
-              }}
-              value={twitchRequirement}
-            >
-              <SelectTrigger id="twitch_requirement">
-                <SelectValue placeholder={t("twitchRequirementNone")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">
-                  {t("twitchRequirementNone")}
-                </SelectItem>
-                <SelectItem value="follower">
-                  {t("twitchRequirementFollower")}
-                </SelectItem>
-                <SelectItem value="subscriber">
-                  {t("twitchRequirementSubscriber")}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {twitchRequirement !== "none" && (
-            <div>
-              <Label className="mb-2" htmlFor="twitch_broadcaster_id">
-                {t("twitchBroadcasterIdLabel")}
-              </Label>
-              <Input
-                disabled={isPending}
-                id="twitch_broadcaster_id"
-                name="twitch_broadcaster_id"
-                onChange={(e) => setTwitchBroadcasterId(e.target.value)}
-                placeholder="123456789"
-                required={twitchRequirement !== "none"}
-                type="text"
-                value={twitchBroadcasterId}
-              />
-              <p className="mt-2 text-gray-500 text-sm">
-                {t("twitchBroadcasterIdHelp")}
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <Label className="mb-2" htmlFor="email_allowlist">
-          {t("emailAllowlistLabel")}
-        </Label>
-        <Textarea
-          disabled={isPending}
-          id="email_allowlist"
-          name="email_allowlist"
-          onChange={(e) => setEmailAllowlist(e.target.value)}
-          placeholder="@example.com, user@test.org"
-          rows={3}
-          value={emailAllowlist}
-        />
-        <p className="mt-2 text-gray-500 text-sm">{t("emailAllowlistHelp")}</p>
-      </div>
-
       {state.error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4">
           <p className="text-red-800">
@@ -374,6 +206,8 @@ export function CreateSpaceForm() {
         {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
         {isPending ? t("creatingButton") : t("createButton")}
       </Button>
+
+      <p className="text-center text-gray-500 text-sm">{t("settingsNotice")}</p>
     </form>
   );
 }

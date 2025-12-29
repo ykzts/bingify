@@ -2,8 +2,8 @@
 
 import { randomUUID } from "node:crypto";
 import { format } from "date-fns";
+import { z } from "zod";
 import { generateSecureToken } from "@/lib/crypto";
-import { createSpaceFormSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 
 const MAX_SLUG_SUGGESTIONS = 10;
@@ -18,6 +18,15 @@ export interface CreateSpaceState {
   success: boolean;
   suggestion?: string;
 }
+
+// Simple schema for initial space creation (share key only)
+const simpleCreateSpaceSchema = z.object({
+  slug: z
+    .string()
+    .min(3, "3文字以上入力してください")
+    .max(30, "30文字以内で入力してください")
+    .regex(/^[a-z0-9-]+$/, "小文字の英数字とハイフンのみ使用できます"),
+});
 
 export async function checkSlugAvailability(slug: string) {
   try {
@@ -61,30 +70,14 @@ async function findAvailableSlug(
   return null;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Space creation requires slug uniqueness checks and conditional gatekeeper rule construction
 export async function createSpace(
   _prevState: CreateSpaceState,
   formData: FormData
 ): Promise<CreateSpaceState> {
   try {
-    // Extract and parse form data
-    const maxParticipantsRaw = formData.get("max_participants") as string;
-    const maxParticipants = Number.parseInt(maxParticipantsRaw, 10);
-
-    // Validate all inputs with unified schema
-    const validation = createSpaceFormSchema.safeParse({
+    // Validate share key only
+    const validation = simpleCreateSpaceSchema.safeParse({
       slug: formData.get("share_key") as string,
-      max_participants: Number.isNaN(maxParticipants)
-        ? undefined
-        : maxParticipants,
-      youtube_requirement:
-        (formData.get("youtube_requirement") as string) || "none",
-      youtube_channel_id: (formData.get("youtube_channel_id") as string) || "",
-      twitch_requirement:
-        (formData.get("twitch_requirement") as string) || "none",
-      twitch_broadcaster_id:
-        (formData.get("twitch_broadcaster_id") as string) || "",
-      email_allowlist: (formData.get("email_allowlist") as string) || "",
     });
 
     if (!validation.success) {
@@ -94,15 +87,7 @@ export async function createSpace(
       };
     }
 
-    const {
-      slug: shareKey,
-      max_participants: maxParticipantsValue,
-      youtube_requirement: youtubeRequirement,
-      youtube_channel_id: youtubeChannelId,
-      twitch_requirement: twitchRequirement,
-      twitch_broadcaster_id: twitchBroadcasterId,
-      email_allowlist: emailAllowlist,
-    } = validation.data;
+    const { slug: shareKey } = validation.data;
 
     // Generate full slug with date suffix
     const dateSuffix = format(new Date(), "yyyyMMdd");
@@ -189,58 +174,20 @@ export async function createSpace(
       };
     }
 
-    // Create space in database
+    // Create space in database with status: 'draft'
     const uuid = randomUUID();
     const viewToken = generateSecureToken();
-
-    // Build gatekeeper_rules
-    let gatekeeperRules: {
-      email?: { allowed: string[] };
-      twitch?: {
-        broadcasterId: string;
-        requirement: string;
-      };
-      youtube?: { channelId: string; requirement: string };
-    } | null = null;
-
-    const hasYouTubeRule = youtubeRequirement !== "none" && youtubeChannelId;
-    const hasTwitchRule = twitchRequirement !== "none" && twitchBroadcasterId;
-    const hasEmailRule = emailAllowlist.length > 0;
-
-    if (hasYouTubeRule || hasTwitchRule || hasEmailRule) {
-      gatekeeperRules = {};
-
-      if (hasYouTubeRule) {
-        gatekeeperRules.youtube = {
-          channelId: youtubeChannelId as string,
-          requirement: youtubeRequirement,
-        };
-      }
-
-      if (hasTwitchRule) {
-        gatekeeperRules.twitch = {
-          broadcasterId: twitchBroadcasterId as string,
-          requirement: twitchRequirement,
-        };
-      }
-
-      if (hasEmailRule) {
-        gatekeeperRules.email = {
-          allowed: emailAllowlist,
-        };
-      }
-    }
 
     const { error } = await supabase
       .from("spaces")
       .insert({
-        gatekeeper_rules: gatekeeperRules,
+        gatekeeper_rules: null,
         id: uuid,
-        max_participants: maxParticipantsValue,
+        max_participants: 50, // Default value
         owner_id: user.id,
         settings: {},
         share_key: fullSlug,
-        status: "active",
+        status: "draft", // Start as draft
         view_token: viewToken,
       })
       .select()
@@ -379,7 +326,7 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       };
     }
 
-    // Find active space
+    // Find active space (excluding draft)
     let activeSpace: UserSpace | null = null;
     const allActiveSpaces = (spaces ?? []).filter((s) => s.status === "active");
     const activeSpaceData = allActiveSpaces[0] ?? null;
