@@ -29,7 +29,12 @@ try {
       return line;
     }
 
-    const [key] = trimmed.split("=");
+    const eqIndex = trimmed.indexOf("=");
+    if (eqIndex === -1) {
+      return line;
+    }
+
+    const key = trimmed.slice(0, eqIndex);
     if (updates[key]) {
       usedKeys.add(key);
       return `${key}=${updates[key]}`;
