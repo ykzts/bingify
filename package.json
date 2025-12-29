@@ -69,7 +69,7 @@
     "check": "biome check .",
     "check:ci": "biome ci .",
     "dev": "next dev",
-    "dev:env": "node --experimental-strip-types scripts/update-env.ts",
+    "dev:env": "node scripts/update-env.ts",
     "format": "biome format --write .",
     "format:check": "biome format .",
     "format:docs": "prettier --write \"**/*.{md,yaml,yml}\"",
