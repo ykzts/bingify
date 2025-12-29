@@ -16,4 +16,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_PR_NUM: ${{ github.event.pull_request.number }}
-        run: gh pr comment "$GH_PR_NUM" --body "@coderabbitai review"
+          GH_REPO: ${{ github.repository }}
+        run: gh pr comment "$GH_PR_NUM" --repo "$GH_REPO" --body "@coderabbitai review"
