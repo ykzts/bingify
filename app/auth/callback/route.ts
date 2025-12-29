@@ -61,19 +61,19 @@ export async function GET(request: NextRequest) {
 
   // Successfully authenticated, redirect to specified path or default
   const locale = getLocaleFromReferer();
-  
+
   // Use redirect parameter if provided, otherwise default to homepage
   let redirectPath = redirect && redirect.trim() !== "" ? redirect : "/";
-  
+
   // Ensure the redirect path starts with /
   if (!redirectPath.startsWith("/")) {
     redirectPath = `/${redirectPath}`;
   }
-  
+
   // If redirect path already includes locale, use it as-is
   // Otherwise, prepend locale if available
   const hasLocale = LOCALE_PATTERN.test(redirectPath);
   const finalPath = hasLocale ? redirectPath : buildPath(redirectPath, locale);
-  
+
   return NextResponse.redirect(`${origin}${finalPath}`);
 }

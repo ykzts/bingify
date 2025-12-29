@@ -117,7 +117,7 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
   it("should redirect to localized dashboard on successful authentication with locale in referer", async () => {
@@ -137,7 +137,7 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/ja/dashboard`);
+    expect(response.headers.get("location")).toBe(`${origin}/ja/`);
   });
 
   it("should handle missing referer header gracefully", async () => {
@@ -153,7 +153,7 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
   it("should handle malformed referer URL gracefully", async () => {
@@ -173,7 +173,7 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
   it("should ignore invalid locale in referer and redirect to non-localized path", async () => {
@@ -193,7 +193,7 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
   it("should handle malformed referer URL on authentication error", async () => {
@@ -224,5 +224,74 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(
       `${origin}/login?error=auth_failed`
     );
+  });
+
+  it("should redirect to specified path when redirect parameter is provided", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/dashboard`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
+  });
+
+  it("should redirect to localized specified path when redirect parameter is provided with locale", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/admin`,
+      {
+        headers: {
+          referer: `${origin}/ja/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/ja/admin`);
+  });
+
+  it("should handle redirect parameter with locale already included", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/ja/dashboard`,
+      {
+        headers: {
+          referer: `${origin}/en/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/ja/dashboard`);
   });
 });
