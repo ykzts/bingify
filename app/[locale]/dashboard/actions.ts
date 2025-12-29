@@ -120,9 +120,10 @@ export async function createSpace(
       // Continue with space creation if settings fetch fails (graceful degradation)
     } else if (systemSettings) {
       // Count user's existing spaces
+      // Note: Using regular SELECT for consistency with other count queries
       const { count: userSpaceCount, error: countError } = await supabase
         .from("spaces")
-        .select("*", { count: "exact", head: true })
+        .select("id", { count: "exact" })
         .eq("owner_id", user.id);
 
       if (countError) {
