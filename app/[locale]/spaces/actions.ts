@@ -530,3 +530,168 @@ export async function checkUserParticipation(
     return false;
   }
 }
+
+/**
+ * Public space information returned to non-participants
+ */
+export interface PublicSpaceInfo {
+  description: string | null;
+  gatekeeper_rules: {
+    email?: {
+      allowed: string[]; // Masked email patterns
+    };
+    twitch?: {
+      requirement: string;
+    };
+    youtube?: {
+      requirement: string;
+    };
+  } | null;
+  hideMetadata: boolean;
+  id: string;
+  share_key: string;
+  title: string | null;
+}
+
+/**
+ * Helper to mask YouTube gatekeeper rules
+ */
+function maskYoutubeRules(
+  gatekeeperRules: GatekeeperRules
+): { requirement: string } | undefined {
+  if (!gatekeeperRules.youtube?.channelId) {
+    return undefined;
+  }
+
+  const requirement =
+    gatekeeperRules.youtube.requirement ||
+    (gatekeeperRules.youtube.required ? "subscriber" : "none");
+
+  if (requirement === "none") {
+    return undefined;
+  }
+
+  return { requirement };
+}
+
+/**
+ * Helper to mask Twitch gatekeeper rules
+ */
+function maskTwitchRules(
+  gatekeeperRules: GatekeeperRules
+): { requirement: string } | undefined {
+  if (!gatekeeperRules.twitch?.broadcasterId) {
+    return undefined;
+  }
+
+  let requirement = gatekeeperRules.twitch.requirement || "none";
+
+  // Handle legacy format
+  if (requirement === "none") {
+    if (gatekeeperRules.twitch.requireSub) {
+      requirement = "subscriber";
+    } else if (gatekeeperRules.twitch.requireFollow) {
+      requirement = "follower";
+    }
+  }
+
+  if (requirement === "none") {
+    return undefined;
+  }
+
+  return { requirement };
+}
+
+/**
+ * Helper to mask email gatekeeper rules
+ */
+async function maskEmailRules(
+  gatekeeperRules: GatekeeperRules
+): Promise<{ allowed: string[] } | undefined> {
+  if (
+    !gatekeeperRules.email?.allowed ||
+    gatekeeperRules.email.allowed.length === 0
+  ) {
+    return undefined;
+  }
+
+  const { maskEmailPatterns } = await import("@/lib/privacy");
+  return {
+    allowed: maskEmailPatterns(gatekeeperRules.email.allowed),
+  };
+}
+
+/**
+ * Get public information about a space for non-participants
+ * This function masks sensitive data like email addresses
+ */
+export async function getSpacePublicInfo(
+  spaceId: string
+): Promise<PublicSpaceInfo | null> {
+  try {
+    if (!isValidUUID(spaceId)) {
+      return null;
+    }
+
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("spaces")
+      .select(
+        "id, share_key, status, title, description, gatekeeper_rules, settings"
+      )
+      .eq("id", spaceId)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    // Only return data for active spaces
+    if (data.status !== "active") {
+      return null;
+    }
+
+    // Parse settings to check if metadata should be hidden
+    const settings =
+      (data.settings as { hide_metadata_before_join?: boolean }) || {};
+    const hideMetadata = settings.hide_metadata_before_join === true;
+
+    // Mask gatekeeper rules
+    const gatekeeperRules = data.gatekeeper_rules as GatekeeperRules | null;
+    let maskedGatekeeperRules: PublicSpaceInfo["gatekeeper_rules"] = null;
+
+    if (gatekeeperRules) {
+      maskedGatekeeperRules = {};
+
+      // Mask email allowlist
+      const maskedEmail = await maskEmailRules(gatekeeperRules);
+      if (maskedEmail) {
+        maskedGatekeeperRules.email = maskedEmail;
+      }
+
+      // Include YouTube requirement (no masking needed)
+      const maskedYoutube = maskYoutubeRules(gatekeeperRules);
+      if (maskedYoutube) {
+        maskedGatekeeperRules.youtube = maskedYoutube;
+      }
+
+      // Include Twitch requirement (no masking needed)
+      const maskedTwitch = maskTwitchRules(gatekeeperRules);
+      if (maskedTwitch) {
+        maskedGatekeeperRules.twitch = maskedTwitch;
+      }
+    }
+
+    return {
+      description: data.description,
+      gatekeeper_rules: maskedGatekeeperRules,
+      hideMetadata,
+      id: data.id,
+      share_key: data.share_key,
+      title: data.title,
+    };
+  } catch (_error) {
+    return null;
+  }
+}

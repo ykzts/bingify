@@ -41,6 +41,8 @@ export async function updateSpaceSettings(
     // Extract and parse form data
     const maxParticipantsRaw = formData.get("max_participants") as string;
     const maxParticipants = Number.parseInt(maxParticipantsRaw, 10);
+    const hideMetadataBeforeJoin =
+      formData.get("hide_metadata_before_join") === "true";
 
     // Validate form data
     const validation = updateSpaceFormSchema.safeParse({
@@ -200,6 +202,9 @@ export async function updateSpaceSettings(
         description: description || null,
         gatekeeper_rules: gatekeeperRules,
         max_participants: maxParticipantsValue,
+        settings: {
+          hide_metadata_before_join: hideMetadataBeforeJoin,
+        },
         title: title || null,
       })
       .eq("id", spaceId)

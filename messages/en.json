@@ -311,8 +311,9 @@
     "verifyingTwitch": "Verifying...",
     "verifyYouTubeButton": "Verify YouTube Account",
     "verifyingYouTube": "Verifying...",
+    "draftMessage": "The host is currently preparing. Please wait.",
     "draftTitle": "Preparing",
-    "draftMessage": "The host is currently preparing. Please wait."
+    "privateSpace": "Private Space"
   },
   "UsernameSettings": {
     "description": "Set the name that will be displayed in the app.",
@@ -329,6 +330,21 @@
     "usernameHelp": "Maximum 50 characters",
     "usernameLabel": "Username",
     "usernamePlaceholder": "Enter your name"
+  },
+  "SpaceLanding": {
+    "emailRequirement": "Email Requirement",
+    "loginNote": "You need to sign in and join this space to participate in the bingo game.",
+    "loginToJoinNote": "Sign in to view details and join this space.",
+    "privateSpace": "Private Space",
+    "privateSpaceDescription": "This is a private space. Sign in to view details and join.",
+    "privateSpaceTitle": "Private Space",
+    "requirementsTitle": "Participation Requirements",
+    "twitchFollowerRequired": "Must be a follower",
+    "twitchRequirement": "Twitch Requirement",
+    "twitchSubscriberRequired": "Must be a subscriber",
+    "youtubeRequirement": "YouTube Requirement",
+    "youtubeMemberRequired": "Must be a member",
+    "youtubeSubscriberRequired": "Must be a subscriber"
   },
   "SpaceSettings": {
     "heading": "Space Settings",
@@ -355,6 +371,9 @@
     "twitchBroadcasterIdLabel": "Twitch Broadcaster ID",
     "emailAllowlistLabel": "Email Restrictions",
     "emailAllowlistHelp": "Allow only specific email addresses or domains to join",
+    "hideMetadataHelp": "When enabled, non-participants will only see a 'Private Space' message without title or description",
+    "hideMetadataLabel": "Hide title and description from non-participants",
+    "privacyTitle": "Privacy Settings",
     "updateSuccess": "Settings updated successfully",
     "updateButton": "Update Settings",
     "publishButton": "Publish and Start"

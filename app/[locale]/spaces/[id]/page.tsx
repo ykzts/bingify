@@ -3,8 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { checkUserParticipation, getSpaceById } from "../actions";
+import {
+  checkUserParticipation,
+  getSpaceById,
+  getSpacePublicInfo,
+} from "../actions";
 import { BingoCardDisplay } from "./_components/bingo-card-display";
+import { SpaceLandingPage } from "./_components/space-landing-page";
 import { SpaceParticipation } from "./_components/space-participation";
 
 interface Props {
@@ -85,6 +90,49 @@ export default async function UserSpacePage({ params }: Props) {
 
   // Check if user is already a participant
   const isParticipant = await checkUserParticipation(id);
+
+  // For non-participants, fetch public info to show landing page
+  if (!isParticipant) {
+    const publicInfo = await getSpacePublicInfo(id);
+
+    if (!publicInfo) {
+      notFound();
+    }
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Space Content */}
+        <div className="mx-auto max-w-4xl p-6">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="mb-1 font-bold text-2xl">
+                {publicInfo.hideMetadata
+                  ? t("privateSpace")
+                  : publicInfo.share_key}
+              </h1>
+              <p className="text-gray-600 text-sm">{t("spaceSubtitle")}</p>
+            </div>
+            <Link
+              className="text-gray-600 text-sm hover:text-gray-900 hover:underline"
+              href="/"
+            >
+              {t("backToHome")}
+            </Link>
+          </div>
+
+          {/* Landing Page for non-participants */}
+          <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+            <SpaceLandingPage publicInfo={publicInfo} />
+          </div>
+
+          {/* Participant Info Section */}
+          <div className="mt-6">
+            <SpaceParticipation spaceId={id} spaceInfo={space} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

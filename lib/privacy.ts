@@ -13,7 +13,7 @@
  * @returns The masked email address
  */
 export function maskEmail(email: string): string {
-  if (!email || !email.includes("@")) {
+  if (!email?.includes("@")) {
     return email;
   }
 
