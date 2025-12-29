@@ -9,11 +9,11 @@ permissions:
 
 jobs:
   trigger:
-    if: github.actor == 'Copilot' && github.event.pull_request.draft == false
+    if: github.actor == 'Copilot' && !github.event.pull_request.draft
     runs-on: ubuntu-24.04
     steps:
       - name: Request CodeRabbit Review
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_PR_NUM: ${{ github.event.pull_request.number }}
-        run: gh pr comment $GH_PR_NUM --body "@coderabbitai review"
+        run: gh pr comment "$GH_PR_NUM" --body "@coderabbitai review"
