@@ -27,6 +27,9 @@ interface Space {
   } | null;
   id: string;
   max_participants: number;
+  settings?: {
+    hide_metadata_before_join?: boolean;
+  };
   status: string;
   title: string | null;
 }
@@ -66,6 +69,9 @@ export function SpaceSettingsForm({
   );
   const [emailAllowlist, setEmailAllowlist] = useState(
     space.gatekeeper_rules?.email?.allowed?.join(", ") || ""
+  );
+  const [hideMetadataBeforeJoin, setHideMetadataBeforeJoin] = useState(
+    space.settings?.hide_metadata_before_join ?? false
   );
 
   const [updateState, updateAction, isUpdating] = useActionState<
@@ -307,6 +313,35 @@ export function SpaceSettingsForm({
             <p className="mt-1 text-gray-500 text-sm">
               {t("emailAllowlistHelp")}
             </p>
+          </div>
+        </div>
+
+        {/* Privacy Settings */}
+        <div className="space-y-4">
+          <h2 className="font-semibold text-lg">{t("privacyTitle")}</h2>
+
+          <div className="flex items-start gap-3">
+            <input
+              checked={hideMetadataBeforeJoin}
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+              disabled={isPending}
+              id="hide_metadata_before_join"
+              name="hide_metadata_before_join"
+              onChange={(e) => setHideMetadataBeforeJoin(e.target.checked)}
+              type="checkbox"
+              value="true"
+            />
+            <div className="flex-1">
+              <Label
+                className="cursor-pointer"
+                htmlFor="hide_metadata_before_join"
+              >
+                {t("hideMetadataLabel")}
+              </Label>
+              <p className="mt-1 text-gray-500 text-sm">
+                {t("hideMetadataHelp")}
+              </p>
+            </div>
           </div>
         </div>
 

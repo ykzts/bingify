@@ -41,6 +41,7 @@ export async function updateSpaceSettings(
     // Extract and parse form data
     const maxParticipantsRaw = formData.get("max_participants") as string;
     const maxParticipants = Number.parseInt(maxParticipantsRaw, 10);
+    const hideMetadataBeforeJoin = formData.has("hide_metadata_before_join");
 
     // Validate form data
     const validation = updateSpaceFormSchema.safeParse({
@@ -87,7 +88,7 @@ export async function updateSpaceSettings(
     // Get current space data
     const { data: space, error: spaceError } = await supabase
       .from("spaces")
-      .select("owner_id, max_participants")
+      .select("owner_id, max_participants, settings")
       .eq("id", spaceId)
       .single();
 
@@ -200,6 +201,10 @@ export async function updateSpaceSettings(
         description: description || null,
         gatekeeper_rules: gatekeeperRules,
         max_participants: maxParticipantsValue,
+        settings: {
+          ...(space.settings as Record<string, unknown>),
+          hide_metadata_before_join: hideMetadataBeforeJoin,
+        },
         title: title || null,
       })
       .eq("id", spaceId)

@@ -18,7 +18,7 @@ export default async function SpaceSettingsPage({ params }: Props) {
   const { data: space, error } = await supabase
     .from("spaces")
     .select(
-      "id, share_key, status, max_participants, gatekeeper_rules, title, description"
+      "id, share_key, status, max_participants, gatekeeper_rules, title, description, settings"
     )
     .eq("id", id)
     .single();
