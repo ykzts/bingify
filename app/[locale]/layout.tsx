@@ -9,7 +9,6 @@ import {
 import { routing } from "@/i18n/routing";
 import { Footer } from "./_components/footer";
 import { HeaderMenuWrapper } from "./_components/header-menu-wrapper";
-import "../globals.css";
 
 const nunito = Nunito({
   display: "swap",
@@ -17,20 +16,13 @@ const nunito = Nunito({
   variable: "--font-nunito",
 });
 
-interface Props {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}
-
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
+}: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Metadata" });
 
@@ -43,7 +35,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function LocaleLayout({ children, params }: Props) {
+export default async function LocaleLayout({
+  children,
+  params,
+}: LayoutProps<"/[locale]">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

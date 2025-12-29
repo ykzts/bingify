@@ -8,7 +8,7 @@ on:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -17,19 +17,22 @@ jobs:
 
       - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
-          node-version: "24"
-          cache: "pnpm"
+          node-version: 24.x
+          cache: pnpm
 
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
 
-      - run: pnpm check:ci --reporter=github
-        name: Run Biome checks
+      - name: Generate types
+        run: pnpm typegen
 
-      - run: pnpm type-check
-        name: Type check
+      - name: Run Biome checks
+        run: pnpm check:ci --reporter=github
 
-      - run: pnpm test:ci
-        name: Run tests
+      - name: Type check
+        run: pnpm type-check
 
-      - run: pnpm build
-        name: Build
+      - name: Run tests
+        run: pnpm test:ci
+        
+      - name: Build
+        run: pnpm build

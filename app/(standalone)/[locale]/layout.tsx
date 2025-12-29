@@ -1,10 +1,12 @@
-import "../../../globals.css";
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { cn } from "@/lib/utils";
-import { BackgroundProvider, ColoredHtml } from "./_context/background-context";
+import {
+  BackgroundProvider,
+  ColoredHtml,
+} from "./screen/_context/background-context";
 
 const nunito = Nunito({
   display: "swap",
@@ -12,18 +14,16 @@ const nunito = Nunito({
   variable: "--font-nunito",
 });
 
-interface Props {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}
-
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Bingify Screen",
   };
 }
 
-export default async function ScreenLayout({ children, params }: Props) {
+export default async function ScreenLayout({
+  children,
+  params,
+}: LayoutProps<"/[locale]">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

@@ -81,7 +81,8 @@
     "test": "vitest",
     "test:ci": "vitest run",
     "test:ui": "vitest --ui",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "typegen": "next typegen"
   },
   "version": "0.1.0"
 }
