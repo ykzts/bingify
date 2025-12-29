@@ -216,11 +216,11 @@
     "selectLanguage": "言語を選択"
   },
   "Login": {
-    "description": "ダッシュボードにアクセスして、ビンゴスペースを管理するにはサインインしてください。",
+    "description": "ゲームのホストやアカウント管理のためにサインインしてください。",
     "descriptionSpace": "サインインして、このビンゴスペースに参加しましょう。",
     "errorMessage": "サインイン中にエラーが発生しました。もう一度お試しください。",
     "googleButton": "Googleでサインイン",
-    "title": "ダッシュボードにサインイン",
+    "title": "Bingifyにサインイン",
     "titleSpace": "スペースに参加",
     "twitchButton": "Twitchでサインイン"
   },

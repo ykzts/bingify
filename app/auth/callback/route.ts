@@ -8,6 +8,7 @@ const LOCALE_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/`);
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
+  const redirect = requestUrl.searchParams.get("redirect");
   const origin = requestUrl.origin;
 
   // Helper function to extract locale from referer
@@ -58,8 +59,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}${loginPath}`);
   }
 
-  // Successfully authenticated, redirect to dashboard
+  // Successfully authenticated, redirect to specified path or default
   const locale = getLocaleFromReferer();
-  const redirectPath = buildPath("/dashboard", locale);
-  return NextResponse.redirect(`${origin}${redirectPath}`);
+  
+  // Use redirect parameter if provided, otherwise default to homepage
+  let redirectPath = redirect && redirect.trim() !== "" ? redirect : "/";
+  
+  // Ensure the redirect path starts with /
+  if (!redirectPath.startsWith("/")) {
+    redirectPath = `/${redirectPath}`;
+  }
+  
+  // If redirect path already includes locale, use it as-is
+  // Otherwise, prepend locale if available
+  const hasLocale = LOCALE_PATTERN.test(redirectPath);
+  const finalPath = hasLocale ? redirectPath : buildPath(redirectPath, locale);
+  
+  return NextResponse.redirect(`${origin}${finalPath}`);
 }

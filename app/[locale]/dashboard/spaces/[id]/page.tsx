@@ -23,7 +23,7 @@ export default async function AdminSpacePage({ params }: Props) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}/login`);
+    redirect(`/${locale}/login?redirect=/dashboard/spaces/${id}`);
   }
 
   // Fetch space (RLS ensures only owner can access)

@@ -30,7 +30,7 @@ export default async function SetupPage({ params }: Props) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}/login`);
+    redirect(`/${locale}/login?redirect=/setup`);
   }
 
   return (

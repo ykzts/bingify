@@ -216,11 +216,11 @@
     "selectLanguage": "Select language"
   },
   "Login": {
-    "description": "Sign in to access the dashboard and manage your bingo spaces.",
+    "description": "Sign in to host games or manage your account.",
     "descriptionSpace": "Sign in to join this bingo space and participate in the game.",
     "errorMessage": "An error occurred during sign-in. Please try again.",
     "googleButton": "Sign in with Google",
-    "title": "Sign in to Dashboard",
+    "title": "Sign in to Bingify",
     "titleSpace": "Sign in to Join Space",
     "twitchButton": "Sign in with Twitch"
   },
