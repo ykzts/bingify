@@ -550,6 +550,7 @@ export interface PublicSpaceInfo {
   hideMetadata: boolean;
   id: string;
   share_key: string;
+  status: string | null;
   title: string | null;
 }
 
@@ -647,11 +648,6 @@ export async function getSpacePublicInfo(
       return null;
     }
 
-    // Only return data for active spaces
-    if (data.status !== "active") {
-      return null;
-    }
-
     // Parse settings to check if metadata should be hidden
     const settings =
       (data.settings as { hide_metadata_before_join?: boolean }) || {};
@@ -681,6 +677,11 @@ export async function getSpacePublicInfo(
       if (maskedTwitch) {
         maskedGatekeeperRules.twitch = maskedTwitch;
       }
+
+      // If no rules were actually added, normalize back to null
+      if (Object.keys(maskedGatekeeperRules).length === 0) {
+        maskedGatekeeperRules = null;
+      }
     }
 
     return {
@@ -689,6 +690,7 @@ export async function getSpacePublicInfo(
       hideMetadata,
       id: data.id,
       share_key: data.share_key,
+      status: data.status,
       title: data.title,
     };
   } catch (_error) {

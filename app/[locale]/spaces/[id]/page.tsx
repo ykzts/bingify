@@ -41,6 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Space page requires handling draft/active status, participant checks, and different views
 export default async function UserSpacePage({ params }: Props) {
   const { id, locale } = await params;
   setRequestLocale(locale);
@@ -96,6 +97,31 @@ export default async function UserSpacePage({ params }: Props) {
     const publicInfo = await getSpacePublicInfo(id);
 
     if (!publicInfo) {
+      notFound();
+    }
+
+    // If space is draft, show waiting screen
+    if (publicInfo.status === "draft") {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-gray-50">
+          <div className="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
+            <h1 className="mb-4 font-bold text-2xl text-gray-900">
+              {t("draftTitle")}
+            </h1>
+            <p className="mb-6 text-gray-600">{t("draftMessage")}</p>
+            <Link
+              className="text-purple-600 hover:underline"
+              href={`/${locale}`}
+            >
+              {t("backToHome")}
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    // If space is not active, show 404
+    if (publicInfo.status !== "active") {
       notFound();
     }
 

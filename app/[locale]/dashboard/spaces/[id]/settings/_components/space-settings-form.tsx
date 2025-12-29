@@ -71,7 +71,7 @@ export function SpaceSettingsForm({
     space.gatekeeper_rules?.email?.allowed?.join(", ") || ""
   );
   const [hideMetadataBeforeJoin, setHideMetadataBeforeJoin] = useState(
-    space.settings?.hide_metadata_before_join
+    space.settings?.hide_metadata_before_join ?? false
   );
 
   const [updateState, updateAction, isUpdating] = useActionState<

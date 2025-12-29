@@ -47,11 +47,6 @@ export function SpaceLandingPage({ publicInfo }: Props) {
         )}
       </div>
 
-      {/* Info Note */}
-      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-        <p className="text-blue-800 text-sm">{t("loginNote")}</p>
-      </div>
-
       {/* Requirements Section */}
       {publicInfo.gatekeeper_rules && (
         <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-6">
