@@ -294,4 +294,73 @@ describe("Auth Callback Route", () => {
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe(`${origin}/ja/dashboard`);
   });
+
+  it("should reject protocol-relative URLs in redirect parameter", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=//evil.com/path`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should reject absolute URLs in redirect parameter", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=https://evil.com/path`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should reject redirect with @ symbol", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/path@evil.com`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
 });
