@@ -6,6 +6,31 @@ reviews:
   auto_review:
     ignore_usernames:
       - renovate[bot]
+  path_instructions:
+    - instructions: |
+        各指摘コメントの冒頭には、必ずPull Requestの作成者（Author）へのメンションを含めてください。
+        
+        【メンションのルール】
+        1. Authorが "copilot", "copilot[bot]", またはその他のCopilot関連のBotであると判断できる場合:
+           必ず "@copilot" とメンションしてください。
+        2. それ以外（人間のユーザー）の場合:
+           Authorの正しいユーザー名（例: @username）をメンションしてください。
+        
+        形式例:
+        "@copilot ここは修正が必要です..."
+        "@user123 提案ですが..."
+        
+        理由:
+        コメントの通知漏れを防ぐため、例外なくメンションが必要です。
+      path: "**/*"
+    - instructions: |
+        これらのファイルは shadcn/ui によって生成されたUIコンポーネントです。
+        
+        以下のルールに従ってレビューしてください：
+        1. **重大なバグ**や**セキュリティ上の脆弱性**が見つかった場合のみ指摘してください。
+        2. コードスタイル、型定義の厳密化、軽微なリファクタリング提案は**行わないでください**。
+        3. もし指摘する場合は、それがshadcn/uiの標準実装から逸脱するリスクがないか考慮してください。
+      path: "components/ui/**/*.tsx"
   poem: false
   profile: chill
   request_changes_workflow: true
