@@ -28,13 +28,12 @@ export default async function SpaceSettingsPage({ params }: Props) {
   }
 
   // Get current participant count
-  // Note: Using regular SELECT instead of HEAD to ensure RLS policy works correctly
-  // The RLS policy allows space owners to read participants
-  const { count: participantCount, error: participantCountError } =
-    await supabase
-      .from("participants")
-      .select("id", { count: "exact" })
-      .eq("space_id", id);
+  // Note: Fetching actual data instead of using count to avoid RLS recursion issues
+  // The RLS policy on participants table has recursive EXISTS checks that can cause issues with count queries
+  const { data: participantsData, error: participantCountError } =
+    await supabase.from("participants").select("id").eq("space_id", id);
+
+  const participantCount = participantsData?.length ?? 0;
 
   if (participantCountError) {
     console.error(

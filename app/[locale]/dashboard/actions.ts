@@ -341,11 +341,13 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
 
     if (activeSpaceData) {
       // Get participant count
-      // Note: Using regular SELECT instead of HEAD to ensure RLS policy works correctly
-      const { count } = await supabase
+      // Note: Fetching actual data instead of using count to avoid RLS recursion issues
+      const { data: participantsData } = await supabase
         .from("participants")
-        .select("id", { count: "exact" })
+        .select("id")
         .eq("space_id", activeSpaceData.id);
+
+      const count = participantsData?.length ?? 0;
 
       activeSpace = {
         ...activeSpaceData,
