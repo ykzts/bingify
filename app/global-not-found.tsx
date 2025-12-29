@@ -1,5 +1,6 @@
 import "./globals.css";
 import { FileQuestion } from "lucide-react";
+import { Nunito } from "next/font/google";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,10 +11,16 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 
+const nunito = Nunito({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-nunito",
+});
+
 export default function GlobalNotFound() {
   return (
     <html lang="en">
-      <body>
+      <body className={`${nunito.variable} antialiased`}>
         <div className="container mx-auto px-4 py-16">
           <Empty>
             <EmptyIcon>
