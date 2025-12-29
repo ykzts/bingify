@@ -414,6 +414,98 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
+  it("should reject redirect with empty string", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should reject redirect with encoded slashes", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=%2F%2Fevil.com`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should reject redirect with path traversal", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/dashboard/../../etc/passwd`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  it("should reject redirect with encoded path traversal", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/dashboard%2F..%2F..%2Fetc%2Fpasswd`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
   it("should handle paths with backslashes", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
