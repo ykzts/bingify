@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SpaceSettingsForm } from "./_components/space-settings-form";
 
@@ -14,15 +13,6 @@ export default async function SpaceSettingsPage({ params }: Props) {
 
   const t = await getTranslations("SpaceSettings");
   const supabase = await createClient();
-
-  // Get current user
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect({ href: "/login", locale });
-  }
 
   // Fetch space (RLS ensures only owner can access)
   const { data: space, error } = await supabase
