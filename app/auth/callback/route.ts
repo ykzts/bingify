@@ -4,6 +4,7 @@ import { routing } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
 
 const LOCALE_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/`);
+const PROTOCOL_PATTERN = /^[a-zA-Z][a-zA-Z0-9+.-]*:/;
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -72,17 +73,14 @@ export async function GET(request: NextRequest) {
     redirectPath = "/";
   }
 
-  // Additional validation: ensure no protocol or domain
-  try {
-    // If it can be parsed as absolute URL, reject it
-    new URL(redirectPath, "http://example.com");
-    // If we get here, it might be a valid path, but let's be extra safe
-    // and ensure it doesn't contain : or @ which could indicate a protocol or auth
-    if (redirectPath.includes(":") || redirectPath.includes("@")) {
-      redirectPath = "/";
-    }
-  } catch {
-    // Not a valid URL path, use default
+  // Additional validation: ensure it's not an absolute URL
+  // Check for protocol schemes (http:, https:, etc.)
+  if (PROTOCOL_PATTERN.test(redirectPath)) {
+    redirectPath = "/";
+  }
+
+  // Reject paths with @ symbol which could indicate userinfo in URLs
+  if (redirectPath.includes("@")) {
     redirectPath = "/";
   }
 

@@ -363,4 +363,29 @@ describe("Auth Callback Route", () => {
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
+
+  it("should accept redirect with query parameters containing colons", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+      },
+    } as any);
+
+    const request = new NextRequest(
+      `${origin}/auth/callback?code=valid_code&redirect=/dashboard?time=12:30:00`,
+      {
+        headers: {
+          referer: `${origin}/login`,
+        },
+      }
+    );
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/dashboard?time=12:30:00`
+    );
+  });
 });
