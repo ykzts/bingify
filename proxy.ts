@@ -133,7 +133,7 @@ async function handleAdminAuth(
   return intlResponse;
 }
 
-export async function proxy(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // --- 1. Basic Auth Check (Highest Priority) ---
