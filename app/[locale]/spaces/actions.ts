@@ -467,10 +467,13 @@ export async function getParticipantCount(
     const supabase = await createClient();
 
     // Get participant count and max participants
-    const { count, error: countError } = await supabase
+    // Note: Fetching actual data instead of using count to avoid RLS recursion issues
+    const { data: participantsData, error: countError } = await supabase
       .from("participants")
-      .select("*", { count: "exact", head: true })
+      .select("id")
       .eq("space_id", spaceId);
+
+    const count = participantsData?.length ?? 0;
 
     if (countError) {
       console.error("Error counting participants:", countError);

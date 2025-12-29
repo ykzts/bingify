@@ -28,10 +28,20 @@ export default async function SpaceSettingsPage({ params }: Props) {
   }
 
   // Get current participant count
-  const { count: participantCount } = await supabase
-    .from("participants")
-    .select("*", { count: "exact", head: true })
-    .eq("space_id", id);
+  // Note: Fetching actual data instead of using count to avoid RLS recursion issues
+  // The RLS policy on participants table has recursive EXISTS checks that can cause issues with count queries
+  const { data: participantsData, error: participantCountError } =
+    await supabase.from("participants").select("id").eq("space_id", id);
+
+  const participantCount = participantsData?.length ?? 0;
+
+  if (participantCountError) {
+    console.error(
+      "Failed to fetch participant count for space",
+      id,
+      participantCountError
+    );
+  }
 
   // Get system settings
   const { data: systemSettings } = await supabase
@@ -50,6 +60,12 @@ export default async function SpaceSettingsPage({ params }: Props) {
             {space.status === "draft" ? t("statusDraft") : t("statusActive")}
           </p>
         </div>
+
+        {participantCountError && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+            <p className="text-red-800">{t("errorFetchParticipantCount")}</p>
+          </div>
+        )}
 
         <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
           <SpaceSettingsForm

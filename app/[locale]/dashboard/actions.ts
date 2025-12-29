@@ -120,9 +120,12 @@ export async function createSpace(
       // Continue with space creation if settings fetch fails (graceful degradation)
     } else if (systemSettings) {
       // Count user's existing spaces
+      // Note: The spaces table RLS policy does not have recursion issues,
+      // so we can use count: "exact" directly. The participants table uses
+      // a different approach (fetching rows then using array length) due to RLS recursion.
       const { count: userSpaceCount, error: countError } = await supabase
         .from("spaces")
-        .select("*", { count: "exact", head: true })
+        .select("id", { count: "exact" })
         .eq("owner_id", user.id);
 
       if (countError) {
@@ -340,10 +343,13 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
 
     if (activeSpaceData) {
       // Get participant count
-      const { count } = await supabase
+      // Note: Fetching actual data instead of using count to avoid RLS recursion issues
+      const { data: participantsData } = await supabase
         .from("participants")
-        .select("*", { count: "exact", head: true })
+        .select("id")
         .eq("space_id", activeSpaceData.id);
+
+      const count = participantsData?.length ?? 0;
 
       activeSpace = {
         ...activeSpaceData,

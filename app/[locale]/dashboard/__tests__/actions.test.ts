@@ -51,7 +51,13 @@ describe("Dashboard Actions", () => {
             return {
               select: vi.fn().mockReturnValue({
                 eq: vi.fn().mockResolvedValue({
-                  count: 5,
+                  data: [
+                    { id: "p1" },
+                    { id: "p2" },
+                    { id: "p3" },
+                    { id: "p4" },
+                    { id: "p5" },
+                  ],
                   error: null,
                 }),
               }),
