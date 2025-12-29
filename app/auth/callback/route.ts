@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const LOCALE_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/`);
 const PROTOCOL_PATTERN = /^[a-zA-Z][a-zA-Z0-9+.-]*:/;
+const DANGEROUS_PROTOCOLS = /(?:javascript|data|vbscript|file|about):/i;
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -74,13 +75,14 @@ export async function GET(request: NextRequest) {
   }
 
   // Additional validation: ensure it's not an absolute URL
-  // Check for protocol schemes (http:, https:, etc.)
+  // Check for protocol schemes (http:, https:, etc.) at the start
   if (PROTOCOL_PATTERN.test(redirectPath)) {
     redirectPath = "/";
   }
 
-  // Reject paths with @ symbol which could indicate userinfo in URLs
-  if (redirectPath.includes("@")) {
+  // Check for dangerous protocol handlers anywhere in the path
+  // This prevents XSS attacks through URL manipulation like javascript:alert(1)
+  if (DANGEROUS_PROTOCOLS.test(redirectPath)) {
     redirectPath = "/";
   }
 
