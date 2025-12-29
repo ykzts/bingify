@@ -45,22 +45,6 @@ async function handleShareKeyRoute(
     // Run intl middleware first to detect locale and set headers/cookies
     const intlResponse = intlMiddleware(request);
 
-    // Check authentication before allowing access
-    const supabase = createClient(request, intlResponse);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      // Redirect to login if not authenticated
-      const pathname = request.nextUrl.pathname;
-      const localeMatch = pathname.match(LOCALE_PATTERN);
-      const loginPath = localeMatch ? `/${localeMatch[1]}/login` : "/login";
-      const loginUrl = new URL(loginPath, request.url);
-      loginUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-
     // Get the locale from the intl middleware response
     const locale =
       intlResponse.cookies.get("NEXT_LOCALE")?.value || routing.defaultLocale;
@@ -149,7 +133,7 @@ async function handleAdminAuth(
   return intlResponse;
 }
 
-export async function proxy(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // --- 1. Basic Auth Check (Highest Priority) ---
@@ -160,18 +144,18 @@ export async function proxy(request: NextRequest) {
 
   // --- 2. Supabase Auth Check for /dashboard routes ---
   if (isDashboardPath(pathname)) {
-    return await handleAuthenticatedRoute(request, pathname);
+    return handleAuthenticatedRoute(request, pathname);
   }
 
   // --- 3. Admin Auth Check for /admin routes ---
   if (isAdminPath(pathname)) {
-    return await handleAdminAuth(request, pathname);
+    return handleAdminAuth(request, pathname);
   }
 
-  // --- 4. Share Key Rewrite Logic with Auth Check ---
+  // --- 4. Share Key Rewrite Logic ---
   if (pathname.startsWith("/@")) {
     const shareKey = pathname.slice(2);
-    return await handleShareKeyRoute(request, shareKey);
+    return handleShareKeyRoute(request, shareKey);
   }
 
   // --- 5. Internationalization Routing ---
