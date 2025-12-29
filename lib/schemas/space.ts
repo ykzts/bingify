@@ -129,7 +129,12 @@ export const twitchRequirementSchema = z.enum([
 export type SpaceFormData = z.infer<typeof spaceSchema>;
 
 // Space status enum
-export const spaceStatusSchema = z.enum(["draft", "active", "archived"]);
+export const spaceStatusSchema = z.enum([
+  "draft",
+  "active",
+  "archived",
+  "expired",
+]);
 
 export type SpaceStatus = z.infer<typeof spaceStatusSchema>;
 
@@ -138,10 +143,12 @@ export const updateSpaceFormSchema = z
   .object({
     title: z
       .string()
+      .trim()
       .max(100, "タイトルは100文字以内で入力してください")
       .optional(),
     description: z
       .string()
+      .trim()
       .max(500, "説明は500文字以内で入力してください")
       .optional(),
     max_participants: z

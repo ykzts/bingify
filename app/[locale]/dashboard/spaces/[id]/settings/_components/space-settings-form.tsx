@@ -114,6 +114,11 @@ export function SpaceSettingsForm({
               type="text"
               value={title}
             />
+            {updateState.fieldErrors?.title && (
+              <p className="mt-1 text-red-600 text-sm">
+                {updateState.fieldErrors.title}
+              </p>
+            )}
             <p className="mt-1 text-gray-500 text-sm">{t("titleHelp")}</p>
           </div>
 
@@ -131,6 +136,11 @@ export function SpaceSettingsForm({
               rows={3}
               value={description}
             />
+            {updateState.fieldErrors?.description && (
+              <p className="mt-1 text-red-600 text-sm">
+                {updateState.fieldErrors.description}
+              </p>
+            )}
             <p className="mt-1 text-gray-500 text-sm">{t("descriptionHelp")}</p>
           </div>
         </div>
@@ -157,6 +167,11 @@ export function SpaceSettingsForm({
               type="number"
               value={maxParticipants}
             />
+            {updateState.fieldErrors?.max_participants && (
+              <p className="mt-1 text-red-600 text-sm">
+                {updateState.fieldErrors.max_participants}
+              </p>
+            )}
             <p className="mt-1 text-gray-500 text-sm">
               {t("maxParticipantsHelp", {
                 current: currentParticipantCount,
@@ -212,6 +227,11 @@ export function SpaceSettingsForm({
                 type="text"
                 value={youtubeChannelId}
               />
+              {updateState.fieldErrors?.youtube_channel_id && (
+                <p className="mt-1 text-red-600 text-sm">
+                  {updateState.fieldErrors.youtube_channel_id}
+                </p>
+              )}
             </div>
           )}
 
@@ -258,6 +278,11 @@ export function SpaceSettingsForm({
                 type="text"
                 value={twitchBroadcasterId}
               />
+              {updateState.fieldErrors?.twitch_broadcaster_id && (
+                <p className="mt-1 text-red-600 text-sm">
+                  {updateState.fieldErrors.twitch_broadcaster_id}
+                </p>
+              )}
             </div>
           )}
 
@@ -274,6 +299,11 @@ export function SpaceSettingsForm({
               rows={3}
               value={emailAllowlist}
             />
+            {updateState.fieldErrors?.email_allowlist && (
+              <p className="mt-1 text-red-600 text-sm">
+                {updateState.fieldErrors.email_allowlist}
+              </p>
+            )}
             <p className="mt-1 text-gray-500 text-sm">
               {t("emailAllowlistHelp")}
             </p>

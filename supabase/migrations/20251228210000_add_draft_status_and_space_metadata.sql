@@ -6,10 +6,11 @@ ALTER TABLE spaces
 ADD COLUMN title TEXT,
 ADD COLUMN description TEXT;
 
--- Add title and description to spaces_archive table for consistency
+-- Add title, description, and gatekeeper_rules to spaces_archive table for consistency
 ALTER TABLE spaces_archive
 ADD COLUMN title TEXT,
-ADD COLUMN description TEXT;
+ADD COLUMN description TEXT,
+ADD COLUMN gatekeeper_rules JSONB;
 
 -- Update archive trigger function to include new columns
 CREATE OR REPLACE FUNCTION archive_deleted_space()

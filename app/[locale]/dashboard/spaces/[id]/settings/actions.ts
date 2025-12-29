@@ -236,6 +236,14 @@ export async function publishSpace(
   formData: FormData
 ): Promise<PublishSpaceState> {
   try {
+    // Validate UUID first before any operations
+    if (!isValidUUID(spaceId)) {
+      return {
+        error: "Invalid space ID",
+        success: false,
+      };
+    }
+
     // First update the settings
     const updateResult = await updateSpaceSettings(
       spaceId,
@@ -246,13 +254,6 @@ export async function publishSpace(
     if (!updateResult.success) {
       return {
         error: updateResult.error || "設定の更新に失敗しました",
-        success: false,
-      };
-    }
-
-    if (!isValidUUID(spaceId)) {
-      return {
-        error: "Invalid space ID",
         success: false,
       };
     }
