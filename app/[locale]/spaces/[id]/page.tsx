@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { createClient } from "@/lib/supabase/server";
 import { checkUserParticipation, getSpaceById } from "../actions";
 import { BingoCardDisplay } from "./_components/bingo-card-display";
 import { SpaceParticipation } from "./_components/space-participation";
@@ -49,8 +50,19 @@ export default async function UserSpacePage({ params }: Props) {
     notFound();
   }
 
-  // If space is draft, show waiting screen
+  // Get current user
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // If space is draft, only owner can access - others get 404
   if (space.status === "draft") {
+    if (!user || space.owner_id !== user.id) {
+      notFound();
+    }
+
+    // Owner sees waiting screen
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
