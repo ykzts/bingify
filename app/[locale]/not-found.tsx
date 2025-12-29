@@ -1,5 +1,4 @@
 import { FileQuestion } from "lucide-react";
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,6 +8,7 @@ import {
   EmptyIcon,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { Link } from "@/i18n/navigation";
 
 export default async function NotFound() {
   const t = await getTranslations("NotFound");
@@ -19,7 +19,7 @@ export default async function NotFound() {
         <EmptyIcon>
           <FileQuestion className="h-20 w-20 text-muted-foreground" />
         </EmptyIcon>
-        <EmptyTitle>{t("title")}</EmptyTitle>
+        <EmptyTitle as="h1">{t("title")}</EmptyTitle>
         <EmptyDescription>{t("description")}</EmptyDescription>
         <EmptyAction>
           <Button asChild>

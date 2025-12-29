@@ -6,6 +6,7 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
   experimental: {
+    globalNotFound: true,
     turbopackUseSystemTlsCerts: true,
   },
   images: {

@@ -1,4 +1,5 @@
 import * as React from "react";
+import "@/app/globals.css";
 
 import { cn } from "@/lib/utils";
 
@@ -31,9 +32,11 @@ EmptyIcon.displayName = "EmptyIcon";
 
 const EmptyTitle = React.forwardRef<
   HTMLHeadingElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <h3
+  React.HTMLAttributes<HTMLHeadingElement> & {
+    as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  }
+>(({ as: Comp = "h3", className, ...props }, ref) => (
+  <Comp
     ref={ref}
     className={cn("mt-4 font-semibold text-lg", className)}
     {...props}
