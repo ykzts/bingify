@@ -152,7 +152,7 @@ export function proxy(request: NextRequest) {
     return handleAdminAuth(request, pathname);
   }
 
-  // --- 4. Share Key Rewrite Logic with Auth Check ---
+  // --- 4. Share Key Rewrite Logic ---
   if (pathname.startsWith("/@")) {
     const shareKey = pathname.slice(2);
     return handleShareKeyRoute(request, shareKey);
