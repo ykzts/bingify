@@ -32,13 +32,6 @@ function isDashboardPath(pathname: string): boolean {
   );
 }
 
-function isSpacesPath(pathname: string): boolean {
-  const SPACES_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/spaces/`);
-  return (
-    pathname.startsWith("/spaces/") || Boolean(pathname.match(SPACES_PATTERN))
-  );
-}
-
 async function handleShareKeyRoute(
   request: NextRequest,
   shareKey: string
@@ -165,8 +158,8 @@ export async function proxy(request: NextRequest) {
     return authResponse;
   }
 
-  // --- 2. Supabase Auth Check for /dashboard and /spaces routes ---
-  if (isDashboardPath(pathname) || isSpacesPath(pathname)) {
+  // --- 2. Supabase Auth Check for /dashboard routes ---
+  if (isDashboardPath(pathname)) {
     return await handleAuthenticatedRoute(request, pathname);
   }
 
