@@ -40,6 +40,9 @@
 
 - YouTube確認が必要な場合に青色の情報バナーを表示
 - 確認失敗時の適切なエラーメッセージ表示
+- **スマートボタン統合**: YouTubeトークンの有無に応じて「YouTubeを確認して参加」または「参加する」を表示
+- **OAuth自動処理**: トークンがない場合、ボタンクリックでGoogle OAuth（YouTube readonly scope）を実行
+- **シームレスなUX**: OAuth後は同じページに戻り、ボタンが自動的に「参加する」に切り替わる
 
 #### スペース作成フォーム (`app/[locale]/dashboard/create-space-form.tsx`)
 
@@ -56,6 +59,8 @@
 - `errorYouTubeVerificationFailed`
 - `verifyYouTubeButton`
 - `verifyingYouTube`
+- `verifyAndJoinButton` - スマートボタン用: "Verify & Join" / "YouTubeを確認して参加"
+- `verifyingAndJoining` - スマートボタン用: "Verifying..." / "確認中..."
 
 ### 4. テスト
 
@@ -67,103 +72,6 @@ YouTube API連携の包括的なテスト (`lib/__tests__/youtube.test.ts`):
 - APIエラー
 - ネットワークエラー
 - パラメータ検証
-
-## 実装が必要な残りの作業
-
-### YouTubeトークン取得のためのOAuthフロー
-
-現在の実装ではバックエンドロジックが整っていますが、YouTubeアクセストークンを取得するためのクライアント側OAuthフローが必要です。実装手順は以下の通りです:
-
-#### 1. Google OAuthの設定
-
-既存のSupabase OAuth設定を使用します（`SUPABASE_AUTH_EXTERNAL_GOOGLE_*`環境変数）。
-
-#### 2. クライアント側のアクセストークン取得
-
-Supabaseセッションから既存のGoogle OAuthトークンを取得:
-
-```tsx
-// app/[locale]/spaces/[id]/_components/youtube-verification-button.tsx
-"use client";
-
-import { useState } from "react";
-import { useTranslations } from "next-intl";
-import { createClient } from "@/lib/supabase/client";
-
-export function YouTubeVerificationButton({
-  onTokenReceived,
-}: {
-  onTokenReceived: (token: string) => void;
-}) {
-  const t = useTranslations("UserSpace");
-  const [isVerifying, setIsVerifying] = useState(false);
-
-  const handleVerify = async () => {
-    setIsVerifying(true);
-
-    try {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (session?.provider_token) {
-        onTokenReceived(session.provider_token);
-      } else {
-        // Google OAuth でログインする必要がある
-        await supabase.auth.signInWithOAuth({
-          provider: "google",
-          options: {
-            scopes: "https://www.googleapis.com/auth/youtube.readonly",
-            redirectTo: window.location.href,
-          },
-        });
-      }
-    } catch (error) {
-      console.error("YouTube verification error:", error);
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
-  return (
-    <button onClick={handleVerify} disabled={isVerifying} className="...">
-      {isVerifying ? t("verifyingYouTube") : t("verifyYouTubeButton")}
-    </button>
-  );
-}
-```
-
-#### 3. スペース参加との統合
-
-`space-participation.tsx`を更新:
-
-1. YouTube確認が必要な場合にYouTube確認ボタンを表示
-2. 確認後、アクセストークンを使用して`joinSpace()`を呼び出し
-3. 確認フローのエラーを処理
-
-実装例:
-
-```tsx
-const handleYouTubeVerify = async (token: string) => {
-  setIsJoining(true);
-  const result = await joinSpace(spaceId, token);
-  if (result.success) {
-    setHasJoined(true);
-    router.refresh();
-  } else {
-    setError(result.errorKey ? t(result.errorKey) : t("errorJoinFailed"));
-  }
-  setIsJoining(false);
-};
-
-// レンダリング内
-{
-  spaceInfo.gatekeeper_rules?.youtube?.required && !hasJoined && (
-    <YouTubeVerificationButton onTokenReceived={handleYouTubeVerify} />
-  );
-}
-```
 
 ## 実装のテスト
 
@@ -180,9 +88,12 @@ const handleYouTubeVerify = async (token: string) => {
    - 参加を試行
    - エラーが表示される: "YouTubeアカウントの確認が必要です"
 
-3. **確認付きでの参加** (OAuth実装後)
-   - "YouTubeアカウントを確認する"ボタンをクリック
-   - Googleで認証
+3. **確認付きでの参加**
+   - "YouTubeを確認して参加"ボタンをクリック
+   - Googleで認証（YouTube readonly scopeで）
+   - 認証後、自動的にスペースページに戻る
+   - ボタンが"参加する"に変わる
+   - ボタンをクリックして参加
    - 登録済み: スペースに正常に参加
    - 未登録: エラーメッセージを表示
 

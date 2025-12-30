@@ -225,7 +225,13 @@ export function SpaceParticipation({
       return (
         <JoinButton
           compact={compact}
-          icon={compact ? <Youtube className="h-4 w-4" /> : <Youtube className="h-5 w-5" />}
+          icon={
+            compact ? (
+              <Youtube className="h-4 w-4" />
+            ) : (
+              <Youtube className="h-5 w-5" />
+            )
+          }
           isJoining={isJoining}
           onClick={handleYouTubeVerify}
           text={t("verifyAndJoinButton")}
