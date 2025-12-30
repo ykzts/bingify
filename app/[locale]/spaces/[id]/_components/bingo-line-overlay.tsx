@@ -84,7 +84,7 @@ export function BingoLineOverlay({
             key={index}
             stroke="#f59e0b"
             strokeLinecap="round"
-            strokeWidth="0.25"
+            strokeWidth="0.08"
             transition={{ delay: index * 0.2, duration: 0.6 }}
             x1={x1}
             x2={x2}
