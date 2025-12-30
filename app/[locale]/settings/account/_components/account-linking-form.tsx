@@ -10,6 +10,10 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import {
+  buildOAuthCallbackUrl,
+  GOOGLE_OAUTH_SCOPES,
+} from "@/lib/auth/oauth-utils";
 import { createClient } from "@/lib/supabase/client";
 import { unlinkIdentity } from "../actions";
 
@@ -85,7 +89,9 @@ export function AccountLinkingForm({ user }: AccountLinkingFormProps) {
       const supabase = createClient();
       const { error } = await supabase.auth.linkIdentity({
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: buildOAuthCallbackUrl(),
+          // Request YouTube scope for Google to enable space gatekeeper verification
+          ...(provider === "google" && { scopes: GOOGLE_OAUTH_SCOPES }),
         },
         provider,
       });

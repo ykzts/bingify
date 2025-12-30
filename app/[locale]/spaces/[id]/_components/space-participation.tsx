@@ -4,6 +4,10 @@ import { Loader2, Users, Youtube } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
+import {
+  buildOAuthCallbackUrl,
+  GOOGLE_OAUTH_SCOPES,
+} from "@/lib/auth/oauth-utils";
 import { createClient } from "@/lib/supabase/client";
 import type { JoinSpaceState, SpaceInfo } from "../../actions";
 import {
@@ -194,16 +198,12 @@ export function SpaceParticipation({
 
       const supabase = createClient();
 
-      // Build callback URL with redirect back to this space
-      const callbackUrl = new URL("/auth/callback", window.location.origin);
-      callbackUrl.searchParams.set("redirect", window.location.pathname);
-
       // Use linkIdentity to add YouTube scope to existing session
       // This is the correct method for authenticated users requesting additional OAuth scopes
       const { error: oauthError } = await supabase.auth.linkIdentity({
         options: {
-          redirectTo: callbackUrl.toString(),
-          scopes: "https://www.googleapis.com/auth/youtube.readonly",
+          redirectTo: buildOAuthCallbackUrl(window.location.pathname),
+          scopes: GOOGLE_OAUTH_SCOPES,
         },
         provider: "google",
       });
