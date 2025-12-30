@@ -285,6 +285,7 @@ export async function regenerateViewToken(
 export interface UserSpace {
   created_at: string;
   id: string;
+  is_owner?: boolean;
   participant_count?: number;
   share_key: string;
   status: string;
@@ -313,15 +314,15 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       };
     }
 
-    // Fetch user's spaces ordered by creation date
-    const { data: spaces, error } = await supabase
+    // Fetch spaces where user is owner
+    const { data: ownedSpaces, error: ownedError } = await supabase
       .from("spaces")
       .select("id, share_key, status, created_at")
       .eq("owner_id", user.id)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching spaces:", error);
+    if (ownedError) {
+      console.error("Error fetching owned spaces:", ownedError);
       return {
         activeSpace: null,
         error: "Failed to fetch spaces",
@@ -329,9 +330,69 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       };
     }
 
+    // Fetch spaces where user is admin
+    const { data: adminRoles, error: adminError } = await supabase
+      .from("space_roles")
+      .select(
+        `
+        space_id,
+        spaces:space_id (
+          id,
+          share_key,
+          status,
+          created_at
+        )
+      `
+      )
+      .eq("user_id", user.id)
+      .eq("role", "admin");
+
+    if (adminError) {
+      console.error("Error fetching admin spaces:", adminError);
+    }
+
+    // Combine owned and admin spaces
+    const ownedSpacesWithFlag: UserSpace[] = (ownedSpaces || []).map((s) => ({
+      ...s,
+      is_owner: true,
+    }));
+
+    const adminSpaces: UserSpace[] = (adminRoles || [])
+      .map((role) => {
+        const space = (role.spaces as any);
+        if (!space) return null;
+        return {
+          created_at: space.created_at,
+          id: space.id,
+          is_owner: false,
+          share_key: space.share_key,
+          status: space.status,
+        };
+      })
+      .filter((s): s is UserSpace => s !== null);
+
+    // Combine and deduplicate (in case user is both owner and admin somehow)
+    const spaceMap = new Map<string, UserSpace>();
+    for (const space of [...ownedSpacesWithFlag, ...adminSpaces]) {
+      if (!spaceMap.has(space.id)) {
+        spaceMap.set(space.id, space);
+      } else {
+        // If space exists, prefer owner flag
+        const existing = spaceMap.get(space.id);
+        if (existing && space.is_owner) {
+          spaceMap.set(space.id, space);
+        }
+      }
+    }
+
+    const allSpaces = Array.from(spaceMap.values()).sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
     // Find active space (excluding draft)
     let activeSpace: UserSpace | null = null;
-    const allActiveSpaces = (spaces ?? []).filter((s) => s.status === "active");
+    const allActiveSpaces = allSpaces.filter((s) => s.status === "active");
     const activeSpaceData = allActiveSpaces[0] ?? null;
 
     if (allActiveSpaces.length > 1) {
@@ -359,7 +420,7 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
 
     return {
       activeSpace,
-      spaces: spaces || [],
+      spaces: allSpaces,
     };
   } catch (error) {
     console.error("Error in getUserSpaces:", error);

@@ -125,7 +125,14 @@ export default async function DashboardPage({ params }: Props) {
                     key={space.id}
                   >
                     <td className="px-4 py-3 font-medium text-gray-900">
-                      {space.share_key}
+                      <div className="flex items-center gap-2">
+                        {space.share_key}
+                        {space.is_owner === false && (
+                          <span className="rounded bg-blue-100 px-2 py-0.5 text-blue-800 text-xs">
+                            管理者
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-gray-500">
                       {(() => {
