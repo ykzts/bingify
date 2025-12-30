@@ -91,7 +91,9 @@ export function BingoGameManager({ spaceId }: Props) {
     );
 
     if (availableNumbers.length === 0) {
-      toast.error(t("allNumbersCalled"));
+      toast.error(t("allNumbersCalled"), {
+        duration: 3000,
+      });
       setIsCalling(false);
       return;
     }
@@ -106,7 +108,9 @@ export function BingoGameManager({ spaceId }: Props) {
         duration: 3000,
       });
     } else {
-      toast.error(result.error || t("callNumberError"));
+      toast.error(result.error || t("callNumberError"), {
+        duration: 3000,
+      });
     }
 
     setIsCalling(false);
@@ -127,7 +131,9 @@ export function BingoGameManager({ spaceId }: Props) {
         duration: 3000,
       });
     } else {
-      toast.error(result.error || t("resetGameError"));
+      toast.error(result.error || t("resetGameError"), {
+        duration: 3000,
+      });
     }
 
     setIsResetting(false);
