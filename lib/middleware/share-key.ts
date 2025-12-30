@@ -1,8 +1,38 @@
 import { createClient } from "@supabase/supabase-js";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { detectLocaleFromRequest } from "./locale-detection";
 
 const SHARE_KEY_REGEX = /^[a-zA-Z0-9-]+$/;
+
+export async function handleShareKeyRoute(
+  request: NextRequest,
+  shareKey: string
+): Promise<NextResponse> {
+  // Validate share key format
+  if (!validateShareKey(shareKey)) {
+    return new NextResponse("Not Found", { status: 404 });
+  }
+
+  try {
+    // Detect locale from request (cookie or Accept-Language header)
+    const locale = detectLocaleFromRequest(request);
+
+    // Handle the share key rewrite with the detected locale
+    const response = await handleShareKeyRewrite(request, shareKey, locale);
+
+    // Set the NEXT_LOCALE cookie to ensure consistent locale handling
+    response.cookies.set("NEXT_LOCALE", locale, {
+      path: "/",
+      sameSite: "lax",
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Middleware lookup error:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
 
 export async function handleShareKeyRewrite(
   request: NextRequest,
