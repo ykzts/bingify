@@ -5,11 +5,11 @@ import confetti from "canvas-confetti";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useRef } from "react";
+import type { CalledNumber } from "@/hooks/use-called-numbers";
+import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
 import { checkBingoLines } from "@/lib/utils/bingo-checker";
 import { useBingoCard } from "../_hooks/use-bingo-card";
-import type { CalledNumber } from "../_hooks/use-called-numbers";
-import { useCalledNumbers } from "../_hooks/use-called-numbers";
 import { updateBingoStatus } from "../bingo-actions";
 import { BingoLineOverlay } from "./bingo-line-overlay";
 
@@ -27,7 +27,10 @@ export function BingoCardDisplay({ spaceId }: Props) {
   const t = useTranslations("UserSpace");
   const queryClient = useQueryClient();
   const { data: bingoCard, isPending, error } = useBingoCard(spaceId);
-  const { data: calledNumbers = new Set<number>() } = useCalledNumbers(spaceId);
+  const { data: calledNumbers = new Set<number>() } = useCalledNumbers(
+    spaceId,
+    { asSet: true }
+  );
   const previousStatusRef = useRef<"none" | "reach" | "bingo">("none");
 
   // Use useEffectEvent to separate event logic from effect dependencies

@@ -5,9 +5,9 @@ import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
+import type { CalledNumber } from "@/hooks/use-called-numbers";
+import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
-import type { CalledNumber } from "../_hooks/use-called-numbers";
-import { useCalledNumbers } from "../_hooks/use-called-numbers";
 import { callNumber, resetGame } from "../actions";
 
 interface Props {

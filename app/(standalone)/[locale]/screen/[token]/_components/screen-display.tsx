@@ -6,11 +6,11 @@ import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useEffectEvent, useState } from "react";
+import type { CalledNumber } from "@/hooks/use-called-numbers";
+import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useBackground } from "../../_context/background-context";
-import type { CalledNumber } from "../_hooks/use-called-numbers";
-import { useCalledNumbers } from "../_hooks/use-called-numbers";
 
 interface Props {
   baseUrl: string;
@@ -54,7 +54,7 @@ export function ScreenDisplay({
 }: Props) {
   const t = useTranslations("ScreenView");
   const queryClient = useQueryClient();
-  const { data: calledNumbers = [] } = useCalledNumbers(spaceId);
+  const { data: calledNumbers = [] } = useCalledNumbers(spaceId, { retry: 3 });
   const [mode, setMode] = useState<DisplayMode>(
     normalizeDisplayMode(initialMode)
   );
