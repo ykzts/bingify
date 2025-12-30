@@ -30,7 +30,7 @@ const LOCALE_COOKIE_REGEX = /(?:^|;\s*)NEXT_LOCALE=([^;]+)/;
 type Locale = (typeof routing.locales)[number];
 
 function isValidLocale(locale: string): locale is Locale {
-  return routing.locales.includes(locale as Locale);
+  return routing.locales.some((l) => l === locale);
 }
 
 function detectLocaleFromHeaders(headersList: Headers): string {
