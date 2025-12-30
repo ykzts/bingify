@@ -182,9 +182,7 @@ export function SpaceParticipation({
 
     const result: JoinSpaceState = await joinSpace(
       spaceId,
-      session?.provider_token ?? undefined,
-      undefined,
-      undefined
+      session?.provider_token ?? undefined
     );
 
     if (result.success) {
@@ -215,6 +213,31 @@ export function SpaceParticipation({
     setIsLeaving(false);
   };
 
+  // Helper function to render the appropriate join button
+  const renderJoinButton = (compact?: boolean) => {
+    if (requiresYouTube && !hasYouTubeToken) {
+      return (
+        <JoinButton
+          compact={compact}
+          icon={compact ? <Youtube className="h-4 w-4" /> : <Youtube className="h-5 w-5" />}
+          isJoining={isJoining}
+          onClick={handleYouTubeVerify}
+          text={t("verifyAndJoinButton")}
+          textLoading={t("verifyingAndJoining")}
+        />
+      );
+    }
+    return (
+      <JoinButton
+        compact={compact}
+        isJoining={isJoining}
+        onClick={handleJoin}
+        text={t("joinButton")}
+        textLoading={t("joining")}
+      />
+    );
+  };
+
   if (isLoading) {
     return (
       <div
@@ -232,25 +255,7 @@ export function SpaceParticipation({
     return (
       <div className="flex items-center gap-3">
         {error && <p className="text-red-800 text-sm">{error}</p>}
-        {!hasJoined &&
-          (requiresYouTube && !hasYouTubeToken ? (
-            <JoinButton
-              compact
-              icon={<Youtube className="h-4 w-4" />}
-              isJoining={isJoining}
-              onClick={handleYouTubeVerify}
-              text={t("verifyAndJoinButton")}
-              textLoading={t("verifyingAndJoining")}
-            />
-          ) : (
-            <JoinButton
-              compact
-              isJoining={isJoining}
-              onClick={handleJoin}
-              text={t("joinButton")}
-              textLoading={t("joining")}
-            />
-          ))}
+        {!hasJoined && renderJoinButton(true)}
       </div>
     );
   }
@@ -307,23 +312,7 @@ export function SpaceParticipation({
           textLoading={t("leaving")}
         />
       )}
-      {!hasJoined && requiresYouTube && !hasYouTubeToken && (
-        <JoinButton
-          icon={<Youtube className="h-5 w-5" />}
-          isJoining={isJoining}
-          onClick={handleYouTubeVerify}
-          text={t("verifyAndJoinButton")}
-          textLoading={t("verifyingAndJoining")}
-        />
-      )}
-      {!hasJoined && (!requiresYouTube || hasYouTubeToken) && (
-        <JoinButton
-          isJoining={isJoining}
-          onClick={handleJoin}
-          text={t("joinButton")}
-          textLoading={t("joining")}
-        />
-      )}
+      {!hasJoined && renderJoinButton()}
     </div>
   );
 }
