@@ -112,17 +112,28 @@ const NAME_SPLIT_REGEX = /\s+/;
  * Get initials from display name
  */
 function getInitials(name: string | null | undefined): string {
-  if (!name) {
+  const trimmed = name?.trim();
+  if (!trimmed) {
     return "G";
   }
-  const parts = name.trim().split(NAME_SPLIT_REGEX);
+
+  const parts = trimmed
+    .split(NAME_SPLIT_REGEX)
+    .filter((part) => part.length > 0);
+
+  if (parts.length === 0 || !parts[0]) {
+    return "G";
+  }
+
   if (parts.length === 1) {
     return parts[0].substring(0, 2).toUpperCase();
   }
+
   const lastPart = parts.at(-1);
-  if (!lastPart) {
+  if (!lastPart || lastPart.length === 0) {
     return parts[0].substring(0, 2).toUpperCase();
   }
+
   return (parts[0][0] + lastPart[0]).toUpperCase();
 }
 
