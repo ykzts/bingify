@@ -22,7 +22,9 @@ export function BingoLineOverlay({
 
   return (
     <svg
+      aria-label="Bingo line overlay"
       className="pointer-events-none absolute inset-0 h-full w-full"
+      role="img"
       style={{ zIndex: 10 }}
       viewBox={`0 0 ${cardSize} ${cardSize}`}
     >

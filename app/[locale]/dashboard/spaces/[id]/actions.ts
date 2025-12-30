@@ -305,7 +305,16 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
       return [];
     }
 
-    return (data || []) as Participant[];
+    // Transform the data to match our interface
+    return (data || []).map((p) => ({
+      bingo_status: p.bingo_status,
+      id: p.id,
+      joined_at: p.joined_at,
+      profiles: Array.isArray(p.profiles)
+        ? p.profiles[0]
+        : (p.profiles as { display_name: string | null } | undefined),
+      user_id: p.user_id,
+    }));
   } catch (error) {
     console.error("Error getting participants:", error);
     return [];

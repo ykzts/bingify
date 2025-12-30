@@ -17,6 +17,63 @@ interface ParticipantUpdate {
   user_id: string;
 }
 
+/**
+ * Show notification for status change
+ */
+function showStatusNotification(
+  participant: Participant,
+  newStatus: "none" | "reach" | "bingo",
+  userId: string
+): void {
+  const displayName =
+    participant?.profiles?.display_name || `User ${userId.substring(0, 8)}`;
+
+  if (newStatus === "bingo") {
+    toast.success(`🎉 ${displayName} got BINGO!`, {
+      duration: 5000,
+    });
+  } else if (newStatus === "reach") {
+    toast.info(`⚡ ${displayName} has REACH!`, {
+      duration: 3000,
+    });
+  }
+}
+
+/**
+ * Update and sort participant list
+ */
+function updateParticipantList(
+  participants: Participant[],
+  updatedId: string,
+  newStatus: "none" | "reach" | "bingo"
+): Participant[] {
+  const index = participants.findIndex((p) => p.id === updatedId);
+  if (index === -1) {
+    return participants;
+  }
+
+  const newList = [...participants];
+  newList[index] = {
+    ...newList[index],
+    bingo_status: newStatus,
+  };
+
+  // Sort by bingo status (bingo > reach > none) then by joined_at
+  newList.sort((a, b) => {
+    const statusOrder = { bingo: 0, reach: 1, none: 2 };
+    const statusDiff =
+      statusOrder[a.bingo_status] - statusOrder[b.bingo_status];
+    if (statusDiff !== 0) {
+      return statusDiff;
+    }
+    return (
+      new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime()
+    );
+  });
+
+  return newList;
+}
+
 export function ParticipantsStatus({ spaceId }: Props) {
   const t = useTranslations("AdminSpace");
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -54,48 +111,16 @@ export function ParticipantsStatus({ spaceId }: Props) {
 
             // Update the participant in the list
             setParticipants((prev) => {
-              const index = prev.findIndex((p) => p.id === updated.id);
-              if (index === -1) {
-                return prev;
-              }
-
-              const newList = [...prev];
-              newList[index] = {
-                ...newList[index],
-                bingo_status: updated.bingo_status,
-              };
-
-              // Sort by bingo status (bingo > reach > none) then by joined_at
-              newList.sort((a, b) => {
-                const statusOrder = { bingo: 0, reach: 1, none: 2 };
-                const statusDiff =
-                  statusOrder[a.bingo_status] - statusOrder[b.bingo_status];
-                if (statusDiff !== 0) {
-                  return statusDiff;
-                }
-                return (
-                  new Date(a.joined_at).getTime() -
-                  new Date(b.joined_at).getTime()
+              const currentParticipant = prev.find((p) => p.id === updated.id);
+              if (currentParticipant) {
+                showStatusNotification(
+                  currentParticipant,
+                  updated.bingo_status,
+                  updated.user_id
                 );
-              });
-
-              return newList;
+              }
+              return updateParticipantList(prev, updated.id, updated.bingo_status);
             });
-
-            // Show notification based on status change
-            const displayName =
-              prev.find((p) => p.id === updated.id)?.profiles?.display_name ||
-              `User ${updated.user_id.substring(0, 8)}`;
-
-            if (updated.bingo_status === "bingo") {
-              toast.success(`🎉 ${displayName} got BINGO!`, {
-                duration: 5000,
-              });
-            } else if (updated.bingo_status === "reach") {
-              toast.info(`⚡ ${displayName} has REACH!`, {
-                duration: 3000,
-              });
-            }
           }
         )
         .subscribe();
@@ -155,15 +180,16 @@ export function ParticipantsStatus({ spaceId }: Props) {
             );
           }
 
+          let borderClass = "border-gray-200 bg-white";
+          if (participant.bingo_status === "bingo") {
+            borderClass = "border-yellow-300 bg-yellow-50";
+          } else if (participant.bingo_status === "reach") {
+            borderClass = "border-orange-300 bg-orange-50";
+          }
+
           return (
             <div
-              className={`flex items-center justify-between rounded-lg border p-3 ${
-                participant.bingo_status === "bingo"
-                  ? "border-yellow-300 bg-yellow-50"
-                  : participant.bingo_status === "reach"
-                    ? "border-orange-300 bg-orange-50"
-                    : "border-gray-200 bg-white"
-              }`}
+              className={`flex items-center justify-between rounded-lg border p-3 ${borderClass}`}
               key={participant.id}
             >
               <span className="text-gray-900 text-sm">{displayName}</span>

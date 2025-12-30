@@ -17,7 +17,6 @@ export interface BingoCheckResult {
 }
 
 const CARD_SIZE = 5;
-const FREE_SPACE_VALUE = 0;
 const FREE_SPACE_ROW = 2;
 const FREE_SPACE_COL = 2;
 
@@ -48,86 +47,119 @@ export function checkBingoLines(
 
   // Check horizontal lines (rows)
   for (let row = 0; row < CARD_SIZE; row++) {
-    const positions: Array<{ row: number; col: number }> = [];
-    let markedCount = 0;
-
-    for (let col = 0; col < CARD_SIZE; col++) {
-      positions.push({ row, col });
-      if (isMarked(cardNumbers[row][col], calledNumbers, row, col)) {
-        markedCount++;
-      }
-    }
-
-    if (markedCount === CARD_SIZE) {
-      bingoLines.push({ type: "horizontal", index: row, positions });
-    } else if (markedCount === CARD_SIZE - 1) {
-      reachLines.push({ type: "horizontal", index: row, positions });
-    }
+    checkLine(
+      generateRowPositions(row),
+      cardNumbers,
+      calledNumbers,
+      "horizontal",
+      row,
+      bingoLines,
+      reachLines
+    );
   }
 
   // Check vertical lines (columns)
   for (let col = 0; col < CARD_SIZE; col++) {
-    const positions: Array<{ row: number; col: number }> = [];
-    let markedCount = 0;
-
-    for (let row = 0; row < CARD_SIZE; row++) {
-      positions.push({ row, col });
-      if (isMarked(cardNumbers[row][col], calledNumbers, row, col)) {
-        markedCount++;
-      }
-    }
-
-    if (markedCount === CARD_SIZE) {
-      bingoLines.push({ type: "vertical", index: col, positions });
-    } else if (markedCount === CARD_SIZE - 1) {
-      reachLines.push({ type: "vertical", index: col, positions });
-    }
+    checkLine(
+      generateColPositions(col),
+      cardNumbers,
+      calledNumbers,
+      "vertical",
+      col,
+      bingoLines,
+      reachLines
+    );
   }
 
-  // Check diagonal (top-left to bottom-right)
-  {
-    const positions: Array<{ row: number; col: number }> = [];
-    let markedCount = 0;
-
-    for (let i = 0; i < CARD_SIZE; i++) {
-      positions.push({ row: i, col: i });
-      if (isMarked(cardNumbers[i][i], calledNumbers, i, i)) {
-        markedCount++;
-      }
-    }
-
-    if (markedCount === CARD_SIZE) {
-      bingoLines.push({ type: "diagonal", index: 0, positions });
-    } else if (markedCount === CARD_SIZE - 1) {
-      reachLines.push({ type: "diagonal", index: 0, positions });
-    }
-  }
-
-  // Check diagonal (top-right to bottom-left)
-  {
-    const positions: Array<{ row: number; col: number }> = [];
-    let markedCount = 0;
-
-    for (let i = 0; i < CARD_SIZE; i++) {
-      const row = i;
-      const col = CARD_SIZE - 1 - i;
-      positions.push({ row, col });
-      if (isMarked(cardNumbers[row][col], calledNumbers, row, col)) {
-        markedCount++;
-      }
-    }
-
-    if (markedCount === CARD_SIZE) {
-      bingoLines.push({ type: "diagonal", index: 1, positions });
-    } else if (markedCount === CARD_SIZE - 1) {
-      reachLines.push({ type: "diagonal", index: 1, positions });
-    }
-  }
+  // Check diagonals
+  checkLine(
+    generateDiagonalPositions(0),
+    cardNumbers,
+    calledNumbers,
+    "diagonal",
+    0,
+    bingoLines,
+    reachLines
+  );
+  checkLine(
+    generateDiagonalPositions(1),
+    cardNumbers,
+    calledNumbers,
+    "diagonal",
+    1,
+    bingoLines,
+    reachLines
+  );
 
   return {
+    bingoLines,
     hasBingo: bingoLines.length > 0,
     hasReach: reachLines.length > 0,
-    bingoLines,
     reachLines,
   };
+}
+
+/**
+ * Generate positions for a row
+ */
+function generateRowPositions(row: number): Array<{ row: number; col: number }> {
+  const positions: Array<{ row: number; col: number }> = [];
+  for (let col = 0; col < CARD_SIZE; col++) {
+    positions.push({ row, col });
+  }
+  return positions;
+}
+
+/**
+ * Generate positions for a column
+ */
+function generateColPositions(col: number): Array<{ row: number; col: number }> {
+  const positions: Array<{ row: number; col: number }> = [];
+  for (let row = 0; row < CARD_SIZE; row++) {
+    positions.push({ row, col });
+  }
+  return positions;
+}
+
+/**
+ * Generate positions for a diagonal
+ * @param index - 0 for top-left to bottom-right, 1 for top-right to bottom-left
+ */
+function generateDiagonalPositions(
+  index: number
+): Array<{ row: number; col: number }> {
+  const positions: Array<{ row: number; col: number }> = [];
+  for (let i = 0; i < CARD_SIZE; i++) {
+    const row = i;
+    const col = index === 0 ? i : CARD_SIZE - 1 - i;
+    positions.push({ row, col });
+  }
+  return positions;
+}
+
+/**
+ * Check a single line (row, column, or diagonal) for bingo or reach
+ */
+function checkLine(
+  positions: Array<{ row: number; col: number }>,
+  cardNumbers: number[][],
+  calledNumbers: Set<number>,
+  type: "horizontal" | "vertical" | "diagonal",
+  index: number,
+  bingoLines: BingoLine[],
+  reachLines: BingoLine[]
+): void {
+  let markedCount = 0;
+
+  for (const pos of positions) {
+    if (isMarked(cardNumbers[pos.row][pos.col], calledNumbers, pos.row, pos.col)) {
+      markedCount++;
+    }
+  }
+
+  if (markedCount === CARD_SIZE) {
+    bingoLines.push({ index, positions, type });
+  } else if (markedCount === CARD_SIZE - 1) {
+    reachLines.push({ index, positions, type });
+  }
 }
