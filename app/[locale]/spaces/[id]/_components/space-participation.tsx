@@ -118,6 +118,18 @@ export function SpaceParticipation({
     [spaceInfo.gatekeeper_rules]
   );
 
+  // Check if Twitch verification is required
+  // This logic matches the server-side verification in actions.ts verifyGatekeeperRules
+  const requiresTwitch = useMemo(
+    () =>
+      spaceInfo.gatekeeper_rules?.twitch?.broadcasterId &&
+      (spaceInfo.gatekeeper_rules.twitch.requirement === "follower" ||
+        spaceInfo.gatekeeper_rules.twitch.requirement === "subscriber" ||
+        spaceInfo.gatekeeper_rules.twitch.requireFollow ||
+        spaceInfo.gatekeeper_rules.twitch.requireSub),
+    [spaceInfo.gatekeeper_rules]
+  );
+
   // Handle visibility change listener cleanup when waiting for OAuth
   useEffect(() => {
     if (!waitingForOAuth) {
@@ -234,25 +246,40 @@ export function SpaceParticipation({
 
     // Get session with provider tokens
     // Note: provider_token will be from the most recent OAuth provider used.
-    // For YouTube verification, this will be the Google OAuth token with YouTube scope
-    // obtained from handleYouTubeVerify or previous Google authentication.
     const supabase = createClient();
     const {
       data: { session },
     } = await supabase.auth.getSession();
 
-    // Extract Twitch credentials from identities if available
-    const twitchIdentity = session?.user?.identities?.find(
-      (identity) => identity.provider === "twitch"
-    );
-    const twitchUserId = twitchIdentity?.id;
+    // Pass credentials based on which provider is required (YouTube OR Twitch, not both)
+    // This simplifies token management since Supabase only stores one provider_token at a time
+    let result: JoinSpaceState;
 
-    const result: JoinSpaceState = await joinSpace(
-      spaceId,
-      session?.provider_token ?? undefined,
-      session?.provider_token ?? undefined, // Twitch access token (same as provider_token if last auth was Twitch)
-      twitchUserId
-    );
+    if (requiresYouTube) {
+      // YouTube verification: pass only YouTube token (Google OAuth with YouTube scope)
+      result = await joinSpace(
+        spaceId,
+        session?.provider_token ?? undefined,
+        undefined,
+        undefined
+      );
+    } else if (requiresTwitch) {
+      // Twitch verification: pass only Twitch token and user ID
+      const twitchIdentity = session?.user?.identities?.find(
+        (identity) => identity.provider === "twitch"
+      );
+      const twitchUserId = twitchIdentity?.id;
+
+      result = await joinSpace(
+        spaceId,
+        undefined,
+        session?.provider_token ?? undefined,
+        twitchUserId
+      );
+    } else {
+      // No special verification required: regular join
+      result = await joinSpace(spaceId, undefined, undefined, undefined);
+    }
 
     if (result.success) {
       setHasJoined(true);
