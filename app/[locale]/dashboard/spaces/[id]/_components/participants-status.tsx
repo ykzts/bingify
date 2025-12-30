@@ -107,7 +107,20 @@ export function ParticipantsStatus({ spaceId }: Props) {
               return;
             }
 
+            // Validate payload structure
             const updated = payload.new as ParticipantUpdate;
+            if (
+              !((updated?.id && updated.user_id) && updated.bingo_status)
+            ) {
+              console.error("Invalid participant update payload:", payload);
+              return;
+            }
+
+            // Validate bingo_status value
+            if (!["none", "reach", "bingo"].includes(updated.bingo_status)) {
+              console.error("Invalid bingo_status value:", updated.bingo_status);
+              return;
+            }
 
             // Update the participant in the list
             setParticipants((prev) => {

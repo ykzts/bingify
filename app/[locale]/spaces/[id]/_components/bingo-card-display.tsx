@@ -171,6 +171,11 @@ export function BingoCardDisplay({ spaceId }: Props) {
             particleCount: Math.floor(particleCount),
           });
         }, 250);
+
+        // Cleanup interval on unmount
+        return () => {
+          clearInterval(interval);
+        };
       }
     }
   }, [bingoCard, calledNumbers, spaceId]);
