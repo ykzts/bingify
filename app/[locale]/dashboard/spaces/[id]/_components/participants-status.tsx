@@ -119,7 +119,11 @@ function getInitials(name: string | null | undefined): string {
   if (parts.length === 1) {
     return parts[0].substring(0, 2).toUpperCase();
   }
-  return (parts[0][0] + parts.at(-1)?.[0]).toUpperCase();
+  const lastPart = parts.at(-1);
+  if (!lastPart) {
+    return parts[0].substring(0, 2).toUpperCase();
+  }
+  return (parts[0][0] + lastPart[0]).toUpperCase();
 }
 
 export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
@@ -346,9 +350,11 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t("participantsTableUser")}</TableHead>
+                <TableHead>{t("participantsTableStatus")}</TableHead>
+                <TableHead className="text-right">
+                  {t("participantsTableActions")}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
