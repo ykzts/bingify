@@ -305,8 +305,8 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
     }
 
     // Transform the data to match our interface
-    const participants = (data || []).map((p) => ({
-      bingo_status: p.bingo_status,
+    const participants: Participant[] = (data || []).map((p) => ({
+      bingo_status: p.bingo_status as "none" | "reach" | "bingo",
       id: p.id,
       joined_at: p.joined_at,
       profiles: Array.isArray(p.profiles)
