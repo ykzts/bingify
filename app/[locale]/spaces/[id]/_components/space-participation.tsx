@@ -3,7 +3,7 @@
 import { Loader2, Users, Youtube } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { JoinSpaceState, SpaceInfo } from "../../actions";
 import {
@@ -48,11 +48,8 @@ function JoinButton({
       onClick={onClick}
       type="button"
     >
-      {isJoining ? (
-        <Loader2 className={loaderClass} />
-      ) : (
-        icon && <span className="flex items-center">{icon}</span>
-      )}
+      {isJoining && <Loader2 className={loaderClass} />}
+      {!isJoining && icon && <span className="flex items-center">{icon}</span>}
       {isJoining ? textLoading : text}
     </button>
   );
@@ -84,7 +81,6 @@ function LeaveButton({
   );
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Component requires multiple conditional checks for join state, YouTube verification, and participant status
 export function SpaceParticipation({
   compact = false,
   spaceId,
@@ -108,11 +104,14 @@ export function SpaceParticipation({
 
   // Check if YouTube verification is required
   // This logic matches the server-side verification in actions.ts verifyGatekeeperRules
-  const requiresYouTube =
-    spaceInfo.gatekeeper_rules?.youtube?.channelId &&
-    (spaceInfo.gatekeeper_rules.youtube.requirement === "subscriber" ||
-      spaceInfo.gatekeeper_rules.youtube.requirement === "member" ||
-      spaceInfo.gatekeeper_rules.youtube.required);
+  const requiresYouTube = useMemo(
+    () =>
+      spaceInfo.gatekeeper_rules?.youtube?.channelId &&
+      (spaceInfo.gatekeeper_rules.youtube.requirement === "subscriber" ||
+        spaceInfo.gatekeeper_rules.youtube.requirement === "member" ||
+        spaceInfo.gatekeeper_rules.youtube.required),
+    [spaceInfo.gatekeeper_rules]
+  );
 
   // Load participant info and check if user has joined and has YouTube token
   useEffect(() => {
@@ -126,14 +125,22 @@ export function SpaceParticipation({
       setHasJoined(joined);
 
       // Check for YouTube token if YouTube verification is required
-      // Note: provider_token presence indicates recent OAuth authentication.
-      // For YouTube requirements, this will be set after Google OAuth with YouTube scope.
+      // Note: We verify that the provider_token is specifically from Google OAuth.
+      // The provider_token can be from any OAuth provider (Google, Twitch, etc.),
+      // so we check the session's app_metadata.provider to ensure it's from Google.
       if (requiresYouTube && !joined) {
         const supabase = createClient();
         const {
           data: { session },
         } = await supabase.auth.getSession();
-        setHasYouTubeToken(!!session?.provider_token);
+
+        // Only consider it a valid YouTube token if:
+        // 1. provider_token exists
+        // 2. The last authentication was with Google (provider === "google")
+        const isGoogleToken =
+          session?.provider_token &&
+          session?.user?.app_metadata?.provider === "google";
+        setHasYouTubeToken(!!isGoogleToken);
       }
 
       setIsLoading(false);
@@ -166,6 +173,25 @@ export function SpaceParticipation({
         setIsJoining(false);
       }
       // Note: If successful, user will be redirected, so no need to setIsJoining(false)
+      // However, if the OAuth window is closed or fails to load, we set up a listener
+      // to reset the state when the user returns to the page
+      else {
+        // Set up a visibility change listener to reset state if user returns without completing OAuth
+        const handleVisibilityChange = () => {
+          if (document.visibilityState === "visible") {
+            // Give a small delay to allow OAuth redirect to complete if it was successful
+            setTimeout(() => {
+              // If we're still on this page and haven't redirected, reset the state
+              setIsJoining(false);
+            }, 1000);
+            document.removeEventListener(
+              "visibilitychange",
+              handleVisibilityChange
+            );
+          }
+        };
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+      }
     } catch (err) {
       console.error("Error during YouTube verification:", err);
       setError(t("errorYouTubeVerificationFailed"));
@@ -221,17 +247,13 @@ export function SpaceParticipation({
 
   // Helper function to render the appropriate join button
   const renderJoinButton = (compact?: boolean) => {
+    const iconClassName = compact ? "h-4 w-4" : "h-5 w-5";
+
     if (requiresYouTube && !hasYouTubeToken) {
       return (
         <JoinButton
           compact={compact}
-          icon={
-            compact ? (
-              <Youtube className="h-4 w-4" />
-            ) : (
-              <Youtube className="h-5 w-5" />
-            )
-          }
+          icon={<Youtube className={iconClassName} />}
           isJoining={isJoining}
           onClick={handleYouTubeVerify}
           text={t("verifyAndJoinButton")}
