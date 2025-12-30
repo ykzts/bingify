@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
-  EmptyAction,
+  EmptyContent,
   EmptyDescription,
-  EmptyIcon,
+  EmptyHeader,
+  EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Link } from "@/i18n/navigation";
@@ -16,16 +17,18 @@ export default async function NotFound() {
   return (
     <div className="container mx-auto px-4 py-16">
       <Empty>
-        <EmptyIcon>
-          <FileQuestion className="h-20 w-20 text-muted-foreground" />
-        </EmptyIcon>
-        <EmptyTitle as="h1">{t("title")}</EmptyTitle>
-        <EmptyDescription>{t("description")}</EmptyDescription>
-        <EmptyAction>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <FileQuestion className="h-20 w-20 text-muted-foreground" />
+          </EmptyMedia>
+          <EmptyTitle>{t("title")}</EmptyTitle>
+          <EmptyDescription>{t("description")}</EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
           <Button asChild>
             <Link href="/">{t("backHome")}</Link>
           </Button>
-        </EmptyAction>
+        </EmptyContent>
       </Empty>
     </div>
   );
