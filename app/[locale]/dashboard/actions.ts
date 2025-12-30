@@ -2,7 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { format } from "date-fns";
-import { cacheTag, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 import { generateSecureToken } from "@/lib/crypto";
 import { createClient } from "@/lib/supabase/server";
@@ -302,8 +302,6 @@ export interface UserSpacesResult {
 }
 
 export async function getUserSpaces(): Promise<UserSpacesResult> {
-  "use cache";
-  
   try {
     const supabase = await createClient();
 
@@ -319,9 +317,6 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
         spaces: [],
       };
     }
-
-    // Tag cache with user ID for targeted invalidation
-    cacheTag(`user-spaces-${user.id}`);
 
     // Fetch user's spaces ordered by creation date
     const { data: spaces, error } = await supabase

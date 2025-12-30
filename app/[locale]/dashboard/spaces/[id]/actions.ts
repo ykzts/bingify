@@ -1,6 +1,6 @@
 "use server";
 
-import { cacheTag, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
@@ -100,9 +100,6 @@ export async function callNumber(
 export async function getCalledNumbers(
   spaceId: string
 ): Promise<CalledNumber[]> {
-  "use cache";
-  cacheTag(`space-${spaceId}-called-numbers`);
-  
   try {
     if (!isValidUUID(spaceId)) {
       return [];
@@ -274,9 +271,6 @@ export interface GetParticipantsResult {
 export async function getParticipants(
   spaceId: string
 ): Promise<GetParticipantsResult> {
-  "use cache";
-  cacheTag(`space-${spaceId}-participants`);
-  
   try {
     if (!isValidUUID(spaceId)) {
       console.error("[getParticipants] Invalid UUID:", spaceId);
