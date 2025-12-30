@@ -16,6 +16,39 @@ const DASHBOARD_PATTERN = new RegExp(
 );
 const ADMIN_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/admin(/|$)`);
 
+type Locale = (typeof routing.locales)[number];
+
+function isValidLocale(locale: string): locale is Locale {
+  return routing.locales.some((l) => l === locale);
+}
+
+function detectLocaleFromRequest(request: NextRequest): string {
+  // Check for NEXT_LOCALE cookie first (set by middleware on previous visits)
+  const cookie = request.cookies.get("NEXT_LOCALE")?.value;
+  if (cookie && isValidLocale(cookie)) {
+    return cookie;
+  }
+
+  // Check Accept-Language header
+  const acceptLanguage = request.headers.get("accept-language");
+  if (acceptLanguage) {
+    // Parse the Accept-Language header (e.g., "ja,en-US;q=0.9,en;q=0.8")
+    const languages = acceptLanguage.split(",").map((lang) => {
+      const [locale] = lang.trim().split(";");
+      return locale.split("-")[0]; // Get the primary language code
+    });
+
+    // Find the first matching locale
+    for (const lang of languages) {
+      if (isValidLocale(lang)) {
+        return lang;
+      }
+    }
+  }
+
+  return routing.defaultLocale;
+}
+
 function isAdminPath(pathname: string): boolean {
   return (
     pathname === "/admin" ||
@@ -42,24 +75,17 @@ async function handleShareKeyRoute(
   }
 
   try {
-    // Run intl middleware first to detect locale and set headers/cookies
-    const intlResponse = intlMiddleware(request);
+    // Detect locale from request (cookie or Accept-Language header)
+    const locale = detectLocaleFromRequest(request);
 
-    // Get the locale from the intl middleware response
-    const locale =
-      intlResponse.cookies.get("NEXT_LOCALE")?.value || routing.defaultLocale;
-
-    // Now handle the share key rewrite with the detected locale
+    // Handle the share key rewrite with the detected locale
     const response = await handleShareKeyRewrite(request, shareKey, locale);
 
-    // Copy locale cookie from intl response to our rewrite response
-    const localeCookie = intlResponse.cookies.get("NEXT_LOCALE");
-    if (localeCookie) {
-      response.cookies.set("NEXT_LOCALE", localeCookie.value, {
-        path: "/",
-        sameSite: "lax",
-      });
-    }
+    // Set the NEXT_LOCALE cookie to ensure consistent locale handling
+    response.cookies.set("NEXT_LOCALE", locale, {
+      path: "/",
+      sameSite: "lax",
+    });
 
     return response;
   } catch (error) {
