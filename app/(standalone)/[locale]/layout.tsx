@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
+import { QueryProvider } from "@/components/providers/query-provider";
 import { cn } from "@/lib/utils";
 import {
   BackgroundProvider,
@@ -34,7 +36,11 @@ export default async function ScreenLayout({
       <ColoredHtml className={cn("antialiased", nunito.variable)} lang={locale}>
         <body className="bg-transparent">
           <NextIntlClientProvider locale={locale} messages={messages}>
-            {children}
+            <Suspense fallback={<div />}>
+              <QueryProvider>
+                {children}
+              </QueryProvider>
+            </Suspense>
           </NextIntlClientProvider>
         </body>
       </ColoredHtml>

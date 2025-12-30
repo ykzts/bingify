@@ -6,6 +6,8 @@ interface Props {
 }
 
 export default async function AdminPage({ params }: Props) {
+  "use cache: private";
+  
   const { locale } = await params;
   setRequestLocale(locale);
 

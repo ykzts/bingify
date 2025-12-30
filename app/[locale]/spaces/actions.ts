@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidateTag } from "next/cache";
+import { cacheTag, revalidateTag } from "next/cache";
 import { checkEmailAllowed } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import { checkFollowStatus, checkSubStatus } from "@/lib/twitch";
@@ -41,6 +41,9 @@ export interface SpaceInfo {
 }
 
 export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
+  "use cache: private";
+  cacheTag(`space-${spaceId}`);
+  
   try {
     if (!isValidUUID(spaceId)) {
       return null;
@@ -465,6 +468,9 @@ export async function leaveSpace(spaceId: string): Promise<JoinSpaceState> {
 export async function getParticipantCount(
   spaceId: string
 ): Promise<{ count: number; maxParticipants: number } | null> {
+  "use cache: private";
+  cacheTag(`space-${spaceId}-participants`);
+  
   try {
     // Validate UUID format
     if (!isValidUUID(spaceId)) {
@@ -639,6 +645,9 @@ async function maskEmailRules(
 export async function getSpacePublicInfo(
   spaceId: string
 ): Promise<PublicSpaceInfo | null> {
+  "use cache: private";
+  cacheTag(`space-${spaceId}-public`);
+  
   try {
     if (!isValidUUID(spaceId)) {
       return null;

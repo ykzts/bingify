@@ -1,5 +1,6 @@
 "use server";
 
+import { cacheTag, revalidateTag } from "next/cache";
 import {
   type SystemSettings,
   systemSettingsSchema,
@@ -12,6 +13,9 @@ export interface GetSystemSettingsResult {
 }
 
 export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
+  "use cache: private";
+  cacheTag("system-settings");
+  
   try {
     const supabase = await createClient();
 
@@ -112,6 +116,9 @@ export async function updateSystemSettings(
         success: false,
       };
     }
+
+    // Invalidate system settings cache
+    revalidateTag("system-settings", "default");
 
     return {
       success: true,

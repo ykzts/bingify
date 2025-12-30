@@ -11,6 +11,8 @@ interface Props {
 }
 
 export default async function AdminLayout({ children, params }: Props) {
+  "use cache: private";
+  
   const { locale } = await params;
   setRequestLocale(locale);
 

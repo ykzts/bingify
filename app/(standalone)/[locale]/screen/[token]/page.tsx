@@ -1,14 +1,22 @@
 import { headers } from "next/headers";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { ScreenDisplay } from "./_components/screen-display";
+
+// Provide at least one static param for build-time validation
+export async function generateStaticParams() {
+  return [{ token: "__build_validation__", locale: "ja" }];
+}
 
 interface Props {
   params: Promise<{ locale: string; token: string }>;
   searchParams: Promise<{ bg?: string; mode?: string }>;
 }
 
-export default async function ScreenViewPage({ params, searchParams }: Props) {
+async function ScreenContent({ params, searchParams }: Props) {
+  "use cache: private";
+  
   const { locale, token } = await params;
   const rawSearchParams = await searchParams;
 
@@ -70,5 +78,13 @@ export default async function ScreenViewPage({ params, searchParams }: Props) {
       shareKey={space.share_key}
       spaceId={space.id}
     />
+  );
+}
+
+export default function ScreenViewPage(props: Props) {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-black"><div className="text-white">Loading...</div></div>}>
+      <ScreenContent {...props} />
+    </Suspense>
   );
 }

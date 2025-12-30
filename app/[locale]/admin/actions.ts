@@ -1,5 +1,6 @@
 "use server";
 
+import { cacheTag } from "next/cache";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -288,6 +289,9 @@ export async function getAllSpaces(
   hasMore?: boolean;
   spaces?: Space[];
 }> {
+  "use cache: private";
+  cacheTag("admin-spaces");
+  
   try {
     // Verify admin role
     const { isAdmin } = await verifyAdminRole();
@@ -337,6 +341,9 @@ export async function getAllUsers(
   hasMore?: boolean;
   users?: User[];
 }> {
+  "use cache: private";
+  cacheTag("admin-users");
+  
   try {
     // Verify admin role
     const { isAdmin } = await verifyAdminRole();
