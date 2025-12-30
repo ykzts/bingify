@@ -260,6 +260,7 @@ export interface Participant {
 export async function getParticipants(spaceId: string): Promise<Participant[]> {
   try {
     if (!isValidUUID(spaceId)) {
+      console.error("[getParticipants] Invalid UUID:", spaceId);
       return [];
     }
 
@@ -270,18 +271,39 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
     } = await supabase.auth.getUser();
 
     if (!user) {
+      console.error("[getParticipants] No authenticated user");
       return [];
     }
 
-    const { data: space } = await supabase
+    console.log("[getParticipants] User authenticated:", user.id);
+
+    const { data: space, error: spaceError } = await supabase
       .from("spaces")
       .select("owner_id")
       .eq("id", spaceId)
       .single();
 
-    if (!space || space.owner_id !== user.id) {
+    if (spaceError) {
+      console.error("[getParticipants] Error fetching space:", spaceError);
       return [];
     }
+
+    if (!space) {
+      console.error("[getParticipants] Space not found:", spaceId);
+      return [];
+    }
+
+    if (space.owner_id !== user.id) {
+      console.error(
+        "[getParticipants] User is not owner:",
+        user.id,
+        "vs",
+        space.owner_id
+      );
+      return [];
+    }
+
+    console.log("[getParticipants] User is owner, fetching participants...");
 
     const { data, error } = await supabase
       .from("participants")
@@ -303,6 +325,11 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
       console.error("Error fetching participants:", error);
       return [];
     }
+
+    console.log(
+      "[getParticipants] Successfully fetched participants:",
+      data?.length || 0
+    );
 
     // Transform the data to match our interface
     const participants: Participant[] = (data || []).map((p) => ({
