@@ -252,15 +252,24 @@ export interface Participant {
   id: string;
   joined_at: string;
   profiles?: {
-    display_name: string | null;
-  };
+    avatar_url: string | null;
+    full_name: string | null;
+  } | null;
   user_id: string;
 }
 
-export async function getParticipants(spaceId: string): Promise<Participant[]> {
+export interface GetParticipantsResult {
+  data: Participant[];
+  error?: string;
+}
+
+export async function getParticipants(
+  spaceId: string
+): Promise<GetParticipantsResult> {
   try {
     if (!isValidUUID(spaceId)) {
-      return [];
+      console.error("[getParticipants] Invalid UUID:", spaceId);
+      return { data: [], error: "Invalid space ID" };
     }
 
     const supabase = await createClient();
@@ -270,48 +279,100 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return [];
+      console.error("[getParticipants] No authenticated user");
+      return { data: [], error: "Not authenticated" };
     }
 
-    const { data: space } = await supabase
+    console.log("[getParticipants] User authenticated:", user.id);
+
+    const { data: space, error: spaceError } = await supabase
       .from("spaces")
       .select("owner_id")
       .eq("id", spaceId)
       .single();
 
-    if (!space || space.owner_id !== user.id) {
-      return [];
+    if (spaceError) {
+      console.error("[getParticipants] Error fetching space:", spaceError);
+      return {
+        data: [],
+        error: "Failed to fetch space information",
+      };
     }
 
-    const { data, error } = await supabase
+    if (!space) {
+      console.error("[getParticipants] Space not found:", spaceId);
+      return { data: [], error: "Space not found" };
+    }
+
+    if (space.owner_id !== user.id) {
+      console.error(
+        "[getParticipants] User is not owner:",
+        user.id,
+        "vs",
+        space.owner_id
+      );
+      return { data: [], error: "Permission denied" };
+    }
+
+    console.log("[getParticipants] User is owner, fetching participants...");
+
+    // Fetch participants first
+    const { data: participantsData, error: participantsError } = await supabase
       .from("participants")
-      .select(
-        `
-        id,
-        user_id,
-        joined_at,
-        bingo_status,
-        profiles:user_id (
-          display_name
-        )
-      `
-      )
+      .select("id, user_id, joined_at, bingo_status")
       .eq("space_id", spaceId)
       .order("joined_at", { ascending: true });
 
-    if (error) {
-      console.error("Error fetching participants:", error);
-      return [];
+    if (participantsError) {
+      console.error(
+        "[getParticipants] Error fetching participants:",
+        participantsError
+      );
+      return {
+        data: [],
+        error: "Failed to fetch participants",
+      };
     }
+
+    if (!participantsData || participantsData.length === 0) {
+      console.log("[getParticipants] No participants found");
+      return { data: [] };
+    }
+
+    // Fetch profiles for all participant user_ids
+    const userIds = participantsData.map((p) => p.user_id);
+    const { data: profilesData, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, full_name, avatar_url")
+      .in("id", userIds);
+
+    if (profilesError) {
+      console.error(
+        "[getParticipants] Error fetching profiles:",
+        profilesError
+      );
+      // Continue without profiles rather than failing entirely
+    }
+
+    console.log(
+      "[getParticipants] Successfully fetched participants:",
+      participantsData.length
+    );
+
+    // Merge participants with profiles
+    const profilesMap = new Map((profilesData || []).map((p) => [p.id, p]));
+
+    const data = participantsData.map((participant) => ({
+      ...participant,
+      profiles: profilesMap.get(participant.user_id) || null,
+    }));
 
     // Transform the data to match our interface
     const participants: Participant[] = (data || []).map((p) => ({
       bingo_status: p.bingo_status as "none" | "reach" | "bingo",
       id: p.id,
       joined_at: p.joined_at,
-      profiles: Array.isArray(p.profiles)
-        ? p.profiles[0]
-        : (p.profiles as { display_name: string | null } | undefined),
+      profiles: p.profiles,
       user_id: p.user_id,
     }));
 
@@ -321,7 +382,7 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
       reach: 1,
       none: 2,
     };
-    return participants.sort((a, b) => {
+    const sortedParticipants = participants.sort((a, b) => {
       const priorityDiff =
         statusPriority[a.bingo_status] - statusPriority[b.bingo_status];
       if (priorityDiff !== 0) {
@@ -329,8 +390,79 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
       }
       return new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime();
     });
+
+    return { data: sortedParticipants };
   } catch (error) {
     console.error("Error getting participants:", error);
-    return [];
+    return { data: [], error: "An unexpected error occurred" };
+  }
+}
+
+export interface KickParticipantResult {
+  error?: string;
+  success: boolean;
+}
+
+export async function kickParticipant(
+  spaceId: string,
+  participantId: string
+): Promise<KickParticipantResult> {
+  try {
+    if (!(isValidUUID(spaceId) && isValidUUID(participantId))) {
+      return {
+        error: "Invalid ID",
+        success: false,
+      };
+    }
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "Authentication required",
+        success: false,
+      };
+    }
+
+    const { data: space } = await supabase
+      .from("spaces")
+      .select("owner_id")
+      .eq("id", spaceId)
+      .single();
+
+    if (!space || space.owner_id !== user.id) {
+      return {
+        error: "Permission denied",
+        success: false,
+      };
+    }
+
+    const { error } = await supabase
+      .from("participants")
+      .delete()
+      .eq("id", participantId)
+      .eq("space_id", spaceId);
+
+    if (error) {
+      console.error("Database error:", error);
+      return {
+        error: "Failed to remove participant",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error kicking participant:", error);
+    return {
+      error: "An error occurred",
+      success: false,
+    };
   }
 }
