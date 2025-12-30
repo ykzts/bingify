@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidateTag } from "next/cache";
 import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
@@ -237,6 +238,10 @@ export async function updateSpaceSettings(
       };
     }
 
+    // Invalidate space caches after successful update
+    revalidateTag(`space-${spaceId}`, "default");
+    revalidateTag(`space-${spaceId}-public`, "default");
+
     return {
       success: true,
     };
@@ -311,6 +316,10 @@ export async function publishSpace(
         success: false,
       };
     }
+
+    // Invalidate space caches after publishing
+    revalidateTag(`space-${spaceId}`, "default");
+    revalidateTag(`space-${spaceId}-public`, "default");
 
     return {
       success: true,

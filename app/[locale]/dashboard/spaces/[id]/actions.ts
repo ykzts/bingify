@@ -1,5 +1,6 @@
 "use server";
 
+import { cacheTag, revalidateTag } from "next/cache";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
@@ -81,6 +82,9 @@ export async function callNumber(
       };
     }
 
+    // Invalidate called numbers cache for this space
+    revalidateTag(`space-${spaceId}-called-numbers`, "default");
+
     return {
       success: true,
     };
@@ -96,6 +100,9 @@ export async function callNumber(
 export async function getCalledNumbers(
   spaceId: string
 ): Promise<CalledNumber[]> {
+  "use cache";
+  cacheTag(`space-${spaceId}-called-numbers`);
+  
   try {
     if (!isValidUUID(spaceId)) {
       return [];
@@ -169,6 +176,9 @@ export async function resetGame(spaceId: string): Promise<CallNumberResult> {
       };
     }
 
+    // Invalidate called numbers cache
+    revalidateTag(`space-${spaceId}-called-numbers`, "default");
+
     return {
       success: true,
     };
@@ -229,6 +239,10 @@ export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
       };
     }
 
+    // Invalidate space-related caches
+    revalidateTag(`space-${spaceId}`, "default");
+    revalidateTag(`space-${spaceId}-public`, "default");
+
     return {
       success: true,
     };
@@ -260,6 +274,9 @@ export interface GetParticipantsResult {
 export async function getParticipants(
   spaceId: string
 ): Promise<GetParticipantsResult> {
+  "use cache";
+  cacheTag(`space-${spaceId}-participants`);
+  
   try {
     if (!isValidUUID(spaceId)) {
       console.error("[getParticipants] Invalid UUID:", spaceId);
@@ -448,6 +465,9 @@ export async function kickParticipant(
         success: false,
       };
     }
+
+    // Invalidate participant-related cache
+    revalidateTag(`space-${spaceId}-participants`, "default");
 
     return {
       success: true,
