@@ -298,6 +298,8 @@
     "joinButton": "Join Space",
     "joinPrompt": "Join this bingo space to participate",
     "joining": "Joining...",
+    "verifyAndJoinButton": "Verify & Join",
+    "verifyingAndJoining": "Verifying...",
     "leaveButton": "Leave Space",
     "leaving": "Leaving...",
     "loading": "Loading...",

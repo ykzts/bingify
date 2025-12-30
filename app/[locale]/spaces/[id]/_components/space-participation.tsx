@@ -1,9 +1,10 @@
 "use client";
 
-import { Loader2, Users } from "lucide-react";
+import { Loader2, Users, Youtube } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import type { JoinSpaceState, SpaceInfo } from "../../actions";
 import {
   checkUserParticipation,
@@ -20,6 +21,7 @@ interface SpaceParticipationProps {
 
 interface JoinButtonProps {
   compact?: boolean;
+  icon?: React.ReactNode;
   isJoining: boolean;
   onClick: () => void;
   text: string;
@@ -28,6 +30,7 @@ interface JoinButtonProps {
 
 function JoinButton({
   compact,
+  icon,
   isJoining,
   onClick,
   text,
@@ -45,7 +48,11 @@ function JoinButton({
       onClick={onClick}
       type="button"
     >
-      {isJoining && <Loader2 className={loaderClass} />}
+      {isJoining ? (
+        <Loader2 className={loaderClass} />
+      ) : (
+        icon && <span className="flex items-center">{icon}</span>
+      )}
       {isJoining ? textLoading : text}
     </button>
   );
@@ -77,6 +84,7 @@ function LeaveButton({
   );
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Component requires multiple conditional checks for join state, YouTube verification, and participant status
 export function SpaceParticipation({
   compact = false,
   spaceId,
@@ -96,8 +104,16 @@ export function SpaceParticipation({
   });
   const [hasJoined, setHasJoined] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasYouTubeToken, setHasYouTubeToken] = useState(false);
 
-  // Load participant info and check if user has joined
+  // Check if YouTube verification is required
+  const requiresYouTube =
+    spaceInfo.gatekeeper_rules?.youtube?.channelId &&
+    (spaceInfo.gatekeeper_rules.youtube.requirement === "subscriber" ||
+      spaceInfo.gatekeeper_rules.youtube.requirement === "member" ||
+      spaceInfo.gatekeeper_rules.youtube.required);
+
+  // Load participant info and check if user has joined and has YouTube token
   useEffect(() => {
     const loadInitialData = async () => {
       setIsLoading(true);
@@ -107,21 +123,69 @@ export function SpaceParticipation({
       ]);
       setParticipantInfo(info);
       setHasJoined(joined);
+
+      // Check for YouTube token if YouTube verification is required
+      if (requiresYouTube && !joined) {
+        const supabase = createClient();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        setHasYouTubeToken(!!session?.provider_token);
+      }
+
       setIsLoading(false);
     };
     loadInitialData();
-  }, [spaceId]);
+  }, [spaceId, requiresYouTube]);
 
   const refreshParticipantInfo = async () => {
     const info = await getParticipantCount(spaceId);
     setParticipantInfo(info);
   };
 
+  const handleYouTubeVerify = async () => {
+    setIsJoining(true);
+    setError(null);
+
+    try {
+      const supabase = createClient();
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        options: {
+          redirectTo: window.location.href,
+          scopes: "https://www.googleapis.com/auth/youtube.readonly",
+        },
+        provider: "google",
+      });
+
+      if (oauthError) {
+        console.error("OAuth error:", oauthError);
+        setError(t("errorYouTubeVerificationFailed"));
+        setIsJoining(false);
+      }
+      // Note: If successful, user will be redirected, so no need to setIsJoining(false)
+    } catch (err) {
+      console.error("Error during YouTube verification:", err);
+      setError(t("errorYouTubeVerificationFailed"));
+      setIsJoining(false);
+    }
+  };
+
   const handleJoin = async () => {
     setIsJoining(true);
     setError(null);
 
-    const result: JoinSpaceState = await joinSpace(spaceId);
+    // Get session with provider tokens
+    const supabase = createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const result: JoinSpaceState = await joinSpace(
+      spaceId,
+      session?.provider_token ?? undefined,
+      undefined,
+      undefined
+    );
 
     if (result.success) {
       setHasJoined(true);
@@ -168,23 +232,33 @@ export function SpaceParticipation({
     return (
       <div className="flex items-center gap-3">
         {error && <p className="text-red-800 text-sm">{error}</p>}
-        {!hasJoined && (
-          <JoinButton
-            compact
-            isJoining={isJoining}
-            onClick={handleJoin}
-            text={t("joinButton")}
-            textLoading={t("joining")}
-          />
-        )}
+        {!hasJoined &&
+          (requiresYouTube && !hasYouTubeToken ? (
+            <JoinButton
+              compact
+              icon={<Youtube className="h-4 w-4" />}
+              isJoining={isJoining}
+              onClick={handleYouTubeVerify}
+              text={t("verifyAndJoinButton")}
+              textLoading={t("verifyingAndJoining")}
+            />
+          ) : (
+            <JoinButton
+              compact
+              isJoining={isJoining}
+              onClick={handleJoin}
+              text={t("joinButton")}
+              textLoading={t("joining")}
+            />
+          ))}
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      {/* YouTube Requirement Notice */}
-      {spaceInfo.gatekeeper_rules?.youtube?.required && !hasJoined && (
+      {/* YouTube Requirement Notice - Only show if token is missing */}
+      {requiresYouTube && !hasYouTubeToken && !hasJoined && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
           <p className="text-blue-800 text-sm">
             {t("errorYouTubeVerificationRequired")}
@@ -225,14 +299,24 @@ export function SpaceParticipation({
       )}
 
       {/* Join/Leave Button */}
-      {hasJoined ? (
+      {hasJoined && (
         <LeaveButton
           isLeaving={isLeaving}
           onClick={handleLeave}
           text={t("leaveButton")}
           textLoading={t("leaving")}
         />
-      ) : (
+      )}
+      {!hasJoined && requiresYouTube && !hasYouTubeToken && (
+        <JoinButton
+          icon={<Youtube className="h-5 w-5" />}
+          isJoining={isJoining}
+          onClick={handleYouTubeVerify}
+          text={t("verifyAndJoinButton")}
+          textLoading={t("verifyingAndJoining")}
+        />
+      )}
+      {!hasJoined && (!requiresYouTube || hasYouTubeToken) && (
         <JoinButton
           isJoining={isJoining}
           onClick={handleJoin}
