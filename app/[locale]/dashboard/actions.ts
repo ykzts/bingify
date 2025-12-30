@@ -165,13 +165,13 @@ export async function createSpace(
       if (!suggestion) {
         return {
           error:
-            "利用可能なスラグが見つかりませんでした。別の名前をお試しください。",
+            "利用可能な共有キーが見つかりませんでした。別の名前をお試しください。",
           success: false,
         };
       }
 
       return {
-        error: "このスラグは既に使用されています",
+        error: "この共有キーは既に使用されています",
         success: false,
         suggestion,
       };
