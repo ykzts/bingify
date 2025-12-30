@@ -4,13 +4,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import confetti from "canvas-confetti";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { checkBingoLines } from "@/lib/utils/bingo-checker";
-import { updateBingoStatus } from "../bingo-actions";
 import { useBingoCard } from "../_hooks/use-bingo-card";
 import type { CalledNumber } from "../_hooks/use-called-numbers";
 import { useCalledNumbers } from "../_hooks/use-called-numbers";
+import { updateBingoStatus } from "../bingo-actions";
 import { BingoLineOverlay } from "./bingo-line-overlay";
 
 interface Props {
@@ -44,7 +44,9 @@ export function BingoCardDisplay({ spaceId }: Props) {
     queryClient.setQueryData<Set<number>>(
       ["called-numbers", spaceId],
       (prev) => {
-        if (!prev) return new Set([newNumber.value]);
+        if (!prev) {
+          return new Set([newNumber.value]);
+        }
         return new Set([...prev, newNumber.value]);
       }
     );
@@ -55,7 +57,9 @@ export function BingoCardDisplay({ spaceId }: Props) {
     queryClient.setQueryData<Set<number>>(
       ["called-numbers", spaceId],
       (prev) => {
-        if (!prev) return new Set();
+        if (!prev) {
+          return new Set();
+        }
         const newSet = new Set(prev);
         newSet.delete(deletedNumber.value);
         return newSet;
@@ -98,7 +102,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
     return () => {
       channel.unsubscribe();
     };
-  }, [spaceId, queryClient]);
+  }, [spaceId]);
 
   // Check bingo status when called numbers or card changes
   useEffect(() => {

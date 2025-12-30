@@ -82,7 +82,9 @@ export function ScreenDisplay({
     queryClient.setQueryData<CalledNumber[]>(
       ["called-numbers", spaceId],
       (prev) => {
-        if (!prev) return [newNumber];
+        if (!prev) {
+          return [newNumber];
+        }
         const alreadyExists = prev.some((n) => n.id === newNumber.id);
         return alreadyExists ? prev : [...prev, newNumber];
       }
@@ -94,7 +96,9 @@ export function ScreenDisplay({
     queryClient.setQueryData<CalledNumber[]>(
       ["called-numbers", spaceId],
       (prev) => {
-        if (!prev) return [];
+        if (!prev) {
+          return [];
+        }
         return prev.filter((n) => n.id !== deletedNumber.id);
       }
     );
@@ -147,7 +151,7 @@ export function ScreenDisplay({
     return () => {
       channel.unsubscribe();
     };
-  }, [spaceId, queryClient]);
+  }, [spaceId]);
 
   const currentNumber =
     calledNumbers.length > 0 ? (calledNumbers.at(-1)?.value ?? null) : null;

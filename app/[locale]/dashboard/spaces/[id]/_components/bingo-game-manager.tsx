@@ -6,9 +6,9 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { callNumber, resetGame } from "../actions";
 import type { CalledNumber } from "../_hooks/use-called-numbers";
 import { useCalledNumbers } from "../_hooks/use-called-numbers";
+import { callNumber, resetGame } from "../actions";
 
 interface Props {
   spaceId: string;
@@ -17,7 +17,7 @@ interface Props {
 export function BingoGameManager({ spaceId }: Props) {
   const t = useTranslations("AdminSpace");
   const queryClient = useQueryClient();
-  const { data: calledNumbers = [], isPending } = useCalledNumbers(spaceId);
+  const { data: calledNumbers = [] } = useCalledNumbers(spaceId);
   const [isCalling, setIsCalling] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
@@ -35,7 +35,9 @@ export function BingoGameManager({ spaceId }: Props) {
     queryClient.setQueryData<CalledNumber[]>(
       ["called-numbers", spaceId],
       (prev) => {
-        if (!prev) return [newNumber];
+        if (!prev) {
+          return [newNumber];
+        }
         const alreadyExists = prev.some((n) => n.id === newNumber.id);
         return alreadyExists ? prev : [...prev, newNumber];
       }
@@ -47,7 +49,9 @@ export function BingoGameManager({ spaceId }: Props) {
     queryClient.setQueryData<CalledNumber[]>(
       ["called-numbers", spaceId],
       (prev) => {
-        if (!prev) return [];
+        if (!prev) {
+          return [];
+        }
         return prev.filter((n) => n.id !== deletedNumber.id);
       }
     );
@@ -88,7 +92,7 @@ export function BingoGameManager({ spaceId }: Props) {
     return () => {
       channel.unsubscribe();
     };
-  }, [spaceId, queryClient]);
+  }, [spaceId]);
 
   const handleCallNumber = async () => {
     setIsCalling(true);

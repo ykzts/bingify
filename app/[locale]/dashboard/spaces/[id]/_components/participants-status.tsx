@@ -34,9 +34,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/client";
-import { kickParticipant } from "../actions";
 import type { Participant } from "../_hooks/use-participants";
 import { useParticipants } from "../_hooks/use-participants";
+import { kickParticipant } from "../actions";
 
 interface Props {
   maxParticipants: number;
@@ -142,7 +142,11 @@ function getInitials(name: string | null | undefined): string {
 export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
   const t = useTranslations("AdminSpace");
   const queryClient = useQueryClient();
-  const { data: participants = [], isPending, error } = useParticipants(spaceId);
+  const {
+    data: participants = [],
+    isPending,
+    error,
+  } = useParticipants(spaceId);
   const [kickingId, setKickingId] = useState<string | null>(null);
   const [isPendingKick, startTransition] = useTransition();
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -156,9 +160,9 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
     ((payload: { new: ParticipantUpdate }) => void) | null
   >(null);
   const onInsertRef = useRef<(() => void) | null>(null);
-  const onDeleteRef = useRef<((payload: { old: { id: string } }) => void) | null>(
-    null
-  );
+  const onDeleteRef = useRef<
+    ((payload: { old: { id: string } }) => void) | null
+  >(null);
 
   // Update refs when dependencies change
   onUpdateRef.current = (payload: { new: ParticipantUpdate }) => {
@@ -180,7 +184,9 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
     queryClient.setQueryData<Participant[]>(
       ["participants", spaceId],
       (prev) => {
-        if (!prev) return [];
+        if (!prev) {
+          return [];
+        }
         const currentParticipant = prev.find((p) => p.id === updated.id);
         if (currentParticipant) {
           showStatusNotification(currentParticipant, updated.bingo_status, t);
@@ -206,7 +212,9 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
     queryClient.setQueryData<Participant[]>(
       ["participants", spaceId],
       (prev) => {
-        if (!prev) return [];
+        if (!prev) {
+          return [];
+        }
         return prev.filter((p) => p.id !== deletedId);
       }
     );
@@ -261,7 +269,7 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
     return () => {
       channel.unsubscribe();
     };
-  }, [spaceId, queryClient, t]);
+  }, [spaceId]);
 
   const handleKickClick = (
     participantId: string,
