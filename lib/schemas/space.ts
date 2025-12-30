@@ -70,7 +70,7 @@ export function checkEmailAllowed(
 }
 
 export const spaceSchema = z.object({
-  slug: z
+  shareKey: z
     .string()
     .min(3, "3文字以上入力してください")
     .max(30, "30文字以内で入力してください")
@@ -280,7 +280,7 @@ export const createSpaceFormSchema = z
       .min(1, "1人以上を指定してください")
       .max(1000, "最大1000人までです")
       .default(50),
-    slug: z
+    shareKey: z
       .string()
       .min(3, "3文字以上入力してください")
       .max(30, "30文字以内で入力してください")

@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { generateRandomKey } from "@/lib/utils/random-key";
 import type { CreateSpaceState } from "./actions";
-import { checkSlugAvailability, createSpace } from "./actions";
+import { checkShareKeyAvailability, createSpace } from "./actions";
 
 export function CreateSpaceForm() {
   const router = useRouter();
@@ -69,7 +69,7 @@ export function CreateSpaceForm() {
     const check = async () => {
       setChecking(true);
       try {
-        const result = await checkSlugAvailability(debouncedShareKey);
+        const result = await checkShareKeyAvailability(debouncedShareKey);
         setAvailable(result.available);
       } finally {
         setChecking(false);

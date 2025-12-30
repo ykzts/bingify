@@ -21,40 +21,40 @@ export interface CreateSpaceState {
 
 // Simple schema for initial space creation (share key only)
 const simpleCreateSpaceSchema = z.object({
-  slug: z
+  shareKey: z
     .string()
     .min(3, "3文字以上入力してください")
     .max(30, "30文字以内で入力してください")
     .regex(/^[a-z0-9-]+$/, "小文字の英数字とハイフンのみ使用できます"),
 });
 
-export async function checkSlugAvailability(slug: string) {
+export async function checkShareKeyAvailability(shareKey: string) {
   try {
     const dateSuffix = format(new Date(), "yyyyMMdd");
-    const fullSlug = `${slug}-${dateSuffix}`;
+    const fullShareKey = `${shareKey}-${dateSuffix}`;
 
     const supabase = await createClient();
     const { data } = await supabase
       .from("spaces")
       .select("id")
-      .eq("share_key", fullSlug)
+      .eq("share_key", fullShareKey)
       .single();
 
     return { available: !data };
   } catch (error) {
-    console.error("Slug check error:", error);
+    console.error("Share key check error:", error);
     return { available: false };
   }
 }
 
-async function findAvailableSlug(
-  baseSlug: string,
+async function findAvailableShareKey(
+  baseShareKey: string,
   dateSuffix: string,
   supabase: Awaited<ReturnType<typeof createClient>>
 ): Promise<string | null> {
   // Try suggestions with incrementing numbers
   for (let i = 2; i <= MAX_SLUG_SUGGESTIONS; i++) {
-    const suggestion = `${baseSlug}-${i}-${dateSuffix}`;
+    const suggestion = `${baseShareKey}-${i}-${dateSuffix}`;
     const { data } = await supabase
       .from("spaces")
       .select("id")
@@ -77,7 +77,7 @@ export async function createSpace(
   try {
     // Validate share key only
     const validation = simpleCreateSpaceSchema.safeParse({
-      slug: formData.get("share_key") as string,
+      shareKey: formData.get("share_key") as string,
     });
 
     if (!validation.success) {
@@ -87,11 +87,11 @@ export async function createSpace(
       };
     }
 
-    const { slug: shareKey } = validation.data;
+    const { shareKey } = validation.data;
 
-    // Generate full slug with date suffix
+    // Generate full share key with date suffix
     const dateSuffix = format(new Date(), "yyyyMMdd");
-    const fullSlug = `${shareKey}-${dateSuffix}`;
+    const fullShareKey = `${shareKey}-${dateSuffix}`;
 
     // Check availability
     const supabase = await createClient();
@@ -151,12 +151,12 @@ export async function createSpace(
     const { data: existing } = await supabase
       .from("spaces")
       .select("id")
-      .eq("share_key", fullSlug)
+      .eq("share_key", fullShareKey)
       .single();
 
     if (existing) {
       // Find an available suggestion
-      const suggestion = await findAvailableSlug(
+      const suggestion = await findAvailableShareKey(
         shareKey,
         dateSuffix,
         supabase
@@ -189,7 +189,7 @@ export async function createSpace(
         max_participants: 50, // Default value
         owner_id: user.id,
         settings: {},
-        share_key: fullSlug,
+        share_key: fullShareKey,
         status: "draft", // Start as draft
         view_token: viewToken,
       })
@@ -205,7 +205,7 @@ export async function createSpace(
     }
 
     return {
-      shareKey: fullSlug,
+      shareKey: fullShareKey,
       spaceId: uuid,
       success: true,
     };

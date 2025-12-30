@@ -100,7 +100,7 @@
     "copyUrlButton": "閲覧用URLをコピー",
     "copyUrlError": "URLのコピーに失敗しました",
     "copyUrlSuccess": "URLをクリップボードにコピーしました",
-    "heading": "管理画面",
+    "heading": "ダッシュボード",
     "loadingParticipants": "参加者を読み込み中...",
     "noParticipants": "まだ参加者がいません",
     "numberCalledSuccess": "番号 {number} を呼びました",
@@ -149,7 +149,7 @@
     "settingsNotice": "作成後、詳細設定画面で参加人数制限やその他の設定を行えます"
   },
   "Dashboard": {
-    "activeSpaceBackToAdmin": "管理画面へ戻る",
+    "activeSpaceBackToAdmin": "ダッシュボードへ戻る",
     "activeSpaceLabel": "進行中",
     "activeSpaceParticipants": "{count}人が参加中",
     "createFormDescription": "必要な情報を入力して、すぐにビンゴ大会を始めましょう。",
