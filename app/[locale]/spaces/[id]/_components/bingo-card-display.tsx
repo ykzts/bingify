@@ -1,11 +1,14 @@
 "use client";
 
+import confetti from "canvas-confetti";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { checkBingoLines } from "@/lib/utils/bingo-checker";
 import type { BingoCard } from "../bingo-actions";
-import { getOrCreateBingoCard } from "../bingo-actions";
+import { getOrCreateBingoCard, updateBingoStatus } from "../bingo-actions";
+import { BingoLineOverlay } from "./bingo-line-overlay";
 
 interface Props {
   spaceId: string;
@@ -30,6 +33,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
   const [calledNumbers, setCalledNumbers] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const previousStatusRef = useRef<"none" | "reach" | "bingo">("none");
 
   useEffect(() => {
     const loadBingoCard = async () => {
@@ -121,6 +125,75 @@ export function BingoCardDisplay({ spaceId }: Props) {
     };
   }, [spaceId]);
 
+  // Check bingo status when called numbers or card changes
+  useEffect(() => {
+    if (!bingoCard) {
+      return;
+    }
+
+    // Determine new status based on called numbers
+    let newStatus: "none" | "reach" | "bingo" = "none";
+
+    if (calledNumbers.size > 0) {
+      const result = checkBingoLines(bingoCard.numbers, calledNumbers);
+
+      if (result.hasBingo) {
+        newStatus = "bingo";
+      } else if (result.hasReach) {
+        newStatus = "reach";
+      }
+    }
+
+    // Only update and trigger effects if status changed
+    if (newStatus !== previousStatusRef.current) {
+      previousStatusRef.current = newStatus;
+
+      // Update database
+      updateBingoStatus(spaceId, newStatus).catch((err) => {
+        console.error("Failed to update bingo status:", err);
+      });
+    }
+
+    // Trigger confetti on bingo
+    let confettiInterval: NodeJS.Timeout | null = null;
+    if (newStatus === "bingo") {
+      const duration = 3000;
+      const animationEnd = Date.now() + duration;
+      const defaults = {
+        startVelocity: 30,
+        spread: 360,
+        ticks: 60,
+        zIndex: 0,
+      };
+
+      confettiInterval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          if (confettiInterval) {
+            clearInterval(confettiInterval);
+          }
+          return;
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+
+        confetti({
+          ...defaults,
+          origin: { x: Math.random(), y: Math.random() - 0.2 },
+          particleCount: Math.floor(particleCount),
+        });
+      }, 250);
+    }
+
+    // Cleanup interval on unmount
+    return () => {
+      if (confettiInterval) {
+        clearInterval(confettiInterval);
+      }
+    };
+  }, [bingoCard, calledNumbers, spaceId]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -144,12 +217,29 @@ export function BingoCardDisplay({ spaceId }: Props) {
     return calledNumbers.has(number);
   };
 
+  // Calculate bingo lines for rendering
+  const bingoCheckResult = bingoCard
+    ? checkBingoLines(bingoCard.numbers, calledNumbers)
+    : { hasBingo: false, hasReach: false, bingoLines: [], reachLines: [] };
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="mb-4 text-center font-bold text-2xl">
           {t("bingoCardTitle")}
         </h2>
+
+        {/* Status badges */}
+        {bingoCheckResult.hasBingo && (
+          <div className="mx-auto mb-4 max-w-md rounded-lg bg-yellow-500 px-4 py-2 text-center font-bold text-lg text-white">
+            🎉 {t("bingo")} 🎉
+          </div>
+        )}
+        {!bingoCheckResult.hasBingo && bingoCheckResult.hasReach && (
+          <div className="mx-auto mb-4 max-w-md rounded-lg bg-orange-500 px-4 py-2 text-center font-bold text-white">
+            ⚡ {t("reach")} ⚡
+          </div>
+        )}
 
         <div className="mx-auto grid max-w-md grid-cols-5 gap-2">
           {["B", "I", "N", "G", "O"].map((letter) => (
@@ -162,7 +252,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
           ))}
         </div>
 
-        <div className="mx-auto mt-2 grid max-w-md grid-cols-5 gap-2">
+        <div className="relative mx-auto mt-2 grid max-w-md grid-cols-5 gap-2">
           {bingoCard.numbers.map((row, rowIndex) =>
             row.map((number, colIndex) => {
               const isCalled = isNumberCalled(number);
@@ -195,6 +285,8 @@ export function BingoCardDisplay({ spaceId }: Props) {
               );
             })
           )}
+          {/* Bingo line overlay */}
+          <BingoLineOverlay bingoLines={bingoCheckResult.bingoLines} />
         </div>
       </div>
 

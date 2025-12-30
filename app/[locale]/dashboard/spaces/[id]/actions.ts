@@ -246,3 +246,91 @@ export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
     };
   }
 }
+
+export interface Participant {
+  bingo_status: "none" | "reach" | "bingo";
+  id: string;
+  joined_at: string;
+  profiles?: {
+    display_name: string | null;
+  };
+  user_id: string;
+}
+
+export async function getParticipants(spaceId: string): Promise<Participant[]> {
+  try {
+    if (!isValidUUID(spaceId)) {
+      return [];
+    }
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return [];
+    }
+
+    const { data: space } = await supabase
+      .from("spaces")
+      .select("owner_id")
+      .eq("id", spaceId)
+      .single();
+
+    if (!space || space.owner_id !== user.id) {
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from("participants")
+      .select(
+        `
+        id,
+        user_id,
+        joined_at,
+        bingo_status,
+        profiles:user_id (
+          display_name
+        )
+      `
+      )
+      .eq("space_id", spaceId)
+      .order("joined_at", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching participants:", error);
+      return [];
+    }
+
+    // Transform the data to match our interface
+    const participants: Participant[] = (data || []).map((p) => ({
+      bingo_status: p.bingo_status as "none" | "reach" | "bingo",
+      id: p.id,
+      joined_at: p.joined_at,
+      profiles: Array.isArray(p.profiles)
+        ? p.profiles[0]
+        : (p.profiles as { display_name: string | null } | undefined),
+      user_id: p.user_id,
+    }));
+
+    // Sort by bingo status priority (bingo > reach > none) then by joined_at
+    const statusPriority: Record<"bingo" | "reach" | "none", number> = {
+      bingo: 0,
+      reach: 1,
+      none: 2,
+    };
+    return participants.sort((a, b) => {
+      const priorityDiff =
+        statusPriority[a.bingo_status] - statusPriority[b.bingo_status];
+      if (priorityDiff !== 0) {
+        return priorityDiff;
+      }
+      return new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime();
+    });
+  } catch (error) {
+    console.error("Error getting participants:", error);
+    return [];
+  }
+}

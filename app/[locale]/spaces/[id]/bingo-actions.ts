@@ -17,6 +17,11 @@ export interface BingoCardResult {
   success: boolean;
 }
 
+export interface UpdateBingoStatusResult {
+  error?: string;
+  success: boolean;
+}
+
 const BINGO_CARD_SIZE = 5;
 const NUMBERS_PER_COLUMN = 15;
 const FREE_SPACE_ROW = 2;
@@ -145,6 +150,60 @@ export async function getOrCreateBingoCard(
     };
   } catch (error) {
     console.error("Error getting or creating bingo card:", error);
+    return {
+      error: "An error occurred",
+      success: false,
+    };
+  }
+}
+
+/**
+ * Update participant's bingo status (none, reach, or bingo)
+ */
+export async function updateBingoStatus(
+  spaceId: string,
+  status: "none" | "reach" | "bingo"
+): Promise<UpdateBingoStatusResult> {
+  try {
+    if (!isValidUUID(spaceId)) {
+      return {
+        error: "Invalid space ID",
+        success: false,
+      };
+    }
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "Authentication required",
+        success: false,
+      };
+    }
+
+    const { error } = await supabase
+      .from("participants")
+      .update({ bingo_status: status })
+      .eq("space_id", spaceId)
+      .eq("user_id", user.id);
+
+    if (error) {
+      console.error("Error updating bingo status:", error);
+      return {
+        error: "Failed to update bingo status",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error updating bingo status:", error);
     return {
       error: "An error occurred",
       success: false,
