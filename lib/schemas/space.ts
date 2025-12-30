@@ -295,6 +295,20 @@ export const createSpaceFormSchema = z
   })
   .refine(
     (data) => {
+      // If social mode, social_platform must be specified
+      if (data.gatekeeper_mode === "social") {
+        return data.social_platform !== undefined;
+      }
+      return true;
+    },
+    {
+      message:
+        "ソーシャル連携を選択する場合、プラットフォームを指定してください",
+      path: ["social_platform"],
+    }
+  )
+  .refine(
+    (data) => {
       // If social mode with YouTube, channel ID must be provided
       if (
         data.gatekeeper_mode === "social" &&

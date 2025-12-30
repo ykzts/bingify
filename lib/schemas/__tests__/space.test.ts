@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   checkEmailAllowed,
+  createSpaceFormSchema,
   emailAllowlistSchema,
   gatekeeperModeSchema,
   parseEmailAllowlist,
@@ -166,6 +167,69 @@ describe("updateSpaceFormSchema - exclusive gatekeeper modes", () => {
     if (!result.success) {
       expect(result.error.issues[0].path).toContain("social_platform");
     }
+  });
+});
+
+describe("createSpaceFormSchema - exclusive gatekeeper modes", () => {
+  it("should accept none mode without any rules", () => {
+    const result = createSpaceFormSchema.safeParse({
+      email_allowlist: "",
+      gatekeeper_mode: "none",
+      max_participants: 50,
+      slug: "test-space",
+      twitch_broadcaster_id: "",
+      twitch_requirement: "none",
+      youtube_channel_id: "",
+      youtube_requirement: "none",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject social mode without social_platform specified", () => {
+    const result = createSpaceFormSchema.safeParse({
+      email_allowlist: "",
+      gatekeeper_mode: "social",
+      max_participants: 50,
+      slug: "test-space",
+      twitch_broadcaster_id: "",
+      twitch_requirement: "none",
+      youtube_channel_id: "",
+      youtube_requirement: "none",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toContain("social_platform");
+    }
+  });
+
+  it("should accept social mode with YouTube platform and valid channel", () => {
+    const result = createSpaceFormSchema.safeParse({
+      email_allowlist: "",
+      gatekeeper_mode: "social",
+      max_participants: 50,
+      slug: "test-space",
+      social_platform: "youtube",
+      twitch_broadcaster_id: "",
+      twitch_requirement: "none",
+      youtube_channel_id: "UCxxxxxxxxxxxxxxxxxxxxxx",
+      youtube_requirement: "subscriber",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("should accept social mode with Twitch platform and valid broadcaster ID", () => {
+    const result = createSpaceFormSchema.safeParse({
+      email_allowlist: "",
+      gatekeeper_mode: "social",
+      max_participants: 50,
+      slug: "test-space",
+      social_platform: "twitch",
+      twitch_broadcaster_id: "123456789",
+      twitch_requirement: "follower",
+      youtube_channel_id: "",
+      youtube_requirement: "none",
+    });
+    expect(result.success).toBe(true);
   });
 });
 
