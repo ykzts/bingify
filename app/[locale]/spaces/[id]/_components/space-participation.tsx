@@ -18,6 +18,10 @@ import {
   leaveSpace,
 } from "../../actions";
 
+// SessionStorage keys for OAuth completion tracking
+const YOUTUBE_OAUTH_COMPLETE_KEY = "youtube_oauth_complete";
+const TWITCH_OAUTH_COMPLETE_KEY = "twitch_oauth_complete";
+
 interface SpaceParticipationProps {
   compact?: boolean;
   spaceId: string;
@@ -175,12 +179,12 @@ export function SpaceParticipation({
       // and can proceed with joining.
       if (requiresYouTube && !joined) {
         const youtubeOAuthComplete = sessionStorage.getItem(
-          "youtube_oauth_complete"
+          YOUTUBE_OAUTH_COMPLETE_KEY
         );
 
         if (youtubeOAuthComplete) {
           // User just completed OAuth, clear the flag and set token as valid
-          sessionStorage.removeItem("youtube_oauth_complete");
+          sessionStorage.removeItem(YOUTUBE_OAUTH_COMPLETE_KEY);
           setHasYouTubeToken(true);
         } else {
           // No OAuth completion detected, require verification
@@ -192,12 +196,12 @@ export function SpaceParticipation({
       // Same logic as YouTube: use sessionStorage to track OAuth completion
       if (requiresTwitch && !joined) {
         const twitchOAuthComplete = sessionStorage.getItem(
-          "twitch_oauth_complete"
+          TWITCH_OAUTH_COMPLETE_KEY
         );
 
         if (twitchOAuthComplete) {
           // User just completed OAuth, clear the flag and set token as valid
-          sessionStorage.removeItem("twitch_oauth_complete");
+          sessionStorage.removeItem(TWITCH_OAUTH_COMPLETE_KEY);
           setHasTwitchToken(true);
         } else {
           // No OAuth completion detected, require verification
@@ -231,7 +235,7 @@ export function SpaceParticipation({
     try {
       // Set flag in sessionStorage before OAuth redirect
       // This allows us to detect when the user returns from OAuth
-      sessionStorage.setItem("youtube_oauth_complete", "true");
+      sessionStorage.setItem(YOUTUBE_OAUTH_COMPLETE_KEY, "true");
 
       const supabase = createClient();
 
@@ -248,7 +252,7 @@ export function SpaceParticipation({
       if (oauthError) {
         console.error("OAuth error:", oauthError);
         // Clear the flag if OAuth initiation failed
-        sessionStorage.removeItem("youtube_oauth_complete");
+        sessionStorage.removeItem(YOUTUBE_OAUTH_COMPLETE_KEY);
         setError(t("errorYouTubeVerificationFailed"));
         setIsJoining(false);
       } else {
@@ -259,7 +263,7 @@ export function SpaceParticipation({
     } catch (err) {
       console.error("Error during YouTube verification:", err);
       // Clear the flag if an exception occurred
-      sessionStorage.removeItem("youtube_oauth_complete");
+      sessionStorage.removeItem(YOUTUBE_OAUTH_COMPLETE_KEY);
       setError(t("errorYouTubeVerificationFailed"));
       setIsJoining(false);
     }
@@ -272,12 +276,13 @@ export function SpaceParticipation({
     try {
       // Set flag in sessionStorage before OAuth redirect
       // This allows us to detect when the user returns from OAuth
-      sessionStorage.setItem("twitch_oauth_complete", "true");
+      sessionStorage.setItem(TWITCH_OAUTH_COMPLETE_KEY, "true");
 
       const supabase = createClient();
 
-      // Use signInWithOAuth for Twitch with required scopes
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      // Use linkIdentity for consistency with YouTube implementation
+      // This adds Twitch scope to existing session for authenticated users
+      const { error: oauthError } = await supabase.auth.linkIdentity({
         options: {
           redirectTo: buildOAuthCallbackUrl(window.location.pathname),
           scopes: TWITCH_OAUTH_SCOPES,
@@ -288,7 +293,7 @@ export function SpaceParticipation({
       if (oauthError) {
         console.error("OAuth error:", oauthError);
         // Clear the flag if OAuth initiation failed
-        sessionStorage.removeItem("twitch_oauth_complete");
+        sessionStorage.removeItem(TWITCH_OAUTH_COMPLETE_KEY);
         setError(t("errorTwitchVerificationFailed"));
         setIsJoining(false);
       } else {
@@ -299,7 +304,7 @@ export function SpaceParticipation({
     } catch (err) {
       console.error("Error during Twitch verification:", err);
       // Clear the flag if an exception occurred
-      sessionStorage.removeItem("twitch_oauth_complete");
+      sessionStorage.removeItem(TWITCH_OAUTH_COMPLETE_KEY);
       setError(t("errorTwitchVerificationFailed"));
       setIsJoining(false);
     }
