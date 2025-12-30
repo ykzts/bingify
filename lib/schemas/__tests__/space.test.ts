@@ -1,9 +1,156 @@
 import { describe, expect, it } from "vitest";
 import {
   checkEmailAllowed,
+  createSpaceFormSchema,
   emailAllowlistSchema,
+  gatekeeperModeSchema,
   parseEmailAllowlist,
+  socialPlatformSchema,
+  updateSpaceFormSchema,
 } from "../space";
+
+describe("gatekeeperModeSchema", () => {
+  it("should accept valid gatekeeper modes", () => {
+    expect(gatekeeperModeSchema.parse("none")).toBe("none");
+    expect(gatekeeperModeSchema.parse("social")).toBe("social");
+    expect(gatekeeperModeSchema.parse("email")).toBe("email");
+  });
+
+  it("should reject invalid gatekeeper modes", () => {
+    expect(() => gatekeeperModeSchema.parse("invalid")).toThrow();
+  });
+});
+
+describe("socialPlatformSchema", () => {
+  it("should accept valid social platforms", () => {
+    expect(socialPlatformSchema.parse("youtube")).toBe("youtube");
+    expect(socialPlatformSchema.parse("twitch")).toBe("twitch");
+  });
+
+  it("should reject invalid social platforms", () => {
+    expect(() => socialPlatformSchema.parse("facebook")).toThrow();
+  });
+});
+
+describe("updateSpaceFormSchema - exclusive gatekeeper modes", () => {
+  it("should accept none mode without any rules", () => {
+    const result = updateSpaceFormSchema.safeParse({
+      description: "Test space",
+      email_allowlist: "",
+      gatekeeper_mode: "none",
+      max_participants: 50,
+      title: "Test",
+      twitch_broadcaster_id: "",
+      twitch_requirement: "none",
+      youtube_channel_id: "",
+      youtube_requirement: "none",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("should accept social mode with YouTube platform and valid channel", () => {
+    const result = updateSpaceFormSchema.safeParse({
+      description: "Test space",
+      email_allowlist: "",
+      gatekeeper_mode: "social",
+      max_participants: 50,
+      social_platform: "youtube",
+      title: "Test",
+      twitch_broadcaster_id: "",
+      twitch_requirement: "none",
+      youtube_channel_id: "UCxxxxxxxxxxxxxxxxxxxxxx",
+      youtube_requirement: "subscriber",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject social mode with YouTube when channel ID is invalid", () => {
+    const result = updateSpaceFormSchema.safeParse({
+      description: "Test space",
+      email_allowlist: "",
+      gatekeeper_mode: "social",
+      max_participants: 50,
+      social_platform: "youtube",
+      title: "Test",
+      twitch_broadcaster_id: "",
+      twitch_requirement: "none",
+      youtube_channel_id: "invalid",
+      youtube_requirement: "subscriber",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toContain("youtube_channel_id");
+    }
+  });
+
+  it("should accept social mode with Twitch platform and valid broadcaster ID", () => {
+    const result = updateSpaceFormSchema.safeParse({
+      description: "Test space",
+      email_allowlist: "",
+      gatekeeper_mode: "social",
+      max_participants: 50,
+      social_platform: "twitch",
+      title: "Test",
+      twitch_broadcaster_id: "123456789",
+      twitch_requirement: "follower",
+      youtube_channel_id: "",
+      youtube_requirement: "none",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject social mode with Twitch when broadcaster ID is invalid", () => {
+    const result = updateSpaceFormSchema.safeParse({
+      description: "Test space",
+      email_allowlist: "",
+      gatekeeper_mode: "social",
+      max_participants: 50,
+      social_platform: "twitch",
+      title: "Test",
+      twitch_broadcaster_id: "notanumber",
+      twitch_requirement: "follower",
+      youtube_channel_id: "",
+      youtube_requirement: "none",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toContain("twitch_broadcaster_id");
+    }
+  });
+
+  it("should accept email mode with valid email patterns", () => {
+    const result = updateSpaceFormSchema.safeParse({
+      description: "Test space",
+      email_allowlist: "@example.com, user@test.org",
+      gatekeeper_mode: "email",
+      max_participants: 50,
+      title: "Test",
+      twitch_broadcaster_id: "",
+      twitch_requirement: "none",
+      youtube_channel_id: "",
+      youtube_requirement: "none",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject email mode without email patterns", () => {
+    const result = updateSpaceFormSchema.safeParse({
+      description: "Test space",
+      email_allowlist: "",
+      gatekeeper_mode: "email",
+      max_participants: 50,
+      title: "Test",
+      twitch_broadcaster_id: "",
+      twitch_requirement: "none",
+      youtube_channel_id: "",
+      youtube_requirement: "none",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toContain("email_allowlist");
+    }
+  });
+});
 
 describe("parseEmailAllowlist", () => {
   it("should parse comma-separated patterns", () => {
