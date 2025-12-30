@@ -101,6 +101,7 @@ export function SpaceParticipation({
   const [hasJoined, setHasJoined] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasYouTubeToken, setHasYouTubeToken] = useState(false);
+  const [waitingForOAuth, setWaitingForOAuth] = useState(false);
 
   // Check if YouTube verification is required
   // This logic matches the server-side verification in actions.ts verifyGatekeeperRules
@@ -112,6 +113,31 @@ export function SpaceParticipation({
         spaceInfo.gatekeeper_rules.youtube.required),
     [spaceInfo.gatekeeper_rules]
   );
+
+  // Handle visibility change listener cleanup when waiting for OAuth
+  useEffect(() => {
+    if (!waitingForOAuth) {
+      return;
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        // Give a small delay to allow OAuth redirect to complete if it was successful
+        setTimeout(() => {
+          // If we're still on this page and haven't redirected, reset the state
+          setIsJoining(false);
+          setWaitingForOAuth(false);
+        }, 1000);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Cleanup: remove the listener when component unmounts or waitingForOAuth changes
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [waitingForOAuth]);
 
   // Load participant info and check if user has joined and has YouTube token
   useEffect(() => {
@@ -127,20 +153,25 @@ export function SpaceParticipation({
       // Check for YouTube token if YouTube verification is required
       // Note: We verify that the provider_token is specifically from Google OAuth.
       // The provider_token can be from any OAuth provider (Google, Twitch, etc.),
-      // so we check the session's app_metadata.provider to ensure it's from Google.
+      // so we check the session's identities array for a Google identity with a token.
       if (requiresYouTube && !joined) {
         const supabase = createClient();
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
+        // Search for a Google identity in the identities array
+        // This is more reliable than app_metadata.provider which can be stale
+        const googleIdentity = session?.user?.identities?.find(
+          (identity) => identity.provider === "google"
+        );
+
         // Only consider it a valid YouTube token if:
-        // 1. provider_token exists
-        // 2. The last authentication was with Google (provider === "google")
-        const isGoogleToken =
-          session?.provider_token &&
-          session?.user?.app_metadata?.provider === "google";
-        setHasYouTubeToken(!!isGoogleToken);
+        // 1. A Google identity exists
+        // 2. It has a provider_token
+        const hasValidGoogleToken =
+          googleIdentity?.identity_data && session?.provider_token;
+        setHasYouTubeToken(!!hasValidGoogleToken);
       }
 
       setIsLoading(false);
@@ -171,26 +202,10 @@ export function SpaceParticipation({
         console.error("OAuth error:", oauthError);
         setError(t("errorYouTubeVerificationFailed"));
         setIsJoining(false);
-      }
-      // Note: If successful, user will be redirected, so no need to setIsJoining(false)
-      // However, if the OAuth window is closed or fails to load, we set up a listener
-      // to reset the state when the user returns to the page
-      else {
-        // Set up a visibility change listener to reset state if user returns without completing OAuth
-        const handleVisibilityChange = () => {
-          if (document.visibilityState === "visible") {
-            // Give a small delay to allow OAuth redirect to complete if it was successful
-            setTimeout(() => {
-              // If we're still on this page and haven't redirected, reset the state
-              setIsJoining(false);
-            }, 1000);
-            document.removeEventListener(
-              "visibilitychange",
-              handleVisibilityChange
-            );
-          }
-        };
-        document.addEventListener("visibilitychange", handleVisibilityChange);
+      } else {
+        // Set waiting state to trigger the visibility change listener
+        // The listener will reset isJoining if the user returns without completing OAuth
+        setWaitingForOAuth(true);
       }
     } catch (err) {
       console.error("Error during YouTube verification:", err);
