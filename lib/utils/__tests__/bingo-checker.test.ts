@@ -129,4 +129,49 @@ describe("checkBingoLines", () => {
     expect(result.bingoLines[0].type).toBe("horizontal");
     expect(result.bingoLines[0].index).toBe(2);
   });
+
+  test("detects cross pattern (horizontal + vertical through center)", () => {
+    // Complete row 2 (horizontal): 3, 18, FREE, 48, 63
+    // Complete col 2 (vertical): 31, 32, FREE, 34, 35
+    const calledNumbers = new Set([3, 18, 48, 63, 31, 32, 34, 35]);
+    const result = checkBingoLines(testCard, calledNumbers);
+
+    expect(result.hasBingo).toBe(true);
+    expect(result.bingoLines).toHaveLength(2);
+
+    // Find horizontal and vertical lines
+    const horizontalLine = result.bingoLines.find((l) => l.type === "horizontal");
+    const verticalLine = result.bingoLines.find((l) => l.type === "vertical");
+
+    expect(horizontalLine).toBeDefined();
+    expect(horizontalLine?.index).toBe(2);
+    expect(verticalLine).toBeDefined();
+    expect(verticalLine?.index).toBe(2);
+  });
+
+  test("detects all three line types simultaneously (horizontal + vertical + diagonal)", () => {
+    // Row 0 (horizontal): 1, 16, 31, 46, 61
+    // Col 0 (vertical): 1, 2, 3, 4, 5
+    // Diagonal 0 (top-left to bottom-right): 1, 17, FREE, 49, 65
+    const calledNumbers = new Set([
+      1, 16, 31, 46, 61, // row 0
+      2, 3, 4, 5, // col 0 (1 already counted)
+      17, 49, 65, // diagonal 0 (1 already counted, FREE is always marked)
+    ]);
+    const result = checkBingoLines(testCard, calledNumbers);
+
+    expect(result.hasBingo).toBe(true);
+    expect(result.bingoLines).toHaveLength(3);
+
+    const horizontalLine = result.bingoLines.find((l) => l.type === "horizontal");
+    const verticalLine = result.bingoLines.find((l) => l.type === "vertical");
+    const diagonalLine = result.bingoLines.find((l) => l.type === "diagonal");
+
+    expect(horizontalLine).toBeDefined();
+    expect(horizontalLine?.index).toBe(0);
+    expect(verticalLine).toBeDefined();
+    expect(verticalLine?.index).toBe(0);
+    expect(diagonalLine).toBeDefined();
+    expect(diagonalLine?.index).toBe(0);
+  });
 });
