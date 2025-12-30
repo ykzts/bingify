@@ -1,12 +1,13 @@
 "use client";
 
-import { Loader2, Users, Youtube } from "lucide-react";
+import { Loader2, Twitch, Users, Youtube } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   buildOAuthCallbackUrl,
   GOOGLE_OAUTH_SCOPES,
+  TWITCH_OAUTH_SCOPES,
 } from "@/lib/auth/oauth-utils";
 import { createClient } from "@/lib/supabase/client";
 import type { JoinSpaceState, SpaceInfo } from "../../actions";
@@ -105,6 +106,7 @@ export function SpaceParticipation({
   const [hasJoined, setHasJoined] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasYouTubeToken, setHasYouTubeToken] = useState(false);
+  const [hasTwitchToken, setHasTwitchToken] = useState(false);
   const [waitingForOAuth, setWaitingForOAuth] = useState(false);
 
   // Check if YouTube verification is required
@@ -155,17 +157,14 @@ export function SpaceParticipation({
     };
   }, [waitingForOAuth]);
 
-  // Load participant info and check if user has joined and has YouTube token
-  useEffect(() => {
-    const loadInitialData = async () => {
-      setIsLoading(true);
-      const [info, joined] = await Promise.all([
-        getParticipantCount(spaceId),
-        checkUserParticipation(spaceId),
-      ]);
-      setParticipantInfo(info);
-      setHasJoined(joined);
+  const refreshParticipantInfo = async () => {
+    const info = await getParticipantCount(spaceId);
+    setParticipantInfo(info);
+  };
 
+  // Check OAuth completion flags in sessionStorage for YouTube and Twitch
+  const checkOAuthTokens = useCallback(
+    (joined: boolean) => {
       // Check for YouTube token if YouTube verification is required
       // Note: We cannot reliably determine if session.provider_token belongs to
       // the Google identity, as Supabase's provider_token is always from the most
@@ -189,15 +188,41 @@ export function SpaceParticipation({
         }
       }
 
+      // Check for Twitch token if Twitch verification is required
+      // Same logic as YouTube: use sessionStorage to track OAuth completion
+      if (requiresTwitch && !joined) {
+        const twitchOAuthComplete = sessionStorage.getItem(
+          "twitch_oauth_complete"
+        );
+
+        if (twitchOAuthComplete) {
+          // User just completed OAuth, clear the flag and set token as valid
+          sessionStorage.removeItem("twitch_oauth_complete");
+          setHasTwitchToken(true);
+        } else {
+          // No OAuth completion detected, require verification
+          setHasTwitchToken(false);
+        }
+      }
+    },
+    [requiresYouTube, requiresTwitch]
+  );
+
+  // Load participant info and check if user has joined and has YouTube/Twitch tokens
+  useEffect(() => {
+    const loadInitialData = async () => {
+      setIsLoading(true);
+      const [info, joined] = await Promise.all([
+        getParticipantCount(spaceId),
+        checkUserParticipation(spaceId),
+      ]);
+      setParticipantInfo(info);
+      setHasJoined(joined);
+      checkOAuthTokens(joined);
       setIsLoading(false);
     };
     loadInitialData();
-  }, [spaceId, requiresYouTube]);
-
-  const refreshParticipantInfo = async () => {
-    const info = await getParticipantCount(spaceId);
-    setParticipantInfo(info);
-  };
+  }, [spaceId, checkOAuthTokens]);
 
   const handleYouTubeVerify = async () => {
     setIsJoining(true);
@@ -236,6 +261,46 @@ export function SpaceParticipation({
       // Clear the flag if an exception occurred
       sessionStorage.removeItem("youtube_oauth_complete");
       setError(t("errorYouTubeVerificationFailed"));
+      setIsJoining(false);
+    }
+  };
+
+  const handleTwitchVerify = async () => {
+    setIsJoining(true);
+    setError(null);
+
+    try {
+      // Set flag in sessionStorage before OAuth redirect
+      // This allows us to detect when the user returns from OAuth
+      sessionStorage.setItem("twitch_oauth_complete", "true");
+
+      const supabase = createClient();
+
+      // Use signInWithOAuth for Twitch with required scopes
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        options: {
+          redirectTo: buildOAuthCallbackUrl(window.location.pathname),
+          scopes: TWITCH_OAUTH_SCOPES,
+        },
+        provider: "twitch",
+      });
+
+      if (oauthError) {
+        console.error("OAuth error:", oauthError);
+        // Clear the flag if OAuth initiation failed
+        sessionStorage.removeItem("twitch_oauth_complete");
+        setError(t("errorTwitchVerificationFailed"));
+        setIsJoining(false);
+      } else {
+        // Set waiting state to trigger the visibility change listener
+        // The listener will reset isJoining if the user returns without completing OAuth
+        setWaitingForOAuth(true);
+      }
+    } catch (err) {
+      console.error("Error during Twitch verification:", err);
+      // Clear the flag if an exception occurred
+      sessionStorage.removeItem("twitch_oauth_complete");
+      setError(t("errorTwitchVerificationFailed"));
       setIsJoining(false);
     }
   };
@@ -325,6 +390,20 @@ export function SpaceParticipation({
         />
       );
     }
+
+    if (requiresTwitch && !hasTwitchToken) {
+      return (
+        <JoinButton
+          compact={compact}
+          icon={<Twitch className={iconClassName} />}
+          isJoining={isJoining}
+          onClick={handleTwitchVerify}
+          text={t("verifyAndJoinButton")}
+          textLoading={t("verifyingAndJoining")}
+        />
+      );
+    }
+
     return (
       <JoinButton
         compact={compact}
@@ -369,17 +448,14 @@ export function SpaceParticipation({
         </div>
       )}
 
-      {/* Twitch Requirement Notice */}
-      {spaceInfo.gatekeeper_rules?.twitch &&
-        (spaceInfo.gatekeeper_rules.twitch.requireFollow ||
-          spaceInfo.gatekeeper_rules.twitch.requireSub) &&
-        !hasJoined && (
-          <div className="rounded-lg border border-purple-200 bg-purple-50 p-4">
-            <p className="text-purple-800 text-sm">
-              {t("errorTwitchVerificationRequired")}
-            </p>
-          </div>
-        )}
+      {/* Twitch Requirement Notice - Only show if token is missing */}
+      {requiresTwitch && !hasTwitchToken && !hasJoined && (
+        <div className="rounded-lg border border-purple-200 bg-purple-50 p-4">
+          <p className="text-purple-800 text-sm">
+            {t("errorTwitchVerificationRequired")}
+          </p>
+        </div>
+      )}
 
       {/* Participant Count */}
       {participantInfo && (
