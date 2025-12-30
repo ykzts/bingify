@@ -155,13 +155,22 @@ export function SpaceParticipation({
       // the Google identity, as Supabase's provider_token is always from the most
       // recent OAuth provider and doesn't include metadata about which provider it's from.
       //
-      // Conservative approach: Always show "Verify & Join" for YouTube requirements.
-      // If the user is already authenticated with Google, the OAuth flow completes instantly.
-      // This prevents a scenario where we show "Join Space" with a stale/wrong token,
-      // leading to server-side validation failures and a poor UX.
+      // To prevent OAuth redirect loops, we use sessionStorage to track when OAuth
+      // has just completed. If the flag exists, we know the user just authenticated
+      // and can proceed with joining.
       if (requiresYouTube && !joined) {
-        // Always require verification for YouTube to ensure we have the correct token
-        setHasYouTubeToken(false);
+        const youtubeOAuthComplete = sessionStorage.getItem(
+          "youtube_oauth_complete"
+        );
+
+        if (youtubeOAuthComplete) {
+          // User just completed OAuth, clear the flag and set token as valid
+          sessionStorage.removeItem("youtube_oauth_complete");
+          setHasYouTubeToken(true);
+        } else {
+          // No OAuth completion detected, require verification
+          setHasYouTubeToken(false);
+        }
       }
 
       setIsLoading(false);
@@ -179,6 +188,10 @@ export function SpaceParticipation({
     setError(null);
 
     try {
+      // Set flag in sessionStorage before OAuth redirect
+      // This allows us to detect when the user returns from OAuth
+      sessionStorage.setItem("youtube_oauth_complete", "true");
+
       const supabase = createClient();
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         options: {
@@ -190,6 +203,8 @@ export function SpaceParticipation({
 
       if (oauthError) {
         console.error("OAuth error:", oauthError);
+        // Clear the flag if OAuth initiation failed
+        sessionStorage.removeItem("youtube_oauth_complete");
         setError(t("errorYouTubeVerificationFailed"));
         setIsJoining(false);
       } else {
@@ -199,6 +214,8 @@ export function SpaceParticipation({
       }
     } catch (err) {
       console.error("Error during YouTube verification:", err);
+      // Clear the flag if an exception occurred
+      sessionStorage.removeItem("youtube_oauth_complete");
       setError(t("errorYouTubeVerificationFailed"));
       setIsJoining(false);
     }
