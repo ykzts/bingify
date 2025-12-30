@@ -10,7 +10,8 @@ interface BingoLineOverlayProps {
 
 /**
  * Renders SVG lines over completed bingo lines
- * Each cell is 1x1 in the SVG coordinate system
+ * The grid uses gap-2 (0.5rem) between cells, so we need to account for gaps in coordinates
+ * With 5 cells and 4 gaps: each cell gets (100 - 4*gap) / 5 space, gaps are between cells
  */
 export function BingoLineOverlay({
   bingoLines,
@@ -20,13 +21,29 @@ export function BingoLineOverlay({
     return null;
   }
 
+  // Gap ratio: with gap-2 (0.5rem) in a grid, approximate gap as 0.2 relative to cell size
+  // This maps to the visual grid with gaps where each cell + gap unit is ~1.2
+  const gapRatio = 0.2;
+  const cellSize = 1;
+  const cellWithGap = cellSize + gapRatio;
+
+  // Helper to calculate center position of a cell at given index
+  const getCellCenter = (index: number) => {
+    return index * cellWithGap + cellSize / 2;
+  };
+
+  // Padding from edges
+  const padding = 0.05;
+  const gridStart = padding;
+  const gridEnd = (cardSize - 1) * cellWithGap + cellSize - padding;
+
   return (
     <svg
       aria-label="Bingo line overlay"
       className="pointer-events-none absolute inset-0 h-full w-full"
       role="img"
       style={{ zIndex: 10 }}
-      viewBox={`0 0 ${cardSize} ${cardSize}`}
+      viewBox={`0 0 ${cardSize * cellWithGap - gapRatio} ${cardSize * cellWithGap - gapRatio}`}
     >
       {bingoLines.map((line, index) => {
         let x1: number;
@@ -36,28 +53,30 @@ export function BingoLineOverlay({
 
         if (line.type === "horizontal") {
           // Horizontal line across row
-          y1 = line.index + 0.5;
-          y2 = line.index + 0.5;
-          x1 = 0.1;
-          x2 = cardSize - 0.1;
+          const y = getCellCenter(line.index);
+          y1 = y;
+          y2 = y;
+          x1 = gridStart;
+          x2 = gridEnd;
         } else if (line.type === "vertical") {
           // Vertical line down column
-          x1 = line.index + 0.5;
-          x2 = line.index + 0.5;
-          y1 = 0.1;
-          y2 = cardSize - 0.1;
+          const x = getCellCenter(line.index);
+          x1 = x;
+          x2 = x;
+          y1 = gridStart;
+          y2 = gridEnd;
         } else if (line.index === 0) {
           // Diagonal from top-left to bottom-right
-          x1 = 0.1;
-          y1 = 0.1;
-          x2 = cardSize - 0.1;
-          y2 = cardSize - 0.1;
+          x1 = gridStart;
+          y1 = gridStart;
+          x2 = gridEnd;
+          y2 = gridEnd;
         } else {
           // Diagonal from top-right to bottom-left
-          x1 = cardSize - 0.1;
-          y1 = 0.1;
-          x2 = 0.1;
-          y2 = cardSize - 0.1;
+          x1 = gridEnd;
+          y1 = gridStart;
+          x2 = gridStart;
+          y2 = gridEnd;
         }
 
         return (
