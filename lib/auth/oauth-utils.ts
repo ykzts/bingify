@@ -23,3 +23,9 @@ export function buildOAuthCallbackUrl(redirectPath?: string): string {
  */
 export const GOOGLE_OAUTH_SCOPES =
   "https://www.googleapis.com/auth/youtube.readonly";
+
+/**
+ * Default OAuth scopes for Twitch authentication
+ * Includes follower and subscription read access for space gatekeeper verification
+ */
+export const TWITCH_OAUTH_SCOPES = "user:read:follows user:read:subscriptions";
