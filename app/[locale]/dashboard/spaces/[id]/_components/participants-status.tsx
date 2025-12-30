@@ -3,7 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useEffectEvent, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -155,17 +155,8 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
     name: string | null;
   } | null>(null);
 
-  // Use refs to avoid adding to dependencies
-  const onUpdateRef = useRef<
-    ((payload: { new: ParticipantUpdate }) => void) | null
-  >(null);
-  const onInsertRef = useRef<(() => void) | null>(null);
-  const onDeleteRef = useRef<
-    ((payload: { old: { id: string } }) => void) | null
-  >(null);
-
-  // Update refs when dependencies change
-  onUpdateRef.current = (payload: { new: ParticipantUpdate }) => {
+  // Use useEffectEvent to separate event logic from effect dependencies
+  const onUpdate = useEffectEvent((payload: { new: ParticipantUpdate }) => {
     const updated = payload.new;
 
     // Validate payload structure
@@ -194,14 +185,14 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
         return updateParticipantList(prev, updated.id, updated.bingo_status);
       }
     );
-  };
+  });
 
-  onInsertRef.current = () => {
+  const onInsert = useEffectEvent(() => {
     // Refetch participants when a new one joins
     queryClient.invalidateQueries({ queryKey: ["participants", spaceId] });
-  };
+  });
 
-  onDeleteRef.current = (payload: { old: { id: string } }) => {
+  const onDelete = useEffectEvent((payload: { old: { id: string } }) => {
     // Validate payload structure
     if (!payload?.old || typeof payload.old.id !== "string") {
       console.warn("Invalid participant delete payload:", payload);
@@ -218,7 +209,7 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
         return prev.filter((p) => p.id !== deletedId);
       }
     );
-  };
+  });
 
   useEffect(() => {
     const supabase = createClient();
@@ -234,7 +225,7 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
         },
         (payload) => {
           const updated = payload.new as ParticipantUpdate;
-          onUpdateRef.current?.({ new: updated });
+          onUpdate({ new: updated });
         }
       )
       .on(
@@ -246,7 +237,7 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
           table: "participants",
         },
         () => {
-          onInsertRef.current?.();
+          onInsert();
         }
       )
       .on(
@@ -260,7 +251,7 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
         (payload) => {
           const deletedId = (payload.old as { id?: string }).id;
           if (deletedId) {
-            onDeleteRef.current?.({ old: { id: deletedId } });
+            onDelete({ old: { id: deletedId } });
           }
         }
       )

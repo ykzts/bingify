@@ -5,7 +5,7 @@ import { Settings } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useBackground } from "../../_context/background-context";
@@ -63,21 +63,13 @@ export function ScreenDisplay({
   // Use background context instead of local state
   const { background, setBackground } = useBackground();
 
-  // Use refs to avoid adding to dependencies
-  const onInsertRef = useRef<((payload: { new: CalledNumber }) => void) | null>(
-    null
-  );
-  const onDeleteRef = useRef<((payload: { old: CalledNumber }) => void) | null>(
-    null
-  );
-
   // Initialize background from props
   useEffect(() => {
     setBackground(normalizeBackgroundType(initialBg));
   }, [initialBg, setBackground]);
 
-  // Update refs when dependencies change
-  onInsertRef.current = (payload: { new: CalledNumber }) => {
+  // Use useEffectEvent to separate event logic from effect dependencies
+  const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
     const newNumber = payload.new;
     queryClient.setQueryData<CalledNumber[]>(
       ["called-numbers", spaceId],
@@ -89,9 +81,9 @@ export function ScreenDisplay({
         return alreadyExists ? prev : [...prev, newNumber];
       }
     );
-  };
+  });
 
-  onDeleteRef.current = (payload: { old: CalledNumber }) => {
+  const onDelete = useEffectEvent((payload: { old: CalledNumber }) => {
     const deletedNumber = payload.old;
     queryClient.setQueryData<CalledNumber[]>(
       ["called-numbers", spaceId],
@@ -102,7 +94,7 @@ export function ScreenDisplay({
         return prev.filter((n) => n.id !== deletedNumber.id);
       }
     );
-  };
+  });
 
   useEffect(() => {
     const supabase = createClient();
@@ -118,7 +110,7 @@ export function ScreenDisplay({
         },
         (payload) => {
           const newNumber = payload.new as CalledNumber;
-          onInsertRef.current?.({ new: newNumber });
+          onInsert({ new: newNumber });
         }
       )
       .on(
@@ -131,7 +123,7 @@ export function ScreenDisplay({
         },
         (payload) => {
           const deletedNumber = payload.old as CalledNumber;
-          onDeleteRef.current?.({ old: deletedNumber });
+          onDelete({ old: deletedNumber });
         }
       )
       .subscribe((status) => {

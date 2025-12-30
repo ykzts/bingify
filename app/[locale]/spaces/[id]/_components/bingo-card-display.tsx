@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import confetti from "canvas-confetti";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef } from "react";
+import { useEffect, useEffectEvent, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { checkBingoLines } from "@/lib/utils/bingo-checker";
 import { useBingoCard } from "../_hooks/use-bingo-card";
@@ -30,16 +30,8 @@ export function BingoCardDisplay({ spaceId }: Props) {
   const { data: calledNumbers = new Set<number>() } = useCalledNumbers(spaceId);
   const previousStatusRef = useRef<"none" | "reach" | "bingo">("none");
 
-  // Use refs to avoid adding to dependencies
-  const onInsertRef = useRef<((payload: { new: CalledNumber }) => void) | null>(
-    null
-  );
-  const onDeleteRef = useRef<((payload: { old: CalledNumber }) => void) | null>(
-    null
-  );
-
-  // Update refs when dependencies change
-  onInsertRef.current = (payload: { new: CalledNumber }) => {
+  // Use useEffectEvent to separate event logic from effect dependencies
+  const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
     const newNumber = payload.new;
     queryClient.setQueryData<Set<number>>(
       ["called-numbers", spaceId],
@@ -50,9 +42,9 @@ export function BingoCardDisplay({ spaceId }: Props) {
         return new Set([...prev, newNumber.value]);
       }
     );
-  };
+  });
 
-  onDeleteRef.current = (payload: { old: CalledNumber }) => {
+  const onDelete = useEffectEvent((payload: { old: CalledNumber }) => {
     const deletedNumber = payload.old;
     queryClient.setQueryData<Set<number>>(
       ["called-numbers", spaceId],
@@ -65,7 +57,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
         return newSet;
       }
     );
-  };
+  });
 
   useEffect(() => {
     const supabase = createClient();
@@ -81,7 +73,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
         },
         (payload) => {
           const newNumber = payload.new as CalledNumber;
-          onInsertRef.current?.({ new: newNumber });
+          onInsert({ new: newNumber });
         }
       )
       .on(
@@ -94,7 +86,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
         },
         (payload) => {
           const deletedNumber = payload.old as CalledNumber;
-          onDeleteRef.current?.({ old: deletedNumber });
+          onDelete({ old: deletedNumber });
         }
       )
       .subscribe();

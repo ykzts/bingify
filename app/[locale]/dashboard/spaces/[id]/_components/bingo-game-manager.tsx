@@ -3,7 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import type { CalledNumber } from "../_hooks/use-called-numbers";
@@ -21,16 +21,8 @@ export function BingoGameManager({ spaceId }: Props) {
   const [isCalling, setIsCalling] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
-  // Use ref to avoid adding to dependencies
-  const onInsertRef = useRef<((payload: { new: CalledNumber }) => void) | null>(
-    null
-  );
-  const onDeleteRef = useRef<((payload: { old: CalledNumber }) => void) | null>(
-    null
-  );
-
-  // Update refs when dependencies change
-  onInsertRef.current = (payload: { new: CalledNumber }) => {
+  // Use useEffectEvent to separate event logic from effect dependencies
+  const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
     const newNumber = payload.new;
     queryClient.setQueryData<CalledNumber[]>(
       ["called-numbers", spaceId],
@@ -42,9 +34,9 @@ export function BingoGameManager({ spaceId }: Props) {
         return alreadyExists ? prev : [...prev, newNumber];
       }
     );
-  };
+  });
 
-  onDeleteRef.current = (payload: { old: CalledNumber }) => {
+  const onDelete = useEffectEvent((payload: { old: CalledNumber }) => {
     const deletedNumber = payload.old;
     queryClient.setQueryData<CalledNumber[]>(
       ["called-numbers", spaceId],
@@ -55,7 +47,7 @@ export function BingoGameManager({ spaceId }: Props) {
         return prev.filter((n) => n.id !== deletedNumber.id);
       }
     );
-  };
+  });
 
   useEffect(() => {
     const supabase = createClient();
@@ -71,7 +63,7 @@ export function BingoGameManager({ spaceId }: Props) {
         },
         (payload) => {
           const newNumber = payload.new as CalledNumber;
-          onInsertRef.current?.({ new: newNumber });
+          onInsert({ new: newNumber });
         }
       )
       .on(
@@ -84,7 +76,7 @@ export function BingoGameManager({ spaceId }: Props) {
         },
         (payload) => {
           const deletedNumber = payload.old as CalledNumber;
-          onDeleteRef.current?.({ old: deletedNumber });
+          onDelete({ old: deletedNumber });
         }
       )
       .subscribe();
