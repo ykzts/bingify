@@ -121,7 +121,13 @@ INSERT INTO spaces (
 	50,
 	NOW() - INTERVAL '2 days',
 	NOW() - INTERVAL '1 hour'
-);
+)
+ON CONFLICT (id) DO UPDATE
+	SET title = EXCLUDED.title,
+			description = EXCLUDED.description,
+			status = EXCLUDED.status,
+			settings = EXCLUDED.settings,
+			updated_at = EXCLUDED.updated_at;
 
 -- Space B: Draft/preparation space
 INSERT INTO spaces (
@@ -150,7 +156,13 @@ INSERT INTO spaces (
 	30,
 	NOW() - INTERVAL '1 day',
 	NOW() - INTERVAL '1 hour'
-);
+)
+ON CONFLICT (id) DO UPDATE
+	SET title = EXCLUDED.title,
+			description = EXCLUDED.description,
+			status = EXCLUDED.status,
+			settings = EXCLUDED.settings,
+			updated_at = EXCLUDED.updated_at;
 
 -- Space C: Archived space
 INSERT INTO spaces (
@@ -179,7 +191,13 @@ INSERT INTO spaces (
 	50,
 	NOW() - INTERVAL '30 days',
 	NOW() - INTERVAL '25 days'
-);
+)
+ON CONFLICT (id) DO UPDATE
+	SET title = EXCLUDED.title,
+			description = EXCLUDED.description,
+			status = EXCLUDED.status,
+			settings = EXCLUDED.settings,
+			updated_at = EXCLUDED.updated_at;
 
 -- Space D: YouTube restricted space
 INSERT INTO spaces (
@@ -208,7 +226,14 @@ INSERT INTO spaces (
 	100,
 	NOW() - INTERVAL '5 hours',
 	NOW() - INTERVAL '1 hour'
-);
+)
+ON CONFLICT (id) DO UPDATE
+	SET title = EXCLUDED.title,
+			description = EXCLUDED.description,
+			status = EXCLUDED.status,
+			settings = EXCLUDED.settings,
+			gatekeeper_rules = EXCLUDED.gatekeeper_rules,
+			updated_at = EXCLUDED.updated_at;
 
 -- Space E: Twitch restricted space
 INSERT INTO spaces (
@@ -237,7 +262,14 @@ INSERT INTO spaces (
 	75,
 	NOW() - INTERVAL '3 hours',
 	NOW() - INTERVAL '30 minutes'
-);
+)
+ON CONFLICT (id) DO UPDATE
+	SET title = EXCLUDED.title,
+			description = EXCLUDED.description,
+			status = EXCLUDED.status,
+			settings = EXCLUDED.settings,
+			gatekeeper_rules = EXCLUDED.gatekeeper_rules,
+			updated_at = EXCLUDED.updated_at;
 
 -- ============================================================================
 -- Participants
@@ -257,7 +289,9 @@ INSERT INTO participants (
 	'00000000-0000-0000-0000-000000000001'::uuid,
 	'reach',
 	NOW() - INTERVAL '2 days'
-);
+)
+ON CONFLICT (id) DO UPDATE
+	SET bingo_status = EXCLUDED.bingo_status;
 
 -- User 2 (guest) as participant
 INSERT INTO participants (
@@ -272,7 +306,9 @@ INSERT INTO participants (
 	'00000000-0000-0000-0000-000000000002'::uuid,
 	'none',
 	NOW() - INTERVAL '1 day'
-);
+)
+ON CONFLICT (id) DO UPDATE
+	SET bingo_status = EXCLUDED.bingo_status;
 
 -- ============================================================================
 -- Bingo Cards
@@ -289,7 +325,7 @@ INSERT INTO bingo_cards (
 ) VALUES (
 	'11111111-aaaa-aaaa-aaaa-111111111111'::uuid,
 	'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid,
-	'00000000-0000-0000-0000-000000000001',
+	'00000000-0000-0000-0000-000000000001'::text,
 	'[
 		[5, 12, 23, 34, 45],
 		[7, 18, 25, 38, 52],
@@ -298,7 +334,9 @@ INSERT INTO bingo_cards (
 		[14, 29, 36, 50, 71]
 	]'::jsonb,
 	NOW() - INTERVAL '2 days'
-);
+)
+ON CONFLICT (id) DO UPDATE
+	SET numbers = EXCLUDED.numbers;
 
 -- Card for User 2
 INSERT INTO bingo_cards (
@@ -310,7 +348,7 @@ INSERT INTO bingo_cards (
 ) VALUES (
 	'22222222-aaaa-aaaa-aaaa-222222222222'::uuid,
 	'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid,
-	'00000000-0000-0000-0000-000000000002',
+	'00000000-0000-0000-0000-000000000002'::text,
 	'[
 		[3, 16, 24, 37, 48],
 		[6, 19, 28, 39, 51],
@@ -319,7 +357,9 @@ INSERT INTO bingo_cards (
 		[15, 30, 35, 49, 72]
 	]'::jsonb,
 	NOW() - INTERVAL '1 day'
-);
+)
+ON CONFLICT (id) DO UPDATE
+	SET numbers = EXCLUDED.numbers;
 
 -- ============================================================================
 -- Called Numbers
@@ -339,7 +379,8 @@ VALUES
 	('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid, 21, NOW() - INTERVAL '50 minutes'),
 	('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid, 41, NOW() - INTERVAL '45 minutes'),
 	('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid, 11, NOW() - INTERVAL '40 minutes'),
-	('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid, 27, NOW() - INTERVAL '35 minutes');
+	('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid, 27, NOW() - INTERVAL '35 minutes')
+ON CONFLICT (space_id, value) DO NOTHING;
 
 -- ============================================================================
 -- Seed Data Complete
