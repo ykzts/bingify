@@ -153,14 +153,14 @@ export function AdminManagement({ spaceId }: Props) {
             <p className="text-red-800 text-sm">{error}</p>
           </div>
         )}
-        {!(loading || error ) && admins.length === 0 && (
+        {!(loading || error) && admins.length === 0 && (
           <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
             <p className="text-gray-500 text-sm">
               まだ管理者は招待されていません
             </p>
           </div>
         )}
-        {!(loading || error ) && admins.length > 0 && (
+        {!(loading || error) && admins.length > 0 && (
           <div className="space-y-2">
             {admins.map((admin) => (
               <div
