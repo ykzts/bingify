@@ -60,16 +60,37 @@ function determineGatekeeperMode(
 }
 
 // Determine initial social platform
+// Prefer the platform that has a meaningful (non-"none") requirement.
+// If both have equally significant requirements, fall back to YouTube first.
 function determineSocialPlatform(
   rules: Space["gatekeeper_rules"]
 ): "youtube" | "twitch" {
+  const youtubeRequirement = rules?.youtube?.requirement;
+  const twitchRequirement = rules?.twitch?.requirement;
+
+  const youtubeHasRequirement =
+    typeof youtubeRequirement === "string" && youtubeRequirement !== "none";
+  const twitchHasRequirement =
+    typeof twitchRequirement === "string" && twitchRequirement !== "none";
+
+  // If exactly one platform has a real requirement, choose that one
+  if (youtubeHasRequirement && !twitchHasRequirement) {
+    return "youtube";
+  }
+  if (twitchHasRequirement && !youtubeHasRequirement) {
+    return "twitch";
+  }
+
+  // Tie-breaker: preserve existing YouTube-first behavior when both are present
   if (rules?.youtube) {
     return "youtube";
   }
   if (rules?.twitch) {
     return "twitch";
   }
-  return "youtube"; // default
+
+  // Default when no social rules exist
+  return "youtube";
 }
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Settings form requires comprehensive state management
@@ -81,13 +102,13 @@ export function SpaceSettingsForm({
 }: Props) {
   const router = useRouter();
   const t = useTranslations("SpaceSettings");
-  
+
   const [title, setTitle] = useState(space.title || "");
   const [description, setDescription] = useState(space.description || "");
   const [maxParticipants, setMaxParticipants] = useState(
     space.max_participants
   );
-  
+
   // Gatekeeper state
   const [gatekeeperMode, setGatekeeperMode] = useState<
     "none" | "social" | "email"
@@ -95,7 +116,7 @@ export function SpaceSettingsForm({
   const [socialPlatform, setSocialPlatform] = useState<"youtube" | "twitch">(
     determineSocialPlatform(space.gatekeeper_rules)
   );
-  
+
   // YouTube state
   const [youtubeRequirement, setYoutubeRequirement] = useState(
     space.gatekeeper_rules?.youtube?.requirement || "none"
@@ -103,7 +124,7 @@ export function SpaceSettingsForm({
   const [youtubeChannelId, setYoutubeChannelId] = useState(
     space.gatekeeper_rules?.youtube?.channelId || ""
   );
-  
+
   // Twitch state
   const [twitchRequirement, setTwitchRequirement] = useState(
     space.gatekeeper_rules?.twitch?.requirement || "none"
@@ -111,12 +132,12 @@ export function SpaceSettingsForm({
   const [twitchBroadcasterId, setTwitchBroadcasterId] = useState(
     space.gatekeeper_rules?.twitch?.broadcasterId || ""
   );
-  
+
   // Email state
   const [emailAllowlist, setEmailAllowlist] = useState(
     space.gatekeeper_rules?.email?.allowed?.join(", ") || ""
   );
-  
+
   const [hideMetadataBeforeJoin, setHideMetadataBeforeJoin] = useState(
     space.settings?.hide_metadata_before_join ?? false
   );
@@ -253,17 +274,23 @@ export function SpaceSettingsForm({
               <TabsTrigger value="social">
                 {t("gatekeeperModeSocial")}
               </TabsTrigger>
-              <TabsTrigger value="email">{t("gatekeeperModeEmail")}</TabsTrigger>
+              <TabsTrigger value="email">
+                {t("gatekeeperModeEmail")}
+              </TabsTrigger>
             </TabsList>
 
             {/* None Tab */}
             <TabsContent className="space-y-4" value="none">
-              <p className="text-gray-600 text-sm">{t("noneModeDescription")}</p>
+              <p className="text-gray-600 text-sm">
+                {t("noneModeDescription")}
+              </p>
             </TabsContent>
 
             {/* Social Tab */}
             <TabsContent className="space-y-4" value="social">
-              <p className="text-gray-600 text-sm">{t("socialModeDescription")}</p>
+              <p className="text-gray-600 text-sm">
+                {t("socialModeDescription")}
+              </p>
 
               {/* Hidden input for social_platform */}
               <input
@@ -283,7 +310,10 @@ export function SpaceSettingsForm({
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem id="platform-youtube" value="youtube" />
-                    <Label className="cursor-pointer" htmlFor="platform-youtube">
+                    <Label
+                      className="cursor-pointer"
+                      htmlFor="platform-youtube"
+                    >
                       {t("platformYoutube")}
                     </Label>
                   </div>
@@ -318,7 +348,9 @@ export function SpaceSettingsForm({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">{t("requirementNone")}</SelectItem>
+                        <SelectItem value="none">
+                          {t("requirementNone")}
+                        </SelectItem>
                         <SelectItem value="subscriber">
                           {t("youtubeSubscriber")}
                         </SelectItem>
@@ -373,8 +405,12 @@ export function SpaceSettingsForm({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">{t("requirementNone")}</SelectItem>
-                        <SelectItem value="follower">{t("twitchFollower")}</SelectItem>
+                        <SelectItem value="none">
+                          {t("requirementNone")}
+                        </SelectItem>
+                        <SelectItem value="follower">
+                          {t("twitchFollower")}
+                        </SelectItem>
                         <SelectItem value="subscriber">
                           {t("twitchSubscriber")}
                         </SelectItem>
@@ -410,7 +446,9 @@ export function SpaceSettingsForm({
 
             {/* Email Tab */}
             <TabsContent className="space-y-4" value="email">
-              <p className="text-gray-600 text-sm">{t("emailModeDescription")}</p>
+              <p className="text-gray-600 text-sm">
+                {t("emailModeDescription")}
+              </p>
 
               <div>
                 <Label className="mb-2" htmlFor="email_allowlist">
@@ -437,7 +475,7 @@ export function SpaceSettingsForm({
             </TabsContent>
           </Tabs>
 
-          {/* Hidden inputs for non-selected platforms */}
+          {/* Hidden inputs for non-selected modes and platforms */}
           {gatekeeperMode !== "social" && (
             <>
               <input name="youtube_requirement" type="hidden" value="none" />

@@ -174,6 +174,20 @@ export const updateSpaceFormSchema = z
   })
   .refine(
     (data) => {
+      // If social mode, social_platform must be specified
+      if (data.gatekeeper_mode === "social") {
+        return data.social_platform !== undefined;
+      }
+      return true;
+    },
+    {
+      message:
+        "ソーシャル連携を選択する場合、プラットフォームを指定してください",
+      path: ["social_platform"],
+    }
+  )
+  .refine(
+    (data) => {
       // If social mode with YouTube, channel ID must be provided
       if (
         data.gatekeeper_mode === "social" &&
@@ -273,7 +287,9 @@ export const createSpaceFormSchema = z
       .regex(/^[a-z0-9-]+$/, "小文字の英数字とハイフンのみ使用できます"),
     social_platform: socialPlatformSchema.optional(),
     twitch_broadcaster_id: z.string().trim().optional(),
-    twitch_requirement: z.enum(["none", "follower", "subscriber"]).default("none"),
+    twitch_requirement: z
+      .enum(["none", "follower", "subscriber"])
+      .default("none"),
     youtube_channel_id: z.string().trim().optional(),
     youtube_requirement: z.enum(["none", "subscriber"]).default("none"),
   })

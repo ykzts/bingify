@@ -149,6 +149,24 @@ describe("updateSpaceFormSchema - exclusive gatekeeper modes", () => {
       expect(result.error.issues[0].path).toContain("email_allowlist");
     }
   });
+
+  it("should reject social mode without social_platform specified", () => {
+    const result = updateSpaceFormSchema.safeParse({
+      description: "Test space",
+      email_allowlist: "",
+      gatekeeper_mode: "social",
+      max_participants: 50,
+      title: "Test",
+      twitch_broadcaster_id: "",
+      twitch_requirement: "none",
+      youtube_channel_id: "",
+      youtube_requirement: "none",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toContain("social_platform");
+    }
+  });
 });
 
 describe("parseEmailAllowlist", () => {

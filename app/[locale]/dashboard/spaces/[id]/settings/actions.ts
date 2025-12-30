@@ -178,20 +178,28 @@ export async function updateSpaceSettings(
       gatekeeperRules = null;
     } else if (gatekeeperMode === "social") {
       gatekeeperRules = {};
-      
+
       // Only add the selected platform's rules
-      if (socialPlatform === "youtube" && youtubeRequirement !== "none" && youtubeChannelId) {
+      if (
+        socialPlatform === "youtube" &&
+        youtubeRequirement !== "none" &&
+        youtubeChannelId
+      ) {
         gatekeeperRules.youtube = {
           channelId: youtubeChannelId,
           requirement: youtubeRequirement,
         };
-      } else if (socialPlatform === "twitch" && twitchRequirement !== "none" && twitchBroadcasterId) {
+      } else if (
+        socialPlatform === "twitch" &&
+        twitchRequirement !== "none" &&
+        twitchBroadcasterId
+      ) {
         gatekeeperRules.twitch = {
           broadcasterId: twitchBroadcasterId,
           requirement: twitchRequirement,
         };
       }
-      
+
       // If no valid social rules, set to null
       if (Object.keys(gatekeeperRules).length === 0) {
         gatekeeperRules = null;
