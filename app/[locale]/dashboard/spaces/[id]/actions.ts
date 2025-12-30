@@ -246,3 +246,68 @@ export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
     };
   }
 }
+
+export interface Participant {
+  bingo_status: "none" | "reach" | "bingo";
+  id: string;
+  joined_at: string;
+  profiles?: {
+    display_name: string | null;
+  };
+  user_id: string;
+}
+
+export async function getParticipants(spaceId: string): Promise<Participant[]> {
+  try {
+    if (!isValidUUID(spaceId)) {
+      return [];
+    }
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return [];
+    }
+
+    const { data: space } = await supabase
+      .from("spaces")
+      .select("owner_id")
+      .eq("id", spaceId)
+      .single();
+
+    if (!space || space.owner_id !== user.id) {
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from("participants")
+      .select(
+        `
+        id,
+        user_id,
+        joined_at,
+        bingo_status,
+        profiles:user_id (
+          display_name
+        )
+      `
+      )
+      .eq("space_id", spaceId)
+      .order("bingo_status", { ascending: false })
+      .order("joined_at", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching participants:", error);
+      return [];
+    }
+
+    return (data || []) as Participant[];
+  } catch (error) {
+    console.error("Error getting participants:", error);
+    return [];
+  }
+}

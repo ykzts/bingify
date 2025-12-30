@@ -2,8 +2,10 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { Toaster } from "@/components/ui/sonner";
 import { BingoGameManager } from "./_components/bingo-game-manager";
 import { CloseSpaceButton } from "./_components/close-space-button";
+import { ParticipantsStatus } from "./_components/participants-status";
 import { ViewingUrlManager } from "./_components/viewing-url-manager";
 
 interface Props {
@@ -39,6 +41,7 @@ export default async function AdminSpacePage({ params }: Props) {
 
   return (
     <div className="min-h-screen p-8">
+      <Toaster />
       <h1 className="mb-8 font-bold text-3xl">{t("heading")}</h1>
 
       <div className="mx-auto max-w-3xl space-y-8">
@@ -83,6 +86,12 @@ export default async function AdminSpacePage({ params }: Props) {
         {space.status === "active" && (
           <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <BingoGameManager spaceId={space.id} />
+          </div>
+        )}
+
+        {space.status === "active" && (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <ParticipantsStatus spaceId={space.id} />
           </div>
         )}
 
