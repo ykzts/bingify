@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   buildOAuthCallbackUrl,
   GOOGLE_OAUTH_SCOPES,
+  TWITCH_OAUTH_SCOPES,
 } from "@/lib/auth/oauth-utils";
 import { createClient } from "@/lib/supabase/client";
 
@@ -25,8 +26,11 @@ export function LoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       options: {
         redirectTo: buildOAuthCallbackUrl(redirect ?? undefined),
-        // Request YouTube scope for Google login to enable space gatekeeper verification
+        // Request provider-specific scopes to enable space gatekeeper verification
+        // Google: YouTube readonly scope for subscription checks
+        // Twitch: Follow and subscription read scopes
         ...(provider === "google" && { scopes: GOOGLE_OAUTH_SCOPES }),
+        ...(provider === "twitch" && { scopes: TWITCH_OAUTH_SCOPES }),
       },
       provider,
     });
