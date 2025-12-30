@@ -151,27 +151,17 @@ export function SpaceParticipation({
       setHasJoined(joined);
 
       // Check for YouTube token if YouTube verification is required
-      // Note: We verify that the provider_token is specifically from Google OAuth.
-      // The provider_token can be from any OAuth provider (Google, Twitch, etc.),
-      // so we check the session's identities array for a Google identity with a token.
+      // Note: We cannot reliably determine if session.provider_token belongs to
+      // the Google identity, as Supabase's provider_token is always from the most
+      // recent OAuth provider and doesn't include metadata about which provider it's from.
+      //
+      // Conservative approach: Always show "Verify & Join" for YouTube requirements.
+      // If the user is already authenticated with Google, the OAuth flow completes instantly.
+      // This prevents a scenario where we show "Join Space" with a stale/wrong token,
+      // leading to server-side validation failures and a poor UX.
       if (requiresYouTube && !joined) {
-        const supabase = createClient();
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        // Search for a Google identity in the identities array
-        // This is more reliable than app_metadata.provider which can be stale
-        const googleIdentity = session?.user?.identities?.find(
-          (identity) => identity.provider === "google"
-        );
-
-        // Only consider it a valid YouTube token if:
-        // 1. A Google identity exists
-        // 2. It has a provider_token
-        const hasValidGoogleToken =
-          googleIdentity?.identity_data && session?.provider_token;
-        setHasYouTubeToken(!!hasValidGoogleToken);
+        // Always require verification for YouTube to ensure we have the correct token
+        setHasYouTubeToken(false);
       }
 
       setIsLoading(false);
