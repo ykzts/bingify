@@ -3,7 +3,6 @@ import { FileQuestion } from "lucide-react";
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import { headers } from "next/headers";
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +25,13 @@ export const metadata: Metadata = {
   title: "404 Not Found | Bingify",
 };
 
-const LOCALE_COOKIE_REGEX = /NEXT_LOCALE=([^;]+)/;
+const LOCALE_COOKIE_REGEX = /(?:^|;\s*)NEXT_LOCALE=([^;]+)/;
+
+type Locale = (typeof routing.locales)[number];
+
+function isValidLocale(locale: string): locale is Locale {
+  return routing.locales.includes(locale as Locale);
+}
 
 function detectLocaleFromHeaders(headersList: Headers): string {
   // Check for NEXT_LOCALE cookie first (set by middleware)
@@ -35,7 +40,7 @@ function detectLocaleFromHeaders(headersList: Headers): string {
     const localeMatch = cookie.match(LOCALE_COOKIE_REGEX);
     if (localeMatch?.[1]) {
       const locale = localeMatch[1];
-      if (routing.locales.includes(locale as "en" | "ja")) {
+      if (isValidLocale(locale)) {
         return locale;
       }
     }
@@ -52,7 +57,7 @@ function detectLocaleFromHeaders(headersList: Headers): string {
 
     // Find the first matching locale
     for (const lang of languages) {
-      if (routing.locales.includes(lang as "en" | "ja")) {
+      if (isValidLocale(lang)) {
         return lang;
       }
     }
@@ -80,7 +85,7 @@ export default async function GlobalNotFound() {
             </EmptyHeader>
             <EmptyContent>
               <Button asChild>
-                <Link href={`/${locale}`}>{t("backHome")}</Link>
+                <a href={`/${locale}`}>{t("backHome")}</a>
               </Button>
             </EmptyContent>
           </Empty>
