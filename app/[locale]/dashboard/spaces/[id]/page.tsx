@@ -31,7 +31,9 @@ export default async function AdminSpacePage({ params }: Props) {
   // Fetch space (RLS ensures only owner can access)
   const { data: space, error } = await supabase
     .from("spaces")
-    .select("id, share_key, view_token, owner_id, status, created_at")
+    .select(
+      "id, share_key, view_token, owner_id, status, created_at, max_participants"
+    )
     .eq("id", id)
     .single();
 
@@ -90,9 +92,10 @@ export default async function AdminSpacePage({ params }: Props) {
         )}
 
         {space.status === "active" && (
-          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <ParticipantsStatus spaceId={space.id} />
-          </div>
+          <ParticipantsStatus
+            maxParticipants={space.max_participants}
+            spaceId={space.id}
+          />
         )}
 
         {space.status === "active" && (

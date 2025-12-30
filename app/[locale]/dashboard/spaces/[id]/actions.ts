@@ -334,3 +334,72 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
     return [];
   }
 }
+
+export interface KickParticipantResult {
+  error?: string;
+  success: boolean;
+}
+
+export async function kickParticipant(
+  spaceId: string,
+  participantId: string
+): Promise<KickParticipantResult> {
+  try {
+    if (!(isValidUUID(spaceId) && isValidUUID(participantId))) {
+      return {
+        error: "Invalid ID",
+        success: false,
+      };
+    }
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "Authentication required",
+        success: false,
+      };
+    }
+
+    const { data: space } = await supabase
+      .from("spaces")
+      .select("owner_id")
+      .eq("id", spaceId)
+      .single();
+
+    if (!space || space.owner_id !== user.id) {
+      return {
+        error: "Permission denied",
+        success: false,
+      };
+    }
+
+    const { error } = await supabase
+      .from("participants")
+      .delete()
+      .eq("id", participantId)
+      .eq("space_id", spaceId);
+
+    if (error) {
+      console.error("Database error:", error);
+      return {
+        error: "Failed to remove participant",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error kicking participant:", error);
+    return {
+      error: "An error occurred",
+      success: false,
+    };
+  }
+}
