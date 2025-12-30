@@ -140,7 +140,9 @@ describe("checkBingoLines", () => {
     expect(result.bingoLines).toHaveLength(2);
 
     // Find horizontal and vertical lines
-    const horizontalLine = result.bingoLines.find((l) => l.type === "horizontal");
+    const horizontalLine = result.bingoLines.find(
+      (l) => l.type === "horizontal"
+    );
     const verticalLine = result.bingoLines.find((l) => l.type === "vertical");
 
     expect(horizontalLine).toBeDefined();
@@ -154,16 +156,27 @@ describe("checkBingoLines", () => {
     // Col 0 (vertical): 1, 2, 3, 4, 5
     // Diagonal 0 (top-left to bottom-right): 1, 17, FREE, 49, 65
     const calledNumbers = new Set([
-      1, 16, 31, 46, 61, // row 0
-      2, 3, 4, 5, // col 0 (1 already counted)
-      17, 49, 65, // diagonal 0 (1 already counted, FREE is always marked)
+      1,
+      16,
+      31,
+      46,
+      61, // row 0
+      2,
+      3,
+      4,
+      5, // col 0 (1 already counted)
+      17,
+      49,
+      65, // diagonal 0 (1 already counted, FREE is always marked)
     ]);
     const result = checkBingoLines(testCard, calledNumbers);
 
     expect(result.hasBingo).toBe(true);
     expect(result.bingoLines).toHaveLength(3);
 
-    const horizontalLine = result.bingoLines.find((l) => l.type === "horizontal");
+    const horizontalLine = result.bingoLines.find(
+      (l) => l.type === "horizontal"
+    );
     const verticalLine = result.bingoLines.find((l) => l.type === "vertical");
     const diagonalLine = result.bingoLines.find((l) => l.type === "diagonal");
 
