@@ -27,37 +27,34 @@ export function BingoCardDisplay({ spaceId }: Props) {
   const t = useTranslations("UserSpace");
   const queryClient = useQueryClient();
   const { data: bingoCard, isPending, error } = useBingoCard(spaceId);
-  const { data: calledNumbers = new Set<number>() } = useCalledNumbers(
-    spaceId,
-    { asSet: true }
-  );
+  const { data: calledNumbersArray = [] } = useCalledNumbers(spaceId);
+  const calledNumbers = new Set(calledNumbersArray.map(({ value }) => value));
   const previousStatusRef = useRef<"none" | "reach" | "bingo">("none");
 
   // Use useEffectEvent to separate event logic from effect dependencies
   const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
     const newNumber = payload.new;
-    queryClient.setQueryData<Set<number>>(
-      ["called-numbers-set", spaceId],
+    queryClient.setQueryData<CalledNumber[]>(
+      ["called-numbers", spaceId],
       (prev) => {
         if (!prev) {
-          return new Set([newNumber.value]);
+          return [newNumber];
         }
-        return new Set([...prev, newNumber.value]);
+        const alreadyExists = prev.some((n) => n.id === newNumber.id);
+        return alreadyExists ? prev : [...prev, newNumber];
       }
     );
   });
 
   const onDelete = useEffectEvent((payload: { old: CalledNumber }) => {
     const deletedNumber = payload.old;
-    queryClient.setQueryData<Set<number>>(
-      ["called-numbers-set", spaceId],
+    queryClient.setQueryData<CalledNumber[]>(
+      ["called-numbers", spaceId],
       (prev) => {
         if (!prev) {
-          return new Set();
+          return [];
         }
-        const newSet = new Set(prev);
-        newSet.delete(deletedNumber.value);
-        return newSet;
+        return prev.filter((n) => n.id !== deletedNumber.id);
       }
     );
   });
