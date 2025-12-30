@@ -448,13 +448,11 @@ export async function inviteAdmin(
     }
 
     // Add user as admin
-    const { error: insertError } = await supabase
-      .from("space_roles")
-      .insert({
-        role: "admin",
-        space_id: spaceId,
-        user_id: targetUser.id,
-      });
+    const { error: insertError } = await supabase.from("space_roles").insert({
+      role: "admin",
+      space_id: spaceId,
+      user_id: targetUser.id,
+    });
 
     if (insertError) {
       console.error("Database error:", insertError);
@@ -646,16 +644,16 @@ export async function getSpaceAdmins(
     }
 
     // Transform the data
-    type ProfileData = {
+    interface ProfileData {
       avatar_url: string | null;
       email: string | null;
       full_name: string | null;
-    };
+    }
 
-    type RoleWithProfile = {
+    interface RoleWithProfile {
       profiles: ProfileData | ProfileData[] | null;
       user_id: string;
-    };
+    }
 
     const admins: SpaceAdmin[] = (roles || []).map((role: RoleWithProfile) => {
       const profile = Array.isArray(role.profiles)

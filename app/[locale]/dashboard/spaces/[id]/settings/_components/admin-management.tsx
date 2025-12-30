@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   type GetSpaceAdminsResult,
-  type InviteAdminState,
-  type SpaceAdmin,
   getSpaceAdmins,
+  type InviteAdminState,
   inviteAdmin,
   removeAdmin,
+  type SpaceAdmin,
 } from "../actions";
 
 interface Props {

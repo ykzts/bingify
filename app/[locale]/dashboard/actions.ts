@@ -358,24 +358,24 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       is_owner: true,
     }));
 
-    type SpaceData = {
+    interface SpaceData {
       created_at: string;
       id: string;
       share_key: string;
       status: string;
-    };
+    }
 
-    type RoleWithSpace = {
+    interface RoleWithSpace {
       space_id: string;
       spaces: SpaceData | SpaceData[] | null;
-    };
+    }
 
     const adminSpaces: UserSpace[] = (adminRoles || [])
       .map((role: RoleWithSpace): UserSpace | null => {
-        const space = Array.isArray(role.spaces)
-          ? role.spaces[0]
-          : role.spaces;
-        if (!space) return null;
+        const space = Array.isArray(role.spaces) ? role.spaces[0] : role.spaces;
+        if (!space) {
+          return null;
+        }
         return {
           created_at: space.created_at,
           id: space.id,
