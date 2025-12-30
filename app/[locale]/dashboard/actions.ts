@@ -297,6 +297,7 @@ export interface UserSpacesResult {
   spaces: UserSpace[];
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Function handles multiple space sources and deduplication logic
 export async function getUserSpaces(): Promise<UserSpacesResult> {
   try {
     const supabase = await createClient();
@@ -357,9 +358,23 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       is_owner: true,
     }));
 
+    type SpaceData = {
+      created_at: string;
+      id: string;
+      share_key: string;
+      status: string;
+    };
+
+    type RoleWithSpace = {
+      space_id: string;
+      spaces: SpaceData | SpaceData[] | null;
+    };
+
     const adminSpaces: UserSpace[] = (adminRoles || [])
-      .map((role) => {
-        const space = (role.spaces as any);
+      .map((role: RoleWithSpace): UserSpace | null => {
+        const space = Array.isArray(role.spaces)
+          ? role.spaces[0]
+          : role.spaces;
         if (!space) return null;
         return {
           created_at: space.created_at,
@@ -374,14 +389,14 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
     // Combine and deduplicate (in case user is both owner and admin somehow)
     const spaceMap = new Map<string, UserSpace>();
     for (const space of [...ownedSpacesWithFlag, ...adminSpaces]) {
-      if (!spaceMap.has(space.id)) {
-        spaceMap.set(space.id, space);
-      } else {
+      if (spaceMap.has(space.id)) {
         // If space exists, prefer owner flag
         const existing = spaceMap.get(space.id);
         if (existing && space.is_owner) {
           spaceMap.set(space.id, space);
         }
+      } else {
+        spaceMap.set(space.id, space);
       }
     }
 

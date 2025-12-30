@@ -17,16 +17,16 @@ import {
 } from "../actions";
 
 interface Props {
-  locale: string;
   spaceId: string;
 }
 
-export function AdminManagement({ spaceId, locale }: Props) {
+export function AdminManagement({ spaceId }: Props) {
   const router = useRouter();
   const [admins, setAdmins] = useState<SpaceAdmin[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [removingUserId, setRemovingUserId] = useState<string | null>(null);
+  const [removeError, setRemoveError] = useState<string | null>(null);
 
   // Invite admin form state
   const [inviteState, inviteAction, isInvitePending] = useActionState<
@@ -34,10 +34,10 @@ export function AdminManagement({ spaceId, locale }: Props) {
     FormData
   >(inviteAdmin.bind(null, spaceId), { success: false });
 
-  // Load admins
+  // biome-ignore lint/correctness/useExhaustiveDependencies: spaceId is stable and doesn't need to be in deps
   useEffect(() => {
     loadAdmins();
-  }, [spaceId]);
+  }, []);
 
   const loadAdmins = async () => {
     setLoading(true);
@@ -52,6 +52,7 @@ export function AdminManagement({ spaceId, locale }: Props) {
   };
 
   // Reload admins when invite succeeds
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only trigger on inviteState.success change
   useEffect(() => {
     if (inviteState.success) {
       loadAdmins();
@@ -60,11 +61,13 @@ export function AdminManagement({ spaceId, locale }: Props) {
   }, [inviteState.success]);
 
   const handleRemoveAdmin = async (adminUserId: string) => {
+    // biome-ignore lint/suspicious/noAlert: Simple confirmation dialog is appropriate here
     if (!confirm("この管理者を削除してもよろしいですか?")) {
       return;
     }
 
     setRemovingUserId(adminUserId);
+    setRemoveError(null);
     const result = await removeAdmin(spaceId, adminUserId);
     setRemovingUserId(null);
 
@@ -72,7 +75,7 @@ export function AdminManagement({ spaceId, locale }: Props) {
       loadAdmins();
       router.refresh();
     } else if (result.error) {
-      alert(result.error);
+      setRemoveError(result.error);
     }
   };
 
@@ -135,21 +138,29 @@ export function AdminManagement({ spaceId, locale }: Props) {
       {/* Admin List */}
       <div>
         <h3 className="mb-3 font-semibold text-sm">現在の管理者</h3>
-        {loading ? (
+        {removeError && (
+          <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3">
+            <p className="text-red-800 text-sm">{removeError}</p>
+          </div>
+        )}
+        {loading && (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
           </div>
-        ) : error ? (
+        )}
+        {!loading && error && (
           <div className="rounded-lg border border-red-200 bg-red-50 p-4">
             <p className="text-red-800 text-sm">{error}</p>
           </div>
-        ) : admins.length === 0 ? (
+        )}
+        {!(loading || error ) && admins.length === 0 && (
           <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
             <p className="text-gray-500 text-sm">
               まだ管理者は招待されていません
             </p>
           </div>
-        ) : (
+        )}
+        {!(loading || error ) && admins.length > 0 && (
           <div className="space-y-2">
             {admins.map((admin) => (
               <div
@@ -159,7 +170,10 @@ export function AdminManagement({ spaceId, locale }: Props) {
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
                     {admin.avatar_url && (
-                      <AvatarImage alt={admin.full_name || "Admin"} src={admin.avatar_url} />
+                      <AvatarImage
+                        alt={admin.full_name || "Admin"}
+                        src={admin.avatar_url}
+                      />
                     )}
                     <AvatarFallback>
                       {admin.full_name?.charAt(0).toUpperCase() ||

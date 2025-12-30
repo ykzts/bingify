@@ -4,6 +4,9 @@ import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
 
+// Email validation regex at top level for performance
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export interface UpdateSpaceState {
   error?: string;
   fieldErrors?: Record<string, string>;
@@ -115,7 +118,7 @@ export async function updateSpaceSettings(
 
     const isAdmin = !!adminRole;
 
-    if (!isOwner && !isAdmin) {
+    if (!(isOwner || isAdmin)) {
       return {
         error: "権限がありません",
         success: false,
@@ -379,8 +382,7 @@ export async function inviteAdmin(
     }
 
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!EMAIL_REGEX.test(email)) {
       return {
         error: "有効なメールアドレスを入力してください",
         success: false,
@@ -484,7 +486,7 @@ export async function removeAdmin(
   adminUserId: string
 ): Promise<RemoveAdminState> {
   try {
-    if (!isValidUUID(spaceId) || !isValidUUID(adminUserId)) {
+    if (!(isValidUUID(spaceId) && isValidUUID(adminUserId))) {
       return {
         error: "無効なIDです",
         success: false,
@@ -644,12 +646,28 @@ export async function getSpaceAdmins(
     }
 
     // Transform the data
-    const admins: SpaceAdmin[] = (roles || []).map((role) => ({
-      avatar_url: (role.profiles as any)?.avatar_url || null,
-      email: (role.profiles as any)?.email || null,
-      full_name: (role.profiles as any)?.full_name || null,
-      user_id: role.user_id,
-    }));
+    type ProfileData = {
+      avatar_url: string | null;
+      email: string | null;
+      full_name: string | null;
+    };
+
+    type RoleWithProfile = {
+      profiles: ProfileData | ProfileData[] | null;
+      user_id: string;
+    };
+
+    const admins: SpaceAdmin[] = (roles || []).map((role: RoleWithProfile) => {
+      const profile = Array.isArray(role.profiles)
+        ? role.profiles[0]
+        : role.profiles;
+      return {
+        avatar_url: profile?.avatar_url || null,
+        email: profile?.email || null,
+        full_name: profile?.full_name || null,
+        user_id: role.user_id,
+      };
+    });
 
     return {
       admins,

@@ -95,7 +95,7 @@ export default async function SpaceSettingsPage({ params }: Props) {
         {/* Admin Management - Only visible to owner */}
         {isOwner && (
           <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
-            <AdminManagement locale={locale} spaceId={id} />
+            <AdminManagement spaceId={id} />
           </div>
         )}
       </div>
