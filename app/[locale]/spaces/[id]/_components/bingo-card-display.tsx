@@ -1,24 +1,20 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import confetti from "canvas-confetti";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { checkBingoLines } from "@/lib/utils/bingo-checker";
-import type { BingoCard } from "../bingo-actions";
-import { getOrCreateBingoCard, updateBingoStatus } from "../bingo-actions";
+import { updateBingoStatus } from "../bingo-actions";
+import { useBingoCard } from "../_hooks/use-bingo-card";
+import type { CalledNumber } from "../_hooks/use-called-numbers";
+import { useCalledNumbers } from "../_hooks/use-called-numbers";
 import { BingoLineOverlay } from "./bingo-line-overlay";
 
 interface Props {
   spaceId: string;
-}
-
-interface CalledNumber {
-  called_at: string;
-  id: string;
-  space_id: string;
-  value: number;
 }
 
 const FREE_SPACE_VALUE = 0;
@@ -29,101 +25,80 @@ const BINGO_BORDER_GRAY = "#d1d5db";
 
 export function BingoCardDisplay({ spaceId }: Props) {
   const t = useTranslations("UserSpace");
-  const [bingoCard, setBingoCard] = useState<BingoCard | null>(null);
-  const [calledNumbers, setCalledNumbers] = useState<Set<number>>(new Set());
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const { data: bingoCard, isPending, error } = useBingoCard(spaceId);
+  const { data: calledNumbers = new Set<number>() } = useCalledNumbers(spaceId);
   const previousStatusRef = useRef<"none" | "reach" | "bingo">("none");
 
-  useEffect(() => {
-    const loadBingoCard = async () => {
-      setIsLoading(true);
-      setError(null);
+  // Use refs to avoid adding to dependencies
+  const onInsertRef = useRef<((payload: { new: CalledNumber }) => void) | null>(
+    null
+  );
+  const onDeleteRef = useRef<((payload: { old: CalledNumber }) => void) | null>(
+    null
+  );
 
-      const result = await getOrCreateBingoCard(spaceId);
-
-      if (result.success && result.card) {
-        setBingoCard(result.card);
-      } else {
-        setError(result.error || t("errorLoadingCard"));
+  // Update refs when dependencies change
+  onInsertRef.current = (payload: { new: CalledNumber }) => {
+    const newNumber = payload.new;
+    queryClient.setQueryData<Set<number>>(
+      ["called-numbers", spaceId],
+      (prev) => {
+        if (!prev) return new Set([newNumber.value]);
+        return new Set([...prev, newNumber.value]);
       }
+    );
+  };
 
-      setIsLoading(false);
-    };
-
-    loadBingoCard();
-  }, [spaceId, t]);
+  onDeleteRef.current = (payload: { old: CalledNumber }) => {
+    const deletedNumber = payload.old;
+    queryClient.setQueryData<Set<number>>(
+      ["called-numbers", spaceId],
+      (prev) => {
+        if (!prev) return new Set();
+        const newSet = new Set(prev);
+        newSet.delete(deletedNumber.value);
+        return newSet;
+      }
+    );
+  };
 
   useEffect(() => {
-    let isMounted = true;
     const supabase = createClient();
-    let channel: ReturnType<typeof supabase.channel> | null = null;
-
-    const init = async () => {
-      const { data } = await supabase
-        .from("called_numbers")
-        .select("value")
-        .eq("space_id", spaceId)
-        .order("called_at", { ascending: true });
-
-      if (!isMounted) {
-        return;
-      }
-
-      if (data) {
-        setCalledNumbers(new Set(data.map((n) => n.value)));
-      }
-
-      channel = supabase
-        .channel(`space-${spaceId}-bingo-participant`)
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            filter: `space_id=eq.${spaceId}`,
-            schema: "public",
-            table: "called_numbers",
-          },
-          (payload) => {
-            if (!isMounted) {
-              return;
-            }
-            const newNumber = payload.new as CalledNumber;
-            setCalledNumbers((prev) => new Set([...prev, newNumber.value]));
-          }
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "DELETE",
-            filter: `space_id=eq.${spaceId}`,
-            schema: "public",
-            table: "called_numbers",
-          },
-          (payload) => {
-            if (!isMounted) {
-              return;
-            }
-            const deletedNumber = payload.old as CalledNumber;
-            setCalledNumbers((prev) => {
-              const newSet = new Set(prev);
-              newSet.delete(deletedNumber.value);
-              return newSet;
-            });
-          }
-        )
-        .subscribe();
-    };
-
-    init();
+    const channel = supabase
+      .channel(`space-${spaceId}-bingo-participant`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          filter: `space_id=eq.${spaceId}`,
+          schema: "public",
+          table: "called_numbers",
+        },
+        (payload) => {
+          const newNumber = payload.new as CalledNumber;
+          onInsertRef.current?.({ new: newNumber });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          filter: `space_id=eq.${spaceId}`,
+          schema: "public",
+          table: "called_numbers",
+        },
+        (payload) => {
+          const deletedNumber = payload.old as CalledNumber;
+          onDeleteRef.current?.({ old: deletedNumber });
+        }
+      )
+      .subscribe();
 
     return () => {
-      isMounted = false;
-      if (channel) {
-        channel.unsubscribe();
-      }
+      channel.unsubscribe();
     };
-  }, [spaceId]);
+  }, [spaceId, queryClient]);
 
   // Check bingo status when called numbers or card changes
   useEffect(() => {
@@ -194,7 +169,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
     };
   }, [bingoCard, calledNumbers, spaceId]);
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-gray-500">{t("loading")}</div>
@@ -205,7 +180,9 @@ export function BingoCardDisplay({ spaceId }: Props) {
   if (error || !bingoCard) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-        <p className="text-red-800 text-sm">{error || t("errorLoadingCard")}</p>
+        <p className="text-red-800 text-sm">
+          {error instanceof Error ? error.message : t("errorLoadingCard")}
+        </p>
       </div>
     );
   }
