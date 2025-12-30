@@ -234,9 +234,17 @@ export function SpaceParticipation({
       data: { session },
     } = await supabase.auth.getSession();
 
+    // Extract Twitch credentials from identities if available
+    const twitchIdentity = session?.user?.identities?.find(
+      (identity) => identity.provider === "twitch"
+    );
+    const twitchUserId = twitchIdentity?.id;
+
     const result: JoinSpaceState = await joinSpace(
       spaceId,
-      session?.provider_token ?? undefined
+      session?.provider_token ?? undefined,
+      session?.provider_token ?? undefined, // Twitch access token (same as provider_token if last auth was Twitch)
+      twitchUserId
     );
 
     if (result.success) {
