@@ -174,59 +174,106 @@ export function ScreenDisplay({
 
   return (
     <div className="fixed inset-0 min-h-screen w-full overflow-hidden transition-colors duration-300">
-      {/* Current Number Display */}
-      <div
-        className={cn(
-          "flex items-center justify-center",
-          isMinimal ? "h-screen w-full" : "h-[60vh]"
-        )}
-      >
-        {currentNumber !== null ? (
-          <motion.h1
-            animate={{ scale: 1, opacity: 1 }}
-            className="font-black text-[clamp(8rem,20vw,16rem)] text-white drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)]"
-            initial={{ scale: 0, opacity: 0 }}
-            key={currentNumber}
-            style={{
-              WebkitTextStroke: "3px black",
-              textShadow: "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 260,
-              damping: 20,
-            }}
-          >
-            {currentNumber}
-          </motion.h1>
-        ) : (
-          <div className="text-center">
-            <p
-              className="font-bold text-4xl text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]"
-              style={{ WebkitTextStroke: "1px black" }}
+      {isMinimal ? (
+        /* Minimal Mode: Current Number Only */
+        <div className="flex h-screen w-full items-center justify-center">
+          {currentNumber !== null ? (
+            <motion.h1
+              animate={{ scale: 1, opacity: 1 }}
+              className="font-black text-[clamp(8rem,20vw,16rem)] text-white drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)]"
+              initial={{ scale: 0, opacity: 0 }}
+              key={currentNumber}
+              style={{
+                WebkitTextStroke: "3px black",
+                textShadow:
+                  "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+              }}
             >
-              {t("waitingForNumbers")}
-            </p>
-          </div>
-        )}
-      </div>
+              {currentNumber}
+            </motion.h1>
+          ) : (
+            <div className="text-center">
+              <p
+                className="font-bold text-4xl text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]"
+                style={{ WebkitTextStroke: "1px black" }}
+              >
+                {t("waitingForNumbers")}
+              </p>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Full Mode: 2-Column Layout (Landscape) / Vertical Stack (Portrait) */
+        <div className="flex h-screen w-full flex-col gap-4 p-4 lg:flex-row lg:gap-6 lg:p-6">
+          {/* Left Panel: Current Number + QR Code */}
+          <div className="flex flex-col items-center justify-center gap-6 lg:w-[35%] lg:gap-8">
+            {/* Current Number */}
+            <div className="flex flex-1 items-center justify-center">
+              {currentNumber !== null ? (
+                <motion.h1
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="font-black text-[clamp(6rem,15vw,12rem)] text-white drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)] lg:text-[clamp(8rem,20vh,20rem)]"
+                  initial={{ scale: 0, opacity: 0 }}
+                  key={currentNumber}
+                  style={{
+                    WebkitTextStroke: "3px black",
+                    textShadow:
+                      "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 260,
+                    damping: 20,
+                  }}
+                >
+                  {currentNumber}
+                </motion.h1>
+              ) : (
+                <div className="text-center">
+                  <p
+                    className="font-bold text-3xl text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] lg:text-4xl"
+                    style={{ WebkitTextStroke: "1px black" }}
+                  >
+                    {t("waitingForNumbers")}
+                  </p>
+                </div>
+              )}
+            </div>
 
-      {/* Full Mode: History and QR Code */}
-      {!isMinimal && (
-        <div className="absolute bottom-0 w-full bg-black/70 p-6 backdrop-blur-md md:p-8">
-          <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-            {/* History Grid */}
-            <div className="flex-1">
-              <h2 className="mb-3 font-bold text-white text-xl">
+            {/* QR Code */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="rounded-xl bg-white p-4">
+                <QRCodeSVG
+                  aria-label={t("scanToJoin")}
+                  size={160}
+                  title={t("scanToJoin")}
+                  value={participationUrl}
+                />
+              </div>
+              <p className="text-center font-bold text-sm text-white">
+                {t("scanToJoin")}
+              </p>
+            </div>
+          </div>
+
+          {/* Right Panel: History Grid */}
+          <div className="flex flex-1 items-center rounded-xl bg-black/70 p-4 backdrop-blur-md lg:w-[65%] lg:p-6">
+            <div className="w-full">
+              <h2 className="mb-3 font-bold text-white text-xl lg:mb-4">
                 {t("calledNumbers")}
               </h2>
-              <div className="grid grid-cols-10 gap-1.5 md:grid-cols-[repeat(15,minmax(0,1fr))] md:gap-2">
+              <div className="grid grid-cols-10 gap-1.5 lg:grid-cols-[repeat(15,minmax(0,1fr))] lg:gap-2">
                 {Array.from({ length: 75 }, (_, i) => i + 1).map((number) => {
                   const isCalled = historySet.has(number);
                   return (
                     <div
                       className={cn(
-                        "flex aspect-square items-center justify-center rounded font-bold text-xs md:text-sm",
+                        "flex aspect-square items-center justify-center rounded font-bold text-xs lg:text-sm",
                         isCalled
                           ? "bg-blue-600 text-white"
                           : "border border-gray-500 bg-gray-800/50 text-gray-500"
@@ -238,21 +285,6 @@ export function ScreenDisplay({
                   );
                 })}
               </div>
-            </div>
-
-            {/* QR Code */}
-            <div className="flex flex-col items-center gap-2">
-              <div className="rounded-lg bg-white p-3">
-                <QRCodeSVG
-                  aria-label={t("scanToJoin")}
-                  size={120}
-                  title={t("scanToJoin")}
-                  value={participationUrl}
-                />
-              </div>
-              <p className="text-center text-white text-xs">
-                {t("scanToJoin")}
-              </p>
             </div>
           </div>
         </div>
