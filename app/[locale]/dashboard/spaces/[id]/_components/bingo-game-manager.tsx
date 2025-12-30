@@ -3,6 +3,7 @@
 import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import type { CalledNumber } from "../actions";
 import { callNumber, getCalledNumbers, resetGame } from "../actions";
@@ -16,8 +17,6 @@ export function BingoGameManager({ spaceId }: Props) {
   const [calledNumbers, setCalledNumbers] = useState<CalledNumber[]>([]);
   const [isCalling, setIsCalling] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -84,8 +83,6 @@ export function BingoGameManager({ spaceId }: Props) {
   }, [spaceId]);
 
   const handleCallNumber = async () => {
-    setError(null);
-    setSuccess(null);
     setIsCalling(true);
 
     const calledValues = new Set(calledNumbers.map((n) => n.value));
@@ -94,7 +91,9 @@ export function BingoGameManager({ spaceId }: Props) {
     );
 
     if (availableNumbers.length === 0) {
-      setError(t("allNumbersCalled"));
+      toast.error(t("allNumbersCalled"), {
+        duration: 3000,
+      });
       setIsCalling(false);
       return;
     }
@@ -105,10 +104,13 @@ export function BingoGameManager({ spaceId }: Props) {
     const result = await callNumber(spaceId, randomNumber);
 
     if (result.success) {
-      setSuccess(t("numberCalledSuccess", { number: randomNumber }));
-      setTimeout(() => setSuccess(null), 3000);
+      toast.success(t("numberCalledSuccess", { number: randomNumber }), {
+        duration: 3000,
+      });
     } else {
-      setError(result.error || t("callNumberError"));
+      toast.error(result.error || t("callNumberError"), {
+        duration: 3000,
+      });
     }
 
     setIsCalling(false);
@@ -120,17 +122,18 @@ export function BingoGameManager({ spaceId }: Props) {
       return;
     }
 
-    setError(null);
-    setSuccess(null);
     setIsResetting(true);
 
     const result = await resetGame(spaceId);
 
     if (result.success) {
-      setSuccess(t("resetGameSuccess"));
-      setTimeout(() => setSuccess(null), 3000);
+      toast.success(t("resetGameSuccess"), {
+        duration: 3000,
+      });
     } else {
-      setError(result.error || t("resetGameError"));
+      toast.error(result.error || t("resetGameError"), {
+        duration: 3000,
+      });
     }
 
     setIsResetting(false);
@@ -142,18 +145,6 @@ export function BingoGameManager({ spaceId }: Props) {
     <div className="space-y-6">
       <div>
         <h2 className="mb-4 font-semibold text-xl">{t("bingoGameManager")}</h2>
-
-        {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-red-800 text-sm">
-            {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3 text-green-800 text-sm">
-            {success}
-          </div>
-        )}
 
         <div className="mb-4 flex gap-3">
           <button
