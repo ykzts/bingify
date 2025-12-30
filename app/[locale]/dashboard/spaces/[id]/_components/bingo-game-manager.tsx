@@ -1,12 +1,14 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
+import type { CalledNumber } from "@/hooks/use-called-numbers";
+import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
-import type { CalledNumber } from "../actions";
-import { callNumber, getCalledNumbers, resetGame } from "../actions";
+import { callNumber, resetGame } from "../actions";
 
 interface Props {
   spaceId: string;
@@ -14,71 +16,73 @@ interface Props {
 
 export function BingoGameManager({ spaceId }: Props) {
   const t = useTranslations("AdminSpace");
-  const [calledNumbers, setCalledNumbers] = useState<CalledNumber[]>([]);
+  const queryClient = useQueryClient();
+  const { data: calledNumbers = [] } = useCalledNumbers(spaceId);
   const [isCalling, setIsCalling] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
-  useEffect(() => {
-    let isMounted = true;
-    const supabase = createClient();
-    let channel: ReturnType<typeof supabase.channel> | null = null;
-
-    const init = async () => {
-      const numbers = await getCalledNumbers(spaceId);
-      if (!isMounted) {
-        return;
+  // Use useEffectEvent to separate event logic from effect dependencies
+  const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
+    const newNumber = payload.new;
+    queryClient.setQueryData<CalledNumber[]>(
+      ["called-numbers", spaceId],
+      (prev) => {
+        if (!prev) {
+          return [newNumber];
+        }
+        const alreadyExists = prev.some((n) => n.id === newNumber.id);
+        return alreadyExists ? prev : [...prev, newNumber];
       }
-      setCalledNumbers(numbers);
+    );
+  });
 
-      channel = supabase
-        .channel(`space-${spaceId}-called-numbers`)
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            filter: `space_id=eq.${spaceId}`,
-            schema: "public",
-            table: "called_numbers",
-          },
-          (payload) => {
-            const newNumber = payload.new as CalledNumber;
-            if (!isMounted) {
-              return;
-            }
-            setCalledNumbers((prev) => {
-              const alreadyExists = prev.some((n) => n.id === newNumber.id);
-              return alreadyExists ? prev : [...prev, newNumber];
-            });
-          }
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "DELETE",
-            filter: `space_id=eq.${spaceId}`,
-            schema: "public",
-            table: "called_numbers",
-          },
-          (payload) => {
-            if (!isMounted) {
-              return;
-            }
-            const deletedNumber = payload.old as CalledNumber;
-            setCalledNumbers((prev) =>
-              prev.filter((n) => n.id !== deletedNumber.id)
-            );
-          }
-        )
-        .subscribe();
-    };
+  const onDelete = useEffectEvent((payload: { old: CalledNumber }) => {
+    const deletedNumber = payload.old;
+    queryClient.setQueryData<CalledNumber[]>(
+      ["called-numbers", spaceId],
+      (prev) => {
+        if (!prev) {
+          return [];
+        }
+        return prev.filter((n) => n.id !== deletedNumber.id);
+      }
+    );
+  });
 
-    init();
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`space-${spaceId}-called-numbers`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          filter: `space_id=eq.${spaceId}`,
+          schema: "public",
+          table: "called_numbers",
+        },
+        (payload) => {
+          const newNumber = payload.new as CalledNumber;
+          onInsert({ new: newNumber });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          filter: `space_id=eq.${spaceId}`,
+          schema: "public",
+          table: "called_numbers",
+        },
+        (payload) => {
+          const deletedNumber = payload.old as CalledNumber;
+          onDelete({ old: deletedNumber });
+        }
+      )
+      .subscribe();
 
     return () => {
-      isMounted = false;
-      if (channel) {
-        channel.unsubscribe();
-      }
+      channel.unsubscribe();
     };
   }, [spaceId]);
 

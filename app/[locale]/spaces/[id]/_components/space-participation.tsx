@@ -11,12 +11,11 @@ import {
 } from "@/lib/auth/oauth-utils";
 import { createClient } from "@/lib/supabase/client";
 import type { JoinSpaceState, SpaceInfo } from "../../actions";
+import { joinSpace, leaveSpace } from "../../actions";
 import {
-  checkUserParticipation,
-  getParticipantCount,
-  joinSpace,
-  leaveSpace,
-} from "../../actions";
+  useParticipantInfo,
+  useUserParticipation,
+} from "../_hooks/use-participation";
 
 // SessionStorage keys for OAuth completion tracking
 const YOUTUBE_OAUTH_COMPLETE_KEY = "youtube_oauth_complete";
@@ -100,18 +99,23 @@ export function SpaceParticipation({
   const [isJoining, setIsJoining] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [participantInfo, setParticipantInfo] = useState<{
-    count: number;
-    maxParticipants: number;
-  } | null>({
-    count: 0,
-    maxParticipants: spaceInfo.max_participants,
-  });
-  const [hasJoined, setHasJoined] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [hasYouTubeToken, setHasYouTubeToken] = useState(false);
   const [hasTwitchToken, setHasTwitchToken] = useState(false);
   const [waitingForOAuth, setWaitingForOAuth] = useState(false);
+
+  // Use queries for participant data
+  const {
+    data: participantInfo = null,
+    isPending: isLoadingInfo,
+    refetch: refetchInfo,
+  } = useParticipantInfo(spaceId);
+  const {
+    data: hasJoined = false,
+    isPending: isLoadingJoined,
+    refetch: refetchJoined,
+  } = useUserParticipation(spaceId);
+
+  const isLoading = isLoadingInfo || isLoadingJoined;
 
   // Check if YouTube verification is required
   // This logic matches the server-side verification in actions.ts verifyGatekeeperRules
@@ -161,11 +165,6 @@ export function SpaceParticipation({
     };
   }, [waitingForOAuth]);
 
-  const refreshParticipantInfo = async () => {
-    const info = await getParticipantCount(spaceId);
-    setParticipantInfo(info);
-  };
-
   // Check OAuth completion flags in sessionStorage for YouTube and Twitch
   const checkOAuthTokens = useCallback(
     (joined: boolean) => {
@@ -212,21 +211,10 @@ export function SpaceParticipation({
     [requiresYouTube, requiresTwitch]
   );
 
-  // Load participant info and check if user has joined and has YouTube/Twitch tokens
+  // Check OAuth tokens when hasJoined changes
   useEffect(() => {
-    const loadInitialData = async () => {
-      setIsLoading(true);
-      const [info, joined] = await Promise.all([
-        getParticipantCount(spaceId),
-        checkUserParticipation(spaceId),
-      ]);
-      setParticipantInfo(info);
-      setHasJoined(joined);
-      checkOAuthTokens(joined);
-      setIsLoading(false);
-    };
-    loadInitialData();
-  }, [spaceId, checkOAuthTokens]);
+    checkOAuthTokens(hasJoined);
+  }, [hasJoined, checkOAuthTokens]);
 
   const handleYouTubeVerify = async () => {
     setIsJoining(true);
@@ -352,8 +340,7 @@ export function SpaceParticipation({
     }
 
     if (result.success) {
-      setHasJoined(true);
-      await refreshParticipantInfo();
+      await Promise.all([refetchJoined(), refetchInfo()]);
       router.refresh();
     } else {
       setError(result.errorKey ? t(result.errorKey) : t("errorJoinFailed"));
@@ -369,8 +356,7 @@ export function SpaceParticipation({
     const result: JoinSpaceState = await leaveSpace(spaceId);
 
     if (result.success) {
-      setHasJoined(false);
-      await refreshParticipantInfo();
+      await Promise.all([refetchJoined(), refetchInfo()]);
       router.refresh();
     } else {
       setError(result.errorKey ? t(result.errorKey) : t("errorLeaveFailed"));

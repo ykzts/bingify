@@ -1,20 +1,16 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { Settings } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
+import type { CalledNumber } from "@/hooks/use-called-numbers";
+import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useBackground } from "../../_context/background-context";
-
-interface CalledNumber {
-  called_at: string;
-  id: string;
-  space_id: string;
-  value: number;
-}
 
 interface Props {
   baseUrl: string;
@@ -57,7 +53,8 @@ export function ScreenDisplay({
   spaceId,
 }: Props) {
   const t = useTranslations("ScreenView");
-  const [calledNumbers, setCalledNumbers] = useState<CalledNumber[]>([]);
+  const queryClient = useQueryClient();
+  const { data: calledNumbers = [] } = useCalledNumbers(spaceId, { retry: 3 });
   const [mode, setMode] = useState<DisplayMode>(
     normalizeDisplayMode(initialMode)
   );
@@ -71,96 +68,80 @@ export function ScreenDisplay({
     setBackground(normalizeBackgroundType(initialBg));
   }, [initialBg, setBackground]);
 
+  // Use useEffectEvent to separate event logic from effect dependencies
+  const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
+    const newNumber = payload.new;
+    queryClient.setQueryData<CalledNumber[]>(
+      ["called-numbers", spaceId],
+      (prev) => {
+        if (!prev) {
+          return [newNumber];
+        }
+        const alreadyExists = prev.some((n) => n.id === newNumber.id);
+        return alreadyExists ? prev : [...prev, newNumber];
+      }
+    );
+  });
+
+  const onDelete = useEffectEvent((payload: { old: CalledNumber }) => {
+    const deletedNumber = payload.old;
+    queryClient.setQueryData<CalledNumber[]>(
+      ["called-numbers", spaceId],
+      (prev) => {
+        if (!prev) {
+          return [];
+        }
+        return prev.filter((n) => n.id !== deletedNumber.id);
+      }
+    );
+  });
+
   useEffect(() => {
-    let isMounted = true;
     const supabase = createClient();
-    let channel: ReturnType<typeof supabase.channel> | null = null;
-
-    const init = async () => {
-      const { data, error: queryError } = await supabase
-        .from("called_numbers")
-        .select("id, space_id, value, called_at")
-        .eq("space_id", spaceId)
-        .order("called_at", { ascending: true });
-
-      if (!isMounted) {
-        return;
-      }
-
-      if (queryError) {
-        console.error("Error fetching called numbers:", queryError);
-        // Silently fail - just show no numbers
-        return;
-      }
-
-      if (data) {
-        setCalledNumbers(data);
-      }
-
-      channel = supabase
-        .channel(`screen-${spaceId}-called-numbers`)
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            filter: `space_id=eq.${spaceId}`,
-            schema: "public",
-            table: "called_numbers",
-          },
-          (payload) => {
-            if (!isMounted) {
-              return;
-            }
-            const newNumber = payload.new as CalledNumber;
-            setCalledNumbers((prev) => {
-              const alreadyExists = prev.some((n) => n.id === newNumber.id);
-              return alreadyExists ? prev : [...prev, newNumber];
-            });
-          }
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "DELETE",
-            filter: `space_id=eq.${spaceId}`,
-            schema: "public",
-            table: "called_numbers",
-          },
-          (payload) => {
-            if (!isMounted) {
-              return;
-            }
-            const deletedNumber = payload.old as CalledNumber;
-            setCalledNumbers((prev) =>
-              prev.filter((n) => n.id !== deletedNumber.id)
-            );
-          }
-        )
-        .subscribe((status) => {
-          if (!isMounted) {
-            return;
-          }
-          // Handle subscription status
-          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-            console.error(
-              `Supabase subscription error for screen-${spaceId}:`,
-              status
-            );
-          } else if (status === "SUBSCRIBED") {
-            console.info(
-              `Supabase subscription established for screen-${spaceId}`
-            );
-          }
-        });
-    };
-
-    init();
+    const channel = supabase
+      .channel(`screen-${spaceId}-called-numbers`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          filter: `space_id=eq.${spaceId}`,
+          schema: "public",
+          table: "called_numbers",
+        },
+        (payload) => {
+          const newNumber = payload.new as CalledNumber;
+          onInsert({ new: newNumber });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          filter: `space_id=eq.${spaceId}`,
+          schema: "public",
+          table: "called_numbers",
+        },
+        (payload) => {
+          const deletedNumber = payload.old as CalledNumber;
+          onDelete({ old: deletedNumber });
+        }
+      )
+      .subscribe((status) => {
+        // Handle subscription status
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          console.error(
+            `Supabase subscription error for screen-${spaceId}:`,
+            status
+          );
+        } else if (status === "SUBSCRIBED") {
+          console.info(
+            `Supabase subscription established for screen-${spaceId}`
+          );
+        }
+      });
 
     return () => {
-      isMounted = false;
-      if (channel) {
-        channel.unsubscribe();
-      }
+      channel.unsubscribe();
     };
   }, [spaceId]);
 

@@ -1,8 +1,9 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useEffectEvent, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -33,8 +34,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/client";
-import type { Participant } from "../actions";
-import { getParticipants, kickParticipant } from "../actions";
+import type { Participant } from "../_hooks/use-participants";
+import { useParticipants } from "../_hooks/use-participants";
+import { kickParticipant } from "../actions";
 
 interface Props {
   maxParticipants: number;
@@ -139,137 +141,126 @@ function getInitials(name: string | null | undefined): string {
 
 export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
   const t = useTranslations("AdminSpace");
-  const [participants, setParticipants] = useState<Participant[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const {
+    data: participants = [],
+    isPending,
+    error,
+  } = useParticipants(spaceId);
   const [kickingId, setKickingId] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isPendingKick, startTransition] = useTransition();
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [participantToKick, setParticipantToKick] = useState<{
     id: string;
     name: string | null;
   } | null>(null);
 
-  useEffect(() => {
-    let isMounted = true;
-    const supabase = createClient();
-    let channel: ReturnType<typeof supabase.channel> | null = null;
+  // Use useEffectEvent to separate event logic from effect dependencies
+  const onUpdate = useEffectEvent((payload: { new: ParticipantUpdate }) => {
+    const updated = payload.new;
 
-    const init = async () => {
-      const result = await getParticipants(spaceId);
-      if (!isMounted) {
-        return;
+    // Validate payload structure
+    if (!(updated?.id && updated.user_id && updated.bingo_status)) {
+      console.error("Invalid participant update payload:", payload);
+      return;
+    }
+
+    // Validate bingo_status value
+    if (!["none", "reach", "bingo"].includes(updated.bingo_status)) {
+      console.error("Invalid bingo_status value:", updated.bingo_status);
+      return;
+    }
+
+    // Update the participant in the list
+    queryClient.setQueryData<Participant[]>(
+      ["participants", spaceId],
+      (prev) => {
+        if (!prev) {
+          return [];
+        }
+        const currentParticipant = prev.find((p) => p.id === updated.id);
+        if (currentParticipant) {
+          showStatusNotification(currentParticipant, updated.bingo_status, t);
+        }
+        return updateParticipantList(prev, updated.id, updated.bingo_status);
       }
-      setParticipants(result.data);
-      setError(result.error || null);
-      setIsLoading(false);
+    );
+  });
 
-      channel = supabase
-        .channel(`space-${spaceId}-participants-status`)
-        .on(
-          "postgres_changes",
-          {
-            event: "UPDATE",
-            filter: `space_id=eq.${spaceId}`,
-            schema: "public",
-            table: "participants",
-          },
-          (payload) => {
-            if (!isMounted) {
-              return;
-            }
+  const onInsert = useEffectEvent(() => {
+    // Refetch participants when a new one joins
+    queryClient.invalidateQueries({ queryKey: ["participants", spaceId] });
+  });
 
-            // Validate payload structure
-            const updated = payload.new as ParticipantUpdate;
-            if (!(updated?.id && updated.user_id && updated.bingo_status)) {
-              console.error("Invalid participant update payload:", payload);
-              return;
-            }
+  const onDelete = useEffectEvent((payload: { old: { id: string } }) => {
+    // Validate payload structure
+    if (!payload?.old || typeof payload.old.id !== "string") {
+      console.warn("Invalid participant delete payload:", payload);
+      return;
+    }
 
-            // Validate bingo_status value
-            if (!["none", "reach", "bingo"].includes(updated.bingo_status)) {
-              console.error(
-                "Invalid bingo_status value:",
-                updated.bingo_status
-              );
-              return;
-            }
+    const deletedId = payload.old.id;
+    queryClient.setQueryData<Participant[]>(
+      ["participants", spaceId],
+      (prev) => {
+        if (!prev) {
+          return [];
+        }
+        return prev.filter((p) => p.id !== deletedId);
+      }
+    );
+  });
 
-            // Update the participant in the list
-            setParticipants((prev) => {
-              const currentParticipant = prev.find((p) => p.id === updated.id);
-              if (currentParticipant) {
-                showStatusNotification(
-                  currentParticipant,
-                  updated.bingo_status,
-                  t
-                );
-              }
-              return updateParticipantList(
-                prev,
-                updated.id,
-                updated.bingo_status
-              );
-            });
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`space-${spaceId}-participants-status`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          filter: `space_id=eq.${spaceId}`,
+          schema: "public",
+          table: "participants",
+        },
+        (payload) => {
+          const updated = payload.new as ParticipantUpdate;
+          onUpdate({ new: updated });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          filter: `space_id=eq.${spaceId}`,
+          schema: "public",
+          table: "participants",
+        },
+        () => {
+          onInsert();
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          filter: `space_id=eq.${spaceId}`,
+          schema: "public",
+          table: "participants",
+        },
+        (payload) => {
+          const deletedId = (payload.old as { id?: string }).id;
+          if (deletedId) {
+            onDelete({ old: { id: deletedId } });
           }
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            filter: `space_id=eq.${spaceId}`,
-            schema: "public",
-            table: "participants",
-          },
-          async () => {
-            if (!isMounted) {
-              return;
-            }
-            const result = await getParticipants(spaceId);
-            if (isMounted) {
-              setParticipants(result.data);
-              setError(result.error || null);
-            }
-          }
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "DELETE",
-            filter: `space_id=eq.${spaceId}`,
-            schema: "public",
-            table: "participants",
-          },
-          (payload) => {
-            if (!isMounted) {
-              return;
-            }
-
-            // Validate payload structure
-            if (
-              !payload?.old ||
-              typeof (payload.old as { id?: string }).id !== "string"
-            ) {
-              console.warn("Invalid participant delete payload:", payload);
-              return;
-            }
-
-            const deletedId = (payload.old as { id: string }).id;
-            setParticipants((prev) => prev.filter((p) => p.id !== deletedId));
-          }
-        )
-        .subscribe();
-    };
-
-    init();
+        }
+      )
+      .subscribe();
 
     return () => {
-      isMounted = false;
-      if (channel) {
-        channel.unsubscribe();
-      }
+      channel.unsubscribe();
     };
-  }, [spaceId, t]);
+  }, [spaceId]);
 
   const handleKickClick = (
     participantId: string,
@@ -305,7 +296,7 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
     setParticipantToKick(null);
   };
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <Card>
         <CardHeader>
@@ -449,7 +440,7 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
-                        disabled={kickingId === participant.id || isPending}
+                        disabled={kickingId === participant.id || isPendingKick}
                         onClick={() =>
                           handleKickClick(
                             participant.id,

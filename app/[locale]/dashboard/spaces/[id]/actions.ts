@@ -1,18 +1,12 @@
 "use server";
 
+import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
 
 export interface CallNumberResult {
   error?: string;
   success: boolean;
-}
-
-export interface CalledNumber {
-  called_at: string;
-  id: string;
-  space_id: string;
-  value: number;
 }
 
 export async function callNumber(
