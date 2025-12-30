@@ -107,6 +107,7 @@ export function SpaceParticipation({
   const [hasYouTubeToken, setHasYouTubeToken] = useState(false);
 
   // Check if YouTube verification is required
+  // This logic matches the server-side verification in actions.ts verifyGatekeeperRules
   const requiresYouTube =
     spaceInfo.gatekeeper_rules?.youtube?.channelId &&
     (spaceInfo.gatekeeper_rules.youtube.requirement === "subscriber" ||
@@ -125,6 +126,8 @@ export function SpaceParticipation({
       setHasJoined(joined);
 
       // Check for YouTube token if YouTube verification is required
+      // Note: provider_token presence indicates recent OAuth authentication.
+      // For YouTube requirements, this will be set after Google OAuth with YouTube scope.
       if (requiresYouTube && !joined) {
         const supabase = createClient();
         const {
@@ -175,6 +178,9 @@ export function SpaceParticipation({
     setError(null);
 
     // Get session with provider tokens
+    // Note: provider_token will be from the most recent OAuth provider used.
+    // For YouTube verification, this will be the Google OAuth token with YouTube scope
+    // obtained from handleYouTubeVerify or previous Google authentication.
     const supabase = createClient();
     const {
       data: { session },
