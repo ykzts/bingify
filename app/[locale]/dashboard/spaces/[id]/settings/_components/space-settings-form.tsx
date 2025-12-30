@@ -50,7 +50,7 @@ function determineGatekeeperMode(
   if (!rules) {
     return "none";
   }
-  if (rules.email && rules.email.allowed.length > 0) {
+  if (rules.email?.allowed && rules.email.allowed.length > 0) {
     return "email";
   }
   if (rules.youtube || rules.twitch) {
