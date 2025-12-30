@@ -230,6 +230,16 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
             if (!isMounted) {
               return;
             }
+
+            // Validate payload structure
+            if (
+              !payload?.old ||
+              typeof (payload.old as { id?: string }).id !== "string"
+            ) {
+              console.warn("Invalid participant delete payload:", payload);
+              return;
+            }
+
             const deletedId = (payload.old as { id: string }).id;
             setParticipants((prev) => prev.filter((p) => p.id !== deletedId));
           }
