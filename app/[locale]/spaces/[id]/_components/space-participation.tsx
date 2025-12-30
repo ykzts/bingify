@@ -193,9 +193,16 @@ export function SpaceParticipation({
       sessionStorage.setItem("youtube_oauth_complete", "true");
 
       const supabase = createClient();
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+
+      // Build callback URL with redirect back to this space
+      const callbackUrl = new URL("/auth/callback", window.location.origin);
+      callbackUrl.searchParams.set("redirect", window.location.pathname);
+
+      // Use linkIdentity to add YouTube scope to existing session
+      // This is the correct method for authenticated users requesting additional OAuth scopes
+      const { error: oauthError } = await supabase.auth.linkIdentity({
         options: {
-          redirectTo: window.location.href,
+          redirectTo: callbackUrl.toString(),
           scopes: "https://www.googleapis.com/auth/youtube.readonly",
         },
         provider: "google",
