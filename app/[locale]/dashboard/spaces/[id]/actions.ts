@@ -253,15 +253,22 @@ export interface Participant {
   joined_at: string;
   profiles?: {
     full_name: string | null;
-  };
+  } | null;
   user_id: string;
 }
 
-export async function getParticipants(spaceId: string): Promise<Participant[]> {
+export interface GetParticipantsResult {
+  data: Participant[];
+  error?: string;
+}
+
+export async function getParticipants(
+  spaceId: string
+): Promise<GetParticipantsResult> {
   try {
     if (!isValidUUID(spaceId)) {
       console.error("[getParticipants] Invalid UUID:", spaceId);
-      return [];
+      return { data: [], error: "Invalid space ID" };
     }
 
     const supabase = await createClient();
@@ -272,7 +279,7 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
 
     if (!user) {
       console.error("[getParticipants] No authenticated user");
-      return [];
+      return { data: [], error: "Not authenticated" };
     }
 
     console.log("[getParticipants] User authenticated:", user.id);
@@ -285,12 +292,15 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
 
     if (spaceError) {
       console.error("[getParticipants] Error fetching space:", spaceError);
-      return [];
+      return {
+        data: [],
+        error: "Failed to fetch space information",
+      };
     }
 
     if (!space) {
       console.error("[getParticipants] Space not found:", spaceId);
-      return [];
+      return { data: [], error: "Space not found" };
     }
 
     if (space.owner_id !== user.id) {
@@ -300,45 +310,68 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
         "vs",
         space.owner_id
       );
-      return [];
+      return { data: [], error: "Permission denied" };
     }
 
     console.log("[getParticipants] User is owner, fetching participants...");
 
-    const { data, error } = await supabase
+    // Fetch participants first
+    const { data: participantsData, error: participantsError } = await supabase
       .from("participants")
-      .select(
-        `
-        id,
-        user_id,
-        joined_at,
-        bingo_status,
-        profiles:user_id (
-          full_name
-        )
-      `
-      )
+      .select("id, user_id, joined_at, bingo_status")
       .eq("space_id", spaceId)
       .order("joined_at", { ascending: true });
 
-    if (error) {
-      console.error("Error fetching participants:", error);
-      return [];
+    if (participantsError) {
+      console.error(
+        "[getParticipants] Error fetching participants:",
+        participantsError
+      );
+      return {
+        data: [],
+        error: "Failed to fetch participants",
+      };
+    }
+
+    if (!participantsData || participantsData.length === 0) {
+      console.log("[getParticipants] No participants found");
+      return { data: [] };
+    }
+
+    // Fetch profiles for all participant user_ids
+    const userIds = participantsData.map((p) => p.user_id);
+    const { data: profilesData, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", userIds);
+
+    if (profilesError) {
+      console.error(
+        "[getParticipants] Error fetching profiles:",
+        profilesError
+      );
+      // Continue without profiles rather than failing entirely
     }
 
     console.log(
       "[getParticipants] Successfully fetched participants:",
-      data?.length || 0
+      participantsData.length
     );
+
+    // Merge participants with profiles
+    const profilesMap = new Map((profilesData || []).map((p) => [p.id, p]));
+
+    const data = participantsData.map((participant) => ({
+      ...participant,
+      profiles: profilesMap.get(participant.user_id) || null,
+    }));
 
     // Transform the data to match our interface
     const participants: Participant[] = (data || []).map((p) => ({
       bingo_status: p.bingo_status as "none" | "reach" | "bingo",
       id: p.id,
       joined_at: p.joined_at,
-      profiles: Array.isArray(p.profiles)
-        ? p.profiles[0]
-        : (p.profiles as { full_name: string | null } | undefined),
+      profiles: p.profiles,
       user_id: p.user_id,
     }));
 
@@ -348,7 +381,7 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
       reach: 1,
       none: 2,
     };
-    return participants.sort((a, b) => {
+    const sortedParticipants = participants.sort((a, b) => {
       const priorityDiff =
         statusPriority[a.bingo_status] - statusPriority[b.bingo_status];
       if (priorityDiff !== 0) {
@@ -356,9 +389,11 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
       }
       return new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime();
     });
+
+    return { data: sortedParticipants };
   } catch (error) {
     console.error("Error getting participants:", error);
-    return [];
+    return { data: [], error: "An unexpected error occurred" };
   }
 }
 

@@ -130,6 +130,7 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
   const t = useTranslations("AdminSpace");
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [kickingId, setKickingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -144,11 +145,12 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
     let channel: ReturnType<typeof supabase.channel> | null = null;
 
     const init = async () => {
-      const data = await getParticipants(spaceId);
+      const result = await getParticipants(spaceId);
       if (!isMounted) {
         return;
       }
-      setParticipants(data);
+      setParticipants(result.data);
+      setError(result.error || null);
       setIsLoading(false);
 
       channel = supabase
@@ -212,9 +214,10 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
             if (!isMounted) {
               return;
             }
-            const refreshedData = await getParticipants(spaceId);
+            const result = await getParticipants(spaceId);
             if (isMounted) {
-              setParticipants(refreshedData);
+              setParticipants(result.data);
+              setError(result.error || null);
             }
           }
         )
@@ -303,6 +306,25 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
           <div className="flex items-center justify-center py-8">
             <div className="text-muted-foreground text-sm">
               {t("loadingParticipants")}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {t("participantsListTitle", { count: 0, max: maxParticipants })}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <div className="text-destructive text-sm">
+              {t("participantsErrorFetch")}
             </div>
           </div>
         </CardContent>

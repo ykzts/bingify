@@ -110,6 +110,7 @@
     "noParticipants": "No participants yet",
     "numberCalledSuccess": "Called number {number}",
     "participantGuestName": "Guest user",
+    "participantsErrorFetch": "Failed to load participants. Please try refreshing the page.",
     "participantsListTitle": "Participants ({count}/{max})",
     "participantsStatus": "Participants Status",
     "participantsTableActions": "Actions",

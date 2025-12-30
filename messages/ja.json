@@ -110,6 +110,7 @@
     "noParticipants": "まだ参加者がいません",
     "numberCalledSuccess": "番号 {number} を呼びました",
     "participantGuestName": "ゲストユーザー",
+    "participantsErrorFetch": "参加者の読み込みに失敗しました。ページを再読み込みしてください。",
     "participantsListTitle": "参加者 ({count}/{max})",
     "participantsStatus": "参加者の状態",
     "participantsTableActions": "アクション",
