@@ -4,8 +4,8 @@ import confetti from "canvas-confetti";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { checkBingoLines } from "@/lib/utils/bingo-checker";
 import { createClient } from "@/lib/supabase/client";
+import { checkBingoLines } from "@/lib/utils/bingo-checker";
 import type { BingoCard } from "../bingo-actions";
 import { getOrCreateBingoCard, updateBingoStatus } from "../bingo-actions";
 import { BingoLineOverlay } from "./bingo-line-overlay";
@@ -153,7 +153,12 @@ export function BingoCardDisplay({ spaceId }: Props) {
       if (newStatus === "bingo") {
         const duration = 3000;
         const animationEnd = Date.now() + duration;
-        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+        const defaults = {
+          startVelocity: 30,
+          spread: 360,
+          ticks: 60,
+          zIndex: 0,
+        };
 
         const interval = setInterval(() => {
           const timeLeft = animationEnd - Date.now();

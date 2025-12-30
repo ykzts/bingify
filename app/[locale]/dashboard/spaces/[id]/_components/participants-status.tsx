@@ -1,8 +1,8 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import type { Participant } from "../actions";
 import { getParticipants } from "../actions";
@@ -66,9 +66,7 @@ function updateParticipantList(
     if (statusDiff !== 0) {
       return statusDiff;
     }
-    return (
-      new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime()
-    );
+    return new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime();
   });
 
   return newList;
@@ -109,16 +107,17 @@ export function ParticipantsStatus({ spaceId }: Props) {
 
             // Validate payload structure
             const updated = payload.new as ParticipantUpdate;
-            if (
-              !((updated?.id && updated.user_id) && updated.bingo_status)
-            ) {
+            if (!(updated?.id && updated.user_id && updated.bingo_status)) {
               console.error("Invalid participant update payload:", payload);
               return;
             }
 
             // Validate bingo_status value
             if (!["none", "reach", "bingo"].includes(updated.bingo_status)) {
-              console.error("Invalid bingo_status value:", updated.bingo_status);
+              console.error(
+                "Invalid bingo_status value:",
+                updated.bingo_status
+              );
               return;
             }
 
@@ -132,7 +131,11 @@ export function ParticipantsStatus({ spaceId }: Props) {
                   updated.user_id
                 );
               }
-              return updateParticipantList(prev, updated.id, updated.bingo_status);
+              return updateParticipantList(
+                prev,
+                updated.id,
+                updated.bingo_status
+              );
             });
           }
         )

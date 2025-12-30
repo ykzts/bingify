@@ -102,7 +102,9 @@ export function checkBingoLines(
 /**
  * Generate positions for a row
  */
-function generateRowPositions(row: number): Array<{ row: number; col: number }> {
+function generateRowPositions(
+  row: number
+): Array<{ row: number; col: number }> {
   const positions: Array<{ row: number; col: number }> = [];
   for (let col = 0; col < CARD_SIZE; col++) {
     positions.push({ row, col });
@@ -113,7 +115,9 @@ function generateRowPositions(row: number): Array<{ row: number; col: number }> 
 /**
  * Generate positions for a column
  */
-function generateColPositions(col: number): Array<{ row: number; col: number }> {
+function generateColPositions(
+  col: number
+): Array<{ row: number; col: number }> {
   const positions: Array<{ row: number; col: number }> = [];
   for (let row = 0; row < CARD_SIZE; row++) {
     positions.push({ row, col });
@@ -152,7 +156,9 @@ function checkLine(
   let markedCount = 0;
 
   for (const pos of positions) {
-    if (isMarked(cardNumbers[pos.row][pos.col], calledNumbers, pos.row, pos.col)) {
+    if (
+      isMarked(cardNumbers[pos.row][pos.col], calledNumbers, pos.row, pos.col)
+    ) {
       markedCount++;
     }
   }

@@ -79,7 +79,13 @@ export function BingoLineOverlay({
         );
       })}
       <defs>
-        <linearGradient id="bingoLineGradient" x1="0%" x2="100%" y1="0%" y2="0%">
+        <linearGradient
+          id="bingoLineGradient"
+          x1="0%"
+          x2="100%"
+          y1="0%"
+          y2="0%"
+        >
           <stop offset="0%" stopColor="#fbbf24" />
           <stop offset="50%" stopColor="#f59e0b" />
           <stop offset="100%" stopColor="#d97706" />

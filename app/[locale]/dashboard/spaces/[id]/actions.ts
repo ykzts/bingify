@@ -297,7 +297,6 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
       `
       )
       .eq("space_id", spaceId)
-      .order("bingo_status", { ascending: false })
       .order("joined_at", { ascending: true });
 
     if (error) {
@@ -306,7 +305,7 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
     }
 
     // Transform the data to match our interface
-    return (data || []).map((p) => ({
+    const participants = (data || []).map((p) => ({
       bingo_status: p.bingo_status,
       id: p.id,
       joined_at: p.joined_at,
@@ -315,6 +314,17 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
         : (p.profiles as { display_name: string | null } | undefined),
       user_id: p.user_id,
     }));
+
+    // Sort by bingo status priority (bingo > reach > none) then by joined_at
+    const statusPriority = { bingo: 0, reach: 1, none: 2 };
+    return participants.sort((a, b) => {
+      const priorityDiff =
+        statusPriority[a.bingo_status] - statusPriority[b.bingo_status];
+      if (priorityDiff !== 0) {
+        return priorityDiff;
+      }
+      return new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime();
+    });
   } catch (error) {
     console.error("Error getting participants:", error);
     return [];
