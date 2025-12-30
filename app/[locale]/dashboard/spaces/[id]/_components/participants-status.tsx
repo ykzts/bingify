@@ -60,7 +60,11 @@ function updateParticipantList(
 
   // Sort by bingo status (bingo > reach > none) then by joined_at
   newList.sort((a, b) => {
-    const statusOrder = { bingo: 0, reach: 1, none: 2 };
+    const statusOrder: Record<"bingo" | "reach" | "none", number> = {
+      bingo: 0,
+      reach: 1,
+      none: 2,
+    };
     const statusDiff =
       statusOrder[a.bingo_status] - statusOrder[b.bingo_status];
     if (statusDiff !== 0) {

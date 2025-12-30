@@ -316,7 +316,11 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
     }));
 
     // Sort by bingo status priority (bingo > reach > none) then by joined_at
-    const statusPriority = { bingo: 0, reach: 1, none: 2 };
+    const statusPriority: Record<"bingo" | "reach" | "none", number> = {
+      bingo: 0,
+      reach: 1,
+      none: 2,
+    };
     return participants.sort((a, b) => {
       const priorityDiff =
         statusPriority[a.bingo_status] - statusPriority[b.bingo_status];

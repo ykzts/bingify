@@ -275,6 +275,7 @@
   "UserSpace": {
     "alreadyJoined": "あなたは既にこのスペースのメンバーです",
     "backToHome": "ホームに戻る",
+    "bingo": "ビンゴ！",
     "bingoCardTitle": "あなたのビンゴカード",
     "bingoGamePlaceholder": "ビンゴゲームがここに表示されます。参加して楽しみましょう！",
     "bingoGameTitle": "ビンゴゲーム",
@@ -309,6 +310,7 @@
     "noNumbersCalled": "まだ番号が呼ばれていません",
     "notParticipantBanner": "このスペースを閲覧中です。参加してビンゴゲームに参加しましょう！",
     "participantCount": "{count} / {max} 人が参加中",
+    "reach": "リーチ！",
     "recentCalledNumbers": "最近呼ばれた番号",
     "spaceId": "スペースID",
     "spaceSubtitle": "ビンゴスペース",

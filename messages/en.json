@@ -275,6 +275,7 @@
   "UserSpace": {
     "alreadyJoined": "You are already a member of this space",
     "backToHome": "Back to Home",
+    "bingo": "BINGO!",
     "bingoCardTitle": "Your Bingo Card",
     "bingoGamePlaceholder": "The bingo game will appear here. Join to participate!",
     "bingoGameTitle": "Bingo Game",
@@ -309,6 +310,7 @@
     "noNumbersCalled": "No numbers called yet",
     "notParticipantBanner": "You're viewing this space. Join to participate in the bingo game!",
     "participantCount": "{count} / {max} participants",
+    "reach": "REACH!",
     "recentCalledNumbers": "Recently Called Numbers",
     "spaceId": "Space ID",
     "spaceSubtitle": "Bingo Space",

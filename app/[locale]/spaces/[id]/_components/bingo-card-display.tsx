@@ -127,17 +127,21 @@ export function BingoCardDisplay({ spaceId }: Props) {
 
   // Check bingo status when called numbers or card changes
   useEffect(() => {
-    if (!bingoCard || calledNumbers.size === 0) {
+    if (!bingoCard) {
       return;
     }
 
-    const result = checkBingoLines(bingoCard.numbers, calledNumbers);
-
+    // Determine new status based on called numbers
     let newStatus: "none" | "reach" | "bingo" = "none";
-    if (result.hasBingo) {
-      newStatus = "bingo";
-    } else if (result.hasReach) {
-      newStatus = "reach";
+
+    if (calledNumbers.size > 0) {
+      const result = checkBingoLines(bingoCard.numbers, calledNumbers);
+
+      if (result.hasBingo) {
+        newStatus = "bingo";
+      } else if (result.hasReach) {
+        newStatus = "reach";
+      }
     }
 
     // Only update and trigger effects if status changed
@@ -148,41 +152,46 @@ export function BingoCardDisplay({ spaceId }: Props) {
       updateBingoStatus(spaceId, newStatus).catch((err) => {
         console.error("Failed to update bingo status:", err);
       });
-
-      // Trigger confetti on bingo
-      if (newStatus === "bingo") {
-        const duration = 3000;
-        const animationEnd = Date.now() + duration;
-        const defaults = {
-          startVelocity: 30,
-          spread: 360,
-          ticks: 60,
-          zIndex: 0,
-        };
-
-        const interval = setInterval(() => {
-          const timeLeft = animationEnd - Date.now();
-
-          if (timeLeft <= 0) {
-            clearInterval(interval);
-            return;
-          }
-
-          const particleCount = 50 * (timeLeft / duration);
-
-          confetti({
-            ...defaults,
-            origin: { x: Math.random(), y: Math.random() - 0.2 },
-            particleCount: Math.floor(particleCount),
-          });
-        }, 250);
-
-        // Cleanup interval on unmount
-        return () => {
-          clearInterval(interval);
-        };
-      }
     }
+
+    // Trigger confetti on bingo
+    let confettiInterval: NodeJS.Timeout | null = null;
+    if (newStatus === "bingo") {
+      const duration = 3000;
+      const animationEnd = Date.now() + duration;
+      const defaults = {
+        startVelocity: 30,
+        spread: 360,
+        ticks: 60,
+        zIndex: 0,
+      };
+
+      confettiInterval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          if (confettiInterval) {
+            clearInterval(confettiInterval);
+          }
+          return;
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+
+        confetti({
+          ...defaults,
+          origin: { x: Math.random(), y: Math.random() - 0.2 },
+          particleCount: Math.floor(particleCount),
+        });
+      }, 250);
+    }
+
+    // Cleanup interval on unmount
+    return () => {
+      if (confettiInterval) {
+        clearInterval(confettiInterval);
+      }
+    };
   }, [bingoCard, calledNumbers, spaceId]);
 
   if (isLoading) {
@@ -223,12 +232,12 @@ export function BingoCardDisplay({ spaceId }: Props) {
         {/* Status badges */}
         {bingoCheckResult.hasBingo && (
           <div className="mx-auto mb-4 max-w-md rounded-lg bg-yellow-500 px-4 py-2 text-center font-bold text-lg text-white">
-            🎉 BINGO! 🎉
+            🎉 {t("bingo")} 🎉
           </div>
         )}
         {!bingoCheckResult.hasBingo && bingoCheckResult.hasReach && (
           <div className="mx-auto mb-4 max-w-md rounded-lg bg-orange-500 px-4 py-2 text-center font-bold text-white">
-            ⚡ REACH! ⚡
+            ⚡ {t("reach")} ⚡
           </div>
         )}
 
