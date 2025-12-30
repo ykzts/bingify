@@ -298,6 +298,8 @@
     "joinButton": "スペースに参加",
     "joinPrompt": "このビンゴスペースに参加して楽しみましょう",
     "joining": "参加中...",
+    "verifyAndJoinButton": "YouTubeを確認して参加",
+    "verifyingAndJoining": "確認中...",
     "leaveButton": "スペースから退出",
     "leaving": "退出中...",
     "loading": "読み込み中...",

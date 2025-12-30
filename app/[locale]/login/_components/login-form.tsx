@@ -3,6 +3,10 @@
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import {
+  buildOAuthCallbackUrl,
+  GOOGLE_OAUTH_SCOPES,
+} from "@/lib/auth/oauth-utils";
 import { createClient } from "@/lib/supabase/client";
 
 export function LoginForm() {
@@ -18,15 +22,11 @@ export function LoginForm() {
     setIsLoading(true);
     const supabase = createClient();
 
-    // Build callback URL with redirect parameter if present
-    const callbackUrl = new URL("/auth/callback", window.location.origin);
-    if (redirect) {
-      callbackUrl.searchParams.set("redirect", redirect);
-    }
-
     const { error } = await supabase.auth.signInWithOAuth({
       options: {
-        redirectTo: callbackUrl.toString(),
+        redirectTo: buildOAuthCallbackUrl(redirect ?? undefined),
+        // Request YouTube scope for Google login to enable space gatekeeper verification
+        ...(provider === "google" && { scopes: GOOGLE_OAUTH_SCOPES }),
       },
       provider,
     });

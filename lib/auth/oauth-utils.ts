@@ -1,0 +1,25 @@
+/**
+ * Utility functions for OAuth authentication flows
+ */
+
+/**
+ * Builds a callback URL for OAuth redirects
+ * @param redirectPath - Optional path to redirect to after authentication (e.g., "/spaces/123")
+ * @returns The complete callback URL with redirect parameter if provided
+ */
+export function buildOAuthCallbackUrl(redirectPath?: string): string {
+  const callbackUrl = new URL("/auth/callback", window.location.origin);
+
+  if (redirectPath) {
+    callbackUrl.searchParams.set("redirect", redirectPath);
+  }
+
+  return callbackUrl.toString();
+}
+
+/**
+ * Default OAuth scopes for Google authentication
+ * Includes YouTube readonly access for space gatekeeper verification
+ */
+export const GOOGLE_OAUTH_SCOPES =
+  "https://www.googleapis.com/auth/youtube.readonly";
