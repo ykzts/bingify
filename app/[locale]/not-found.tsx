@@ -18,7 +18,7 @@ export default async function NotFound() {
     <div className="container mx-auto px-4 py-16">
       <Empty>
         <EmptyHeader>
-          <EmptyMedia variant="icon">
+          <EmptyMedia>
             <FileQuestion className="h-20 w-20 text-muted-foreground" />
           </EmptyMedia>
           <EmptyTitle>{t("title")}</EmptyTitle>
