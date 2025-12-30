@@ -56,7 +56,7 @@ function showStatusNotification(
   t: (key: string) => string
 ): void {
   const displayName =
-    participant?.profiles?.display_name || t("participantGuestName");
+    participant?.profiles?.full_name || t("participantGuestName");
 
   if (newStatus === "bingo") {
     toast.success(`🎉 ${displayName} got BINGO!`, {
@@ -370,11 +370,8 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
             <TableBody>
               {participants.map((participant) => {
                 const displayName =
-                  participant.profiles?.display_name ||
-                  t("participantGuestName");
-                const initials = getInitials(
-                  participant.profiles?.display_name
-                );
+                  participant.profiles?.full_name || t("participantGuestName");
+                const initials = getInitials(participant.profiles?.full_name);
 
                 return (
                   <TableRow key={participant.id}>
@@ -389,7 +386,7 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
                           <span className="font-medium text-sm">
                             {displayName}
                           </span>
-                          {!participant.profiles?.display_name && (
+                          {!participant.profiles?.full_name && (
                             <span className="text-muted-foreground text-xs">
                               {participant.user_id.substring(0, 8)}
                             </span>
@@ -417,7 +414,7 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
                         onClick={() =>
                           handleKickClick(
                             participant.id,
-                            participant.profiles?.display_name || null
+                            participant.profiles?.full_name || null
                           )
                         }
                         size="sm"

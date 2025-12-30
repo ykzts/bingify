@@ -252,7 +252,7 @@ export interface Participant {
   id: string;
   joined_at: string;
   profiles?: {
-    display_name: string | null;
+    full_name: string | null;
   };
   user_id: string;
 }
@@ -292,7 +292,7 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
         joined_at,
         bingo_status,
         profiles:user_id (
-          display_name
+          full_name
         )
       `
       )
@@ -311,7 +311,7 @@ export async function getParticipants(spaceId: string): Promise<Participant[]> {
       joined_at: p.joined_at,
       profiles: Array.isArray(p.profiles)
         ? p.profiles[0]
-        : (p.profiles as { display_name: string | null } | undefined),
+        : (p.profiles as { full_name: string | null } | undefined),
       user_id: p.user_id,
     }));
 
