@@ -34,7 +34,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
   const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
     const newNumber = payload.new;
     queryClient.setQueryData<Set<number>>(
-      ["called-numbers", spaceId],
+      ["called-numbers-set", spaceId],
       (prev) => {
         if (!prev) {
           return new Set([newNumber.value]);
@@ -47,7 +47,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
   const onDelete = useEffectEvent((payload: { old: CalledNumber }) => {
     const deletedNumber = payload.old;
     queryClient.setQueryData<Set<number>>(
-      ["called-numbers", spaceId],
+      ["called-numbers-set", spaceId],
       (prev) => {
         if (!prev) {
           return new Set();

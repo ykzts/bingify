@@ -72,7 +72,7 @@ export function ScreenDisplay({
   const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
     const newNumber = payload.new;
     queryClient.setQueryData<CalledNumber[]>(
-      ["called-numbers", spaceId],
+      ["called-numbers-array", spaceId],
       (prev) => {
         if (!prev) {
           return [newNumber];
@@ -86,7 +86,7 @@ export function ScreenDisplay({
   const onDelete = useEffectEvent((payload: { old: CalledNumber }) => {
     const deletedNumber = payload.old;
     queryClient.setQueryData<CalledNumber[]>(
-      ["called-numbers", spaceId],
+      ["called-numbers-array", spaceId],
       (prev) => {
         if (!prev) {
           return [];

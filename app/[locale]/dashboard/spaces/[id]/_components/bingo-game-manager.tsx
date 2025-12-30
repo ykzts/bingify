@@ -25,7 +25,7 @@ export function BingoGameManager({ spaceId }: Props) {
   const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
     const newNumber = payload.new;
     queryClient.setQueryData<CalledNumber[]>(
-      ["called-numbers", spaceId],
+      ["called-numbers-array", spaceId],
       (prev) => {
         if (!prev) {
           return [newNumber];
@@ -39,7 +39,7 @@ export function BingoGameManager({ spaceId }: Props) {
   const onDelete = useEffectEvent((payload: { old: CalledNumber }) => {
     const deletedNumber = payload.old;
     queryClient.setQueryData<CalledNumber[]>(
-      ["called-numbers", spaceId],
+      ["called-numbers-array", spaceId],
       (prev) => {
         if (!prev) {
           return [];

@@ -26,7 +26,7 @@ export function useCalledNumbers(spaceId: string) {
 
       return (data || []) as CalledNumber[];
     },
-    queryKey: ["called-numbers", spaceId],
+    queryKey: ["called-numbers-array", spaceId],
     retry: 3,
   });
 }

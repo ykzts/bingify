@@ -25,6 +25,6 @@ export function useCalledNumbers(spaceId: string) {
 
       return new Set((data || []).map((n) => n.value));
     },
-    queryKey: ["called-numbers", spaceId],
+    queryKey: ["called-numbers-set", spaceId],
   });
 }
