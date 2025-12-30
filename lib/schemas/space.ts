@@ -138,34 +138,48 @@ export const spaceStatusSchema = z.enum([
 
 export type SpaceStatus = z.infer<typeof spaceStatusSchema>;
 
+// Gatekeeper mode enum
+export const gatekeeperModeSchema = z.enum(["none", "social", "email"]);
+export type GatekeeperMode = z.infer<typeof gatekeeperModeSchema>;
+
+// Social platform enum
+export const socialPlatformSchema = z.enum(["youtube", "twitch"]);
+export type SocialPlatform = z.infer<typeof socialPlatformSchema>;
+
 // Schema for space update (settings page)
 export const updateSpaceFormSchema = z
   .object({
-    title: z
-      .string()
-      .trim()
-      .max(100, "タイトルは100文字以内で入力してください")
-      .optional(),
     description: z
       .string()
       .trim()
       .max(500, "説明は500文字以内で入力してください")
       .optional(),
+    email_allowlist: z.string().trim().optional(),
+    gatekeeper_mode: gatekeeperModeSchema,
     max_participants: z
       .number()
       .int("整数を入力してください")
       .min(1, "1人以上を指定してください")
       .max(1000, "最大1000人までです"),
-    youtube_requirement: z.enum(["none", "subscriber"]),
-    youtube_channel_id: z.string().trim().optional(),
-    twitch_requirement: z.enum(["none", "follower", "subscriber"]),
+    social_platform: socialPlatformSchema.optional(),
+    title: z
+      .string()
+      .trim()
+      .max(100, "タイトルは100文字以内で入力してください")
+      .optional(),
     twitch_broadcaster_id: z.string().trim().optional(),
-    email_allowlist: z.string().trim().optional(),
+    twitch_requirement: z.enum(["none", "follower", "subscriber"]),
+    youtube_channel_id: z.string().trim().optional(),
+    youtube_requirement: z.enum(["none", "subscriber"]),
   })
   .refine(
     (data) => {
-      // If YouTube requirement is set, channel ID must be provided
-      if (data.youtube_requirement !== "none") {
+      // If social mode with YouTube, channel ID must be provided
+      if (
+        data.gatekeeper_mode === "social" &&
+        data.social_platform === "youtube" &&
+        data.youtube_requirement !== "none"
+      ) {
         return (
           data.youtube_channel_id &&
           data.youtube_channel_id.trim() !== "" &&
@@ -182,8 +196,12 @@ export const updateSpaceFormSchema = z
   )
   .refine(
     (data) => {
-      // If Twitch requirement is set, broadcaster ID must be provided
-      if (data.twitch_requirement !== "none") {
+      // If social mode with Twitch, broadcaster ID must be provided
+      if (
+        data.gatekeeper_mode === "social" &&
+        data.social_platform === "twitch" &&
+        data.twitch_requirement !== "none"
+      ) {
         return (
           data.twitch_broadcaster_id &&
           data.twitch_broadcaster_id.trim() !== "" &&
@@ -199,20 +217,27 @@ export const updateSpaceFormSchema = z
   )
   .refine(
     (data) => {
-      // Validate email allowlist format if provided
-      if (!data.email_allowlist || data.email_allowlist.trim() === "") {
-        return true;
+      // Validate email allowlist format if in email mode
+      if (data.gatekeeper_mode === "email") {
+        if (!data.email_allowlist || data.email_allowlist.trim() === "") {
+          return false;
+        }
+        const patterns = parseEmailAllowlist(data.email_allowlist);
+        if (patterns.length === 0) {
+          return false;
+        }
+        return patterns.every((pattern) => {
+          return (
+            DOMAIN_FORMAT_REGEX.test(pattern) ||
+            EMAIL_FORMAT_REGEX.test(pattern)
+          );
+        });
       }
-      const patterns = parseEmailAllowlist(data.email_allowlist);
-      return patterns.every((pattern) => {
-        return (
-          DOMAIN_FORMAT_REGEX.test(pattern) || EMAIL_FORMAT_REGEX.test(pattern)
-        );
-      });
+      return true;
     },
     {
       message:
-        "メールアドレスまたはドメインの形式が正しくありません。例: @example.com, user@example.com, example.com",
+        "メールアドレス制限を設定する場合、少なくとも1つのメールアドレスまたはドメインが必要です。例: @example.com, user@example.com, example.com",
       path: ["email_allowlist"],
     }
   )
@@ -233,27 +258,33 @@ export type UpdateSpaceFormData = z.infer<typeof updateSpaceFormSchema>;
 // Comprehensive schema for space creation including gatekeeper settings
 export const createSpaceFormSchema = z
   .object({
-    slug: z
-      .string()
-      .min(3, "3文字以上入力してください")
-      .max(30, "30文字以内で入力してください")
-      .regex(/^[a-z0-9-]+$/, "小文字の英数字とハイフンのみ使用できます"),
+    email_allowlist: z.string().trim().optional(),
+    gatekeeper_mode: gatekeeperModeSchema.default("none"),
     max_participants: z
       .number()
       .int("整数を入力してください")
       .min(1, "1人以上を指定してください")
       .max(1000, "最大1000人までです")
       .default(50),
-    youtube_requirement: z.enum(["none", "subscriber"]),
-    youtube_channel_id: z.string().trim().optional(),
-    twitch_requirement: z.enum(["none", "follower", "subscriber"]),
+    slug: z
+      .string()
+      .min(3, "3文字以上入力してください")
+      .max(30, "30文字以内で入力してください")
+      .regex(/^[a-z0-9-]+$/, "小文字の英数字とハイフンのみ使用できます"),
+    social_platform: socialPlatformSchema.optional(),
     twitch_broadcaster_id: z.string().trim().optional(),
-    email_allowlist: z.string().trim().optional(),
+    twitch_requirement: z.enum(["none", "follower", "subscriber"]).default("none"),
+    youtube_channel_id: z.string().trim().optional(),
+    youtube_requirement: z.enum(["none", "subscriber"]).default("none"),
   })
   .refine(
     (data) => {
-      // If YouTube requirement is set, channel ID must be provided
-      if (data.youtube_requirement !== "none") {
+      // If social mode with YouTube, channel ID must be provided
+      if (
+        data.gatekeeper_mode === "social" &&
+        data.social_platform === "youtube" &&
+        data.youtube_requirement !== "none"
+      ) {
         return (
           data.youtube_channel_id &&
           data.youtube_channel_id.trim() !== "" &&
@@ -270,8 +301,12 @@ export const createSpaceFormSchema = z
   )
   .refine(
     (data) => {
-      // If Twitch requirement is set, broadcaster ID must be provided
-      if (data.twitch_requirement !== "none") {
+      // If social mode with Twitch, broadcaster ID must be provided
+      if (
+        data.gatekeeper_mode === "social" &&
+        data.social_platform === "twitch" &&
+        data.twitch_requirement !== "none"
+      ) {
         return (
           data.twitch_broadcaster_id &&
           data.twitch_broadcaster_id.trim() !== "" &&
@@ -287,20 +322,27 @@ export const createSpaceFormSchema = z
   )
   .refine(
     (data) => {
-      // Validate email allowlist format if provided
-      if (!data.email_allowlist || data.email_allowlist.trim() === "") {
-        return true;
+      // Validate email allowlist format if in email mode
+      if (data.gatekeeper_mode === "email") {
+        if (!data.email_allowlist || data.email_allowlist.trim() === "") {
+          return false;
+        }
+        const patterns = parseEmailAllowlist(data.email_allowlist);
+        if (patterns.length === 0) {
+          return false;
+        }
+        return patterns.every((pattern) => {
+          return (
+            DOMAIN_FORMAT_REGEX.test(pattern) ||
+            EMAIL_FORMAT_REGEX.test(pattern)
+          );
+        });
       }
-      const patterns = parseEmailAllowlist(data.email_allowlist);
-      return patterns.every((pattern) => {
-        return (
-          DOMAIN_FORMAT_REGEX.test(pattern) || EMAIL_FORMAT_REGEX.test(pattern)
-        );
-      });
+      return true;
     },
     {
       message:
-        "メールアドレスまたはドメインの形式が正しくありません。例: @example.com, user@example.com, example.com",
+        "メールアドレス制限を設定する場合、少なくとも1つのメールアドレスまたはドメインが必要です。例: @example.com, user@example.com, example.com",
       path: ["email_allowlist"],
     }
   )

@@ -45,19 +45,21 @@ export async function updateSpaceSettings(
 
     // Validate form data
     const validation = updateSpaceFormSchema.safeParse({
-      title: (formData.get("title") as string) || undefined,
       description: (formData.get("description") as string) || undefined,
+      email_allowlist: (formData.get("email_allowlist") as string) || "",
+      gatekeeper_mode: (formData.get("gatekeeper_mode") as string) || "none",
       max_participants: Number.isNaN(maxParticipants)
         ? undefined
         : maxParticipants,
-      youtube_requirement:
-        (formData.get("youtube_requirement") as string) || "none",
-      youtube_channel_id: (formData.get("youtube_channel_id") as string) || "",
-      twitch_requirement:
-        (formData.get("twitch_requirement") as string) || "none",
+      social_platform: (formData.get("social_platform") as string) || undefined,
+      title: (formData.get("title") as string) || undefined,
       twitch_broadcaster_id:
         (formData.get("twitch_broadcaster_id") as string) || "",
-      email_allowlist: (formData.get("email_allowlist") as string) || "",
+      twitch_requirement:
+        (formData.get("twitch_requirement") as string) || "none",
+      youtube_channel_id: (formData.get("youtube_channel_id") as string) || "",
+      youtube_requirement:
+        (formData.get("youtube_requirement") as string) || "none",
     });
 
     if (!validation.success) {
@@ -75,14 +77,16 @@ export async function updateSpaceSettings(
     }
 
     const {
-      title,
       description,
-      max_participants: maxParticipantsValue,
-      youtube_requirement: youtubeRequirement,
-      youtube_channel_id: youtubeChannelId,
-      twitch_requirement: twitchRequirement,
-      twitch_broadcaster_id: twitchBroadcasterId,
       email_allowlist: emailAllowlist,
+      gatekeeper_mode: gatekeeperMode,
+      max_participants: maxParticipantsValue,
+      social_platform: socialPlatform,
+      title,
+      twitch_broadcaster_id: twitchBroadcasterId,
+      twitch_requirement: twitchRequirement,
+      youtube_channel_id: youtubeChannelId,
+      youtube_requirement: youtubeRequirement,
     } = validation.data;
 
     // Get current space data
@@ -159,7 +163,7 @@ export async function updateSpaceSettings(
       };
     }
 
-    // Build gatekeeper_rules
+    // Build exclusive gatekeeper_rules based on selected mode
     let gatekeeperRules: {
       email?: { allowed: string[] };
       twitch?: {
@@ -169,32 +173,36 @@ export async function updateSpaceSettings(
       youtube?: { channelId: string; requirement: string };
     } | null = null;
 
-    const hasYouTubeRule = youtubeRequirement !== "none" && youtubeChannelId;
-    const hasTwitchRule = twitchRequirement !== "none" && twitchBroadcasterId;
-    const hasEmailRule = emailAllowlist.length > 0;
-
-    if (hasYouTubeRule || hasTwitchRule || hasEmailRule) {
+    if (gatekeeperMode === "none") {
+      // No restrictions
+      gatekeeperRules = null;
+    } else if (gatekeeperMode === "social") {
       gatekeeperRules = {};
-
-      if (hasYouTubeRule) {
+      
+      // Only add the selected platform's rules
+      if (socialPlatform === "youtube" && youtubeRequirement !== "none" && youtubeChannelId) {
         gatekeeperRules.youtube = {
-          channelId: youtubeChannelId as string,
+          channelId: youtubeChannelId,
           requirement: youtubeRequirement,
         };
-      }
-
-      if (hasTwitchRule) {
+      } else if (socialPlatform === "twitch" && twitchRequirement !== "none" && twitchBroadcasterId) {
         gatekeeperRules.twitch = {
-          broadcasterId: twitchBroadcasterId as string,
+          broadcasterId: twitchBroadcasterId,
           requirement: twitchRequirement,
         };
       }
-
-      if (hasEmailRule) {
-        gatekeeperRules.email = {
-          allowed: emailAllowlist,
-        };
+      
+      // If no valid social rules, set to null
+      if (Object.keys(gatekeeperRules).length === 0) {
+        gatekeeperRules = null;
       }
+    } else if (gatekeeperMode === "email" && emailAllowlist.length > 0) {
+      // Email restrictions
+      gatekeeperRules = {
+        email: {
+          allowed: emailAllowlist,
+        },
+      };
     }
 
     // Update space
