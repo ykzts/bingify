@@ -446,18 +446,18 @@ export function SpaceSettingsForm({
               <input name="twitch_broadcaster_id" type="hidden" value="" />
             </>
           )}
-          {gatekeeperMode !== "social" || socialPlatform !== "youtube" ? (
+          {gatekeeperMode === "social" && socialPlatform === "twitch" && (
             <>
               <input name="youtube_requirement" type="hidden" value="none" />
               <input name="youtube_channel_id" type="hidden" value="" />
             </>
-          ) : null}
-          {gatekeeperMode !== "social" || socialPlatform !== "twitch" ? (
+          )}
+          {gatekeeperMode === "social" && socialPlatform === "youtube" && (
             <>
               <input name="twitch_requirement" type="hidden" value="none" />
               <input name="twitch_broadcaster_id" type="hidden" value="" />
             </>
-          ) : null}
+          )}
           {gatekeeperMode !== "email" && (
             <input name="email_allowlist" type="hidden" value="" />
           )}
