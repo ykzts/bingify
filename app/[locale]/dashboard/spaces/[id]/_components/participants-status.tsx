@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -400,6 +400,12 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
+                          {participant.profiles?.avatar_url && (
+                            <AvatarImage
+                              alt={displayName}
+                              src={participant.profiles.avatar_url}
+                            />
+                          )}
                           <AvatarFallback className="bg-primary/10 text-primary text-xs">
                             {initials}
                           </AvatarFallback>

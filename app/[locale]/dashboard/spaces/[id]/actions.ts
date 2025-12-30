@@ -252,6 +252,7 @@ export interface Participant {
   id: string;
   joined_at: string;
   profiles?: {
+    avatar_url: string | null;
     full_name: string | null;
   } | null;
   user_id: string;
@@ -342,7 +343,7 @@ export async function getParticipants(
     const userIds = participantsData.map((p) => p.user_id);
     const { data: profilesData, error: profilesError } = await supabase
       .from("profiles")
-      .select("id, full_name")
+      .select("id, full_name, avatar_url")
       .in("id", userIds);
 
     if (profilesError) {
