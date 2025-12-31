@@ -193,6 +193,7 @@
     "adminBadge": "Admin",
     "cancel": "Cancel",
     "copyLinkAction": "Copy Link",
+    "copyLinkError": "Failed to copy link",
     "copyLinkSuccess": "Link copied to clipboard",
     "createFormDescription": "Fill in the required information to start your bingo event right away.",
     "createFormTitle": "Create New Space",

@@ -193,6 +193,7 @@
     "adminBadge": "管理者",
     "cancel": "キャンセル",
     "copyLinkAction": "URLをコピー",
+    "copyLinkError": "リンクのコピーに失敗しました",
     "copyLinkSuccess": "URLをクリップボードにコピーしました",
     "createFormDescription": "必要な情報を入力して、すぐにビンゴ大会を始めましょう。",
     "createFormTitle": "新しいスペースを作成",

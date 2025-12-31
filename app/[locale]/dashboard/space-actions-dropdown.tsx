@@ -8,7 +8,6 @@ import {
   Settings,
   Trash2,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -29,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getPathname, useRouter } from "@/i18n/navigation";
 import type { UserSpace } from "./actions";
 import { deleteSpace } from "./actions";
 
@@ -51,18 +51,18 @@ export function SpaceActionsDropdown({
   };
 
   const handleCopyLink = async () => {
-    const url = `${window.location.origin}/${locale}/spaces/${space.id}`;
+    const url = `${window.location.origin}${getPathname({ href: `/@${space.share_key}`, locale })}`;
     try {
       await navigator.clipboard.writeText(url);
       toast.success(t("copyLinkSuccess"));
     } catch (error) {
       console.error("Failed to copy:", error);
-      toast.error("Failed to copy link");
+      toast.error(t("copyLinkError"));
     }
   };
 
   const handleOpenPublicView = () => {
-    const url = `/${locale}/spaces/${space.id}`;
+    const url = getPathname({ href: `/@${space.share_key}`, locale });
     window.open(url, "_blank");
   };
 
