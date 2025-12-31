@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Toaster } from "@/components/ui/sonner";
 import { createClient } from "@/lib/supabase/server";
 import { BingoGameManager } from "./_components/bingo-game-manager";
 import { CloseSpaceButton } from "./_components/close-space-button";
@@ -43,7 +42,6 @@ export default async function AdminSpacePage({ params }: Props) {
 
   return (
     <div className="min-h-screen p-8">
-      <Toaster />
       <h1 className="mb-8 font-bold text-3xl">{t("heading")}</h1>
 
       <div className="mx-auto max-w-3xl space-y-8">

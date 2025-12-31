@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useConfirm } from "@/components/providers/confirm-provider";
 import { banUser } from "../actions";
 
 interface User {
@@ -20,13 +22,17 @@ interface UserListProps {
 
 export function UserList({ initialUsers }: UserListProps) {
   const t = useTranslations("Admin");
+  const confirm = useConfirm();
   const [users, setUsers] = useState(initialUsers);
   const [banning, setBanning] = useState<string | null>(null);
 
   const handleBan = async (userId: string, userEmail: string | null) => {
     if (
-      // biome-ignore lint/suspicious/noAlert: Admin panel using simple confirmation dialog
-      !confirm(t("banConfirm", { email: userEmail || userId }))
+      !(await confirm({
+        description: t("banConfirm", { email: userEmail || userId }),
+        title: t("banAction"),
+        variant: "destructive",
+      }))
     ) {
       return;
     }
@@ -36,11 +42,9 @@ export function UserList({ initialUsers }: UserListProps) {
 
     if (result.success) {
       setUsers((prev) => prev.filter((user) => user.id !== userId));
-      // biome-ignore lint/suspicious/noAlert: Admin panel using simple notification
-      alert(t("banSuccess"));
+      toast.success(t("banSuccess"));
     } else {
-      // biome-ignore lint/suspicious/noAlert: Admin panel using simple error notification
-      alert(t(result.error || "errorGeneric"));
+      toast.error(t(result.error || "errorGeneric"));
     }
 
     setBanning(null);
