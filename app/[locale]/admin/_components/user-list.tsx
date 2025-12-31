@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
+import { Button } from "@/components/ui/button";
 import { banUser } from "../actions";
 
 interface User {
@@ -123,16 +124,17 @@ export function UserList({ initialUsers }: UserListProps) {
                   {user.role === "admin" ? (
                     <span className="text-gray-400">{t("roleAdmin")}</span>
                   ) : (
-                    <button
-                      className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                    <Button
                       disabled={banning === user.id}
                       onClick={() => handleBan(user.id, user.email)}
+                      size="sm"
                       type="button"
+                      variant="destructive"
                     >
                       {banning === user.id
                         ? t("banInProgress")
                         : t("banAction")}
-                    </button>
+                    </Button>
                   )}
                 </td>
               </tr>

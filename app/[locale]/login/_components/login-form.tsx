@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   buildOAuthCallbackUrl,
   GOOGLE_OAUTH_SCOPES,
@@ -61,12 +62,13 @@ export function LoginForm() {
       )}
 
       <div className="space-y-3">
-        <button
+        <Button
           aria-label={t("googleButton")}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full"
           disabled={isLoading}
           onClick={() => handleOAuthLogin("google")}
           type="button"
+          variant="outline"
         >
           {isLoading ? (
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
@@ -92,11 +94,11 @@ export function LoginForm() {
             </svg>
           )}
           {t("googleButton")}
-        </button>
+        </Button>
 
-        <button
+        <Button
           aria-label={t("twitchButton")}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-twitch px-6 py-3 font-medium text-white transition hover:bg-twitch-hover disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full bg-twitch hover:bg-twitch-hover"
           disabled={isLoading}
           onClick={() => handleOAuthLogin("twitch")}
           type="button"
@@ -110,7 +112,7 @@ export function LoginForm() {
             </svg>
           )}
           {t("twitchButton")}
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
+import { Button } from "@/components/ui/button";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
@@ -158,26 +159,26 @@ export function BingoGameManager({ spaceId }: Props) {
         <h2 className="mb-4 font-semibold text-xl">{t("bingoGameManager")}</h2>
 
         <div className="mb-4 flex gap-3">
-          <button
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          <Button
+            className="flex-1"
             disabled={isCalling || isResetting || calledValuesSet.size >= 75}
             onClick={handleCallNumber}
             type="button"
           >
             {isCalling ? t("calling") : t("callNumberButton")}
-          </button>
+          </Button>
 
-          <button
-            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          <Button
             disabled={isResetting || isCalling}
             onClick={handleResetGame}
             type="button"
+            variant="outline"
           >
             <RefreshCw
               className={`h-4 w-4 ${isResetting ? "animate-spin" : ""}`}
             />
             {t("resetGameButton")}
-          </button>
+          </Button>
         </div>
 
         <div className="text-gray-600 text-sm">
