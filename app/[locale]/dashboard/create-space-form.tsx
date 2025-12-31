@@ -121,9 +121,11 @@ export function CreateSpaceForm() {
               <Dices className="h-4 w-4" />
             </InputGroupButton>
           </InputGroupAddon>
-          <InputGroupText className="rounded-lg rounded-l-none">
-            -{dateSuffix}
-          </InputGroupText>
+          <InputGroupAddon align="inline-end">
+            <InputGroupText className="rounded-lg rounded-l-none">
+              -{dateSuffix}
+            </InputGroupText>
+          </InputGroupAddon>
         </InputGroup>
 
         <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 p-3">

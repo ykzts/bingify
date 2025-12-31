@@ -282,28 +282,30 @@ export function SpaceSettingsForm({
                 <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
                 <Input
                   disabled={isPending}
-              max={systemMaxParticipants}
-              min={Math.max(1, currentParticipantCount)}
-              name="max_participants"
-              onChange={(e) => {
-                const value = e.target.valueAsNumber;
-                setMaxParticipants(Number.isNaN(value) ? 50 : value);
-              }}
-              required
-              type="number"
-              value={maxParticipants}
-            />
-            <FieldError>{updateState.fieldErrors?.max_participants}</FieldError>
-            <FieldDescription>
-              {t("maxParticipantsHelp", {
-                current: currentParticipantCount,
-                max: systemMaxParticipants,
-              })}
-            </FieldDescription>
-          </FieldContent>
-        </Field>
-      </FieldGroup>
-    </FieldSet>
+                  max={systemMaxParticipants}
+                  min={Math.max(1, currentParticipantCount)}
+                  name="max_participants"
+                  onChange={(e) => {
+                    const value = e.target.valueAsNumber;
+                    setMaxParticipants(Number.isNaN(value) ? 50 : value);
+                  }}
+                  required
+                  type="number"
+                  value={maxParticipants}
+                />
+                <FieldError>
+                  {updateState.fieldErrors?.max_participants}
+                </FieldError>
+                <FieldDescription>
+                  {t("maxParticipantsHelp", {
+                    current: currentParticipantCount,
+                    max: systemMaxParticipants,
+                  })}
+                </FieldDescription>
+              </FieldContent>
+            </Field>
+          </FieldGroup>
+        </FieldSet>
 
         {/* Gatekeeper Rules with Tabs */}
         <div className="space-y-4">
@@ -431,7 +433,9 @@ export function SpaceSettingsForm({
                           <Input
                             disabled={isPending}
                             name="youtube_channel_id"
-                            onChange={(e) => setYoutubeChannelId(e.target.value)}
+                            onChange={(e) =>
+                              setYoutubeChannelId(e.target.value)
+                            }
                             placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
                             required={youtubeRequirement !== "none"}
                             type="text"
@@ -484,7 +488,9 @@ export function SpaceSettingsForm({
                     {twitchRequirement !== "none" && (
                       <Field>
                         <FieldContent>
-                          <FieldLabel>{t("twitchBroadcasterIdLabel")}</FieldLabel>
+                          <FieldLabel>
+                            {t("twitchBroadcasterIdLabel")}
+                          </FieldLabel>
                           <Input
                             disabled={isPending}
                             name="twitch_broadcaster_id"
@@ -528,7 +534,9 @@ export function SpaceSettingsForm({
                     <FieldError>
                       {updateState.fieldErrors?.email_allowlist}
                     </FieldError>
-                    <FieldDescription>{t("emailAllowlistHelp")}</FieldDescription>
+                    <FieldDescription>
+                      {t("emailAllowlistHelp")}
+                    </FieldDescription>
                   </FieldContent>
                 </Field>
               </TabsContent>
