@@ -18,6 +18,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import type { SystemFeatures } from "@/lib/types/settings";
+import { cn } from "@/lib/utils";
 import type { PublishSpaceState, UpdateSpaceState } from "../actions";
 import { publishSpace, updateSpaceSettings } from "../actions";
 
@@ -187,29 +188,24 @@ export function SpaceSettingsForm({
     features.gatekeeper.twitch.enabled || isTwitchConfigured;
   const showSocialOption = showYoutubeOption || showTwitchOption;
 
-  // Auto-switch gatekeeper mode if current mode is not available
-  useEffect(() => {
-    if (gatekeeperMode === "social" && !showSocialOption) {
-      setGatekeeperMode("none");
-    } else if (gatekeeperMode === "email" && !showEmailOption) {
-      setGatekeeperMode("none");
-    }
-  }, [gatekeeperMode, showSocialOption, showEmailOption]);
+  // Calculate effective gatekeeper mode (fallback to "none" if current mode is not available)
+  const effectiveGatekeeperMode =
+    (gatekeeperMode === "social" && !showSocialOption) ||
+    (gatekeeperMode === "email" && !showEmailOption)
+      ? "none"
+      : gatekeeperMode;
 
-  // Auto-switch social platform if current platform is not available
-  useEffect(() => {
-    if (socialPlatform === "youtube" && !showYoutubeOption) {
-      if (showTwitchOption) {
-        setSocialPlatform("twitch");
-      }
-    } else if (
-      socialPlatform === "twitch" &&
-      !showTwitchOption &&
-      showYoutubeOption
-    ) {
-      setSocialPlatform("youtube");
-    }
-  }, [socialPlatform, showYoutubeOption, showTwitchOption]);
+  // Calculate effective social platform (fallback to available option)
+  let effectiveSocialPlatform = socialPlatform;
+  if (socialPlatform === "youtube" && !showYoutubeOption && showTwitchOption) {
+    effectiveSocialPlatform = "twitch";
+  } else if (
+    socialPlatform === "twitch" &&
+    !showTwitchOption &&
+    showYoutubeOption
+  ) {
+    effectiveSocialPlatform = "youtube";
+  }
 
   const isDraft = space.status === "draft";
   const isPending = isUpdating || isPublishing;
@@ -317,16 +313,20 @@ export function SpaceSettingsForm({
           <h2 className="font-semibold text-lg">{t("gatekeeperTitle")}</h2>
 
           {/* Hidden input for gatekeeper_mode */}
-          <input name="gatekeeper_mode" type="hidden" value={gatekeeperMode} />
+          <input
+            name="gatekeeper_mode"
+            type="hidden"
+            value={effectiveGatekeeperMode}
+          />
 
           <Tabs
-            defaultValue={gatekeeperMode}
+            defaultValue={effectiveGatekeeperMode}
             onValueChange={(value) =>
               setGatekeeperMode(value as "none" | "social" | "email")
             }
-            value={gatekeeperMode}
+            value={effectiveGatekeeperMode}
           >
-            <TabsList className={`grid w-full ${gridColsClass}`}>
+            <TabsList className={cn("grid w-full", gridColsClass)}>
               <TabsTrigger value="none">{t("gatekeeperModeNone")}</TabsTrigger>
               {showSocialOption && (
                 <TabsTrigger value="social">
@@ -358,7 +358,7 @@ export function SpaceSettingsForm({
                 <input
                   name="social_platform"
                   type="hidden"
-                  value={socialPlatform}
+                  value={effectiveSocialPlatform}
                 />
 
                 <div>
@@ -368,7 +368,7 @@ export function SpaceSettingsForm({
                     onValueChange={(value) =>
                       setSocialPlatform(value as "youtube" | "twitch")
                     }
-                    value={socialPlatform}
+                    value={effectiveSocialPlatform}
                   >
                     {showYoutubeOption && (
                       <div className="flex items-center space-x-2">
@@ -396,7 +396,7 @@ export function SpaceSettingsForm({
                 </div>
 
                 {/* YouTube Settings */}
-                {socialPlatform === "youtube" && showYoutubeOption && (
+                {effectiveSocialPlatform === "youtube" && showYoutubeOption && (
                   <>
                     <div>
                       <Label className="mb-2" htmlFor="youtube_requirement">
@@ -453,7 +453,7 @@ export function SpaceSettingsForm({
                 )}
 
                 {/* Twitch Settings */}
-                {socialPlatform === "twitch" && showTwitchOption && (
+                {effectiveSocialPlatform === "twitch" && showTwitchOption && (
                   <>
                     <div>
                       <Label className="mb-2" htmlFor="twitch_requirement">
@@ -550,7 +550,7 @@ export function SpaceSettingsForm({
           </Tabs>
 
           {/* Hidden inputs for non-selected modes and platforms */}
-          {gatekeeperMode !== "social" && (
+          {effectiveGatekeeperMode !== "social" && (
             <>
               <input name="youtube_requirement" type="hidden" value="none" />
               <input name="youtube_channel_id" type="hidden" value="" />
@@ -558,19 +558,21 @@ export function SpaceSettingsForm({
               <input name="twitch_broadcaster_id" type="hidden" value="" />
             </>
           )}
-          {gatekeeperMode === "social" && socialPlatform === "twitch" && (
-            <>
-              <input name="youtube_requirement" type="hidden" value="none" />
-              <input name="youtube_channel_id" type="hidden" value="" />
-            </>
-          )}
-          {gatekeeperMode === "social" && socialPlatform === "youtube" && (
-            <>
-              <input name="twitch_requirement" type="hidden" value="none" />
-              <input name="twitch_broadcaster_id" type="hidden" value="" />
-            </>
-          )}
-          {gatekeeperMode !== "email" && (
+          {effectiveGatekeeperMode === "social" &&
+            effectiveSocialPlatform === "twitch" && (
+              <>
+                <input name="youtube_requirement" type="hidden" value="none" />
+                <input name="youtube_channel_id" type="hidden" value="" />
+              </>
+            )}
+          {effectiveGatekeeperMode === "social" &&
+            effectiveSocialPlatform === "youtube" && (
+              <>
+                <input name="twitch_requirement" type="hidden" value="none" />
+                <input name="twitch_broadcaster_id" type="hidden" value="" />
+              </>
+            )}
+          {effectiveGatekeeperMode !== "email" && (
             <input name="email_allowlist" type="hidden" value="" />
           )}
         </div>
