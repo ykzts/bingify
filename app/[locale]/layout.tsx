@@ -9,6 +9,7 @@ import {
 import { ConfirmProvider } from "@/components/providers/confirm-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
+import { getAbsoluteUrl } from "@/lib/utils/url";
 import { Footer } from "./_components/footer";
 import { HeaderMenuWrapper } from "./_components/header-menu-wrapper";
 
@@ -30,6 +31,7 @@ export async function generateMetadata({
 
   return {
     description: t("description"),
+    metadataBase: new URL(getAbsoluteUrl()),
     title: {
       default: t("title"),
       template: "%s | Bingify",

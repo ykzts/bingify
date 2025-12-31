@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getAbsoluteUrl } from "@/lib/utils/url";
 import { regenerateViewToken } from "../../../actions";
 
 interface Props {
@@ -45,7 +46,7 @@ export function ViewingUrlDialog({ locale, spaceId, viewToken }: Props) {
 
   // Build URL with query parameters
   const buildUrl = () => {
-    const baseUrl = `${window.location.origin}/${locale}/screen/${currentToken}`;
+    const baseUrl = getAbsoluteUrl(`/${locale}/screen/${currentToken}`);
     const params = new URLSearchParams();
 
     if (mode !== "full") {

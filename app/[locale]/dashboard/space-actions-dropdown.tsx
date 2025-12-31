@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "@/i18n/navigation";
+import { getAbsoluteUrl } from "@/lib/utils/url";
 import type { UserSpace } from "./actions";
 import { deleteSpace } from "./actions";
 
@@ -47,7 +48,7 @@ export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
   };
 
   const handleCopyLink = async () => {
-    const url = `${window.location.origin}/@${space.share_key}`;
+    const url = getAbsoluteUrl(`/@${space.share_key}`);
     try {
       await navigator.clipboard.writeText(url);
       toast.success(t("copyLinkSuccess"));
