@@ -399,9 +399,27 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
 
+    // Get participant counts for all spaces
+    // Note: Fetching actual data instead of using count to avoid RLS recursion issues
+    const spacesWithCounts = await Promise.all(
+      allSpaces.map(async (space) => {
+        const { data: participantsData } = await supabase
+          .from("participants")
+          .select("id")
+          .eq("space_id", space.id);
+
+        return {
+          ...space,
+          participant_count: participantsData?.length ?? 0,
+        };
+      })
+    );
+
     // Find active space (excluding draft)
     let activeSpace: UserSpace | null = null;
-    const allActiveSpaces = allSpaces.filter((s) => s.status === "active");
+    const allActiveSpaces = spacesWithCounts.filter(
+      (s) => s.status === "active"
+    );
     const activeSpaceData = allActiveSpaces[0] ?? null;
 
     if (allActiveSpaces.length > 1) {
@@ -412,24 +430,12 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
     }
 
     if (activeSpaceData) {
-      // Get participant count
-      // Note: Fetching actual data instead of using count to avoid RLS recursion issues
-      const { data: participantsData } = await supabase
-        .from("participants")
-        .select("id")
-        .eq("space_id", activeSpaceData.id);
-
-      const count = participantsData?.length ?? 0;
-
-      activeSpace = {
-        ...activeSpaceData,
-        participant_count: count || 0,
-      };
+      activeSpace = activeSpaceData;
     }
 
     return {
       activeSpace,
-      spaces: allSpaces,
+      spaces: spacesWithCounts,
     };
   } catch (error) {
     console.error("Error in getUserSpaces:", error);
@@ -437,6 +443,54 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       activeSpace: null,
       error: "An unexpected error occurred",
       spaces: [],
+    };
+  }
+}
+
+export interface DeleteSpaceResult {
+  error?: string;
+  success: boolean;
+}
+
+export async function deleteSpace(spaceId: string): Promise<DeleteSpaceResult> {
+  try {
+    const supabase = await createClient();
+
+    // Get current user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "Authentication required",
+        success: false,
+      };
+    }
+
+    // Delete the space (RLS policy ensures only owner can delete)
+    const { error } = await supabase
+      .from("spaces")
+      .delete()
+      .eq("id", spaceId)
+      .eq("owner_id", user.id);
+
+    if (error) {
+      console.error("Database error:", error);
+      return {
+        error: "Failed to delete space",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error deleting space:", error);
+    return {
+      error: "An unexpected error occurred",
+      success: false,
     };
   }
 }
