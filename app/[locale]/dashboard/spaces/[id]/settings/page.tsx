@@ -59,9 +59,17 @@ export default async function SpaceSettingsPage({ params }: Props) {
   // Get system settings
   const { data: systemSettings } = await supabase
     .from("system_settings")
-    .select("max_participants_per_space")
+    .select("features, max_participants_per_space")
     .eq("id", 1)
     .single();
+
+  const features = systemSettings?.features || {
+    gatekeeper: {
+      email: { enabled: true },
+      twitch: { enabled: true },
+      youtube: { enabled: true },
+    },
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -84,6 +92,7 @@ export default async function SpaceSettingsPage({ params }: Props) {
         <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
           <SpaceSettingsForm
             currentParticipantCount={participantCount || 0}
+            features={features}
             locale={locale}
             space={space}
             systemMaxParticipants={
