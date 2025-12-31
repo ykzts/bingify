@@ -5,6 +5,7 @@ import {
   type ReactNode,
   useCallback,
   useContext,
+  useRef,
   useState,
 } from "react";
 import {
@@ -32,9 +33,7 @@ const ConfirmContext = createContext<ConfirmContextType | undefined>(undefined);
 
 export function ConfirmProvider({ children }: { children: ReactNode }) {
   const [options, setOptions] = useState<ConfirmOptions | null>(null);
-  const [resolveRef, setResolveRef] = useState<
-    ((value: boolean) => void) | null
-  >(null);
+  const resolveRef = useRef<((value: boolean) => void) | null>(null);
 
   const confirm = useCallback((opts: ConfirmOptions) => {
     return new Promise<boolean>((resolve) => {
@@ -46,15 +45,15 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
         variant: "default",
         ...opts,
       });
-      setResolveRef(() => resolve);
+      resolveRef.current = resolve;
     });
   }, []);
 
   const handleClose = (value: boolean) => {
     setOptions(null);
-    if (resolveRef) {
-      resolveRef(value);
-      setResolveRef(null);
+    if (resolveRef.current) {
+      resolveRef.current(value);
+      resolveRef.current = null;
     }
   };
 
@@ -62,7 +61,14 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
     <ConfirmContext.Provider value={confirm}>
       {children}
       {options && (
-        <AlertDialog onOpenChange={() => handleClose(false)} open={true}>
+        <AlertDialog
+          onOpenChange={(open) => {
+            if (!open) {
+              handleClose(false);
+            }
+          }}
+          open={true}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>{options.title}</AlertDialogTitle>
