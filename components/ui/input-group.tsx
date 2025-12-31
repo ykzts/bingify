@@ -4,12 +4,23 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "./input";
 
-const InputGroup = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("flex items-center", className)} {...props} />
-));
+interface InputGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+  relative?: boolean;
+}
+
+const InputGroup = React.forwardRef<HTMLDivElement, InputGroupProps>(
+  ({ className, relative = false, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        "flex items-center",
+        relative && "relative",
+        className
+      )}
+      {...props}
+    />
+  )
+);
 InputGroup.displayName = "InputGroup";
 
 const InputGroupInput = React.forwardRef<
