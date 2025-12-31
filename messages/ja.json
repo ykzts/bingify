@@ -170,7 +170,8 @@
     "historyDetails": "詳細",
     "historyNoSpaces": "まだスペースを作成していません",
     "historySpaceName": "スペース名",
-    "historyTitle": "過去の履歴"
+    "historyTitle": "過去の履歴",
+    "adminBadge": "管理者"
   },
   "Errors": {
     "authRequired": "認証が必要です",

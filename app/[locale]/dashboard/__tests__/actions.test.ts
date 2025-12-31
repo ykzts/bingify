@@ -44,6 +44,22 @@ describe("Dashboard Actions", () => {
                     error: null,
                   }),
                 }),
+                in: vi.fn().mockResolvedValue({
+                  data: [],
+                  error: null,
+                }),
+              }),
+            };
+          }
+          if (table === "space_roles") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockResolvedValue({
+                    data: [],
+                    error: null,
+                  }),
+                }),
               }),
             };
           }
@@ -145,15 +161,31 @@ describe("Dashboard Actions", () => {
             data: { user: { id: userId } },
           }),
         },
-        from: vi.fn().mockReturnValue({
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              order: vi.fn().mockResolvedValue({
-                data: mockSpaces,
-                error: null,
+        from: vi.fn().mockImplementation((table: string) => {
+          if (table === "spaces") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  order: vi.fn().mockResolvedValue({
+                    data: mockSpaces,
+                    error: null,
+                  }),
+                }),
               }),
-            }),
-          }),
+            };
+          }
+          if (table === "space_roles") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockResolvedValue({
+                    data: [],
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
         }),
       };
 
@@ -206,6 +238,18 @@ describe("Dashboard Actions", () => {
               }),
             };
           }
+          if (table === "space_roles") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockResolvedValue({
+                    data: [],
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
           if (table === "participants") {
             return {
               select: vi.fn().mockReturnValue({
@@ -241,15 +285,31 @@ describe("Dashboard Actions", () => {
             data: { user: { id: userId } },
           }),
         },
-        from: vi.fn().mockReturnValue({
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              order: vi.fn().mockResolvedValue({
-                data: [],
-                error: null,
+        from: vi.fn().mockImplementation((table: string) => {
+          if (table === "spaces") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  order: vi.fn().mockResolvedValue({
+                    data: [],
+                    error: null,
+                  }),
+                }),
               }),
-            }),
-          }),
+            };
+          }
+          if (table === "space_roles") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockResolvedValue({
+                    data: [],
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
         }),
       };
 

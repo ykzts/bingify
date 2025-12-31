@@ -619,19 +619,11 @@ export async function getSpaceAdmins(
       };
     }
 
-    // Get all admins with their profile info
+    // Get all admins with their profile info - split into two queries
+    // Step 1: Get space_roles for this space
     const { data: roles, error: rolesError } = await supabase
       .from("space_roles")
-      .select(
-        `
-        user_id,
-        profiles:user_id (
-          email,
-          full_name,
-          avatar_url
-        )
-      `
-      )
+      .select("user_id")
       .eq("space_id", spaceId)
       .eq("role", "admin");
 
@@ -643,22 +635,35 @@ export async function getSpaceAdmins(
       };
     }
 
-    // Transform the data
-    interface ProfileData {
+    // Step 2: Fetch profiles for the user_ids
+    const userIds = (roles || []).map((role) => role.user_id);
+    let profiles: Array<{
       avatar_url: string | null;
       email: string | null;
       full_name: string | null;
+      id: string;
+    }> = [];
+
+    if (userIds.length > 0) {
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, email, full_name, avatar_url")
+        .in("id", userIds);
+
+      if (profilesError) {
+        console.error("Error fetching profiles:", profilesError);
+        return {
+          admins: [],
+          error: "管理者情報の取得に失敗しました",
+        };
+      }
+
+      profiles = profilesData || [];
     }
 
-    interface RoleWithProfile {
-      profiles: ProfileData | ProfileData[] | null;
-      user_id: string;
-    }
-
-    const admins: SpaceAdmin[] = (roles || []).map((role: RoleWithProfile) => {
-      const profile = Array.isArray(role.profiles)
-        ? role.profiles[0]
-        : role.profiles;
+    // Transform the data - merge roles with profiles
+    const admins: SpaceAdmin[] = (roles || []).map((role) => {
+      const profile = profiles.find((p) => p.id === role.user_id);
       return {
         avatar_url: profile?.avatar_url || null,
         email: profile?.email || null,

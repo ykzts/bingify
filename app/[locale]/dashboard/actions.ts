@@ -331,25 +331,38 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       };
     }
 
-    // Fetch spaces where user is admin
+    // Fetch spaces where user is admin - split into two queries
+    // Step 1: Get space_ids where user is admin
     const { data: adminRoles, error: adminError } = await supabase
       .from("space_roles")
-      .select(
-        `
-        space_id,
-        spaces:space_id (
-          id,
-          share_key,
-          status,
-          created_at
-        )
-      `
-      )
+      .select("space_id")
       .eq("user_id", user.id)
       .eq("role", "admin");
 
     if (adminError) {
-      console.error("Error fetching admin spaces:", adminError);
+      console.error("Error fetching admin roles:", adminError);
+    }
+
+    // Step 2: Fetch the actual space records
+    const spaceIds = (adminRoles || []).map((role) => role.space_id);
+    let adminSpacesData: Array<{
+      created_at: string;
+      id: string;
+      share_key: string;
+      status: string;
+    }> = [];
+
+    if (spaceIds.length > 0) {
+      const { data: fetchedSpaces, error: spacesError } = await supabase
+        .from("spaces")
+        .select("id, share_key, status, created_at")
+        .in("id", spaceIds);
+
+      if (spacesError) {
+        console.error("Error fetching admin spaces:", spacesError);
+      } else {
+        adminSpacesData = fetchedSpaces || [];
+      }
     }
 
     // Combine owned and admin spaces
@@ -358,33 +371,13 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       is_owner: true,
     }));
 
-    interface SpaceData {
-      created_at: string;
-      id: string;
-      share_key: string;
-      status: string;
-    }
-
-    interface RoleWithSpace {
-      space_id: string;
-      spaces: SpaceData | SpaceData[] | null;
-    }
-
-    const adminSpaces: UserSpace[] = (adminRoles || [])
-      .map((role: RoleWithSpace): UserSpace | null => {
-        const space = Array.isArray(role.spaces) ? role.spaces[0] : role.spaces;
-        if (!space) {
-          return null;
-        }
-        return {
-          created_at: space.created_at,
-          id: space.id,
-          is_owner: false,
-          share_key: space.share_key,
-          status: space.status,
-        };
-      })
-      .filter((s): s is UserSpace => s !== null);
+    const adminSpaces: UserSpace[] = adminSpacesData.map((space) => ({
+      created_at: space.created_at,
+      id: space.id,
+      is_owner: false,
+      share_key: space.share_key,
+      status: space.status,
+    }));
 
     // Combine and deduplicate (in case user is both owner and admin somehow)
     const spaceMap = new Map<string, UserSpace>();

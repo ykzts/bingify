@@ -129,7 +129,7 @@ export default async function DashboardPage({ params }: Props) {
                         {space.share_key}
                         {space.is_owner === false && (
                           <span className="rounded bg-blue-100 px-2 py-0.5 text-blue-800 text-xs">
-                            管理者
+                            {t("adminBadge")}
                           </span>
                         )}
                       </div>
