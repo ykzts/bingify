@@ -57,6 +57,7 @@ export function SpaceActionsDropdown({
       toast.success(t("copyLinkSuccess"));
     } catch (error) {
       console.error("Failed to copy:", error);
+      toast.error("Failed to copy link");
     }
   };
 
@@ -85,7 +86,7 @@ export function SpaceActionsDropdown({
   };
 
   const handleReopen = () => {
-    // Navigate to the space management page where they can reopen
+    // Navigate to the space settings page where user can change status from closed to draft/active
     router.push(`/${locale}/dashboard/spaces/${space.id}`);
   };
 

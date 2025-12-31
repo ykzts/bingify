@@ -425,7 +425,7 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
     // Add participant counts to spaces
     const spacesWithCounts = allSpaces.map((space) => ({
       ...space,
-      participant_count: participantCounts[space.id] || 0,
+      participant_count: participantCounts[space.id] ?? 0,
     }));
 
     // Find active space (excluding draft)
