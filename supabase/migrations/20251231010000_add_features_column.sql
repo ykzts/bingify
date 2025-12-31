@@ -8,7 +8,9 @@ ADD COLUMN features JSONB NOT NULL DEFAULT '{
   }
 }'::jsonb;
 
--- Update the get_system_settings function to include features
+-- Drop and recreate the get_system_settings function to include features
+DROP FUNCTION IF EXISTS get_system_settings();
+
 CREATE OR REPLACE FUNCTION get_system_settings()
 RETURNS TABLE (
   max_participants_per_space INTEGER,
