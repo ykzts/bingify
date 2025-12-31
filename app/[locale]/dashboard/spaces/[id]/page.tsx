@@ -68,73 +68,69 @@ export default async function AdminSpacePage({ params }: Props) {
   };
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="mx-auto max-w-3xl space-y-8">
-        {/* Header with Action Buttons */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-bold text-3xl">{t("heading")}</h1>
-            <p className="mt-1 text-gray-600">
-              {t("spaceId")}: {space.share_key}
-            </p>
+    <div className="mx-auto min-h-screen max-w-3xl space-y-8 p-8">
+      {/* Header with Action Buttons */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-bold text-3xl">{t("heading")}</h1>
+          <p className="mt-1 text-gray-600">
+            {t("spaceId")}: {space.share_key}
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <ViewingUrlDialog
+            locale={locale}
+            spaceId={space.id}
+            viewToken={space.view_token}
+          />
+          <SpaceSettingsSheet
+            currentParticipantCount={participantCount}
+            features={features}
+            isOwner={isOwner}
+            locale={locale}
+            space={space}
+            systemMaxParticipants={
+              systemSettings?.max_participants_per_space || 1000
+            }
+          />
+        </div>
+      </div>
+      {/* Main Content Area - Status-based rendering */}
+      {space.status === "draft" && (
+        <DraftStatusView locale={locale} spaceId={space.id} />
+      )}
+
+      {space.status === "active" && (
+        <>
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <BingoGameManager spaceId={space.id} />
           </div>
-          <div className="flex gap-3">
-            <ViewingUrlDialog
-              locale={locale}
-              spaceId={space.id}
-              viewToken={space.view_token}
-            />
-            <SpaceSettingsSheet
-              currentParticipantCount={participantCount}
-              features={features}
-              isOwner={isOwner}
-              locale={locale}
-              space={space}
-              systemMaxParticipants={
-                systemSettings?.max_participants_per_space || 1000
-              }
-            />
+
+          <ParticipantsStatus
+            maxParticipants={space.max_participants}
+            spaceId={space.id}
+          />
+
+          <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
+            <h2 className="mb-4 font-semibold text-xl">
+              {t("closeSpaceTitle")}
+            </h2>
+            <p className="mb-4 text-gray-700 text-sm">
+              {t("closeSpaceDescription")}
+            </p>
+            <CloseSpaceButton spaceId={space.id} />
+          </div>
+        </>
+      )}
+
+      {space.status === "closed" && (
+        <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+          <div className="text-center">
+            <h2 className="mb-2 font-bold text-2xl">{t("closeSpaceTitle")}</h2>
+            <p className="text-gray-600">{t("closeSpaceDescription")}</p>
           </div>
         </div>
-        {/* Main Content Area - Status-based rendering */}
-        {space.status === "draft" && (
-          <DraftStatusView locale={locale} spaceId={space.id} />
-        )}
-
-        {space.status === "active" && (
-          <>
-            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-              <BingoGameManager spaceId={space.id} />
-            </div>
-
-            <ParticipantsStatus
-              maxParticipants={space.max_participants}
-              spaceId={space.id}
-            />
-
-            <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
-              <h2 className="mb-4 font-semibold text-xl">
-                {t("closeSpaceTitle")}
-              </h2>
-              <p className="mb-4 text-gray-700 text-sm">
-                {t("closeSpaceDescription")}
-              </p>
-              <CloseSpaceButton spaceId={space.id} />
-            </div>
-          </>
-        )}
-
-        {space.status === "closed" && (
-          <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
-            <div className="text-center">
-              <h2 className="mb-2 font-bold text-2xl">
-                {t("closeSpaceTitle")}
-              </h2>
-              <p className="text-gray-600">{t("closeSpaceDescription")}</p>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
