@@ -21,13 +21,18 @@ export default async function Home({ params }: Props) {
 
   // Fetch system settings to get the actual max participants value
   const supabase = await createClient();
-  const { data: systemSettings } = await supabase
+  const { data: systemSettings, error } = await supabase
     .from("system_settings")
     .select("max_participants_per_space")
     .eq("id", 1)
     .single();
 
+  // Fall back to default value if query fails or returns no data
   const maxParticipants = systemSettings?.max_participants_per_space ?? 50;
+
+  if (error) {
+    console.error("Failed to fetch system settings:", error);
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background font-sans">
