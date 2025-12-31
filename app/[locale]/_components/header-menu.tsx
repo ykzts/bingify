@@ -1,6 +1,13 @@
 "use client";
 
-import { Globe, LayoutDashboard, LogOut, Settings, Shield, User } from "lucide-react";
+import {
+  Globe,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  Shield,
+  User,
+} from "lucide-react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
