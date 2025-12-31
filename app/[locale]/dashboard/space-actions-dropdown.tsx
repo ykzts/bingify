@@ -28,7 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getPathname, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import type { UserSpace } from "./actions";
 import { deleteSpace } from "./actions";
 
@@ -51,7 +51,7 @@ export function SpaceActionsDropdown({
   };
 
   const handleCopyLink = async () => {
-    const url = `${window.location.origin}${getPathname({ href: `/@${space.share_key}`, locale })}`;
+    const url = `${window.location.origin}/@${space.share_key}`;
     try {
       await navigator.clipboard.writeText(url);
       toast.success(t("copyLinkSuccess"));
@@ -62,7 +62,7 @@ export function SpaceActionsDropdown({
   };
 
   const handleOpenPublicView = () => {
-    const url = getPathname({ href: `/@${space.share_key}`, locale });
+    const url = `/@${space.share_key}`;
     window.open(url, "_blank");
   };
 
