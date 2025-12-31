@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -59,16 +60,16 @@ export function UserHeader({ user }: UserHeaderProps) {
         <Settings className="h-4 w-4" />
         {t("settings")}
       </Link>
-      <button
+      <Button
         aria-label={t("logout")}
-        className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
         disabled={isLoggingOut}
         onClick={handleLogout}
         type="button"
+        variant="outline"
       >
         <LogOut className="h-4 w-4" />
         {t("logout")}
-      </button>
+      </Button>
     </div>
   );
 }

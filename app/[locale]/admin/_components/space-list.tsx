@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
+import { Button } from "@/components/ui/button";
 import { forceDeleteSpace } from "../actions";
 
 interface Space {
@@ -117,16 +118,17 @@ export function SpaceList({ initialSpaces }: SpaceListProps) {
                     : "N/A"}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm">
-                  <button
-                    className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                  <Button
                     disabled={deleting === space.id}
                     onClick={() => handleDelete(space.id)}
+                    size="sm"
                     type="button"
+                    variant="destructive"
                   >
                     {deleting === space.id
                       ? t("deleteInProgress")
                       : t("deleteAction")}
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))

@@ -4,6 +4,7 @@ import { Copy, RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useConfirm } from "@/components/providers/confirm-provider";
+import { Button } from "@/components/ui/button";
 import { regenerateViewToken } from "../../../actions";
 
 interface Props {
@@ -89,28 +90,24 @@ export function ViewingUrlManager({ locale, spaceId, viewToken }: Props) {
             readOnly
             value={viewingUrl}
           />
-          <button
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-blue-700"
-            onClick={handleCopyUrl}
-            type="button"
-          >
+          <Button onClick={handleCopyUrl} type="button">
             <Copy className="h-4 w-4" />
             {t("copyUrlButton")}
-          </button>
+          </Button>
         </div>
       </div>
 
-      <button
-        className="flex items-center gap-2 rounded-lg border border-red-300 bg-white px-4 py-2 font-medium text-red-600 text-sm transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+      <Button
         disabled={isRegenerating}
         onClick={handleRegenerateUrl}
         type="button"
+        variant="outline"
       >
         <RefreshCw
           className={`h-4 w-4 ${isRegenerating ? "animate-spin" : ""}`}
         />
         {t("regenerateUrlButton")}
-      </button>
+      </Button>
 
       {message && (
         <div

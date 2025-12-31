@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useEffectEvent, useState } from "react";
+import { Button } from "@/components/ui/button";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
@@ -292,84 +293,60 @@ export function ScreenDisplay({
             <div>
               <p className="mb-1 text-gray-400">{t("displayMode")}</p>
               <div className="flex gap-2">
-                <button
-                  className={cn(
-                    "rounded px-2 py-1 transition",
-                    mode === "full"
-                      ? "bg-blue-600"
-                      : "bg-gray-700 hover:bg-gray-600"
-                  )}
+                <Button
                   onClick={() => setMode("full")}
+                  size="sm"
                   type="button"
+                  variant={mode === "full" ? "default" : "outline"}
                 >
                   {t("modeFull")}
-                </button>
-                <button
-                  className={cn(
-                    "rounded px-2 py-1 transition",
-                    mode === "minimal"
-                      ? "bg-blue-600"
-                      : "bg-gray-700 hover:bg-gray-600"
-                  )}
+                </Button>
+                <Button
                   onClick={() => setMode("minimal")}
+                  size="sm"
                   type="button"
+                  variant={mode === "minimal" ? "default" : "outline"}
                 >
                   {t("modeMinimal")}
-                </button>
+                </Button>
               </div>
             </div>
 
             <div>
               <p className="mb-1 text-gray-400">{t("background")}</p>
               <div className="grid grid-cols-2 gap-2">
-                <button
-                  className={cn(
-                    "rounded px-2 py-1 transition",
-                    background === "default"
-                      ? "bg-blue-600"
-                      : "bg-gray-700 hover:bg-gray-600"
-                  )}
+                <Button
                   onClick={() => setBackground("default")}
+                  size="sm"
                   type="button"
+                  variant={background === "default" ? "default" : "outline"}
                 >
                   {t("bgDefault")}
-                </button>
-                <button
-                  className={cn(
-                    "rounded px-2 py-1 transition",
-                    background === "transparent"
-                      ? "bg-blue-600"
-                      : "bg-gray-700 hover:bg-gray-600"
-                  )}
+                </Button>
+                <Button
                   onClick={() => setBackground("transparent")}
+                  size="sm"
                   type="button"
+                  variant={background === "transparent" ? "default" : "outline"}
                 >
                   {t("bgTransparent")}
-                </button>
-                <button
-                  className={cn(
-                    "rounded px-2 py-1 transition",
-                    background === "green"
-                      ? "bg-blue-600"
-                      : "bg-gray-700 hover:bg-gray-600"
-                  )}
+                </Button>
+                <Button
                   onClick={() => setBackground("green")}
+                  size="sm"
                   type="button"
+                  variant={background === "green" ? "default" : "outline"}
                 >
                   {t("bgGreen")}
-                </button>
-                <button
-                  className={cn(
-                    "rounded px-2 py-1 transition",
-                    background === "blue"
-                      ? "bg-blue-600"
-                      : "bg-gray-700 hover:bg-gray-600"
-                  )}
+                </Button>
+                <Button
                   onClick={() => setBackground("blue")}
+                  size="sm"
                   type="button"
+                  variant={background === "blue" ? "default" : "outline"}
                 >
                   {t("bgBlue")}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
 import { claimAdmin } from "@/app/[locale]/admin/actions";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
 
 export function ClaimAdminButton() {
@@ -30,13 +31,9 @@ export function ClaimAdminButton() {
         </div>
       )}
 
-      <button
-        className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
-        disabled={isPending}
-        type="submit"
-      >
+      <Button className="w-full" disabled={isPending} type="submit">
         {isPending ? t("claimingButton") : t("claimButton")}
-      </button>
+      </Button>
     </form>
   );
 }

@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useConfirm } from "@/components/providers/confirm-provider";
+import { Button } from "@/components/ui/button";
 import {
   buildOAuthCallbackUrl,
   GOOGLE_OAUTH_SCOPES,
@@ -192,17 +193,12 @@ export function AccountLinkingForm({ user }: AccountLinkingFormProps) {
                   </div>
                 </div>
 
-                <button
+                <Button
                   aria-label={
                     linked
                       ? `${t("disconnect")} ${provider.label}`
                       : `${t("connect")} ${provider.label}`
                   }
-                  className={`flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-sm transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                    linked
-                      ? "border border-red-200 bg-white text-red-600 hover:bg-red-50"
-                      : "bg-primary text-white hover:opacity-90"
-                  }`}
                   disabled={isLoading}
                   onClick={() =>
                     linked
@@ -210,13 +206,14 @@ export function AccountLinkingForm({ user }: AccountLinkingFormProps) {
                       : handleLink(provider.name)
                   }
                   type="button"
+                  variant={linked ? "destructive" : "default"}
                 >
                   {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                   {!(isLoading || linked) && <LinkIcon className="h-4 w-4" />}
                   {isLoading && t("processing")}
                   {!isLoading && linked && t("disconnect")}
                   {!(isLoading || linked) && t("connect")}
-                </button>
+                </Button>
               </div>
             );
           })}

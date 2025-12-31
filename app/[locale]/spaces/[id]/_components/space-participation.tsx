@@ -4,6 +4,7 @@ import { Loader2, Twitch, Users, Youtube } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   buildOAuthCallbackUrl,
   GOOGLE_OAUTH_SCOPES,
@@ -44,22 +45,21 @@ function JoinButton({
   text,
   textLoading,
 }: JoinButtonProps) {
-  const buttonClass = compact
-    ? "flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-    : "flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50";
-  const loaderClass = compact ? "h-3 w-3 animate-spin" : "h-4 w-4 animate-spin";
-
   return (
-    <button
-      className={buttonClass}
+    <Button
+      className={compact ? "" : "w-full"}
       disabled={isJoining}
       onClick={onClick}
       type="button"
     >
-      {isJoining && <Loader2 className={loaderClass} />}
+      {isJoining && (
+        <Loader2
+          className={compact ? "h-3 w-3 animate-spin" : "h-4 w-4 animate-spin"}
+        />
+      )}
       {!isJoining && icon && <span className="flex items-center">{icon}</span>}
       {isJoining ? textLoading : text}
-    </button>
+    </Button>
   );
 }
 
@@ -77,15 +77,16 @@ function LeaveButton({
   textLoading,
 }: LeaveButtonProps) {
   return (
-    <button
-      className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+    <Button
+      className="w-full"
       disabled={isLeaving}
       onClick={onClick}
       type="button"
+      variant="outline"
     >
       {isLeaving && <Loader2 className="h-4 w-4 animate-spin" />}
       {isLeaving ? textLoading : text}
-    </button>
+    </Button>
   );
 }
 

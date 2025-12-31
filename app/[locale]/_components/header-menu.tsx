@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -78,13 +79,14 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
       <div className="flex items-center gap-3">
         <DropdownMenu onOpenChange={setOpen} open={open}>
           <DropdownMenuTrigger asChild>
-            <button
+            <Button
               aria-label={tLang("label")}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white transition hover:bg-gray-50"
+              size="icon"
               type="button"
+              variant="outline"
             >
               <Globe className="h-4 w-4 text-gray-600" />
-            </button>
+            </Button>
           </DropdownMenuTrigger>
 
           <DropdownMenuPortal>
@@ -120,10 +122,11 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
   return (
     <DropdownMenu onOpenChange={setOpen} open={open}>
       <DropdownMenuTrigger asChild>
-        <button
+        <Button
           aria-label={t("menu")}
-          className="flex items-center gap-2 rounded-full transition hover:opacity-80"
+          className="rounded-full"
           type="button"
+          variant="ghost"
         >
           {user.avatar_url ? (
             <Image
@@ -138,7 +141,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
               <User className="h-4 w-4 text-gray-600" />
             </div>
           )}
-        </button>
+        </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuPortal>

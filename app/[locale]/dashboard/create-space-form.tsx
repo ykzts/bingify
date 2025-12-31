@@ -204,13 +204,14 @@ export function CreateSpaceForm() {
                 <code className="flex-1 rounded bg-white px-3 py-2 font-mono text-sm">
                   {state.suggestion}
                 </code>
-                <button
-                  className="rounded-lg bg-red-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-red-700"
+                <Button
                   onClick={handleAcceptSuggestion}
+                  size="sm"
                   type="button"
+                  variant="destructive"
                 >
                   {t("useSuggestionButton")}
-                </button>
+                </Button>
               </div>
             </div>
           )}
