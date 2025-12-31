@@ -187,6 +187,30 @@ export function SpaceSettingsForm({
     features.gatekeeper.twitch.enabled || isTwitchConfigured;
   const showSocialOption = showYoutubeOption || showTwitchOption;
 
+  // Auto-switch gatekeeper mode if current mode is not available
+  useEffect(() => {
+    if (gatekeeperMode === "social" && !showSocialOption) {
+      setGatekeeperMode("none");
+    } else if (gatekeeperMode === "email" && !showEmailOption) {
+      setGatekeeperMode("none");
+    }
+  }, [gatekeeperMode, showSocialOption, showEmailOption]);
+
+  // Auto-switch social platform if current platform is not available
+  useEffect(() => {
+    if (socialPlatform === "youtube" && !showYoutubeOption) {
+      if (showTwitchOption) {
+        setSocialPlatform("twitch");
+      }
+    } else if (
+      socialPlatform === "twitch" &&
+      !showTwitchOption &&
+      showYoutubeOption
+    ) {
+      setSocialPlatform("youtube");
+    }
+  }, [socialPlatform, showYoutubeOption, showTwitchOption]);
+
   const isDraft = space.status === "draft";
   const isPending = isUpdating || isPublishing;
 
