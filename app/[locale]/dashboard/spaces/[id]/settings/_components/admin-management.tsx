@@ -6,8 +6,8 @@ import { useActionState, useEffect, useState } from "react";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   type GetSpaceAdminsResult,
   getSpaceAdmins,
@@ -102,25 +102,20 @@ export function AdminManagement({ spaceId }: Props) {
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
         <h3 className="mb-3 font-semibold text-sm">管理者を招待</h3>
         <form action={inviteAction} className="space-y-3">
-          <div>
-            <Label htmlFor="admin-email">メールアドレス</Label>
+          <Field>
+            <FieldLabel>メールアドレス</FieldLabel>
             <Input
               disabled={isInvitePending}
-              id="admin-email"
               name="email"
               placeholder="user@example.com"
               required
               type="email"
             />
-            {inviteState.error && (
-              <p className="mt-1 text-red-600 text-sm">{inviteState.error}</p>
-            )}
+            <FieldError>{inviteState.error}</FieldError>
             {inviteState.success && (
-              <p className="mt-1 text-green-600 text-sm">
-                管理者を追加しました
-              </p>
+              <p className="text-green-600 text-sm">管理者を追加しました</p>
             )}
-          </div>
+          </Field>
           <Button
             className="w-full"
             disabled={isInvitePending}
