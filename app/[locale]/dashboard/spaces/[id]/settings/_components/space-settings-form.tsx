@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import type { SystemFeatures } from "@/lib/types/settings";
 import type { PublishSpaceState, UpdateSpaceState } from "../actions";
 import { publishSpace, updateSpaceSettings } from "../actions";
 
@@ -38,6 +39,7 @@ interface Space {
 
 interface Props {
   currentParticipantCount: number;
+  features: SystemFeatures;
   locale: string;
   space: Space;
   systemMaxParticipants: number;
@@ -95,9 +97,10 @@ function determineSocialPlatform(
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Settings form requires comprehensive state management
 export function SpaceSettingsForm({
+  currentParticipantCount,
+  features,
   locale,
   space,
-  currentParticipantCount,
   systemMaxParticipants,
 }: Props) {
   const router = useRouter();
@@ -164,8 +167,38 @@ export function SpaceSettingsForm({
     }
   }, [publishState.success, router, space.id, locale]);
 
+  // Determine visibility of gatekeeper options based on features and existing configuration
+  const isEmailConfigured =
+    space.gatekeeper_rules?.email?.allowed &&
+    space.gatekeeper_rules.email.allowed.length > 0;
+  const isYoutubeConfigured =
+    space.gatekeeper_rules?.youtube?.requirement &&
+    space.gatekeeper_rules.youtube.requirement !== "none";
+  const isTwitchConfigured =
+    space.gatekeeper_rules?.twitch?.requirement &&
+    space.gatekeeper_rules.twitch.requirement !== "none";
+
+  // Show option if: (feature is enabled) OR (feature is disabled BUT already configured)
+  const showEmailOption =
+    features.gatekeeper.email.enabled || isEmailConfigured;
+  const showYoutubeOption =
+    features.gatekeeper.youtube.enabled || isYoutubeConfigured;
+  const showTwitchOption =
+    features.gatekeeper.twitch.enabled || isTwitchConfigured;
+  const showSocialOption = showYoutubeOption || showTwitchOption;
+
   const isDraft = space.status === "draft";
   const isPending = isUpdating || isPublishing;
+
+  // Calculate grid columns for tabs
+  const visibleTabCount =
+    1 + (showSocialOption ? 1 : 0) + (showEmailOption ? 1 : 0);
+  let gridColsClass = "grid-cols-1";
+  if (visibleTabCount === 3) {
+    gridColsClass = "grid-cols-3";
+  } else if (visibleTabCount === 2) {
+    gridColsClass = "grid-cols-2";
+  }
 
   return (
     <div className="space-y-8">
@@ -269,14 +302,18 @@ export function SpaceSettingsForm({
             }
             value={gatekeeperMode}
           >
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className={`grid w-full ${gridColsClass}`}>
               <TabsTrigger value="none">{t("gatekeeperModeNone")}</TabsTrigger>
-              <TabsTrigger value="social">
-                {t("gatekeeperModeSocial")}
-              </TabsTrigger>
-              <TabsTrigger value="email">
-                {t("gatekeeperModeEmail")}
-              </TabsTrigger>
+              {showSocialOption && (
+                <TabsTrigger value="social">
+                  {t("gatekeeperModeSocial")}
+                </TabsTrigger>
+              )}
+              {showEmailOption && (
+                <TabsTrigger value="email">
+                  {t("gatekeeperModeEmail")}
+                </TabsTrigger>
+              )}
             </TabsList>
 
             {/* None Tab */}
@@ -287,192 +324,205 @@ export function SpaceSettingsForm({
             </TabsContent>
 
             {/* Social Tab */}
-            <TabsContent className="space-y-4" value="social">
-              <p className="text-gray-600 text-sm">
-                {t("socialModeDescription")}
-              </p>
+            {showSocialOption && (
+              <TabsContent className="space-y-4" value="social">
+                <p className="text-gray-600 text-sm">
+                  {t("socialModeDescription")}
+                </p>
 
-              {/* Hidden input for social_platform */}
-              <input
-                name="social_platform"
-                type="hidden"
-                value={socialPlatform}
-              />
-
-              <div>
-                <Label className="mb-2">{t("socialPlatformLabel")}</Label>
-                <RadioGroup
-                  disabled={isPending}
-                  onValueChange={(value) =>
-                    setSocialPlatform(value as "youtube" | "twitch")
-                  }
+                {/* Hidden input for social_platform */}
+                <input
+                  name="social_platform"
+                  type="hidden"
                   value={socialPlatform}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem id="platform-youtube" value="youtube" />
-                    <Label
-                      className="cursor-pointer"
-                      htmlFor="platform-youtube"
-                    >
-                      {t("platformYoutube")}
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem id="platform-twitch" value="twitch" />
-                    <Label className="cursor-pointer" htmlFor="platform-twitch">
-                      {t("platformTwitch")}
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
+                />
 
-              {/* YouTube Settings */}
-              {socialPlatform === "youtube" && (
-                <>
-                  <div>
-                    <Label className="mb-2" htmlFor="youtube_requirement">
-                      {t("youtubeRequirementLabel")}
-                    </Label>
-                    <Select
-                      disabled={isPending}
-                      name="youtube_requirement"
-                      onValueChange={(value) => {
-                        setYoutubeRequirement(value);
-                        if (value === "none") {
-                          setYoutubeChannelId("");
-                        }
-                      }}
-                      value={youtubeRequirement}
-                    >
-                      <SelectTrigger id="youtube_requirement">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">
-                          {t("requirementNone")}
-                        </SelectItem>
-                        <SelectItem value="subscriber">
-                          {t("youtubeSubscriber")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div>
+                  <Label className="mb-2">{t("socialPlatformLabel")}</Label>
+                  <RadioGroup
+                    disabled={isPending}
+                    onValueChange={(value) =>
+                      setSocialPlatform(value as "youtube" | "twitch")
+                    }
+                    value={socialPlatform}
+                  >
+                    {showYoutubeOption && (
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem id="platform-youtube" value="youtube" />
+                        <Label
+                          className="cursor-pointer"
+                          htmlFor="platform-youtube"
+                        >
+                          {t("platformYoutube")}
+                        </Label>
+                      </div>
+                    )}
+                    {showTwitchOption && (
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem id="platform-twitch" value="twitch" />
+                        <Label
+                          className="cursor-pointer"
+                          htmlFor="platform-twitch"
+                        >
+                          {t("platformTwitch")}
+                        </Label>
+                      </div>
+                    )}
+                  </RadioGroup>
+                </div>
 
-                  {youtubeRequirement !== "none" && (
+                {/* YouTube Settings */}
+                {socialPlatform === "youtube" && showYoutubeOption && (
+                  <>
                     <div>
-                      <Label className="mb-2" htmlFor="youtube_channel_id">
-                        {t("youtubeChannelIdLabel")}
+                      <Label className="mb-2" htmlFor="youtube_requirement">
+                        {t("youtubeRequirementLabel")}
                       </Label>
-                      <Input
+                      <Select
                         disabled={isPending}
-                        id="youtube_channel_id"
-                        name="youtube_channel_id"
-                        onChange={(e) => setYoutubeChannelId(e.target.value)}
-                        placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
-                        required={youtubeRequirement !== "none"}
-                        type="text"
-                        value={youtubeChannelId}
-                      />
-                      {updateState.fieldErrors?.youtube_channel_id && (
-                        <p className="mt-1 text-red-600 text-sm">
-                          {updateState.fieldErrors.youtube_channel_id}
-                        </p>
-                      )}
+                        name="youtube_requirement"
+                        onValueChange={(value) => {
+                          setYoutubeRequirement(value);
+                          if (value === "none") {
+                            setYoutubeChannelId("");
+                          }
+                        }}
+                        value={youtubeRequirement}
+                      >
+                        <SelectTrigger id="youtube_requirement">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">
+                            {t("requirementNone")}
+                          </SelectItem>
+                          <SelectItem value="subscriber">
+                            {t("youtubeSubscriber")}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  )}
-                </>
-              )}
 
-              {/* Twitch Settings */}
-              {socialPlatform === "twitch" && (
-                <>
-                  <div>
-                    <Label className="mb-2" htmlFor="twitch_requirement">
-                      {t("twitchRequirementLabel")}
-                    </Label>
-                    <Select
-                      disabled={isPending}
-                      name="twitch_requirement"
-                      onValueChange={(value) => {
-                        setTwitchRequirement(value);
-                        if (value === "none") {
-                          setTwitchBroadcasterId("");
-                        }
-                      }}
-                      value={twitchRequirement}
-                    >
-                      <SelectTrigger id="twitch_requirement">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">
-                          {t("requirementNone")}
-                        </SelectItem>
-                        <SelectItem value="follower">
-                          {t("twitchFollower")}
-                        </SelectItem>
-                        <SelectItem value="subscriber">
-                          {t("twitchSubscriber")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                    {youtubeRequirement !== "none" && (
+                      <div>
+                        <Label className="mb-2" htmlFor="youtube_channel_id">
+                          {t("youtubeChannelIdLabel")}
+                        </Label>
+                        <Input
+                          disabled={isPending}
+                          id="youtube_channel_id"
+                          name="youtube_channel_id"
+                          onChange={(e) => setYoutubeChannelId(e.target.value)}
+                          placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
+                          required={youtubeRequirement !== "none"}
+                          type="text"
+                          value={youtubeChannelId}
+                        />
+                        {updateState.fieldErrors?.youtube_channel_id && (
+                          <p className="mt-1 text-red-600 text-sm">
+                            {updateState.fieldErrors.youtube_channel_id}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
 
-                  {twitchRequirement !== "none" && (
+                {/* Twitch Settings */}
+                {socialPlatform === "twitch" && showTwitchOption && (
+                  <>
                     <div>
-                      <Label className="mb-2" htmlFor="twitch_broadcaster_id">
-                        {t("twitchBroadcasterIdLabel")}
+                      <Label className="mb-2" htmlFor="twitch_requirement">
+                        {t("twitchRequirementLabel")}
                       </Label>
-                      <Input
+                      <Select
                         disabled={isPending}
-                        id="twitch_broadcaster_id"
-                        name="twitch_broadcaster_id"
-                        onChange={(e) => setTwitchBroadcasterId(e.target.value)}
-                        placeholder="123456789"
-                        required={twitchRequirement !== "none"}
-                        type="text"
-                        value={twitchBroadcasterId}
-                      />
-                      {updateState.fieldErrors?.twitch_broadcaster_id && (
-                        <p className="mt-1 text-red-600 text-sm">
-                          {updateState.fieldErrors.twitch_broadcaster_id}
-                        </p>
-                      )}
+                        name="twitch_requirement"
+                        onValueChange={(value) => {
+                          setTwitchRequirement(value);
+                          if (value === "none") {
+                            setTwitchBroadcasterId("");
+                          }
+                        }}
+                        value={twitchRequirement}
+                      >
+                        <SelectTrigger id="twitch_requirement">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">
+                            {t("requirementNone")}
+                          </SelectItem>
+                          <SelectItem value="follower">
+                            {t("twitchFollower")}
+                          </SelectItem>
+                          <SelectItem value="subscriber">
+                            {t("twitchSubscriber")}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  )}
-                </>
-              )}
-            </TabsContent>
+
+                    {twitchRequirement !== "none" && (
+                      <div>
+                        <Label className="mb-2" htmlFor="twitch_broadcaster_id">
+                          {t("twitchBroadcasterIdLabel")}
+                        </Label>
+                        <Input
+                          disabled={isPending}
+                          id="twitch_broadcaster_id"
+                          name="twitch_broadcaster_id"
+                          onChange={(e) =>
+                            setTwitchBroadcasterId(e.target.value)
+                          }
+                          placeholder="123456789"
+                          required={twitchRequirement !== "none"}
+                          type="text"
+                          value={twitchBroadcasterId}
+                        />
+                        {updateState.fieldErrors?.twitch_broadcaster_id && (
+                          <p className="mt-1 text-red-600 text-sm">
+                            {updateState.fieldErrors.twitch_broadcaster_id}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </TabsContent>
+            )}
 
             {/* Email Tab */}
-            <TabsContent className="space-y-4" value="email">
-              <p className="text-gray-600 text-sm">
-                {t("emailModeDescription")}
-              </p>
-
-              <div>
-                <Label className="mb-2" htmlFor="email_allowlist">
-                  {t("emailAllowlistLabel")}
-                </Label>
-                <Textarea
-                  disabled={isPending}
-                  id="email_allowlist"
-                  name="email_allowlist"
-                  onChange={(e) => setEmailAllowlist(e.target.value)}
-                  placeholder={t("emailAllowlistPlaceholder")}
-                  rows={3}
-                  value={emailAllowlist}
-                />
-                {updateState.fieldErrors?.email_allowlist && (
-                  <p className="mt-1 text-red-600 text-sm">
-                    {updateState.fieldErrors.email_allowlist}
-                  </p>
-                )}
-                <p className="mt-1 text-gray-500 text-sm">
-                  {t("emailAllowlistHelp")}
+            {showEmailOption && (
+              <TabsContent className="space-y-4" value="email">
+                <p className="text-gray-600 text-sm">
+                  {t("emailModeDescription")}
                 </p>
-              </div>
-            </TabsContent>
+
+                <div>
+                  <Label className="mb-2" htmlFor="email_allowlist">
+                    {t("emailAllowlistLabel")}
+                  </Label>
+                  <Textarea
+                    disabled={isPending}
+                    id="email_allowlist"
+                    name="email_allowlist"
+                    onChange={(e) => setEmailAllowlist(e.target.value)}
+                    placeholder={t("emailAllowlistPlaceholder")}
+                    rows={3}
+                    value={emailAllowlist}
+                  />
+                  {updateState.fieldErrors?.email_allowlist && (
+                    <p className="mt-1 text-red-600 text-sm">
+                      {updateState.fieldErrors.email_allowlist}
+                    </p>
+                  )}
+                  <p className="mt-1 text-gray-500 text-sm">
+                    {t("emailAllowlistHelp")}
+                  </p>
+                </div>
+              </TabsContent>
+            )}
           </Tabs>
 
           {/* Hidden inputs for non-selected modes and platforms */}
