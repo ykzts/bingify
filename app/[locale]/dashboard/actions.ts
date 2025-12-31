@@ -119,7 +119,7 @@ export async function createSpace(
       console.error("Failed to fetch system settings:", settingsError);
       // Continue with space creation if settings fetch fails (graceful degradation)
     } else if (systemSettings) {
-      // Count user's existing active spaces (excluding archived)
+      // Count user's existing active spaces (excluding closed)
       // Note: The spaces table RLS policy does not have recursion issues,
       // so we can use count: "exact" directly. The participants table uses
       // a different approach (fetching rows then using array length) due to RLS recursion.
@@ -127,7 +127,7 @@ export async function createSpace(
         .from("spaces")
         .select("id", { count: "exact" })
         .eq("owner_id", user.id)
-        .neq("status", "archived");
+        .neq("status", "closed");
 
       if (countError) {
         console.error("Failed to count user spaces:", countError);

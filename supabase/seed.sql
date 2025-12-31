@@ -180,12 +180,12 @@ INSERT INTO spaces (
 	updated_at
 ) VALUES (
 	'cccccccc-cccc-cccc-cccc-cccccccccccc'::uuid,
-	'space-c-archived-event',
+	'space-c-closed-event',
 	'view-token-space-c-secure-256bit',
 	'00000000-0000-0000-0000-000000000001'::uuid,
 	'先月のイベント',
 	'11月に開催したビンゴイベントのアーカイブ',
-	'archived',
+	'closed',
 	'{"cardSize": 5, "freeCenter": true}'::jsonb,
 	NULL,
 	50,

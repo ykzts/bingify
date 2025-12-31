@@ -210,7 +210,7 @@ export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
 
     const { error, count } = await supabase
       .from("spaces")
-      .update({ status: "archived" })
+      .update({ status: "closed" })
       .eq("id", spaceId)
       .eq("owner_id", user.id);
 

@@ -53,7 +53,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Add comment to document status values
-COMMENT ON COLUMN spaces.status IS 'Space status: draft (preparation, not public), active (in progress, public), archived (ended, view only)';
+COMMENT ON COLUMN spaces.status IS 'Space status: draft (preparation, not public), active (in progress, public), closed (ended, view only)';
 
 -- Add comments for new columns
 COMMENT ON COLUMN spaces.title IS 'Optional display title for the space';

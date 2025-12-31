@@ -132,7 +132,7 @@ export type SpaceFormData = z.infer<typeof spaceSchema>;
 export const spaceStatusSchema = z.enum([
   "draft",
   "active",
-  "archived",
+  "closed",
   "expired",
 ]);
 
