@@ -3,6 +3,7 @@
 import { Copy, RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { useConfirm } from "@/components/providers/confirm-provider";
 import { regenerateViewToken } from "../../../actions";
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
 
 export function ViewingUrlManager({ locale, spaceId, viewToken }: Props) {
   const t = useTranslations("AdminSpace");
+  const confirm = useConfirm();
   const [currentToken, setCurrentToken] = useState(viewToken);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [message, setMessage] = useState<{
@@ -35,8 +37,13 @@ export function ViewingUrlManager({ locale, spaceId, viewToken }: Props) {
   };
 
   const handleRegenerateUrl = async () => {
-    // biome-ignore lint/suspicious/noAlert: User confirmation required for destructive action
-    if (!confirm(t("regenerateConfirm"))) {
+    if (
+      !(await confirm({
+        description: t("regenerateConfirm"),
+        title: t("regenerateUrlButton"),
+        variant: "destructive",
+      }))
+    ) {
       return;
     }
 

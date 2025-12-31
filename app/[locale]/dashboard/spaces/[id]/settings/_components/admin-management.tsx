@@ -3,6 +3,7 @@
 import { Loader2, Trash2, UserPlus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
+import { useConfirm } from "@/components/providers/confirm-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,7 @@ interface Props {
 
 export function AdminManagement({ spaceId }: Props) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [admins, setAdmins] = useState<SpaceAdmin[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,8 +63,13 @@ export function AdminManagement({ spaceId }: Props) {
   }, [inviteState.success]);
 
   const handleRemoveAdmin = async (adminUserId: string) => {
-    // biome-ignore lint/suspicious/noAlert: Simple confirmation dialog is appropriate here
-    if (!confirm("この管理者を削除してもよろしいですか?")) {
+    if (
+      !(await confirm({
+        description: "この管理者を削除してもよろしいですか?",
+        title: "管理者削除",
+        variant: "destructive",
+      }))
+    ) {
       return;
     }
 

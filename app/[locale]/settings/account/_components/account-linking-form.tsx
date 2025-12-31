@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { useConfirm } from "@/components/providers/confirm-provider";
 import {
   buildOAuthCallbackUrl,
   GOOGLE_OAUTH_SCOPES,
@@ -32,6 +33,7 @@ interface ProviderConfig {
 export function AccountLinkingForm({ user }: AccountLinkingFormProps) {
   const t = useTranslations("AccountSettings");
   const router = useRouter();
+  const confirm = useConfirm();
   const [loading, setLoading] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -115,8 +117,13 @@ export function AccountLinkingForm({ user }: AccountLinkingFormProps) {
     }
 
     const providerName = provider === "google" ? "Google" : "Twitch";
-    // biome-ignore lint/suspicious/noAlert: User confirmation required for destructive action
-    if (!confirm(t("unlinkConfirm", { provider: providerName }))) {
+    if (
+      !(await confirm({
+        description: t("unlinkConfirm", { provider: providerName }),
+        title: t("title"),
+        variant: "destructive",
+      }))
+    ) {
       return;
     }
 

@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useConfirm } from "@/components/providers/confirm-provider";
 import { forceDeleteSpace } from "../actions";
 
 interface Space {
@@ -19,13 +21,17 @@ interface SpaceListProps {
 
 export function SpaceList({ initialSpaces }: SpaceListProps) {
   const t = useTranslations("Admin");
+  const confirm = useConfirm();
   const [spaces, setSpaces] = useState(initialSpaces);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   const handleDelete = async (spaceId: string) => {
     if (
-      // biome-ignore lint/suspicious/noAlert: Admin panel using simple confirmation dialog
-      !confirm(t("deleteConfirm"))
+      !(await confirm({
+        description: t("deleteConfirm"),
+        title: t("deleteAction"),
+        variant: "destructive",
+      }))
     ) {
       return;
     }
@@ -35,11 +41,9 @@ export function SpaceList({ initialSpaces }: SpaceListProps) {
 
     if (result.success) {
       setSpaces((prev) => prev.filter((space) => space.id !== spaceId));
-      // biome-ignore lint/suspicious/noAlert: Admin panel using simple notification
-      alert(t("deleteSuccess"));
+      toast.success(t("deleteSuccess"));
     } else {
-      // biome-ignore lint/suspicious/noAlert: Admin panel using simple error notification
-      alert(t(result.error || "errorGeneric"));
+      toast.error(t(result.error || "errorGeneric"));
     }
 
     setDeleting(null);

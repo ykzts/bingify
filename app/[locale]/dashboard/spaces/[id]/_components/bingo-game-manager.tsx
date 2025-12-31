@@ -5,6 +5,7 @@ import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
+import { useConfirm } from "@/components/providers/confirm-provider";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
@@ -17,6 +18,7 @@ interface Props {
 export function BingoGameManager({ spaceId }: Props) {
   const t = useTranslations("AdminSpace");
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
   const { data: calledNumbers = [] } = useCalledNumbers(spaceId);
   const [isCalling, setIsCalling] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -121,8 +123,13 @@ export function BingoGameManager({ spaceId }: Props) {
   };
 
   const handleResetGame = async () => {
-    // biome-ignore lint/suspicious/noAlert: User confirmation required for destructive action
-    if (!confirm(t("resetGameConfirm"))) {
+    if (
+      !(await confirm({
+        description: t("resetGameConfirm"),
+        title: t("resetGameButton"),
+        variant: "destructive",
+      }))
+    ) {
       return;
     }
 
