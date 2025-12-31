@@ -203,6 +203,16 @@ describe("Dashboard Actions", () => {
               }),
             };
           }
+          if (table === "participants") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({
+                  data: [],
+                  error: null,
+                }),
+              }),
+            };
+          }
         }),
       };
 
