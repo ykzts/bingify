@@ -8,8 +8,12 @@ import { useActionState, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { InputGroup } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
 import { generateRandomKey } from "@/lib/utils/random-key";
 import type { CreateSpaceState } from "./actions";
 import { checkShareKeyAvailability, createSpace } from "./actions";
@@ -92,24 +96,24 @@ export function CreateSpaceForm() {
       <Field>
         <FieldLabel>共有キー</FieldLabel>
 
-        <InputGroup className="mb-2">
-          <div className="relative flex-1">
-            <Input
-              className="rounded-r-none border-r-0 pr-10 font-mono"
-              disabled={isPending}
-              maxLength={30}
-              minLength={3}
-              name="share_key"
-              onChange={handleShareKeyChange}
-              pattern="[a-z0-9-]+"
-              placeholder="my-party"
-              required
-              type="text"
-              value={shareKey}
-            />
+        <InputGroup className="mb-2" relative>
+          <InputGroupInput
+            className="rounded-r-none border-r-0 pr-10 font-mono"
+            disabled={isPending}
+            maxLength={30}
+            minLength={3}
+            name="share_key"
+            onChange={handleShareKeyChange}
+            pattern="[a-z0-9-]+"
+            placeholder="my-party"
+            required
+            type="text"
+            value={shareKey}
+          />
+          <InputGroupAddon align="inline-end">
             <button
               aria-label={t("generateRandomButtonAriaLabel")}
-              className="absolute top-1 right-1 z-10 flex h-7 w-7 items-center justify-center rounded-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+              className="flex h-7 w-7 items-center justify-center rounded-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
               disabled={isPending}
               onClick={handleGenerateRandomKey}
               title={t("generateRandomButton")}
@@ -117,10 +121,10 @@ export function CreateSpaceForm() {
             >
               <Dices className="h-4 w-4" />
             </button>
-          </div>
-          <span className="flex h-9 select-none items-center rounded-lg rounded-l-none border border-gray-300 border-l-0 bg-gray-50 px-3 font-mono text-gray-500 text-sm">
+          </InputGroupAddon>
+          <InputGroupText className="rounded-lg rounded-l-none">
             -{dateSuffix}
-          </span>
+          </InputGroupText>
         </InputGroup>
 
         <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 p-3">

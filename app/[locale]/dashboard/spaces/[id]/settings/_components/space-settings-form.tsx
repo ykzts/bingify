@@ -11,6 +11,7 @@ import {
   FieldError,
   FieldLabel,
 } from "@/components/ui/field";
+import { FieldGroup, FieldSet, FieldSetLegend } from "@/components/ui/fieldset";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -230,48 +231,49 @@ export function SpaceSettingsForm({
     <div className="space-y-8">
       <form action={updateAction} className="space-y-6">
         {/* Basic Information */}
-        <div className="space-y-4">
-          <h2 className="font-semibold text-lg">{t("basicInfoTitle")}</h2>
+        <FieldSet>
+          <FieldSetLegend>{t("basicInfoTitle")}</FieldSetLegend>
+          <FieldGroup>
+            <Field>
+              <FieldLabel>{t("titleLabel")}</FieldLabel>
+              <Input
+                disabled={isPending}
+                maxLength={100}
+                name="title"
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={t("titlePlaceholder")}
+                type="text"
+                value={title}
+              />
+              <FieldError>{updateState.fieldErrors?.title}</FieldError>
+              <FieldDescription>{t("titleHelp")}</FieldDescription>
+            </Field>
 
-          <Field>
-            <FieldLabel>{t("titleLabel")}</FieldLabel>
-            <Input
-              disabled={isPending}
-              maxLength={100}
-              name="title"
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={t("titlePlaceholder")}
-              type="text"
-              value={title}
-            />
-            <FieldError>{updateState.fieldErrors?.title}</FieldError>
-            <FieldDescription>{t("titleHelp")}</FieldDescription>
-          </Field>
-
-          <Field>
-            <FieldLabel>{t("descriptionLabel")}</FieldLabel>
-            <Textarea
-              disabled={isPending}
-              maxLength={500}
-              name="description"
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={t("descriptionPlaceholder")}
-              rows={3}
-              value={description}
-            />
-            <FieldError>{updateState.fieldErrors?.description}</FieldError>
-            <FieldDescription>{t("descriptionHelp")}</FieldDescription>
-          </Field>
-        </div>
+            <Field>
+              <FieldLabel>{t("descriptionLabel")}</FieldLabel>
+              <Textarea
+                disabled={isPending}
+                maxLength={500}
+                name="description"
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={t("descriptionPlaceholder")}
+                rows={3}
+                value={description}
+              />
+              <FieldError>{updateState.fieldErrors?.description}</FieldError>
+              <FieldDescription>{t("descriptionHelp")}</FieldDescription>
+            </Field>
+          </FieldGroup>
+        </FieldSet>
 
         {/* Capacity Settings */}
-        <div className="space-y-4">
-          <h2 className="font-semibold text-lg">{t("capacityTitle")}</h2>
-
-          <Field>
-            <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
-            <Input
-              disabled={isPending}
+        <FieldSet>
+          <FieldSetLegend>{t("capacityTitle")}</FieldSetLegend>
+          <FieldGroup>
+            <Field>
+              <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
+              <Input
+                disabled={isPending}
               max={systemMaxParticipants}
               min={Math.max(1, currentParticipantCount)}
               name="max_participants"
@@ -291,7 +293,8 @@ export function SpaceSettingsForm({
               })}
             </FieldDescription>
           </Field>
-        </div>
+        </FieldGroup>
+      </FieldSet>
 
         {/* Gatekeeper Rules with Tabs */}
         <div className="space-y-4">

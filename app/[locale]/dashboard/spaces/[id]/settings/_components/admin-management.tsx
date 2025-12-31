@@ -3,6 +3,7 @@
 import { Loader2, Trash2, UserPlus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ export function AdminManagement({ spaceId }: Props) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: Only trigger on inviteState.success change
   useEffect(() => {
     if (inviteState.success) {
+      toast.success("管理者を追加しました");
       loadAdmins();
       router.refresh();
     }
@@ -112,9 +114,6 @@ export function AdminManagement({ spaceId }: Props) {
               type="email"
             />
             <FieldError>{inviteState.error}</FieldError>
-            {inviteState.success && (
-              <p className="text-green-600 text-sm">管理者を追加しました</p>
-            )}
           </Field>
           <Button
             className="w-full"

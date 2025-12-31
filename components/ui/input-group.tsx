@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "./button";
 import { Input } from "./input";
 
 interface InputGroupProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -55,6 +56,19 @@ const InputGroupAddon = React.forwardRef<
 });
 InputGroupAddon.displayName = "InputGroupAddon";
 
+const InputGroupButton = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<typeof Button>
+>(({ className, ...props }, ref) => (
+  <Button
+    ref={ref}
+    className={cn("rounded-l-none", className)}
+    type="button"
+    {...props}
+  />
+));
+InputGroupButton.displayName = "InputGroupButton";
+
 const InputGroupText = React.forwardRef<
   HTMLSpanElement,
   React.HTMLAttributes<HTMLSpanElement>
@@ -70,4 +84,10 @@ const InputGroupText = React.forwardRef<
 ));
 InputGroupText.displayName = "InputGroupText";
 
-export { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText };
+export {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupText,
+};
