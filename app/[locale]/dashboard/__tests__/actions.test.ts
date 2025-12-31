@@ -384,10 +384,7 @@ describe("Dashboard Actions", () => {
       const formData = new FormData();
       formData.set("share_key", shareKey);
 
-      const result = await createSpace(
-        { success: false },
-        formData
-      );
+      const result = await createSpace({ success: false }, formData);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe("maxSpacesReached");
@@ -408,10 +405,7 @@ describe("Dashboard Actions", () => {
       const formData = new FormData();
       formData.set("share_key", "test-space");
 
-      const result = await createSpace(
-        { success: false },
-        formData
-      );
+      const result = await createSpace({ success: false }, formData);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe("認証が必要です。ログインしてください。");
@@ -431,10 +425,7 @@ describe("Dashboard Actions", () => {
       const formData = new FormData();
       formData.set("share_key", "AB"); // Too short
 
-      const result = await createSpace(
-        { success: false },
-        formData
-      );
+      const result = await createSpace({ success: false }, formData);
 
       expect(result.success).toBe(false);
       expect(result.error).toContain("3文字以上");
@@ -472,15 +463,17 @@ describe("Dashboard Actions", () => {
                 selectCalled = true;
                 return {
                   eq: vi.fn().mockReturnValue({
-                    neq: vi.fn().mockImplementation((column: string, value: string) => {
-                      if (column === "status" && value === "archived") {
-                        neqCalledWithArchived = true;
-                      }
-                      return Promise.resolve({
-                        count: 4, // User has 4 active spaces
-                        error: null,
-                      });
-                    }),
+                    neq: vi
+                      .fn()
+                      .mockImplementation((column: string, value: string) => {
+                        if (column === "status" && value === "archived") {
+                          neqCalledWithArchived = true;
+                        }
+                        return Promise.resolve({
+                          count: 4, // User has 4 active spaces
+                          error: null,
+                        });
+                      }),
                   }),
                 };
               }),
@@ -495,10 +488,7 @@ describe("Dashboard Actions", () => {
       const formData = new FormData();
       formData.set("share_key", shareKey);
 
-      await createSpace(
-        { success: false },
-        formData
-      );
+      await createSpace({ success: false }, formData);
 
       // Verify that the query was made to exclude archived spaces
       expect(selectCalled).toBe(true);
