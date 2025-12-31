@@ -83,13 +83,13 @@ describe("Dashboard Actions", () => {
           if (table === "participants") {
             return {
               select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
+                in: vi.fn().mockResolvedValue({
                   data: [
-                    { id: "p1" },
-                    { id: "p2" },
-                    { id: "p3" },
-                    { id: "p4" },
-                    { id: "p5" },
+                    { space_id: "space-1" },
+                    { space_id: "space-1" },
+                    { space_id: "space-1" },
+                    { space_id: "space-1" },
+                    { space_id: "space-1" },
                   ],
                   error: null,
                 }),
@@ -206,7 +206,7 @@ describe("Dashboard Actions", () => {
           if (table === "participants") {
             return {
               select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
+                in: vi.fn().mockResolvedValue({
                   data: [],
                   error: null,
                 }),
@@ -280,8 +280,12 @@ describe("Dashboard Actions", () => {
           if (table === "participants") {
             return {
               select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
-                  count: 3,
+                in: vi.fn().mockResolvedValue({
+                  data: [
+                    { space_id: "space-1" },
+                    { space_id: "space-1" },
+                    { space_id: "space-1" },
+                  ],
                   error: null,
                 }),
               }),
@@ -295,6 +299,7 @@ describe("Dashboard Actions", () => {
       const result = await getUserSpaces();
       expect(result.activeSpace).toBeDefined();
       expect(result.activeSpace?.id).toBe("space-1");
+      expect(result.activeSpace?.participant_count).toBe(3);
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         expect.stringContaining("Multiple active spaces found")
       );

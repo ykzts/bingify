@@ -399,21 +399,34 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
 
-    // Get participant counts for all spaces
+    // Get participant counts for all spaces in a single query
     // Note: Fetching actual data instead of using count to avoid RLS recursion issues
-    const spacesWithCounts = await Promise.all(
-      allSpaces.map(async (space) => {
-        const { data: participantsData } = await supabase
-          .from("participants")
-          .select("id")
-          .eq("space_id", space.id);
+    const allSpaceIds = allSpaces.map((space) => space.id);
+    let participantCounts: Record<string, number> = {};
 
-        return {
-          ...space,
-          participant_count: participantsData?.length ?? 0,
-        };
-      })
-    );
+    if (allSpaceIds.length > 0) {
+      const { data: participantsData } = await supabase
+        .from("participants")
+        .select("space_id")
+        .in("space_id", allSpaceIds);
+
+      // Count participants per space
+      if (participantsData) {
+        participantCounts = participantsData.reduce(
+          (acc, participant) => {
+            acc[participant.space_id] = (acc[participant.space_id] || 0) + 1;
+            return acc;
+          },
+          {} as Record<string, number>
+        );
+      }
+    }
+
+    // Add participant counts to spaces
+    const spacesWithCounts = allSpaces.map((space) => ({
+      ...space,
+      participant_count: participantCounts[space.id] || 0,
+    }));
 
     // Find active space (excluding draft)
     let activeSpace: UserSpace | null = null;
