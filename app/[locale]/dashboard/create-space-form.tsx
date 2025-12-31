@@ -1,7 +1,13 @@
 "use client";
 
 import { format } from "date-fns";
-import { AlertCircle, Check, Dices, Loader2 } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  Check,
+  Dices,
+  Loader2,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
@@ -106,7 +112,7 @@ export function CreateSpaceForm() {
             name="share_key"
             onChange={handleShareKeyChange}
             pattern="[a-z0-9-]+"
-            placeholder="my-party"
+            placeholder="@my-party"
             required
             type="text"
             value={shareKey}
@@ -128,16 +134,20 @@ export function CreateSpaceForm() {
           </InputGroupAddon>
         </InputGroup>
 
-        <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+        <div className="mb-2 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
           <p className="text-amber-800 text-sm">
-            ⚠️ この共有キーを知っているユーザーは誰でも参加できます
+            この共有キーを知っているユーザーは誰でも参加できます
           </p>
         </div>
 
         <p className="mb-2 text-gray-500 text-sm">
           公開URL:{" "}
           <span className="font-mono">
-            @{shareKey || "..."}-{dateSuffix}
+            https://example.com/spaces/
+            <span className="font-semibold text-gray-900">
+              @{shareKey || "..."}-{dateSuffix}
+            </span>
           </span>
         </p>
 
