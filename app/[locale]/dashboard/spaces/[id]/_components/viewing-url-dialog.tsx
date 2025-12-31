@@ -164,9 +164,7 @@ export function ViewingUrlDialog({ locale, spaceId, viewToken }: Props) {
                 <Checkbox
                   checked={hideInfo}
                   id="hide-info"
-                  onCheckedChange={(checked) =>
-                    setHideInfo(checked === true)
-                  }
+                  onCheckedChange={(checked) => setHideInfo(checked === true)}
                 />
                 <Label className="cursor-pointer text-sm" htmlFor="hide-info">
                   {t("urlOptionHideInfo")}
@@ -180,10 +178,7 @@ export function ViewingUrlDialog({ locale, spaceId, viewToken }: Props) {
                     setTransparent(checked === true)
                   }
                 />
-                <Label
-                  className="cursor-pointer text-sm"
-                  htmlFor="transparent"
-                >
+                <Label className="cursor-pointer text-sm" htmlFor="transparent">
                   {t("urlOptionTransparent")}
                 </Label>
               </div>
