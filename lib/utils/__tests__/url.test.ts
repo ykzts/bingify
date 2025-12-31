@@ -14,8 +14,8 @@ describe("getBaseUrl", () => {
     process.env = originalEnv;
   });
 
-  test("returns NEXT_PUBLIC_APP_URL when explicitly defined", () => {
-    process.env.NEXT_PUBLIC_APP_URL = "https://example.com";
+  test("returns NEXT_PUBLIC_SITE_URL when explicitly defined", () => {
+    process.env.NEXT_PUBLIC_SITE_URL = "https://example.com";
     expect(getBaseUrl()).toBe("https://example.com");
   });
 
@@ -44,13 +44,13 @@ describe("getBaseUrl", () => {
   });
 
   test("returns localhost in local development", () => {
-    delete process.env.NEXT_PUBLIC_APP_URL;
-    delete process.env.NODE_ENV;
+    process.env.NEXT_PUBLIC_SITE_URL = undefined;
+    process.env.NODE_ENV = undefined;
     expect(getBaseUrl()).toBe("http://localhost:3000");
   });
 
-  test("NEXT_PUBLIC_APP_URL takes precedence over Vercel variables", () => {
-    process.env.NEXT_PUBLIC_APP_URL = "https://custom-domain.com";
+  test("NEXT_PUBLIC_SITE_URL takes precedence over Vercel variables", () => {
+    process.env.NEXT_PUBLIC_SITE_URL = "https://custom-domain.com";
     process.env.NODE_ENV = "production";
     process.env.VERCEL_ENV = "preview";
     process.env.VERCEL_BRANCH_URL = "my-branch.vercel.app";
@@ -60,9 +60,9 @@ describe("getBaseUrl", () => {
 
   test("returns localhost when no Vercel URLs are available in production", () => {
     process.env.NODE_ENV = "production";
-    delete process.env.NEXT_PUBLIC_APP_URL;
-    delete process.env.VERCEL_ENV;
-    delete process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    process.env.NEXT_PUBLIC_SITE_URL = undefined;
+    process.env.VERCEL_ENV = undefined;
+    process.env.VERCEL_PROJECT_PRODUCTION_URL = undefined;
 
     expect(getBaseUrl()).toBe("http://localhost:3000");
   });
@@ -74,7 +74,7 @@ describe("getAbsoluteUrl", () => {
   beforeEach(() => {
     // Reset process.env to original state before each test
     process.env = { ...originalEnv };
-    process.env.NEXT_PUBLIC_APP_URL = "https://example.com";
+    process.env.NEXT_PUBLIC_SITE_URL = "https://example.com";
   });
 
   afterEach(() => {
@@ -139,7 +139,7 @@ describe("getAbsoluteUrl", () => {
   });
 
   test("works with different base URLs", () => {
-    process.env.NEXT_PUBLIC_APP_URL = "http://localhost:3000";
+    process.env.NEXT_PUBLIC_SITE_URL = "http://localhost:3000";
     expect(getAbsoluteUrl("/dashboard")).toBe(
       "http://localhost:3000/dashboard"
     );

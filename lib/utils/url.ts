@@ -4,15 +4,15 @@
 
 /**
  * Get the base URL for the application following priority order:
- * 1. NEXT_PUBLIC_APP_URL (explicitly defined)
+ * 1. NEXT_PUBLIC_SITE_URL (explicitly defined)
  * 2. Vercel Preview environment (VERCEL_BRANCH_URL or VERCEL_URL)
  * 3. Vercel Production environment (VERCEL_PROJECT_PRODUCTION_URL)
  * 4. Local development fallback (http://localhost:3000)
  */
 export function getBaseUrl(): string {
   // 1. Explicitly defined URL
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    return process.env.NEXT_PUBLIC_APP_URL;
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
   }
 
   // 2. Vercel Preview & Production fallbacks

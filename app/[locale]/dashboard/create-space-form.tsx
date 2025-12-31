@@ -22,6 +22,7 @@ import {
   InputGroupText,
 } from "@/components/ui/input-group";
 import { generateRandomKey } from "@/lib/utils/random-key";
+import { getAbsoluteUrl } from "@/lib/utils/url";
 import type { CreateSpaceState } from "./actions";
 import { checkShareKeyAvailability, createSpace } from "./actions";
 
@@ -29,9 +30,6 @@ export function CreateSpaceForm() {
   const router = useRouter();
   const t = useTranslations("CreateSpace");
   const tErrors = useTranslations("Errors");
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`;
   const [shareKey, setShareKey] = useState("");
   const [debouncedShareKey] = useDebounce(shareKey, 500);
   const [checking, setChecking] = useState(false);
@@ -150,7 +148,7 @@ export function CreateSpaceForm() {
         <p className="mb-2 text-gray-500 text-sm">
           公開URL:{" "}
           <span className="font-mono">
-            {siteUrl}/
+            {getAbsoluteUrl()}/
             <span className="font-semibold text-gray-900">
               @{shareKey || "..."}-{dateSuffix}
             </span>

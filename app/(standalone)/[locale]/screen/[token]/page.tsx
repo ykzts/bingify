@@ -1,6 +1,6 @@
-import { headers } from "next/headers";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getAbsoluteUrl } from "@/lib/utils/url";
 import { ScreenDisplay } from "./_components/screen-display";
 
 interface Props {
@@ -55,11 +55,8 @@ export default async function ScreenViewPage({ params, searchParams }: Props) {
     );
   }
 
-  // Get base URL from headers for QR code generation
-  const headersList = await headers();
-  const host = headersList.get("host") || "localhost:3000";
-  const protocol = headersList.get("x-forwarded-proto") || "http";
-  const baseUrl = `${protocol}://${host}`;
+  // Get base URL for QR code generation
+  const baseUrl = getAbsoluteUrl();
 
   return (
     <ScreenDisplay

@@ -10,10 +10,7 @@ import { getAbsoluteUrl } from "@/lib/utils/url";
  * @returns The complete callback URL with redirect parameter if provided
  */
 export function buildOAuthCallbackUrl(redirectPath?: string): string {
-  // On client side, use window.location.origin for immediate availability
-  // The getAbsoluteUrl is primarily for server-side rendering
-  const baseUrl =
-    typeof window !== "undefined" ? window.location.origin : getAbsoluteUrl();
+  const baseUrl = getAbsoluteUrl();
   const callbackUrl = new URL("/auth/callback", baseUrl);
 
   if (redirectPath) {
