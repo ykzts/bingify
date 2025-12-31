@@ -1,6 +1,23 @@
 import { z } from "zod";
+import type { SystemFeatures } from "@/lib/types/settings";
+
+// Schema for validating feature flags structure
+export const systemFeaturesSchema = z.object({
+  gatekeeper: z.object({
+    email: z.object({
+      enabled: z.boolean(),
+    }),
+    twitch: z.object({
+      enabled: z.boolean(),
+    }),
+    youtube: z.object({
+      enabled: z.boolean(),
+    }),
+  }),
+}) satisfies z.ZodType<SystemFeatures>;
 
 export const systemSettingsSchema = z.object({
+  features: systemFeaturesSchema,
   max_participants_per_space: z
     .number()
     .int("整数を入力してください")

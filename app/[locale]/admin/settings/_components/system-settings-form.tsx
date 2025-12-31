@@ -40,6 +40,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
 
   return (
     <form action={formAction} className="space-y-6">
+      {/* Resource Limits Section */}
       <div className="space-y-4">
         {/* Max Participants per Space */}
         <div className="space-y-2">
@@ -93,6 +94,82 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             type="number"
           />
           <p className="text-gray-600 text-sm">{t("spaceExpirationHelp")}</p>
+        </div>
+      </div>
+
+      {/* Feature Flags Section */}
+      <div className="space-y-4 border-t pt-6">
+        <h4 className="font-semibold text-base">{t("featureFlagsTitle")}</h4>
+        <p className="text-gray-600 text-sm">{t("featureFlagsDescription")}</p>
+
+        {/* Gatekeeper Features */}
+        <div className="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <h5 className="font-medium text-sm">
+            {t("gatekeeperFeaturesTitle")}
+          </h5>
+
+          {/* YouTube Gatekeeper */}
+          <div className="flex items-center space-x-2">
+            <input
+              className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+              defaultChecked={
+                initialSettings?.features?.gatekeeper?.youtube?.enabled ?? true
+              }
+              disabled={isPending}
+              id="features.gatekeeper.youtube.enabled"
+              name="features.gatekeeper.youtube.enabled"
+              type="checkbox"
+              value="true"
+            />
+            <Label
+              className="cursor-pointer font-normal"
+              htmlFor="features.gatekeeper.youtube.enabled"
+            >
+              {t("gatekeeperYoutubeLabel")}
+            </Label>
+          </div>
+
+          {/* Twitch Gatekeeper */}
+          <div className="flex items-center space-x-2">
+            <input
+              className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+              defaultChecked={
+                initialSettings?.features?.gatekeeper?.twitch?.enabled ?? true
+              }
+              disabled={isPending}
+              id="features.gatekeeper.twitch.enabled"
+              name="features.gatekeeper.twitch.enabled"
+              type="checkbox"
+              value="true"
+            />
+            <Label
+              className="cursor-pointer font-normal"
+              htmlFor="features.gatekeeper.twitch.enabled"
+            >
+              {t("gatekeeperTwitchLabel")}
+            </Label>
+          </div>
+
+          {/* Email Gatekeeper */}
+          <div className="flex items-center space-x-2">
+            <input
+              className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+              defaultChecked={
+                initialSettings?.features?.gatekeeper?.email?.enabled ?? true
+              }
+              disabled={isPending}
+              id="features.gatekeeper.email.enabled"
+              name="features.gatekeeper.email.enabled"
+              type="checkbox"
+              value="true"
+            />
+            <Label
+              className="cursor-pointer font-normal"
+              htmlFor="features.gatekeeper.email.enabled"
+            >
+              {t("gatekeeperEmailLabel")}
+            </Label>
+          </div>
         </div>
       </div>
 
