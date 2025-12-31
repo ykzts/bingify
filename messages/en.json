@@ -170,7 +170,8 @@
     "historyDetails": "Details",
     "historyNoSpaces": "No spaces created yet",
     "historySpaceName": "Space Name",
-    "historyTitle": "History"
+    "historyTitle": "History",
+    "adminBadge": "Admin"
   },
   "Errors": {
     "authRequired": "Authentication required",

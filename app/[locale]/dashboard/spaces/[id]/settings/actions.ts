@@ -4,6 +4,9 @@ import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
 
+// Email validation regex at top level for performance
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export interface UpdateSpaceState {
   error?: string;
   fieldErrors?: Record<string, string>;
@@ -103,8 +106,19 @@ export async function updateSpaceSettings(
       };
     }
 
-    // Check ownership
-    if (space.owner_id !== user.id) {
+    // Check if user is owner or admin
+    const isOwner = space.owner_id === user.id;
+    const { data: adminRole } = await supabase
+      .from("space_roles")
+      .select("id")
+      .eq("space_id", spaceId)
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .single();
+
+    const isAdmin = !!adminRole;
+
+    if (!(isOwner || isAdmin)) {
       return {
         error: "権限がありません",
         success: false,
@@ -226,8 +240,8 @@ export async function updateSpaceSettings(
         },
         title: title || null,
       })
-      .eq("id", spaceId)
-      .eq("owner_id", user.id);
+      .eq("id", spaceId);
+    // Note: RLS policy handles both owner and admin access, no need to check owner_id here
 
     if (updateError) {
       console.error("Database error:", updateError);
@@ -320,6 +334,352 @@ export async function publishSpace(
     return {
       error: "予期しないエラーが発生しました",
       success: false,
+    };
+  }
+}
+
+// Admin management actions
+
+export interface InviteAdminState {
+  error?: string;
+  success: boolean;
+}
+
+export async function inviteAdmin(
+  spaceId: string,
+  _prevState: InviteAdminState,
+  formData: FormData
+): Promise<InviteAdminState> {
+  try {
+    if (!isValidUUID(spaceId)) {
+      return {
+        error: "無効なスペースIDです",
+        success: false,
+      };
+    }
+
+    const supabase = await createClient();
+
+    // Get current user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "認証が必要です。ログインしてください。",
+        success: false,
+      };
+    }
+
+    const email = (formData.get("email") as string)?.trim().toLowerCase();
+
+    if (!email) {
+      return {
+        error: "メールアドレスを入力してください",
+        success: false,
+      };
+    }
+
+    // Validate email format
+    if (!EMAIL_REGEX.test(email)) {
+      return {
+        error: "有効なメールアドレスを入力してください",
+        success: false,
+      };
+    }
+
+    // Check if current user is the owner
+    const { data: space, error: spaceError } = await supabase
+      .from("spaces")
+      .select("owner_id")
+      .eq("id", spaceId)
+      .single();
+
+    if (spaceError || !space) {
+      return {
+        error: "スペースが見つかりませんでした",
+        success: false,
+      };
+    }
+
+    if (space.owner_id !== user.id) {
+      return {
+        error: "オーナーのみが管理者を招待できます",
+        success: false,
+      };
+    }
+
+    // Find user by email
+    const { data: targetUser, error: userError } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("email", email)
+      .single();
+
+    if (userError || !targetUser) {
+      return {
+        error: "このメールアドレスのユーザーが見つかりませんでした",
+        success: false,
+      };
+    }
+
+    // Check if user is already the owner
+    if (targetUser.id === space.owner_id) {
+      return {
+        error: "オーナーは管理者として追加できません",
+        success: false,
+      };
+    }
+
+    // Check if user is already an admin
+    const { data: existingRole } = await supabase
+      .from("space_roles")
+      .select("id")
+      .eq("space_id", spaceId)
+      .eq("user_id", targetUser.id)
+      .single();
+
+    if (existingRole) {
+      return {
+        error: "このユーザーは既に管理者です",
+        success: false,
+      };
+    }
+
+    // Add user as admin
+    const { error: insertError } = await supabase.from("space_roles").insert({
+      role: "admin",
+      space_id: spaceId,
+      user_id: targetUser.id,
+    });
+
+    if (insertError) {
+      console.error("Database error:", insertError);
+      return {
+        error: "管理者の追加に失敗しました",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error inviting admin:", error);
+    return {
+      error: "予期しないエラーが発生しました",
+      success: false,
+    };
+  }
+}
+
+export interface RemoveAdminState {
+  error?: string;
+  success: boolean;
+}
+
+export async function removeAdmin(
+  spaceId: string,
+  adminUserId: string
+): Promise<RemoveAdminState> {
+  try {
+    if (!(isValidUUID(spaceId) && isValidUUID(adminUserId))) {
+      return {
+        error: "無効なIDです",
+        success: false,
+      };
+    }
+
+    const supabase = await createClient();
+
+    // Get current user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "認証が必要です。ログインしてください。",
+        success: false,
+      };
+    }
+
+    // Check if current user is the owner
+    const { data: space, error: spaceError } = await supabase
+      .from("spaces")
+      .select("owner_id")
+      .eq("id", spaceId)
+      .single();
+
+    if (spaceError || !space) {
+      return {
+        error: "スペースが見つかりませんでした",
+        success: false,
+      };
+    }
+
+    if (space.owner_id !== user.id) {
+      return {
+        error: "オーナーのみが管理者を削除できます",
+        success: false,
+      };
+    }
+
+    // Prevent removing the owner (should not happen, but safety check)
+    if (adminUserId === space.owner_id) {
+      return {
+        error: "オーナーは削除できません",
+        success: false,
+      };
+    }
+
+    // Remove admin role
+    const { error: deleteError } = await supabase
+      .from("space_roles")
+      .delete()
+      .eq("space_id", spaceId)
+      .eq("user_id", adminUserId);
+
+    if (deleteError) {
+      console.error("Database error:", deleteError);
+      return {
+        error: "管理者の削除に失敗しました",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error removing admin:", error);
+    return {
+      error: "予期しないエラーが発生しました",
+      success: false,
+    };
+  }
+}
+
+export interface SpaceAdmin {
+  avatar_url: string | null;
+  email: string | null;
+  full_name: string | null;
+  user_id: string;
+}
+
+export interface GetSpaceAdminsResult {
+  admins: SpaceAdmin[];
+  error?: string;
+}
+
+export async function getSpaceAdmins(
+  spaceId: string
+): Promise<GetSpaceAdminsResult> {
+  try {
+    if (!isValidUUID(spaceId)) {
+      return {
+        admins: [],
+        error: "無効なスペースIDです",
+      };
+    }
+
+    const supabase = await createClient();
+
+    // Get current user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        admins: [],
+        error: "認証が必要です",
+      };
+    }
+
+    // Verify user is owner
+    const { data: space, error: spaceError } = await supabase
+      .from("spaces")
+      .select("owner_id")
+      .eq("id", spaceId)
+      .single();
+
+    if (spaceError || !space) {
+      return {
+        admins: [],
+        error: "スペースが見つかりませんでした",
+      };
+    }
+
+    if (space.owner_id !== user.id) {
+      return {
+        admins: [],
+        error: "権限がありません",
+      };
+    }
+
+    // Get all admins with their profile info - split into two queries
+    // Step 1: Get space_roles for this space
+    const { data: roles, error: rolesError } = await supabase
+      .from("space_roles")
+      .select("user_id")
+      .eq("space_id", spaceId)
+      .eq("role", "admin");
+
+    if (rolesError) {
+      console.error("Error fetching admins:", rolesError);
+      return {
+        admins: [],
+        error: "管理者一覧の取得に失敗しました",
+      };
+    }
+
+    // Step 2: Fetch profiles for the user_ids
+    const userIds = (roles || []).map((role) => role.user_id);
+    let profiles: Array<{
+      avatar_url: string | null;
+      email: string | null;
+      full_name: string | null;
+      id: string;
+    }> = [];
+
+    if (userIds.length > 0) {
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, email, full_name, avatar_url")
+        .in("id", userIds);
+
+      if (profilesError) {
+        console.error("Error fetching profiles:", profilesError);
+        return {
+          admins: [],
+          error: "管理者情報の取得に失敗しました",
+        };
+      }
+
+      profiles = profilesData || [];
+    }
+
+    // Transform the data - merge roles with profiles
+    const admins: SpaceAdmin[] = (roles || []).map((role) => {
+      const profile = profiles.find((p) => p.id === role.user_id);
+      return {
+        avatar_url: profile?.avatar_url || null,
+        email: profile?.email || null,
+        full_name: profile?.full_name || null,
+        user_id: role.user_id,
+      };
+    });
+
+    return {
+      admins,
+    };
+  } catch (error) {
+    console.error("Error in getSpaceAdmins:", error);
+    return {
+      admins: [],
+      error: "予期しないエラーが発生しました",
     };
   }
 }

@@ -285,6 +285,7 @@ export async function regenerateViewToken(
 export interface UserSpace {
   created_at: string;
   id: string;
+  is_owner?: boolean;
   participant_count?: number;
   share_key: string;
   status: string;
@@ -296,6 +297,7 @@ export interface UserSpacesResult {
   spaces: UserSpace[];
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Function handles multiple space sources and deduplication logic
 export async function getUserSpaces(): Promise<UserSpacesResult> {
   try {
     const supabase = await createClient();
@@ -313,15 +315,15 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       };
     }
 
-    // Fetch user's spaces ordered by creation date
-    const { data: spaces, error } = await supabase
+    // Fetch spaces where user is owner
+    const { data: ownedSpaces, error: ownedError } = await supabase
       .from("spaces")
       .select("id, share_key, status, created_at")
       .eq("owner_id", user.id)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching spaces:", error);
+    if (ownedError) {
+      console.error("Error fetching owned spaces:", ownedError);
       return {
         activeSpace: null,
         error: "Failed to fetch spaces",
@@ -329,9 +331,76 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       };
     }
 
+    // Fetch spaces where user is admin - split into two queries
+    // Step 1: Get space_ids where user is admin
+    const { data: adminRoles, error: adminError } = await supabase
+      .from("space_roles")
+      .select("space_id")
+      .eq("user_id", user.id)
+      .eq("role", "admin");
+
+    if (adminError) {
+      console.error("Error fetching admin roles:", adminError);
+    }
+
+    // Step 2: Fetch the actual space records
+    const spaceIds = (adminRoles || []).map((role) => role.space_id);
+    let adminSpacesData: Array<{
+      created_at: string;
+      id: string;
+      share_key: string;
+      status: string;
+    }> = [];
+
+    if (spaceIds.length > 0) {
+      const { data: fetchedSpaces, error: spacesError } = await supabase
+        .from("spaces")
+        .select("id, share_key, status, created_at")
+        .in("id", spaceIds);
+
+      if (spacesError) {
+        console.error("Error fetching admin spaces:", spacesError);
+      } else {
+        adminSpacesData = fetchedSpaces || [];
+      }
+    }
+
+    // Combine owned and admin spaces
+    const ownedSpacesWithFlag: UserSpace[] = (ownedSpaces || []).map((s) => ({
+      ...s,
+      is_owner: true,
+    }));
+
+    const adminSpaces: UserSpace[] = adminSpacesData.map((space) => ({
+      created_at: space.created_at,
+      id: space.id,
+      is_owner: false,
+      share_key: space.share_key,
+      status: space.status,
+    }));
+
+    // Combine and deduplicate (in case user is both owner and admin somehow)
+    const spaceMap = new Map<string, UserSpace>();
+    for (const space of [...ownedSpacesWithFlag, ...adminSpaces]) {
+      if (spaceMap.has(space.id)) {
+        // If space exists, prefer owner flag
+        const existing = spaceMap.get(space.id);
+        if (existing && space.is_owner) {
+          spaceMap.set(space.id, space);
+        }
+      } else {
+        spaceMap.set(space.id, space);
+      }
+    }
+
+    const allSpaces = Array.from(spaceMap.values()).sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
     // Find active space (excluding draft)
     let activeSpace: UserSpace | null = null;
-    const allActiveSpaces = (spaces ?? []).filter((s) => s.status === "active");
+    const allActiveSpaces = allSpaces.filter((s) => s.status === "active");
     const activeSpaceData = allActiveSpaces[0] ?? null;
 
     if (allActiveSpaces.length > 1) {
@@ -359,7 +428,7 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
 
     return {
       activeSpace,
-      spaces: spaces || [],
+      spaces: allSpaces,
     };
   } catch (error) {
     console.error("Error in getUserSpaces:", error);

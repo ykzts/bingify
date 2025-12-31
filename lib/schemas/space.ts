@@ -417,3 +417,19 @@ export const emailAllowlistSchema = z
         "メールアドレスまたはドメインの形式が正しくありません。例: @example.com, user@example.com, example.com",
     }
   );
+
+// Schema for inviting admin by email
+export const inviteAdminSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email("有効なメールアドレスを入力してください")
+    .transform((email) => email.toLowerCase()),
+});
+
+export type InviteAdminFormData = z.infer<typeof inviteAdminSchema>;
+
+// Schema for removing admin
+export const removeAdminSchema = z.object({
+  adminUserId: z.string().uuid("無効なユーザーIDです"),
+});
