@@ -431,12 +431,12 @@ describe("Dashboard Actions", () => {
       expect(result.error).toContain("3文字以上");
     });
 
-    it("should count only active spaces (exclude archived) when checking max limit", async () => {
+    it("should count only active spaces (exclude closed) when checking max limit", async () => {
       const userId = "test-user-id";
       const shareKey = "test-space";
 
       let selectCalled = false;
-      let neqCalledWithArchived = false;
+      let neqCalledWithClosed = false;
 
       const mockClient = {
         auth: {
@@ -466,8 +466,8 @@ describe("Dashboard Actions", () => {
                     neq: vi
                       .fn()
                       .mockImplementation((column: string, value: string) => {
-                        if (column === "status" && value === "archived") {
-                          neqCalledWithArchived = true;
+                        if (column === "status" && value === "closed") {
+                          neqCalledWithClosed = true;
                         }
                         return Promise.resolve({
                           count: 4, // User has 4 active spaces
@@ -490,9 +490,9 @@ describe("Dashboard Actions", () => {
 
       await createSpace({ success: false }, formData);
 
-      // Verify that the query was made to exclude archived spaces
+      // Verify that the query was made to exclude closed spaces
       expect(selectCalled).toBe(true);
-      expect(neqCalledWithArchived).toBe(true);
+      expect(neqCalledWithClosed).toBe(true);
     });
   });
 });
