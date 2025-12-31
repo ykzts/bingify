@@ -215,6 +215,8 @@
     "terms": "Terms of Service"
   },
   "HeaderMenu": {
+    "admin": "Admin",
+    "dashboard": "Dashboard",
     "language": "Language",
     "login": "Sign in",
     "logout": "Sign out",

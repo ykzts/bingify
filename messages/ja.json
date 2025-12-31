@@ -215,6 +215,8 @@
     "terms": "利用規約"
   },
   "HeaderMenu": {
+    "admin": "システム管理",
+    "dashboard": "ダッシュボード",
     "language": "言語設定",
     "login": "ログイン",
     "logout": "ログアウト",
