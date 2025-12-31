@@ -69,34 +69,33 @@ export default async function AdminSpacePage({ params }: Props) {
 
   return (
     <div className="min-h-screen p-8">
-      {/* Header with Action Buttons */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="font-bold text-3xl">{t("heading")}</h1>
-          <p className="mt-1 text-gray-600">
-            {t("spaceId")}: {space.share_key}
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <ViewingUrlDialog
-            locale={locale}
-            spaceId={space.id}
-            viewToken={space.view_token}
-          />
-          <SpaceSettingsSheet
-            currentParticipantCount={participantCount}
-            features={features}
-            isOwner={isOwner}
-            locale={locale}
-            space={space}
-            systemMaxParticipants={
-              systemSettings?.max_participants_per_space || 1000
-            }
-          />
-        </div>
-      </div>
-
       <div className="mx-auto max-w-3xl space-y-8">
+        {/* Header with Action Buttons */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-bold text-3xl">{t("heading")}</h1>
+            <p className="mt-1 text-gray-600">
+              {t("spaceId")}: {space.share_key}
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <ViewingUrlDialog
+              locale={locale}
+              spaceId={space.id}
+              viewToken={space.view_token}
+            />
+            <SpaceSettingsSheet
+              currentParticipantCount={participantCount}
+              features={features}
+              isOwner={isOwner}
+              locale={locale}
+              space={space}
+              systemMaxParticipants={
+                systemSettings?.max_participants_per_space || 1000
+              }
+            />
+          </div>
+        </div>
         {/* Main Content Area - Status-based rendering */}
         {space.status === "draft" && (
           <DraftStatusView locale={locale} spaceId={space.id} />
