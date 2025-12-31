@@ -107,15 +107,18 @@ export function CreateSpaceForm() {
         <FieldLabel>共有キー</FieldLabel>
 
         <InputGroup className="mb-2">
+          <InputGroupAddon align="inline-start">
+            <InputGroupText>@</InputGroupText>
+          </InputGroupAddon>
           <InputGroupInput
-            className="rounded-r-none border-r-0 pr-10 font-mono"
+            className="rounded-none border-x-0 pr-10 font-mono"
             disabled={isPending}
             maxLength={30}
             minLength={3}
             name="share_key"
             onChange={handleShareKeyChange}
             pattern="[a-z0-9-]+"
-            placeholder="@my-party"
+            placeholder="my-party"
             required
             type="text"
             value={shareKey}
