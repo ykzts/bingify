@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { createClient } from "@/lib/supabase/server";
 import { Faq } from "./_components/faq";
 import { Features } from "./_components/features";
 import { FloatingParticles } from "./_components/floating-particles";
@@ -17,6 +18,16 @@ export default async function Home({ params }: Props) {
   const tFeatures = await getTranslations("Features");
   const tFaq = await getTranslations("Faq");
   const tSupport = await getTranslations("Support");
+
+  // Fetch system settings to get the actual max participants value
+  const supabase = await createClient();
+  const { data: systemSettings } = await supabase
+    .from("system_settings")
+    .select("max_participants_per_space")
+    .eq("id", 1)
+    .single();
+
+  const maxParticipants = systemSettings?.max_participants_per_space ?? 50;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background font-sans">
@@ -45,11 +56,11 @@ export default async function Home({ params }: Props) {
           subheading={tFeatures("subheading")}
         />
         <Faq
-          answer1={tFaq("answer1", { maxParticipants: 50 })}
+          answer1={tFaq("answer1", { maxParticipants })}
           answer2={tFaq("answer2")}
           answer3={tFaq("answer3")}
           heading={tFaq("heading")}
-          maxParticipants={50}
+          maxParticipants={maxParticipants}
           question1={tFaq("question1")}
           question2={tFaq("question2")}
           question3={tFaq("question3")}
