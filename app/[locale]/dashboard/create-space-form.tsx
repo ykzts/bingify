@@ -96,8 +96,8 @@ export function CreateSpaceForm() {
 
   useEffect(() => {
     if (state.success && state.spaceId) {
-      // Redirect to settings page after creation
-      router.push(`/dashboard/spaces/${state.spaceId}/settings`);
+      // Redirect to space detail page after creation (draft state)
+      router.push(`/dashboard/spaces/${state.spaceId}`);
     }
   }, [state, router]);
 

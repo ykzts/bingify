@@ -1,11 +1,12 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { BingoGameManager } from "./_components/bingo-game-manager";
 import { CloseSpaceButton } from "./_components/close-space-button";
+import { DraftStatusView } from "./_components/draft-status-view";
 import { ParticipantsStatus } from "./_components/participants-status";
-import { ViewingUrlManager } from "./_components/viewing-url-manager";
+import { SpaceSettingsSheet } from "./_components/space-settings-sheet";
+import { ViewingUrlDialog } from "./_components/viewing-url-dialog";
 
 interface Props {
   params: Promise<{ id: string; locale: string }>;
@@ -27,11 +28,11 @@ export default async function AdminSpacePage({ params }: Props) {
     redirect(`/${locale}/login?redirect=/dashboard/spaces/${id}`);
   }
 
-  // Fetch space (RLS ensures only owner can access)
+  // Fetch space with all necessary fields for settings
   const { data: space, error } = await supabase
     .from("spaces")
     .select(
-      "id, share_key, view_token, owner_id, status, created_at, max_participants"
+      "id, share_key, view_token, owner_id, status, created_at, max_participants, title, description, gatekeeper_rules, settings"
     )
     .eq("id", id)
     .single();
@@ -40,63 +41,76 @@ export default async function AdminSpacePage({ params }: Props) {
     notFound();
   }
 
+  // Check if current user is owner
+  const isOwner = space.owner_id === user.id;
+
+  // Get current participant count
+  const { data: participantsData } = await supabase
+    .from("participants")
+    .select("id")
+    .eq("space_id", id);
+
+  const participantCount = participantsData?.length ?? 0;
+
+  // Get system settings for the settings sheet
+  const { data: systemSettings } = await supabase
+    .from("system_settings")
+    .select("features, max_participants_per_space")
+    .eq("id", 1)
+    .single();
+
+  const features = systemSettings?.features || {
+    gatekeeper: {
+      email: { enabled: true },
+      twitch: { enabled: true },
+      youtube: { enabled: true },
+    },
+  };
+
   return (
-    <div className="min-h-screen p-8">
-      <h1 className="mb-8 font-bold text-3xl">{t("heading")}</h1>
-
-      <div className="mx-auto max-w-3xl space-y-8">
-        {/* Status Banner */}
-        {space.status === "draft" && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 shadow-sm">
-            <h2 className="mb-2 font-semibold text-amber-900 text-xl">
-              {t("draftStatusTitle")}
-            </h2>
-            <p className="mb-4 text-amber-800 text-sm">
-              {t("draftStatusMessage")}
-            </p>
-            <Link
-              className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-amber-700"
-              href={`/${locale}/dashboard/spaces/${space.id}/settings`}
-            >
-              {t("goToSettings")}
-            </Link>
-          </div>
-        )}
-
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-semibold text-xl">
-              {t("spaceId")}: {space.share_key}
-            </h2>
-            <Link
-              className="text-purple-600 text-sm hover:underline"
-              href={`/${locale}/dashboard/spaces/${space.id}/settings`}
-            >
-              {t("settingsLink")}
-            </Link>
-          </div>
-
-          <ViewingUrlManager
+    <div className="mx-auto min-h-screen max-w-3xl space-y-8 p-8">
+      {/* Header with Action Buttons */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-bold text-3xl">{t("heading")}</h1>
+          <p className="mt-1 text-gray-600">
+            {t("spaceId")}: {space.share_key}
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <ViewingUrlDialog
             locale={locale}
             spaceId={space.id}
             viewToken={space.view_token}
           />
+          <SpaceSettingsSheet
+            currentParticipantCount={participantCount}
+            features={features}
+            isOwner={isOwner}
+            locale={locale}
+            space={space}
+            systemMaxParticipants={
+              systemSettings?.max_participants_per_space || 1000
+            }
+          />
         </div>
+      </div>
+      {/* Main Content Area - Status-based rendering */}
+      {space.status === "draft" && (
+        <DraftStatusView locale={locale} spaceId={space.id} />
+      )}
 
-        {space.status === "active" && (
+      {space.status === "active" && (
+        <>
           <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <BingoGameManager spaceId={space.id} />
           </div>
-        )}
 
-        {space.status === "active" && (
           <ParticipantsStatus
             maxParticipants={space.max_participants}
             spaceId={space.id}
           />
-        )}
 
-        {space.status === "active" && (
           <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
             <h2 className="mb-4 font-semibold text-xl">
               {t("closeSpaceTitle")}
@@ -106,8 +120,17 @@ export default async function AdminSpacePage({ params }: Props) {
             </p>
             <CloseSpaceButton spaceId={space.id} />
           </div>
-        )}
-      </div>
+        </>
+      )}
+
+      {space.status === "closed" && (
+        <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+          <div className="text-center">
+            <h2 className="mb-2 font-bold text-2xl">{t("closeSpaceTitle")}</h2>
+            <p className="text-gray-600">{t("closeSpaceDescription")}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
