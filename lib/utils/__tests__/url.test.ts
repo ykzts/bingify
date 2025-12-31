@@ -1,85 +1,72 @@
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { getAbsoluteUrl, getBaseUrl } from "../url";
 
 describe("getBaseUrl", () => {
-  const originalEnv = process.env;
-
-  beforeEach(() => {
-    // Reset process.env to original state before each test
-    process.env = { ...originalEnv };
-  });
-
   afterEach(() => {
-    // Restore original env after tests
-    process.env = originalEnv;
+    vi.unstubAllEnvs();
   });
 
   test("returns NEXT_PUBLIC_SITE_URL when explicitly defined", () => {
-    process.env.NEXT_PUBLIC_SITE_URL = "https://example.com";
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://example.com");
     expect(getBaseUrl()).toBe("https://example.com");
   });
 
   test("returns Vercel Branch URL in preview environment", () => {
-    process.env.NODE_ENV = "production";
-    process.env.VERCEL_ENV = "preview";
-    process.env.VERCEL_BRANCH_URL = "my-branch-abc123.vercel.app";
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("VERCEL_BRANCH_URL", "my-branch-abc123.vercel.app");
 
     expect(getBaseUrl()).toBe("https://my-branch-abc123.vercel.app");
   });
 
   test("returns Vercel URL when Branch URL is not available in preview", () => {
-    process.env.NODE_ENV = "production";
-    process.env.VERCEL_ENV = "preview";
-    process.env.VERCEL_URL = "my-preview-xyz789.vercel.app";
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("VERCEL_URL", "my-preview-xyz789.vercel.app");
 
     expect(getBaseUrl()).toBe("https://my-preview-xyz789.vercel.app");
   });
 
   test("returns production URL in Vercel production environment", () => {
-    process.env.NODE_ENV = "production";
-    process.env.VERCEL_ENV = "production";
-    process.env.VERCEL_PROJECT_PRODUCTION_URL = "myapp.vercel.app";
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("VERCEL_ENV", "production");
+    vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "myapp.vercel.app");
 
     expect(getBaseUrl()).toBe("https://myapp.vercel.app");
   });
 
   test("returns localhost in local development", () => {
-    process.env.NEXT_PUBLIC_SITE_URL = undefined;
-    process.env.NODE_ENV = undefined;
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", undefined);
+    vi.stubEnv("NODE_ENV", undefined);
     expect(getBaseUrl()).toBe("http://localhost:3000");
   });
 
   test("NEXT_PUBLIC_SITE_URL takes precedence over Vercel variables", () => {
-    process.env.NEXT_PUBLIC_SITE_URL = "https://custom-domain.com";
-    process.env.NODE_ENV = "production";
-    process.env.VERCEL_ENV = "preview";
-    process.env.VERCEL_BRANCH_URL = "my-branch.vercel.app";
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://custom-domain.com");
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("VERCEL_BRANCH_URL", "my-branch.vercel.app");
 
     expect(getBaseUrl()).toBe("https://custom-domain.com");
   });
 
   test("returns localhost when no Vercel URLs are available in production", () => {
-    process.env.NODE_ENV = "production";
-    process.env.NEXT_PUBLIC_SITE_URL = undefined;
-    process.env.VERCEL_ENV = undefined;
-    process.env.VERCEL_PROJECT_PRODUCTION_URL = undefined;
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", undefined);
+    vi.stubEnv("VERCEL_ENV", undefined);
+    vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", undefined);
 
     expect(getBaseUrl()).toBe("http://localhost:3000");
   });
 });
 
 describe("getAbsoluteUrl", () => {
-  const originalEnv = process.env;
-
   beforeEach(() => {
-    // Reset process.env to original state before each test
-    process.env = { ...originalEnv };
-    process.env.NEXT_PUBLIC_SITE_URL = "https://example.com";
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://example.com");
   });
 
   afterEach(() => {
-    // Restore original env after tests
-    process.env = originalEnv;
+    vi.unstubAllEnvs();
   });
 
   test("returns base URL when no path is provided", () => {
@@ -139,7 +126,7 @@ describe("getAbsoluteUrl", () => {
   });
 
   test("works with different base URLs", () => {
-    process.env.NEXT_PUBLIC_SITE_URL = "http://localhost:3000";
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "http://localhost:3000");
     expect(getAbsoluteUrl("/dashboard")).toBe(
       "http://localhost:3000/dashboard"
     );
