@@ -4,5 +4,16 @@
   "files": {
     "ignoreUnknown": true,
     "includes": ["!components/ui"]
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["types/supabase.ts"],
+      "linter": {
+        "enabled": false
+      },
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }
