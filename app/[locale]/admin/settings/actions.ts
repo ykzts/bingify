@@ -18,7 +18,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
     const { data, error } = await supabase
       .from("system_settings")
       .select(
-        "max_participants_per_space, max_spaces_per_user, space_expiration_hours"
+        "max_participants_per_space, max_spaces_per_user, space_expiration_hours, features"
       )
       .eq("id", 1)
       .single();
@@ -85,7 +85,22 @@ export async function updateSystemSettings(
     const maxSpacesRaw = formData.get("max_spaces_per_user") as string;
     const expirationHoursRaw = formData.get("space_expiration_hours") as string;
 
+    // Parse feature flags
+    const gatekeeperYoutubeEnabled =
+      formData.get("features.gatekeeper.youtube.enabled") === "true";
+    const gatekeeperTwitchEnabled =
+      formData.get("features.gatekeeper.twitch.enabled") === "true";
+    const gatekeeperEmailEnabled =
+      formData.get("features.gatekeeper.email.enabled") === "true";
+
     const validation = systemSettingsSchema.safeParse({
+      features: {
+        gatekeeper: {
+          email: { enabled: gatekeeperEmailEnabled },
+          twitch: { enabled: gatekeeperTwitchEnabled },
+          youtube: { enabled: gatekeeperYoutubeEnabled },
+        },
+      },
       max_participants_per_space: Number.parseInt(maxParticipantsRaw, 10),
       max_spaces_per_user: Number.parseInt(maxSpacesRaw, 10),
       space_expiration_hours: Number.parseInt(expirationHoursRaw, 10),
