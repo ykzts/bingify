@@ -119,14 +119,15 @@ export async function createSpace(
       console.error("Failed to fetch system settings:", settingsError);
       // Continue with space creation if settings fetch fails (graceful degradation)
     } else if (systemSettings) {
-      // Count user's existing spaces
+      // Count user's existing active spaces (excluding archived)
       // Note: The spaces table RLS policy does not have recursion issues,
       // so we can use count: "exact" directly. The participants table uses
       // a different approach (fetching rows then using array length) due to RLS recursion.
       const { count: userSpaceCount, error: countError } = await supabase
         .from("spaces")
         .select("id", { count: "exact" })
-        .eq("owner_id", user.id);
+        .eq("owner_id", user.id)
+        .neq("status", "archived");
 
       if (countError) {
         console.error("Failed to count user spaces:", countError);

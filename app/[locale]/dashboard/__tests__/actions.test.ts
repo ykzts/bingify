@@ -5,9 +5,26 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(),
 }));
 
+vi.mock("node:crypto", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:crypto")>();
+  return {
+    ...actual,
+    default: actual,
+    randomUUID: vi.fn(() => "test-uuid-123"),
+  };
+});
+
+vi.mock("date-fns", () => ({
+  format: vi.fn(() => "20241231"),
+}));
+
+vi.mock("@/lib/crypto", () => ({
+  generateSecureToken: vi.fn(() => "test-token-123"),
+}));
+
 // Import after mocks
 import { createClient } from "@/lib/supabase/server";
-import { getUserSpaces } from "../actions";
+import { createSpace, getUserSpaces } from "../actions";
 
 describe("Dashboard Actions", () => {
   describe("getUserSpaces", () => {
@@ -319,6 +336,163 @@ describe("Dashboard Actions", () => {
       expect(result.activeSpace).toBeNull();
       expect(result.spaces).toHaveLength(0);
       expect(result.error).toBeUndefined();
+    });
+  });
+
+  describe("createSpace", () => {
+    it("should reject space creation when max active spaces limit is reached", async () => {
+      const userId = "test-user-id";
+      const shareKey = "test-space";
+
+      const mockClient = {
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: userId } },
+          }),
+        },
+        from: vi.fn().mockImplementation((table: string) => {
+          if (table === "system_settings") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
+                    data: { max_spaces_per_user: 5 },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          if (table === "spaces") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  neq: vi.fn().mockResolvedValue({
+                    count: 5, // User has 5 active spaces (at the limit)
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          return {};
+        }),
+      };
+
+      vi.mocked(createClient).mockResolvedValue(mockClient as any);
+
+      const formData = new FormData();
+      formData.set("share_key", shareKey);
+
+      const result = await createSpace({ success: false }, formData);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("maxSpacesReached");
+      expect(result.errorData?.max).toBe(5);
+    });
+
+    it("should require user authentication", async () => {
+      const mockClient = {
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: null },
+          }),
+        },
+      };
+
+      vi.mocked(createClient).mockResolvedValue(mockClient as any);
+
+      const formData = new FormData();
+      formData.set("share_key", "test-space");
+
+      const result = await createSpace({ success: false }, formData);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("認証が必要です。ログインしてください。");
+    });
+
+    it("should validate share key format", async () => {
+      const mockClient = {
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: "test-user-id" } },
+          }),
+        },
+      };
+
+      vi.mocked(createClient).mockResolvedValue(mockClient as any);
+
+      const formData = new FormData();
+      formData.set("share_key", "AB"); // Too short
+
+      const result = await createSpace({ success: false }, formData);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("3文字以上");
+    });
+
+    it("should count only active spaces (exclude archived) when checking max limit", async () => {
+      const userId = "test-user-id";
+      const shareKey = "test-space";
+
+      let selectCalled = false;
+      let neqCalledWithArchived = false;
+
+      const mockClient = {
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: userId } },
+          }),
+        },
+        from: vi.fn().mockImplementation((table: string) => {
+          if (table === "system_settings") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
+                    data: { max_spaces_per_user: 5 },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          if (table === "spaces") {
+            return {
+              select: vi.fn().mockImplementation(() => {
+                selectCalled = true;
+                return {
+                  eq: vi.fn().mockReturnValue({
+                    neq: vi
+                      .fn()
+                      .mockImplementation((column: string, value: string) => {
+                        if (column === "status" && value === "archived") {
+                          neqCalledWithArchived = true;
+                        }
+                        return Promise.resolve({
+                          count: 4, // User has 4 active spaces
+                          error: null,
+                        });
+                      }),
+                  }),
+                };
+              }),
+            };
+          }
+          return {};
+        }),
+      };
+
+      vi.mocked(createClient).mockResolvedValue(mockClient as any);
+
+      const formData = new FormData();
+      formData.set("share_key", shareKey);
+
+      await createSpace({ success: false }, formData);
+
+      // Verify that the query was made to exclude archived spaces
+      expect(selectCalled).toBe(true);
+      expect(neqCalledWithArchived).toBe(true);
     });
   });
 });
