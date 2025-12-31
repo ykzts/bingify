@@ -14,7 +14,7 @@ async function HeaderMenuData() {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("avatar_url, email, full_name")
+    .select("avatar_url, email, full_name, role")
     .eq("id", user.id)
     .single();
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Globe, LogOut, Settings, User } from "lucide-react";
+import { Globe, LayoutDashboard, LogOut, Settings, Shield, User } from "lucide-react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
@@ -25,6 +25,7 @@ interface HeaderMenuProps {
     avatar_url?: string | null;
     email?: string | null;
     full_name?: string | null;
+    role?: string | null;
   } | null;
 }
 
@@ -147,6 +148,30 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
               <p className="text-gray-500 text-sm">{user.email}</p>
             )}
           </div>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem asChild>
+            <Link
+              className="flex cursor-pointer items-center gap-2"
+              href="/dashboard"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              {t("dashboard")}
+            </Link>
+          </DropdownMenuItem>
+
+          {user.role === "admin" && (
+            <DropdownMenuItem asChild>
+              <Link
+                className="flex cursor-pointer items-center gap-2"
+                href="/admin"
+              >
+                <Shield className="h-4 w-4" />
+                {t("admin")}
+              </Link>
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuSeparator />
 
