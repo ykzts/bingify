@@ -33,21 +33,17 @@ import type { UserSpace } from "./actions";
 import { deleteSpace } from "./actions";
 
 interface SpaceActionsDropdownProps {
-  locale: string;
   space: UserSpace;
 }
 
-export function SpaceActionsDropdown({
-  locale,
-  space,
-}: SpaceActionsDropdownProps) {
+export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
   const t = useTranslations("Dashboard");
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleManage = () => {
-    router.push(`/${locale}/dashboard/spaces/${space.id}`);
+    router.push(`/dashboard/spaces/${space.id}`);
   };
 
   const handleCopyLink = async () => {
@@ -87,7 +83,7 @@ export function SpaceActionsDropdown({
 
   const handleReopen = () => {
     // Navigate to the space settings page where user can change status from closed to draft/active
-    router.push(`/${locale}/dashboard/spaces/${space.id}`);
+    router.push(`/dashboard/spaces/${space.id}`);
   };
 
   const isActive = space.status === "active";

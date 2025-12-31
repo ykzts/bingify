@@ -173,7 +173,7 @@ export default async function DashboardPage({ params }: Props) {
                       })()}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <SpaceActionsDropdown locale={locale} space={space} />
+                      <SpaceActionsDropdown space={space} />
                     </td>
                   </tr>
                 ))}
