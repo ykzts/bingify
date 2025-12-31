@@ -4,6 +4,8 @@ import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getUserSpaces } from "./actions";
 import { CreateSpaceForm } from "./create-space-form";
+import { SpaceActionsDropdown } from "./space-actions-dropdown";
+import { StatusBadge } from "./status-badge";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -112,9 +114,12 @@ export default async function DashboardPage({ params }: Props) {
                   <th className="px-4 py-3 font-medium">
                     {t("historySpaceName")}
                   </th>
+                  <th className="px-4 py-3 font-medium">
+                    {t("historyStatus")}
+                  </th>
                   <th className="px-4 py-3 font-medium">{t("historyDate")}</th>
                   <th className="px-4 py-3 text-right font-medium">
-                    {t("historyDetails")}
+                    {t("spaceActions")}
                   </th>
                 </tr>
               </thead>
@@ -125,14 +130,39 @@ export default async function DashboardPage({ params }: Props) {
                     key={space.id}
                   >
                     <td className="px-4 py-3 font-medium text-gray-900">
-                      <div className="flex items-center gap-2">
-                        {space.share_key}
-                        {space.is_owner === false && (
-                          <span className="rounded bg-blue-100 px-2 py-0.5 text-blue-800 text-xs">
-                            {t("adminBadge")}
-                          </span>
-                        )}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          {space.share_key}
+                          {space.is_owner === false && (
+                            <span className="rounded bg-blue-100 px-2 py-0.5 text-blue-800 text-xs">
+                              {t("adminBadge")}
+                            </span>
+                          )}
+                        </div>
+                        {space.status === "active" &&
+                          space.participant_count !== undefined && (
+                            <p className="flex items-center gap-1 text-gray-500 text-xs">
+                              <Users className="h-3 w-3" />
+                              {t("activeSpaceParticipants", {
+                                count: space.participant_count || 0,
+                              })}
+                            </p>
+                          )}
                       </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge
+                        label={(() => {
+                          if (space.status === "active") {
+                            return t("statusActive");
+                          }
+                          if (space.status === "draft") {
+                            return t("statusDraft");
+                          }
+                          return t("statusClosed");
+                        })()}
+                        status={space.status}
+                      />
                     </td>
                     <td className="px-4 py-3 text-gray-500">
                       {(() => {
@@ -143,12 +173,7 @@ export default async function DashboardPage({ params }: Props) {
                       })()}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Link
-                        className="text-purple-600 hover:underline"
-                        href={`/${locale}/dashboard/spaces/${space.id}`}
-                      >
-                        {t("historyDetails")}
-                      </Link>
+                      <SpaceActionsDropdown space={space} />
                     </td>
                   </tr>
                 ))}
