@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -227,13 +233,10 @@ export function SpaceSettingsForm({
         <div className="space-y-4">
           <h2 className="font-semibold text-lg">{t("basicInfoTitle")}</h2>
 
-          <div>
-            <Label className="mb-2" htmlFor="title">
-              {t("titleLabel")}
-            </Label>
+          <Field>
+            <FieldLabel>{t("titleLabel")}</FieldLabel>
             <Input
               disabled={isPending}
-              id="title"
               maxLength={100}
               name="title"
               onChange={(e) => setTitle(e.target.value)}
@@ -241,21 +244,14 @@ export function SpaceSettingsForm({
               type="text"
               value={title}
             />
-            {updateState.fieldErrors?.title && (
-              <p className="mt-1 text-red-600 text-sm">
-                {updateState.fieldErrors.title}
-              </p>
-            )}
-            <p className="mt-1 text-gray-500 text-sm">{t("titleHelp")}</p>
-          </div>
+            <FieldError>{updateState.fieldErrors?.title}</FieldError>
+            <FieldDescription>{t("titleHelp")}</FieldDescription>
+          </Field>
 
-          <div>
-            <Label className="mb-2" htmlFor="description">
-              {t("descriptionLabel")}
-            </Label>
+          <Field>
+            <FieldLabel>{t("descriptionLabel")}</FieldLabel>
             <Textarea
               disabled={isPending}
-              id="description"
               maxLength={500}
               name="description"
               onChange={(e) => setDescription(e.target.value)}
@@ -263,26 +259,19 @@ export function SpaceSettingsForm({
               rows={3}
               value={description}
             />
-            {updateState.fieldErrors?.description && (
-              <p className="mt-1 text-red-600 text-sm">
-                {updateState.fieldErrors.description}
-              </p>
-            )}
-            <p className="mt-1 text-gray-500 text-sm">{t("descriptionHelp")}</p>
-          </div>
+            <FieldError>{updateState.fieldErrors?.description}</FieldError>
+            <FieldDescription>{t("descriptionHelp")}</FieldDescription>
+          </Field>
         </div>
 
         {/* Capacity Settings */}
         <div className="space-y-4">
           <h2 className="font-semibold text-lg">{t("capacityTitle")}</h2>
 
-          <div>
-            <Label className="mb-2" htmlFor="max_participants">
-              {t("maxParticipantsLabel")}
-            </Label>
+          <Field>
+            <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
             <Input
               disabled={isPending}
-              id="max_participants"
               max={systemMaxParticipants}
               min={Math.max(1, currentParticipantCount)}
               name="max_participants"
@@ -294,18 +283,14 @@ export function SpaceSettingsForm({
               type="number"
               value={maxParticipants}
             />
-            {updateState.fieldErrors?.max_participants && (
-              <p className="mt-1 text-red-600 text-sm">
-                {updateState.fieldErrors.max_participants}
-              </p>
-            )}
-            <p className="mt-1 text-gray-500 text-sm">
+            <FieldError>{updateState.fieldErrors?.max_participants}</FieldError>
+            <FieldDescription>
               {t("maxParticipantsHelp", {
                 current: currentParticipantCount,
                 max: systemMaxParticipants,
               })}
-            </p>
-          </div>
+            </FieldDescription>
+          </Field>
         </div>
 
         {/* Gatekeeper Rules with Tabs */}
@@ -398,10 +383,8 @@ export function SpaceSettingsForm({
                 {/* YouTube Settings */}
                 {effectiveSocialPlatform === "youtube" && showYoutubeOption && (
                   <>
-                    <div>
-                      <Label className="mb-2" htmlFor="youtube_requirement">
-                        {t("youtubeRequirementLabel")}
-                      </Label>
+                    <Field>
+                      <FieldLabel>{t("youtubeRequirementLabel")}</FieldLabel>
                       <Select
                         disabled={isPending}
                         name="youtube_requirement"
@@ -413,7 +396,7 @@ export function SpaceSettingsForm({
                         }}
                         value={youtubeRequirement}
                       >
-                        <SelectTrigger id="youtube_requirement">
+                        <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -425,16 +408,13 @@ export function SpaceSettingsForm({
                           </SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </Field>
 
                     {youtubeRequirement !== "none" && (
-                      <div>
-                        <Label className="mb-2" htmlFor="youtube_channel_id">
-                          {t("youtubeChannelIdLabel")}
-                        </Label>
+                      <Field>
+                        <FieldLabel>{t("youtubeChannelIdLabel")}</FieldLabel>
                         <Input
                           disabled={isPending}
-                          id="youtube_channel_id"
                           name="youtube_channel_id"
                           onChange={(e) => setYoutubeChannelId(e.target.value)}
                           placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
@@ -442,12 +422,10 @@ export function SpaceSettingsForm({
                           type="text"
                           value={youtubeChannelId}
                         />
-                        {updateState.fieldErrors?.youtube_channel_id && (
-                          <p className="mt-1 text-red-600 text-sm">
-                            {updateState.fieldErrors.youtube_channel_id}
-                          </p>
-                        )}
-                      </div>
+                        <FieldError>
+                          {updateState.fieldErrors?.youtube_channel_id}
+                        </FieldError>
+                      </Field>
                     )}
                   </>
                 )}
@@ -455,10 +433,8 @@ export function SpaceSettingsForm({
                 {/* Twitch Settings */}
                 {effectiveSocialPlatform === "twitch" && showTwitchOption && (
                   <>
-                    <div>
-                      <Label className="mb-2" htmlFor="twitch_requirement">
-                        {t("twitchRequirementLabel")}
-                      </Label>
+                    <Field>
+                      <FieldLabel>{t("twitchRequirementLabel")}</FieldLabel>
                       <Select
                         disabled={isPending}
                         name="twitch_requirement"
@@ -470,7 +446,7 @@ export function SpaceSettingsForm({
                         }}
                         value={twitchRequirement}
                       >
-                        <SelectTrigger id="twitch_requirement">
+                        <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -485,16 +461,13 @@ export function SpaceSettingsForm({
                           </SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </Field>
 
                     {twitchRequirement !== "none" && (
-                      <div>
-                        <Label className="mb-2" htmlFor="twitch_broadcaster_id">
-                          {t("twitchBroadcasterIdLabel")}
-                        </Label>
+                      <Field>
+                        <FieldLabel>{t("twitchBroadcasterIdLabel")}</FieldLabel>
                         <Input
                           disabled={isPending}
-                          id="twitch_broadcaster_id"
                           name="twitch_broadcaster_id"
                           onChange={(e) =>
                             setTwitchBroadcasterId(e.target.value)
@@ -504,12 +477,10 @@ export function SpaceSettingsForm({
                           type="text"
                           value={twitchBroadcasterId}
                         />
-                        {updateState.fieldErrors?.twitch_broadcaster_id && (
-                          <p className="mt-1 text-red-600 text-sm">
-                            {updateState.fieldErrors.twitch_broadcaster_id}
-                          </p>
-                        )}
-                      </div>
+                        <FieldError>
+                          {updateState.fieldErrors?.twitch_broadcaster_id}
+                        </FieldError>
+                      </Field>
                     )}
                   </>
                 )}
@@ -523,28 +494,21 @@ export function SpaceSettingsForm({
                   {t("emailModeDescription")}
                 </p>
 
-                <div>
-                  <Label className="mb-2" htmlFor="email_allowlist">
-                    {t("emailAllowlistLabel")}
-                  </Label>
+                <Field>
+                  <FieldLabel>{t("emailAllowlistLabel")}</FieldLabel>
                   <Textarea
                     disabled={isPending}
-                    id="email_allowlist"
                     name="email_allowlist"
                     onChange={(e) => setEmailAllowlist(e.target.value)}
                     placeholder={t("emailAllowlistPlaceholder")}
                     rows={3}
                     value={emailAllowlist}
                   />
-                  {updateState.fieldErrors?.email_allowlist && (
-                    <p className="mt-1 text-red-600 text-sm">
-                      {updateState.fieldErrors.email_allowlist}
-                    </p>
-                  )}
-                  <p className="mt-1 text-gray-500 text-sm">
-                    {t("emailAllowlistHelp")}
-                  </p>
-                </div>
+                  <FieldError>
+                    {updateState.fieldErrors?.email_allowlist}
+                  </FieldError>
+                  <FieldDescription>{t("emailAllowlistHelp")}</FieldDescription>
+                </Field>
               </TabsContent>
             )}
           </Tabs>

@@ -8,6 +8,11 @@ import {
   updateSystemSettings,
 } from "@/app/[locale]/admin/settings/actions";
 import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
@@ -43,58 +48,49 @@ export function SystemSettingsForm({ initialSettings }: Props) {
       {/* Resource Limits Section */}
       <div className="space-y-4">
         {/* Max Participants per Space */}
-        <div className="space-y-2">
-          <Label htmlFor="max_participants_per_space">
-            {t("maxParticipantsLabel")}
-          </Label>
+        <Field>
+          <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
           <Input
             defaultValue={initialSettings?.max_participants_per_space ?? 50}
             disabled={isPending}
-            id="max_participants_per_space"
             max={10_000}
             min={1}
             name="max_participants_per_space"
             required
             type="number"
           />
-          <p className="text-gray-600 text-sm">{t("maxParticipantsHelp")}</p>
-        </div>
+          <FieldDescription>{t("maxParticipantsHelp")}</FieldDescription>
+        </Field>
 
         {/* Max Spaces per User */}
-        <div className="space-y-2">
-          <Label htmlFor="max_spaces_per_user">
-            {t("maxSpacesPerUserLabel")}
-          </Label>
+        <Field>
+          <FieldLabel>{t("maxSpacesPerUserLabel")}</FieldLabel>
           <Input
             defaultValue={initialSettings?.max_spaces_per_user ?? 5}
             disabled={isPending}
-            id="max_spaces_per_user"
             max={100}
             min={1}
             name="max_spaces_per_user"
             required
             type="number"
           />
-          <p className="text-gray-600 text-sm">{t("maxSpacesPerUserHelp")}</p>
-        </div>
+          <FieldDescription>{t("maxSpacesPerUserHelp")}</FieldDescription>
+        </Field>
 
         {/* Space Expiration Hours */}
-        <div className="space-y-2">
-          <Label htmlFor="space_expiration_hours">
-            {t("spaceExpirationLabel")}
-          </Label>
+        <Field>
+          <FieldLabel>{t("spaceExpirationLabel")}</FieldLabel>
           <Input
             defaultValue={initialSettings?.space_expiration_hours ?? 48}
             disabled={isPending}
-            id="space_expiration_hours"
             max={8760}
             min={0}
             name="space_expiration_hours"
             required
             type="number"
           />
-          <p className="text-gray-600 text-sm">{t("spaceExpirationHelp")}</p>
-        </div>
+          <FieldDescription>{t("spaceExpirationHelp")}</FieldDescription>
+        </Field>
       </div>
 
       {/* Feature Flags Section */}

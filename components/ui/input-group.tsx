@@ -8,11 +8,7 @@ const InputGroup = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("relative flex items-center", className)}
-    {...props}
-  />
+  <div ref={ref} className={cn("flex items-center", className)} {...props} />
 ));
 InputGroup.displayName = "InputGroup";
 
@@ -48,4 +44,19 @@ const InputGroupAddon = React.forwardRef<
 });
 InputGroupAddon.displayName = "InputGroupAddon";
 
-export { InputGroup, InputGroupAddon, InputGroupInput };
+const InputGroupText = React.forwardRef<
+  HTMLSpanElement,
+  React.HTMLAttributes<HTMLSpanElement>
+>(({ className, ...props }, ref) => (
+  <span
+    ref={ref}
+    className={cn(
+      "flex h-9 select-none items-center border border-input bg-muted px-3 text-muted-foreground text-sm",
+      className
+    )}
+    {...props}
+  />
+));
+InputGroupText.displayName = "InputGroupText";
+
+export { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText };

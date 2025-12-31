@@ -7,8 +7,9 @@ import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { Button } from "@/components/ui/button";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { InputGroup } from "@/components/ui/input-group";
 import { generateRandomKey } from "@/lib/utils/random-key";
 import type { CreateSpaceState } from "./actions";
 import { checkShareKeyAvailability, createSpace } from "./actions";
@@ -88,17 +89,14 @@ export function CreateSpaceForm() {
 
   return (
     <form action={formAction} className="space-y-6">
-      <div>
-        <Label className="mb-2" htmlFor="share_key">
-          共有キー
-        </Label>
+      <Field>
+        <FieldLabel>共有キー</FieldLabel>
 
-        <div className="mb-2 flex items-center">
+        <InputGroup className="mb-2">
           <div className="relative flex-1">
             <Input
               className="rounded-r-none border-r-0 pr-10 font-mono"
               disabled={isPending}
-              id="share_key"
               maxLength={30}
               minLength={3}
               name="share_key"
@@ -123,7 +121,7 @@ export function CreateSpaceForm() {
           <span className="flex h-9 select-none items-center rounded-lg rounded-l-none border border-gray-300 border-l-0 bg-gray-50 px-3 font-mono text-gray-500 text-sm">
             -{dateSuffix}
           </span>
-        </div>
+        </InputGroup>
 
         <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
           <p className="text-amber-800 text-sm">
@@ -167,7 +165,7 @@ export function CreateSpaceForm() {
             )}
           </div>
         )}
-      </div>
+      </Field>
 
       {state.error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4">
