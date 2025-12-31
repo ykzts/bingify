@@ -15,7 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { closeSpace } from "../actions";
 
 interface CloseSpaceButtonProps {
@@ -65,7 +65,10 @@ export function CloseSpaceButton({ spaceId }: CloseSpaceButtonProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirm}>
+            <AlertDialogAction
+              className={buttonVariants({ variant: "destructive" })}
+              onClick={handleConfirm}
+            >
               {t("closeSpaceButton")}
             </AlertDialogAction>
           </AlertDialogFooter>
