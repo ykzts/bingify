@@ -136,6 +136,7 @@ lib/
 - `pnpm build` — 本番ビルド
 - `pnpm local:setup` — Supabase ローカルインスタンス起動
 - `pnpm local:stop` — Supabase ローカルインスタンス停止
+- `pnpm supabase:typegen` — Supabase の型定義を生成（DB 変更後に実行）
 - `pnpm lint` — ESLint 実行
 
 ## 環境変数
@@ -203,3 +204,37 @@ supabase migration new <migration_name>
 1. Supabase Dashboard の SQL Editor を開く
 2. 問題のあるマイグレーションを元に戻す SQL を実行
 3. 修正内容を**新しい**マイグレーションファイルとして作成し、PR を作成（⚠️ 既存ファイルは編集しない）
+
+## 型定義の生成
+
+Supabase のデータベーススキーマから TypeScript の型定義を自動生成できます。
+
+### 型定義の更新手順
+
+データベースのスキーマを変更した後は、以下のコマンドで型定義を更新してください：
+
+```bash
+pnpm supabase:typegen
+```
+
+このコマンドは `types/supabase.ts` に最新の型定義を生成します。
+
+**重要:**
+
+- ローカルの Supabase インスタンスが起動している必要があります（`pnpm local:setup`）
+- 生成された型定義ファイルは Git 管理対象となります
+- DB スキーマ変更後は必ず型定義を更新し、コミットに含めてください
+
+### 型定義の使用例
+
+```typescript
+import type { Database, Tables } from '@/types/supabase';
+
+// テーブルの Row 型を取得
+type Space = Tables<'spaces'>;
+type BingoCard = Tables<'bingo_cards'>;
+
+// Database 型を使用して Supabase クライアントを型付け
+import { createClient } from '@supabase/supabase-js';
+const supabase = createClient<Database>(url, key);
+```
