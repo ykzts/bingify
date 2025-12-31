@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState, useTransition } from "react";
+import { toast } from "sonner";
 import { closeSpace } from "../actions";
 
 interface CloseSpaceButtonProps {
@@ -11,11 +12,11 @@ interface CloseSpaceButtonProps {
 
 export function CloseSpaceButton({ spaceId }: CloseSpaceButtonProps) {
   const t = useTranslations("AdminSpace");
+  const locale = useLocale();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleClose = () => {
@@ -30,10 +31,10 @@ export function CloseSpaceButton({ spaceId }: CloseSpaceButtonProps) {
       const result = await closeSpace(spaceId);
 
       if (result.success) {
-        setShowSuccess(true);
-        setTimeout(() => {
-          router.refresh();
-        }, 1500);
+        toast.success(t("closeSpaceSuccess"), {
+          duration: 3000,
+        });
+        router.push(`/${locale}/dashboard`);
       } else {
         setError(result.error || t("closeSpaceError"));
       }
@@ -57,20 +58,16 @@ export function CloseSpaceButton({ spaceId }: CloseSpaceButtonProps) {
   // Escape key handler for confirmation modal
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        if (showConfirm) {
-          setShowConfirm(false);
-        } else if (showSuccess) {
-          setShowSuccess(false);
-        }
+      if (event.key === "Escape" && showConfirm) {
+        setShowConfirm(false);
       }
     };
 
-    if (showConfirm || showSuccess) {
+    if (showConfirm) {
       document.addEventListener("keydown", handleEscape);
       return () => document.removeEventListener("keydown", handleEscape);
     }
-  }, [showConfirm, showSuccess]);
+  }, [showConfirm]);
 
   return (
     <div>
@@ -126,28 +123,6 @@ export function CloseSpaceButton({ spaceId }: CloseSpaceButtonProps) {
                 {t("closeSpaceButton")}
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Success Dialog */}
-      {showSuccess && (
-        <div
-          aria-labelledby="close-space-success-title"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-          role="dialog"
-        >
-          <div className="mx-auto max-w-md rounded-lg bg-white p-6 shadow-xl">
-            <output
-              aria-live="polite"
-              className="block"
-              id="close-space-success-title"
-            >
-              <h3 className="mb-4 font-semibold text-green-600 text-lg">
-                {t("closeSpaceSuccess")}
-              </h3>
-            </output>
           </div>
         </div>
       )}
