@@ -7,11 +7,14 @@ import { useActionState, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Field,
+  FieldContent,
   FieldDescription,
   FieldError,
+  FieldGroup,
   FieldLabel,
+  FieldLegend,
+  FieldSet,
 } from "@/components/ui/field";
-import { FieldGroup, FieldSet, FieldSetLegend } from "@/components/ui/fieldset";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -232,48 +235,53 @@ export function SpaceSettingsForm({
       <form action={updateAction} className="space-y-6">
         {/* Basic Information */}
         <FieldSet>
-          <FieldSetLegend>{t("basicInfoTitle")}</FieldSetLegend>
+          <FieldLegend>{t("basicInfoTitle")}</FieldLegend>
           <FieldGroup>
             <Field>
-              <FieldLabel>{t("titleLabel")}</FieldLabel>
-              <Input
-                disabled={isPending}
-                maxLength={100}
-                name="title"
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder={t("titlePlaceholder")}
-                type="text"
-                value={title}
-              />
-              <FieldError>{updateState.fieldErrors?.title}</FieldError>
-              <FieldDescription>{t("titleHelp")}</FieldDescription>
+              <FieldContent>
+                <FieldLabel>{t("titleLabel")}</FieldLabel>
+                <Input
+                  disabled={isPending}
+                  maxLength={100}
+                  name="title"
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder={t("titlePlaceholder")}
+                  type="text"
+                  value={title}
+                />
+                <FieldError>{updateState.fieldErrors?.title}</FieldError>
+                <FieldDescription>{t("titleHelp")}</FieldDescription>
+              </FieldContent>
             </Field>
 
             <Field>
-              <FieldLabel>{t("descriptionLabel")}</FieldLabel>
-              <Textarea
-                disabled={isPending}
-                maxLength={500}
-                name="description"
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder={t("descriptionPlaceholder")}
-                rows={3}
-                value={description}
-              />
-              <FieldError>{updateState.fieldErrors?.description}</FieldError>
-              <FieldDescription>{t("descriptionHelp")}</FieldDescription>
+              <FieldContent>
+                <FieldLabel>{t("descriptionLabel")}</FieldLabel>
+                <Textarea
+                  disabled={isPending}
+                  maxLength={500}
+                  name="description"
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={t("descriptionPlaceholder")}
+                  rows={3}
+                  value={description}
+                />
+                <FieldError>{updateState.fieldErrors?.description}</FieldError>
+                <FieldDescription>{t("descriptionHelp")}</FieldDescription>
+              </FieldContent>
             </Field>
           </FieldGroup>
         </FieldSet>
 
         {/* Capacity Settings */}
         <FieldSet>
-          <FieldSetLegend>{t("capacityTitle")}</FieldSetLegend>
+          <FieldLegend>{t("capacityTitle")}</FieldLegend>
           <FieldGroup>
             <Field>
-              <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
-              <Input
-                disabled={isPending}
+              <FieldContent>
+                <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
+                <Input
+                  disabled={isPending}
               max={systemMaxParticipants}
               min={Math.max(1, currentParticipantCount)}
               name="max_participants"
@@ -292,9 +300,10 @@ export function SpaceSettingsForm({
                 max: systemMaxParticipants,
               })}
             </FieldDescription>
-          </Field>
-        </FieldGroup>
-      </FieldSet>
+          </FieldContent>
+        </Field>
+      </FieldGroup>
+    </FieldSet>
 
         {/* Gatekeeper Rules with Tabs */}
         <div className="space-y-4">
@@ -387,47 +396,51 @@ export function SpaceSettingsForm({
                 {effectiveSocialPlatform === "youtube" && showYoutubeOption && (
                   <>
                     <Field>
-                      <FieldLabel>{t("youtubeRequirementLabel")}</FieldLabel>
-                      <Select
-                        disabled={isPending}
-                        name="youtube_requirement"
-                        onValueChange={(value) => {
-                          setYoutubeRequirement(value);
-                          if (value === "none") {
-                            setYoutubeChannelId("");
-                          }
-                        }}
-                        value={youtubeRequirement}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">
-                            {t("requirementNone")}
-                          </SelectItem>
-                          <SelectItem value="subscriber">
-                            {t("youtubeSubscriber")}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FieldContent>
+                        <FieldLabel>{t("youtubeRequirementLabel")}</FieldLabel>
+                        <Select
+                          disabled={isPending}
+                          name="youtube_requirement"
+                          onValueChange={(value) => {
+                            setYoutubeRequirement(value);
+                            if (value === "none") {
+                              setYoutubeChannelId("");
+                            }
+                          }}
+                          value={youtubeRequirement}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">
+                              {t("requirementNone")}
+                            </SelectItem>
+                            <SelectItem value="subscriber">
+                              {t("youtubeSubscriber")}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FieldContent>
                     </Field>
 
                     {youtubeRequirement !== "none" && (
                       <Field>
-                        <FieldLabel>{t("youtubeChannelIdLabel")}</FieldLabel>
-                        <Input
-                          disabled={isPending}
-                          name="youtube_channel_id"
-                          onChange={(e) => setYoutubeChannelId(e.target.value)}
-                          placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
-                          required={youtubeRequirement !== "none"}
-                          type="text"
-                          value={youtubeChannelId}
-                        />
-                        <FieldError>
-                          {updateState.fieldErrors?.youtube_channel_id}
-                        </FieldError>
+                        <FieldContent>
+                          <FieldLabel>{t("youtubeChannelIdLabel")}</FieldLabel>
+                          <Input
+                            disabled={isPending}
+                            name="youtube_channel_id"
+                            onChange={(e) => setYoutubeChannelId(e.target.value)}
+                            placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
+                            required={youtubeRequirement !== "none"}
+                            type="text"
+                            value={youtubeChannelId}
+                          />
+                          <FieldError>
+                            {updateState.fieldErrors?.youtube_channel_id}
+                          </FieldError>
+                        </FieldContent>
                       </Field>
                     )}
                   </>
@@ -437,52 +450,56 @@ export function SpaceSettingsForm({
                 {effectiveSocialPlatform === "twitch" && showTwitchOption && (
                   <>
                     <Field>
-                      <FieldLabel>{t("twitchRequirementLabel")}</FieldLabel>
-                      <Select
-                        disabled={isPending}
-                        name="twitch_requirement"
-                        onValueChange={(value) => {
-                          setTwitchRequirement(value);
-                          if (value === "none") {
-                            setTwitchBroadcasterId("");
-                          }
-                        }}
-                        value={twitchRequirement}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">
-                            {t("requirementNone")}
-                          </SelectItem>
-                          <SelectItem value="follower">
-                            {t("twitchFollower")}
-                          </SelectItem>
-                          <SelectItem value="subscriber">
-                            {t("twitchSubscriber")}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FieldContent>
+                        <FieldLabel>{t("twitchRequirementLabel")}</FieldLabel>
+                        <Select
+                          disabled={isPending}
+                          name="twitch_requirement"
+                          onValueChange={(value) => {
+                            setTwitchRequirement(value);
+                            if (value === "none") {
+                              setTwitchBroadcasterId("");
+                            }
+                          }}
+                          value={twitchRequirement}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">
+                              {t("requirementNone")}
+                            </SelectItem>
+                            <SelectItem value="follower">
+                              {t("twitchFollower")}
+                            </SelectItem>
+                            <SelectItem value="subscriber">
+                              {t("twitchSubscriber")}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FieldContent>
                     </Field>
 
                     {twitchRequirement !== "none" && (
                       <Field>
-                        <FieldLabel>{t("twitchBroadcasterIdLabel")}</FieldLabel>
-                        <Input
-                          disabled={isPending}
-                          name="twitch_broadcaster_id"
-                          onChange={(e) =>
-                            setTwitchBroadcasterId(e.target.value)
-                          }
-                          placeholder="123456789"
-                          required={twitchRequirement !== "none"}
-                          type="text"
-                          value={twitchBroadcasterId}
-                        />
-                        <FieldError>
-                          {updateState.fieldErrors?.twitch_broadcaster_id}
-                        </FieldError>
+                        <FieldContent>
+                          <FieldLabel>{t("twitchBroadcasterIdLabel")}</FieldLabel>
+                          <Input
+                            disabled={isPending}
+                            name="twitch_broadcaster_id"
+                            onChange={(e) =>
+                              setTwitchBroadcasterId(e.target.value)
+                            }
+                            placeholder="123456789"
+                            required={twitchRequirement !== "none"}
+                            type="text"
+                            value={twitchBroadcasterId}
+                          />
+                          <FieldError>
+                            {updateState.fieldErrors?.twitch_broadcaster_id}
+                          </FieldError>
+                        </FieldContent>
                       </Field>
                     )}
                   </>
@@ -498,19 +515,21 @@ export function SpaceSettingsForm({
                 </p>
 
                 <Field>
-                  <FieldLabel>{t("emailAllowlistLabel")}</FieldLabel>
-                  <Textarea
-                    disabled={isPending}
-                    name="email_allowlist"
-                    onChange={(e) => setEmailAllowlist(e.target.value)}
-                    placeholder={t("emailAllowlistPlaceholder")}
-                    rows={3}
-                    value={emailAllowlist}
-                  />
-                  <FieldError>
-                    {updateState.fieldErrors?.email_allowlist}
-                  </FieldError>
-                  <FieldDescription>{t("emailAllowlistHelp")}</FieldDescription>
+                  <FieldContent>
+                    <FieldLabel>{t("emailAllowlistLabel")}</FieldLabel>
+                    <Textarea
+                      disabled={isPending}
+                      name="email_allowlist"
+                      onChange={(e) => setEmailAllowlist(e.target.value)}
+                      placeholder={t("emailAllowlistPlaceholder")}
+                      rows={3}
+                      value={emailAllowlist}
+                    />
+                    <FieldError>
+                      {updateState.fieldErrors?.email_allowlist}
+                    </FieldError>
+                    <FieldDescription>{t("emailAllowlistHelp")}</FieldDescription>
+                  </FieldContent>
                 </Field>
               </TabsContent>
             )}

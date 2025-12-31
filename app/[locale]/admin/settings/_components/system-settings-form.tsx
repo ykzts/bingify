@@ -10,10 +10,13 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Field,
+  FieldContent,
   FieldDescription,
+  FieldGroup,
   FieldLabel,
+  FieldLegend,
+  FieldSet,
 } from "@/components/ui/field";
-import { FieldGroup, FieldSet, FieldSetLegend } from "@/components/ui/fieldset";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
@@ -48,51 +51,57 @@ export function SystemSettingsForm({ initialSettings }: Props) {
     <form action={formAction} className="space-y-6">
       {/* Resource Limits Section */}
       <FieldSet>
-        <FieldSetLegend>リソース制限</FieldSetLegend>
+        <FieldLegend>リソース制限</FieldLegend>
         <FieldGroup>
           {/* Max Participants per Space */}
           <Field>
-            <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
-            <Input
-              defaultValue={initialSettings?.max_participants_per_space ?? 50}
-              disabled={isPending}
-              max={10_000}
-              min={1}
-              name="max_participants_per_space"
-              required
-              type="number"
-            />
-            <FieldDescription>{t("maxParticipantsHelp")}</FieldDescription>
+            <FieldContent>
+              <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
+              <Input
+                defaultValue={initialSettings?.max_participants_per_space ?? 50}
+                disabled={isPending}
+                max={10_000}
+                min={1}
+                name="max_participants_per_space"
+                required
+                type="number"
+              />
+              <FieldDescription>{t("maxParticipantsHelp")}</FieldDescription>
+            </FieldContent>
           </Field>
 
           {/* Max Spaces per User */}
           <Field>
-            <FieldLabel>{t("maxSpacesPerUserLabel")}</FieldLabel>
-            <Input
-              defaultValue={initialSettings?.max_spaces_per_user ?? 5}
-              disabled={isPending}
-              max={100}
-              min={1}
-              name="max_spaces_per_user"
-              required
-              type="number"
-            />
-            <FieldDescription>{t("maxSpacesPerUserHelp")}</FieldDescription>
+            <FieldContent>
+              <FieldLabel>{t("maxSpacesPerUserLabel")}</FieldLabel>
+              <Input
+                defaultValue={initialSettings?.max_spaces_per_user ?? 5}
+                disabled={isPending}
+                max={100}
+                min={1}
+                name="max_spaces_per_user"
+                required
+                type="number"
+              />
+              <FieldDescription>{t("maxSpacesPerUserHelp")}</FieldDescription>
+            </FieldContent>
           </Field>
 
           {/* Space Expiration Hours */}
           <Field>
-            <FieldLabel>{t("spaceExpirationLabel")}</FieldLabel>
-            <Input
-              defaultValue={initialSettings?.space_expiration_hours ?? 48}
-              disabled={isPending}
-              max={8760}
-              min={0}
-              name="space_expiration_hours"
-              required
-              type="number"
-            />
-            <FieldDescription>{t("spaceExpirationHelp")}</FieldDescription>
+            <FieldContent>
+              <FieldLabel>{t("spaceExpirationLabel")}</FieldLabel>
+              <Input
+                defaultValue={initialSettings?.space_expiration_hours ?? 48}
+                disabled={isPending}
+                max={8760}
+                min={0}
+                name="space_expiration_hours"
+                required
+                type="number"
+              />
+              <FieldDescription>{t("spaceExpirationHelp")}</FieldDescription>
+            </FieldContent>
           </Field>
         </FieldGroup>
       </FieldSet>

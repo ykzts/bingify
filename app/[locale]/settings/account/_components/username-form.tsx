@@ -7,6 +7,7 @@ import { useActionState, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Field,
+  FieldContent,
   FieldDescription,
   FieldLabel,
 } from "@/components/ui/field";
@@ -50,17 +51,19 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
 
       <form action={formAction} className="space-y-4">
         <Field>
-          <FieldLabel>{t("usernameLabel")}</FieldLabel>
-          <Input
-            maxLength={50}
-            name="username"
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder={t("usernamePlaceholder")}
-            required
-            type="text"
-            value={username}
-          />
-          <FieldDescription>{t("usernameHelp")}</FieldDescription>
+          <FieldContent>
+            <FieldLabel>{t("usernameLabel")}</FieldLabel>
+            <Input
+              maxLength={50}
+              name="username"
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder={t("usernamePlaceholder")}
+              required
+              type="text"
+              value={username}
+            />
+            <FieldDescription>{t("usernameHelp")}</FieldDescription>
+          </FieldContent>
         </Field>
 
         {(state.error || state.errorKey) && (

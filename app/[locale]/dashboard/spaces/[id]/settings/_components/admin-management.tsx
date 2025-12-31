@@ -7,7 +7,12 @@ import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   type GetSpaceAdminsResult,
@@ -105,15 +110,17 @@ export function AdminManagement({ spaceId }: Props) {
         <h3 className="mb-3 font-semibold text-sm">管理者を招待</h3>
         <form action={inviteAction} className="space-y-3">
           <Field>
-            <FieldLabel>メールアドレス</FieldLabel>
-            <Input
-              disabled={isInvitePending}
-              name="email"
-              placeholder="user@example.com"
-              required
-              type="email"
-            />
-            <FieldError>{inviteState.error}</FieldError>
+            <FieldContent>
+              <FieldLabel>メールアドレス</FieldLabel>
+              <Input
+                disabled={isInvitePending}
+                name="email"
+                placeholder="user@example.com"
+                required
+                type="email"
+              />
+              <FieldError>{inviteState.error}</FieldError>
+            </FieldContent>
           </Field>
           <Button
             className="w-full"

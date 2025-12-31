@@ -11,6 +11,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import {
   InputGroup,
   InputGroupAddon,
+  InputGroupButton,
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/input-group";
@@ -96,7 +97,7 @@ export function CreateSpaceForm() {
       <Field>
         <FieldLabel>共有キー</FieldLabel>
 
-        <InputGroup className="mb-2" relative>
+        <InputGroup className="mb-2">
           <InputGroupInput
             className="rounded-r-none border-r-0 pr-10 font-mono"
             disabled={isPending}
@@ -111,16 +112,14 @@ export function CreateSpaceForm() {
             value={shareKey}
           />
           <InputGroupAddon align="inline-end">
-            <button
+            <InputGroupButton
               aria-label={t("generateRandomButtonAriaLabel")}
-              className="flex h-7 w-7 items-center justify-center rounded-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
-              disabled={isPending}
               onClick={handleGenerateRandomKey}
+              size="icon-xs"
               title={t("generateRandomButton")}
-              type="button"
             >
               <Dices className="h-4 w-4" />
-            </button>
+            </InputGroupButton>
           </InputGroupAddon>
           <InputGroupText className="rounded-lg rounded-l-none">
             -{dateSuffix}
