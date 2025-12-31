@@ -29,7 +29,9 @@ export function CreateSpaceForm() {
   const router = useRouter();
   const t = useTranslations("CreateSpace");
   const tErrors = useTranslations("Errors");
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`;
   const [shareKey, setShareKey] = useState("");
   const [debouncedShareKey] = useDebounce(shareKey, 500);
   const [checking, setChecking] = useState(false);
