@@ -29,6 +29,7 @@ export function CreateSpaceForm() {
   const router = useRouter();
   const t = useTranslations("CreateSpace");
   const tErrors = useTranslations("Errors");
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const [shareKey, setShareKey] = useState("");
   const [debouncedShareKey] = useDebounce(shareKey, 500);
   const [checking, setChecking] = useState(false);
@@ -144,7 +145,7 @@ export function CreateSpaceForm() {
         <p className="mb-2 text-gray-500 text-sm">
           公開URL:{" "}
           <span className="font-mono">
-            https://example.com/spaces/
+            {siteUrl}/
             <span className="font-semibold text-gray-900">
               @{shareKey || "..."}-{dateSuffix}
             </span>
