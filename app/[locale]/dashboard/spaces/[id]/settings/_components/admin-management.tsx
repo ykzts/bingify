@@ -3,11 +3,17 @@
 import { Loader2, Trash2, UserPlus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   type GetSpaceAdminsResult,
   getSpaceAdmins,
@@ -57,6 +63,7 @@ export function AdminManagement({ spaceId }: Props) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: Only trigger on inviteState.success change
   useEffect(() => {
     if (inviteState.success) {
+      toast.success("管理者を追加しました");
       loadAdmins();
       router.refresh();
     }
@@ -102,25 +109,19 @@ export function AdminManagement({ spaceId }: Props) {
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
         <h3 className="mb-3 font-semibold text-sm">管理者を招待</h3>
         <form action={inviteAction} className="space-y-3">
-          <div>
-            <Label htmlFor="admin-email">メールアドレス</Label>
-            <Input
-              disabled={isInvitePending}
-              id="admin-email"
-              name="email"
-              placeholder="user@example.com"
-              required
-              type="email"
-            />
-            {inviteState.error && (
-              <p className="mt-1 text-red-600 text-sm">{inviteState.error}</p>
-            )}
-            {inviteState.success && (
-              <p className="mt-1 text-green-600 text-sm">
-                管理者を追加しました
-              </p>
-            )}
-          </div>
+          <Field>
+            <FieldContent>
+              <FieldLabel>メールアドレス</FieldLabel>
+              <Input
+                disabled={isInvitePending}
+                name="email"
+                placeholder="user@example.com"
+                required
+                type="email"
+              />
+              <FieldError>{inviteState.error}</FieldError>
+            </FieldContent>
+          </Field>
           <Button
             className="w-full"
             disabled={isInvitePending}

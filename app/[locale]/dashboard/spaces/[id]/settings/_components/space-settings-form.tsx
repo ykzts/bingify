@@ -5,6 +5,16 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -224,89 +234,78 @@ export function SpaceSettingsForm({
     <div className="space-y-8">
       <form action={updateAction} className="space-y-6">
         {/* Basic Information */}
-        <div className="space-y-4">
-          <h2 className="font-semibold text-lg">{t("basicInfoTitle")}</h2>
+        <FieldSet>
+          <FieldLegend>{t("basicInfoTitle")}</FieldLegend>
+          <FieldGroup>
+            <Field>
+              <FieldContent>
+                <FieldLabel>{t("titleLabel")}</FieldLabel>
+                <Input
+                  disabled={isPending}
+                  maxLength={100}
+                  name="title"
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder={t("titlePlaceholder")}
+                  type="text"
+                  value={title}
+                />
+                <FieldError>{updateState.fieldErrors?.title}</FieldError>
+                <FieldDescription>{t("titleHelp")}</FieldDescription>
+              </FieldContent>
+            </Field>
 
-          <div>
-            <Label className="mb-2" htmlFor="title">
-              {t("titleLabel")}
-            </Label>
-            <Input
-              disabled={isPending}
-              id="title"
-              maxLength={100}
-              name="title"
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={t("titlePlaceholder")}
-              type="text"
-              value={title}
-            />
-            {updateState.fieldErrors?.title && (
-              <p className="mt-1 text-red-600 text-sm">
-                {updateState.fieldErrors.title}
-              </p>
-            )}
-            <p className="mt-1 text-gray-500 text-sm">{t("titleHelp")}</p>
-          </div>
-
-          <div>
-            <Label className="mb-2" htmlFor="description">
-              {t("descriptionLabel")}
-            </Label>
-            <Textarea
-              disabled={isPending}
-              id="description"
-              maxLength={500}
-              name="description"
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={t("descriptionPlaceholder")}
-              rows={3}
-              value={description}
-            />
-            {updateState.fieldErrors?.description && (
-              <p className="mt-1 text-red-600 text-sm">
-                {updateState.fieldErrors.description}
-              </p>
-            )}
-            <p className="mt-1 text-gray-500 text-sm">{t("descriptionHelp")}</p>
-          </div>
-        </div>
+            <Field>
+              <FieldContent>
+                <FieldLabel>{t("descriptionLabel")}</FieldLabel>
+                <Textarea
+                  disabled={isPending}
+                  maxLength={500}
+                  name="description"
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={t("descriptionPlaceholder")}
+                  rows={3}
+                  value={description}
+                />
+                <FieldError>{updateState.fieldErrors?.description}</FieldError>
+                <FieldDescription>{t("descriptionHelp")}</FieldDescription>
+              </FieldContent>
+            </Field>
+          </FieldGroup>
+        </FieldSet>
 
         {/* Capacity Settings */}
-        <div className="space-y-4">
-          <h2 className="font-semibold text-lg">{t("capacityTitle")}</h2>
-
-          <div>
-            <Label className="mb-2" htmlFor="max_participants">
-              {t("maxParticipantsLabel")}
-            </Label>
-            <Input
-              disabled={isPending}
-              id="max_participants"
-              max={systemMaxParticipants}
-              min={Math.max(1, currentParticipantCount)}
-              name="max_participants"
-              onChange={(e) => {
-                const value = e.target.valueAsNumber;
-                setMaxParticipants(Number.isNaN(value) ? 50 : value);
-              }}
-              required
-              type="number"
-              value={maxParticipants}
-            />
-            {updateState.fieldErrors?.max_participants && (
-              <p className="mt-1 text-red-600 text-sm">
-                {updateState.fieldErrors.max_participants}
-              </p>
-            )}
-            <p className="mt-1 text-gray-500 text-sm">
-              {t("maxParticipantsHelp", {
-                current: currentParticipantCount,
-                max: systemMaxParticipants,
-              })}
-            </p>
-          </div>
-        </div>
+        <FieldSet>
+          <FieldLegend>{t("capacityTitle")}</FieldLegend>
+          <FieldGroup>
+            <Field>
+              <FieldContent>
+                <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
+                <Input
+                  disabled={isPending}
+                  max={systemMaxParticipants}
+                  min={Math.max(1, currentParticipantCount)}
+                  name="max_participants"
+                  onChange={(e) => {
+                    const value = e.target.valueAsNumber;
+                    setMaxParticipants(Number.isNaN(value) ? 50 : value);
+                  }}
+                  required
+                  type="number"
+                  value={maxParticipants}
+                />
+                <FieldError>
+                  {updateState.fieldErrors?.max_participants}
+                </FieldError>
+                <FieldDescription>
+                  {t("maxParticipantsHelp", {
+                    current: currentParticipantCount,
+                    max: systemMaxParticipants,
+                  })}
+                </FieldDescription>
+              </FieldContent>
+            </Field>
+          </FieldGroup>
+        </FieldSet>
 
         {/* Gatekeeper Rules with Tabs */}
         <div className="space-y-4">
@@ -398,56 +397,55 @@ export function SpaceSettingsForm({
                 {/* YouTube Settings */}
                 {effectiveSocialPlatform === "youtube" && showYoutubeOption && (
                   <>
-                    <div>
-                      <Label className="mb-2" htmlFor="youtube_requirement">
-                        {t("youtubeRequirementLabel")}
-                      </Label>
-                      <Select
-                        disabled={isPending}
-                        name="youtube_requirement"
-                        onValueChange={(value) => {
-                          setYoutubeRequirement(value);
-                          if (value === "none") {
-                            setYoutubeChannelId("");
-                          }
-                        }}
-                        value={youtubeRequirement}
-                      >
-                        <SelectTrigger id="youtube_requirement">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">
-                            {t("requirementNone")}
-                          </SelectItem>
-                          <SelectItem value="subscriber">
-                            {t("youtubeSubscriber")}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <Field>
+                      <FieldContent>
+                        <FieldLabel>{t("youtubeRequirementLabel")}</FieldLabel>
+                        <Select
+                          disabled={isPending}
+                          name="youtube_requirement"
+                          onValueChange={(value) => {
+                            setYoutubeRequirement(value);
+                            if (value === "none") {
+                              setYoutubeChannelId("");
+                            }
+                          }}
+                          value={youtubeRequirement}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">
+                              {t("requirementNone")}
+                            </SelectItem>
+                            <SelectItem value="subscriber">
+                              {t("youtubeSubscriber")}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FieldContent>
+                    </Field>
 
                     {youtubeRequirement !== "none" && (
-                      <div>
-                        <Label className="mb-2" htmlFor="youtube_channel_id">
-                          {t("youtubeChannelIdLabel")}
-                        </Label>
-                        <Input
-                          disabled={isPending}
-                          id="youtube_channel_id"
-                          name="youtube_channel_id"
-                          onChange={(e) => setYoutubeChannelId(e.target.value)}
-                          placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
-                          required={youtubeRequirement !== "none"}
-                          type="text"
-                          value={youtubeChannelId}
-                        />
-                        {updateState.fieldErrors?.youtube_channel_id && (
-                          <p className="mt-1 text-red-600 text-sm">
-                            {updateState.fieldErrors.youtube_channel_id}
-                          </p>
-                        )}
-                      </div>
+                      <Field>
+                        <FieldContent>
+                          <FieldLabel>{t("youtubeChannelIdLabel")}</FieldLabel>
+                          <Input
+                            disabled={isPending}
+                            name="youtube_channel_id"
+                            onChange={(e) =>
+                              setYoutubeChannelId(e.target.value)
+                            }
+                            placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
+                            required={youtubeRequirement !== "none"}
+                            type="text"
+                            value={youtubeChannelId}
+                          />
+                          <FieldError>
+                            {updateState.fieldErrors?.youtube_channel_id}
+                          </FieldError>
+                        </FieldContent>
+                      </Field>
                     )}
                   </>
                 )}
@@ -455,61 +453,60 @@ export function SpaceSettingsForm({
                 {/* Twitch Settings */}
                 {effectiveSocialPlatform === "twitch" && showTwitchOption && (
                   <>
-                    <div>
-                      <Label className="mb-2" htmlFor="twitch_requirement">
-                        {t("twitchRequirementLabel")}
-                      </Label>
-                      <Select
-                        disabled={isPending}
-                        name="twitch_requirement"
-                        onValueChange={(value) => {
-                          setTwitchRequirement(value);
-                          if (value === "none") {
-                            setTwitchBroadcasterId("");
-                          }
-                        }}
-                        value={twitchRequirement}
-                      >
-                        <SelectTrigger id="twitch_requirement">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">
-                            {t("requirementNone")}
-                          </SelectItem>
-                          <SelectItem value="follower">
-                            {t("twitchFollower")}
-                          </SelectItem>
-                          <SelectItem value="subscriber">
-                            {t("twitchSubscriber")}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <Field>
+                      <FieldContent>
+                        <FieldLabel>{t("twitchRequirementLabel")}</FieldLabel>
+                        <Select
+                          disabled={isPending}
+                          name="twitch_requirement"
+                          onValueChange={(value) => {
+                            setTwitchRequirement(value);
+                            if (value === "none") {
+                              setTwitchBroadcasterId("");
+                            }
+                          }}
+                          value={twitchRequirement}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">
+                              {t("requirementNone")}
+                            </SelectItem>
+                            <SelectItem value="follower">
+                              {t("twitchFollower")}
+                            </SelectItem>
+                            <SelectItem value="subscriber">
+                              {t("twitchSubscriber")}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FieldContent>
+                    </Field>
 
                     {twitchRequirement !== "none" && (
-                      <div>
-                        <Label className="mb-2" htmlFor="twitch_broadcaster_id">
-                          {t("twitchBroadcasterIdLabel")}
-                        </Label>
-                        <Input
-                          disabled={isPending}
-                          id="twitch_broadcaster_id"
-                          name="twitch_broadcaster_id"
-                          onChange={(e) =>
-                            setTwitchBroadcasterId(e.target.value)
-                          }
-                          placeholder="123456789"
-                          required={twitchRequirement !== "none"}
-                          type="text"
-                          value={twitchBroadcasterId}
-                        />
-                        {updateState.fieldErrors?.twitch_broadcaster_id && (
-                          <p className="mt-1 text-red-600 text-sm">
-                            {updateState.fieldErrors.twitch_broadcaster_id}
-                          </p>
-                        )}
-                      </div>
+                      <Field>
+                        <FieldContent>
+                          <FieldLabel>
+                            {t("twitchBroadcasterIdLabel")}
+                          </FieldLabel>
+                          <Input
+                            disabled={isPending}
+                            name="twitch_broadcaster_id"
+                            onChange={(e) =>
+                              setTwitchBroadcasterId(e.target.value)
+                            }
+                            placeholder="123456789"
+                            required={twitchRequirement !== "none"}
+                            type="text"
+                            value={twitchBroadcasterId}
+                          />
+                          <FieldError>
+                            {updateState.fieldErrors?.twitch_broadcaster_id}
+                          </FieldError>
+                        </FieldContent>
+                      </Field>
                     )}
                   </>
                 )}
@@ -523,28 +520,25 @@ export function SpaceSettingsForm({
                   {t("emailModeDescription")}
                 </p>
 
-                <div>
-                  <Label className="mb-2" htmlFor="email_allowlist">
-                    {t("emailAllowlistLabel")}
-                  </Label>
-                  <Textarea
-                    disabled={isPending}
-                    id="email_allowlist"
-                    name="email_allowlist"
-                    onChange={(e) => setEmailAllowlist(e.target.value)}
-                    placeholder={t("emailAllowlistPlaceholder")}
-                    rows={3}
-                    value={emailAllowlist}
-                  />
-                  {updateState.fieldErrors?.email_allowlist && (
-                    <p className="mt-1 text-red-600 text-sm">
-                      {updateState.fieldErrors.email_allowlist}
-                    </p>
-                  )}
-                  <p className="mt-1 text-gray-500 text-sm">
-                    {t("emailAllowlistHelp")}
-                  </p>
-                </div>
+                <Field>
+                  <FieldContent>
+                    <FieldLabel>{t("emailAllowlistLabel")}</FieldLabel>
+                    <Textarea
+                      disabled={isPending}
+                      name="email_allowlist"
+                      onChange={(e) => setEmailAllowlist(e.target.value)}
+                      placeholder={t("emailAllowlistPlaceholder")}
+                      rows={3}
+                      value={emailAllowlist}
+                    />
+                    <FieldError>
+                      {updateState.fieldErrors?.email_allowlist}
+                    </FieldError>
+                    <FieldDescription>
+                      {t("emailAllowlistHelp")}
+                    </FieldDescription>
+                  </FieldContent>
+                </Field>
               </TabsContent>
             )}
           </Tabs>

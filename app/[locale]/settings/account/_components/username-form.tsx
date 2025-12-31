@@ -4,6 +4,14 @@ import { AlertCircle, CheckCircle, Loader2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { type UpdateUsernameState, updateUsername } from "../actions";
 
 interface UsernameFormProps {
@@ -42,23 +50,21 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
       <p className="mb-6 text-gray-600 text-sm">{t("description")}</p>
 
       <form action={formAction} className="space-y-4">
-        <div>
-          <label className="mb-2 block font-medium text-sm" htmlFor="username">
-            {t("usernameLabel")}
-          </label>
-          <input
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            id="username"
-            maxLength={50}
-            name="username"
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder={t("usernamePlaceholder")}
-            required
-            type="text"
-            value={username}
-          />
-          <p className="mt-1 text-gray-500 text-xs">{t("usernameHelp")}</p>
-        </div>
+        <Field>
+          <FieldContent>
+            <FieldLabel>{t("usernameLabel")}</FieldLabel>
+            <Input
+              maxLength={50}
+              name="username"
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder={t("usernamePlaceholder")}
+              required
+              type="text"
+              value={username}
+            />
+            <FieldDescription>{t("usernameHelp")}</FieldDescription>
+          </FieldContent>
+        </Field>
 
         {(state.error || state.errorKey) && (
           <div
@@ -85,11 +91,7 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
           </div>
         )}
 
-        <button
-          className="flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isPending}
-          type="submit"
-        >
+        <Button disabled={isPending} type="submit">
           {isPending ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -98,7 +100,7 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
           ) : (
             t("saveButton")
           )}
-        </button>
+        </Button>
       </form>
     </div>
   );
