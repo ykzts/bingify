@@ -152,6 +152,9 @@ export function BingoCardDisplay({ spaceId }: Props) {
       newStatus = "reach";
     }
 
+    // Trigger confetti only on transition to bingo
+    const isTransitionToBingo = newStatus === "bingo" && previousStatusRef.current !== "bingo";
+
     // Only update database if status changed
     if (newStatus !== previousStatusRef.current) {
       previousStatusRef.current = newStatus;
@@ -160,13 +163,11 @@ export function BingoCardDisplay({ spaceId }: Props) {
       });
     }
 
-    // Trigger confetti on bingo
-    if (newStatus === "bingo") {
+    // Trigger confetti animation on transition to bingo
+    if (isTransitionToBingo) {
       const confettiInterval = triggerConfetti();
       return () => {
-        if (confettiInterval) {
-          clearInterval(confettiInterval);
-        }
+        clearInterval(confettiInterval);
       };
     }
   }, [bingoCard, calledNumbers, spaceId]);
