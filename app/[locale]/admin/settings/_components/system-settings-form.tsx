@@ -87,6 +87,23 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             </FieldContent>
           </Field>
 
+          {/* Max Total Spaces */}
+          <Field>
+            <FieldContent>
+              <FieldLabel>{t("maxTotalSpacesLabel")}</FieldLabel>
+              <Input
+                defaultValue={initialSettings?.max_total_spaces ?? 1000}
+                disabled={isPending}
+                max={100_000}
+                min={0}
+                name="max_total_spaces"
+                required
+                type="number"
+              />
+              <FieldDescription>{t("maxTotalSpacesHelp")}</FieldDescription>
+            </FieldContent>
+          </Field>
+
           {/* Space Expiration Hours */}
           <Field>
             <FieldContent>

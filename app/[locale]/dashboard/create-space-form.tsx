@@ -189,9 +189,17 @@ export function CreateSpaceForm() {
       {state.error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4">
           <p className="text-red-800">
-            {state.error === "maxSpacesReached" && state.errorData?.max
-              ? tErrors("maxSpacesReached", { max: state.errorData.max })
-              : state.error}
+            {(() => {
+              if (state.error === "maxSpacesReached" && state.errorData?.max) {
+                return tErrors("maxSpacesReached", {
+                  max: state.errorData.max,
+                });
+              }
+              if (state.error === "maxTotalSpacesReached") {
+                return tErrors("maxTotalSpacesReached");
+              }
+              return state.error;
+            })()}
           </p>
           {state.suggestion && (
             <div className="mt-3">

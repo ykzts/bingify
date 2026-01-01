@@ -533,5 +533,73 @@ describe("Dashboard Actions", () => {
       expect(selectCalled).toBe(true);
       expect(neqCalledWithClosed).toBe(true);
     });
+
+    it("should reject space creation when global max total spaces limit is reached", async () => {
+      const userId = "test-user-id";
+      const shareKey = "test-space";
+
+      const mockClient = {
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: userId } },
+          }),
+        },
+        from: vi.fn().mockImplementation((table: string) => {
+          if (table === "profiles") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
+                    data: { role: "organizer" },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          if (table === "system_settings") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
+                    data: { max_spaces_per_user: 5, max_total_spaces: 10 },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          if (table === "spaces") {
+            // First call is for global count (head: true)
+            // Second call is for user count
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  neq: vi.fn().mockResolvedValue({
+                    count: 10, // Global limit reached
+                    error: null,
+                  }),
+                }),
+                neq: vi.fn().mockResolvedValue({
+                  count: 10, // Global limit reached
+                  error: null,
+                }),
+              }),
+            };
+          }
+          return {};
+        }),
+      };
+
+      vi.mocked(createClient).mockResolvedValue(mockClient as any);
+
+      const formData = new FormData();
+      formData.set("share_key", shareKey);
+
+      const result = await createSpace({ success: false }, formData);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("maxTotalSpacesReached");
+    });
   });
 });
