@@ -1,6 +1,6 @@
 "use client";
 
-import Turnstile from "react-turnstile";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 interface TurnstileWidgetProps {
   onVerify: (token: string) => void;
@@ -20,10 +20,12 @@ export function TurnstileWidget({ onVerify }: TurnstileWidgetProps) {
 
   return (
     <Turnstile
-      onVerify={onVerify}
-      sitekey={siteKey}
-      size="normal"
-      theme="light"
+      onSuccess={onVerify}
+      options={{
+        size: "normal",
+        theme: "light",
+      }}
+      siteKey={siteKey}
     />
   );
 }
