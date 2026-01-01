@@ -1,6 +1,6 @@
 "use client";
 
-import { Turnstile } from "react-turnstile";
+import Turnstile from "react-turnstile";
 
 interface TurnstileWidgetProps {
   onVerify: (token: string) => void;
