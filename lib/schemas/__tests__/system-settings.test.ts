@@ -54,6 +54,7 @@ describe("systemFeaturesSchema", () => {
 describe("systemSettingsSchema", () => {
   it("should accept valid system settings with features", () => {
     const result = systemSettingsSchema.safeParse({
+      default_user_role: "organizer",
       features: {
         gatekeeper: {
           email: { enabled: true },
@@ -113,6 +114,7 @@ describe("systemSettingsSchema", () => {
 
   it("should accept space_expiration_hours as 0 (unlimited)", () => {
     const result = systemSettingsSchema.safeParse({
+      default_user_role: "organizer",
       features: {
         gatekeeper: {
           email: { enabled: true },

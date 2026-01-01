@@ -70,6 +70,7 @@ async function findAvailableShareKey(
   return null;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Function handles multiple space creation checks including validation, authentication, role permissions, quota limits, and database operations
 export async function createSpace(
   _prevState: CreateSpaceState,
   formData: FormData
@@ -104,6 +105,29 @@ export async function createSpace(
     if (!user) {
       return {
         error: "認証が必要です。ログインしてください。",
+        success: false,
+      };
+    }
+
+    // Check user role for space creation permission
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Failed to fetch user profile:", profileError);
+      return {
+        error: "プロフィール情報の取得に失敗しました。",
+        success: false,
+      };
+    }
+
+    // Only admin and organizer can create spaces
+    if (profile.role === "user") {
+      return {
+        error: "スペースを作成する権限がありません。",
         success: false,
       };
     }
