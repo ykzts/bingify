@@ -1,6 +1,5 @@
 import {
   type SystemSettings,
-  systemFeaturesSchema,
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
@@ -33,24 +32,8 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
       };
     }
 
-    // Validate the features field using Zod schema
-    const featuresValidation = systemFeaturesSchema.safeParse(data.features);
-    if (!featuresValidation.success) {
-      console.error("Invalid features data from DB:", featuresValidation.error);
-      return {
-        error: "errorInvalidData",
-      };
-    }
-
-    // Validate the entire settings object
-    const settingsValidation = systemSettingsSchema.safeParse({
-      default_user_role: data.default_user_role,
-      features: featuresValidation.data,
-      max_participants_per_space: data.max_participants_per_space,
-      max_spaces_per_user: data.max_spaces_per_user,
-      max_total_spaces: data.max_total_spaces,
-      space_expiration_hours: data.space_expiration_hours,
-    });
+    // Validate the entire settings object including the JSONB features field
+    const settingsValidation = systemSettingsSchema.safeParse(data);
 
     if (!settingsValidation.success) {
       console.error(
