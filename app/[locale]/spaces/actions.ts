@@ -3,6 +3,7 @@
 import { checkEmailAllowed } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import { checkFollowStatus, checkSubStatus } from "@/lib/twitch";
+import type { GatekeeperRules, PublicSpaceInfo } from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";
 import { checkSubscriptionStatus } from "@/lib/youtube";
 
@@ -10,24 +11,6 @@ export interface JoinSpaceState {
   error?: string;
   errorKey?: string;
   success: boolean;
-}
-
-export interface GatekeeperRules {
-  email?: {
-    allowed?: string[];
-    blocked?: string[];
-  };
-  twitch?: {
-    broadcasterId: string;
-    requirement?: string; // "follower" or "subscriber"
-    requireFollow?: boolean; // Legacy format, for backward compatibility
-    requireSub?: boolean; // Legacy format, for backward compatibility
-  };
-  youtube?: {
-    channelId: string;
-    requirement?: string; // "subscriber" or "member"
-    required?: boolean; // Legacy format, for backward compatibility
-  };
 }
 
 export interface SpaceInfo {
@@ -59,7 +42,7 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
       return null;
     }
 
-    return data;
+    return data as SpaceInfo;
   } catch (_error) {
     return null;
   }
@@ -532,29 +515,6 @@ export async function checkUserParticipation(
   } catch (_error) {
     return false;
   }
-}
-
-/**
- * Public space information returned to non-participants
- */
-export interface PublicSpaceInfo {
-  description: string | null;
-  gatekeeper_rules: {
-    email?: {
-      allowed: string[]; // Masked email patterns
-    };
-    twitch?: {
-      requirement: string;
-    };
-    youtube?: {
-      requirement: string;
-    };
-  } | null;
-  hideMetadata: boolean;
-  id: string;
-  share_key: string;
-  status: string | null;
-  title: string | null;
 }
 
 /**

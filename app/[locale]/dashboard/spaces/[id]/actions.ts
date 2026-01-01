@@ -244,7 +244,7 @@ export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
 export interface Participant {
   bingo_status: "none" | "reach" | "bingo";
   id: string;
-  joined_at: string;
+  joined_at: string | null;
   profiles?: {
     avatar_url: string | null;
     full_name: string | null;
@@ -382,7 +382,10 @@ export async function getParticipants(
       if (priorityDiff !== 0) {
         return priorityDiff;
       }
-      return new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime();
+      return (
+        new Date(a.joined_at || 0).getTime() -
+        new Date(b.joined_at || 0).getTime()
+      );
     });
 
     return { data: sortedParticipants };

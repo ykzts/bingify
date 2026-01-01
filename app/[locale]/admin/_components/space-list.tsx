@@ -5,19 +5,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Button } from "@/components/ui/button";
+import type { Tables } from "@/types/supabase";
 import { forceDeleteSpace } from "../actions";
 
-interface Space {
-  created_at: string | null;
-  id: string;
-  settings: Record<string, unknown> | null;
-  share_key: string;
-  status: string | null;
-  updated_at: string | null;
-}
-
 interface SpaceListProps {
-  initialSpaces: Space[];
+  initialSpaces: Tables<"spaces">[];
 }
 
 export function SpaceList({ initialSpaces }: SpaceListProps) {

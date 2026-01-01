@@ -2,6 +2,7 @@
 
 import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
+import type { SpaceAdmin } from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";
 
 // Email validation regex at top level for performance
@@ -559,13 +560,6 @@ export async function removeAdmin(
       success: false,
     };
   }
-}
-
-export interface SpaceAdmin {
-  avatar_url: string | null;
-  email: string | null;
-  full_name: string | null;
-  user_id: string;
 }
 
 export interface GetSpaceAdminsResult {

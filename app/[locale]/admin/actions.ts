@@ -3,29 +3,11 @@
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import type { Tables } from "@/types/supabase";
 
 interface AdminActionResult {
   error?: string;
   success: boolean;
-}
-
-interface Space {
-  created_at: string | null;
-  id: string;
-  settings: Record<string, unknown> | null;
-  share_key: string;
-  status: string | null;
-  updated_at: string | null;
-}
-
-interface User {
-  avatar_url: string | null;
-  created_at: string | null;
-  email: string | null;
-  full_name: string | null;
-  id: string;
-  role: string;
-  updated_at: string | null;
 }
 
 /**
@@ -286,7 +268,7 @@ export async function getAllSpaces(
 ): Promise<{
   error?: string;
   hasMore?: boolean;
-  spaces?: Space[];
+  spaces?: Tables<"spaces">[];
 }> {
   try {
     // Verify admin role
@@ -335,7 +317,7 @@ export async function getAllUsers(
 ): Promise<{
   error?: string;
   hasMore?: boolean;
-  users?: User[];
+  users?: Tables<"profiles">[];
 }> {
   try {
     // Verify admin role

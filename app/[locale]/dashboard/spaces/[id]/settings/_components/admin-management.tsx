@@ -14,13 +14,13 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import type { SpaceAdmin } from "@/lib/types/space";
 import {
   type GetSpaceAdminsResult,
   getSpaceAdmins,
   type InviteAdminState,
   inviteAdmin,
   removeAdmin,
-  type SpaceAdmin,
 } from "../actions";
 
 interface Props {

@@ -2,8 +2,7 @@
 
 import { Lock, Mail, Twitch, Youtube } from "lucide-react";
 import { useTranslations } from "next-intl";
-
-import type { PublicSpaceInfo } from "../../actions";
+import type { PublicSpaceInfo } from "@/lib/types/space";
 
 interface Props {
   publicInfo: PublicSpaceInfo;

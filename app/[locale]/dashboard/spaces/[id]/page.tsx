@@ -29,17 +29,22 @@ export default async function AdminSpacePage({ params }: Props) {
   }
 
   // Fetch space with all necessary fields for settings
-  const { data: space, error } = await supabase
+  const { data: spaceData, error } = await supabase
     .from("spaces")
     .select(
-      "id, share_key, view_token, owner_id, status, created_at, max_participants, title, description, gatekeeper_rules, settings"
+      "id, share_key, view_token, owner_id, status, created_at, updated_at, max_participants, title, description, gatekeeper_rules, settings"
     )
     .eq("id", id)
     .single();
 
-  if (error || !space) {
+  if (error || !spaceData) {
     notFound();
   }
+
+  // Cast the space data to the Space type with typed JSON fields
+  const space = spaceData as import("@/lib/types/space").Space & {
+    view_token: string;
+  };
 
   // Check if current user is owner
   const isOwner = space.owner_id === user.id;
@@ -59,13 +64,13 @@ export default async function AdminSpacePage({ params }: Props) {
     .eq("id", 1)
     .single();
 
-  const features = systemSettings?.features || {
+  const features = (systemSettings?.features || {
     gatekeeper: {
       email: { enabled: true },
       twitch: { enabled: true },
       youtube: { enabled: true },
     },
-  };
+  }) as import("@/lib/types/settings").SystemFeatures;
 
   return (
     <div className="mx-auto min-h-screen max-w-3xl space-y-8 p-8">

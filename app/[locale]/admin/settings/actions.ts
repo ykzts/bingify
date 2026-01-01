@@ -31,7 +31,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
     }
 
     return {
-      settings: data,
+      settings: data as SystemSettings,
     };
   } catch (error) {
     console.error("Error in getSystemSettings:", error);

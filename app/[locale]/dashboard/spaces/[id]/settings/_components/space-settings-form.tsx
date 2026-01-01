@@ -28,25 +28,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import type { SystemFeatures } from "@/lib/types/settings";
+import type { Space } from "@/lib/types/space";
 import { cn } from "@/lib/utils";
 import type { PublishSpaceState, UpdateSpaceState } from "../actions";
 import { publishSpace, updateSpaceSettings } from "../actions";
-
-interface Space {
-  description: string | null;
-  gatekeeper_rules: {
-    email?: { allowed: string[] };
-    twitch?: { broadcasterId: string; requirement: string };
-    youtube?: { channelId: string; requirement: string };
-  } | null;
-  id: string;
-  max_participants: number;
-  settings?: {
-    hide_metadata_before_join?: boolean;
-  };
-  status: string;
-  title: string | null;
-}
 
 interface Props {
   currentParticipantCount: number;

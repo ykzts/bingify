@@ -1,12 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
+import type { Tables } from "@/types/supabase";
 
-export interface CalledNumber {
-  called_at: string;
-  id: string;
-  space_id: string;
-  value: number;
-}
+export type CalledNumber = Tables<"called_numbers">;
 
 interface UseCalledNumbersOptions {
   /**
@@ -40,7 +36,7 @@ export function useCalledNumbers(
         throw error;
       }
 
-      return (data || []) as CalledNumber[];
+      return (data || []) as Tables<"called_numbers">[];
     },
     queryKey: ["called-numbers", spaceId],
     retry,

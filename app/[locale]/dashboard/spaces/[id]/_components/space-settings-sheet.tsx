@@ -13,26 +13,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import type { SystemFeatures } from "@/lib/types/settings";
+import type { Space } from "@/lib/types/space";
 import { AdminManagement } from "../settings/_components/admin-management";
 import { SpaceSettingsForm } from "../settings/_components/space-settings-form";
-
-interface Space {
-  description: string | null;
-  gatekeeper_rules: {
-    email?: { allowed: string[] };
-    twitch?: { broadcasterId: string; requirement: string };
-    youtube?: { channelId: string; requirement: string };
-  } | null;
-  id: string;
-  max_participants: number;
-  owner_id: string;
-  settings?: {
-    hide_metadata_before_join?: boolean;
-  };
-  share_key: string;
-  status: string;
-  title: string | null;
-}
 
 interface Props {
   currentParticipantCount: number;
