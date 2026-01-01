@@ -70,6 +70,7 @@ async function findAvailableShareKey(
   return null;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Function handles multiple space creation checks including validation, authentication, role permissions, quota limits, and database operations
 export async function createSpace(
   _prevState: CreateSpaceState,
   formData: FormData
