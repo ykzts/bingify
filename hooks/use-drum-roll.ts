@@ -45,6 +45,7 @@ export function useDrumRoll(options?: UseDrumRollOptions): UseDrumRollReturn {
   const [isAnimating, setIsAnimating] = useState(false);
   const animationRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
+  const activePromiseRef = useRef<Promise<void> | null>(null);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -57,7 +58,18 @@ export function useDrumRoll(options?: UseDrumRollOptions): UseDrumRollReturn {
 
   const startDrumRoll = useCallback(
     (finalNumber: number): Promise<void> => {
-      return new Promise((resolve) => {
+      // Re-entry protection: if animation is already running, return existing promise
+      if (isAnimating || animationRef.current !== null) {
+        return activePromiseRef.current || Promise.resolve();
+      }
+
+      // Cancel any leftover animation frame to avoid leaks
+      if (animationRef.current !== null) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+
+      const promise = new Promise<void>((resolve) => {
         setIsAnimating(true);
         startTimeRef.current = performance.now();
         let lastUpdate = 0;
@@ -92,14 +104,18 @@ export function useDrumRoll(options?: UseDrumRollOptions): UseDrumRollReturn {
             setCurrentNumber(finalNumber);
             setIsAnimating(false);
             animationRef.current = null;
+            activePromiseRef.current = null;
             resolve();
           }
         };
 
         animationRef.current = requestAnimationFrame(animate);
       });
+
+      activePromiseRef.current = promise;
+      return promise;
     },
-    [duration, min, max]
+    [duration, min, max, isAnimating]
   );
 
   return {
