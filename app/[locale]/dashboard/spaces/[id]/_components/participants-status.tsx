@@ -37,6 +37,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Participant } from "../_hooks/use-participants";
 import { useParticipants } from "../_hooks/use-participants";
 import { kickParticipant } from "../actions";
+import { ParticipantCardDialog } from "./participant-card-dialog";
 
 interface Props {
   maxParticipants: number;
@@ -439,20 +440,31 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        disabled={kickingId === participant.id || isPendingKick}
-                        onClick={() =>
-                          handleKickClick(
-                            participant.id,
+                      <div className="flex items-center justify-end gap-1">
+                        <ParticipantCardDialog
+                          participantName={
                             participant.profiles?.full_name || null
-                          )
-                        }
-                        size="sm"
-                        variant="ghost"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">{t("kickButton")}</span>
-                      </Button>
+                          }
+                          spaceId={spaceId}
+                          userId={participant.user_id}
+                        />
+                        <Button
+                          disabled={
+                            kickingId === participant.id || isPendingKick
+                          }
+                          onClick={() =>
+                            handleKickClick(
+                              participant.id,
+                              participant.profiles?.full_name || null
+                            )
+                          }
+                          size="sm"
+                          variant="ghost"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">{t("kickButton")}</span>
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 );

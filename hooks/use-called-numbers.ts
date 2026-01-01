@@ -6,6 +6,10 @@ export type CalledNumber = Tables<"called_numbers">;
 
 interface UseCalledNumbersOptions {
   /**
+   * Enable or disable the query. Default is true.
+   */
+  enabled?: boolean;
+  /**
    * Number of retry attempts on error. Default is 1.
    */
   retry?: number;
@@ -20,9 +24,10 @@ export function useCalledNumbers(
   spaceId: string,
   options?: UseCalledNumbersOptions
 ) {
-  const { retry = 1 } = options || {};
+  const { enabled = true, retry = 1 } = options || {};
 
   return useQuery({
+    enabled,
     queryFn: async () => {
       const supabase = createClient();
       const { data, error } = await supabase

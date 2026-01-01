@@ -463,3 +463,114 @@ export async function kickParticipant(
     };
   }
 }
+
+export interface ParticipantCardData {
+  card: {
+    created_at: string;
+    id: string;
+    numbers: number[][];
+    space_id: string;
+    user_id: string;
+  };
+  participant: {
+    bingo_status: "none" | "reach" | "bingo";
+    full_name: string | null;
+  };
+}
+
+export interface GetParticipantCardResult {
+  data?: ParticipantCardData;
+  error?: string;
+  success: boolean;
+}
+
+export async function getParticipantCard(
+  spaceId: string,
+  userId: string
+): Promise<GetParticipantCardResult> {
+  try {
+    if (!(isValidUUID(spaceId) && isValidUUID(userId))) {
+      return {
+        error: "Invalid ID",
+        success: false,
+      };
+    }
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "Authentication required",
+        success: false,
+      };
+    }
+
+    const { data: space } = await supabase
+      .from("spaces")
+      .select("owner_id")
+      .eq("id", spaceId)
+      .single();
+
+    if (!space || space.owner_id !== user.id) {
+      return {
+        error: "Permission denied",
+        success: false,
+      };
+    }
+
+    const { data: participant } = await supabase
+      .from("participants")
+      .select("bingo_status, user_id")
+      .eq("space_id", spaceId)
+      .eq("user_id", userId)
+      .single();
+
+    if (!participant) {
+      return {
+        error: "Participant not found",
+        success: false,
+      };
+    }
+
+    const { data: card } = await supabase
+      .from("bingo_cards")
+      .select("id, space_id, user_id, numbers, created_at")
+      .eq("space_id", spaceId)
+      .eq("user_id", userId)
+      .single();
+
+    if (!card) {
+      return {
+        error: "Card not found",
+        success: false,
+      };
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", userId)
+      .single();
+
+    return {
+      data: {
+        card: card as ParticipantCardData["card"],
+        participant: {
+          bingo_status: participant.bingo_status as "none" | "reach" | "bingo",
+          full_name: profile?.full_name || null,
+        },
+      },
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error getting participant card:", error);
+    return {
+      error: "An error occurred",
+      success: false,
+    };
+  }
+}
