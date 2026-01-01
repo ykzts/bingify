@@ -38,6 +38,49 @@ import { createSpaceFormOpts, createSpaceFormSchema } from "./form-options";
 
 const SUGGESTION_REGEX = /提案: (.+)/;
 
+interface SuggestionDisplayProps {
+  state: unknown;
+  onAcceptSuggestion: () => void;
+  t: (key: string) => string;
+}
+
+function SuggestionDisplay({
+  state,
+  onAcceptSuggestion,
+  t,
+}: SuggestionDisplayProps) {
+  const stateRecord = state as Record<string, unknown>;
+  const errorMap = stateRecord?.errorMap as Record<string, unknown> | undefined;
+  const onChangeError =
+    typeof errorMap?.onChange === "string" ? errorMap.onChange : null;
+
+  if (!onChangeError?.includes("提案:")) {
+    return null;
+  }
+
+  const suggestionMatch = onChangeError.match(SUGGESTION_REGEX);
+  const suggestion = suggestionMatch?.[1] || "";
+
+  return (
+    <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+      <p className="mb-2 text-amber-800 text-sm">{t("suggestionPrefix")}</p>
+      <div className="flex items-center gap-2">
+        <code className="flex-1 rounded bg-white px-3 py-2 font-mono text-sm">
+          {suggestion}
+        </code>
+        <Button
+          onClick={onAcceptSuggestion}
+          size="sm"
+          type="button"
+          variant="destructive"
+        >
+          {t("useSuggestionButton")}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function CreateSpaceForm() {
   const router = useRouter();
   const t = useTranslations("CreateSpace");
@@ -257,46 +300,11 @@ export function CreateSpaceForm() {
         )}
       </form.Field>
 
-      {/* Show suggestion if available */}
-      {(() => {
-        const stateRecord = state as Record<string, unknown>;
-        return (
-          stateRecord?.errorMap &&
-          typeof stateRecord.errorMap === "object" &&
-          stateRecord.errorMap !== null &&
-          "onChange" in stateRecord.errorMap &&
-          typeof (stateRecord.errorMap as Record<string, unknown>).onChange ===
-            "string" &&
-          (
-            (stateRecord.errorMap as Record<string, unknown>).onChange as string
-          ).includes("提案:")
-        );
-      })() && (
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <p className="mb-2 text-amber-800 text-sm">{t("suggestionPrefix")}</p>
-          <div className="flex items-center gap-2">
-            <code className="flex-1 rounded bg-white px-3 py-2 font-mono text-sm">
-              {(() => {
-                const stateRecord = state as Record<string, unknown>;
-                const errorMap = stateRecord?.errorMap as
-                  | Record<string, unknown>
-                  | undefined;
-                return typeof errorMap?.onChange === "string"
-                  ? errorMap.onChange.match(SUGGESTION_REGEX)?.[1]
-                  : "";
-              })()}
-            </code>
-            <Button
-              onClick={handleAcceptSuggestion}
-              size="sm"
-              type="button"
-              variant="destructive"
-            >
-              {t("useSuggestionButton")}
-            </Button>
-          </div>
-        </div>
-      )}
+      <SuggestionDisplay
+        onAcceptSuggestion={handleAcceptSuggestion}
+        state={state}
+        t={t}
+      />
 
       <Button
         className="w-full"

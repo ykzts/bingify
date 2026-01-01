@@ -1,6 +1,5 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
 import {
   createServerValidate,
   initialFormState,
@@ -14,6 +13,105 @@ import {
 } from "./form-options";
 
 const MAX_SLUG_SUGGESTIONS = 10;
+
+async function checkUserAuthentication(
+  supabase: Awaited<ReturnType<typeof createClient>>
+) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "認証が必要です。ログインしてください。", user: null };
+  }
+
+  return { error: null, user };
+}
+
+async function checkUserRole(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string
+) {
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .single();
+
+  if (profileError) {
+    console.error("Failed to fetch user profile:", profileError);
+    return { error: "プロフィール情報の取得に失敗しました。" };
+  }
+
+  if (profile.role === "user") {
+    return { error: "スペースを作成する権限がありません。" };
+  }
+
+  return { error: null };
+}
+
+async function checkSpaceLimits(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string
+) {
+  const { data: systemSettings, error: settingsError } = await supabase
+    .from("system_settings")
+    .select("max_spaces_per_user, max_total_spaces")
+    .eq("id", 1)
+    .single();
+
+  if (settingsError) {
+    console.error("Failed to fetch system settings:", settingsError);
+    return { error: null };
+  }
+
+  if (!systemSettings) {
+    return { error: null };
+  }
+
+  // Check global space limit
+  if (systemSettings.max_total_spaces > 0) {
+    const { count: totalSpaceCount, error: totalCountError } = await supabase
+      .from("spaces")
+      .select("id", { count: "exact", head: true })
+      .neq("status", "closed");
+
+    if (totalCountError) {
+      console.error("Failed to count total spaces:", totalCountError);
+      return { error: "スペースの総数確認に失敗しました。" };
+    }
+
+    if (
+      totalSpaceCount !== null &&
+      totalSpaceCount >= systemSettings.max_total_spaces
+    ) {
+      return { error: "システム全体のスペース作成上限に達しています。" };
+    }
+  }
+
+  // Check user space limit
+  const { count: userSpaceCount, error: countError } = await supabase
+    .from("spaces")
+    .select("id", { count: "exact" })
+    .eq("owner_id", userId)
+    .neq("status", "closed");
+
+  if (countError) {
+    console.error("Failed to count user spaces:", countError);
+    return { error: "ユーザーのスペース数確認に失敗しました。" };
+  }
+
+  if (
+    userSpaceCount !== null &&
+    userSpaceCount >= systemSettings.max_spaces_per_user
+  ) {
+    return {
+      error: `作成できるスペースの上限（${systemSettings.max_spaces_per_user}個）に達しています。`,
+    };
+  }
+
+  return { error: null };
+}
 
 async function findAvailableShareKey(
   baseShareKey: string,
@@ -46,95 +144,22 @@ const serverValidate = createServerValidate({
     const dateSuffix = format(new Date(), "yyyyMMdd");
     const fullShareKey = `${value.share_key}-${dateSuffix}`;
 
-    // Get the authenticated user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return {
-        form: "認証が必要です。ログインしてください。",
-      };
+    // Check authentication
+    const { error: authError, user } = await checkUserAuthentication(supabase);
+    if (authError || !user) {
+      return { form: authError || "認証が必要です。" };
     }
 
-    // Check user role for space creation permission
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profileError) {
-      console.error("Failed to fetch user profile:", profileError);
-      return {
-        form: "プロフィール情報の取得に失敗しました。",
-      };
+    // Check user role
+    const { error: roleError } = await checkUserRole(supabase, user.id);
+    if (roleError) {
+      return { form: roleError };
     }
 
-    // Only admin and organizer can create spaces
-    if (profile.role === "user") {
-      return {
-        form: "スペースを作成する権限がありません。",
-      };
-    }
-
-    // Check system settings for max spaces per user and global limit
-    const { data: systemSettings, error: settingsError } = await supabase
-      .from("system_settings")
-      .select("max_spaces_per_user, max_total_spaces")
-      .eq("id", 1)
-      .single();
-
-    if (settingsError) {
-      console.error("Failed to fetch system settings:", settingsError);
-    } else if (systemSettings) {
-      // Check global space limit first (if not 0/unlimited)
-      if (systemSettings.max_total_spaces > 0) {
-        const { count: totalSpaceCount, error: totalCountError } =
-          await supabase
-            .from("spaces")
-            .select("id", { count: "exact", head: true })
-            .neq("status", "closed");
-
-        if (totalCountError) {
-          console.error("Failed to count total spaces:", totalCountError);
-          return {
-            form: "スペースの総数確認に失敗しました。",
-          };
-        }
-
-        if (
-          totalSpaceCount !== null &&
-          totalSpaceCount >= systemSettings.max_total_spaces
-        ) {
-          return {
-            form: "システム全体のスペース作成上限に達しています。",
-          };
-        }
-      }
-
-      // Count user's existing active spaces (excluding closed)
-      const { count: userSpaceCount, error: countError } = await supabase
-        .from("spaces")
-        .select("id", { count: "exact" })
-        .eq("owner_id", user.id)
-        .neq("status", "closed");
-
-      if (countError) {
-        console.error("Failed to count user spaces:", countError);
-        return {
-          form: "ユーザーのスペース数確認に失敗しました。",
-        };
-      }
-
-      if (
-        userSpaceCount !== null &&
-        userSpaceCount >= systemSettings.max_spaces_per_user
-      ) {
-        return {
-          form: `作成できるスペースの上限（${systemSettings.max_spaces_per_user}個）に達しています。`,
-        };
-      }
+    // Check space limits
+    const { error: limitError } = await checkSpaceLimits(supabase, user.id);
+    if (limitError) {
+      return { form: limitError };
     }
 
     // Check if share key is already taken
@@ -152,7 +177,6 @@ const serverValidate = createServerValidate({
       };
     }
 
-    // If all validations pass, return undefined
     return undefined;
   },
 });
@@ -165,7 +189,6 @@ export interface CreateSpaceActionState {
   suggestion?: string;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Function handles form validation, space creation, and error handling with database operations
 export async function createSpaceAction(
   _prevState: unknown,
   formData: FormData
@@ -218,7 +241,7 @@ export async function createSpaceAction(
     }
 
     // Create space in database with status: 'draft'
-    const uuid = randomUUID();
+    const uuid = crypto.randomUUID();
     const viewToken = generateSecureToken();
 
     const { error } = await supabase
