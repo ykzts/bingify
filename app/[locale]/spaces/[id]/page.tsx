@@ -31,13 +31,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: `Join the bingo space: ${space.share_key}`,
     openGraph: {
       description: `Join the bingo space: ${space.share_key}`,
-      title: `Bingify - ${space.share_key}`,
+      title: space.share_key,
     },
-    title: `${space.share_key} - Bingify`,
+    title: space.share_key,
     twitter: {
       card: "summary_large_image",
       description: `Join the bingo space: ${space.share_key}`,
-      title: `Bingify - ${space.share_key}`,
+      title: space.share_key,
     },
   };
 }
