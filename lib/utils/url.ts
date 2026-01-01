@@ -5,8 +5,8 @@
 /**
  * Get the base URL for the application following priority order:
  * 1. NEXT_PUBLIC_SITE_URL (explicitly defined)
- * 2. Vercel Preview environment (VERCEL_BRANCH_URL or VERCEL_URL)
- * 3. Vercel Production environment (VERCEL_PROJECT_PRODUCTION_URL)
+ * 2. Vercel Preview environment (NEXT_PUBLIC_VERCEL_BRANCH_URL or NEXT_PUBLIC_VERCEL_URL)
+ * 3. Vercel Production environment (NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL)
  * 4. Local development fallback (http://localhost:3000)
  */
 export function getBaseUrl(): string {
@@ -17,15 +17,25 @@ export function getBaseUrl(): string {
 
   // 2. Vercel Preview & Production fallbacks
   if (process.env.NODE_ENV === "production") {
-    if (process.env.VERCEL_ENV === "preview") {
-      const vercelUrl = process.env.VERCEL_BRANCH_URL || process.env.VERCEL_URL;
+    const vercelEnv =
+      process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.VERCEL_ENV;
+
+    if (vercelEnv === "preview") {
+      const vercelUrl =
+        process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ||
+        process.env.VERCEL_BRANCH_URL ||
+        process.env.NEXT_PUBLIC_VERCEL_URL ||
+        process.env.VERCEL_URL;
       if (vercelUrl) {
         return `https://${vercelUrl}`;
       }
     }
 
-    if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-      return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+    const productionUrl =
+      process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ||
+      process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    if (productionUrl) {
+      return `https://${productionUrl}`;
     }
   }
 
