@@ -408,7 +408,7 @@
     "eventEndedTitle": "This Event Has Ended",
     "eventEndedMessage": "Thank you for participating in this bingo event. The event has been closed by the host.",
     "yourFinalResultTitle": "Your Final Result",
-    "metaDescription": "Join the bingo space: {spaceKey}"
+    "metaDescription": "Join the bingo space: {spaceName}"
   },
   "UsernameSettings": {
     "description": "Set the name that will be displayed in the app.",

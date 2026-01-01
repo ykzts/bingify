@@ -400,7 +400,7 @@
     "eventEndedTitle": "このイベントは終了しました",
     "eventEndedMessage": "このビンゴイベントにご参加いただきありがとうございました。イベントはホストによって閉鎖されました。",
     "yourFinalResultTitle": "あなたの最終結果",
-    "metaDescription": "ビンゴスペース {spaceKey} に参加しよう"
+    "metaDescription": "ビンゴスペース {spaceName} に参加しよう"
   },
   "UsernameSettings": {
     "description": "アプリ内で表示される名前を設定します。",
