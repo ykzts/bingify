@@ -106,6 +106,30 @@ export function SystemSettingsForm({ initialSettings }: Props) {
         </FieldGroup>
       </FieldSet>
 
+      {/* User Settings Section */}
+      <FieldSet className="border-t pt-6">
+        <FieldLegend>{t("userSettingsTitle")}</FieldLegend>
+        <FieldGroup>
+          {/* Default User Role */}
+          <Field>
+            <FieldContent>
+              <FieldLabel>{t("defaultUserRoleLabel")}</FieldLabel>
+              <select
+                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                defaultValue={initialSettings?.default_user_role ?? "organizer"}
+                disabled={isPending}
+                name="default_user_role"
+                required
+              >
+                <option value="organizer">{t("roleOrganizer")}</option>
+                <option value="user">{t("roleUser")}</option>
+              </select>
+              <FieldDescription>{t("defaultUserRoleHelp")}</FieldDescription>
+            </FieldContent>
+          </Field>
+        </FieldGroup>
+      </FieldSet>
+
       {/* Feature Flags Section */}
       <div className="space-y-4 border-t pt-6">
         <h4 className="font-semibold text-base">{t("featureFlagsTitle")}</h4>

@@ -316,6 +316,7 @@ export type Database = {
       system_settings: {
         Row: {
           created_at: string | null
+          default_user_role: string
           features: Json
           id: number
           max_participants_per_space: number
@@ -325,6 +326,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          default_user_role?: string
           features?: Json
           id?: number
           max_participants_per_space?: number
@@ -334,6 +336,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          default_user_role?: string
           features?: Json
           id?: number
           max_participants_per_space?: number

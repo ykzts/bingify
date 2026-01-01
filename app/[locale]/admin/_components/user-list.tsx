@@ -5,7 +5,14 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Button } from "@/components/ui/button";
-import { banUser } from "../actions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { banUser, updateUserRole } from "../actions";
 
 interface User {
   avatar_url: string | null;
@@ -26,6 +33,7 @@ export function UserList({ initialUsers }: UserListProps) {
   const confirm = useConfirm();
   const [users, setUsers] = useState(initialUsers);
   const [banning, setBanning] = useState<string | null>(null);
+  const [updatingRole, setUpdatingRole] = useState<string | null>(null);
 
   const handleBan = async (userId: string, userEmail: string | null) => {
     if (
@@ -49,6 +57,27 @@ export function UserList({ initialUsers }: UserListProps) {
     }
 
     setBanning(null);
+  };
+
+  const handleRoleChange = async (
+    userId: string,
+    newRole: "admin" | "organizer" | "user"
+  ) => {
+    setUpdatingRole(userId);
+    const result = await updateUserRole(userId, newRole);
+
+    if (result.success) {
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === userId ? { ...user, role: newRole } : user
+        )
+      );
+      toast.success(t("roleUpdateSuccess"));
+    } else {
+      toast.error(t(result.error || "errorGeneric"));
+    }
+
+    setUpdatingRole(null);
   };
 
   return (
@@ -84,7 +113,7 @@ export function UserList({ initialUsers }: UserListProps) {
               className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
               scope="col"
             >
-              {t("banAction")}
+              {t("actions")}
             </th>
           </tr>
         </thead>
@@ -105,15 +134,27 @@ export function UserList({ initialUsers }: UserListProps) {
                   {user.full_name || "N/A"}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
-                  <span
-                    className={`inline-flex rounded-full px-2 font-semibold text-xs leading-5 ${
-                      user.role === "admin"
-                        ? "bg-purple-100 text-purple-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
+                  <Select
+                    disabled={updatingRole === user.id}
+                    onValueChange={(value) =>
+                      handleRoleChange(
+                        user.id,
+                        value as "admin" | "organizer" | "user"
+                      )
+                    }
+                    value={user.role}
                   >
-                    {user.role}
-                  </span>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">{t("roleAdmin")}</SelectItem>
+                      <SelectItem value="organizer">
+                        {t("roleOrganizer")}
+                      </SelectItem>
+                      <SelectItem value="user">{t("roleUser")}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-gray-500 text-sm">
                   {user.created_at
@@ -121,21 +162,15 @@ export function UserList({ initialUsers }: UserListProps) {
                     : "N/A"}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm">
-                  {user.role === "admin" ? (
-                    <span className="text-gray-400">{t("roleAdmin")}</span>
-                  ) : (
-                    <Button
-                      disabled={banning === user.id}
-                      onClick={() => handleBan(user.id, user.email)}
-                      size="sm"
-                      type="button"
-                      variant="destructive"
-                    >
-                      {banning === user.id
-                        ? t("banInProgress")
-                        : t("banAction")}
-                    </Button>
-                  )}
+                  <Button
+                    disabled={banning === user.id || user.role === "admin"}
+                    onClick={() => handleBan(user.id, user.email)}
+                    size="sm"
+                    type="button"
+                    variant="destructive"
+                  >
+                    {banning === user.id ? t("banInProgress") : t("banAction")}
+                  </Button>
                 </td>
               </tr>
             ))

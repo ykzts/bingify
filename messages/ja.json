@@ -60,7 +60,14 @@
     "statusActive": "active",
     "subtitle": "サイト管理者用のコントロールパネル",
     "usersCount": "全{count}名のユーザー",
-    "usersTitle": "ユーザー管理"
+    "usersTitle": "ユーザー管理",
+    "actions": "アクション",
+    "errorCannotChangeOwnRole": "自分のロールは変更できません",
+    "errorInvalidRole": "無効なロールです",
+    "roleOrganizer": "主催者",
+    "roleUpdateSuccess": "ロールを更新しました",
+    "roleUser": "参加者",
+    "updateRoleError": "ロールの更新に失敗しました"
   },
   "AdminSettings": {
     "description": "サーバーリソース管理とスペース制限の設定",
@@ -85,7 +92,10 @@
     "spaceExpirationHelp": "スペース作成から何時間で有効期限切れとするか設定します（0は無期限）",
     "spaceExpirationLabel": "スペース有効期限（時間）",
     "title": "システム設定",
-    "updateSuccess": "設定を更新しました"
+    "updateSuccess": "設定を更新しました",
+    "defaultUserRoleHelp": "新規登録ユーザーに自動的に付与される権限です。「主催者」はスペース作成が可能、「参加者」は作成不可となります。",
+    "defaultUserRoleLabel": "新規ユーザーの初期権限",
+    "userSettingsTitle": "ユーザー設定"
   },
   "AdminSpace": {
     "allNumbersCalled": "すべての番号が呼ばれました",
