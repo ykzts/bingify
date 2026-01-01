@@ -112,9 +112,10 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                     max={10_000}
                     min={1}
                     name={field.name}
-                    onChange={(e) =>
-                      field.handleChange(Number.parseInt(e.target.value, 10))
-                    }
+                    onChange={(e) => {
+                      const parsed = Number.parseInt(e.target.value, 10);
+                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
+                    }}
                     required
                     type="number"
                     value={field.state.value as number}
@@ -152,9 +153,10 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                     max={100}
                     min={1}
                     name={field.name}
-                    onChange={(e) =>
-                      field.handleChange(Number.parseInt(e.target.value, 10))
-                    }
+                    onChange={(e) => {
+                      const parsed = Number.parseInt(e.target.value, 10);
+                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
+                    }}
                     required
                     type="number"
                     value={field.state.value as number}
@@ -192,9 +194,10 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                     max={100_000}
                     min={0}
                     name={field.name}
-                    onChange={(e) =>
-                      field.handleChange(Number.parseInt(e.target.value, 10))
-                    }
+                    onChange={(e) => {
+                      const parsed = Number.parseInt(e.target.value, 10);
+                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
+                    }}
                     required
                     type="number"
                     value={field.state.value as number}
@@ -230,9 +233,10 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                     max={8760}
                     min={0}
                     name={field.name}
-                    onChange={(e) =>
-                      field.handleChange(Number.parseInt(e.target.value, 10))
-                    }
+                    onChange={(e) => {
+                      const parsed = Number.parseInt(e.target.value, 10);
+                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
+                    }}
                     required
                     type="number"
                     value={field.state.value as number}
