@@ -366,6 +366,18 @@ describe("Dashboard Actions", () => {
           }),
         },
         from: vi.fn().mockImplementation((table: string) => {
+          if (table === "profiles") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
+                    data: { role: "organizer" },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
           if (table === "system_settings") {
             return {
               select: vi.fn().mockReturnValue({
@@ -460,6 +472,18 @@ describe("Dashboard Actions", () => {
           }),
         },
         from: vi.fn().mockImplementation((table: string) => {
+          if (table === "profiles") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
+                    data: { role: "organizer" },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
           if (table === "system_settings") {
             return {
               select: vi.fn().mockReturnValue({
