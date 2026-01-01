@@ -269,6 +269,7 @@ export interface PublishSpaceState {
   success: boolean;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Publish space requires conditional logic for form vs direct publish
 export async function publishSpace(
   spaceId: string,
   _prevState: PublishSpaceState,
@@ -298,8 +299,16 @@ export async function publishSpace(
     }
 
     // If formData has settings (called from settings form), update settings first
-    const hasSettings = formData.has("max_participants");
-    if (hasSettings) {
+    // Check if any form field is present to determine if this is from the settings form
+    const hasFormFields =
+      formData.has("title") ||
+      formData.has("description") ||
+      formData.has("max_participants") ||
+      formData.has("gatekeeper_mode");
+
+    if (hasFormFields) {
+      // When called from settings form, delegate to updateSpaceSettings
+      // which handles validation and permission checks
       const updateResult = await updateSpaceSettings(
         spaceId,
         { success: false },
@@ -312,39 +321,40 @@ export async function publishSpace(
           success: false,
         };
       }
-    }
+    } else {
+      // When called directly (e.g., from draft-status-view), check permissions
+      // Check if space exists and user has permission (owner or admin)
+      const { data: space, error: spaceError } = await supabase
+        .from("spaces")
+        .select("owner_id")
+        .eq("id", spaceId)
+        .single();
 
-    // Check if space exists and user has permission (owner or admin)
-    const { data: space, error: spaceError } = await supabase
-      .from("spaces")
-      .select("owner_id")
-      .eq("id", spaceId)
-      .single();
+      if (spaceError || !space) {
+        return {
+          error: "スペースが見つかりませんでした",
+          success: false,
+        };
+      }
 
-    if (spaceError || !space) {
-      return {
-        error: "スペースが見つかりませんでした",
-        success: false,
-      };
-    }
+      // Check if user is owner or admin
+      const isOwner = space.owner_id === user.id;
+      const { data: adminRole } = await supabase
+        .from("space_roles")
+        .select("id")
+        .eq("space_id", spaceId)
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .single();
 
-    // Check if user is owner or admin
-    const isOwner = space.owner_id === user.id;
-    const { data: adminRole } = await supabase
-      .from("space_roles")
-      .select("id")
-      .eq("space_id", spaceId)
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .single();
+      const isAdmin = !!adminRole;
 
-    const isAdmin = !!adminRole;
-
-    if (!(isOwner || isAdmin)) {
-      return {
-        error: "権限がありません",
-        success: false,
-      };
+      if (!(isOwner || isAdmin)) {
+        return {
+          error: "権限がありません",
+          success: false,
+        };
+      }
     }
 
     // Update status to active
