@@ -272,27 +272,13 @@ export interface PublishSpaceState {
 export async function publishSpace(
   spaceId: string,
   _prevState: PublishSpaceState,
-  formData: FormData
+  _formData: FormData
 ): Promise<PublishSpaceState> {
   try {
     // Validate UUID first before any operations
     if (!isValidUUID(spaceId)) {
       return {
         error: "Invalid space ID",
-        success: false,
-      };
-    }
-
-    // First update the settings
-    const updateResult = await updateSpaceSettings(
-      spaceId,
-      { success: false },
-      formData
-    );
-
-    if (!updateResult.success) {
-      return {
-        error: updateResult.error || "設定の更新に失敗しました",
         success: false,
       };
     }
@@ -311,12 +297,52 @@ export async function publishSpace(
       };
     }
 
+    // Check if space exists and user has permission (owner or admin)
+    const { data: space, error: spaceError } = await supabase
+      .from("spaces")
+      .select("owner_id, status")
+      .eq("id", spaceId)
+      .single();
+
+    if (spaceError || !space) {
+      return {
+        error: "スペースが見つかりませんでした",
+        success: false,
+      };
+    }
+
+    // Check if space is already published
+    if (space.status !== "draft") {
+      return {
+        error: "このスペースは既に公開されています",
+        success: false,
+      };
+    }
+
+    // Check if user is owner or admin
+    const isOwner = space.owner_id === user.id;
+    const { data: adminRole } = await supabase
+      .from("space_roles")
+      .select("id")
+      .eq("space_id", spaceId)
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .single();
+
+    const isAdmin = !!adminRole;
+
+    if (!(isOwner || isAdmin)) {
+      return {
+        error: "権限がありません",
+        success: false,
+      };
+    }
+
     // Update status to active
     const { error: publishError } = await supabase
       .from("spaces")
       .update({ status: "active" })
       .eq("id", spaceId)
-      .eq("owner_id", user.id)
       .eq("status", "draft"); // Only publish if currently draft
 
     if (publishError) {
@@ -332,6 +358,37 @@ export async function publishSpace(
     };
   } catch (error) {
     console.error("Error publishing space:", error);
+    return {
+      error: "予期しないエラーが発生しました",
+      success: false,
+    };
+  }
+}
+
+export async function updateAndPublishSpace(
+  spaceId: string,
+  _prevState: PublishSpaceState,
+  formData: FormData
+): Promise<PublishSpaceState> {
+  try {
+    // First update the settings
+    const updateResult = await updateSpaceSettings(
+      spaceId,
+      { success: false },
+      formData
+    );
+
+    if (!updateResult.success) {
+      return {
+        error: updateResult.error || "設定の更新に失敗しました",
+        success: false,
+      };
+    }
+
+    // Then publish
+    return await publishSpace(spaceId, _prevState, formData);
+  } catch (error) {
+    console.error("Error updating and publishing space:", error);
     return {
       error: "予期しないエラーが発生しました",
       success: false,
