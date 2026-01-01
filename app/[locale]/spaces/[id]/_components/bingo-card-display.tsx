@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import confetti from "canvas-confetti";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { useEffect, useEffectEvent, useRef } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef } from "react";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
@@ -28,8 +28,30 @@ export function BingoCardDisplay({ spaceId }: Props) {
   const queryClient = useQueryClient();
   const { data: bingoCard, isPending, error } = useBingoCard(spaceId);
   const { data: calledNumbersArray = [] } = useCalledNumbers(spaceId);
-  const calledNumbers = new Set(calledNumbersArray.map(({ value }) => value));
+  const calledNumbers = useMemo(
+    () => new Set(calledNumbersArray.map(({ value }) => value)),
+    [calledNumbersArray]
+  );
   const previousStatusRef = useRef<"none" | "reach" | "bingo">("none");
+
+  // Freeze state when bingo is achieved
+  const frozenCalledNumbersRef = useRef<Set<number> | null>(null);
+  const frozenBingoLinesRef = useRef<ReturnType<typeof checkBingoLines> | null>(
+    null
+  );
+
+  // Calculate bingo lines for rendering - use frozen state if bingo has been achieved
+  const bingoCheckResult = useMemo(() => {
+    if (frozenBingoLinesRef.current) {
+      return frozenBingoLinesRef.current;
+    }
+    return bingoCard
+      ? checkBingoLines(bingoCard.numbers, calledNumbers)
+      : { hasBingo: false, hasReach: false, bingoLines: [], reachLines: [] };
+  }, [bingoCard, calledNumbers]);
+
+  // Use frozen called numbers for display if bingo achieved
+  const displayCalledNumbers = frozenCalledNumbersRef.current || calledNumbers;
 
   // Use useEffectEvent to separate event logic from effect dependencies
   const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
@@ -58,6 +80,73 @@ export function BingoCardDisplay({ spaceId }: Props) {
       }
     );
   });
+
+  // Extract confetti animation logic
+  const triggerConfetti = useEffectEvent(() => {
+    const duration = 3000;
+    const animationEnd = Date.now() + duration;
+    const defaults = {
+      startVelocity: 30,
+      spread: 360,
+      ticks: 60,
+      zIndex: 0,
+    };
+
+    const confettiInterval = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        clearInterval(confettiInterval);
+        return;
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+
+      confetti({
+        ...defaults,
+        origin: { x: Math.random(), y: Math.random() - 0.2 },
+        particleCount: Math.floor(particleCount),
+      });
+    }, 250);
+
+    return confettiInterval;
+  });
+
+  // Helper to handle game reset
+  const handleGameReset = useEffectEvent(() => {
+    frozenCalledNumbersRef.current = null;
+    frozenBingoLinesRef.current = null;
+    previousStatusRef.current = "none";
+  });
+
+  // Helper to update bingo status
+  const processBingoStatus = useEffectEvent(
+    (result: ReturnType<typeof checkBingoLines>) => {
+      let newStatus: "none" | "reach" | "bingo" = "none";
+
+      if (result.hasBingo) {
+        newStatus = "bingo";
+        if (previousStatusRef.current !== "bingo") {
+          frozenCalledNumbersRef.current = new Set(calledNumbers);
+          frozenBingoLinesRef.current = result;
+        }
+      } else if (result.hasReach) {
+        newStatus = "reach";
+      }
+
+      const isTransitionToBingo =
+        newStatus === "bingo" && previousStatusRef.current !== "bingo";
+
+      if (newStatus !== previousStatusRef.current) {
+        previousStatusRef.current = newStatus;
+        updateBingoStatus(spaceId, newStatus).catch((err) => {
+          console.error("Failed to update bingo status:", err);
+        });
+      }
+
+      return isTransitionToBingo;
+    }
+  );
 
   useEffect(() => {
     const supabase = createClient();
@@ -102,68 +191,25 @@ export function BingoCardDisplay({ spaceId }: Props) {
       return;
     }
 
-    // Determine new status based on called numbers
-    let newStatus: "none" | "reach" | "bingo" = "none";
-
-    if (calledNumbers.size > 0) {
-      const result = checkBingoLines(bingoCard.numbers, calledNumbers);
-
-      if (result.hasBingo) {
-        newStatus = "bingo";
-      } else if (result.hasReach) {
-        newStatus = "reach";
+    // Reset frozen state if all numbers cleared (game reset)
+    if (calledNumbers.size === 0) {
+      if (frozenCalledNumbersRef.current) {
+        handleGameReset();
       }
+      return;
     }
 
-    // Only update and trigger effects if status changed
-    if (newStatus !== previousStatusRef.current) {
-      previousStatusRef.current = newStatus;
+    const result = checkBingoLines(bingoCard.numbers, calledNumbers);
+    const isTransitionToBingo = processBingoStatus(result);
 
-      // Update database
-      updateBingoStatus(spaceId, newStatus).catch((err) => {
-        console.error("Failed to update bingo status:", err);
-      });
-    }
-
-    // Trigger confetti on bingo
-    let confettiInterval: NodeJS.Timeout | null = null;
-    if (newStatus === "bingo") {
-      const duration = 3000;
-      const animationEnd = Date.now() + duration;
-      const defaults = {
-        startVelocity: 30,
-        spread: 360,
-        ticks: 60,
-        zIndex: 0,
-      };
-
-      confettiInterval = setInterval(() => {
-        const timeLeft = animationEnd - Date.now();
-
-        if (timeLeft <= 0) {
-          if (confettiInterval) {
-            clearInterval(confettiInterval);
-          }
-          return;
-        }
-
-        const particleCount = 50 * (timeLeft / duration);
-
-        confetti({
-          ...defaults,
-          origin: { x: Math.random(), y: Math.random() - 0.2 },
-          particleCount: Math.floor(particleCount),
-        });
-      }, 250);
-    }
-
-    // Cleanup interval on unmount
-    return () => {
-      if (confettiInterval) {
+    // Trigger confetti animation on transition to bingo
+    if (isTransitionToBingo) {
+      const confettiInterval = triggerConfetti();
+      return () => {
         clearInterval(confettiInterval);
-      }
-    };
-  }, [bingoCard, calledNumbers, spaceId]);
+      };
+    }
+  }, [bingoCard, calledNumbers]);
 
   if (isPending) {
     return (
@@ -187,13 +233,12 @@ export function BingoCardDisplay({ spaceId }: Props) {
     if (number === FREE_SPACE_VALUE) {
       return true;
     }
+    // Use frozen state if bingo has been achieved
+    if (frozenCalledNumbersRef.current) {
+      return frozenCalledNumbersRef.current.has(number);
+    }
     return calledNumbers.has(number);
   };
-
-  // Calculate bingo lines for rendering
-  const bingoCheckResult = bingoCard
-    ? checkBingoLines(bingoCard.numbers, calledNumbers)
-    : { hasBingo: false, hasReach: false, bingoLines: [], reachLines: [] };
 
   return (
     <div className="space-y-6">
@@ -268,13 +313,13 @@ export function BingoCardDisplay({ spaceId }: Props) {
           {t("recentCalledNumbers")}
         </h3>
         <div className="mx-auto max-w-md">
-          {calledNumbers.size === 0 ? (
+          {displayCalledNumbers.size === 0 ? (
             <p className="text-center text-gray-500 text-sm">
               {t("noNumbersCalled")}
             </p>
           ) : (
             <div className="flex flex-wrap justify-center gap-2">
-              {Array.from(calledNumbers)
+              {Array.from(displayCalledNumbers)
                 .slice(-10)
                 .reverse()
                 .map((number) => (
