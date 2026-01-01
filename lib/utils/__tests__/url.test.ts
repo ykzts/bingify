@@ -19,10 +19,38 @@ describe("getBaseUrl", () => {
     expect(getBaseUrl()).toBe("https://my-branch-abc123.vercel.app");
   });
 
+  test("returns Vercel Branch URL using NEXT_PUBLIC_* variables in preview", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "preview");
+    vi.stubEnv("NEXT_PUBLIC_VERCEL_BRANCH_URL", "my-branch-abc123.vercel.app");
+
+    expect(getBaseUrl()).toBe("https://my-branch-abc123.vercel.app");
+  });
+
+  test("prioritizes NEXT_PUBLIC_VERCEL_BRANCH_URL over VERCEL_BRANCH_URL", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "preview");
+    vi.stubEnv(
+      "NEXT_PUBLIC_VERCEL_BRANCH_URL",
+      "next-public-branch.vercel.app"
+    );
+    vi.stubEnv("VERCEL_BRANCH_URL", "old-branch.vercel.app");
+
+    expect(getBaseUrl()).toBe("https://next-public-branch.vercel.app");
+  });
+
   test("returns Vercel URL when Branch URL is not available in preview", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("VERCEL_ENV", "preview");
     vi.stubEnv("VERCEL_URL", "my-preview-xyz789.vercel.app");
+
+    expect(getBaseUrl()).toBe("https://my-preview-xyz789.vercel.app");
+  });
+
+  test("returns NEXT_PUBLIC_VERCEL_URL when Branch URL is not available in preview", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "preview");
+    vi.stubEnv("NEXT_PUBLIC_VERCEL_URL", "my-preview-xyz789.vercel.app");
 
     expect(getBaseUrl()).toBe("https://my-preview-xyz789.vercel.app");
   });
@@ -35,6 +63,26 @@ describe("getBaseUrl", () => {
     expect(getBaseUrl()).toBe("https://myapp.vercel.app");
   });
 
+  test("returns production URL using NEXT_PUBLIC_* variable", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL", "myapp.vercel.app");
+
+    expect(getBaseUrl()).toBe("https://myapp.vercel.app");
+  });
+
+  test("prioritizes NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL over VERCEL_PROJECT_PRODUCTION_URL", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "production");
+    vi.stubEnv(
+      "NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL",
+      "next-public-production.vercel.app"
+    );
+    vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "old-production.vercel.app");
+
+    expect(getBaseUrl()).toBe("https://next-public-production.vercel.app");
+  });
+
   test("returns localhost in local development", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", undefined);
     vi.stubEnv("NODE_ENV", undefined);
@@ -44,8 +92,8 @@ describe("getBaseUrl", () => {
   test("NEXT_PUBLIC_SITE_URL takes precedence over Vercel variables", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://custom-domain.com");
     vi.stubEnv("NODE_ENV", "production");
-    vi.stubEnv("VERCEL_ENV", "preview");
-    vi.stubEnv("VERCEL_BRANCH_URL", "my-branch.vercel.app");
+    vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "preview");
+    vi.stubEnv("NEXT_PUBLIC_VERCEL_BRANCH_URL", "my-branch.vercel.app");
 
     expect(getBaseUrl()).toBe("https://custom-domain.com");
   });
