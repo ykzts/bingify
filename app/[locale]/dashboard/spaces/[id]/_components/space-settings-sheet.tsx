@@ -16,6 +16,7 @@ import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { AdminManagement } from "../settings/_components/admin-management";
 import { SpaceSettingsForm } from "../settings/_components/space-settings-form";
+import { DangerZone } from "./danger-zone";
 
 interface Props {
   currentParticipantCount: number;
@@ -71,6 +72,11 @@ export function SpaceSettingsSheet({
               <AdminManagement spaceId={space.id} />
             </div>
           )}
+
+          {/* Danger Zone - Always visible for destructive actions */}
+          <div className="border-red-200 border-t pt-8">
+            <DangerZone spaceId={space.id} />
+          </div>
         </div>
       </SheetContent>
     </Sheet>
