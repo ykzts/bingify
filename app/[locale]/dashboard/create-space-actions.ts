@@ -2,7 +2,6 @@
 
 import { randomUUID } from "node:crypto";
 import {
-  type ServerValidateError,
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";

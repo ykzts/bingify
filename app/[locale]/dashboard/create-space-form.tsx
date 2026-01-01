@@ -36,10 +36,11 @@ import {
 } from "./create-space-actions";
 import { createSpaceFormOpts, createSpaceFormSchema } from "./form-options";
 
+const SUGGESTION_REGEX = /提案: (.+)/;
+
 export function CreateSpaceForm() {
   const router = useRouter();
   const t = useTranslations("CreateSpace");
-  const tErrors = useTranslations("Errors");
   const [shareKey, setShareKey] = useState("");
   const [debouncedShareKey] = useDebounce(shareKey, 500);
   const [checking, setChecking] = useState(false);
@@ -55,11 +56,11 @@ export function CreateSpaceForm() {
     validators: {
       onChange: createSpaceFormSchema,
     },
+    // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
   });
 
   const formErrors = useStore(form.store, (formState) => formState.errors);
-  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
   const isSubmitting = useStore(
     form.store,
     (formState) => formState.isSubmitting
@@ -83,18 +84,23 @@ export function CreateSpaceForm() {
 
   const handleAcceptSuggestion = () => {
     // Extract suggestion from error map
-    const stateAny = state as any;
+    const stateRecord = state as Record<string, unknown>;
     if (
-      stateAny?.errorMap &&
-      typeof stateAny.errorMap === "object" &&
-      "onChange" in stateAny.errorMap
+      stateRecord?.errorMap &&
+      typeof stateRecord.errorMap === "object" &&
+      stateRecord.errorMap !== null &&
+      "onChange" in stateRecord.errorMap
     ) {
-      const errorMsg = stateAny.errorMap.onChange;
+      const errorMap = stateRecord.errorMap as Record<string, unknown>;
+      const errorMsg = errorMap.onChange;
       if (typeof errorMsg === "string" && errorMsg.includes("提案:")) {
-        const suggestionMatch = errorMsg.match(/提案: (.+)/);
+        const suggestionMatch = errorMsg.match(SUGGESTION_REGEX);
         if (suggestionMatch) {
           const suggestion = suggestionMatch[1];
-          const suggestionWithoutDate = suggestion.replace(`-${dateSuffix}`, "");
+          const suggestionWithoutDate = suggestion.replace(
+            `-${dateSuffix}`,
+            ""
+          );
           setShareKey(suggestionWithoutDate);
           setAvailable(null);
         }
@@ -122,7 +128,9 @@ export function CreateSpaceForm() {
 
   useEffect(() => {
     // Check for successful space creation
-    const meta = (state as any)?.meta;
+    const meta = (state as Record<string, unknown>)?.meta as
+      | { success?: boolean; spaceId?: string }
+      | undefined;
     if (meta?.success && meta?.spaceId) {
       router.push(`/dashboard/spaces/${meta.spaceId}`);
     }
@@ -137,7 +145,7 @@ export function CreateSpaceForm() {
       {formErrors.length > 0 && (
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
           {formErrors.map((error) => (
-            <p key={String(error)} className="text-red-800">
+            <p className="text-red-800" key={String(error)}>
               {String(error)}
             </p>
           ))}
@@ -239,7 +247,7 @@ export function CreateSpaceForm() {
             {field.state.meta.errors.length > 0 && (
               <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-3">
                 {field.state.meta.errors.map((error) => (
-                  <p key={String(error)} className="text-red-800 text-sm">
+                  <p className="text-red-800 text-sm" key={String(error)}>
                     {String(error)}
                   </p>
                 ))}
@@ -251,39 +259,44 @@ export function CreateSpaceForm() {
 
       {/* Show suggestion if available */}
       {(() => {
-        const stateAny = state as any;
+        const stateRecord = state as Record<string, unknown>;
         return (
-          stateAny?.errorMap &&
-          typeof stateAny.errorMap === "object" &&
-          "onChange" in stateAny.errorMap &&
-          typeof stateAny.errorMap.onChange === "string" &&
-          stateAny.errorMap.onChange.includes("提案:")
+          stateRecord?.errorMap &&
+          typeof stateRecord.errorMap === "object" &&
+          stateRecord.errorMap !== null &&
+          "onChange" in stateRecord.errorMap &&
+          typeof (stateRecord.errorMap as Record<string, unknown>).onChange ===
+            "string" &&
+          (
+            (stateRecord.errorMap as Record<string, unknown>).onChange as string
+          ).includes("提案:")
         );
       })() && (
-          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
-            <p className="mb-2 text-amber-800 text-sm">
-              {t("suggestionPrefix")}
-            </p>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 rounded bg-white px-3 py-2 font-mono text-sm">
-                {(() => {
-                  const stateAny = state as any;
-                  return typeof stateAny?.errorMap?.onChange === "string"
-                    ? stateAny.errorMap.onChange.match(/提案: (.+)/)?.[1]
-                    : "";
-                })()}
-              </code>
-              <Button
-                onClick={handleAcceptSuggestion}
-                size="sm"
-                type="button"
-                variant="destructive"
-              >
-                {t("useSuggestionButton")}
-              </Button>
-            </div>
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <p className="mb-2 text-amber-800 text-sm">{t("suggestionPrefix")}</p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 rounded bg-white px-3 py-2 font-mono text-sm">
+              {(() => {
+                const stateRecord = state as Record<string, unknown>;
+                const errorMap = stateRecord?.errorMap as
+                  | Record<string, unknown>
+                  | undefined;
+                return typeof errorMap?.onChange === "string"
+                  ? errorMap.onChange.match(SUGGESTION_REGEX)?.[1]
+                  : "";
+              })()}
+            </code>
+            <Button
+              onClick={handleAcceptSuggestion}
+              size="sm"
+              type="button"
+              variant="destructive"
+            >
+              {t("useSuggestionButton")}
+            </Button>
           </div>
-        )}
+        </div>
+      )}
 
       <Button
         className="w-full"
