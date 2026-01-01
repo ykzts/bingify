@@ -107,6 +107,39 @@ export function BingoCardDisplay({ spaceId }: Props) {
     return confettiInterval;
   });
 
+  // Helper to handle game reset
+  const handleGameReset = useEffectEvent(() => {
+    frozenCalledNumbersRef.current = null;
+    frozenBingoLinesRef.current = null;
+    previousStatusRef.current = "none";
+  });
+
+  // Helper to update bingo status
+  const processBingoStatus = useEffectEvent((result: ReturnType<typeof checkBingoLines>) => {
+    let newStatus: "none" | "reach" | "bingo" = "none";
+
+    if (result.hasBingo) {
+      newStatus = "bingo";
+      if (previousStatusRef.current !== "bingo") {
+        frozenCalledNumbersRef.current = new Set(calledNumbers);
+        frozenBingoLinesRef.current = result;
+      }
+    } else if (result.hasReach) {
+      newStatus = "reach";
+    }
+
+    const isTransitionToBingo = newStatus === "bingo" && previousStatusRef.current !== "bingo";
+
+    if (newStatus !== previousStatusRef.current) {
+      previousStatusRef.current = newStatus;
+      updateBingoStatus(spaceId, newStatus).catch((err) => {
+        console.error("Failed to update bingo status:", err);
+      });
+    }
+
+    return isTransitionToBingo;
+  });
+
   useEffect(() => {
     const supabase = createClient();
     const channel = supabase
@@ -146,35 +179,20 @@ export function BingoCardDisplay({ spaceId }: Props) {
 
   // Check bingo status when called numbers or card changes
   useEffect(() => {
-    if (!bingoCard || calledNumbers.size === 0) {
+    if (!bingoCard) {
+      return;
+    }
+
+    // Reset frozen state if all numbers cleared (game reset)
+    if (calledNumbers.size === 0) {
+      if (frozenCalledNumbersRef.current) {
+        handleGameReset();
+      }
       return;
     }
 
     const result = checkBingoLines(bingoCard.numbers, calledNumbers);
-    let newStatus: "none" | "reach" | "bingo" = "none";
-
-    if (result.hasBingo) {
-      newStatus = "bingo";
-      
-      // Freeze the state on first bingo achievement
-      if (previousStatusRef.current !== "bingo") {
-        frozenCalledNumbersRef.current = new Set(calledNumbers);
-        frozenBingoLinesRef.current = result;
-      }
-    } else if (result.hasReach) {
-      newStatus = "reach";
-    }
-
-    // Trigger confetti only on transition to bingo
-    const isTransitionToBingo = newStatus === "bingo" && previousStatusRef.current !== "bingo";
-
-    // Only update database if status changed
-    if (newStatus !== previousStatusRef.current) {
-      previousStatusRef.current = newStatus;
-      updateBingoStatus(spaceId, newStatus).catch((err) => {
-        console.error("Failed to update bingo status:", err);
-      });
-    }
+    const isTransitionToBingo = processBingoStatus(result);
 
     // Trigger confetti animation on transition to bingo
     if (isTransitionToBingo) {
@@ -183,7 +201,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
         clearInterval(confettiInterval);
       };
     }
-  }, [bingoCard, calledNumbers, spaceId]);
+  }, [bingoCard, calledNumbers]);
 
   if (isPending) {
     return (
