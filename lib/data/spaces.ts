@@ -118,8 +118,9 @@ export async function getSpaces(ids: string[]): Promise<Space[]> {
  * Helper to validate raw space data from Supabase
  * This can be used when you've already fetched data and need to validate it
  */
-export function validateSpaceData(
-  data: Tables<"spaces">
-): Omit<Space, keyof Tables<"spaces">> {
+export function validateSpaceData(data: Tables<"spaces">): {
+  gatekeeper_rules: GatekeeperRules | null;
+  settings: SpaceSettings | null;
+} {
   return validateSpaceJsonFields(data);
 }
