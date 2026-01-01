@@ -4,8 +4,8 @@ import { checkEmailAllowed } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import { checkFollowStatus, checkSubStatus } from "@/lib/twitch";
 import {
-  gatekeeperRulesSchema,
   type GatekeeperRules,
+  gatekeeperRulesSchema,
   type PublicSpaceInfo,
 } from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";

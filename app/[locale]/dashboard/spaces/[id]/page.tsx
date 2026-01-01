@@ -2,10 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
-import {
-  gatekeeperRulesSchema,
-  spaceSettingsSchema,
-} from "@/lib/types/space";
+import { gatekeeperRulesSchema, spaceSettingsSchema } from "@/lib/types/space";
 import { BingoGameManager } from "./_components/bingo-game-manager";
 import { CloseSpaceButton } from "./_components/close-space-button";
 import { DraftStatusView } from "./_components/draft-status-view";
@@ -52,7 +49,7 @@ export default async function AdminSpacePage({ params }: Props) {
   );
   const settingsValidation = spaceSettingsSchema.safeParse(spaceData.settings);
 
-  if (!gatekeeperValidation.success || !settingsValidation.success) {
+  if (!(gatekeeperValidation.success && settingsValidation.success)) {
     console.error("Invalid space data from DB:", {
       gatekeeper: gatekeeperValidation.error,
       settings: settingsValidation.error,
