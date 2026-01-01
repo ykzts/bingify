@@ -1,11 +1,16 @@
 "use server";
 
 import {
+  createServerValidate,
+  initialFormState,
+} from "@tanstack/react-form-nextjs";
+import {
   type SystemSettings,
   systemFeaturesSchema,
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
+import { systemSettingsFormOpts } from "./form-options";
 
 export interface GetSystemSettingsResult {
   error?: string;
@@ -62,6 +67,105 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
   }
 }
 
+async function checkAdminPermission(
+  supabase: Awaited<ReturnType<typeof createClient>>
+) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "errorUnauthorized", user: null };
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin") {
+    return { error: "errorNoPermission", user: null };
+  }
+
+  return { error: null, user };
+}
+
+// Create the server validation function
+const serverValidate = createServerValidate({
+  ...systemSettingsFormOpts,
+  onServerValidate: async () => {
+    const supabase = await createClient();
+
+    // Check admin permission
+    const { error: permissionError } = await checkAdminPermission(supabase);
+    if (permissionError) {
+      return { form: permissionError };
+    }
+
+    return undefined;
+  },
+});
+
+export async function updateSystemSettingsAction(
+  _prevState: unknown,
+  formData: FormData
+) {
+  try {
+    // Validate the form data
+    const validatedData = await serverValidate(formData);
+
+    const supabase = await createClient();
+
+    // Double check admin permission
+    const { error: permissionError } = await checkAdminPermission(supabase);
+    if (permissionError) {
+      return {
+        ...initialFormState,
+        errors: [permissionError],
+      };
+    }
+
+    // Update system settings
+    const { error } = await supabase
+      .from("system_settings")
+      .update(validatedData)
+      .eq("id", 1)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error updating system settings:", error);
+      return {
+        ...initialFormState,
+        errors: ["errorUpdateFailed"],
+      };
+    }
+
+    // Return success state
+    return {
+      ...initialFormState,
+      values: validatedData,
+      meta: {
+        success: true,
+      },
+    };
+  } catch (e) {
+    // Check if it's a ServerValidateError from TanStack Form
+    if (e && typeof e === "object" && "formState" in e) {
+      return (e as { formState: unknown }).formState;
+    }
+
+    // Some other error occurred
+    console.error("Error in updateSystemSettingsAction:", e);
+    return {
+      ...initialFormState,
+      errors: ["errorGeneric"],
+    };
+  }
+}
+
+// Keep the old function for backward compatibility during migration
 export interface UpdateSystemSettingsState {
   error?: string;
   success: boolean;
