@@ -9,20 +9,22 @@ DROP FUNCTION IF EXISTS get_system_settings();
 
 CREATE OR REPLACE FUNCTION get_system_settings()
 RETURNS TABLE (
+  default_user_role TEXT,
+  features JSONB,
   max_participants_per_space INTEGER,
   max_spaces_per_user INTEGER,
-  space_expiration_hours INTEGER,
-  features JSONB,
-  max_total_spaces INTEGER
+  max_total_spaces INTEGER,
+  space_expiration_hours INTEGER
 ) AS $$
 BEGIN
   RETURN QUERY
   SELECT
+    s.default_user_role,
+    s.features,
     s.max_participants_per_space,
     s.max_spaces_per_user,
-    s.space_expiration_hours,
-    s.features,
-    s.max_total_spaces
+    s.max_total_spaces,
+    s.space_expiration_hours
   FROM system_settings s
   WHERE s.id = 1;
 END;

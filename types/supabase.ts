@@ -378,6 +378,7 @@ export type Database = {
       get_system_settings: {
         Args: never
         Returns: {
+          default_user_role: string
           features: Json
           max_participants_per_space: number
           max_spaces_per_user: number
