@@ -5,7 +5,7 @@ import {
   initialFormState,
 } from "@tanstack/react-form-nextjs";
 import { sendContactEmail } from "@/lib/mail";
-import { contactFormOpts } from "./form-options";
+import { contactFormOpts, contactFormSchema } from "./form-options";
 
 /**
  * Verify Cloudflare Turnstile token
@@ -59,7 +59,7 @@ async function verifyTurnstileToken(
 
 const serverValidate = createServerValidate({
   ...contactFormOpts,
-  onServerValidate: () => undefined,
+  onServerValidate: contactFormSchema,
 });
 
 export async function submitContactFormAction(

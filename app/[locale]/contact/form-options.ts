@@ -1,4 +1,5 @@
 import { formOptions } from "@tanstack/react-form-nextjs";
+import { zodValidator } from "@tanstack/zod-form-adapter";
 import { z } from "zod";
 
 export const contactFormSchema = z.object({
@@ -18,4 +19,5 @@ export const contactFormOpts = formOptions({
     message: "",
     name: "",
   },
+  validatorAdapter: zodValidator(),
 });
