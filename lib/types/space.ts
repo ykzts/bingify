@@ -1,32 +1,62 @@
+import { z } from "zod";
 import type { Tables } from "@/types/supabase";
+
+/**
+ * Zod schema for gatekeeper email rules
+ */
+const gatekeeperEmailSchema = z.object({
+  allowed: z.array(z.string()).optional(),
+  blocked: z.array(z.string()).optional(),
+});
+
+/**
+ * Zod schema for gatekeeper Twitch rules
+ */
+const gatekeeperTwitchSchema = z.object({
+  broadcasterId: z.string(),
+  requirement: z.string().optional(), // "follower" or "subscriber"
+  requireFollow: z.boolean().optional(), // Legacy format
+  requireSub: z.boolean().optional(), // Legacy format
+});
+
+/**
+ * Zod schema for gatekeeper YouTube rules
+ */
+const gatekeeperYoutubeSchema = z.object({
+  channelId: z.string(),
+  requirement: z.string().optional(), // "subscriber" or "member"
+  required: z.boolean().optional(), // Legacy format
+});
+
+/**
+ * Zod schema for gatekeeper rules validation
+ */
+export const gatekeeperRulesSchema = z
+  .object({
+    email: gatekeeperEmailSchema.optional(),
+    twitch: gatekeeperTwitchSchema.optional(),
+    youtube: gatekeeperYoutubeSchema.optional(),
+  })
+  .nullable();
 
 /**
  * Gatekeeper rules for space access control
  */
-export interface GatekeeperRules {
-  email?: {
-    allowed?: string[];
-    blocked?: string[];
-  };
-  twitch?: {
-    broadcasterId: string;
-    requirement?: string; // "follower" or "subscriber"
-    requireFollow?: boolean; // Legacy format, for backward compatibility
-    requireSub?: boolean; // Legacy format, for backward compatibility
-  };
-  youtube?: {
-    channelId: string;
-    requirement?: string; // "subscriber" or "member"
-    required?: boolean; // Legacy format, for backward compatibility
-  };
-}
+export type GatekeeperRules = z.infer<typeof gatekeeperRulesSchema>;
+
+/**
+ * Zod schema for space settings validation
+ */
+export const spaceSettingsSchema = z
+  .object({
+    hide_metadata_before_join: z.boolean().optional(),
+  })
+  .nullable();
 
 /**
  * Space settings configuration
  */
-export interface SpaceSettings {
-  hide_metadata_before_join?: boolean;
-}
+export type SpaceSettings = z.infer<typeof spaceSettingsSchema>;
 
 /**
  * Space type with properly typed JSON fields

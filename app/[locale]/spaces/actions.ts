@@ -3,7 +3,11 @@
 import { checkEmailAllowed } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import { checkFollowStatus, checkSubStatus } from "@/lib/twitch";
-import type { GatekeeperRules, PublicSpaceInfo } from "@/lib/types/space";
+import {
+  gatekeeperRulesSchema,
+  type GatekeeperRules,
+  type PublicSpaceInfo,
+} from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";
 import { checkSubscriptionStatus } from "@/lib/youtube";
 
@@ -42,16 +46,25 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
       return null;
     }
 
-    // Safe type assertion: gatekeeper_rules from DB (Json type) is cast to GatekeeperRules
-    // The application logic validates this structure when processing gatekeeper rules
-    // Using 'unknown' intermediate cast for type safety
+    // Validate gatekeeper_rules using Zod schema
+    const gatekeeperValidation = gatekeeperRulesSchema.safeParse(
+      data.gatekeeper_rules
+    );
+    if (!gatekeeperValidation.success) {
+      console.error(
+        "Invalid gatekeeper_rules data from DB:",
+        gatekeeperValidation.error
+      );
+      return null;
+    }
+
     return {
       id: data.id,
       share_key: data.share_key,
       status: data.status,
       owner_id: data.owner_id,
       max_participants: data.max_participants,
-      gatekeeper_rules: data.gatekeeper_rules as unknown as GatekeeperRules | null,
+      gatekeeper_rules: gatekeeperValidation.data,
     };
   } catch (_error) {
     return null;
@@ -533,7 +546,7 @@ export async function checkUserParticipation(
 function maskYoutubeRules(
   gatekeeperRules: GatekeeperRules
 ): { requirement: string } | undefined {
-  if (!gatekeeperRules.youtube?.channelId) {
+  if (!gatekeeperRules?.youtube?.channelId) {
     return undefined;
   }
 
@@ -554,7 +567,7 @@ function maskYoutubeRules(
 function maskTwitchRules(
   gatekeeperRules: GatekeeperRules
 ): { requirement: string } | undefined {
-  if (!gatekeeperRules.twitch?.broadcasterId) {
+  if (!gatekeeperRules?.twitch?.broadcasterId) {
     return undefined;
   }
 
@@ -583,7 +596,7 @@ async function maskEmailRules(
   gatekeeperRules: GatekeeperRules
 ): Promise<{ allowed: string[] } | undefined> {
   if (
-    !gatekeeperRules.email?.allowed ||
+    !gatekeeperRules?.email?.allowed ||
     gatekeeperRules.email.allowed.length === 0
   ) {
     return undefined;

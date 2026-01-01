@@ -1,6 +1,11 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
+import {
+  gatekeeperRulesSchema,
+  spaceSettingsSchema,
+} from "@/lib/types/space";
 import { BingoGameManager } from "./_components/bingo-game-manager";
 import { CloseSpaceButton } from "./_components/close-space-button";
 import { DraftStatusView } from "./_components/draft-status-view";
@@ -41,19 +46,26 @@ export default async function AdminSpacePage({ params }: Props) {
     notFound();
   }
 
-  // Safe type assertion: JSON fields (gatekeeper_rules, settings) from DB are cast to typed interfaces
-  // The application validates these structures when processing space data
-  // Using 'unknown' intermediate cast for type safety
+  // Validate JSON fields using Zod schemas
+  const gatekeeperValidation = gatekeeperRulesSchema.safeParse(
+    spaceData.gatekeeper_rules
+  );
+  const settingsValidation = spaceSettingsSchema.safeParse(spaceData.settings);
+
+  if (!gatekeeperValidation.success || !settingsValidation.success) {
+    console.error("Invalid space data from DB:", {
+      gatekeeper: gatekeeperValidation.error,
+      settings: settingsValidation.error,
+    });
+    notFound();
+  }
+
   const space: import("@/lib/types/space").Space & {
     view_token: string;
   } = {
     ...spaceData,
-    gatekeeper_rules: spaceData.gatekeeper_rules as unknown as
-      | import("@/lib/types/space").GatekeeperRules
-      | null,
-    settings: spaceData.settings as unknown as
-      | import("@/lib/types/space").SpaceSettings
-      | null,
+    gatekeeper_rules: gatekeeperValidation.data,
+    settings: settingsValidation.data,
   };
 
   // Check if current user is owner
@@ -74,17 +86,21 @@ export default async function AdminSpacePage({ params }: Props) {
     .eq("id", 1)
     .single();
 
-  // Safe type assertion: features field from DB (Json type) is cast to SystemFeatures
-  // Default fallback ensures structure if no settings exist
-  // Using 'unknown' intermediate cast for type safety
+  // Validate features field using Zod schema
+  const featuresValidation = systemFeaturesSchema.safeParse(
+    systemSettings?.features
+  );
+
   const features: import("@/lib/types/settings").SystemFeatures =
-    (systemSettings?.features as unknown as import("@/lib/types/settings").SystemFeatures) || {
-      gatekeeper: {
-        email: { enabled: true },
-        twitch: { enabled: true },
-        youtube: { enabled: true },
-      },
-    };
+    featuresValidation.success
+      ? featuresValidation.data
+      : {
+          gatekeeper: {
+            email: { enabled: true },
+            twitch: { enabled: true },
+            youtube: { enabled: true },
+          },
+        };
 
   return (
     <div className="mx-auto min-h-screen max-w-3xl space-y-8 p-8">

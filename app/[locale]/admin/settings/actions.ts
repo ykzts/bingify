@@ -1,6 +1,7 @@
 "use server";
 
 import {
+  systemFeaturesSchema,
   type SystemSettings,
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
@@ -30,11 +31,17 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
       };
     }
 
-    // Safe type assertion: Transform DB row to SystemSettings
-    // The features field (Json type) is cast to the expected SystemFeatures structure
-    // Using 'unknown' intermediate cast for type safety
+    // Validate the features field using Zod schema
+    const featuresValidation = systemFeaturesSchema.safeParse(data.features);
+    if (!featuresValidation.success) {
+      console.error("Invalid features data from DB:", featuresValidation.error);
+      return {
+        error: "errorInvalidData",
+      };
+    }
+
     const settings: SystemSettings = {
-      features: data.features as unknown as import("@/lib/types/settings").SystemFeatures,
+      features: featuresValidation.data,
       max_participants_per_space: data.max_participants_per_space,
       max_spaces_per_user: data.max_spaces_per_user,
       space_expiration_hours: data.space_expiration_hours,
