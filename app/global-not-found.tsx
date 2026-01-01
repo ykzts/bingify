@@ -22,7 +22,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "404 Not Found",
+  title: "404 Not Found | Bingify",
 };
 
 const LOCALE_COOKIE_REGEX = /(?:^|;\s*)NEXT_LOCALE=([^;]+)/;
