@@ -7,7 +7,7 @@
 - パッケージマネージャーは `pnpm` を使用。
 - Next.js / App Router。
 - スタイリングは Tailwind CSS（CSS-first）。`tailwind.config.ts` は不要。
-- バリデーション・フォーム処理：Zod + Server Functions + `useActionState`。
+- バリデーション・フォーム処理：Zod + **TanStack Form** + Server Actions。
 - 新規パッケージ追加時は npm registry を確認し、最新バージョンを必ず使用する（例：`pnpm add <pkg>@latest`）。バージョンは `savePrefix: ''` により正確に固定されるため、`^` や `~` は付与しない。
 
 ## UI Framework
@@ -35,7 +35,12 @@ pnpm dev
 
 - ユーティリティ結合は `cn`（`lib/utils.ts`）を使用。
 - Zod スキーマから型推論（`z.infer<typeof schema>`）。
-- Server Functions でバリデーション実施、エラーは `useActionState` で状態管理。
+- Server Actions とフォーム統合には **TanStack Form** を使用：
+  - `formOptions` で共有フォームオプションを定義。
+  - `createServerValidate` でサーバー側バリデーションを実装。
+  - `useForm` + `useActionState` + `mergeForm` でクライアント/サーバー状態を統合。
+  - フィールドレベルのバリデーションには `form.Field` コンポーネントを使用。
+  - エラー表示は `field.state.meta.errors` から取得。
 - コメントは最小限、必要な箇所のみ。
 - JSON および JS のオブジェクトキーは原則アルファベット順に並べること（設定ファイルや `package.json` の `dependencies`/`devDependencies` など）。必要に応じて ESLint の `sort-keys` で警告運用。
 
