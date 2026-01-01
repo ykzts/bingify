@@ -3,6 +3,11 @@
 import { checkEmailAllowed } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import { checkFollowStatus, checkSubStatus } from "@/lib/twitch";
+import {
+  type GatekeeperRules,
+  gatekeeperRulesSchema,
+  type PublicSpaceInfo,
+} from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";
 import { checkSubscriptionStatus } from "@/lib/youtube";
 
@@ -10,24 +15,6 @@ export interface JoinSpaceState {
   error?: string;
   errorKey?: string;
   success: boolean;
-}
-
-export interface GatekeeperRules {
-  email?: {
-    allowed?: string[];
-    blocked?: string[];
-  };
-  twitch?: {
-    broadcasterId: string;
-    requirement?: string; // "follower" or "subscriber"
-    requireFollow?: boolean; // Legacy format, for backward compatibility
-    requireSub?: boolean; // Legacy format, for backward compatibility
-  };
-  youtube?: {
-    channelId: string;
-    requirement?: string; // "subscriber" or "member"
-    required?: boolean; // Legacy format, for backward compatibility
-  };
 }
 
 export interface SpaceInfo {
@@ -59,7 +46,26 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
       return null;
     }
 
-    return data;
+    // Validate gatekeeper_rules using Zod schema
+    const gatekeeperValidation = gatekeeperRulesSchema.safeParse(
+      data.gatekeeper_rules
+    );
+    if (!gatekeeperValidation.success) {
+      console.error(
+        "Invalid gatekeeper_rules data from DB:",
+        gatekeeperValidation.error
+      );
+      return null;
+    }
+
+    return {
+      id: data.id,
+      share_key: data.share_key,
+      status: data.status,
+      owner_id: data.owner_id,
+      max_participants: data.max_participants,
+      gatekeeper_rules: gatekeeperValidation.data,
+    };
   } catch (_error) {
     return null;
   }
@@ -535,35 +541,12 @@ export async function checkUserParticipation(
 }
 
 /**
- * Public space information returned to non-participants
- */
-export interface PublicSpaceInfo {
-  description: string | null;
-  gatekeeper_rules: {
-    email?: {
-      allowed: string[]; // Masked email patterns
-    };
-    twitch?: {
-      requirement: string;
-    };
-    youtube?: {
-      requirement: string;
-    };
-  } | null;
-  hideMetadata: boolean;
-  id: string;
-  share_key: string;
-  status: string | null;
-  title: string | null;
-}
-
-/**
  * Helper to mask YouTube gatekeeper rules
  */
 function maskYoutubeRules(
   gatekeeperRules: GatekeeperRules
 ): { requirement: string } | undefined {
-  if (!gatekeeperRules.youtube?.channelId) {
+  if (!gatekeeperRules?.youtube?.channelId) {
     return undefined;
   }
 
@@ -584,7 +567,7 @@ function maskYoutubeRules(
 function maskTwitchRules(
   gatekeeperRules: GatekeeperRules
 ): { requirement: string } | undefined {
-  if (!gatekeeperRules.twitch?.broadcasterId) {
+  if (!gatekeeperRules?.twitch?.broadcasterId) {
     return undefined;
   }
 
@@ -613,7 +596,7 @@ async function maskEmailRules(
   gatekeeperRules: GatekeeperRules
 ): Promise<{ allowed: string[] } | undefined> {
   if (
-    !gatekeeperRules.email?.allowed ||
+    !gatekeeperRules?.email?.allowed ||
     gatekeeperRules.email.allowed.length === 0
   ) {
     return undefined;

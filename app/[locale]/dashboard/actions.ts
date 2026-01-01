@@ -284,12 +284,12 @@ export async function regenerateViewToken(
 }
 
 export interface UserSpace {
-  created_at: string;
+  created_at: string | null;
   id: string;
   is_owner?: boolean;
   participant_count?: number;
   share_key: string;
-  status: string;
+  status: string | null;
 }
 
 export interface UserSpacesResult {
@@ -347,10 +347,10 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
     // Step 2: Fetch the actual space records
     const spaceIds = (adminRoles || []).map((role) => role.space_id);
     let adminSpacesData: Array<{
-      created_at: string;
+      created_at: string | null;
       id: string;
       share_key: string;
-      status: string;
+      status: string | null;
     }> = [];
 
     if (spaceIds.length > 0) {
@@ -396,7 +396,8 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
 
     const allSpaces = Array.from(spaceMap.values()).sort(
       (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        new Date(b.created_at || 0).getTime() -
+        new Date(a.created_at || 0).getTime()
     );
 
     // Get participant counts for all spaces in a single query

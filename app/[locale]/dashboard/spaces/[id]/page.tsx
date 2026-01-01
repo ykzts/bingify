@@ -1,6 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
+import { gatekeeperRulesSchema, spaceSettingsSchema } from "@/lib/types/space";
 import { BingoGameManager } from "./_components/bingo-game-manager";
 import { CloseSpaceButton } from "./_components/close-space-button";
 import { DraftStatusView } from "./_components/draft-status-view";
@@ -29,17 +31,39 @@ export default async function AdminSpacePage({ params }: Props) {
   }
 
   // Fetch space with all necessary fields for settings
-  const { data: space, error } = await supabase
+  const { data: spaceData, error } = await supabase
     .from("spaces")
     .select(
-      "id, share_key, view_token, owner_id, status, created_at, max_participants, title, description, gatekeeper_rules, settings"
+      "id, share_key, view_token, owner_id, status, created_at, updated_at, max_participants, title, description, gatekeeper_rules, settings"
     )
     .eq("id", id)
     .single();
 
-  if (error || !space) {
+  if (error || !spaceData) {
     notFound();
   }
+
+  // Validate JSON fields using Zod schemas
+  const gatekeeperValidation = gatekeeperRulesSchema.safeParse(
+    spaceData.gatekeeper_rules
+  );
+  const settingsValidation = spaceSettingsSchema.safeParse(spaceData.settings);
+
+  if (!(gatekeeperValidation.success && settingsValidation.success)) {
+    console.error("Invalid space data from DB:", {
+      gatekeeper: gatekeeperValidation.error,
+      settings: settingsValidation.error,
+    });
+    notFound();
+  }
+
+  const space: import("@/lib/types/space").Space & {
+    view_token: string;
+  } = {
+    ...spaceData,
+    gatekeeper_rules: gatekeeperValidation.data,
+    settings: settingsValidation.data,
+  };
 
   // Check if current user is owner
   const isOwner = space.owner_id === user.id;
@@ -59,13 +83,21 @@ export default async function AdminSpacePage({ params }: Props) {
     .eq("id", 1)
     .single();
 
-  const features = systemSettings?.features || {
-    gatekeeper: {
-      email: { enabled: true },
-      twitch: { enabled: true },
-      youtube: { enabled: true },
-    },
-  };
+  // Validate features field using Zod schema
+  const featuresValidation = systemFeaturesSchema.safeParse(
+    systemSettings?.features
+  );
+
+  const features: import("@/lib/types/settings").SystemFeatures =
+    featuresValidation.success
+      ? featuresValidation.data
+      : {
+          gatekeeper: {
+            email: { enabled: true },
+            twitch: { enabled: true },
+            youtube: { enabled: true },
+          },
+        };
 
   return (
     <div className="mx-auto min-h-screen max-w-3xl space-y-8 p-8">

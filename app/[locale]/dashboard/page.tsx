@@ -161,12 +161,12 @@ export default async function DashboardPage({ params }: Props) {
                           }
                           return t("statusClosed");
                         })()}
-                        status={space.status}
+                        status={space.status || "closed"}
                       />
                     </td>
                     <td className="px-4 py-3 text-gray-500">
                       {(() => {
-                        const date = new Date(space.created_at);
+                        const date = new Date(space.created_at || 0);
                         return Number.isNaN(date.getTime())
                           ? "-"
                           : format(date, dateFormat);
