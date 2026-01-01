@@ -68,12 +68,7 @@ function SuggestionDisplay({
         <code className="flex-1 rounded bg-white px-3 py-2 font-mono text-sm">
           {suggestion}
         </code>
-        <Button
-          onClick={onAcceptSuggestion}
-          size="sm"
-          type="button"
-          variant="destructive"
-        >
+        <Button onClick={onAcceptSuggestion} size="sm" type="button">
           {t("useSuggestionButton")}
         </Button>
       </div>
@@ -180,11 +175,7 @@ export function CreateSpaceForm() {
   }, [state, router]);
 
   return (
-    <form
-      action={action as never}
-      className="space-y-6"
-      onSubmit={() => form.handleSubmit()}
-    >
+    <form action={action} className="space-y-6">
       {formErrors.length > 0 && (
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
           {formErrors.map((error) => (
