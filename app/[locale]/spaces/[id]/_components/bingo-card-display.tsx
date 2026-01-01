@@ -32,8 +32,12 @@ export function BingoCardDisplay({ spaceId }: Props) {
   const previousStatusRef = useRef<"none" | "reach" | "bingo">("none");
 
   // Use useEffectEvent to separate event logic from effect dependencies
-  const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
+  const onInsert = useEffectEvent(async (payload: { new: CalledNumber }) => {
     const newNumber = payload.new;
+
+    // Delay update to sync with screen animation (1.8 seconds)
+    await new Promise((resolve) => setTimeout(resolve, 1800));
+
     queryClient.setQueryData<CalledNumber[]>(
       ["called-numbers", spaceId],
       (prev) => {

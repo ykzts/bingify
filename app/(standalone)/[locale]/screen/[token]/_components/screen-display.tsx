@@ -78,12 +78,13 @@ export function ScreenDisplay({
   }, [initialBg, setBackground]);
 
   // Use useEffectEvent to separate event logic from effect dependencies
-  const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
+  const onInsert = useEffectEvent(async (payload: { new: CalledNumber }) => {
     const newNumber = payload.new;
 
     // Start drum roll animation when new number is inserted
-    startDrumRoll(newNumber.value);
+    await startDrumRoll(newNumber.value);
 
+    // Update query cache AFTER animation completes
     queryClient.setQueryData<CalledNumber[]>(
       ["called-numbers", spaceId],
       (prev) => {
