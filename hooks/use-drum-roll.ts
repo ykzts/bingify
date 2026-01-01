@@ -59,7 +59,7 @@ export function useDrumRoll(options?: UseDrumRollOptions): UseDrumRollReturn {
   const startDrumRoll = useCallback(
     (finalNumber: number): Promise<void> => {
       // Re-entry protection: if animation is already running, return existing promise
-      if (isAnimating || animationRef.current !== null) {
+      if (animationRef.current !== null) {
         return activePromiseRef.current || Promise.resolve();
       }
 
@@ -109,7 +109,7 @@ export function useDrumRoll(options?: UseDrumRollOptions): UseDrumRollReturn {
       activePromiseRef.current = promise;
       return promise;
     },
-    [duration, min, max, isAnimating]
+    [duration, min, max]
   );
 
   return {
