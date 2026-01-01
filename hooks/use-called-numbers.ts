@@ -36,7 +36,8 @@ export function useCalledNumbers(
         throw error;
       }
 
-      return (data || []) as Tables<"called_numbers">[];
+      // Use nullish coalescing for clarity; type assertion only applies to fallback array
+      return (data ?? []) as Tables<"called_numbers">[];
     },
     queryKey: ["called-numbers", spaceId],
     retry,

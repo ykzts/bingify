@@ -42,7 +42,17 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
       return null;
     }
 
-    return data as SpaceInfo;
+    // Safe type assertion: gatekeeper_rules from DB (Json type) is cast to GatekeeperRules
+    // The application logic validates this structure when processing gatekeeper rules
+    // Using 'unknown' intermediate cast for type safety
+    return {
+      id: data.id,
+      share_key: data.share_key,
+      status: data.status,
+      owner_id: data.owner_id,
+      max_participants: data.max_participants,
+      gatekeeper_rules: data.gatekeeper_rules as unknown as GatekeeperRules | null,
+    };
   } catch (_error) {
     return null;
   }

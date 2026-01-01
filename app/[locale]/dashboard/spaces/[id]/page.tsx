@@ -41,9 +41,19 @@ export default async function AdminSpacePage({ params }: Props) {
     notFound();
   }
 
-  // Cast the space data to the Space type with typed JSON fields
-  const space = spaceData as import("@/lib/types/space").Space & {
+  // Safe type assertion: JSON fields (gatekeeper_rules, settings) from DB are cast to typed interfaces
+  // The application validates these structures when processing space data
+  // Using 'unknown' intermediate cast for type safety
+  const space: import("@/lib/types/space").Space & {
     view_token: string;
+  } = {
+    ...spaceData,
+    gatekeeper_rules: spaceData.gatekeeper_rules as unknown as
+      | import("@/lib/types/space").GatekeeperRules
+      | null,
+    settings: spaceData.settings as unknown as
+      | import("@/lib/types/space").SpaceSettings
+      | null,
   };
 
   // Check if current user is owner
@@ -64,13 +74,17 @@ export default async function AdminSpacePage({ params }: Props) {
     .eq("id", 1)
     .single();
 
-  const features = (systemSettings?.features || {
-    gatekeeper: {
-      email: { enabled: true },
-      twitch: { enabled: true },
-      youtube: { enabled: true },
-    },
-  }) as import("@/lib/types/settings").SystemFeatures;
+  // Safe type assertion: features field from DB (Json type) is cast to SystemFeatures
+  // Default fallback ensures structure if no settings exist
+  // Using 'unknown' intermediate cast for type safety
+  const features: import("@/lib/types/settings").SystemFeatures =
+    (systemSettings?.features as unknown as import("@/lib/types/settings").SystemFeatures) || {
+      gatekeeper: {
+        email: { enabled: true },
+        twitch: { enabled: true },
+        youtube: { enabled: true },
+      },
+    };
 
   return (
     <div className="mx-auto min-h-screen max-w-3xl space-y-8 p-8">

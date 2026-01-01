@@ -31,10 +31,7 @@ export interface SpaceSettings {
 /**
  * Space type with properly typed JSON fields
  */
-export type Space = Omit<
-  Tables<"spaces">,
-  "gatekeeper_rules" | "settings"
-> & {
+export type Space = Omit<Tables<"spaces">, "gatekeeper_rules" | "settings"> & {
   gatekeeper_rules: GatekeeperRules | null;
   settings: SpaceSettings | null;
 };

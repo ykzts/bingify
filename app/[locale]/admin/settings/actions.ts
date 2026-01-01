@@ -30,8 +30,18 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
       };
     }
 
+    // Safe type assertion: Transform DB row to SystemSettings
+    // The features field (Json type) is cast to the expected SystemFeatures structure
+    // Using 'unknown' intermediate cast for type safety
+    const settings: SystemSettings = {
+      features: data.features as unknown as import("@/lib/types/settings").SystemFeatures,
+      max_participants_per_space: data.max_participants_per_space,
+      max_spaces_per_user: data.max_spaces_per_user,
+      space_expiration_hours: data.space_expiration_hours,
+    };
+
     return {
-      settings: data as SystemSettings,
+      settings,
     };
   } catch (error) {
     console.error("Error in getSystemSettings:", error);
