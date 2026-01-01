@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
   checkUserParticipation,
@@ -9,6 +9,7 @@ import {
   getSpacePublicInfo,
 } from "../actions";
 import { BingoCardDisplay } from "./_components/bingo-card-display";
+import { EventEndedView } from "./_components/event-ended-view";
 import { SpaceLandingPage } from "./_components/space-landing-page";
 import { SpaceParticipation } from "./_components/space-participation";
 
@@ -76,9 +77,74 @@ export default async function UserSpacePage({ params }: Props) {
             {t("draftTitle")}
           </h1>
           <p className="mb-6 text-gray-600">{t("draftMessage")}</p>
-          <Link className="text-purple-600 hover:underline" href={`/${locale}`}>
+          <Link className="text-purple-600 hover:underline" href="/">
             {t("backToHome")}
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // If space is closed, show event ended screen
+  if (space.status === "closed") {
+    // Check if user is a participant to show their final card
+    const isParticipant = await checkUserParticipation(id);
+
+    if (!isParticipant) {
+      // Non-participants see event ended message
+      return (
+        <div className="min-h-screen bg-gray-50">
+          <div className="mx-auto max-w-4xl p-6">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h1 className="mb-1 font-bold text-2xl">{space.share_key}</h1>
+                <p className="text-gray-600 text-sm">{t("spaceSubtitle")}</p>
+              </div>
+              <Link
+                className="text-gray-600 text-sm hover:text-gray-900 hover:underline"
+                href="/"
+              >
+                {t("backToHome")}
+              </Link>
+            </div>
+
+            <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+              <EventEndedView />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Participants see their final card (read-only)
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="mx-auto max-w-4xl p-6">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="mb-1 font-bold text-2xl">{space.share_key}</h1>
+              <p className="text-gray-600 text-sm">{t("spaceSubtitle")}</p>
+            </div>
+            <Link
+              className="text-gray-600 text-sm hover:text-gray-900 hover:underline"
+              href="/"
+            >
+              {t("backToHome")}
+            </Link>
+          </div>
+
+          {/* Event Ended Message */}
+          <div className="mb-6 rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+            <EventEndedView />
+          </div>
+
+          {/* Participant's Final Result */}
+          <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+            <h2 className="mb-6 text-center font-bold text-2xl">
+              {t("yourFinalResultTitle")}
+            </h2>
+            <BingoCardDisplay readOnly spaceId={id} />
+          </div>
         </div>
       </div>
     );

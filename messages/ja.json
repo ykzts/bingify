@@ -392,7 +392,10 @@
     "verifyYouTubeButton": "YouTubeアカウントを確認する",
     "verifyingYouTube": "確認中...",
     "draftMessage": "ホストが現在準備中です。しばらくお待ちください。",
-    "draftTitle": "準備中"
+    "draftTitle": "準備中",
+    "eventEndedTitle": "このイベントは終了しました",
+    "eventEndedMessage": "このビンゴイベントにご参加いただきありがとうございました。イベントはホストによって閉鎖されました。",
+    "yourFinalResultTitle": "あなたの最終結果"
   },
   "UsernameSettings": {
     "description": "アプリ内で表示される名前を設定します。",
