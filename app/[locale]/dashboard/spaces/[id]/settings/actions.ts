@@ -14,118 +14,6 @@ export interface UpdateSpaceState {
   success: boolean;
 }
 
-/**
- * Build complete FormData from existing space data and submitted form data
- * Used by publishSpace to ensure all required fields are present
- */
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Helper function to populate form data from space settings
-function buildCompleteFormData(
-  formData: FormData,
-  space: {
-    description: string | null;
-    gatekeeper_rules: unknown;
-    max_participants: number;
-    settings: unknown;
-    title: string | null;
-  }
-): FormData {
-  const completeFormData = new FormData();
-
-  // Max participants - required field
-  if (formData.has("max_participants")) {
-    completeFormData.set(
-      "max_participants",
-      formData.get("max_participants") as string
-    );
-  } else {
-    completeFormData.set(
-      "max_participants",
-      String(space.max_participants || 50)
-    );
-  }
-
-  // Optional fields - use existing values or formData values
-  const title = formData.get("title") || space.title || "";
-  completeFormData.set("title", title as string);
-
-  const description = formData.get("description") || space.description || "";
-  completeFormData.set("description", description as string);
-
-  // Gatekeeper settings
-  const gatekeeperRules = space.gatekeeper_rules as {
-    email?: { allowed: string[] };
-    twitch?: { broadcasterId: string; requirement: string };
-    youtube?: { channelId: string; requirement: string };
-  } | null;
-
-  // Determine gatekeeper mode
-  let gatekeeperMode = "none";
-  if (gatekeeperRules) {
-    if (gatekeeperRules.email?.allowed) {
-      gatekeeperMode = "email";
-    } else if (gatekeeperRules.youtube || gatekeeperRules.twitch) {
-      gatekeeperMode = "social";
-    }
-  }
-  completeFormData.set(
-    "gatekeeper_mode",
-    (formData.get("gatekeeper_mode") as string) || gatekeeperMode
-  );
-
-  // Email allowlist
-  const emailAllowlist = gatekeeperRules?.email?.allowed?.join(", ") || "";
-  completeFormData.set(
-    "email_allowlist",
-    (formData.get("email_allowlist") as string) || emailAllowlist
-  );
-
-  // Social platform settings
-  let socialPlatform = "";
-  if (gatekeeperRules?.youtube) {
-    socialPlatform = "youtube";
-  } else if (gatekeeperRules?.twitch) {
-    socialPlatform = "twitch";
-  }
-  if (socialPlatform) {
-    completeFormData.set(
-      "social_platform",
-      (formData.get("social_platform") as string) || socialPlatform
-    );
-  }
-
-  // YouTube settings
-  const youtubeChannelId = gatekeeperRules?.youtube?.channelId || "";
-  completeFormData.set(
-    "youtube_channel_id",
-    (formData.get("youtube_channel_id") as string) || youtubeChannelId
-  );
-  const youtubeRequirement = gatekeeperRules?.youtube?.requirement || "none";
-  completeFormData.set(
-    "youtube_requirement",
-    (formData.get("youtube_requirement") as string) || youtubeRequirement
-  );
-
-  // Twitch settings
-  const twitchBroadcasterId = gatekeeperRules?.twitch?.broadcasterId || "";
-  completeFormData.set(
-    "twitch_broadcaster_id",
-    (formData.get("twitch_broadcaster_id") as string) || twitchBroadcasterId
-  );
-  const twitchRequirement = gatekeeperRules?.twitch?.requirement || "none";
-  completeFormData.set(
-    "twitch_requirement",
-    (formData.get("twitch_requirement") as string) || twitchRequirement
-  );
-
-  // Settings flags
-  const settings = space.settings as { hide_metadata_before_join?: boolean };
-  if (settings?.hide_metadata_before_join) {
-    completeFormData.set("hide_metadata_before_join", "on");
-  }
-
-  return completeFormData;
-}
-
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Update space requires comprehensive validation checks
 export async function updateSpaceSettings(
   spaceId: string,
@@ -384,7 +272,7 @@ export interface PublishSpaceState {
 export async function publishSpace(
   spaceId: string,
   _prevState: PublishSpaceState,
-  formData: FormData
+  _formData: FormData
 ): Promise<PublishSpaceState> {
   try {
     // Validate UUID first before any operations
@@ -409,12 +297,10 @@ export async function publishSpace(
       };
     }
 
-    // Get current space data to populate FormData with existing values
+    // Check if space exists and user has permission (owner or admin)
     const { data: space, error: spaceError } = await supabase
       .from("spaces")
-      .select(
-        "owner_id, max_participants, title, description, gatekeeper_rules, settings"
-      )
+      .select("owner_id")
       .eq("id", spaceId)
       .single();
 
@@ -444,29 +330,11 @@ export async function publishSpace(
       };
     }
 
-    // Build FormData with existing space data if not provided in formData
-    const completeFormData = buildCompleteFormData(formData, space);
-
-    // Update the settings with complete data
-    const updateResult = await updateSpaceSettings(
-      spaceId,
-      { success: false },
-      completeFormData
-    );
-
-    if (!updateResult.success) {
-      return {
-        error: updateResult.error || "設定の更新に失敗しました",
-        success: false,
-      };
-    }
-
     // Update status to active
     const { error: publishError } = await supabase
       .from("spaces")
       .update({ status: "active" })
       .eq("id", spaceId)
-      .eq("owner_id", user.id)
       .eq("status", "draft"); // Only publish if currently draft
 
     if (publishError) {
