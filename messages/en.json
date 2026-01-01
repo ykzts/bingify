@@ -208,6 +208,27 @@
     "youtubeRequirementSubscriber": "Subscribers only",
     "settingsNotice": "After creation, you can configure participant limits and other settings on the settings page"
   },
+  "Contact": {
+    "backToHome": "Back to Home",
+    "completeEmailNote": "We will reply to this email address:",
+    "completeMessage": "Thank you for contacting us. We will review your message and get back to you soon.",
+    "completeMetaDescription": "Your message has been received",
+    "completeMetaTitle": "Message Sent",
+    "completeTitle": "Message Sent Successfully",
+    "description": "Have questions or feedback? Feel free to reach out to us.",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "your@email.com",
+    "messageDescription": "Please provide as much detail as possible",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Enter your message here",
+    "metaDescription": "Contact us with your questions or feedback",
+    "metaTitle": "Contact Us",
+    "nameLabel": "Name",
+    "namePlaceholder": "John Doe",
+    "sendAnother": "Send Another Message",
+    "submitButton": "Send Message",
+    "title": "Contact Us"
+  },
   "Dashboard": {
     "activeSpaceBackToAdmin": "Back to Admin",
     "activeSpaceLabel": "Active",
