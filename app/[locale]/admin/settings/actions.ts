@@ -41,8 +41,9 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
     }
 
     const settings: SystemSettings = {
-      default_user_role: (data.default_user_role ||
-        "organizer") as "organizer" | "user",
+      default_user_role: (data.default_user_role || "organizer") as
+        | "organizer"
+        | "user",
       features: featuresValidation.data,
       max_participants_per_space: data.max_participants_per_space,
       max_spaces_per_user: data.max_spaces_per_user,
