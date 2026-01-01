@@ -2,6 +2,7 @@
 ALTER TABLE spaces ALTER COLUMN max_participants DROP DEFAULT;
 
 -- Create function to dynamically set max_participants from system_settings
+-- Uses SECURITY DEFINER to ensure consistent execution permissions when reading system_settings
 CREATE OR REPLACE FUNCTION set_default_max_participants()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -23,7 +24,7 @@ BEGIN
   
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Create trigger to execute before INSERT
 -- This trigger dynamically sets max_participants from system_settings.max_participants_per_space
