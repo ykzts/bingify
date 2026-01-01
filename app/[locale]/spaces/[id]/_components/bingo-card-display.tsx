@@ -28,7 +28,10 @@ export function BingoCardDisplay({ spaceId }: Props) {
   const queryClient = useQueryClient();
   const { data: bingoCard, isPending, error } = useBingoCard(spaceId);
   const { data: calledNumbersArray = [] } = useCalledNumbers(spaceId);
-  const calledNumbers = new Set(calledNumbersArray.map(({ value }) => value));
+  const calledNumbers = useMemo(
+    () => new Set(calledNumbersArray.map(({ value }) => value)),
+    [calledNumbersArray]
+  );
   const previousStatusRef = useRef<"none" | "reach" | "bingo">("none");
 
   // Freeze state when bingo is achieved
