@@ -59,9 +59,7 @@ async function verifyTurnstileToken(
 
 const serverValidate = createServerValidate({
   ...contactFormOpts,
-  onServerValidate: () => {
-    return undefined;
-  },
+  onServerValidate: () => undefined,
 });
 
 export async function submitContactFormAction(
@@ -79,10 +77,10 @@ export async function submitContactFormAction(
 
     // Verify Turnstile if enabled
     if (turnstileEnabled) {
-      const turnstileToken = formData.get("cf-turnstile-response") as
-        | string
-        | undefined;
-      const verification = await verifyTurnstileToken(turnstileToken);
+      const turnstileToken = formData.get("cf-turnstile-response");
+      const verification = await verifyTurnstileToken(
+        turnstileToken ? String(turnstileToken) : undefined
+      );
 
       if (!verification.success) {
         return {

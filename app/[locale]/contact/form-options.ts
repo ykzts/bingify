@@ -17,5 +17,5 @@ export const contactFormOpts = formOptions({
     email: "",
     message: "",
     name: "",
-  } as ContactFormValues,
+  },
 });

@@ -46,8 +46,10 @@ export function ContactForm({ locale }: Props) {
     validators: {
       onChange: contactFormSchema,
     },
-    // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
-    transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
+    transform: useTransform(
+      (baseForm) => (state ? mergeForm(baseForm, state) : baseForm),
+      [state]
+    ),
   });
 
   const formErrors = useStore(form.store, (formState) => formState.errors);
@@ -57,13 +59,24 @@ export function ContactForm({ locale }: Props) {
   );
 
   useEffect(() => {
-    const meta = (state as Record<string, unknown>)?.meta as
-      | { success?: boolean; userEmail?: string }
-      | undefined;
-    if (meta?.success && meta?.userEmail) {
-      router.push(
-        `/${locale}/contact/complete?email=${encodeURIComponent(meta.userEmail)}`
-      );
+    if (
+      state &&
+      typeof state === "object" &&
+      "meta" in state &&
+      state.meta &&
+      typeof state.meta === "object" &&
+      "success" in state.meta &&
+      "userEmail" in state.meta
+    ) {
+      const { success, userEmail } = state.meta as {
+        success?: boolean;
+        userEmail?: string;
+      };
+      if (success && userEmail) {
+        router.push(
+          `/${locale}/contact/complete?email=${encodeURIComponent(userEmail)}`
+        );
+      }
     }
   }, [state, router, locale]);
 
