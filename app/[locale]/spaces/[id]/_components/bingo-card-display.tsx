@@ -30,10 +30,12 @@ export function BingoCardDisplay({ spaceId }: Props) {
   const { data: calledNumbersArray = [] } = useCalledNumbers(spaceId);
   const calledNumbers = new Set(calledNumbersArray.map(({ value }) => value));
   const previousStatusRef = useRef<"none" | "reach" | "bingo">("none");
-  
+
   // Freeze state when bingo is achieved
   const frozenCalledNumbersRef = useRef<Set<number> | null>(null);
-  const frozenBingoLinesRef = useRef<ReturnType<typeof checkBingoLines> | null>(null);
+  const frozenBingoLinesRef = useRef<ReturnType<typeof checkBingoLines> | null>(
+    null
+  );
 
   // Calculate bingo lines for rendering - use frozen state if bingo has been achieved
   const bingoCheckResult = useMemo(() => {
@@ -75,7 +77,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
       }
     );
   });
-  
+
   // Extract confetti animation logic
   const triggerConfetti = useEffectEvent(() => {
     const duration = 3000;
@@ -103,7 +105,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
         particleCount: Math.floor(particleCount),
       });
     }, 250);
-    
+
     return confettiInterval;
   });
 
@@ -115,30 +117,33 @@ export function BingoCardDisplay({ spaceId }: Props) {
   });
 
   // Helper to update bingo status
-  const processBingoStatus = useEffectEvent((result: ReturnType<typeof checkBingoLines>) => {
-    let newStatus: "none" | "reach" | "bingo" = "none";
+  const processBingoStatus = useEffectEvent(
+    (result: ReturnType<typeof checkBingoLines>) => {
+      let newStatus: "none" | "reach" | "bingo" = "none";
 
-    if (result.hasBingo) {
-      newStatus = "bingo";
-      if (previousStatusRef.current !== "bingo") {
-        frozenCalledNumbersRef.current = new Set(calledNumbers);
-        frozenBingoLinesRef.current = result;
+      if (result.hasBingo) {
+        newStatus = "bingo";
+        if (previousStatusRef.current !== "bingo") {
+          frozenCalledNumbersRef.current = new Set(calledNumbers);
+          frozenBingoLinesRef.current = result;
+        }
+      } else if (result.hasReach) {
+        newStatus = "reach";
       }
-    } else if (result.hasReach) {
-      newStatus = "reach";
+
+      const isTransitionToBingo =
+        newStatus === "bingo" && previousStatusRef.current !== "bingo";
+
+      if (newStatus !== previousStatusRef.current) {
+        previousStatusRef.current = newStatus;
+        updateBingoStatus(spaceId, newStatus).catch((err) => {
+          console.error("Failed to update bingo status:", err);
+        });
+      }
+
+      return isTransitionToBingo;
     }
-
-    const isTransitionToBingo = newStatus === "bingo" && previousStatusRef.current !== "bingo";
-
-    if (newStatus !== previousStatusRef.current) {
-      previousStatusRef.current = newStatus;
-      updateBingoStatus(spaceId, newStatus).catch((err) => {
-        console.error("Failed to update bingo status:", err);
-      });
-    }
-
-    return isTransitionToBingo;
-  });
+  );
 
   useEffect(() => {
     const supabase = createClient();
