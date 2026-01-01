@@ -396,7 +396,10 @@
     "verifyYouTubeButton": "Verify YouTube Account",
     "verifyingYouTube": "Verifying...",
     "draftMessage": "The host is currently preparing. Please wait.",
-    "draftTitle": "Preparing"
+    "draftTitle": "Preparing",
+    "eventEndedTitle": "This Event Has Ended",
+    "eventEndedMessage": "Thank you for participating in this bingo event. The event has been closed by the host.",
+    "yourFinalResultTitle": "Your Final Result"
   },
   "UsernameSettings": {
     "description": "Set the name that will be displayed in the app.",

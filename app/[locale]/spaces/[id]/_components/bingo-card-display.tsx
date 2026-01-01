@@ -14,6 +14,7 @@ import { updateBingoStatus } from "../bingo-actions";
 import { BingoLineOverlay } from "./bingo-line-overlay";
 
 interface Props {
+  readOnly?: boolean;
   spaceId: string;
 }
 
@@ -23,7 +24,7 @@ const BINGO_WHITE = "#ffffff";
 const BINGO_BLACK = "#000000";
 const BINGO_BORDER_GRAY = "#d1d5db";
 
-export function BingoCardDisplay({ spaceId }: Props) {
+export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
   const t = useTranslations("UserSpace");
   const queryClient = useQueryClient();
   const { data: bingoCard, isPending, error } = useBingoCard(spaceId);
@@ -153,6 +154,11 @@ export function BingoCardDisplay({ spaceId }: Props) {
   );
 
   useEffect(() => {
+    // Skip real-time updates in read-only mode
+    if (readOnly) {
+      return;
+    }
+
     const supabase = createClient();
     const channel = supabase
       .channel(`space-${spaceId}-bingo-participant`)
@@ -187,11 +193,12 @@ export function BingoCardDisplay({ spaceId }: Props) {
     return () => {
       channel.unsubscribe();
     };
-  }, [spaceId]);
+  }, [spaceId, readOnly]);
 
   // Check bingo status when called numbers or card changes
   useEffect(() => {
-    if (!bingoCard) {
+    // Skip status updates in read-only mode
+    if (readOnly || !bingoCard) {
       return;
     }
 
@@ -213,7 +220,7 @@ export function BingoCardDisplay({ spaceId }: Props) {
         clearInterval(confettiInterval);
       };
     }
-  }, [bingoCard, calledNumbers]);
+  }, [bingoCard, calledNumbers, readOnly]);
 
   if (isPending) {
     return (
