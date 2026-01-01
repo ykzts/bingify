@@ -1,9 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import {
   type GatekeeperRules,
+  gatekeeperRulesSchema,
   type Space,
   type SpaceSettings,
-  gatekeeperRulesSchema,
   spaceSettingsSchema,
 } from "@/lib/types/space";
 import type { Tables } from "@/types/supabase";

@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Tables } from "@/types/supabase";
-import { getSpace, getSpaceByShareKey, getSpaces, validateSpaceData } from "../spaces";
+import {
+  getSpace,
+  getSpaceByShareKey,
+  getSpaces,
+  validateSpaceData,
+} from "../spaces";
 
 // Mock Supabase client
 const mockSupabase = {
@@ -238,7 +243,9 @@ describe("getSpaces", () => {
       {
         created_at: "2024-01-02T00:00:00Z",
         description: "Test space 2",
-        gatekeeper_rules: { youtube: { channelId: "UC123", requirement: "subscriber" } },
+        gatekeeper_rules: {
+          youtube: { channelId: "UC123", requirement: "subscriber" },
+        },
         id: "test-id-2",
         max_participants: 100,
         owner_id: "owner-id",
@@ -266,7 +273,9 @@ describe("getSpaces", () => {
     expect(result[0].id).toBe("test-id-1");
     expect(result[1].id).toBe("test-id-2");
     expect(result[0].settings).toEqual({ hide_metadata_before_join: false });
-    expect(result[1].gatekeeper_rules).toEqual({ youtube: { channelId: "UC123", requirement: "subscriber" } });
+    expect(result[1].gatekeeper_rules).toEqual({
+      youtube: { channelId: "UC123", requirement: "subscriber" },
+    });
   });
 
   it("should return empty array on error", async () => {

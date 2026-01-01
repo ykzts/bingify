@@ -14,6 +14,16 @@
       "formatter": {
         "enabled": false
       }
+    },
+    {
+      "includes": ["app/\\[locale\\]/admin/settings/actions.ts"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "noBarrelFile": "off"
+          }
+        }
+      }
     }
   ]
 }
