@@ -237,7 +237,9 @@
     "spaceActions": "Actions",
     "statusActive": "Active",
     "statusClosed": "Closed",
-    "statusDraft": "Draft"
+    "statusDraft": "Draft",
+    "metaTitle": "Dashboard",
+    "metaDescription": "Create and manage your bingo spaces. View active events and space history."
   },
   "Errors": {
     "authRequired": "Authentication required",
@@ -306,7 +308,9 @@
     "googleButton": "Sign in with Google",
     "title": "Sign in to Bingify",
     "titleSpace": "Sign in to Join Space",
-    "twitchButton": "Sign in with Twitch"
+    "twitchButton": "Sign in with Twitch",
+    "metaTitle": "Sign in",
+    "metaDescription": "Sign in to Bingify to create bingo spaces, host events, and manage your account."
   },
   "Metadata": {
     "description": "Experience a new kind of bingo that brings everyone together in real-time. Sign in with OAuth and get started easily.",
@@ -403,7 +407,8 @@
     "draftTitle": "Preparing",
     "eventEndedTitle": "This Event Has Ended",
     "eventEndedMessage": "Thank you for participating in this bingo event. The event has been closed by the host.",
-    "yourFinalResultTitle": "Your Final Result"
+    "yourFinalResultTitle": "Your Final Result",
+    "metaDescription": "Join the bingo space: {spaceName}"
   },
   "UsernameSettings": {
     "description": "Set the name that will be displayed in the app.",

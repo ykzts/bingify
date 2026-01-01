@@ -18,26 +18,38 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const space = await getSpaceById(id);
+  const { id, locale } = await params;
+  const publicInfo = await getSpacePublicInfo(id);
 
-  if (!space) {
+  if (!publicInfo) {
     return {
       title: "Space Not Found",
     };
   }
 
+  const t = await getTranslations({ locale, namespace: "UserSpace" });
+
+  // Use title if available, otherwise fall back to share_key
+  const displayTitle = publicInfo.title || publicInfo.share_key;
+
+  // Use custom description if available, otherwise use default localized message with title or share_key
+  const displayDescription =
+    publicInfo.description ||
+    t("metaDescription", {
+      spaceName: publicInfo.title || publicInfo.share_key,
+    });
+
   return {
-    description: `Join the bingo space: ${space.share_key}`,
+    description: displayDescription,
     openGraph: {
-      description: `Join the bingo space: ${space.share_key}`,
-      title: `Bingify - ${space.share_key}`,
+      description: displayDescription,
+      title: displayTitle,
     },
-    title: `${space.share_key} - Bingify`,
+    title: displayTitle,
     twitter: {
       card: "summary_large_image",
-      description: `Join the bingo space: ${space.share_key}`,
-      title: `Bingify - ${space.share_key}`,
+      description: displayDescription,
+      title: displayTitle,
     },
   };
 }

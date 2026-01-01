@@ -1,9 +1,24 @@
-import { setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { LoginForm } from "./_components/login-form";
 
 interface Props {
   params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Login" });
+
+  return {
+    description: t("metaDescription"),
+    openGraph: {
+      description: t("metaDescription"),
+      title: t("metaTitle"),
+    },
+    title: t("metaTitle"),
+  };
 }
 
 export default async function LoginPage({ params }: Props) {

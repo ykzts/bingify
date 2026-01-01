@@ -229,7 +229,9 @@
     "spaceActions": "操作",
     "statusActive": "開催中",
     "statusClosed": "終了",
-    "statusDraft": "準備中"
+    "statusDraft": "準備中",
+    "metaTitle": "ダッシュボード",
+    "metaDescription": "ビンゴスペースの作成と管理。アクティブなイベントとスペース履歴を表示します。"
   },
   "Errors": {
     "authRequired": "認証が必要です",
@@ -298,7 +300,9 @@
     "googleButton": "Googleでサインイン",
     "title": "Bingifyにサインイン",
     "titleSpace": "スペースに参加",
-    "twitchButton": "Twitchでサインイン"
+    "twitchButton": "Twitchでサインイン",
+    "metaTitle": "ログイン",
+    "metaDescription": "Bingifyにログインして、ビンゴスペースの作成、イベントの主催、アカウントの管理を行いましょう。"
   },
   "Metadata": {
     "description": "リアルタイムで盛り上がる、新しいビンゴ体験。OAuth サインインで簡単に始められます。",
@@ -395,7 +399,8 @@
     "draftTitle": "準備中",
     "eventEndedTitle": "このイベントは終了しました",
     "eventEndedMessage": "このビンゴイベントにご参加いただきありがとうございました。イベントはホストによって閉鎖されました。",
-    "yourFinalResultTitle": "あなたの最終結果"
+    "yourFinalResultTitle": "あなたの最終結果",
+    "metaDescription": "ビンゴスペース {spaceName} に参加しよう"
   },
   "UsernameSettings": {
     "description": "アプリ内で表示される名前を設定します。",
