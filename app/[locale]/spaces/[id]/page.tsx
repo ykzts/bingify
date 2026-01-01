@@ -28,14 +28,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const t = await getTranslations({ locale, namespace: "UserSpace" });
-  
+
   // Use title if available, otherwise fall back to share_key
   const displayTitle = publicInfo.title || publicInfo.share_key;
-  
+
   // Use custom description if available, otherwise use default localized message with title or share_key
-  const displayDescription = publicInfo.description || t("metaDescription", { 
-    spaceName: publicInfo.title || publicInfo.share_key 
-  });
+  const displayDescription =
+    publicInfo.description ||
+    t("metaDescription", {
+      spaceName: publicInfo.title || publicInfo.share_key,
+    });
 
   return {
     description: displayDescription,
