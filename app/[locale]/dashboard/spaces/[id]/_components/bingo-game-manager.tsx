@@ -1,16 +1,14 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
-import { useConfirm } from "@/components/providers/confirm-provider";
 import { Button } from "@/components/ui/button";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
-import { callNumber, resetGame } from "../actions";
+import { callNumber } from "../actions";
 
 interface Props {
   spaceId: string;
@@ -19,10 +17,8 @@ interface Props {
 export function BingoGameManager({ spaceId }: Props) {
   const t = useTranslations("AdminSpace");
   const queryClient = useQueryClient();
-  const confirm = useConfirm();
   const { data: calledNumbers = [] } = useCalledNumbers(spaceId);
   const [isCalling, setIsCalling] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
 
   // Use useEffectEvent to separate event logic from effect dependencies
   const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
@@ -126,34 +122,6 @@ export function BingoGameManager({ spaceId }: Props) {
     setIsCalling(false);
   };
 
-  const handleResetGame = async () => {
-    if (
-      !(await confirm({
-        description: t("resetGameConfirm"),
-        title: t("resetGameButton"),
-        variant: "destructive",
-      }))
-    ) {
-      return;
-    }
-
-    setIsResetting(true);
-
-    const result = await resetGame(spaceId);
-
-    if (result.success) {
-      toast.success(t("resetGameSuccess"), {
-        duration: 3000,
-      });
-    } else {
-      toast.error(result.error || t("resetGameError"), {
-        duration: 3000,
-      });
-    }
-
-    setIsResetting(false);
-  };
-
   const calledValuesSet = new Set(calledNumbers.map((n) => n.value));
 
   return (
@@ -161,26 +129,14 @@ export function BingoGameManager({ spaceId }: Props) {
       <div>
         <h2 className="mb-4 font-semibold text-xl">{t("bingoGameManager")}</h2>
 
-        <div className="mb-4 flex gap-3">
+        <div className="mb-4">
           <Button
-            className="flex-1"
-            disabled={isCalling || isResetting || calledValuesSet.size >= 75}
+            className="w-full"
+            disabled={isCalling || calledValuesSet.size >= 75}
             onClick={handleCallNumber}
             type="button"
           >
             {isCalling ? t("calling") : t("callNumberButton")}
-          </Button>
-
-          <Button
-            disabled={isResetting || isCalling}
-            onClick={handleResetGame}
-            type="button"
-            variant="outline"
-          >
-            <RefreshCw
-              className={`h-4 w-4 ${isResetting ? "animate-spin" : ""}`}
-            />
-            {t("resetGameButton")}
           </Button>
         </div>
 

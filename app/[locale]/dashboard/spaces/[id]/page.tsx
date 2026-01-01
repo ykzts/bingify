@@ -4,7 +4,6 @@ import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
 import { gatekeeperRulesSchema, spaceSettingsSchema } from "@/lib/types/space";
 import { BingoGameManager } from "./_components/bingo-game-manager";
-import { CloseSpaceButton } from "./_components/close-space-button";
 import { DraftStatusView } from "./_components/draft-status-view";
 import { ParticipantsStatus } from "./_components/participants-status";
 import { SpaceSettingsSheet } from "./_components/space-settings-sheet";
@@ -142,16 +141,6 @@ export default async function AdminSpacePage({ params }: Props) {
             maxParticipants={space.max_participants}
             spaceId={space.id}
           />
-
-          <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
-            <h2 className="mb-4 font-semibold text-xl">
-              {t("closeSpaceTitle")}
-            </h2>
-            <p className="mb-4 text-gray-700 text-sm">
-              {t("closeSpaceDescription")}
-            </p>
-            <CloseSpaceButton spaceId={space.id} />
-          </div>
         </>
       )}
 
