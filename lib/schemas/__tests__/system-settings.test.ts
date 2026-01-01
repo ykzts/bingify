@@ -64,6 +64,7 @@ describe("systemSettingsSchema", () => {
       },
       max_participants_per_space: 50,
       max_spaces_per_user: 5,
+      max_total_spaces: 1000,
       space_expiration_hours: 48,
     });
     expect(result.success).toBe(true);
@@ -73,6 +74,7 @@ describe("systemSettingsSchema", () => {
     const result = systemSettingsSchema.safeParse({
       max_participants_per_space: 50,
       max_spaces_per_user: 5,
+      max_total_spaces: 1000,
       space_expiration_hours: 48,
     });
     expect(result.success).toBe(false);
@@ -89,6 +91,7 @@ describe("systemSettingsSchema", () => {
       },
       max_participants_per_space: 0,
       max_spaces_per_user: 5,
+      max_total_spaces: 1000,
       space_expiration_hours: 48,
     };
     const result = systemSettingsSchema.safeParse(settings);
@@ -106,6 +109,7 @@ describe("systemSettingsSchema", () => {
       },
       max_participants_per_space: 50,
       max_spaces_per_user: 0,
+      max_total_spaces: 1000,
       space_expiration_hours: 48,
     };
     const result = systemSettingsSchema.safeParse(settings);
@@ -124,6 +128,7 @@ describe("systemSettingsSchema", () => {
       },
       max_participants_per_space: 50,
       max_spaces_per_user: 5,
+      max_total_spaces: 1000,
       space_expiration_hours: 0,
     });
     expect(result.success).toBe(true);
@@ -140,6 +145,7 @@ describe("systemSettingsSchema", () => {
       },
       max_participants_per_space: 50,
       max_spaces_per_user: 5,
+      max_total_spaces: 1000,
       space_expiration_hours: -1,
     });
     expect(result.success).toBe(false);
@@ -156,6 +162,7 @@ describe("systemSettingsSchema", () => {
       },
       max_participants_per_space: 10_001,
       max_spaces_per_user: 5,
+      max_total_spaces: 1000,
       space_expiration_hours: 48,
     });
     expect(result.success).toBe(false);
@@ -172,6 +179,7 @@ describe("systemSettingsSchema", () => {
       },
       max_participants_per_space: 50,
       max_spaces_per_user: 101,
+      max_total_spaces: 1000,
       space_expiration_hours: 48,
     });
     expect(result.success).toBe(false);
@@ -188,7 +196,60 @@ describe("systemSettingsSchema", () => {
       },
       max_participants_per_space: 50,
       max_spaces_per_user: 5,
+      max_total_spaces: 1000,
       space_expiration_hours: 8761,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("should accept max_total_spaces as 0 (unlimited)", () => {
+    const result = systemSettingsSchema.safeParse({
+      default_user_role: "organizer",
+      features: {
+        gatekeeper: {
+          email: { enabled: true },
+          twitch: { enabled: true },
+          youtube: { enabled: true },
+        },
+      },
+      max_participants_per_space: 50,
+      max_spaces_per_user: 5,
+      max_total_spaces: 0,
+      space_expiration_hours: 48,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject negative max_total_spaces", () => {
+    const result = systemSettingsSchema.safeParse({
+      features: {
+        gatekeeper: {
+          email: { enabled: true },
+          twitch: { enabled: true },
+          youtube: { enabled: true },
+        },
+      },
+      max_participants_per_space: 50,
+      max_spaces_per_user: 5,
+      max_total_spaces: -1,
+      space_expiration_hours: 48,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("should reject max_total_spaces over limit", () => {
+    const result = systemSettingsSchema.safeParse({
+      features: {
+        gatekeeper: {
+          email: { enabled: true },
+          twitch: { enabled: true },
+          youtube: { enabled: true },
+        },
+      },
+      max_participants_per_space: 50,
+      max_spaces_per_user: 5,
+      max_total_spaces: 100_001,
+      space_expiration_hours: 48,
     });
     expect(result.success).toBe(false);
   });

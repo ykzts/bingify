@@ -132,10 +132,10 @@ export async function createSpace(
       };
     }
 
-    // Check system settings for max spaces per user
+    // Check system settings for max spaces per user and global limit
     const { data: systemSettings, error: settingsError } = await supabase
       .from("system_settings")
-      .select("max_spaces_per_user")
+      .select("max_spaces_per_user, max_total_spaces")
       .eq("id", 1)
       .single();
 
@@ -143,6 +143,33 @@ export async function createSpace(
       console.error("Failed to fetch system settings:", settingsError);
       // Continue with space creation if settings fetch fails (graceful degradation)
     } else if (systemSettings) {
+      // Check global space limit first (if not 0/unlimited)
+      if (systemSettings.max_total_spaces > 0) {
+        const { count: totalSpaceCount, error: totalCountError } =
+          await supabase
+            .from("spaces")
+            .select("id", { count: "exact", head: true })
+            .neq("status", "closed");
+
+        if (totalCountError) {
+          console.error("Failed to count total spaces:", totalCountError);
+          return {
+            error: "failedToCountSpaces",
+            success: false,
+          };
+        }
+
+        if (
+          totalSpaceCount !== null &&
+          totalSpaceCount >= systemSettings.max_total_spaces
+        ) {
+          return {
+            error: "maxTotalSpacesReached",
+            success: false,
+          };
+        }
+      }
+
       // Count user's existing active spaces (excluding closed)
       // Note: The spaces table RLS policy does not have recursion issues,
       // so we can use count: "exact" directly. The participants table uses

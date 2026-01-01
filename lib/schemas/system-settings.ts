@@ -32,6 +32,11 @@ export const systemSettingsSchema = z.object({
     .int("整数を入力してください")
     .min(1, "1スペース以上を指定してください")
     .max(100, "最大100スペースまでです"),
+  max_total_spaces: z
+    .number()
+    .int("整数を入力してください")
+    .min(0, "0以上を指定してください（0は無制限）")
+    .max(100_000, "最大100000スペースまでです"),
   space_expiration_hours: z
     .number()
     .int("整数を入力してください")

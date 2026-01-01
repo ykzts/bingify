@@ -19,7 +19,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
     const { data, error } = await supabase
       .from("system_settings")
       .select(
-        "max_participants_per_space, max_spaces_per_user, space_expiration_hours, features, default_user_role"
+        "max_participants_per_space, max_spaces_per_user, max_total_spaces, space_expiration_hours, features, default_user_role"
       )
       .eq("id", 1)
       .single();
@@ -47,6 +47,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
       features: featuresValidation.data,
       max_participants_per_space: data.max_participants_per_space,
       max_spaces_per_user: data.max_spaces_per_user,
+      max_total_spaces: data.max_total_spaces,
       space_expiration_hours: data.space_expiration_hours,
     };
 
@@ -103,6 +104,7 @@ export async function updateSystemSettings(
       "max_participants_per_space"
     ) as string;
     const maxSpacesRaw = formData.get("max_spaces_per_user") as string;
+    const maxTotalSpacesRaw = formData.get("max_total_spaces") as string;
     const expirationHoursRaw = formData.get("space_expiration_hours") as string;
     const defaultUserRole = formData.get("default_user_role") as string;
 
@@ -125,6 +127,7 @@ export async function updateSystemSettings(
       },
       max_participants_per_space: Number.parseInt(maxParticipantsRaw, 10),
       max_spaces_per_user: Number.parseInt(maxSpacesRaw, 10),
+      max_total_spaces: Number.parseInt(maxTotalSpacesRaw, 10),
       space_expiration_hours: Number.parseInt(expirationHoursRaw, 10),
     });
 
