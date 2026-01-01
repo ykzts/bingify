@@ -23,6 +23,7 @@ describe("publishSpace", () => {
 
     const mockSpace = {
       owner_id: "owner-123",
+      status: "draft",
     };
 
     // Create mock functions for the chain
@@ -107,6 +108,7 @@ describe("publishSpace", () => {
 
     const mockSpace = {
       owner_id: "owner-123",
+      status: "draft",
     };
 
     const mockAdminRole = {
@@ -190,6 +192,7 @@ describe("publishSpace", () => {
 
     const mockSpace = {
       owner_id: "owner-123",
+      status: "draft",
     };
 
     const mockSingleForSpace = vi.fn().mockResolvedValue({
@@ -298,6 +301,7 @@ describe("publishSpace", () => {
 
     const mockSpace = {
       owner_id: "owner-123",
+      status: "draft",
     };
 
     const mockSingleForSpace = vi.fn().mockResolvedValue({
@@ -417,6 +421,53 @@ describe("publishSpace", () => {
 
     expect(result).toEqual({
       error: "認証が必要です。ログインしてください。",
+      success: false,
+    });
+  });
+
+  it("should reject publishing an already published space", async () => {
+    const { createClient } = await import("@/lib/supabase/server");
+    const { isValidUUID } = await import("@/lib/utils/uuid");
+
+    vi.mocked(isValidUUID).mockReturnValue(true);
+
+    const mockSpace = {
+      owner_id: "owner-123",
+      status: "active",
+    };
+
+    const mockSingleForSpace = vi.fn().mockResolvedValue({
+      data: mockSpace,
+      error: null,
+    });
+
+    const mockSupabase = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: "owner-123" } },
+        }),
+      },
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            single: mockSingleForSpace,
+          })),
+        })),
+      })),
+    };
+
+    vi.mocked(createClient).mockResolvedValue(mockSupabase as never);
+
+    const emptyFormData = new FormData();
+
+    const result = await publishSpace(
+      "space-123",
+      { success: false },
+      emptyFormData
+    );
+
+    expect(result).toEqual({
+      error: "このスペースは既に公開されています",
       success: false,
     });
   });

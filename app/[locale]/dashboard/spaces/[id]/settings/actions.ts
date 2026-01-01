@@ -300,13 +300,21 @@ export async function publishSpace(
     // Check if space exists and user has permission (owner or admin)
     const { data: space, error: spaceError } = await supabase
       .from("spaces")
-      .select("owner_id")
+      .select("owner_id, status")
       .eq("id", spaceId)
       .single();
 
     if (spaceError || !space) {
       return {
         error: "スペースが見つかりませんでした",
+        success: false,
+      };
+    }
+
+    // Check if space is already published
+    if (space.status !== "draft") {
+      return {
+        error: "このスペースは既に公開されています",
         success: false,
       };
     }
