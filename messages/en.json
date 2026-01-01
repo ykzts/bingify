@@ -173,6 +173,12 @@
     "viewingUrlDescription": "Share this URL to display the bingo board on screens, in streaming software, or other display applications.",
     "viewingUrlDialogDescription": "Share this URL to display the bingo board on screens, in streaming software, or other display applications.",
     "viewingUrlDialogTitle": "Public Viewing URL",
+    "loadingCard": "Loading card...",
+    "participantCardTitle": "{name}'s Card",
+    "reachCount": "{count} Reach",
+    "viewCardButton": "View Card",
+    "cardErrorTitle": "Failed to load card",
+    "retryButton": "Retry",
     "viewingUrlLabel": "Public Viewing URL"
   },
   "CreateSpace": {

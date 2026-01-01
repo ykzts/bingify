@@ -165,6 +165,12 @@
     "viewingUrlDescription": "このURLを共有して、画面、配信ソフト、その他の表示アプリケーションにビンゴボードを表示できます。",
     "viewingUrlDialogDescription": "このURLを共有して、画面、配信ソフト、その他の表示アプリケーションにビンゴボードを表示できます。",
     "viewingUrlDialogTitle": "公開閲覧用URL",
+    "loadingCard": "カードを読み込み中...",
+    "participantCardTitle": "{name} さんのカード",
+    "reachCount": "{count} リーチ",
+    "viewCardButton": "カードを見る",
+    "cardErrorTitle": "カードの読み込みに失敗しました",
+    "retryButton": "再試行",
     "viewingUrlLabel": "公開閲覧用URL"
   },
   "CreateSpace": {
