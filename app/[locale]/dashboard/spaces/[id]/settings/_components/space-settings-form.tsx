@@ -31,7 +31,7 @@ import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { cn } from "@/lib/utils";
 import type { PublishSpaceState, UpdateSpaceState } from "../actions";
-import { publishSpace, updateSpaceSettings } from "../actions";
+import { updateAndPublishSpace, updateSpaceSettings } from "../actions";
 
 interface Props {
   currentParticipantCount: number;
@@ -151,7 +151,7 @@ export function SpaceSettingsForm({
   const [publishState, publishAction, isPublishing] = useActionState<
     PublishSpaceState,
     FormData
-  >(publishSpace.bind(null, space.id), {
+  >(updateAndPublishSpace.bind(null, space.id), {
     success: false,
   });
 
