@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Eye } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
+import { BingoCard } from "@/components/bingo/bingo-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { BingoCard } from "@/components/bingo/bingo-card";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { checkBingoLines } from "@/lib/utils/bingo-checker";
 import { getParticipantCard } from "../actions";
