@@ -79,7 +79,6 @@ export function SystemSettingsForm({ initialSettings }: Props) {
 
   return (
     <form action={action} className="space-y-6">
-      {/* Form-level errors */}
       {formErrors.length > 0 && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-3">
           {formErrors.map((error) => (
@@ -90,15 +89,13 @@ export function SystemSettingsForm({ initialSettings }: Props) {
         </div>
       )}
 
-      {/* Resource Limits Section */}
       <FieldSet>
         <FieldLegend>リソース制限</FieldLegend>
         <FieldGroup>
-          {/* Max Participants per Space */}
           <form.Field
             name="max_participants_per_space"
             validators={{
-              onChange: ({ value }) => {
+              onChange: ({ value }: { value: number }) => {
                 if (value < 1 || value > 10_000) {
                   return "1から10000の範囲で入力してください";
                 }
@@ -127,7 +124,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
                     <p className="text-red-600 text-sm">
-                      {field.state.meta.errors[0]}
+                      {String(field.state.meta.errors[0])}
                     </p>
                   )}
                 </FieldContent>
@@ -135,11 +132,10 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          {/* Max Spaces per User */}
           <form.Field
             name="max_spaces_per_user"
             validators={{
-              onChange: ({ value }) => {
+              onChange: ({ value }: { value: number }) => {
                 if (value < 1 || value > 100) {
                   return "1から100の範囲で入力してください";
                 }
@@ -168,7 +164,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
                     <p className="text-red-600 text-sm">
-                      {field.state.meta.errors[0]}
+                      {String(field.state.meta.errors[0])}
                     </p>
                   )}
                 </FieldContent>
@@ -176,11 +172,10 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          {/* Max Total Spaces */}
           <form.Field
             name="max_total_spaces"
             validators={{
-              onChange: ({ value }) => {
+              onChange: ({ value }: { value: number }) => {
                 if (value < 0 || value > 100_000) {
                   return "0から100000の範囲で入力してください";
                 }
@@ -207,7 +202,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   <FieldDescription>{t("maxTotalSpacesHelp")}</FieldDescription>
                   {field.state.meta.errors.length > 0 && (
                     <p className="text-red-600 text-sm">
-                      {field.state.meta.errors[0]}
+                      {String(field.state.meta.errors[0])}
                     </p>
                   )}
                 </FieldContent>
@@ -215,11 +210,10 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          {/* Space Expiration Hours */}
           <form.Field
             name="space_expiration_hours"
             validators={{
-              onChange: ({ value }) => {
+              onChange: ({ value }: { value: number }) => {
                 if (value < 0 || value > 8760) {
                   return "0から8760の範囲で入力してください";
                 }
@@ -248,7 +242,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
                     <p className="text-red-600 text-sm">
-                      {field.state.meta.errors[0]}
+                      {String(field.state.meta.errors[0])}
                     </p>
                   )}
                 </FieldContent>
@@ -258,11 +252,9 @@ export function SystemSettingsForm({ initialSettings }: Props) {
         </FieldGroup>
       </FieldSet>
 
-      {/* User Settings Section */}
       <FieldSet className="border-t pt-6">
         <FieldLegend>{t("userSettingsTitle")}</FieldLegend>
         <FieldGroup>
-          {/* Default User Role */}
           <form.Field name="default_user_role">
             {(field) => (
               <Field>
@@ -286,7 +278,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
                     <p className="text-red-600 text-sm">
-                      {field.state.meta.errors[0]}
+                      {String(field.state.meta.errors[0])}
                     </p>
                   )}
                 </FieldContent>
@@ -296,18 +288,15 @@ export function SystemSettingsForm({ initialSettings }: Props) {
         </FieldGroup>
       </FieldSet>
 
-      {/* Feature Flags Section */}
       <div className="space-y-4 border-t pt-6">
         <h4 className="font-semibold text-base">{t("featureFlagsTitle")}</h4>
         <p className="text-gray-600 text-sm">{t("featureFlagsDescription")}</p>
 
-        {/* Gatekeeper Features */}
         <div className="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
           <h5 className="font-medium text-sm">
             {t("gatekeeperFeaturesTitle")}
           </h5>
 
-          {/* YouTube Gatekeeper */}
           <form.Field name="features.gatekeeper.youtube.enabled">
             {(field) => (
               <div className="flex items-center space-x-2">
@@ -330,7 +319,6 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          {/* Twitch Gatekeeper */}
           <form.Field name="features.gatekeeper.twitch.enabled">
             {(field) => (
               <div className="flex items-center space-x-2">
@@ -353,7 +341,6 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          {/* Email Gatekeeper */}
           <form.Field name="features.gatekeeper.email.enabled">
             {(field) => (
               <div className="flex items-center space-x-2">
@@ -378,16 +365,17 @@ export function SystemSettingsForm({ initialSettings }: Props) {
         </div>
       </div>
 
-      {/* Success Message */}
-      {(state as Record<string, unknown>)?.meta &&
-        ((state as Record<string, unknown>).meta as { success?: boolean })
-          ?.success && (
+      {(() => {
+        const meta = (state as Record<string, unknown>)?.meta as
+          | { success?: boolean }
+          | undefined;
+        return meta?.success ? (
           <div className="rounded-lg border border-green-200 bg-green-50 p-3">
             <p className="text-green-800 text-sm">{t("updateSuccess")}</p>
           </div>
-        )}
+        ) : null;
+      })()}
 
-      {/* Submit Button */}
       <div className="flex justify-end">
         <Button disabled={isSubmitting} type="submit">
           {isSubmitting ? t("saving") : t("saveButton")}
