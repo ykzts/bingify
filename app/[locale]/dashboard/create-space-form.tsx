@@ -104,8 +104,7 @@ export function CreateSpaceForm() {
     (formState) => formState.isSubmitting
   );
 
-  const handleShareKeyChange = (newShareKey: string) => {
-    const normalizedKey = newShareKey.toLowerCase();
+  const handleShareKeyChange = (normalizedKey: string) => {
     setShareKey(normalizedKey);
 
     // Reset validation state when shareKey changes and is too short
@@ -203,8 +202,9 @@ export function CreateSpaceForm() {
                 name={field.name}
                 onChange={(e) => {
                   const newValue = e.target.value;
-                  field.handleChange(newValue);
-                  handleShareKeyChange(newValue);
+                  const normalizedValue = newValue.toLowerCase();
+                  field.handleChange(normalizedValue);
+                  handleShareKeyChange(normalizedValue);
                 }}
                 pattern="[a-z0-9-]+"
                 placeholder="my-party"
