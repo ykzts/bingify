@@ -9,6 +9,7 @@ import { useEffect, useEffectEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
+import { useDrumRoll } from "@/hooks/use-drum-roll";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useBackground } from "../../_context/background-context";
@@ -60,6 +61,13 @@ export function ScreenDisplay({
     normalizeDisplayMode(initialMode)
   );
   const [showSettings, setShowSettings] = useState(false);
+  const {
+    currentNumber: drumRollNumber,
+    isAnimating,
+    startDrumRoll,
+  } = useDrumRoll({
+    duration: 1800, // 1.8 seconds
+  });
 
   // Use background context instead of local state
   const { background, setBackground } = useBackground();
@@ -72,6 +80,10 @@ export function ScreenDisplay({
   // Use useEffectEvent to separate event logic from effect dependencies
   const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
     const newNumber = payload.new;
+
+    // Start drum roll animation when new number is inserted
+    startDrumRoll(newNumber.value);
+
     queryClient.setQueryData<CalledNumber[]>(
       ["called-numbers", spaceId],
       (prev) => {
@@ -148,6 +160,10 @@ export function ScreenDisplay({
 
   const currentNumber =
     calledNumbers.length > 0 ? (calledNumbers.at(-1)?.value ?? null) : null;
+
+  // Show drum roll number during animation, otherwise show the current number
+  const displayNumber = isAnimating ? drumRollNumber : currentNumber;
+
   const history = calledNumbers.map((n) => n.value);
   const historySet = new Set(history); // For O(1) lookup performance
   const participationUrl = `${baseUrl}/${locale}/spaces/${shareKey}`;
@@ -159,12 +175,12 @@ export function ScreenDisplay({
       {isMinimal ? (
         /* Minimal Mode: Current Number Only */
         <div className="flex h-screen w-full items-center justify-center">
-          {currentNumber !== null ? (
+          {displayNumber !== null ? (
             <motion.h1
               animate={{ scale: 1, opacity: 1 }}
               className="font-black text-[clamp(8rem,20vw,16rem)] text-white drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)]"
               initial={{ scale: 0, opacity: 0 }}
-              key={currentNumber}
+              key={displayNumber}
               style={{
                 WebkitTextStroke: "3px black",
                 textShadow:
@@ -176,7 +192,7 @@ export function ScreenDisplay({
                 damping: 20,
               }}
             >
-              {currentNumber}
+              {displayNumber}
             </motion.h1>
           ) : (
             <div className="text-center">
@@ -196,12 +212,12 @@ export function ScreenDisplay({
           <div className="flex flex-col items-center justify-center gap-6 lg:w-[35%] lg:gap-8">
             {/* Current Number */}
             <div className="flex flex-1 items-center justify-center">
-              {currentNumber !== null ? (
+              {displayNumber !== null ? (
                 <motion.h1
                   animate={{ scale: 1, opacity: 1 }}
                   className="font-black text-[clamp(6rem,15vw,12rem)] text-white drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)] lg:text-[clamp(8rem,20vh,20rem)]"
                   initial={{ scale: 0, opacity: 0 }}
-                  key={currentNumber}
+                  key={displayNumber}
                   style={{
                     WebkitTextStroke: "3px black",
                     textShadow:
@@ -213,7 +229,7 @@ export function ScreenDisplay({
                     damping: 20,
                   }}
                 >
-                  {currentNumber}
+                  {displayNumber}
                 </motion.h1>
               ) : (
                 <div className="text-center">

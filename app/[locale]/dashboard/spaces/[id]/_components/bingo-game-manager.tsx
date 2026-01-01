@@ -2,6 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
+import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
@@ -9,6 +10,7 @@ import { useConfirm } from "@/components/providers/confirm-provider";
 import { Button } from "@/components/ui/button";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
+import { useDrumRoll } from "@/hooks/use-drum-roll";
 import { createClient } from "@/lib/supabase/client";
 import { callNumber, resetGame } from "../actions";
 
@@ -23,6 +25,13 @@ export function BingoGameManager({ spaceId }: Props) {
   const { data: calledNumbers = [] } = useCalledNumbers(spaceId);
   const [isCalling, setIsCalling] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const {
+    currentNumber: drumRollNumber,
+    isAnimating,
+    startDrumRoll,
+  } = useDrumRoll({
+    duration: 1800, // 1.8 seconds
+  });
 
   // Use useEffectEvent to separate event logic from effect dependencies
   const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
@@ -108,7 +117,17 @@ export function BingoGameManager({ spaceId }: Props) {
     const randomNumber =
       availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
 
-    const result = await callNumber(spaceId, randomNumber);
+    // Start drum roll animation and API call in parallel
+    const [, resultSettled] = await Promise.allSettled([
+      startDrumRoll(randomNumber),
+      callNumber(spaceId, randomNumber),
+    ]);
+
+    // Extract the result from the settled promise
+    const result =
+      resultSettled.status === "fulfilled"
+        ? resultSettled.value
+        : { success: false, error: "Failed to call number" };
 
     if (result.success) {
       toast.success(t("numberCalledSuccess", { number: randomNumber }), {
@@ -185,6 +204,23 @@ export function BingoGameManager({ spaceId }: Props) {
           {t("calledNumbersCount", { count: calledValuesSet.size, total: 75 })}
         </div>
       </div>
+
+      {/* Drum Roll Display */}
+      {isAnimating && drumRollNumber !== null && (
+        <div className="flex items-center justify-center rounded-lg border-2 border-purple-500 bg-gradient-to-br from-purple-50 to-purple-100 p-8">
+          <motion.div
+            animate={{ scale: [1, 1.1, 1] }}
+            className="font-black text-8xl text-purple-600"
+            transition={{
+              duration: 0.3,
+              repeat: Number.POSITIVE_INFINITY,
+              repeatType: "reverse",
+            }}
+          >
+            {drumRollNumber}
+          </motion.div>
+        </div>
+      )}
 
       <div>
         <h3 className="mb-3 font-medium text-gray-900">{t("calledNumbers")}</h3>
