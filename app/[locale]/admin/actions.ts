@@ -356,3 +356,72 @@ export async function getAllUsers(
     };
   }
 }
+
+/**
+ * Update a user's role
+ */
+export async function updateUserRole(
+  userId: string,
+  newRole: "admin" | "organizer" | "user"
+): Promise<AdminActionResult> {
+  try {
+    // Validate UUID format
+    if (!isValidUuid(userId)) {
+      return {
+        error: "errorInvalidUuid",
+        success: false,
+      };
+    }
+
+    // Validate role value
+    if (!["admin", "organizer", "user"].includes(newRole)) {
+      return {
+        error: "errorInvalidRole",
+        success: false,
+      };
+    }
+
+    // Verify admin role and get current user ID
+    const { isAdmin, userId: currentUserId } = await verifyAdminRole();
+    if (!isAdmin) {
+      return {
+        error: "errorNoPermission",
+        success: false,
+      };
+    }
+
+    // Prevent changing own role
+    if (userId === currentUserId) {
+      return {
+        error: "errorCannotChangeOwnRole",
+        success: false,
+      };
+    }
+
+    const adminClient = createAdminClient();
+
+    // Update the user's role
+    const { error } = await adminClient
+      .from("profiles")
+      .update({ role: newRole })
+      .eq("id", userId);
+
+    if (error) {
+      console.error("Failed to update user role:", error);
+      return {
+        error: "updateRoleError",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error in updateUserRole:", error);
+    return {
+      error: "errorGeneric",
+      success: false,
+    };
+  }
+}

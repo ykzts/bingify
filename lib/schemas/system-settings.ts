@@ -16,7 +16,11 @@ export const systemFeaturesSchema = z.object({
   }),
 }) satisfies z.ZodType<SystemFeatures>;
 
+// Schema for default user role
+export const defaultUserRoleSchema = z.enum(["organizer", "user"]);
+
 export const systemSettingsSchema = z.object({
+  default_user_role: defaultUserRoleSchema,
   features: systemFeaturesSchema,
   max_participants_per_space: z
     .number()

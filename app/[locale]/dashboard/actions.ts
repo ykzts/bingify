@@ -108,6 +108,29 @@ export async function createSpace(
       };
     }
 
+    // Check user role for space creation permission
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Failed to fetch user profile:", profileError);
+      return {
+        error: "プロフィール情報の取得に失敗しました。",
+        success: false,
+      };
+    }
+
+    // Only admin and organizer can create spaces
+    if (profile.role === "user") {
+      return {
+        error: "スペースを作成する権限がありません。",
+        success: false,
+      };
+    }
+
     // Check system settings for max spaces per user
     const { data: systemSettings, error: settingsError } = await supabase
       .from("system_settings")

@@ -19,7 +19,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
     const { data, error } = await supabase
       .from("system_settings")
       .select(
-        "max_participants_per_space, max_spaces_per_user, space_expiration_hours, features"
+        "max_participants_per_space, max_spaces_per_user, space_expiration_hours, features, default_user_role"
       )
       .eq("id", 1)
       .single();
@@ -41,6 +41,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
     }
 
     const settings: SystemSettings = {
+      default_user_role: data.default_user_role || "organizer",
       features: featuresValidation.data,
       max_participants_per_space: data.max_participants_per_space,
       max_spaces_per_user: data.max_spaces_per_user,
@@ -101,6 +102,7 @@ export async function updateSystemSettings(
     ) as string;
     const maxSpacesRaw = formData.get("max_spaces_per_user") as string;
     const expirationHoursRaw = formData.get("space_expiration_hours") as string;
+    const defaultUserRole = formData.get("default_user_role") as string;
 
     // Parse feature flags
     const gatekeeperYoutubeEnabled =
@@ -111,6 +113,7 @@ export async function updateSystemSettings(
       formData.get("features.gatekeeper.email.enabled") === "true";
 
     const validation = systemSettingsSchema.safeParse({
+      default_user_role: defaultUserRole,
       features: {
         gatekeeper: {
           email: { enabled: gatekeeperEmailEnabled },
