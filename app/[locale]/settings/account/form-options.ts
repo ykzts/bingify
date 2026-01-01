@@ -1,11 +1,8 @@
 import { formOptions } from "@tanstack/react-form-nextjs";
-import { z } from "zod";
+import type { usernameSchema } from "@/lib/schemas/user";
+import type { z } from "zod";
 
-export const usernameFormSchema = z.object({
-  username: z.string().trim().min(1).max(50),
-});
-
-export type UsernameFormValues = z.infer<typeof usernameFormSchema>;
+export type UsernameFormValues = z.infer<typeof usernameSchema>;
 
 export const usernameFormOpts = formOptions({
   defaultValues: {
