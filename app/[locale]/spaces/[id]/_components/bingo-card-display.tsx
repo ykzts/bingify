@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import confetti from "canvas-confetti";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { useEffect, useEffectEvent, useRef } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef } from "react";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
@@ -34,6 +34,19 @@ export function BingoCardDisplay({ spaceId }: Props) {
   // Freeze state when bingo is achieved
   const frozenCalledNumbersRef = useRef<Set<number> | null>(null);
   const frozenBingoLinesRef = useRef<ReturnType<typeof checkBingoLines> | null>(null);
+
+  // Calculate bingo lines for rendering - use frozen state if bingo has been achieved
+  const bingoCheckResult = useMemo(() => {
+    if (frozenBingoLinesRef.current) {
+      return frozenBingoLinesRef.current;
+    }
+    return bingoCard
+      ? checkBingoLines(bingoCard.numbers, calledNumbers)
+      : { hasBingo: false, hasReach: false, bingoLines: [], reachLines: [] };
+  }, [bingoCard, calledNumbers]);
+
+  // Use frozen called numbers for display if bingo achieved
+  const displayCalledNumbers = frozenCalledNumbersRef.current || calledNumbers;
 
   // Use useEffectEvent to separate event logic from effect dependencies
   const onInsert = useEffectEvent((payload: { new: CalledNumber }) => {
@@ -201,17 +214,6 @@ export function BingoCardDisplay({ spaceId }: Props) {
     return calledNumbers.has(number);
   };
 
-  // Calculate bingo lines for rendering
-  // Use frozen state if bingo has been achieved
-  const bingoCheckResult = (() => {
-    if (frozenBingoLinesRef.current) {
-      return frozenBingoLinesRef.current;
-    }
-    return bingoCard
-      ? checkBingoLines(bingoCard.numbers, calledNumbers)
-      : { hasBingo: false, hasReach: false, bingoLines: [], reachLines: [] };
-  })();
-
   return (
     <div className="space-y-6">
       <div>
@@ -285,13 +287,13 @@ export function BingoCardDisplay({ spaceId }: Props) {
           {t("recentCalledNumbers")}
         </h3>
         <div className="mx-auto max-w-md">
-          {calledNumbers.size === 0 ? (
+          {displayCalledNumbers.size === 0 ? (
             <p className="text-center text-gray-500 text-sm">
               {t("noNumbersCalled")}
             </p>
           ) : (
             <div className="flex flex-wrap justify-center gap-2">
-              {Array.from(calledNumbers)
+              {Array.from(displayCalledNumbers)
                 .slice(-10)
                 .reverse()
                 .map((number) => (
