@@ -272,7 +272,7 @@ export interface PublishSpaceState {
 export async function publishSpace(
   spaceId: string,
   _prevState: PublishSpaceState,
-  _formData: FormData
+  formData: FormData
 ): Promise<PublishSpaceState> {
   try {
     // Validate UUID first before any operations
@@ -295,6 +295,23 @@ export async function publishSpace(
         error: "認証が必要です。ログインしてください。",
         success: false,
       };
+    }
+
+    // If formData has settings (called from settings form), update settings first
+    const hasSettings = formData.has("max_participants");
+    if (hasSettings) {
+      const updateResult = await updateSpaceSettings(
+        spaceId,
+        { success: false },
+        formData
+      );
+
+      if (!updateResult.success) {
+        return {
+          error: updateResult.error || "設定の更新に失敗しました",
+          success: false,
+        };
+      }
     }
 
     // Check if space exists and user has permission (owner or admin)
