@@ -169,7 +169,11 @@
     "urlOptionMode": "Display Mode",
     "viewingUrlButton": "Viewing URL",
     "viewingUrlDialogDescription": "Share this URL to display the bingo board on screens, in streaming software, or other display applications.",
-    "viewingUrlDialogTitle": "Public Viewing URL"
+    "viewingUrlDialogTitle": "Public Viewing URL",
+    "loadingCard": "Loading card...",
+    "participantCardTitle": "{name}'s Card",
+    "reachCount": "{count} Reach",
+    "viewCardButton": "View Card"
   },
   "CreateSpace": {
     "capacitySectionTitle": "Participant Capacity",
