@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { escapeHtml } from "./utils";
 
 /**
  * Create SMTP transporter for sending emails
@@ -39,14 +40,19 @@ export async function sendContactEmail(options: ContactEmailOptions) {
 
   const transporter = createTransporter();
 
+  // Escape user inputs to prevent HTML injection
+  const escapedName = escapeHtml(name);
+  const escapedEmail = escapeHtml(email);
+  const escapedMessage = escapeHtml(message).replace(/\n/g, "<br>");
+
   const mailOptions = {
     from: mailFrom,
     html: `
       <h2>お問い合わせ</h2>
-      <p><strong>名前:</strong> ${name}</p>
-      <p><strong>メールアドレス:</strong> ${email}</p>
+      <p><strong>名前:</strong> ${escapedName}</p>
+      <p><strong>メールアドレス:</strong> ${escapedEmail}</p>
       <p><strong>本文:</strong></p>
-      <p>${message.replace(/\n/g, "<br>")}</p>
+      <p>${escapedMessage}</p>
     `,
     replyTo: email,
     subject: `【お問い合わせ】${name}様より`,

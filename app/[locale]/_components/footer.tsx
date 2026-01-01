@@ -16,6 +16,12 @@ export function Footer() {
           </Link>
           <Link
             className="text-gray-600 transition-colors hover:text-gray-900"
+            href="/contact"
+          >
+            {t("contact")}
+          </Link>
+          <Link
+            className="text-gray-600 transition-colors hover:text-gray-900"
             href="/terms"
           >
             {t("terms")}
