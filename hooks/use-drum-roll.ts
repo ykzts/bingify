@@ -63,12 +63,6 @@ export function useDrumRoll(options?: UseDrumRollOptions): UseDrumRollReturn {
         return activePromiseRef.current || Promise.resolve();
       }
 
-      // Cancel any leftover animation frame to avoid leaks
-      if (animationRef.current !== null) {
-        cancelAnimationFrame(animationRef.current);
-        animationRef.current = null;
-      }
-
       const promise = new Promise<void>((resolve) => {
         setIsAnimating(true);
         startTimeRef.current = performance.now();
