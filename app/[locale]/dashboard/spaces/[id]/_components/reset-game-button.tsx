@@ -75,9 +75,7 @@ export function ResetGameButton({ spaceId }: ResetGameButtonProps) {
         </AlertDialogContent>
       </AlertDialog>
       {resetState.error && (
-        <p className="mt-2 text-red-600 text-sm">
-          {resetState.error || t("resetGameError")}
-        </p>
+        <p className="mt-2 text-red-600 text-sm">{resetState.error}</p>
       )}
     </div>
   );

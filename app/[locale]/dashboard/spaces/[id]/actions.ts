@@ -4,15 +4,14 @@ import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
 
-export interface CallNumberResult {
+export interface ActionResult {
   error?: string;
   success: boolean;
 }
 
-export interface ResetGameState {
-  error?: string;
-  success: boolean;
-}
+export interface CallNumberResult extends ActionResult {}
+
+export interface ResetGameState extends ActionResult {}
 
 export async function callNumber(
   spaceId: string,
