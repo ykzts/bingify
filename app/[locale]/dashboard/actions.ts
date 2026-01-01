@@ -238,7 +238,7 @@ export async function createSpace(
       .insert({
         gatekeeper_rules: null,
         id: uuid,
-        max_participants: 50, // Default value
+        // max_participants omitted - will be set by trigger from system_settings
         owner_id: user.id,
         settings: {},
         share_key: fullShareKey,

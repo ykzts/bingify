@@ -114,6 +114,9 @@ export function BingoGameManager({ spaceId }: Props) {
       toast.success(t("numberCalledSuccess", { number: randomNumber }), {
         duration: 3000,
       });
+
+      // Wait for screen animation to complete before allowing next call (1.8 seconds)
+      await new Promise((resolve) => setTimeout(resolve, 1800));
     } else {
       toast.error(result.error || t("callNumberError"), {
         duration: 3000,
