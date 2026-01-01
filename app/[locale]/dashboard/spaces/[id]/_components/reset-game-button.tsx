@@ -2,7 +2,7 @@
 
 import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -16,6 +16,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
+import type { ResetGameState } from "../actions";
 import { resetGame } from "../actions";
 
 interface ResetGameButtonProps {
@@ -24,26 +25,23 @@ interface ResetGameButtonProps {
 
 export function ResetGameButton({ spaceId }: ResetGameButtonProps) {
   const t = useTranslations("AdminSpace");
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const handleConfirm = () => {
-    setShowConfirm(false);
-    setError(null);
+  const [resetState, resetAction, isPending] = useActionState<
+    ResetGameState,
+    FormData
+  >(resetGame.bind(null, spaceId), {
+    success: false,
+  });
 
-    startTransition(async () => {
-      const result = await resetGame(spaceId);
-
-      if (result.success) {
-        toast.success(t("resetGameSuccess"), {
-          duration: 3000,
-        });
-      } else {
-        setError(result.error || t("resetGameError"));
-      }
-    });
-  };
+  useEffect(() => {
+    if (resetState.success) {
+      toast.success(t("resetGameSuccess"), {
+        duration: 3000,
+      });
+      setShowConfirm(false);
+    }
+  }, [resetState.success, t]);
 
   return (
     <div>
@@ -63,18 +61,24 @@ export function ResetGameButton({ spaceId }: ResetGameButtonProps) {
               {t("resetGameConfirm")}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-            <AlertDialogAction
-              className={buttonVariants({ variant: "destructive" })}
-              onClick={handleConfirm}
-            >
-              {t("resetGameButton")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
+          <form action={resetAction}>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+              <AlertDialogAction
+                className={buttonVariants({ variant: "destructive" })}
+                type="submit"
+              >
+                {t("resetGameButton")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </form>
         </AlertDialogContent>
       </AlertDialog>
-      {error && <p className="mt-2 text-red-600 text-sm">{error}</p>}
+      {resetState.error && (
+        <p className="mt-2 text-red-600 text-sm">
+          {resetState.error || t("resetGameError")}
+        </p>
+      )}
     </div>
   );
 }

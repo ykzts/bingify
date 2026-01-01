@@ -9,6 +9,11 @@ export interface CallNumberResult {
   success: boolean;
 }
 
+export interface ResetGameState {
+  error?: string;
+  success: boolean;
+}
+
 export async function callNumber(
   spaceId: string,
   number: number
@@ -121,7 +126,11 @@ export async function getCalledNumbers(
   }
 }
 
-export async function resetGame(spaceId: string): Promise<CallNumberResult> {
+export async function resetGame(
+  spaceId: string,
+  _prevState: ResetGameState,
+  _formData: FormData
+): Promise<ResetGameState> {
   try {
     if (!isValidUUID(spaceId)) {
       return {
