@@ -173,7 +173,9 @@
     "loadingCard": "カードを読み込み中...",
     "participantCardTitle": "{name} さんのカード",
     "reachCount": "{count} リーチ",
-    "viewCardButton": "カードを見る"
+    "viewCardButton": "カードを見る",
+    "cardErrorTitle": "カードの読み込みに失敗しました",
+    "retryButton": "再試行"
   },
   "CreateSpace": {
     "capacitySectionTitle": "参加人数制限",

@@ -173,7 +173,9 @@
     "loadingCard": "Loading card...",
     "participantCardTitle": "{name}'s Card",
     "reachCount": "{count} Reach",
-    "viewCardButton": "View Card"
+    "viewCardButton": "View Card",
+    "cardErrorTitle": "Failed to load card",
+    "retryButton": "Retry"
   },
   "CreateSpace": {
     "capacitySectionTitle": "Participant Capacity",

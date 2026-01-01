@@ -33,7 +33,13 @@ export function ParticipantCardDialog({
   const tUser = useTranslations("UserSpace");
   const [open, setOpen] = useState(false);
 
-  const { data: cardData, isPending } = useQuery({
+  const {
+    data: cardData,
+    error,
+    isError,
+    isPending,
+    refetch,
+  } = useQuery({
     enabled: open,
     queryFn: async () => {
       const result = await getParticipantCard(spaceId, userId);
@@ -45,7 +51,9 @@ export function ParticipantCardDialog({
     queryKey: ["participant-card", spaceId, userId],
   });
 
-  const { data: calledNumbersArray = [] } = useCalledNumbers(spaceId);
+  const { data: calledNumbersArray = [] } = useCalledNumbers(spaceId, {
+    enabled: open,
+  });
   const calledNumbers = useMemo(
     () => new Set(calledNumbersArray.map(({ value }) => value)),
     [calledNumbersArray]
@@ -93,7 +101,25 @@ export function ParticipantCardDialog({
           </div>
         )}
 
-        {!isPending && cardData && (
+        {isError && (
+          <div className="flex flex-col items-center justify-center gap-4 py-12">
+            <div className="text-center">
+              <p className="font-medium text-destructive text-sm">
+                {t("cardErrorTitle")}
+              </p>
+              {error instanceof Error && (
+                <p className="mt-1 text-muted-foreground text-xs">
+                  {error.message}
+                </p>
+              )}
+            </div>
+            <Button onClick={() => refetch()} size="sm" variant="outline">
+              {t("retryButton")}
+            </Button>
+          </div>
+        )}
+
+        {!(isPending || isError) && cardData && (
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-2">
               {bingoCheckResult.hasBingo && (
