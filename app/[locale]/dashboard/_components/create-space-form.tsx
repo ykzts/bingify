@@ -273,8 +273,7 @@ export function CreateSpaceForm() {
 
       <SuggestionDisplay
         onAcceptSuggestion={() => {
-          // Get field reference and call handleAcceptSuggestion
-          // Extract suggestion from error map
+          // Extract suggestion from error map and update form field
           const stateRecord = state as Record<string, unknown>;
           if (
             stateRecord?.errorMap &&
@@ -293,7 +292,6 @@ export function CreateSpaceForm() {
                   ""
                 );
                 setShareKey(suggestionWithoutDate);
-                // Need to update form field - will handle via form API
                 form.setFieldValue("share_key", suggestionWithoutDate);
                 setAvailable(null);
               }
