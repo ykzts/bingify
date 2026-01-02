@@ -7,11 +7,11 @@ import {
   useStore,
   useTransform,
 } from "@tanstack/react-form-nextjs";
-import { CheckCircle, Loader2, Rocket } from "lucide-react";
+import { AlertCircle, Loader2, Rocket } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect } from "react";
-import { FormErrors } from "@/components/form-errors";
+import { useActionState, useEffect, useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -52,6 +52,7 @@ interface Props {
   currentParticipantCount: number;
   features: SystemFeatures;
   locale: string;
+  onSuccess?: (message: string) => void;
   space: Space;
   systemMaxParticipants: number;
 }
@@ -111,11 +112,13 @@ export function SpaceSettingsForm({
   currentParticipantCount,
   features,
   locale,
+  onSuccess,
   space,
   systemMaxParticipants,
 }: Props) {
   const router = useRouter();
   const t = useTranslations("SpaceSettings");
+  const [serverError, setServerError] = useState<string | null>(null);
 
   // Use TanStack Form with Next.js server actions for update
   const [updateState, updateAction] = useActionState(
@@ -159,7 +162,6 @@ export function SpaceSettingsForm({
     ),
   });
 
-  const formErrors = useStore(form.store, (formState) => formState.errors);
   const isSubmitting = useStore(
     form.store,
     (formState) => formState.isSubmitting
@@ -175,13 +177,40 @@ export function SpaceSettingsForm({
     (formValues.youtube_requirement as string) || "none";
   const twitchRequirement = (formValues.twitch_requirement as string) || "none";
 
+  // Handle update success/error
+  useEffect(() => {
+    const updateMeta = (updateState as Record<string, unknown>)?.meta as
+      | { success?: boolean }
+      | undefined;
+
+    if (updateMeta?.success) {
+      onSuccess?.(t("updateSuccess"));
+      setServerError(null);
+    }
+
+    const errorMap = (updateState as Record<string, unknown>)?.errorMap;
+    if (errorMap && typeof errorMap === "object" && "form" in errorMap) {
+      setServerError(String(errorMap.form));
+    } else {
+      const errors = (updateState as Record<string, unknown>)?.errors;
+      if (Array.isArray(errors) && errors.length > 0) {
+        setServerError(String(errors[0]));
+      }
+    }
+  }, [updateState, onSuccess, t]);
+
+  // Handle publish success/error and redirect
   useEffect(() => {
     if (publishState.success) {
       // Redirect to admin page after publishing
       router.push(`/${locale}/dashboard/spaces/${space.id}`);
       router.refresh();
     }
-  }, [publishState.success, router, space.id, locale]);
+
+    if (publishState.error) {
+      setServerError(publishState.error);
+    }
+  }, [publishState, router, space.id, locale]);
 
   // Determine visibility of gatekeeper options based on features and existing configuration
   const isEmailConfigured =
@@ -702,31 +731,14 @@ export function SpaceSettingsForm({
           </form.Field>
         </div>
 
-        {/* Error Messages */}
-        <FormErrors
-          className="rounded-lg border border-red-200 bg-red-50 p-4"
-          errors={formErrors}
-        />
-        {publishState.error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-            <p className="text-red-800">{publishState.error}</p>
-          </div>
+        {/* Server Error Display */}
+        {serverError && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>{t("updateError")}</AlertTitle>
+            <AlertDescription>{serverError}</AlertDescription>
+          </Alert>
         )}
-
-        {/* Success Message for Update */}
-        {(() => {
-          const meta = (updateState as Record<string, unknown>)?.meta as
-            | { success?: boolean }
-            | undefined;
-          return meta?.success && !publishState.success ? (
-            <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <p className="text-green-800">{t("updateSuccess")}</p>
-              </div>
-            </div>
-          ) : null;
-        })()}
 
         {/* Action Buttons */}
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
