@@ -93,13 +93,19 @@ export function ContactForm({ locale }: Props) {
       <p className="mb-6 text-gray-600">{t("description")}</p>
 
       <form action={action}>
-        {formErrors.length > 0 && (
-          <div className="mb-4 rounded-md bg-red-50 p-4 text-red-600 text-sm">
-            {formErrors.map((error) => (
-              <p key={getErrorMessage(error)}>{getErrorMessage(error)}</p>
-            ))}
-          </div>
-        )}
+        {(() => {
+          const errorMessages = formErrors
+            .map((error) => getErrorMessage(error))
+            .filter((message) => message.trim() !== "" && message !== "[object Object]");
+          
+          return errorMessages.length > 0 && (
+            <div className="mb-4 rounded-md bg-red-50 p-4 text-red-600 text-sm">
+              {errorMessages.map((message) => (
+                <p key={message}>{message}</p>
+              ))}
+            </div>
+          );
+        })()}
 
         <FieldGroup>
           <form.Field name="name">

@@ -39,7 +39,7 @@ export function getErrorMessage(error: unknown): string {
     return error;
   }
 
-  // Handle Zod issue objects (shape: { message: string, code: string, ... })
+  // Handle objects with message property (Zod issues, Error-like objects)
   if (
     typeof error === "object" &&
     "message" in error &&
@@ -51,6 +51,28 @@ export function getErrorMessage(error: unknown): string {
   // Handle Error instances
   if (error instanceof Error) {
     return error.message;
+  }
+
+  // Handle arrays of errors (rare but possible)
+  if (Array.isArray(error) && error.length > 0) {
+    return getErrorMessage(error[0]);
+  }
+
+  // Handle objects with issues array (Zod error structure)
+  if (
+    typeof error === "object" &&
+    "issues" in error &&
+    Array.isArray(error.issues) &&
+    error.issues.length > 0
+  ) {
+    const firstIssue = error.issues[0];
+    if (
+      typeof firstIssue === "object" &&
+      firstIssue !== null &&
+      "message" in firstIssue
+    ) {
+      return String(firstIssue.message);
+    }
   }
 
   // Fallback: convert to string (should rarely happen with proper validation)
