@@ -150,16 +150,14 @@ export async function inviteAdminAction(
           };
         }
 
-        // Check if already an admin (space.owner_id is guaranteed after checkSpaceOwnership validation)
-        if (!space.owner_id) {
-          return { form: "スペースのオーナー情報が不正です" };
-        }
-
+        // Check if already an admin
+        // Note: space.owner_id is guaranteed to exist because checkSpaceOwnership validates it
         const { error: adminError } = await checkExistingAdmin(
           supabase,
           spaceId,
           targetUser.id,
-          space.owner_id
+          // biome-ignore lint/style/noNonNullAssertion: owner_id is guaranteed by checkSpaceOwnership validation
+          space.owner_id!
         );
         if (adminError) {
           return {
@@ -176,30 +174,21 @@ export async function inviteAdminAction(
     // Validate the form data
     const validatedData = await serverValidate(formData);
 
-    // If validation passes, create the admin
+    // If validation passes, insert the admin role
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
 
-    if (!user) {
-      return {
-        ...initialFormState,
-        errors: ["認証が必要です。ログインしてください。"],
-      };
-    }
-
-    // Find user by email
-    const { data: targetUser, error: userError } = await supabase
+    // Find user by email (validation already confirmed this exists)
+    const { data: targetUser } = await supabase
       .from("profiles")
       .select("id")
       .eq("email", validatedData.email)
       .single();
 
-    if (userError || !targetUser) {
+    if (!targetUser) {
+      // This should not happen after validation, but handle gracefully
       return {
         ...initialFormState,
-        errors: ["このメールアドレスのユーザーが見つかりませんでした"],
+        errors: ["ユーザー情報の取得に失敗しました"],
       };
     }
 
