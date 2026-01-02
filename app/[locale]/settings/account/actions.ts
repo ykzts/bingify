@@ -1,7 +1,12 @@
 "use server";
 
+import {
+  createServerValidate,
+  initialFormState,
+} from "@tanstack/react-form-nextjs";
 import { usernameSchema } from "@/lib/schemas/user";
 import { createClient } from "@/lib/supabase/server";
+import { type UsernameFormValues, usernameFormOpts } from "./form-options";
 
 export interface UnlinkIdentityState {
   error?: string;
@@ -80,6 +85,101 @@ export interface UpdateUsernameState {
   success: boolean;
 }
 
+// Create the server validation function
+const serverValidate = createServerValidate({
+  ...usernameFormOpts,
+  onServerValidate: async ({ value }: { value: UsernameFormValues }) => {
+    const supabase = await createClient();
+
+    // Check authentication
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { form: "errorUnauthorized" };
+    }
+
+    // Validate username with Zod schema
+    const validation = usernameSchema.safeParse({ username: value.username });
+    if (!validation.success) {
+      const issue = validation.error.issues[0];
+      // Map Zod error codes to i18n keys
+      if (issue.code === "too_small") {
+        return { fields: { username: "errorUsernameRequired" } };
+      }
+      if (issue.code === "too_big") {
+        return { fields: { username: "errorUsernameTooLong" } };
+      }
+      return { fields: { username: "errorInvalidUsername" } };
+    }
+
+    return undefined;
+  },
+});
+
+export async function updateUsernameAction(
+  _prevState: unknown,
+  formData: FormData
+) {
+  try {
+    // Validate the form data
+    const validatedData = await serverValidate(formData);
+
+    const supabase = await createClient();
+
+    // Double check authentication
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        ...initialFormState,
+        errors: ["errorUnauthorized"],
+      };
+    }
+
+    // Update the username in the database
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        full_name: validatedData.username,
+      })
+      .eq("id", user.id);
+
+    if (error) {
+      console.error("Update username error:", error);
+      return {
+        ...initialFormState,
+        errors: ["errorUpdateFailed"],
+      };
+    }
+
+    // Return success state
+    return {
+      ...initialFormState,
+      values: validatedData,
+      meta: {
+        success: true,
+      },
+    };
+  } catch (e) {
+    // Check if it's a ServerValidateError from TanStack Form
+    if (e && typeof e === "object" && "formState" in e) {
+      return (e as { formState: unknown }).formState;
+    }
+
+    // Some other error occurred
+    console.error("Error updating username:", e);
+    return {
+      ...initialFormState,
+      errors: ["errorGeneric"],
+    };
+  }
+}
+
+// Keep the old function for backward compatibility during migration
 export async function updateUsername(
   _prevState: UpdateUsernameState,
   formData: FormData
