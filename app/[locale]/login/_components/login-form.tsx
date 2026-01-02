@@ -152,9 +152,8 @@ export function LoginForm({ providers }: Props) {
   };
 
   const getProviderButtonText = (provider: AuthProvider) => {
-    // Provider names are not localized, use label directly
-    // Fallback to "Sign in with {label}" for display
-    return `Sign in with ${provider.label}`;
+    // Use localized "Sign in with {provider}" message
+    return t("signInWithProvider", { provider: provider.label });
   };
 
   const getProviderButtonClass = (provider: string) => {

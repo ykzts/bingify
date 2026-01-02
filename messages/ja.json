@@ -360,7 +360,8 @@
     "orDivider": "または",
     "title": "Bingifyにログイン",
     "titleSpace": "スペースに参加",
-    "twitchButton": "Twitchでログイン"
+    "twitchButton": "Twitchでログイン",
+    "signInWithProvider": "{provider}でログイン"
   },
   "Metadata": {
     "description": "リアルタイムで盛り上がる、新しいビンゴ体験。OAuth ログインで簡単に始められます。",

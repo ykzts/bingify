@@ -360,7 +360,8 @@
     "orDivider": "or",
     "title": "Sign in to Bingify",
     "titleSpace": "Sign in to Join Space",
-    "twitchButton": "Sign in with Twitch"
+    "twitchButton": "Sign in with Twitch",
+    "signInWithProvider": "Sign in with {provider}"
   },
   "Metadata": {
     "description": "Experience a new kind of bingo that brings everyone together in real-time. Sign in with OAuth and get started easily.",
