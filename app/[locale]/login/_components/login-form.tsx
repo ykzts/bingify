@@ -42,6 +42,63 @@ interface Props {
   providers: AuthProvider[];
 }
 
+// Email form component to reduce complexity
+function EmailLoginForm({
+  email,
+  emailError,
+  emailSuccess,
+  isEmailSending,
+  onEmailChange,
+  onSubmit,
+  t,
+}: {
+  email: string;
+  emailError: string | null;
+  emailSuccess: boolean;
+  isEmailSending: boolean;
+  onEmailChange: (value: string) => void;
+  onSubmit: (e: React.FormEvent) => void;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  return (
+    <div className="space-y-4">
+      {emailSuccess && (
+        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4">
+          <CheckCircle className="h-5 w-5 text-green-600" />
+          <p className="text-green-800 text-sm">{t("emailSuccess")}</p>
+        </div>
+      )}
+
+      {emailError && (
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
+          <AlertCircle className="h-5 w-5 text-red-600" />
+          <p className="text-red-800 text-sm">{emailError}</p>
+        </div>
+      )}
+
+      <form className="space-y-4" onSubmit={onSubmit}>
+        <div className="space-y-2">
+          <Label htmlFor="email">{t("emailInputLabel")}</Label>
+          <Input
+            disabled={isEmailSending}
+            id="email"
+            onChange={(e) => onEmailChange(e.target.value)}
+            placeholder={t("emailInputPlaceholder")}
+            type="email"
+            value={email}
+          />
+        </div>
+        <Button className="w-full" disabled={isEmailSending} type="submit">
+          {isEmailSending && (
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          )}
+          {isEmailSending ? t("emailSending") : t("emailSendButton")}
+        </Button>
+      </form>
+    </div>
+  );
+}
+
 export function LoginForm({ providers }: Props) {
   const t = useTranslations("Login");
   const searchParams = useSearchParams();
@@ -226,81 +283,27 @@ export function LoginForm({ providers }: Props) {
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-4 pt-4">
-            {emailSuccess && (
-              <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <p className="text-green-800 text-sm">{t("emailSuccess")}</p>
-              </div>
-            )}
-
-            {emailError && (
-              <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
-                <AlertCircle className="h-5 w-5 text-red-600" />
-                <p className="text-red-800 text-sm">{emailError}</p>
-              </div>
-            )}
-
-            <form className="space-y-4" onSubmit={handleMagicLinkLogin}>
-              <div className="space-y-2">
-                <Label htmlFor="email">{t("emailInputLabel")}</Label>
-                <Input
-                  disabled={isEmailSending}
-                  id="email"
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t("emailInputPlaceholder")}
-                  type="email"
-                  value={email}
-                />
-              </div>
-              <Button
-                className="w-full"
-                disabled={isEmailSending}
-                type="submit"
-              >
-                {isEmailSending && (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                )}
-                {isEmailSending ? t("emailSending") : t("emailSendButton")}
-              </Button>
-            </form>
+            <EmailLoginForm
+              email={email}
+              emailError={emailError}
+              emailSuccess={emailSuccess}
+              isEmailSending={isEmailSending}
+              onEmailChange={setEmail}
+              onSubmit={handleMagicLinkLogin}
+              t={t}
+            />
           </CollapsibleContent>
         </Collapsible>
       ) : (
-        <div className="space-y-4">
-          {emailSuccess && (
-            <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <p className="text-green-800 text-sm">{t("emailSuccess")}</p>
-            </div>
-          )}
-
-          {emailError && (
-            <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
-              <AlertCircle className="h-5 w-5 text-red-600" />
-              <p className="text-red-800 text-sm">{emailError}</p>
-            </div>
-          )}
-
-          <form className="space-y-4" onSubmit={handleMagicLinkLogin}>
-            <div className="space-y-2">
-              <Label htmlFor="email">{t("emailInputLabel")}</Label>
-              <Input
-                disabled={isEmailSending}
-                id="email"
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t("emailInputPlaceholder")}
-                type="email"
-                value={email}
-              />
-            </div>
-            <Button className="w-full" disabled={isEmailSending} type="submit">
-              {isEmailSending && (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              )}
-              {isEmailSending ? t("emailSending") : t("emailSendButton")}
-            </Button>
-          </form>
-        </div>
+        <EmailLoginForm
+          email={email}
+          emailError={emailError}
+          emailSuccess={emailSuccess}
+          isEmailSending={isEmailSending}
+          onEmailChange={setEmail}
+          onSubmit={handleMagicLinkLogin}
+          t={t}
+        />
       )}
     </div>
   );
