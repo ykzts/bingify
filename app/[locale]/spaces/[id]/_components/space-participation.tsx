@@ -11,8 +11,8 @@ import {
   TWITCH_OAUTH_SCOPES,
 } from "@/lib/auth/oauth-utils";
 import { createClient } from "@/lib/supabase/client";
-import type { JoinSpaceState, SpaceInfo } from "../../actions";
-import { joinSpace, leaveSpace } from "../../actions";
+import type { JoinSpaceState, SpaceInfo } from "../../_lib/actions";
+import { joinSpace, leaveSpace } from "../../_lib/actions";
 import {
   useParticipantInfo,
   useUserParticipation,

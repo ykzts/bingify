@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SpaceList } from "../_components/space-list";
-import { getAllSpaces } from "../actions";
+import { getAllSpaces } from "../_lib/actions";
 
 interface Props {
   params: Promise<{ locale: string }>;

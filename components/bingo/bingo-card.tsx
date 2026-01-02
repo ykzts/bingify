@@ -3,8 +3,8 @@
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { BingoLineOverlay } from "@/app/[locale]/spaces/[id]/_components/bingo-line-overlay";
 import type { BingoLine } from "@/lib/utils/bingo-checker";
+import { BingoLineOverlay } from "./bingo-line-overlay";
 
 interface Props {
   bingoLines?: BingoLine[];

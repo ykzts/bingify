@@ -18,12 +18,15 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { SpaceAdmin } from "@/lib/types/space";
 import {
+  inviteAdminFormOpts,
+  inviteAdminFormSchema,
+} from "../_lib/form-options";
+import { inviteAdminAction } from "../_lib/invite-admin-actions";
+import {
   type GetSpaceAdminsResult,
   getSpaceAdmins,
   removeAdmin,
-} from "../actions";
-import { inviteAdminFormOpts, inviteAdminFormSchema } from "../form-options";
-import { inviteAdminAction } from "../invite-admin-actions";
+} from "../_lib/settings-actions";
 
 interface Props {
   spaceId: string;

@@ -37,9 +37,25 @@ import { Textarea } from "@/components/ui/textarea";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { cn } from "@/lib/utils";
-import type { PublishSpaceState } from "../actions";
-import { updateAndPublishSpace, updateSpaceSettings } from "../actions";
-import { spaceSettingsFormOpts } from "../form-options";
+import {
+  spaceSettingsFormOpts,
+  spaceSettingsFormSchema,
+} from "../_lib/form-options";
+import type { PublishSpaceState } from "../_lib/settings-actions";
+import {
+  updateAndPublishSpace,
+  updateSpaceSettings,
+} from "../_lib/settings-actions";
+
+function getErrorMessage(error: unknown): string {
+  if (typeof error === "string") {
+    return error;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+}
 
 interface Props {
   currentParticipantCount: number;
@@ -141,6 +157,9 @@ export function SpaceSettingsForm({
       youtube_channel_id: space.gatekeeper_rules?.youtube?.channelId || "",
       youtube_requirement:
         space.gatekeeper_rules?.youtube?.requirement || "none",
+    },
+    validators: {
+      onChange: spaceSettingsFormSchema,
     },
     transform: useTransform(
       // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
@@ -248,7 +267,7 @@ export function SpaceSettingsForm({
                     />
                     {field.state.meta.errors.length > 0 && (
                       <FieldError>
-                        {String(field.state.meta.errors[0])}
+                        {getErrorMessage(field.state.meta.errors[0])}
                       </FieldError>
                     )}
                     <FieldDescription>{t("titleHelp")}</FieldDescription>
@@ -273,7 +292,7 @@ export function SpaceSettingsForm({
                     />
                     {field.state.meta.errors.length > 0 && (
                       <FieldError>
-                        {String(field.state.meta.errors[0])}
+                        {getErrorMessage(field.state.meta.errors[0])}
                       </FieldError>
                     )}
                     <FieldDescription>{t("descriptionHelp")}</FieldDescription>
@@ -308,7 +327,7 @@ export function SpaceSettingsForm({
                     />
                     {field.state.meta.errors.length > 0 && (
                       <FieldError>
-                        {String(field.state.meta.errors[0])}
+                        {getErrorMessage(field.state.meta.errors[0])}
                       </FieldError>
                     )}
                     <FieldDescription>
@@ -497,7 +516,9 @@ export function SpaceSettingsForm({
                                       />
                                       {field.state.meta.errors.length > 0 && (
                                         <FieldError>
-                                          {String(field.state.meta.errors[0])}
+                                          {getErrorMessage(
+                                            field.state.meta.errors[0]
+                                          )}
                                         </FieldError>
                                       )}
                                     </FieldContent>
@@ -574,7 +595,9 @@ export function SpaceSettingsForm({
                                       />
                                       {field.state.meta.errors.length > 0 && (
                                         <FieldError>
-                                          {String(field.state.meta.errors[0])}
+                                          {getErrorMessage(
+                                            field.state.meta.errors[0]
+                                          )}
                                         </FieldError>
                                       )}
                                     </FieldContent>
@@ -613,7 +636,7 @@ export function SpaceSettingsForm({
                               />
                               {field.state.meta.errors.length > 0 && (
                                 <FieldError>
-                                  {String(field.state.meta.errors[0])}
+                                  {getErrorMessage(field.state.meta.errors[0])}
                                 </FieldError>
                               )}
                               <FieldDescription>

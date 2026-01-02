@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getOrCreateBingoCard } from "../bingo-actions";
+import { getOrCreateBingoCard } from "../_lib/bingo-actions";
 
 export function useBingoCard(spaceId: string) {
   return useQuery({

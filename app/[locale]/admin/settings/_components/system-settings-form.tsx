@@ -10,7 +10,6 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
-import { updateSystemSettingsAction } from "@/app/[locale]/admin/settings/actions";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -23,8 +22,22 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { SystemSettings } from "@/lib/schemas/system-settings";
-import { systemSettingsFormOpts } from "../form-options";
+import {
+  type SystemSettings,
+  systemSettingsSchema,
+} from "@/lib/schemas/system-settings";
+import { updateSystemSettingsAction } from "../_lib/actions";
+import { systemSettingsFormOpts } from "../_lib/form-options";
+
+function getErrorMessage(error: unknown): string {
+  if (typeof error === "string") {
+    return error;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+}
 
 interface Props {
   initialSettings?: SystemSettings;
@@ -53,6 +66,9 @@ export function SystemSettingsForm({ initialSettings }: Props) {
           space_expiration_hours: initialSettings.space_expiration_hours,
         }
       : systemSettingsFormOpts.defaultValues,
+    validators: {
+      onChange: systemSettingsSchema,
+    },
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
   });
@@ -125,7 +141,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
                     <p className="text-red-600 text-sm">
-                      {String(field.state.meta.errors[0])}
+                      {getErrorMessage(field.state.meta.errors[0])}
                     </p>
                   )}
                 </FieldContent>
@@ -166,7 +182,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
                     <p className="text-red-600 text-sm">
-                      {String(field.state.meta.errors[0])}
+                      {getErrorMessage(field.state.meta.errors[0])}
                     </p>
                   )}
                 </FieldContent>
@@ -205,7 +221,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   <FieldDescription>{t("maxTotalSpacesHelp")}</FieldDescription>
                   {field.state.meta.errors.length > 0 && (
                     <p className="text-red-600 text-sm">
-                      {String(field.state.meta.errors[0])}
+                      {getErrorMessage(field.state.meta.errors[0])}
                     </p>
                   )}
                 </FieldContent>
@@ -246,7 +262,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
                     <p className="text-red-600 text-sm">
-                      {String(field.state.meta.errors[0])}
+                      {getErrorMessage(field.state.meta.errors[0])}
                     </p>
                   )}
                 </FieldContent>
@@ -282,7 +298,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
                     <p className="text-red-600 text-sm">
-                      {String(field.state.meta.errors[0])}
+                      {getErrorMessage(field.state.meta.errors[0])}
                     </p>
                   )}
                 </FieldContent>

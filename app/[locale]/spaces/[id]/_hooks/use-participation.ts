@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { checkUserParticipation, getParticipantCount } from "../../actions";
+import {
+  checkUserParticipation,
+  getParticipantCount,
+} from "../../_lib/actions";
 
 export function useParticipantInfo(spaceId: string) {
   return useQuery({

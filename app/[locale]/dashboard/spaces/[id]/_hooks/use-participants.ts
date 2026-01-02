@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getParticipants } from "../actions";
+import { getParticipants } from "../_lib/actions";
 
 export interface Participant {
   bingo_status: "none" | "reach" | "bingo";

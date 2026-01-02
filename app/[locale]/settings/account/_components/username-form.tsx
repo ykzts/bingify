@@ -19,8 +19,9 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { updateUsernameAction } from "../actions";
-import { usernameFormOpts } from "../form-options";
+import { usernameSchema } from "@/lib/schemas/user";
+import { updateUsernameAction } from "../_lib/actions";
+import { usernameFormOpts } from "../_lib/form-options";
 
 interface UsernameFormProps {
   currentUsername?: string | null;
@@ -40,6 +41,9 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
     ...usernameFormOpts,
     defaultValues: {
       username: currentUsername || "",
+    },
+    validators: {
+      onChange: usernameSchema,
     },
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),

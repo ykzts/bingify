@@ -19,19 +19,17 @@ export const inviteAdminFormOpts = formOptions({
 
 // Space settings form schema
 export const spaceSettingsFormSchema = z.object({
-  description: z.string().default(""),
-  email_allowlist: z.string().default(""),
-  gatekeeper_mode: z.enum(["none", "social", "email"]).default("none"),
-  hide_metadata_before_join: z.boolean().default(false),
-  max_participants: z.number().int().min(1).max(1000).default(50),
-  social_platform: z.enum(["youtube", "twitch"]).default("youtube"),
-  title: z.string().default(""),
-  twitch_broadcaster_id: z.string().default(""),
-  twitch_requirement: z
-    .enum(["none", "follower", "subscriber"])
-    .default("none"),
-  youtube_channel_id: z.string().default(""),
-  youtube_requirement: z.enum(["none", "subscriber"]).default("none"),
+  description: z.string(),
+  email_allowlist: z.string(),
+  gatekeeper_mode: z.enum(["none", "social", "email"]),
+  hide_metadata_before_join: z.boolean(),
+  max_participants: z.number().int().min(1).max(1000),
+  social_platform: z.enum(["youtube", "twitch"]),
+  title: z.string(),
+  twitch_broadcaster_id: z.string(),
+  twitch_requirement: z.enum(["none", "follower", "subscriber"]),
+  youtube_channel_id: z.string(),
+  youtube_requirement: z.enum(["none", "subscriber"]),
 });
 
 export type SpaceSettingsFormValues = z.infer<typeof spaceSettingsFormSchema>;

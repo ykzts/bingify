@@ -1,20 +1,13 @@
 "use server";
 
-import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { isValidUUID } from "@/lib/utils/uuid";
 import type { Tables } from "@/types/supabase";
 
 interface AdminActionResult {
   error?: string;
   success: boolean;
-}
-
-/**
- * Validate UUID format using Zod
- */
-function isValidUuid(uuid: string): boolean {
-  return z.string().uuid().safeParse(uuid).success;
 }
 
 /**
@@ -147,7 +140,7 @@ export async function forceDeleteSpace(
 ): Promise<AdminActionResult> {
   try {
     // Validate UUID format
-    if (!isValidUuid(spaceId)) {
+    if (!isValidUUID(spaceId)) {
       return {
         error: "errorInvalidUuid",
         success: false,
@@ -198,7 +191,7 @@ export async function forceDeleteSpace(
 export async function banUser(userId: string): Promise<AdminActionResult> {
   try {
     // Validate UUID format
-    if (!isValidUuid(userId)) {
+    if (!isValidUUID(userId)) {
       return {
         error: "errorInvalidUuid",
         success: false,
@@ -366,7 +359,7 @@ export async function updateUserRole(
 ): Promise<AdminActionResult> {
   try {
     // Validate UUID format
-    if (!isValidUuid(userId)) {
+    if (!isValidUUID(userId)) {
       return {
         error: "errorInvalidUuid",
         success: false,

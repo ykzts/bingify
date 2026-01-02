@@ -2,8 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import { hasAdminUser } from "@/app/[locale]/admin/actions";
 import { createClient } from "@/lib/supabase/server";
+import { hasAdminUser } from "./_lib/actions";
 
 // Force dynamic rendering to ensure Supabase credentials are only required at runtime
 // This allows the build to succeed even when environment variables are not available

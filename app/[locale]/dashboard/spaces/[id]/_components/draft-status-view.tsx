@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import type { PublishSpaceState } from "../settings/actions";
-import { publishSpace } from "../settings/actions";
+import type { PublishSpaceState } from "../_lib/settings-actions";
+import { publishSpace } from "../_lib/settings-actions";
 
 interface Props {
   locale: string;

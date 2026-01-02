@@ -16,7 +16,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { closeSpace } from "../actions";
+import { closeSpace } from "../_lib/actions";
 
 interface CloseSpaceButtonProps {
   spaceId: string;

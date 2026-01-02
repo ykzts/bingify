@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { banUser, updateUserRole } from "../actions";
+import { banUser, updateUserRole } from "../_lib/actions";
 
 interface User {
   avatar_url: string | null;

@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getAbsoluteUrl } from "@/lib/utils/url";
-import { regenerateViewToken } from "../../../actions";
+import { regenerateViewToken } from "../../../_lib/actions";
 
 interface Props {
   locale: string;

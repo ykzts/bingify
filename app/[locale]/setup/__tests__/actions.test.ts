@@ -12,7 +12,7 @@ vi.mock("@/lib/supabase/server", () => ({
 // Import after mocks
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { claimAdmin, hasAdminUser } from "../../admin/actions";
+import { claimAdmin, hasAdminUser } from "../../admin/_lib/actions";
 
 describe("Setup Actions", () => {
   describe("hasAdminUser", () => {

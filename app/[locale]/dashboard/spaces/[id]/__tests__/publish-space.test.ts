@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { publishSpace } from "../actions";
+import { publishSpace } from "../_lib/settings-actions";
 
 // Mock dependencies
 vi.mock("@/lib/supabase/server", () => ({

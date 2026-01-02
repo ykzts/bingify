@@ -23,11 +23,21 @@ import {
 } from "@/components/ui/field";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Textarea } from "@/components/ui/textarea";
-import { submitContactFormAction } from "../actions";
-import { contactFormOpts, contactFormSchema } from "../form-options";
+import { submitContactFormAction } from "../_lib/actions";
+import { contactFormOpts, contactFormSchema } from "../_lib/form-options";
 
 interface Props {
   locale: string;
+}
+
+function getErrorMessage(error: unknown): string {
+  if (typeof error === "string") {
+    return error;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
 }
 
 export function ContactForm({ locale }: Props) {
@@ -95,7 +105,7 @@ export function ContactForm({ locale }: Props) {
         {formErrors.length > 0 && (
           <div className="mb-4 rounded-md bg-red-50 p-4 text-red-600 text-sm">
             {formErrors.map((error) => (
-              <p key={String(error)}>{String(error)}</p>
+              <p key={getErrorMessage(error)}>{getErrorMessage(error)}</p>
             ))}
           </div>
         )}
@@ -113,12 +123,12 @@ export function ContactForm({ locale }: Props) {
                       onChange={(e) => field.handleChange(e.target.value)}
                       placeholder={t("namePlaceholder")}
                       required
-                      value={field.state.value}
+                      value={field.state.value as string}
                     />
                   </InputGroup>
                   <FieldError
                     errors={field.state.meta.errors.map((msg) => ({
-                      message: String(msg),
+                      message: getErrorMessage(msg),
                     }))}
                   />
                 </FieldContent>
@@ -139,12 +149,12 @@ export function ContactForm({ locale }: Props) {
                       placeholder={t("emailPlaceholder")}
                       required
                       type="email"
-                      value={field.state.value}
+                      value={field.state.value as string}
                     />
                   </InputGroup>
                   <FieldError
                     errors={field.state.meta.errors.map((msg) => ({
-                      message: String(msg),
+                      message: getErrorMessage(msg),
                     }))}
                   />
                 </FieldContent>
@@ -165,12 +175,12 @@ export function ContactForm({ locale }: Props) {
                     placeholder={t("messagePlaceholder")}
                     required
                     rows={8}
-                    value={field.state.value}
+                    value={field.state.value as string}
                   />
                   <FieldDescription>{t("messageDescription")}</FieldDescription>
                   <FieldError
                     errors={field.state.meta.errors.map((msg) => ({
-                      message: String(msg),
+                      message: getErrorMessage(msg),
                     }))}
                   />
                 </FieldContent>
