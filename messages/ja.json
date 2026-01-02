@@ -110,6 +110,8 @@
     "maxTotalSpacesHelp": "システム全体で作成できるスペースの最大数を設定します（0は無制限）",
     "maxTotalSpacesLabel": "システム全体の最大スペース数",
     "resourceLimitsTitle": "リソース制限設定",
+    "roleOrganizer": "主催者",
+    "roleUser": "参加者",
     "saveButton": "設定を保存",
     "saving": "保存中...",
     "spaceExpirationHelp": "スペース作成から何時間で有効期限切れとするか設定します（0は無期限）",

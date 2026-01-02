@@ -110,6 +110,8 @@
     "maxTotalSpacesHelp": "Set the maximum total number of spaces allowed system-wide (0 for unlimited)",
     "maxTotalSpacesLabel": "Max Total Spaces (System-wide)",
     "resourceLimitsTitle": "Resource Limit Settings",
+    "roleOrganizer": "Organizer",
+    "roleUser": "User",
     "saveButton": "Save Settings",
     "saving": "Saving...",
     "spaceExpirationHelp": "Set how many hours after creation a space expires (0 for unlimited)",
