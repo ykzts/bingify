@@ -7,10 +7,11 @@ import {
   useStore,
   useTransform,
 } from "@tanstack/react-form-nextjs";
-import { CheckCircle, Loader2, User } from "lucide-react";
+import { Loader2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
 import { FieldErrors } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
 import { SectionHeader } from "@/components/section-header";
@@ -64,9 +65,10 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
       | { success?: boolean }
       | undefined;
     if (meta?.success) {
+      toast.success(t("updateSuccess"));
       router.refresh();
     }
-  }, [state, router]);
+  }, [state, router, t]);
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
@@ -101,21 +103,6 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
             </Field>
           )}
         </form.Field>
-
-        {(() => {
-          const meta = (state as Record<string, unknown>)?.meta as
-            | { success?: boolean }
-            | undefined;
-          return meta?.success ? (
-            <div
-              aria-live="polite"
-              className="flex items-center gap-2 rounded-md bg-green-50 p-3 text-green-800 text-sm"
-            >
-              <CheckCircle className="h-4 w-4 flex-shrink-0" />
-              <span>{t("updateSuccess")}</span>
-            </div>
-          ) : null;
-        })()}
 
         <Button disabled={isSubmitting} type="submit">
           {isSubmitting ? (
