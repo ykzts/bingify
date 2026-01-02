@@ -70,6 +70,9 @@ export async function submitContactFormAction(
     // Validate the form data
     const validatedData = await serverValidate(formData);
 
+    // Parse and transform the validated data with Zod
+    const parsed = contactFormSchema.parse(validatedData);
+
     // Check if Turnstile is enabled
     const turnstileEnabled =
       !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY &&
@@ -90,11 +93,11 @@ export async function submitContactFormAction(
       }
     }
 
-    // Send email
+    // Send email with parsed data
     await sendContactEmail({
-      email: validatedData.email,
-      message: validatedData.message,
-      name: validatedData.name,
+      email: parsed.email,
+      message: parsed.message,
+      name: parsed.name,
     });
 
     // Return success state with user email for redirect
@@ -102,9 +105,9 @@ export async function submitContactFormAction(
       ...initialFormState,
       meta: {
         success: true,
-        userEmail: validatedData.email,
+        userEmail: parsed.email,
       },
-      values: validatedData,
+      values: parsed,
     };
   } catch (e) {
     // Check if it's a ServerValidateError from TanStack Form
