@@ -22,11 +22,8 @@ import {
   getSpaceAdmins,
   removeAdmin,
 } from "../actions";
+import { inviteAdminFormOpts, inviteAdminFormSchema } from "../form-options";
 import { inviteAdminAction } from "../invite-admin-actions";
-import {
-  inviteAdminFormOpts,
-  inviteAdminFormSchema,
-} from "../form-options";
 
 interface Props {
   spaceId: string;
@@ -148,8 +145,8 @@ export function AdminManagement({ spaceId }: Props) {
                 <Input
                   disabled={isSubmitting}
                   name={field.name}
-                  onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
                   placeholder="user@example.com"
                   required
                   type="email"
