@@ -11,6 +11,7 @@ import { Loader2, Mail, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
+import { FormErrors } from "@/components/form-errors";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,21 +24,12 @@ import {
 } from "@/components/ui/field";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Textarea } from "@/components/ui/textarea";
+import { getErrorMessage } from "@/lib/utils";
 import { submitContactFormAction } from "../_lib/actions";
 import { contactFormOpts, contactFormSchema } from "../_lib/form-options";
 
 interface Props {
   locale: string;
-}
-
-function getErrorMessage(error: unknown): string {
-  if (typeof error === "string") {
-    return error;
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return String(error);
 }
 
 export function ContactForm({ locale }: Props) {
@@ -102,13 +94,10 @@ export function ContactForm({ locale }: Props) {
       <p className="mb-6 text-gray-600">{t("description")}</p>
 
       <form action={action}>
-        {formErrors.length > 0 && (
-          <div className="mb-4 rounded-md bg-red-50 p-4 text-red-600 text-sm">
-            {formErrors.map((error) => (
-              <p key={getErrorMessage(error)}>{getErrorMessage(error)}</p>
-            ))}
-          </div>
-        )}
+        <FormErrors
+          className="mb-4 rounded-md bg-red-50 p-4 text-red-600 text-sm"
+          errors={formErrors}
+        />
 
         <FieldGroup>
           <form.Field name="name">

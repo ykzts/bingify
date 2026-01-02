@@ -11,6 +11,7 @@ import { AlertCircle, CheckCircle, Loader2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
+import { FormErrors } from "@/components/form-errors";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { usernameSchema } from "@/lib/schemas/user";
+import { getErrorMessage } from "@/lib/utils";
 import { updateUsernameAction } from "../_lib/actions";
 import { usernameFormOpts } from "../_lib/form-options";
 
@@ -75,22 +77,7 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
       <p className="mb-6 text-gray-600 text-sm">{t("description")}</p>
 
       <form action={action} className="space-y-4">
-        {formErrors.length > 0 && (
-          <div
-            aria-live="polite"
-            className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-red-800 text-sm"
-            role="alert"
-          >
-            <AlertCircle className="h-4 w-4 flex-shrink-0" />
-            <span>
-              {formErrors.map((error) => (
-                <span key={String(error)}>
-                  {t(String(error), { defaultValue: t("errorGeneric") })}
-                </span>
-              ))}
-            </span>
-          </div>
-        )}
+        <FormErrors errors={formErrors} variant="with-icon" />
 
         <form.Field name="username">
           {(field) => (
@@ -116,13 +103,14 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
                   >
                     <AlertCircle className="h-4 w-4 flex-shrink-0" />
                     <span>
-                      {field.state.meta.errors.map((error) => (
-                        <span key={String(error)}>
-                          {t(String(error), {
-                            defaultValue: t("errorGeneric"),
-                          })}
-                        </span>
-                      ))}
+                      {field.state.meta.errors.map((error, index) => {
+                        const message = getErrorMessage(error);
+                        return (
+                          <span key={`${message.slice(0, 20)}-${index}`}>
+                            {message}
+                          </span>
+                        );
+                      })}
                     </span>
                   </div>
                 )}

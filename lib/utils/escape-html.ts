@@ -1,10 +1,3 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
 /**
  * Escape HTML special characters to prevent XSS attacks
  * Replaces &, <, >, ", ', and / with their HTML entity equivalents

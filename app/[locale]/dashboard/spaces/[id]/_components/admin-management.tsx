@@ -11,12 +11,14 @@ import { Loader2, Trash2, UserPlus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { FormErrors } from "@/components/form-errors";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { SpaceAdmin } from "@/lib/types/space";
+import { getErrorMessage } from "@/lib/utils";
 import {
   inviteAdminFormOpts,
   inviteAdminFormSchema,
@@ -131,15 +133,10 @@ export function AdminManagement({ spaceId }: Props) {
       {/* Invite Admin Form */}
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
         <h3 className="mb-3 font-semibold text-sm">管理者を招待</h3>
-        {formErrors.length > 0 && (
-          <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3">
-            {formErrors.map((error) => (
-              <p className="text-red-800 text-sm" key={String(error)}>
-                {String(error)}
-              </p>
-            ))}
-          </div>
-        )}
+        <FormErrors
+          className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3"
+          errors={formErrors}
+        />
         <form action={action} className="space-y-3">
           <form.Field name="email">
             {(field) => (
@@ -157,11 +154,17 @@ export function AdminManagement({ spaceId }: Props) {
                 />
                 {field.state.meta.errors.length > 0 && (
                   <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2">
-                    {field.state.meta.errors.map((error) => (
-                      <p className="text-red-800 text-sm" key={String(error)}>
-                        {String(error)}
-                      </p>
-                    ))}
+                    {field.state.meta.errors.map((error, index) => {
+                      const message = getErrorMessage(error);
+                      return (
+                        <p
+                          className="text-red-800 text-sm"
+                          key={`${message.slice(0, 20)}-${index}`}
+                        >
+                          {message}
+                        </p>
+                      );
+                    })}
                   </div>
                 )}
               </Field>
