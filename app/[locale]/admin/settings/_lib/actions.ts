@@ -5,6 +5,7 @@ import {
   initialFormState,
 } from "@tanstack/react-form-nextjs";
 import {
+  DEFAULT_SYSTEM_SETTINGS,
   type SystemSettings,
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
@@ -64,22 +65,6 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
 
     const warnings: string[] = [];
 
-    // Parse with defaults for each field
-    const defaultSettings: SystemSettings = {
-      default_user_role: "organizer",
-      features: {
-        gatekeeper: {
-          email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
-        },
-      },
-      max_participants_per_space: 50,
-      max_spaces_per_user: 5,
-      max_total_spaces: 1000,
-      space_expiration_hours: 48,
-    };
-
     // Try to parse each field individually, using defaults for failures
     const settings: SystemSettings = {
       default_user_role:
@@ -88,7 +73,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
           ? data.default_user_role
           : (() => {
               warnings.push("default_user_role");
-              return defaultSettings.default_user_role;
+              return DEFAULT_SYSTEM_SETTINGS.default_user_role;
             })(),
 
       features: (() => {
@@ -100,10 +85,10 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
             return featuresResult.data;
           }
           warnings.push("features");
-          return defaultSettings.features;
+          return DEFAULT_SYSTEM_SETTINGS.features;
         } catch {
           warnings.push("features");
-          return defaultSettings.features;
+          return DEFAULT_SYSTEM_SETTINGS.features;
         }
       })(),
 
@@ -113,7 +98,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
           return value;
         }
         warnings.push("max_participants_per_space");
-        return defaultSettings.max_participants_per_space;
+        return DEFAULT_SYSTEM_SETTINGS.max_participants_per_space;
       })(),
 
       max_spaces_per_user: (() => {
@@ -122,7 +107,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
           return value;
         }
         warnings.push("max_spaces_per_user");
-        return defaultSettings.max_spaces_per_user;
+        return DEFAULT_SYSTEM_SETTINGS.max_spaces_per_user;
       })(),
 
       max_total_spaces: (() => {
@@ -131,7 +116,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
           return value;
         }
         warnings.push("max_total_spaces");
-        return defaultSettings.max_total_spaces;
+        return DEFAULT_SYSTEM_SETTINGS.max_total_spaces;
       })(),
 
       space_expiration_hours: (() => {
@@ -140,7 +125,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
           return value;
         }
         warnings.push("space_expiration_hours");
-        return defaultSettings.space_expiration_hours;
+        return DEFAULT_SYSTEM_SETTINGS.space_expiration_hours;
       })(),
     };
 
