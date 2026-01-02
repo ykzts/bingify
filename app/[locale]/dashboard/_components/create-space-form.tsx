@@ -155,7 +155,11 @@ export function CreateSpaceForm() {
       const errorMap = stateRecord.errorMap as Record<string, unknown>;
       if (errorMap.form && typeof errorMap.form === "string") {
         setServerError(errorMap.form);
+      } else {
+        setServerError(null);
       }
+    } else {
+      setServerError(null);
     }
 
     // Clear error on success
