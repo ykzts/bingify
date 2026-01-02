@@ -20,6 +20,7 @@ import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { FormErrors } from "@/components/form-errors";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
@@ -88,6 +89,7 @@ export function CreateSpaceForm() {
   const [debouncedShareKey] = useDebounce(shareKey, 500);
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState<boolean | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const dateSuffix = format(new Date(), "yyyyMMdd");
 
@@ -145,6 +147,23 @@ export function CreateSpaceForm() {
       router.push(`/dashboard/spaces/${meta.spaceId}`);
     }
   }, [state, router]);
+
+  useEffect(() => {
+    // Extract server error from action state
+    const stateRecord = state as Record<string, unknown>;
+    if (stateRecord?.errorMap) {
+      const errorMap = stateRecord.errorMap as Record<string, unknown>;
+      if (errorMap.form && typeof errorMap.form === "string") {
+        setServerError(errorMap.form);
+      }
+    }
+
+    // Clear error on success
+    const meta = stateRecord?.meta as { success?: boolean } | undefined;
+    if (meta?.success) {
+      setServerError(null);
+    }
+  }, [state]);
 
   return (
     <form action={action} className="space-y-6">
@@ -301,6 +320,14 @@ export function CreateSpaceForm() {
         state={state}
         t={t}
       />
+
+      {serverError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>{t("errorTitle")}</AlertTitle>
+          <AlertDescription>{serverError}</AlertDescription>
+        </Alert>
+      )}
 
       <Button
         className="w-full"
