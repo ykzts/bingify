@@ -29,9 +29,11 @@ export function FloatingParticles() {
   // Start with desktop count, will adjust on client
   const [particleCount, setParticleCount] = useState(PARTICLE_COUNT);
   const [isVisible, setIsVisible] = useState(true);
-  const [particles] = useState<Particle[]>(generateParticles);
+  const [particles, setParticles] = useState<Particle[] | null>(null);
 
   useEffect(() => {
+    // Generate particles only on client side to avoid hydration mismatch
+    setParticles(generateParticles());
     // Adjust particle count based on screen size
     const updateParticleCount = () => {
       setParticleCount(
@@ -56,8 +58,8 @@ export function FloatingParticles() {
     };
   }, []);
 
-  // Don't render particles if reduced motion is preferred
-  if (shouldReduceMotion) {
+  // Don't render if reduced motion is preferred or particles not yet generated
+  if (shouldReduceMotion || !particles) {
     return null;
   }
 
