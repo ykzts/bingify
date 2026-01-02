@@ -3,12 +3,23 @@
 
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
+#variable_conflict use_column
 DECLARE
   default_role TEXT;
 BEGIN
-  SELECT default_user_role INTO default_role
-  FROM public.system_settings
-  WHERE id = 1;
+  -- Set safe search_path to prevent search_path hijacking
+  SET search_path = pg_catalog, public;
+
+  -- Try to read system_settings with error handling
+  BEGIN
+    SELECT default_user_role INTO default_role
+    FROM public.system_settings
+    WHERE id = 1;
+  EXCEPTION
+    WHEN OTHERS THEN
+      default_role := 'organizer';
+      RAISE WARNING 'Failed to read system_settings, using default role: %', SQLERRM;
+  END;
 
   IF default_role IS NULL THEN
     default_role := 'organizer';
@@ -49,6 +60,9 @@ RETURNS TABLE (
   space_expiration_hours INTEGER
 ) AS $$
 BEGIN
+  -- Set safe search_path to prevent search_path hijacking
+  SET search_path = pg_catalog, public;
+
   -- Ensure system_settings record exists
   IF NOT EXISTS (SELECT 1 FROM public.system_settings WHERE id = 1) THEN
     RAISE EXCEPTION 'System settings not initialized (id=1 not found)';
@@ -66,3 +80,13 @@ BEGIN
   WHERE s.id = 1;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Revoke public access and grant to specific roles
+REVOKE ALL ON FUNCTION handle_new_user() FROM PUBLIC;
+REVOKE ALL ON FUNCTION get_system_settings() FROM PUBLIC;
+
+-- handle_new_user is called by auth triggers via service_role
+GRANT EXECUTE ON FUNCTION handle_new_user() TO service_role;
+
+-- get_system_settings can be called by authenticated users
+GRANT EXECUTE ON FUNCTION get_system_settings() TO authenticated;
