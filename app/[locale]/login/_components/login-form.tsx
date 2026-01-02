@@ -26,6 +26,18 @@ const emailSchema = z.object({
   email: z.string().email(),
 });
 
+// Centralized provider configuration
+const PROVIDER_CONFIG = {
+  google: {
+    scopes: GOOGLE_OAUTH_SCOPES,
+  },
+  twitch: {
+    scopes: TWITCH_OAUTH_SCOPES,
+  },
+} as const;
+
+type Provider = keyof typeof PROVIDER_CONFIG;
+
 interface Props {
   providers: AuthProvider[];
 }
@@ -48,30 +60,21 @@ export function LoginForm({ providers }: Props) {
     setIsLoading(true);
     const supabase = createClient();
 
-    // Validate provider is supported by Supabase
-    const supportedProviders = ["google", "twitch"] as const;
-    type SupportedProvider = (typeof supportedProviders)[number];
-
-    if (!supportedProviders.includes(provider as SupportedProvider)) {
+    // Validate provider configuration exists
+    const config = PROVIDER_CONFIG[provider as Provider];
+    if (!config) {
       console.error("Unsupported OAuth provider:", provider);
       setOauthError("Unsupported authentication provider");
       setIsLoading(false);
       return;
     }
 
-    const typedProvider = provider as SupportedProvider;
-
-    let scopes: string | undefined;
-    if (typedProvider === "google") {
-      scopes = GOOGLE_OAUTH_SCOPES;
-    } else if (typedProvider === "twitch") {
-      scopes = TWITCH_OAUTH_SCOPES;
-    }
+    const typedProvider = provider as Provider;
 
     const { error } = await supabase.auth.signInWithOAuth({
       options: {
         redirectTo: buildOAuthCallbackUrl(redirect ?? undefined),
-        ...(scopes && { scopes }),
+        scopes: config.scopes,
       },
       provider: typedProvider,
     });
@@ -163,13 +166,6 @@ export function LoginForm({ providers }: Props) {
     return "w-full";
   };
 
-  const getProviderButtonVariant = (provider: string) => {
-    if (provider === "twitch") {
-      return undefined;
-    }
-    return "default" as const;
-  };
-
   const displayError = error || oauthError;
 
   return (
@@ -198,7 +194,6 @@ export function LoginForm({ providers }: Props) {
               key={provider.provider}
               onClick={() => handleOAuthLogin(provider.provider)}
               type="button"
-              variant={getProviderButtonVariant(provider.provider)}
             >
               {isLoading ? (
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
@@ -212,62 +207,58 @@ export function LoginForm({ providers }: Props) {
       )}
 
       {providers.length > 0 && (
-        <>
-          <div className="flex items-center gap-4">
-            <Separator className="flex-1" />
-            <span className="text-gray-500 text-sm">{t("orDivider")}</span>
-            <Separator className="flex-1" />
-          </div>
-
-          <Collapsible onOpenChange={setShowEmailForm} open={showEmailForm}>
-            <CollapsibleTrigger asChild>
-              <Button className="w-full" type="button" variant="ghost">
-                <Mail className="h-4 w-4" />
-                {t("emailButton")}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-4 pt-4">
-              {emailSuccess && (
-                <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <p className="text-green-800 text-sm">{t("emailSuccess")}</p>
-                </div>
-              )}
-
-              {emailError && (
-                <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
-                  <AlertCircle className="h-5 w-5 text-red-600" />
-                  <p className="text-red-800 text-sm">{emailError}</p>
-                </div>
-              )}
-
-              <form className="space-y-4" onSubmit={handleMagicLinkLogin}>
-                <div className="space-y-2">
-                  <Label htmlFor="email">{t("emailInputLabel")}</Label>
-                  <Input
-                    disabled={isEmailSending}
-                    id="email"
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t("emailInputPlaceholder")}
-                    type="email"
-                    value={email}
-                  />
-                </div>
-                <Button
-                  className="w-full"
-                  disabled={isEmailSending}
-                  type="submit"
-                >
-                  {isEmailSending && (
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  )}
-                  {isEmailSending ? t("emailSending") : t("emailSendButton")}
-                </Button>
-              </form>
-            </CollapsibleContent>
-          </Collapsible>
-        </>
+        <div className="flex items-center gap-4">
+          <Separator className="flex-1" />
+          <span className="text-gray-500 text-sm">{t("orDivider")}</span>
+          <Separator className="flex-1" />
+        </div>
       )}
+
+      <Collapsible onOpenChange={setShowEmailForm} open={showEmailForm}>
+        {providers.length > 0 && (
+          <CollapsibleTrigger asChild>
+            <Button className="w-full" type="button" variant="ghost">
+              <Mail className="h-4 w-4" />
+              {t("emailButton")}
+            </Button>
+          </CollapsibleTrigger>
+        )}
+        <CollapsibleContent className="space-y-4 pt-4">
+          {emailSuccess && (
+            <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <p className="text-green-800 text-sm">{t("emailSuccess")}</p>
+            </div>
+          )}
+
+          {emailError && (
+            <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <p className="text-red-800 text-sm">{emailError}</p>
+            </div>
+          )}
+
+          <form className="space-y-4" onSubmit={handleMagicLinkLogin}>
+            <div className="space-y-2">
+              <Label htmlFor="email">{t("emailInputLabel")}</Label>
+              <Input
+                disabled={isEmailSending}
+                id="email"
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t("emailInputPlaceholder")}
+                type="email"
+                value={email}
+              />
+            </div>
+            <Button className="w-full" disabled={isEmailSending} type="submit">
+              {isEmailSending && (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              )}
+              {isEmailSending ? t("emailSending") : t("emailSendButton")}
+            </Button>
+          </form>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 }
