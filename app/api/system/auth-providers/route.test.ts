@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GET } from "./route";
 
@@ -30,7 +31,7 @@ describe("GET /api/system/auth-providers", () => {
       select: vi.fn().mockReturnThis(),
     });
 
-    const request = new Request(
+    const request = new NextRequest(
       "http://localhost:3000/api/system/auth-providers"
     );
     const response = await GET(request);
@@ -58,7 +59,7 @@ describe("GET /api/system/auth-providers", () => {
       select: vi.fn().mockReturnThis(),
     });
 
-    const request = new Request(
+    const request = new NextRequest(
       "http://localhost:3000/api/system/auth-providers"
     );
     const response = await GET(request);
@@ -79,7 +80,7 @@ describe("GET /api/system/auth-providers", () => {
       select: vi.fn().mockReturnThis(),
     });
 
-    const request = new Request(
+    const request = new NextRequest(
       "http://localhost:3000/api/system/auth-providers"
     );
     const response = await GET(request);
@@ -100,7 +101,7 @@ describe("GET /api/system/auth-providers", () => {
       select: vi.fn().mockReturnThis(),
     });
 
-    const request = new Request(
+    const request = new NextRequest(
       "http://localhost:3000/api/system/auth-providers"
     );
     const response = await GET(request);
@@ -115,7 +116,7 @@ describe("GET /api/system/auth-providers", () => {
       throw new Error("Unexpected error");
     });
 
-    const request = new Request(
+    const request = new NextRequest(
       "http://localhost:3000/api/system/auth-providers"
     );
     const response = await GET(request);
