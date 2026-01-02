@@ -9,7 +9,7 @@
     "errorUnauthorized": "認証が必要です",
     "errorUnlinkFailed": "連携解除に失敗しました",
     "linkedAccounts": "連携済みアカウント",
-    "note": "アカウントを連携すると、いずれかのアカウントでサインインできます。最低1つのアカウントは連携したままにする必要があります。",
+    "note": "アカウントを連携すると、いずれかのアカウントでログインできます。最低1つのアカウントは連携したままにする必要があります。",
     "processing": "処理中...",
     "statusLinked": "連携済み",
     "statusNotLinked": "未連携",
@@ -283,10 +283,10 @@
     "question3": "このプロジェクトはどのように運営されていますか？"
   },
   "Features": {
-    "communityDescription": "コミュニティイベント、配信、パーティーに最適。OAuth サインインで簡単に参加でき、みんなで盛り上がれます。",
+    "communityDescription": "コミュニティイベント、配信、パーティーに最適。OAuth ログインで簡単に参加でき、みんなで盛り上がれます。",
     "communityTitle": "Community First",
     "heading": "なぜ Bingify を選ぶのか",
-    "noAppDescription": "アプリのインストール不要。URLを共有し、ブラウザからサインインするだけで参加できます。",
+    "noAppDescription": "アプリのインストール不要。URLを共有し、ブラウザからログインするだけで参加できます。",
     "noAppTitle": "No App Required",
     "realtimeDescription": "リアルタイム通信で、全員の画面が同時に更新。遅延なく一体感を演出します。",
     "realtimeTitle": "Realtime Sync",
@@ -315,7 +315,7 @@
     "badge3": "リアルタイム同期",
     "ctaButton": "ビンゴ会場を作る",
     "description": "リアルタイムで盛り上がる、新しいビンゴ体験。",
-    "descriptionLine2": "Google または Twitch でサインインして、すぐに始められます。",
+    "descriptionLine2": "Google または Twitch でログインして、すぐに始められます。",
     "title": "すべての画面を、",
     "titleHighlight": "熱狂の会場に。"
   },
@@ -324,18 +324,18 @@
     "selectLanguage": "言語を選択"
   },
   "Login": {
-    "description": "ゲームのホストやアカウント管理のためにサインインしてください。",
-    "descriptionSpace": "サインインして、このビンゴスペースに参加しましょう。",
-    "errorMessage": "サインイン中にエラーが発生しました。もう一度お試しください。",
-    "googleButton": "Googleでサインイン",
-    "title": "Bingifyにサインイン",
+    "description": "ゲームのホストやアカウント管理のためにログインしてください。",
+    "descriptionSpace": "ログインして、このビンゴスペースに参加しましょう。",
+    "errorMessage": "ログイン中にエラーが発生しました。もう一度お試しください。",
+    "googleButton": "Googleでログイン",
+    "title": "Bingifyにログイン",
     "titleSpace": "スペースに参加",
-    "twitchButton": "Twitchでサインイン",
+    "twitchButton": "Twitchでログイン",
     "metaTitle": "ログイン",
     "metaDescription": "Bingifyにログインして、ビンゴスペースの作成、イベントの主催、アカウントの管理を行いましょう。"
   },
   "Metadata": {
-    "description": "リアルタイムで盛り上がる、新しいビンゴ体験。OAuth サインインで簡単に始められます。",
+    "description": "リアルタイムで盛り上がる、新しいビンゴ体験。OAuth ログインで簡単に始められます。",
     "title": "Bingify - すべての画面を、熱狂の会場に。"
   },
   "ScreenView": {
@@ -362,7 +362,7 @@
     "errors": {
       "errorGeneric": "予期しないエラーが発生しました。もう一度お試しください。",
       "errorSetupCompleted": "セットアップは既に完了しています。管理者ユーザーが既に存在します。",
-      "errorUnauthorized": "管理者権限を取得するにはサインインが必要です。"
+      "errorUnauthorized": "管理者権限を取得するにはログインが必要です。"
     },
     "subtitle": "初回管理者セットアップ",
     "title": "Bingifyへようこそ",
@@ -450,10 +450,10 @@
   },
   "SpaceLanding": {
     "emailRequirement": "メールアドレス要件",
-    "loginNote": "このスペースに参加してビンゴゲームに参加するには、サインインが必要です。",
-    "loginToJoinNote": "詳細を確認してこのスペースに参加するには、サインインしてください。",
+    "loginNote": "このスペースに参加してビンゴゲームに参加するには、ログインが必要です。",
+    "loginToJoinNote": "詳細を確認してこのスペースに参加するには、ログインしてください。",
     "privateSpace": "非公開スペース",
-    "privateSpaceDescription": "このスペースは非公開です。詳細を確認して参加するには、サインインしてください。",
+    "privateSpaceDescription": "このスペースは非公開です。詳細を確認して参加するには、ログインしてください。",
     "privateSpaceTitle": "非公開スペース",
     "requirementsTitle": "参加条件",
     "twitchFollowerRequired": "フォロー必須",
