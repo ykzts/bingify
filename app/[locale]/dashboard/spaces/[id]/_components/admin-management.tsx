@@ -132,15 +132,21 @@ export function AdminManagement({ spaceId }: Props) {
       {/* Invite Admin Form */}
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
         <h3 className="mb-3 font-semibold text-sm">管理者を招待</h3>
-        {formErrors.length > 0 && (
-          <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3">
-            {formErrors.map((error) => (
-              <p className="text-red-800 text-sm" key={getErrorMessage(error)}>
-                {getErrorMessage(error)}
-              </p>
-            ))}
-          </div>
-        )}
+        {(() => {
+          const errorMessages = formErrors
+            .map((error) => getErrorMessage(error))
+            .filter((message) => message.trim() !== "" && message !== "[object Object]");
+          
+          return errorMessages.length > 0 && (
+            <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3">
+              {errorMessages.map((message) => (
+                <p className="text-red-800 text-sm" key={message}>
+                  {message}
+                </p>
+              ))}
+            </div>
+          );
+        })()}
         <form action={action} className="space-y-3">
           <form.Field name="email">
             {(field) => (

@@ -76,22 +76,28 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
       <p className="mb-6 text-gray-600 text-sm">{t("description")}</p>
 
       <form action={action} className="space-y-4">
-        {formErrors.length > 0 && (
-          <div
-            aria-live="polite"
-            className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-red-800 text-sm"
-            role="alert"
-          >
-            <AlertCircle className="h-4 w-4 flex-shrink-0" />
-            <span>
-              {formErrors.map((error) => (
-                <span key={getErrorMessage(error)}>
-                  {t(getErrorMessage(error), { defaultValue: t("errorGeneric") })}
-                </span>
-              ))}
-            </span>
-          </div>
-        )}
+        {(() => {
+          const errorMessages = formErrors
+            .map((error) => getErrorMessage(error))
+            .filter((message) => message.trim() !== "" && message !== "[object Object]");
+          
+          return errorMessages.length > 0 && (
+            <div
+              aria-live="polite"
+              className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-red-800 text-sm"
+              role="alert"
+            >
+              <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              <span>
+                {errorMessages.map((message) => (
+                  <span key={message}>
+                    {t(message, { defaultValue: t("errorGeneric") })}
+                  </span>
+                ))}
+              </span>
+            </div>
+          );
+        })()}
 
         <form.Field name="username">
           {(field) => (

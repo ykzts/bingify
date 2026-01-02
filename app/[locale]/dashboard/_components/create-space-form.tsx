@@ -179,15 +179,21 @@ export function CreateSpaceForm() {
 
   return (
     <form action={action} className="space-y-6">
-      {formErrors.length > 0 && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
-          {formErrors.map((error) => (
-            <p className="text-red-800" key={getErrorMessage(error)}>
-              {getErrorMessage(error)}
-            </p>
-          ))}
-        </div>
-      )}
+      {(() => {
+        const errorMessages = formErrors
+          .map((error) => getErrorMessage(error))
+          .filter((message) => message.trim() !== "" && message !== "[object Object]");
+        
+        return errorMessages.length > 0 && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+            {errorMessages.map((message) => (
+              <p className="text-red-800" key={message}>
+                {message}
+              </p>
+            ))}
+          </div>
+        );
+      })()}
 
       <form.Field name="share_key">
         {(field) => (
