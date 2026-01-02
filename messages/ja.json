@@ -221,6 +221,7 @@
     "description": "ご不明な点やご要望がございましたら、お気軽にお問い合わせください。",
     "emailLabel": "メールアドレス",
     "emailPlaceholder": "your@email.com",
+    "errorTitle": "送信に失敗しました",
     "messageDescription": "できるだけ詳しくお書きください",
     "messageLabel": "お問い合わせ内容",
     "messagePlaceholder": "お問い合わせ内容を入力してください",

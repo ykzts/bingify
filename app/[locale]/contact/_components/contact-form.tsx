@@ -95,8 +95,10 @@ export function ContactForm({ locale }: Props) {
 
       <form action={action}>
         <FormErrors
-          className="mb-4 rounded-md bg-red-50 p-4 text-red-600 text-sm"
+          className="mb-4"
           errors={formErrors}
+          title={t("errorTitle")}
+          variant="with-icon"
         />
 
         <FieldGroup>
