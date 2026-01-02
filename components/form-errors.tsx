@@ -1,10 +1,11 @@
 import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getErrorMessage } from "@/lib/utils";
 
 interface FormErrorsProps {
   className?: string;
   errors: unknown[];
+  title?: string;
   variant?: "default" | "with-icon";
 }
 
@@ -17,6 +18,7 @@ interface FormErrorsProps {
 export function FormErrors({
   className = "",
   errors,
+  title,
   variant = "default",
 }: FormErrorsProps) {
   const errorMessages = errors
@@ -33,6 +35,7 @@ export function FormErrors({
     return (
       <Alert className={className} variant="destructive">
         <AlertCircle className="h-4 w-4" />
+        {title && <AlertTitle>{title}</AlertTitle>}
         <AlertDescription>
           <div className="flex flex-col gap-1">
             {errorMessages.map((message, index) => (

@@ -221,6 +221,7 @@
     "description": "Have questions or feedback? Feel free to reach out to us.",
     "emailLabel": "Email Address",
     "emailPlaceholder": "your@email.com",
+    "errorTitle": "Failed to Send Message",
     "messageDescription": "Please provide as much detail as possible",
     "messageLabel": "Message",
     "messagePlaceholder": "Enter your message here",
