@@ -1,9 +1,16 @@
 "use client";
 
+import {
+  initialFormState,
+  mergeForm,
+  useForm,
+  useStore,
+  useTransform,
+} from "@tanstack/react-form-nextjs";
 import { CheckCircle, Loader2, Rocket } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -30,8 +37,9 @@ import { Textarea } from "@/components/ui/textarea";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { cn } from "@/lib/utils";
-import type { PublishSpaceState, UpdateSpaceState } from "../actions";
+import type { PublishSpaceState } from "../actions";
 import { updateAndPublishSpace, updateSpaceSettings } from "../actions";
+import { spaceSettingsFormOpts } from "../form-options";
 
 interface Props {
   currentParticipantCount: number;
@@ -102,58 +110,60 @@ export function SpaceSettingsForm({
   const router = useRouter();
   const t = useTranslations("SpaceSettings");
 
-  const [title, setTitle] = useState(space.title || "");
-  const [description, setDescription] = useState(space.description || "");
-  const [maxParticipants, setMaxParticipants] = useState(
-    space.max_participants
+  // Use TanStack Form with Next.js server actions for update
+  const [updateState, updateAction] = useActionState(
+    updateSpaceSettings.bind(null, space.id),
+    initialFormState
   );
 
-  // Gatekeeper state
-  const [gatekeeperMode, setGatekeeperMode] = useState<
-    "none" | "social" | "email"
-  >(determineGatekeeperMode(space.gatekeeper_rules));
-  const [socialPlatform, setSocialPlatform] = useState<"youtube" | "twitch">(
-    determineSocialPlatform(space.gatekeeper_rules)
-  );
-
-  // YouTube state
-  const [youtubeRequirement, setYoutubeRequirement] = useState(
-    space.gatekeeper_rules?.youtube?.requirement || "none"
-  );
-  const [youtubeChannelId, setYoutubeChannelId] = useState(
-    space.gatekeeper_rules?.youtube?.channelId || ""
-  );
-
-  // Twitch state
-  const [twitchRequirement, setTwitchRequirement] = useState(
-    space.gatekeeper_rules?.twitch?.requirement || "none"
-  );
-  const [twitchBroadcasterId, setTwitchBroadcasterId] = useState(
-    space.gatekeeper_rules?.twitch?.broadcasterId || ""
-  );
-
-  // Email state
-  const [emailAllowlist, setEmailAllowlist] = useState(
-    space.gatekeeper_rules?.email?.allowed?.join(", ") || ""
-  );
-
-  const [hideMetadataBeforeJoin, setHideMetadataBeforeJoin] = useState(
-    space.settings?.hide_metadata_before_join ?? false
-  );
-
-  const [updateState, updateAction, isUpdating] = useActionState<
-    UpdateSpaceState,
-    FormData
-  >(updateSpaceSettings.bind(null, space.id), {
-    success: false,
-  });
-
+  // Separate action state for publish
   const [publishState, publishAction, isPublishing] = useActionState<
     PublishSpaceState,
     FormData
   >(updateAndPublishSpace.bind(null, space.id), {
     success: false,
   });
+
+  const form = useForm({
+    ...spaceSettingsFormOpts,
+    defaultValues: {
+      description: space.description || "",
+      email_allowlist: space.gatekeeper_rules?.email?.allowed?.join(", ") || "",
+      gatekeeper_mode: determineGatekeeperMode(space.gatekeeper_rules),
+      hide_metadata_before_join:
+        space.settings?.hide_metadata_before_join ?? false,
+      max_participants: space.max_participants,
+      social_platform: determineSocialPlatform(space.gatekeeper_rules),
+      title: space.title || "",
+      twitch_broadcaster_id:
+        space.gatekeeper_rules?.twitch?.broadcasterId || "",
+      twitch_requirement: space.gatekeeper_rules?.twitch?.requirement || "none",
+      youtube_channel_id: space.gatekeeper_rules?.youtube?.channelId || "",
+      youtube_requirement:
+        space.gatekeeper_rules?.youtube?.requirement || "none",
+    },
+    transform: useTransform(
+      // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
+      (baseForm) => mergeForm(baseForm, updateState!),
+      [updateState]
+    ),
+  });
+
+  const formErrors = useStore(form.store, (formState) => formState.errors);
+  const isSubmitting = useStore(
+    form.store,
+    (formState) => formState.isSubmitting
+  );
+
+  // Get field values directly from form state
+  const formValues = useStore(form.store, (state) => state.values);
+  const gatekeeperMode =
+    (formValues.gatekeeper_mode as "none" | "social" | "email") || "none";
+  const socialPlatform =
+    (formValues.social_platform as "youtube" | "twitch") || "youtube";
+  const youtubeRequirement =
+    (formValues.youtube_requirement as string) || "none";
+  const twitchRequirement = (formValues.twitch_requirement as string) || "none";
 
   useEffect(() => {
     if (publishState.success) {
@@ -203,7 +213,7 @@ export function SpaceSettingsForm({
   }
 
   const isDraft = space.status === "draft";
-  const isPending = isUpdating || isPublishing;
+  const isPending = isSubmitting || isPublishing;
 
   // Calculate grid columns for tabs
   const visibleTabCount =
@@ -222,39 +232,55 @@ export function SpaceSettingsForm({
         <FieldSet>
           <FieldLegend>{t("basicInfoTitle")}</FieldLegend>
           <FieldGroup>
-            <Field>
-              <FieldContent>
-                <FieldLabel>{t("titleLabel")}</FieldLabel>
-                <Input
-                  disabled={isPending}
-                  maxLength={100}
-                  name="title"
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder={t("titlePlaceholder")}
-                  type="text"
-                  value={title}
-                />
-                <FieldError>{updateState.fieldErrors?.title}</FieldError>
-                <FieldDescription>{t("titleHelp")}</FieldDescription>
-              </FieldContent>
-            </Field>
+            <form.Field name="title">
+              {(field) => (
+                <Field>
+                  <FieldContent>
+                    <FieldLabel>{t("titleLabel")}</FieldLabel>
+                    <Input
+                      disabled={isPending}
+                      maxLength={100}
+                      name={field.name}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder={t("titlePlaceholder")}
+                      type="text"
+                      value={field.state.value as string}
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <FieldError>
+                        {String(field.state.meta.errors[0])}
+                      </FieldError>
+                    )}
+                    <FieldDescription>{t("titleHelp")}</FieldDescription>
+                  </FieldContent>
+                </Field>
+              )}
+            </form.Field>
 
-            <Field>
-              <FieldContent>
-                <FieldLabel>{t("descriptionLabel")}</FieldLabel>
-                <Textarea
-                  disabled={isPending}
-                  maxLength={500}
-                  name="description"
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder={t("descriptionPlaceholder")}
-                  rows={3}
-                  value={description}
-                />
-                <FieldError>{updateState.fieldErrors?.description}</FieldError>
-                <FieldDescription>{t("descriptionHelp")}</FieldDescription>
-              </FieldContent>
-            </Field>
+            <form.Field name="description">
+              {(field) => (
+                <Field>
+                  <FieldContent>
+                    <FieldLabel>{t("descriptionLabel")}</FieldLabel>
+                    <Textarea
+                      disabled={isPending}
+                      maxLength={500}
+                      name={field.name}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder={t("descriptionPlaceholder")}
+                      rows={3}
+                      value={field.state.value as string}
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <FieldError>
+                        {String(field.state.meta.errors[0])}
+                      </FieldError>
+                    )}
+                    <FieldDescription>{t("descriptionHelp")}</FieldDescription>
+                  </FieldContent>
+                </Field>
+              )}
+            </form.Field>
           </FieldGroup>
         </FieldSet>
 
@@ -262,33 +288,39 @@ export function SpaceSettingsForm({
         <FieldSet>
           <FieldLegend>{t("capacityTitle")}</FieldLegend>
           <FieldGroup>
-            <Field>
-              <FieldContent>
-                <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
-                <Input
-                  disabled={isPending}
-                  max={systemMaxParticipants}
-                  min={Math.max(1, currentParticipantCount)}
-                  name="max_participants"
-                  onChange={(e) => {
-                    const value = e.target.valueAsNumber;
-                    setMaxParticipants(Number.isNaN(value) ? 50 : value);
-                  }}
-                  required
-                  type="number"
-                  value={maxParticipants}
-                />
-                <FieldError>
-                  {updateState.fieldErrors?.max_participants}
-                </FieldError>
-                <FieldDescription>
-                  {t("maxParticipantsHelp", {
-                    current: currentParticipantCount,
-                    max: systemMaxParticipants,
-                  })}
-                </FieldDescription>
-              </FieldContent>
-            </Field>
+            <form.Field name="max_participants">
+              {(field) => (
+                <Field>
+                  <FieldContent>
+                    <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
+                    <Input
+                      disabled={isPending}
+                      max={systemMaxParticipants}
+                      min={Math.max(1, currentParticipantCount)}
+                      name={field.name}
+                      onChange={(e) => {
+                        const value = e.target.valueAsNumber;
+                        field.handleChange(Number.isNaN(value) ? 50 : value);
+                      }}
+                      required
+                      type="number"
+                      value={field.state.value as number}
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <FieldError>
+                        {String(field.state.meta.errors[0])}
+                      </FieldError>
+                    )}
+                    <FieldDescription>
+                      {t("maxParticipantsHelp", {
+                        current: currentParticipantCount,
+                        max: systemMaxParticipants,
+                      })}
+                    </FieldDescription>
+                  </FieldContent>
+                </Field>
+              )}
+            </form.Field>
           </FieldGroup>
         </FieldSet>
 
@@ -296,237 +328,307 @@ export function SpaceSettingsForm({
         <div className="space-y-4">
           <h2 className="font-semibold text-lg">{t("gatekeeperTitle")}</h2>
 
-          {/* Hidden input for gatekeeper_mode */}
-          <input
-            name="gatekeeper_mode"
-            type="hidden"
-            value={effectiveGatekeeperMode}
-          />
-
-          <Tabs
-            defaultValue={effectiveGatekeeperMode}
-            onValueChange={(value) =>
-              setGatekeeperMode(value as "none" | "social" | "email")
-            }
-            value={effectiveGatekeeperMode}
-          >
-            <TabsList className={cn("grid w-full", gridColsClass)}>
-              <TabsTrigger value="none">{t("gatekeeperModeNone")}</TabsTrigger>
-              {showSocialOption && (
-                <TabsTrigger value="social">
-                  {t("gatekeeperModeSocial")}
-                </TabsTrigger>
-              )}
-              {showEmailOption && (
-                <TabsTrigger value="email">
-                  {t("gatekeeperModeEmail")}
-                </TabsTrigger>
-              )}
-            </TabsList>
-
-            {/* None Tab */}
-            <TabsContent className="space-y-4" value="none">
-              <p className="text-gray-600 text-sm">
-                {t("noneModeDescription")}
-              </p>
-            </TabsContent>
-
-            {/* Social Tab */}
-            {showSocialOption && (
-              <TabsContent className="space-y-4" value="social">
-                <p className="text-gray-600 text-sm">
-                  {t("socialModeDescription")}
-                </p>
-
-                {/* Hidden input for social_platform */}
+          <form.Field name="gatekeeper_mode">
+            {(gatekeeperField) => (
+              <>
+                {/* Hidden input for gatekeeper_mode */}
                 <input
-                  name="social_platform"
+                  name={gatekeeperField.name}
                   type="hidden"
-                  value={effectiveSocialPlatform}
+                  value={effectiveGatekeeperMode}
                 />
 
-                <div>
-                  <Label className="mb-2">{t("socialPlatformLabel")}</Label>
-                  <RadioGroup
-                    disabled={isPending}
-                    onValueChange={(value) =>
-                      setSocialPlatform(value as "youtube" | "twitch")
-                    }
-                    value={effectiveSocialPlatform}
-                  >
-                    {showYoutubeOption && (
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem id="platform-youtube" value="youtube" />
-                        <Label
-                          className="cursor-pointer"
-                          htmlFor="platform-youtube"
-                        >
-                          {t("platformYoutube")}
-                        </Label>
-                      </div>
+                <Tabs
+                  defaultValue={effectiveGatekeeperMode}
+                  onValueChange={(value) =>
+                    gatekeeperField.handleChange(
+                      value as "none" | "social" | "email"
+                    )
+                  }
+                  value={effectiveGatekeeperMode}
+                >
+                  <TabsList className={cn("grid w-full", gridColsClass)}>
+                    <TabsTrigger value="none">
+                      {t("gatekeeperModeNone")}
+                    </TabsTrigger>
+                    {showSocialOption && (
+                      <TabsTrigger value="social">
+                        {t("gatekeeperModeSocial")}
+                      </TabsTrigger>
                     )}
-                    {showTwitchOption && (
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem id="platform-twitch" value="twitch" />
-                        <Label
-                          className="cursor-pointer"
-                          htmlFor="platform-twitch"
-                        >
-                          {t("platformTwitch")}
-                        </Label>
-                      </div>
+                    {showEmailOption && (
+                      <TabsTrigger value="email">
+                        {t("gatekeeperModeEmail")}
+                      </TabsTrigger>
                     )}
-                  </RadioGroup>
-                </div>
+                  </TabsList>
 
-                {/* YouTube Settings */}
-                {effectiveSocialPlatform === "youtube" && showYoutubeOption && (
-                  <>
-                    <Field>
-                      <FieldContent>
-                        <FieldLabel>{t("youtubeRequirementLabel")}</FieldLabel>
-                        <Select
-                          disabled={isPending}
-                          name="youtube_requirement"
-                          onValueChange={(value) => {
-                            setYoutubeRequirement(value);
-                            if (value === "none") {
-                              setYoutubeChannelId("");
-                            }
-                          }}
-                          value={youtubeRequirement}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">
-                              {t("requirementNone")}
-                            </SelectItem>
-                            <SelectItem value="subscriber">
-                              {t("youtubeSubscriber")}
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FieldContent>
-                    </Field>
+                  {/* None Tab */}
+                  <TabsContent className="space-y-4" value="none">
+                    <p className="text-gray-600 text-sm">
+                      {t("noneModeDescription")}
+                    </p>
+                  </TabsContent>
 
-                    {youtubeRequirement !== "none" && (
-                      <Field>
-                        <FieldContent>
-                          <FieldLabel>{t("youtubeChannelIdLabel")}</FieldLabel>
-                          <Input
-                            disabled={isPending}
-                            name="youtube_channel_id"
-                            onChange={(e) =>
-                              setYoutubeChannelId(e.target.value)
-                            }
-                            placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
-                            required={youtubeRequirement !== "none"}
-                            type="text"
-                            value={youtubeChannelId}
-                          />
-                          <FieldError>
-                            {updateState.fieldErrors?.youtube_channel_id}
-                          </FieldError>
-                        </FieldContent>
-                      </Field>
-                    )}
-                  </>
-                )}
+                  {/* Social Tab */}
+                  {showSocialOption && (
+                    <TabsContent className="space-y-4" value="social">
+                      <p className="text-gray-600 text-sm">
+                        {t("socialModeDescription")}
+                      </p>
 
-                {/* Twitch Settings */}
-                {effectiveSocialPlatform === "twitch" && showTwitchOption && (
-                  <>
-                    <Field>
-                      <FieldContent>
-                        <FieldLabel>{t("twitchRequirementLabel")}</FieldLabel>
-                        <Select
-                          disabled={isPending}
-                          name="twitch_requirement"
-                          onValueChange={(value) => {
-                            setTwitchRequirement(value);
-                            if (value === "none") {
-                              setTwitchBroadcasterId("");
-                            }
-                          }}
-                          value={twitchRequirement}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">
-                              {t("requirementNone")}
-                            </SelectItem>
-                            <SelectItem value="follower">
-                              {t("twitchFollower")}
-                            </SelectItem>
-                            <SelectItem value="subscriber">
-                              {t("twitchSubscriber")}
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FieldContent>
-                    </Field>
+                      <form.Field name="social_platform">
+                        {(platformField) => (
+                          <>
+                            {/* Hidden input for social_platform */}
+                            <input
+                              name={platformField.name}
+                              type="hidden"
+                              value={effectiveSocialPlatform}
+                            />
 
-                    {twitchRequirement !== "none" && (
-                      <Field>
-                        <FieldContent>
-                          <FieldLabel>
-                            {t("twitchBroadcasterIdLabel")}
-                          </FieldLabel>
-                          <Input
-                            disabled={isPending}
-                            name="twitch_broadcaster_id"
-                            onChange={(e) =>
-                              setTwitchBroadcasterId(e.target.value)
-                            }
-                            placeholder="123456789"
-                            required={twitchRequirement !== "none"}
-                            type="text"
-                            value={twitchBroadcasterId}
-                          />
-                          <FieldError>
-                            {updateState.fieldErrors?.twitch_broadcaster_id}
-                          </FieldError>
-                        </FieldContent>
-                      </Field>
-                    )}
-                  </>
-                )}
-              </TabsContent>
+                            <div>
+                              <Label className="mb-2">
+                                {t("socialPlatformLabel")}
+                              </Label>
+                              <RadioGroup
+                                disabled={isPending}
+                                onValueChange={(value) =>
+                                  platformField.handleChange(
+                                    value as "youtube" | "twitch"
+                                  )
+                                }
+                                value={effectiveSocialPlatform}
+                              >
+                                {showYoutubeOption && (
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem
+                                      id="platform-youtube"
+                                      value="youtube"
+                                    />
+                                    <Label
+                                      className="cursor-pointer"
+                                      htmlFor="platform-youtube"
+                                    >
+                                      {t("platformYoutube")}
+                                    </Label>
+                                  </div>
+                                )}
+                                {showTwitchOption && (
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem
+                                      id="platform-twitch"
+                                      value="twitch"
+                                    />
+                                    <Label
+                                      className="cursor-pointer"
+                                      htmlFor="platform-twitch"
+                                    >
+                                      {t("platformTwitch")}
+                                    </Label>
+                                  </div>
+                                )}
+                              </RadioGroup>
+                            </div>
+                          </>
+                        )}
+                      </form.Field>
+
+                      {/* YouTube Settings */}
+                      {effectiveSocialPlatform === "youtube" &&
+                        showYoutubeOption && (
+                          <>
+                            <form.Field name="youtube_requirement">
+                              {(field) => (
+                                <Field>
+                                  <FieldContent>
+                                    <FieldLabel>
+                                      {t("youtubeRequirementLabel")}
+                                    </FieldLabel>
+                                    <Select
+                                      disabled={isPending}
+                                      name={field.name}
+                                      onValueChange={(value) => {
+                                        field.handleChange(value);
+                                        if (value === "none") {
+                                          form.setFieldValue(
+                                            "youtube_channel_id",
+                                            ""
+                                          );
+                                        }
+                                      }}
+                                      value={field.state.value as string}
+                                    >
+                                      <SelectTrigger>
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="none">
+                                          {t("requirementNone")}
+                                        </SelectItem>
+                                        <SelectItem value="subscriber">
+                                          {t("youtubeSubscriber")}
+                                        </SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </FieldContent>
+                                </Field>
+                              )}
+                            </form.Field>
+
+                            {youtubeRequirement !== "none" && (
+                              <form.Field name="youtube_channel_id">
+                                {(field) => (
+                                  <Field>
+                                    <FieldContent>
+                                      <FieldLabel>
+                                        {t("youtubeChannelIdLabel")}
+                                      </FieldLabel>
+                                      <Input
+                                        disabled={isPending}
+                                        name={field.name}
+                                        onChange={(e) =>
+                                          field.handleChange(e.target.value)
+                                        }
+                                        placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
+                                        required={youtubeRequirement !== "none"}
+                                        type="text"
+                                        value={field.state.value as string}
+                                      />
+                                      {field.state.meta.errors.length > 0 && (
+                                        <FieldError>
+                                          {String(field.state.meta.errors[0])}
+                                        </FieldError>
+                                      )}
+                                    </FieldContent>
+                                  </Field>
+                                )}
+                              </form.Field>
+                            )}
+                          </>
+                        )}
+
+                      {/* Twitch Settings */}
+                      {effectiveSocialPlatform === "twitch" &&
+                        showTwitchOption && (
+                          <>
+                            <form.Field name="twitch_requirement">
+                              {(field) => (
+                                <Field>
+                                  <FieldContent>
+                                    <FieldLabel>
+                                      {t("twitchRequirementLabel")}
+                                    </FieldLabel>
+                                    <Select
+                                      disabled={isPending}
+                                      name={field.name}
+                                      onValueChange={(value) => {
+                                        field.handleChange(value);
+                                        if (value === "none") {
+                                          form.setFieldValue(
+                                            "twitch_broadcaster_id",
+                                            ""
+                                          );
+                                        }
+                                      }}
+                                      value={field.state.value as string}
+                                    >
+                                      <SelectTrigger>
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="none">
+                                          {t("requirementNone")}
+                                        </SelectItem>
+                                        <SelectItem value="follower">
+                                          {t("twitchFollower")}
+                                        </SelectItem>
+                                        <SelectItem value="subscriber">
+                                          {t("twitchSubscriber")}
+                                        </SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </FieldContent>
+                                </Field>
+                              )}
+                            </form.Field>
+
+                            {twitchRequirement !== "none" && (
+                              <form.Field name="twitch_broadcaster_id">
+                                {(field) => (
+                                  <Field>
+                                    <FieldContent>
+                                      <FieldLabel>
+                                        {t("twitchBroadcasterIdLabel")}
+                                      </FieldLabel>
+                                      <Input
+                                        disabled={isPending}
+                                        name={field.name}
+                                        onChange={(e) =>
+                                          field.handleChange(e.target.value)
+                                        }
+                                        placeholder="123456789"
+                                        required={twitchRequirement !== "none"}
+                                        type="text"
+                                        value={field.state.value as string}
+                                      />
+                                      {field.state.meta.errors.length > 0 && (
+                                        <FieldError>
+                                          {String(field.state.meta.errors[0])}
+                                        </FieldError>
+                                      )}
+                                    </FieldContent>
+                                  </Field>
+                                )}
+                              </form.Field>
+                            )}
+                          </>
+                        )}
+                    </TabsContent>
+                  )}
+
+                  {/* Email Tab */}
+                  {showEmailOption && (
+                    <TabsContent className="space-y-4" value="email">
+                      <p className="text-gray-600 text-sm">
+                        {t("emailModeDescription")}
+                      </p>
+
+                      <form.Field name="email_allowlist">
+                        {(field) => (
+                          <Field>
+                            <FieldContent>
+                              <FieldLabel>
+                                {t("emailAllowlistLabel")}
+                              </FieldLabel>
+                              <Textarea
+                                disabled={isPending}
+                                name={field.name}
+                                onChange={(e) =>
+                                  field.handleChange(e.target.value)
+                                }
+                                placeholder={t("emailAllowlistPlaceholder")}
+                                rows={3}
+                                value={field.state.value as string}
+                              />
+                              {field.state.meta.errors.length > 0 && (
+                                <FieldError>
+                                  {String(field.state.meta.errors[0])}
+                                </FieldError>
+                              )}
+                              <FieldDescription>
+                                {t("emailAllowlistHelp")}
+                              </FieldDescription>
+                            </FieldContent>
+                          </Field>
+                        )}
+                      </form.Field>
+                    </TabsContent>
+                  )}
+                </Tabs>
+              </>
             )}
-
-            {/* Email Tab */}
-            {showEmailOption && (
-              <TabsContent className="space-y-4" value="email">
-                <p className="text-gray-600 text-sm">
-                  {t("emailModeDescription")}
-                </p>
-
-                <Field>
-                  <FieldContent>
-                    <FieldLabel>{t("emailAllowlistLabel")}</FieldLabel>
-                    <Textarea
-                      disabled={isPending}
-                      name="email_allowlist"
-                      onChange={(e) => setEmailAllowlist(e.target.value)}
-                      placeholder={t("emailAllowlistPlaceholder")}
-                      rows={3}
-                      value={emailAllowlist}
-                    />
-                    <FieldError>
-                      {updateState.fieldErrors?.email_allowlist}
-                    </FieldError>
-                    <FieldDescription>
-                      {t("emailAllowlistHelp")}
-                    </FieldDescription>
-                  </FieldContent>
-                </Field>
-              </TabsContent>
-            )}
-          </Tabs>
+          </form.Field>
 
           {/* Hidden inputs for non-selected modes and platforms */}
           {effectiveGatekeeperMode !== "social" && (
@@ -560,54 +662,67 @@ export function SpaceSettingsForm({
         <div className="space-y-4">
           <h2 className="font-semibold text-lg">{t("privacyTitle")}</h2>
 
-          <div className="flex items-start gap-3">
-            <input
-              checked={hideMetadataBeforeJoin}
-              className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-              disabled={isPending}
-              id="hide_metadata_before_join"
-              name="hide_metadata_before_join"
-              onChange={(e) => setHideMetadataBeforeJoin(e.target.checked)}
-              type="checkbox"
-              value="true"
-            />
-            <div className="flex-1">
-              <Label
-                className="cursor-pointer"
-                htmlFor="hide_metadata_before_join"
-              >
-                {t("hideMetadataLabel")}
-              </Label>
-              <p className="mt-1 text-gray-500 text-sm">
-                {t("hideMetadataHelp")}
-              </p>
-            </div>
-          </div>
+          <form.Field name="hide_metadata_before_join">
+            {(field) => (
+              <div className="flex items-start gap-3">
+                <input
+                  checked={field.state.value as boolean}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                  disabled={isPending}
+                  id={field.name}
+                  name={field.name}
+                  onChange={(e) => field.handleChange(e.target.checked)}
+                  type="checkbox"
+                  value="true"
+                />
+                <div className="flex-1">
+                  <Label className="cursor-pointer" htmlFor={field.name}>
+                    {t("hideMetadataLabel")}
+                  </Label>
+                  <p className="mt-1 text-gray-500 text-sm">
+                    {t("hideMetadataHelp")}
+                  </p>
+                </div>
+              </div>
+            )}
+          </form.Field>
         </div>
 
         {/* Error Messages */}
-        {(updateState.error || publishState.error) && (
+        {formErrors.length > 0 && (
           <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-            <p className="text-red-800">
-              {updateState.error || publishState.error}
-            </p>
+            {formErrors.map((error) => (
+              <p className="text-red-800" key={String(error)}>
+                {String(error)}
+              </p>
+            ))}
+          </div>
+        )}
+        {publishState.error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+            <p className="text-red-800">{publishState.error}</p>
           </div>
         )}
 
         {/* Success Message for Update */}
-        {updateState.success && !publishState.success && (
-          <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <p className="text-green-800">{t("updateSuccess")}</p>
+        {(() => {
+          const meta = (updateState as Record<string, unknown>)?.meta as
+            | { success?: boolean }
+            | undefined;
+          return meta?.success && !publishState.success ? (
+            <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <p className="text-green-800">{t("updateSuccess")}</p>
+              </div>
             </div>
-          </div>
-        )}
+          ) : null;
+        })()}
 
         {/* Action Buttons */}
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
           <Button disabled={isPending} type="submit" variant="outline">
-            {isUpdating && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
             {t("updateButton")}
           </Button>
 
