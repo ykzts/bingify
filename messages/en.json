@@ -93,6 +93,7 @@
     "description": "Configure server resource management and space limits",
     "errorFetchFailed": "Failed to fetch system settings",
     "errorGeneric": "An unexpected error occurred",
+    "errorInvalidData": "The settings data retrieved from the database is invalid. Please check the database.",
     "errorNoPermission": "Admin permission required",
     "errorUnauthorized": "Authentication required",
     "errorUpdateFailed": "Failed to update settings",

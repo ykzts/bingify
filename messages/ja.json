@@ -93,6 +93,7 @@
     "description": "サーバーリソース管理とスペース制限の設定",
     "errorFetchFailed": "システム設定の取得に失敗しました",
     "errorGeneric": "予期しないエラーが発生しました",
+    "errorInvalidData": "データベースから取得した設定データが不正です。データベースを確認してください。",
     "errorNoPermission": "管理者権限が必要です",
     "errorUnauthorized": "認証が必要です",
     "errorUpdateFailed": "設定の更新に失敗しました",
