@@ -10,7 +10,7 @@ import {
 import { AlertCircle, Loader2, Rocket } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useEffectEvent, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -177,6 +177,25 @@ export function SpaceSettingsForm({
     (formValues.youtube_requirement as string) || "none";
   const twitchRequirement = (formValues.twitch_requirement as string) || "none";
 
+  // Use useEffectEvent to separate event logic from effect dependencies
+  const handleUpdateSuccess = useEffectEvent(() => {
+    onSuccess?.(t("updateSuccess"));
+    setServerError(null);
+  });
+
+  const handleUpdateError = useEffectEvent((error: string) => {
+    setServerError(error);
+  });
+
+  const handlePublishSuccess = useEffectEvent(() => {
+    router.push(`/${locale}/dashboard/spaces/${space.id}`);
+    router.refresh();
+  });
+
+  const handlePublishError = useEffectEvent((error: string) => {
+    setServerError(error);
+  });
+
   // Handle update success/error
   useEffect(() => {
     const updateMeta = (updateState as Record<string, unknown>)?.meta as
@@ -184,33 +203,31 @@ export function SpaceSettingsForm({
       | undefined;
 
     if (updateMeta?.success) {
-      onSuccess?.(t("updateSuccess"));
-      setServerError(null);
+      handleUpdateSuccess();
+      return;
     }
 
     const errorMap = (updateState as Record<string, unknown>)?.errorMap;
     if (errorMap && typeof errorMap === "object" && "form" in errorMap) {
-      setServerError(String(errorMap.form));
+      handleUpdateError(String(errorMap.form));
     } else {
       const errors = (updateState as Record<string, unknown>)?.errors;
       if (Array.isArray(errors) && errors.length > 0) {
-        setServerError(String(errors[0]));
+        handleUpdateError(String(errors[0]));
       }
     }
-  }, [updateState, onSuccess, t]);
+  }, [updateState]);
 
   // Handle publish success/error and redirect
   useEffect(() => {
     if (publishState.success) {
-      // Redirect to admin page after publishing
-      router.push(`/${locale}/dashboard/spaces/${space.id}`);
-      router.refresh();
+      handlePublishSuccess();
     }
 
     if (publishState.error) {
-      setServerError(publishState.error);
+      handlePublishError(publishState.error);
     }
-  }, [publishState, router, space.id, locale]);
+  }, [publishState]);
 
   // Determine visibility of gatekeeper options based on features and existing configuration
   const isEmailConfigured =
