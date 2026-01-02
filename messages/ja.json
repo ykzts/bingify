@@ -189,6 +189,7 @@
     "creatingButton": "作成中...",
     "emailAllowlistHelp": "参加者のメールアドレスを制限する場合は、許可するドメイン（@example.com または example.com）やメールアドレス（user@example.com）をカンマや改行で区切って入力してください。空欄の場合は制限なしです。",
     "emailAllowlistLabel": "許可メールアドレス・ドメイン（オプション）",
+    "errorTitle": "スペースの作成に失敗しました",
     "generateRandomButton": "ランダム生成",
     "generateRandomButtonAriaLabel": "共有キーをランダムに生成",
     "maxParticipantsHelp": "スペースに参加できる最大人数を設定します（1〜1000人）",
