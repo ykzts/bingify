@@ -1,9 +1,17 @@
 "use server";
 
+import {
+  createServerValidate,
+  initialFormState,
+} from "@tanstack/react-form-nextjs";
 import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import type { SpaceAdmin } from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";
+import {
+  type SpaceSettingsFormValues,
+  spaceSettingsFormOpts,
+} from "./form-options";
 
 // Email validation regex at top level for performance
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -14,19 +22,79 @@ export interface UpdateSpaceState {
   success: boolean;
 }
 
+// Create the server validation function
+// Note: We can't use the full schema with transform here due to type constraints,
+// so we'll do manual validation in the action
+const serverValidate = createServerValidate({
+  ...spaceSettingsFormOpts,
+  onServerValidate: async () => {
+    // Validation happens in the action itself due to schema transform complexity
+    return undefined;
+  },
+});
+
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Update space requires comprehensive validation checks
 export async function updateSpaceSettings(
   spaceId: string,
-  _prevState: UpdateSpaceState,
+  _prevState: unknown,
   formData: FormData
-): Promise<UpdateSpaceState> {
+) {
   try {
     if (!isValidUUID(spaceId)) {
       return {
-        error: "Invalid space ID",
-        success: false,
+        ...initialFormState,
+        errors: ["Invalid space ID"],
       };
     }
+
+    // Validate form data using TanStack Form server validation
+    await serverValidate(formData);
+
+    // Extract form data manually
+    const title = (formData.get("title") as string) || "";
+    const description = (formData.get("description") as string) || "";
+    const maxParticipantsRaw = formData.get("max_participants") as string;
+    const maxParticipantsValue = Number.parseInt(maxParticipantsRaw, 10);
+    const gatekeeperMode = (formData.get("gatekeeper_mode") as string) || "none";
+    const socialPlatform = (formData.get("social_platform") as string) || "youtube";
+    const youtubeRequirement = (formData.get("youtube_requirement") as string) || "none";
+    const youtubeChannelId = (formData.get("youtube_channel_id") as string) || "";
+    const twitchRequirement = (formData.get("twitch_requirement") as string) || "none";
+    const twitchBroadcasterId = (formData.get("twitch_broadcaster_id") as string) || "";
+    const emailAllowlistRaw = (formData.get("email_allowlist") as string) || "";
+    const hideMetadataBeforeJoin = formData.has("hide_metadata_before_join");
+
+    // Additional validation with the full schema for server-side checks
+    const validation = updateSpaceFormSchema.safeParse({
+      description,
+      email_allowlist: emailAllowlistRaw,
+      gatekeeper_mode: gatekeeperMode,
+      max_participants: maxParticipantsValue,
+      social_platform: socialPlatform,
+      title,
+      twitch_broadcaster_id: twitchBroadcasterId,
+      twitch_requirement: twitchRequirement,
+      youtube_channel_id: youtubeChannelId,
+      youtube_requirement: youtubeRequirement,
+    });
+
+    if (!validation.success) {
+      const errorMap: Record<string, string> = {};
+      for (const issue of validation.error.issues) {
+        if (issue.path.length > 0) {
+          errorMap[issue.path[0].toString()] = issue.message;
+        }
+      }
+      return {
+        ...initialFormState,
+        errors: [validation.error.issues[0].message],
+        errorMap,
+      };
+    }
+
+    const {
+      email_allowlist: emailAllowlist,
+    } = validation.data;
 
     const supabase = await createClient();
 
@@ -37,61 +105,10 @@ export async function updateSpaceSettings(
 
     if (!user) {
       return {
-        error: "認証が必要です。ログインしてください。",
-        success: false,
+        ...initialFormState,
+        errors: ["認証が必要です。ログインしてください。"],
       };
     }
-
-    // Extract and parse form data
-    const maxParticipantsRaw = formData.get("max_participants") as string;
-    const maxParticipants = Number.parseInt(maxParticipantsRaw, 10);
-    const hideMetadataBeforeJoin = formData.has("hide_metadata_before_join");
-
-    // Validate form data
-    const validation = updateSpaceFormSchema.safeParse({
-      description: (formData.get("description") as string) || undefined,
-      email_allowlist: (formData.get("email_allowlist") as string) || "",
-      gatekeeper_mode: (formData.get("gatekeeper_mode") as string) || "none",
-      max_participants: Number.isNaN(maxParticipants)
-        ? undefined
-        : maxParticipants,
-      social_platform: (formData.get("social_platform") as string) || undefined,
-      title: (formData.get("title") as string) || undefined,
-      twitch_broadcaster_id:
-        (formData.get("twitch_broadcaster_id") as string) || "",
-      twitch_requirement:
-        (formData.get("twitch_requirement") as string) || "none",
-      youtube_channel_id: (formData.get("youtube_channel_id") as string) || "",
-      youtube_requirement:
-        (formData.get("youtube_requirement") as string) || "none",
-    });
-
-    if (!validation.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of validation.error.issues) {
-        if (issue.path.length > 0) {
-          fieldErrors[issue.path[0].toString()] = issue.message;
-        }
-      }
-      return {
-        error: validation.error.issues[0].message,
-        fieldErrors,
-        success: false,
-      };
-    }
-
-    const {
-      description,
-      email_allowlist: emailAllowlist,
-      gatekeeper_mode: gatekeeperMode,
-      max_participants: maxParticipantsValue,
-      social_platform: socialPlatform,
-      title,
-      twitch_broadcaster_id: twitchBroadcasterId,
-      twitch_requirement: twitchRequirement,
-      youtube_channel_id: youtubeChannelId,
-      youtube_requirement: youtubeRequirement,
-    } = validation.data;
 
     // Get current space data
     const { data: space, error: spaceError } = await supabase
@@ -102,8 +119,8 @@ export async function updateSpaceSettings(
 
     if (spaceError || !space) {
       return {
-        error: "スペースが見つかりませんでした",
-        success: false,
+        ...initialFormState,
+        errors: ["スペースが見つかりませんでした"],
       };
     }
 
@@ -121,8 +138,8 @@ export async function updateSpaceSettings(
 
     if (!(isOwner || isAdmin)) {
       return {
-        error: "権限がありません",
-        success: false,
+        ...initialFormState,
+        errors: ["権限がありません"],
       };
     }
 
@@ -136,8 +153,8 @@ export async function updateSpaceSettings(
     if (settingsError) {
       console.error("Failed to fetch system settings:", settingsError);
       return {
-        error: "システム設定の取得に失敗しました",
-        success: false,
+        ...initialFormState,
+        errors: ["システム設定の取得に失敗しました"],
       };
     }
 
@@ -146,8 +163,10 @@ export async function updateSpaceSettings(
       maxParticipantsValue > systemSettings.max_participants_per_space
     ) {
       return {
-        error: `システムの上限設定（${systemSettings.max_participants_per_space}人）を超える値にはできません。`,
-        success: false,
+        ...initialFormState,
+        errors: [
+          `システムの上限設定（${systemSettings.max_participants_per_space}人）を超える値にはできません。`,
+        ],
       };
     }
 
@@ -163,8 +182,8 @@ export async function updateSpaceSettings(
     if (countError) {
       console.error("Failed to count participants:", countError);
       return {
-        error: "参加者数の取得に失敗しました",
-        success: false,
+        ...initialFormState,
+        errors: ["参加者数の取得に失敗しました"],
       };
     }
 
@@ -173,8 +192,10 @@ export async function updateSpaceSettings(
       maxParticipantsValue < currentParticipantCount
     ) {
       return {
-        error: `現在の参加者数（${currentParticipantCount}人）より少ない人数には設定できません。`,
-        success: false,
+        ...initialFormState,
+        errors: [
+          `現在の参加者数（${currentParticipantCount}人）より少ない人数には設定できません。`,
+        ],
       };
     }
 
@@ -247,19 +268,39 @@ export async function updateSpaceSettings(
     if (updateError) {
       console.error("Database error:", updateError);
       return {
-        error: "設定の更新に失敗しました",
-        success: false,
+        ...initialFormState,
+        errors: ["設定の更新に失敗しました"],
       };
     }
 
     return {
-      success: true,
+      ...initialFormState,
+      values: {
+        description,
+        email_allowlist: emailAllowlistRaw,
+        gatekeeper_mode: gatekeeperMode as "none" | "social" | "email",
+        hide_metadata_before_join: hideMetadataBeforeJoin,
+        max_participants: maxParticipantsValue,
+        social_platform: socialPlatform as "youtube" | "twitch",
+        title,
+        twitch_broadcaster_id: twitchBroadcasterId,
+        twitch_requirement: twitchRequirement as "none" | "follower" | "subscriber",
+        youtube_channel_id: youtubeChannelId,
+        youtube_requirement: youtubeRequirement as "none" | "subscriber",
+      },
+      meta: { success: true },
     };
-  } catch (error) {
-    console.error("Error updating space settings:", error);
+  } catch (e) {
+    // Check if it's a ServerValidateError from TanStack Form
+    if (e && typeof e === "object" && "formState" in e) {
+      return (e as { formState: unknown }).formState;
+    }
+
+    // Some other error occurred
+    console.error("Error updating space settings:", e);
     return {
-      error: "予期しないエラーが発生しました",
-      success: false,
+      ...initialFormState,
+      errors: ["予期しないエラーが発生しました"],
     };
   }
 }
@@ -374,13 +415,21 @@ export async function updateAndPublishSpace(
     // First update the settings
     const updateResult = await updateSpaceSettings(
       spaceId,
-      { success: false },
+      undefined,
       formData
     );
 
-    if (!updateResult.success) {
+    // Check if update was successful (TanStack Form state has meta.success)
+    const updateMeta = (updateResult as Record<string, unknown>)?.meta as
+      | { success?: boolean }
+      | undefined;
+    const hasErrors = Array.isArray((updateResult as Record<string, unknown>)?.errors) &&
+      ((updateResult as Record<string, unknown>)?.errors as unknown[]).length > 0;
+
+    if (hasErrors || !updateMeta?.success) {
+      const errors = (updateResult as Record<string, unknown>)?.errors as string[] | undefined;
       return {
-        error: updateResult.error || "設定の更新に失敗しました",
+        error: errors?.[0] || "設定の更新に失敗しました",
         success: false,
       };
     }
