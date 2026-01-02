@@ -48,10 +48,23 @@ export function LoginForm({ providers }: Props) {
     setIsLoading(true);
     const supabase = createClient();
 
+    // Validate provider is supported by Supabase
+    const supportedProviders = ["google", "twitch"] as const;
+    type SupportedProvider = (typeof supportedProviders)[number];
+
+    if (!supportedProviders.includes(provider as SupportedProvider)) {
+      console.error("Unsupported OAuth provider:", provider);
+      setOauthError("Unsupported authentication provider");
+      setIsLoading(false);
+      return;
+    }
+
+    const typedProvider = provider as SupportedProvider;
+
     let scopes: string | undefined;
-    if (provider === "google") {
+    if (typedProvider === "google") {
       scopes = GOOGLE_OAUTH_SCOPES;
-    } else if (provider === "twitch") {
+    } else if (typedProvider === "twitch") {
       scopes = TWITCH_OAUTH_SCOPES;
     }
 
@@ -60,7 +73,7 @@ export function LoginForm({ providers }: Props) {
         redirectTo: buildOAuthCallbackUrl(redirect ?? undefined),
         ...(scopes && { scopes }),
       },
-      provider: provider as "google" | "twitch",
+      provider: typedProvider,
     });
 
     if (error) {
@@ -139,12 +152,9 @@ export function LoginForm({ providers }: Props) {
   };
 
   const getProviderButtonText = (provider: AuthProvider) => {
-    const translationKey = `${provider.provider}Button`;
-    const translated = t(translationKey);
-    if (translated === translationKey) {
-      return `Sign in with ${provider.label}`;
-    }
-    return translated;
+    // Provider names are not localized, use label directly
+    // Fallback to "Sign in with {label}" for display
+    return `Sign in with ${provider.label}`;
   };
 
   const getProviderButtonClass = (provider: string) => {
