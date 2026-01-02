@@ -28,6 +28,7 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/input-group";
+import { getErrorMessage } from "@/lib/utils";
 import { generateRandomKey } from "@/lib/utils/random-key";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import {
@@ -181,8 +182,8 @@ export function CreateSpaceForm() {
       {formErrors.length > 0 && (
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
           {formErrors.map((error) => (
-            <p className="text-red-800" key={String(error)}>
-              {String(error)}
+            <p className="text-red-800" key={getErrorMessage(error)}>
+              {getErrorMessage(error)}
             </p>
           ))}
         </div>
@@ -284,8 +285,8 @@ export function CreateSpaceForm() {
             {field.state.meta.errors.length > 0 && (
               <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-3">
                 {field.state.meta.errors.map((error) => (
-                  <p className="text-red-800 text-sm" key={String(error)}>
-                    {String(error)}
+                  <p className="text-red-800 text-sm" key={getErrorMessage(error)}>
+                    {getErrorMessage(error)}
                   </p>
                 ))}
               </div>

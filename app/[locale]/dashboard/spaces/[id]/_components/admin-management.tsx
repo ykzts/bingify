@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { SpaceAdmin } from "@/lib/types/space";
+import { getErrorMessage } from "@/lib/utils";
 import {
   inviteAdminFormOpts,
   inviteAdminFormSchema,
@@ -134,8 +135,8 @@ export function AdminManagement({ spaceId }: Props) {
         {formErrors.length > 0 && (
           <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3">
             {formErrors.map((error) => (
-              <p className="text-red-800 text-sm" key={String(error)}>
-                {String(error)}
+              <p className="text-red-800 text-sm" key={getErrorMessage(error)}>
+                {getErrorMessage(error)}
               </p>
             ))}
           </div>
@@ -158,8 +159,8 @@ export function AdminManagement({ spaceId }: Props) {
                 {field.state.meta.errors.length > 0 && (
                   <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2">
                     {field.state.meta.errors.map((error) => (
-                      <p className="text-red-800 text-sm" key={String(error)}>
-                        {String(error)}
+                      <p className="text-red-800 text-sm" key={getErrorMessage(error)}>
+                        {getErrorMessage(error)}
                       </p>
                     ))}
                   </div>

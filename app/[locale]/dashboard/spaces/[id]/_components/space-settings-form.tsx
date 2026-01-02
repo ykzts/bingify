@@ -36,7 +36,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 import {
   spaceSettingsFormOpts,
   spaceSettingsFormSchema,
@@ -46,16 +46,6 @@ import {
   updateAndPublishSpace,
   updateSpaceSettings,
 } from "../_lib/settings-actions";
-
-function getErrorMessage(error: unknown): string {
-  if (typeof error === "string") {
-    return error;
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return String(error);
-}
 
 interface Props {
   currentParticipantCount: number;
@@ -715,8 +705,8 @@ export function SpaceSettingsForm({
         {formErrors.length > 0 && (
           <div className="rounded-lg border border-red-200 bg-red-50 p-4">
             {formErrors.map((error) => (
-              <p className="text-red-800" key={String(error)}>
-                {String(error)}
+              <p className="text-red-800" key={getErrorMessage(error)}>
+                {getErrorMessage(error)}
               </p>
             ))}
           </div>

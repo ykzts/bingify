@@ -26,18 +26,9 @@ import {
   type SystemSettings,
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
+import { getErrorMessage } from "@/lib/utils";
 import { updateSystemSettingsAction } from "../_lib/actions";
 import { systemSettingsFormOpts } from "../_lib/form-options";
-
-function getErrorMessage(error: unknown): string {
-  if (typeof error === "string") {
-    return error;
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return String(error);
-}
 
 interface Props {
   initialSettings?: SystemSettings;
@@ -98,8 +89,8 @@ export function SystemSettingsForm({ initialSettings }: Props) {
       {formErrors.length > 0 && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-3">
           {formErrors.map((error) => (
-            <p className="text-red-800 text-sm" key={String(error)}>
-              {t(String(error), { default: t("errorGeneric") })}
+            <p className="text-red-800 text-sm" key={getErrorMessage(error)}>
+              {t(getErrorMessage(error), { default: t("errorGeneric") })}
             </p>
           ))}
         </div>

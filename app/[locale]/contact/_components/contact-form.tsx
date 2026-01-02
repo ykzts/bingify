@@ -23,21 +23,12 @@ import {
 } from "@/components/ui/field";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Textarea } from "@/components/ui/textarea";
+import { getErrorMessage } from "@/lib/utils";
 import { submitContactFormAction } from "../_lib/actions";
 import { contactFormOpts, contactFormSchema } from "../_lib/form-options";
 
 interface Props {
   locale: string;
-}
-
-function getErrorMessage(error: unknown): string {
-  if (typeof error === "string") {
-    return error;
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return String(error);
 }
 
 export function ContactForm({ locale }: Props) {

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { usernameSchema } from "@/lib/schemas/user";
+import { getErrorMessage } from "@/lib/utils";
 import { updateUsernameAction } from "../_lib/actions";
 import { usernameFormOpts } from "../_lib/form-options";
 
@@ -84,8 +85,8 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span>
               {formErrors.map((error) => (
-                <span key={String(error)}>
-                  {t(String(error), { defaultValue: t("errorGeneric") })}
+                <span key={getErrorMessage(error)}>
+                  {t(getErrorMessage(error), { defaultValue: t("errorGeneric") })}
                 </span>
               ))}
             </span>
@@ -117,8 +118,8 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
                     <AlertCircle className="h-4 w-4 flex-shrink-0" />
                     <span>
                       {field.state.meta.errors.map((error) => (
-                        <span key={String(error)}>
-                          {t(String(error), {
+                        <span key={getErrorMessage(error)}>
+                          {t(getErrorMessage(error), {
                             defaultValue: t("errorGeneric"),
                           })}
                         </span>
