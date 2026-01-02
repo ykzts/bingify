@@ -135,16 +135,21 @@ export function AdminManagement({ spaceId }: Props) {
         {(() => {
           const errorMessages = formErrors
             .map((error) => getErrorMessage(error))
-            .filter((message) => message.trim() !== "" && message !== "[object Object]");
-          
-          return errorMessages.length > 0 && (
-            <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3">
-              {errorMessages.map((message) => (
-                <p className="text-red-800 text-sm" key={message}>
-                  {message}
-                </p>
-              ))}
-            </div>
+            .filter(
+              (message) =>
+                message.trim() !== "" && message !== "[object Object]"
+            );
+
+          return (
+            errorMessages.length > 0 && (
+              <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3">
+                {errorMessages.map((message) => (
+                  <p className="text-red-800 text-sm" key={message}>
+                    {message}
+                  </p>
+                ))}
+              </div>
+            )
           );
         })()}
         <form action={action} className="space-y-3">
@@ -165,7 +170,10 @@ export function AdminManagement({ spaceId }: Props) {
                 {field.state.meta.errors.length > 0 && (
                   <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2">
                     {field.state.meta.errors.map((error) => (
-                      <p className="text-red-800 text-sm" key={getErrorMessage(error)}>
+                      <p
+                        className="text-red-800 text-sm"
+                        key={getErrorMessage(error)}
+                      >
                         {getErrorMessage(error)}
                       </p>
                     ))}

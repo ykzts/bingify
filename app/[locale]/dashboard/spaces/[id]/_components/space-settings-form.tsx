@@ -705,16 +705,21 @@ export function SpaceSettingsForm({
         {(() => {
           const errorMessages = formErrors
             .map((error) => getErrorMessage(error))
-            .filter((message) => message.trim() !== "" && message !== "[object Object]");
-          
-          return errorMessages.length > 0 && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-              {errorMessages.map((message) => (
-                <p className="text-red-800" key={message}>
-                  {message}
-                </p>
-              ))}
-            </div>
+            .filter(
+              (message) =>
+                message.trim() !== "" && message !== "[object Object]"
+            );
+
+          return (
+            errorMessages.length > 0 && (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+                {errorMessages.map((message) => (
+                  <p className="text-red-800" key={message}>
+                    {message}
+                  </p>
+                ))}
+              </div>
+            )
           );
         })()}
         {publishState.error && (

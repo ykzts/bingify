@@ -89,16 +89,20 @@ export function SystemSettingsForm({ initialSettings }: Props) {
       {(() => {
         const errorMessages = formErrors
           .map((error) => getErrorMessage(error))
-          .filter((message) => message.trim() !== "" && message !== "[object Object]");
-        
-        return errorMessages.length > 0 && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-            {errorMessages.map((message) => (
-              <p className="text-red-800 text-sm" key={message}>
-                {t(message, { default: t("errorGeneric") })}
-              </p>
-            ))}
-          </div>
+          .filter(
+            (message) => message.trim() !== "" && message !== "[object Object]"
+          );
+
+        return (
+          errorMessages.length > 0 && (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+              {errorMessages.map((message) => (
+                <p className="text-red-800 text-sm" key={message}>
+                  {t(message, { default: t("errorGeneric") })}
+                </p>
+              ))}
+            </div>
+          )
         );
       })()}
 

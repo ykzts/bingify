@@ -96,14 +96,19 @@ export function ContactForm({ locale }: Props) {
         {(() => {
           const errorMessages = formErrors
             .map((error) => getErrorMessage(error))
-            .filter((message) => message.trim() !== "" && message !== "[object Object]");
-          
-          return errorMessages.length > 0 && (
-            <div className="mb-4 rounded-md bg-red-50 p-4 text-red-600 text-sm">
-              {errorMessages.map((message) => (
-                <p key={message}>{message}</p>
-              ))}
-            </div>
+            .filter(
+              (message) =>
+                message.trim() !== "" && message !== "[object Object]"
+            );
+
+          return (
+            errorMessages.length > 0 && (
+              <div className="mb-4 rounded-md bg-red-50 p-4 text-red-600 text-sm">
+                {errorMessages.map((message) => (
+                  <p key={message}>{message}</p>
+                ))}
+              </div>
+            )
           );
         })()}
 
