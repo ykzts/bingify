@@ -160,6 +160,15 @@ export function LoginForm() {
     }
   };
 
+  const getProviderButtonText = (provider: AuthProvider) => {
+    const translationKey = `${provider.provider}Button`;
+    const translated = t(translationKey);
+    if (translated === translationKey) {
+      return `Sign in with ${provider.label}`;
+    }
+    return translated;
+  };
+
   const getProviderButtonClass = (provider: string) => {
     if (provider === "twitch") {
       return "w-full bg-twitch hover:bg-twitch-hover";
@@ -214,7 +223,7 @@ export function LoginForm() {
                 ) : (
                   getProviderIcon(provider.provider)
                 )}
-                {t(`${provider.provider}Button`)}
+                {getProviderButtonText(provider)}
               </Button>
             ))}
           </div>
