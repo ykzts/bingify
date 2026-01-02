@@ -217,16 +217,56 @@ export function LoginForm({ providers }: Props) {
         </div>
       )}
 
-      <Collapsible onOpenChange={setShowEmailForm} open={showEmailForm}>
-        {providers.length > 0 && (
+      {providers.length > 0 ? (
+        <Collapsible onOpenChange={setShowEmailForm} open={showEmailForm}>
           <CollapsibleTrigger asChild>
             <Button className="w-full" type="button" variant="ghost">
               <Mail className="h-4 w-4" />
               {t("emailButton")}
             </Button>
           </CollapsibleTrigger>
-        )}
-        <CollapsibleContent className="space-y-4 pt-4">
+          <CollapsibleContent className="space-y-4 pt-4">
+            {emailSuccess && (
+              <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <p className="text-green-800 text-sm">{t("emailSuccess")}</p>
+              </div>
+            )}
+
+            {emailError && (
+              <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
+                <AlertCircle className="h-5 w-5 text-red-600" />
+                <p className="text-red-800 text-sm">{emailError}</p>
+              </div>
+            )}
+
+            <form className="space-y-4" onSubmit={handleMagicLinkLogin}>
+              <div className="space-y-2">
+                <Label htmlFor="email">{t("emailInputLabel")}</Label>
+                <Input
+                  disabled={isEmailSending}
+                  id="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t("emailInputPlaceholder")}
+                  type="email"
+                  value={email}
+                />
+              </div>
+              <Button
+                className="w-full"
+                disabled={isEmailSending}
+                type="submit"
+              >
+                {isEmailSending && (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                )}
+                {isEmailSending ? t("emailSending") : t("emailSendButton")}
+              </Button>
+            </form>
+          </CollapsibleContent>
+        </Collapsible>
+      ) : (
+        <div className="space-y-4">
           {emailSuccess && (
             <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4">
               <CheckCircle className="h-5 w-5 text-green-600" />
@@ -260,8 +300,8 @@ export function LoginForm({ providers }: Props) {
               {isEmailSending ? t("emailSending") : t("emailSendButton")}
             </Button>
           </form>
-        </CollapsibleContent>
-      </Collapsible>
+        </div>
+      )}
     </div>
   );
 }
