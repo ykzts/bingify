@@ -98,6 +98,14 @@ function AdminNav({ locale }: { locale: string }) {
         <li>
           <Link
             className="inline-block border-transparent border-b-2 pb-4 hover:border-blue-500"
+            href={`/${locale}/admin/auth-providers`}
+          >
+            {t("navAuthProviders")}
+          </Link>
+        </li>
+        <li>
+          <Link
+            className="inline-block border-transparent border-b-2 pb-4 hover:border-blue-500"
             href={`/${locale}/admin/settings`}
           >
             {t("navSettings")}

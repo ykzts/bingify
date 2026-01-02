@@ -3,7 +3,7 @@
 import { AlertCircle, CheckCircle, Mail } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,18 +19,18 @@ import {
   GOOGLE_OAUTH_SCOPES,
   TWITCH_OAUTH_SCOPES,
 } from "@/lib/auth/oauth-utils";
+import type { AuthProvider } from "@/lib/data/auth-providers";
 import { createClient } from "@/lib/supabase/client";
 
 const emailSchema = z.object({
   email: z.string().email(),
 });
 
-interface AuthProvider {
-  label: string;
-  provider: string;
+interface Props {
+  providers: AuthProvider[];
 }
 
-export function LoginForm() {
+export function LoginForm({ providers }: Props) {
   const t = useTranslations("Login");
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
@@ -42,28 +42,6 @@ export function LoginForm() {
   const [emailError, setEmailError] = useState<string | null>(null);
   const [emailSuccess, setEmailSuccess] = useState(false);
   const [isEmailSending, setIsEmailSending] = useState(false);
-  const [providers, setProviders] = useState<AuthProvider[]>([]);
-  const [providersLoading, setProvidersLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProviders = async () => {
-      try {
-        const response = await fetch("/api/system/auth-providers");
-        if (!response.ok) {
-          throw new Error("Failed to fetch providers");
-        }
-        const data = await response.json();
-        setProviders(data.providers || []);
-      } catch (error) {
-        console.error("Error fetching auth providers:", error);
-        setProviders([]);
-      } finally {
-        setProvidersLoading(false);
-      }
-    };
-
-    fetchProviders();
-  }, []);
 
   const handleOAuthLogin = async (provider: string) => {
     setOauthError(null);
@@ -201,33 +179,27 @@ export function LoginForm() {
         </div>
       )}
 
-      {providersLoading ? (
-        <div className="flex justify-center py-8">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-purple-600" />
+      {providers.length > 0 && (
+        <div className="space-y-3">
+          {providers.map((provider) => (
+            <Button
+              aria-label={`Sign in with ${provider.label}`}
+              className={getProviderButtonClass(provider.provider)}
+              disabled={isLoading}
+              key={provider.provider}
+              onClick={() => handleOAuthLogin(provider.provider)}
+              type="button"
+              variant={getProviderButtonVariant(provider.provider)}
+            >
+              {isLoading ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
+              ) : (
+                getProviderIcon(provider.provider)
+              )}
+              {getProviderButtonText(provider)}
+            </Button>
+          ))}
         </div>
-      ) : (
-        providers.length > 0 && (
-          <div className="space-y-3">
-            {providers.map((provider) => (
-              <Button
-                aria-label={`Sign in with ${provider.label}`}
-                className={getProviderButtonClass(provider.provider)}
-                disabled={isLoading}
-                key={provider.provider}
-                onClick={() => handleOAuthLogin(provider.provider)}
-                type="button"
-                variant={getProviderButtonVariant(provider.provider)}
-              >
-                {isLoading ? (
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
-                ) : (
-                  getProviderIcon(provider.provider)
-                )}
-                {getProviderButtonText(provider)}
-              </Button>
-            ))}
-          </div>
-        )
       )}
 
       {providers.length > 0 && (
