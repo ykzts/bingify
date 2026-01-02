@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  initialFormState,
+  mergeForm,
+  useForm,
+  useStore,
+  useTransform,
+} from "@tanstack/react-form-nextjs";
 import { Loader2, Trash2, UserPlus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
@@ -7,21 +14,16 @@ import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldContent,
-  FieldError,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { SpaceAdmin } from "@/lib/types/space";
 import {
   type GetSpaceAdminsResult,
   getSpaceAdmins,
-  type InviteAdminState,
-  inviteAdmin,
   removeAdmin,
 } from "../actions";
+import { inviteAdminFormOpts, inviteAdminFormSchema } from "../form-options";
+import { inviteAdminAction } from "../invite-admin-actions";
 
 interface Props {
   spaceId: string;
@@ -36,11 +38,26 @@ export function AdminManagement({ spaceId }: Props) {
   const [removingUserId, setRemovingUserId] = useState<string | null>(null);
   const [removeError, setRemoveError] = useState<string | null>(null);
 
-  // Invite admin form state
-  const [inviteState, inviteAction, isInvitePending] = useActionState<
-    InviteAdminState,
-    FormData
-  >(inviteAdmin.bind(null, spaceId), { success: false });
+  // Use TanStack Form with Next.js server actions
+  const [state, action] = useActionState(
+    inviteAdminAction.bind(null, spaceId),
+    initialFormState
+  );
+
+  const form = useForm({
+    ...inviteAdminFormOpts,
+    validators: {
+      onChange: inviteAdminFormSchema,
+    },
+    // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
+    transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
+  });
+
+  const formErrors = useStore(form.store, (formState) => formState.errors);
+  const isSubmitting = useStore(
+    form.store,
+    (formState) => formState.isSubmitting
+  );
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: spaceId is stable and doesn't need to be in deps
   useEffect(() => {
@@ -60,14 +77,17 @@ export function AdminManagement({ spaceId }: Props) {
   };
 
   // Reload admins when invite succeeds
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Only trigger on inviteState.success change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only trigger on state.meta.success change
   useEffect(() => {
-    if (inviteState.success) {
+    const meta = (state as Record<string, unknown>)?.meta as
+      | { success?: boolean }
+      | undefined;
+    if (meta?.success) {
       toast.success("管理者を追加しました");
       loadAdmins();
       router.refresh();
     }
-  }, [inviteState.success]);
+  }, [(state as Record<string, unknown>)?.meta]);
 
   const handleRemoveAdmin = async (adminUserId: string) => {
     if (
@@ -108,27 +128,49 @@ export function AdminManagement({ spaceId }: Props) {
       {/* Invite Admin Form */}
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
         <h3 className="mb-3 font-semibold text-sm">管理者を招待</h3>
-        <form action={inviteAction} className="space-y-3">
-          <Field>
-            <FieldContent>
-              <FieldLabel>メールアドレス</FieldLabel>
-              <Input
-                disabled={isInvitePending}
-                name="email"
-                placeholder="user@example.com"
-                required
-                type="email"
-              />
-              <FieldError>{inviteState.error}</FieldError>
-            </FieldContent>
-          </Field>
+        {formErrors.length > 0 && (
+          <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3">
+            {formErrors.map((error) => (
+              <p className="text-red-800 text-sm" key={String(error)}>
+                {String(error)}
+              </p>
+            ))}
+          </div>
+        )}
+        <form action={action} className="space-y-3">
+          <form.Field name="email">
+            {(field) => (
+              <Field>
+                <FieldLabel>メールアドレス</FieldLabel>
+                <Input
+                  disabled={isSubmitting}
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="user@example.com"
+                  required
+                  type="email"
+                  value={field.state.value as string}
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2">
+                    {field.state.meta.errors.map((error) => (
+                      <p className="text-red-800 text-sm" key={String(error)}>
+                        {String(error)}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </Field>
+            )}
+          </form.Field>
           <Button
             className="w-full"
-            disabled={isInvitePending}
+            disabled={isSubmitting}
             size="sm"
             type="submit"
           >
-            {isInvitePending ? (
+            {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 招待中...
