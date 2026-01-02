@@ -4,6 +4,7 @@ import { AlertCircle, CheckCircle, Mail } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -19,6 +20,10 @@ import {
   TWITCH_OAUTH_SCOPES,
 } from "@/lib/auth/oauth-utils";
 import { createClient } from "@/lib/supabase/client";
+
+const emailSchema = z.object({
+  email: z.string().email(),
+});
 
 export function LoginForm() {
   const t = useTranslations("Login");
@@ -63,8 +68,9 @@ export function LoginForm() {
     setEmailError(null);
     setEmailSuccess(false);
 
-    // Validate email
-    if (!email?.includes("@")) {
+    // Validate email using Zod
+    const result = emailSchema.safeParse({ email });
+    if (!result.success) {
       setEmailError(t("errorEmailInvalid"));
       return;
     }
