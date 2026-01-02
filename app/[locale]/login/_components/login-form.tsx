@@ -1,9 +1,18 @@
 "use client";
 
+import { AlertCircle, CheckCircle, Mail } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import {
   buildOAuthCallbackUrl,
   GOOGLE_OAUTH_SCOPES,
@@ -18,6 +27,11 @@ export function LoginForm() {
   const redirect = searchParams.get("redirect");
   const [oauthError, setOauthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [emailSuccess, setEmailSuccess] = useState(false);
+  const [isEmailSending, setIsEmailSending] = useState(false);
 
   const handleOAuthLogin = async (provider: "google" | "twitch") => {
     setOauthError(null);
@@ -44,6 +58,38 @@ export function LoginForm() {
     // Note: If successful, user will be redirected, so no need to setIsLoading(false)
   };
 
+  const handleMagicLinkLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailError(null);
+    setEmailSuccess(false);
+
+    // Validate email
+    if (!email?.includes("@")) {
+      setEmailError(t("errorEmailInvalid"));
+      return;
+    }
+
+    setIsEmailSending(true);
+    const supabase = createClient();
+
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: buildOAuthCallbackUrl(redirect ?? undefined),
+      },
+    });
+
+    setIsEmailSending(false);
+
+    if (error) {
+      console.error("Magic Link error:", error);
+      setEmailError(error.message);
+    } else {
+      setEmailSuccess(true);
+      setEmail("");
+    }
+  };
+
   const displayError = error || oauthError;
 
   return (
@@ -54,8 +100,9 @@ export function LoginForm() {
       </div>
 
       {displayError && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p className="text-center text-red-800 text-sm">
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
+          <AlertCircle className="h-5 w-5 text-red-600" />
+          <p className="text-red-800 text-sm">
             {error ? t("errorMessage") : displayError}
           </p>
         </div>
@@ -114,6 +161,56 @@ export function LoginForm() {
           {t("twitchButton")}
         </Button>
       </div>
+
+      <div className="flex items-center gap-4">
+        <Separator className="flex-1" />
+        <span className="text-gray-500 text-sm">{t("orDivider")}</span>
+        <Separator className="flex-1" />
+      </div>
+
+      <Collapsible onOpenChange={setShowEmailForm} open={showEmailForm}>
+        <CollapsibleTrigger asChild>
+          <Button className="w-full" type="button" variant="ghost">
+            <Mail className="h-4 w-4" />
+            {t("emailButton")}
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="space-y-4 pt-4">
+          {emailSuccess && (
+            <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <p className="text-green-800 text-sm">{t("emailSuccess")}</p>
+            </div>
+          )}
+
+          {emailError && (
+            <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <p className="text-red-800 text-sm">{emailError}</p>
+            </div>
+          )}
+
+          <form className="space-y-4" onSubmit={handleMagicLinkLogin}>
+            <div className="space-y-2">
+              <Label htmlFor="email">{t("emailInputLabel")}</Label>
+              <Input
+                disabled={isEmailSending}
+                id="email"
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t("emailInputPlaceholder")}
+                type="email"
+                value={email}
+              />
+            </div>
+            <Button className="w-full" disabled={isEmailSending} type="submit">
+              {isEmailSending && (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              )}
+              {isEmailSending ? t("emailSending") : t("emailSendButton")}
+            </Button>
+          </form>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 }

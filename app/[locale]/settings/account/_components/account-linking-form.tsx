@@ -6,6 +6,7 @@ import {
   CheckCircle,
   Link as LinkIcon,
   Loader2,
+  Mail,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -169,6 +170,19 @@ export function AccountLinkingForm({ user }: AccountLinkingFormProps) {
           <p className="text-green-800 text-sm">{success}</p>
         </div>
       )}
+
+      <div className="space-y-4">
+        <h2 className="font-semibold text-lg">{t("linkedEmail")}</h2>
+        <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4">
+          <div className="flex items-center gap-3">
+            <Mail className="h-5 w-5 text-gray-600" />
+            <div>
+              <p className="font-medium">{t("registeredEmail")}</p>
+              <p className="text-gray-500 text-sm">{user.email}</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="space-y-4">
         <h2 className="font-semibold text-lg">{t("linkedAccounts")}</h2>
