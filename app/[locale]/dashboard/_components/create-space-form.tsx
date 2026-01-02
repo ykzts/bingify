@@ -33,8 +33,11 @@ import { getAbsoluteUrl } from "@/lib/utils/url";
 import {
   checkShareKeyAvailability,
   createSpaceAction,
-} from "./create-space-actions";
-import { createSpaceFormOpts, createSpaceFormSchema } from "./form-options";
+} from "../_lib/create-space-actions";
+import {
+  createSpaceFormOpts,
+  createSpaceFormSchema,
+} from "../_lib/form-options";
 
 const SUGGESTION_REGEX = /提案: (.+)/;
 

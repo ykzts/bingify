@@ -2,9 +2,9 @@
 
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
-import { claimAdmin } from "@/app/[locale]/admin/actions";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
+import { claimAdmin } from "../../admin/_lib/actions";
 
 export function ClaimAdminButton() {
   const t = useTranslations("Setup");

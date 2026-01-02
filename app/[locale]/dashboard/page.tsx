@@ -3,10 +3,10 @@ import { FileText, Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { getUserSpaces } from "./actions";
-import { CreateSpaceForm } from "./create-space-form";
-import { SpaceActionsDropdown } from "./space-actions-dropdown";
-import { StatusBadge } from "./status-badge";
+import { CreateSpaceForm } from "./_components/create-space-form";
+import { SpaceActionsDropdown } from "./_components/space-actions-dropdown";
+import { StatusBadge } from "./_components/status-badge";
+import { getUserSpaces } from "./_lib/actions";
 
 interface Props {
   params: Promise<{ locale: string }>;

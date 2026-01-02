@@ -5,13 +5,13 @@ import confetti from "canvas-confetti";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useMemo, useRef } from "react";
+import { BingoLineOverlay } from "@/components/bingo/bingo-line-overlay";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
 import { checkBingoLines } from "@/lib/utils/bingo-checker";
 import { useBingoCard } from "../_hooks/use-bingo-card";
-import { updateBingoStatus } from "../bingo-actions";
-import { BingoLineOverlay } from "./bingo-line-overlay";
+import { updateBingoStatus } from "../_lib/bingo-actions";
 
 interface Props {
   readOnly?: boolean;

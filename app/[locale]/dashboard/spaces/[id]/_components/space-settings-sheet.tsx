@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/sheet";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
-import { AdminManagement } from "../settings/_components/admin-management";
-import { SpaceSettingsForm } from "../settings/_components/space-settings-form";
+import { AdminManagement } from "./admin-management";
 import { DangerZone } from "./danger-zone";
+import { SpaceSettingsForm } from "./space-settings-form";
 
 interface Props {
   currentParticipantCount: number;

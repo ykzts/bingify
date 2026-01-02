@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import { hasAdminUser } from "@/app/[locale]/admin/actions";
 import { createClient } from "@/lib/supabase/server";
+import { hasAdminUser } from "../admin/_lib/actions";
 import { ClaimAdminButton } from "./_components/claim-admin-button";
 
 // Force dynamic rendering to ensure Supabase credentials are only required at runtime

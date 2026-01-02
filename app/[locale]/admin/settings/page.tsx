@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { SystemSettingsForm } from "@/app/[locale]/admin/settings/_components/system-settings-form";
-import { getSystemSettings } from "@/app/[locale]/admin/settings/actions";
+import { SystemSettingsForm } from "./_components/system-settings-form";
+import { getSystemSettings } from "./_lib/actions";
 
 interface Props {
   params: Promise<{ locale: string }>;

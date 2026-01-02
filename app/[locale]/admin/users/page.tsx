@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { UserList } from "../_components/user-list";
-import { getAllUsers } from "../actions";
+import { getAllUsers } from "../_lib/actions";
 
 interface Props {
   params: Promise<{ locale: string }>;

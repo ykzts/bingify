@@ -17,7 +17,7 @@ import {
   GOOGLE_OAUTH_SCOPES,
 } from "@/lib/auth/oauth-utils";
 import { createClient } from "@/lib/supabase/client";
-import { unlinkIdentity } from "../actions";
+import { unlinkIdentity } from "../_lib/actions";
 
 interface AccountLinkingFormProps {
   user: User;

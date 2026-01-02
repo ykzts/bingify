@@ -36,7 +36,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import type { Participant } from "../_hooks/use-participants";
 import { useParticipants } from "../_hooks/use-participants";
-import { kickParticipant } from "../actions";
+import { kickParticipant } from "../_lib/actions";
 import { ParticipantCardDialog } from "./participant-card-dialog";
 
 interface Props {

@@ -30,8 +30,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "@/i18n/navigation";
 import { getAbsoluteUrl } from "@/lib/utils/url";
-import type { UserSpace } from "./actions";
-import { deleteSpace } from "./actions";
+import type { UserSpace } from "../_lib/actions";
+import { deleteSpace } from "../_lib/actions";
 
 interface SpaceActionsDropdownProps {
   space: UserSpace;

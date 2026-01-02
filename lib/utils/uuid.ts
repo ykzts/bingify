@@ -1,6 +1,5 @@
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+import { z } from "zod";
 
 export function isValidUUID(value: string): boolean {
-  return UUID_REGEX.test(value);
+  return z.uuid().safeParse(value).success;
 }
