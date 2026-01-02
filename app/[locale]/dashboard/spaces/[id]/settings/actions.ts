@@ -8,10 +8,7 @@ import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import type { SpaceAdmin } from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";
-import {
-  type SpaceSettingsFormValues,
-  spaceSettingsFormOpts,
-} from "./form-options";
+import { spaceSettingsFormOpts } from "./form-options";
 
 // Email validation regex at top level for performance
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -27,7 +24,7 @@ export interface UpdateSpaceState {
 // so we'll do manual validation in the action
 const serverValidate = createServerValidate({
   ...spaceSettingsFormOpts,
-  onServerValidate: async () => {
+  onServerValidate: () => {
     // Validation happens in the action itself due to schema transform complexity
     return undefined;
   },
@@ -55,12 +52,18 @@ export async function updateSpaceSettings(
     const description = (formData.get("description") as string) || "";
     const maxParticipantsRaw = formData.get("max_participants") as string;
     const maxParticipantsValue = Number.parseInt(maxParticipantsRaw, 10);
-    const gatekeeperMode = (formData.get("gatekeeper_mode") as string) || "none";
-    const socialPlatform = (formData.get("social_platform") as string) || "youtube";
-    const youtubeRequirement = (formData.get("youtube_requirement") as string) || "none";
-    const youtubeChannelId = (formData.get("youtube_channel_id") as string) || "";
-    const twitchRequirement = (formData.get("twitch_requirement") as string) || "none";
-    const twitchBroadcasterId = (formData.get("twitch_broadcaster_id") as string) || "";
+    const gatekeeperMode =
+      (formData.get("gatekeeper_mode") as string) || "none";
+    const socialPlatform =
+      (formData.get("social_platform") as string) || "youtube";
+    const youtubeRequirement =
+      (formData.get("youtube_requirement") as string) || "none";
+    const youtubeChannelId =
+      (formData.get("youtube_channel_id") as string) || "";
+    const twitchRequirement =
+      (formData.get("twitch_requirement") as string) || "none";
+    const twitchBroadcasterId =
+      (formData.get("twitch_broadcaster_id") as string) || "";
     const emailAllowlistRaw = (formData.get("email_allowlist") as string) || "";
     const hideMetadataBeforeJoin = formData.has("hide_metadata_before_join");
 
@@ -92,9 +95,7 @@ export async function updateSpaceSettings(
       };
     }
 
-    const {
-      email_allowlist: emailAllowlist,
-    } = validation.data;
+    const { email_allowlist: emailAllowlist } = validation.data;
 
     const supabase = await createClient();
 
@@ -284,7 +285,10 @@ export async function updateSpaceSettings(
         social_platform: socialPlatform as "youtube" | "twitch",
         title,
         twitch_broadcaster_id: twitchBroadcasterId,
-        twitch_requirement: twitchRequirement as "none" | "follower" | "subscriber",
+        twitch_requirement: twitchRequirement as
+          | "none"
+          | "follower"
+          | "subscriber",
         youtube_channel_id: youtubeChannelId,
         youtube_requirement: youtubeRequirement as "none" | "subscriber",
       },
@@ -423,11 +427,15 @@ export async function updateAndPublishSpace(
     const updateMeta = (updateResult as Record<string, unknown>)?.meta as
       | { success?: boolean }
       | undefined;
-    const hasErrors = Array.isArray((updateResult as Record<string, unknown>)?.errors) &&
-      ((updateResult as Record<string, unknown>)?.errors as unknown[]).length > 0;
+    const hasErrors =
+      Array.isArray((updateResult as Record<string, unknown>)?.errors) &&
+      ((updateResult as Record<string, unknown>)?.errors as unknown[]).length >
+        0;
 
     if (hasErrors || !updateMeta?.success) {
-      const errors = (updateResult as Record<string, unknown>)?.errors as string[] | undefined;
+      const errors = (updateResult as Record<string, unknown>)?.errors as
+        | string[]
+        | undefined;
       return {
         error: errors?.[0] || "設定の更新に失敗しました",
         success: false,

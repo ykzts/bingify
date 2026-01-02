@@ -23,11 +23,13 @@ export const spaceSettingsFormSchema = z.object({
   email_allowlist: z.string().default(""),
   gatekeeper_mode: z.enum(["none", "social", "email"]).default("none"),
   hide_metadata_before_join: z.boolean().default(false),
-  max_participants: z.number().int().min(1).max(10000).default(50),
+  max_participants: z.number().int().min(1).max(10_000).default(50),
   social_platform: z.enum(["youtube", "twitch"]).default("youtube"),
   title: z.string().default(""),
   twitch_broadcaster_id: z.string().default(""),
-  twitch_requirement: z.enum(["none", "follower", "subscriber"]).default("none"),
+  twitch_requirement: z
+    .enum(["none", "follower", "subscriber"])
+    .default("none"),
   youtube_channel_id: z.string().default(""),
   youtube_requirement: z.enum(["none", "subscriber"]).default("none"),
 });

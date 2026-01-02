@@ -37,7 +37,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { cn } from "@/lib/utils";
-import type { PublishSpaceState, UpdateSpaceState } from "../actions";
+import type { PublishSpaceState } from "../actions";
 import { updateAndPublishSpace, updateSpaceSettings } from "../actions";
 import { spaceSettingsFormOpts } from "../form-options";
 
@@ -128,8 +128,7 @@ export function SpaceSettingsForm({
     ...spaceSettingsFormOpts,
     defaultValues: {
       description: space.description || "",
-      email_allowlist:
-        space.gatekeeper_rules?.email?.allowed?.join(", ") || "",
+      email_allowlist: space.gatekeeper_rules?.email?.allowed?.join(", ") || "",
       gatekeeper_mode: determineGatekeeperMode(space.gatekeeper_rules),
       hide_metadata_before_join:
         space.settings?.hide_metadata_before_join ?? false,
@@ -138,14 +137,13 @@ export function SpaceSettingsForm({
       title: space.title || "",
       twitch_broadcaster_id:
         space.gatekeeper_rules?.twitch?.broadcasterId || "",
-      twitch_requirement:
-        space.gatekeeper_rules?.twitch?.requirement || "none",
+      twitch_requirement: space.gatekeeper_rules?.twitch?.requirement || "none",
       youtube_channel_id: space.gatekeeper_rules?.youtube?.channelId || "",
       youtube_requirement:
         space.gatekeeper_rules?.youtube?.requirement || "none",
     },
-    // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform(
+      // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
       (baseForm) => mergeForm(baseForm, updateState!),
       [updateState]
     ),
@@ -163,7 +161,8 @@ export function SpaceSettingsForm({
     (formValues.gatekeeper_mode as "none" | "social" | "email") || "none";
   const socialPlatform =
     (formValues.social_platform as "youtube" | "twitch") || "youtube";
-  const youtubeRequirement = (formValues.youtube_requirement as string) || "none";
+  const youtubeRequirement =
+    (formValues.youtube_requirement as string) || "none";
   const twitchRequirement = (formValues.twitch_requirement as string) || "none";
 
   useEffect(() => {
@@ -277,9 +276,7 @@ export function SpaceSettingsForm({
                         {String(field.state.meta.errors[0])}
                       </FieldError>
                     )}
-                    <FieldDescription>
-                      {t("descriptionHelp")}
-                    </FieldDescription>
+                    <FieldDescription>{t("descriptionHelp")}</FieldDescription>
                   </FieldContent>
                 </Field>
               )}
