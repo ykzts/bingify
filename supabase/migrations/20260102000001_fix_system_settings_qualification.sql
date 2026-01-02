@@ -14,6 +14,8 @@ BEGIN
     default_role := 'organizer';
   END IF;
 
+  -- Set flag to prevent infinite recursion if profiles table has triggers
+  -- that might attempt to modify auth.users
   PERFORM set_config('app.inserting_new_user', 'true', true);
 
   INSERT INTO public.profiles (id, email, full_name, avatar_url, role)
@@ -30,6 +32,7 @@ BEGIN
         avatar_url = EXCLUDED.avatar_url,
         updated_at = NOW();
 
+  -- Clear the flag after profile insertion/update is complete
   PERFORM set_config('app.inserting_new_user', '', true);
 
   RETURN NEW;
@@ -46,6 +49,11 @@ RETURNS TABLE (
   space_expiration_hours INTEGER
 ) AS $$
 BEGIN
+  -- Ensure system_settings record exists
+  IF NOT EXISTS (SELECT 1 FROM public.system_settings WHERE id = 1) THEN
+    RAISE EXCEPTION 'System settings not initialized (id=1 not found)';
+  END IF;
+
   RETURN QUERY
   SELECT
     s.default_user_role,
