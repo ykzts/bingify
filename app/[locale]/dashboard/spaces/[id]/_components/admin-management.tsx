@@ -154,14 +154,17 @@ export function AdminManagement({ spaceId }: Props) {
                 />
                 {field.state.meta.errors.length > 0 && (
                   <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2">
-                    {field.state.meta.errors.map((error) => (
-                      <p
-                        className="text-red-800 text-sm"
-                        key={getErrorMessage(error)}
-                      >
-                        {getErrorMessage(error)}
-                      </p>
-                    ))}
+                    {field.state.meta.errors.map((error, index) => {
+                      const message = getErrorMessage(error);
+                      return (
+                        <p
+                          className="text-red-800 text-sm"
+                          key={`${message.slice(0, 20)}-${index}`}
+                        >
+                          {message}
+                        </p>
+                      );
+                    })}
                   </div>
                 )}
               </Field>

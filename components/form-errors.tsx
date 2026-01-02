@@ -35,11 +35,11 @@ export function FormErrors({
         role="alert"
       >
         <AlertCircle className="h-4 w-4 flex-shrink-0" />
-        <span>
+        <div className="flex flex-col gap-1">
           {errorMessages.map((message, index) => (
             <span key={`${message.slice(0, 20)}-${index}`}>{message}</span>
           ))}
-        </span>
+        </div>
       </div>
     );
   }
