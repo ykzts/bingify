@@ -93,89 +93,85 @@ async function checkExistingAdmin(
   return { error: null };
 }
 
-// Create the server validation function
-export function createInviteAdminServerValidate(spaceId: string) {
-  return createServerValidate({
-    ...inviteAdminFormOpts,
-    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Comprehensive validation requires multiple checks for authentication, ownership, user lookup, and admin status
-    onServerValidate: async ({ value }: { value: InviteAdminFormValues }) => {
-      if (!isValidUUID(spaceId)) {
-        return { form: "無効なスペースIDです" };
-      }
-
-      const supabase = await createClient();
-
-      // Check authentication
-      const { error: authError, user } =
-        await checkUserAuthentication(supabase);
-      if (authError || !user) {
-        return { form: authError || "認証が必要です。" };
-      }
-
-      // Check space ownership
-      const { error: ownerError, space } = await checkSpaceOwnership(
-        supabase,
-        spaceId,
-        user.id
-      );
-      if (ownerError) {
-        return { form: ownerError };
-      }
-      if (!space) {
-        return { form: "権限がありません。" };
-      }
-
-      // Find user by email
-      const { error: userError, targetUser } = await findUserByEmail(
-        supabase,
-        value.email
-      );
-      if (userError) {
-        return {
-          fields: {
-            email: userError,
-          },
-        };
-      }
-      if (!targetUser) {
-        return {
-          fields: {
-            email: "ユーザーが見つかりませんでした",
-          },
-        };
-      }
-
-      // Check if already an admin (space.owner_id is guaranteed after checkSpaceOwnership validation)
-      if (!space.owner_id) {
-        return { form: "スペースのオーナー情報が不正です" };
-      }
-
-      const { error: adminError } = await checkExistingAdmin(
-        supabase,
-        spaceId,
-        targetUser.id,
-        space.owner_id
-      );
-      if (adminError) {
-        return {
-          fields: {
-            email: adminError,
-          },
-        };
-      }
-
-      return undefined;
-    },
-  });
-}
-
 export async function inviteAdminAction(
   spaceId: string,
   _prevState: unknown,
   formData: FormData
 ) {
   try {
-    const serverValidate = createInviteAdminServerValidate(spaceId);
+    // Create the server validation function
+    const serverValidate = createServerValidate({
+      ...inviteAdminFormOpts,
+      // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Comprehensive validation requires multiple checks for authentication, ownership, user lookup, and admin status
+      onServerValidate: async ({ value }: { value: InviteAdminFormValues }) => {
+        if (!isValidUUID(spaceId)) {
+          return { form: "無効なスペースIDです" };
+        }
+
+        const supabase = await createClient();
+
+        // Check authentication
+        const { error: authError, user } =
+          await checkUserAuthentication(supabase);
+        if (authError || !user) {
+          return { form: authError || "認証が必要です。" };
+        }
+
+        // Check space ownership
+        const { error: ownerError, space } = await checkSpaceOwnership(
+          supabase,
+          spaceId,
+          user.id
+        );
+        if (ownerError) {
+          return { form: ownerError };
+        }
+        if (!space) {
+          return { form: "権限がありません。" };
+        }
+
+        // Find user by email
+        const { error: userError, targetUser } = await findUserByEmail(
+          supabase,
+          value.email
+        );
+        if (userError) {
+          return {
+            fields: {
+              email: userError,
+            },
+          };
+        }
+        if (!targetUser) {
+          return {
+            fields: {
+              email: "ユーザーが見つかりませんでした",
+            },
+          };
+        }
+
+        // Check if already an admin (space.owner_id is guaranteed after checkSpaceOwnership validation)
+        if (!space.owner_id) {
+          return { form: "スペースのオーナー情報が不正です" };
+        }
+
+        const { error: adminError } = await checkExistingAdmin(
+          supabase,
+          spaceId,
+          targetUser.id,
+          space.owner_id
+        );
+        if (adminError) {
+          return {
+            fields: {
+              email: adminError,
+            },
+          };
+        }
+
+        return undefined;
+      },
+    });
 
     // Validate the form data
     const validatedData = await serverValidate(formData);
