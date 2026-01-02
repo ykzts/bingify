@@ -23,7 +23,7 @@ export const spaceSettingsFormSchema = z.object({
   email_allowlist: z.string().default(""),
   gatekeeper_mode: z.enum(["none", "social", "email"]).default("none"),
   hide_metadata_before_join: z.boolean().default(false),
-  max_participants: z.number().int().min(1).max(1_000).default(50),
+  max_participants: z.number().int().min(1).max(1000).default(50),
   social_platform: z.enum(["youtube", "twitch"]).default("youtube"),
   title: z.string().default(""),
   twitch_broadcaster_id: z.string().default(""),
