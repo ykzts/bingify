@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
+import { getEnabledAuthProviders } from "@/lib/data/auth-providers";
 import { LoginForm } from "./_components/login-form";
 
 interface Props {
@@ -25,6 +26,8 @@ export default async function LoginPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const providers = await getEnabledAuthProviders();
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-red-100 via-amber-50 to-sky-100">
       <Suspense
@@ -34,7 +37,7 @@ export default async function LoginPage({ params }: Props) {
           </div>
         }
       >
-        <LoginForm />
+        <LoginForm providers={providers} />
       </Suspense>
     </div>
   );

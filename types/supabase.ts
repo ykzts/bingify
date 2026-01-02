@@ -313,6 +313,30 @@ export type Database = {
         }
         Relationships: []
       }
+      system_auth_providers: {
+        Row: {
+          created_at: string | null
+          is_enabled: boolean
+          label: string | null
+          provider: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          is_enabled?: boolean
+          label?: string | null
+          provider: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          is_enabled?: boolean
+          label?: string | null
+          provider?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           created_at: string | null
