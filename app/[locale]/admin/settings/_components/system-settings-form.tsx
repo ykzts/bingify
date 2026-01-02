@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
+import { InlineFieldError } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
 import { Button } from "@/components/ui/button";
 import {
@@ -127,9 +128,9 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                     {t("maxParticipantsHelp")}
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
-                    <p className="text-red-600 text-sm">
+                    <InlineFieldError>
                       {getErrorMessage(field.state.meta.errors[0])}
-                    </p>
+                    </InlineFieldError>
                   )}
                 </FieldContent>
               </Field>
@@ -168,9 +169,9 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                     {t("maxSpacesPerUserHelp")}
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
-                    <p className="text-red-600 text-sm">
+                    <InlineFieldError>
                       {getErrorMessage(field.state.meta.errors[0])}
-                    </p>
+                    </InlineFieldError>
                   )}
                 </FieldContent>
               </Field>
@@ -207,9 +208,9 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   />
                   <FieldDescription>{t("maxTotalSpacesHelp")}</FieldDescription>
                   {field.state.meta.errors.length > 0 && (
-                    <p className="text-red-600 text-sm">
+                    <InlineFieldError>
                       {getErrorMessage(field.state.meta.errors[0])}
-                    </p>
+                    </InlineFieldError>
                   )}
                 </FieldContent>
               </Field>
@@ -248,9 +249,9 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                     {t("spaceExpirationHelp")}
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
-                    <p className="text-red-600 text-sm">
+                    <InlineFieldError>
                       {getErrorMessage(field.state.meta.errors[0])}
-                    </p>
+                    </InlineFieldError>
                   )}
                 </FieldContent>
               </Field>

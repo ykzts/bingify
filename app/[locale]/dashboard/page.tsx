@@ -3,6 +3,7 @@ import { FileText, Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { SectionHeader } from "@/components/section-header";
 import { CreateSpaceForm } from "./_components/create-space-form";
 import { SpaceActionsDropdown } from "./_components/space-actions-dropdown";
 import { StatusBadge } from "./_components/status-badge";
@@ -113,10 +114,7 @@ export default async function DashboardPage({ params }: Props) {
 
       {/* --- SECTION 3: History --- */}
       <section>
-        <h2 className="mb-4 flex items-center gap-2 font-bold text-gray-800 text-lg">
-          <FileText className="h-5 w-5" />
-          {t("historyTitle")}
-        </h2>
+        <SectionHeader icon={FileText}>{t("historyTitle")}</SectionHeader>
         {spaces.length === 0 ? (
           <div className="overflow-hidden rounded-lg border bg-white p-8 text-center shadow-sm">
             <p className="text-gray-500 text-sm">{t("historyNoSpaces")}</p>

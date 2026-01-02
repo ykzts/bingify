@@ -11,14 +11,15 @@ import { Loader2, Trash2, UserPlus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { FieldErrors } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
 import { useConfirm } from "@/components/providers/confirm-provider";
+import { SectionHeader } from "@/components/section-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { SpaceAdmin } from "@/lib/types/space";
-import { getErrorMessage } from "@/lib/utils";
 import {
   inviteAdminFormOpts,
   inviteAdminFormSchema,
@@ -120,15 +121,12 @@ export function AdminManagement({ spaceId }: Props) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="mb-2 flex items-center gap-2 font-bold text-lg">
-          <Users className="h-5 w-5" />
-          管理者設定
-        </h2>
-        <p className="text-gray-600 text-sm">
-          スペースを共同で管理できるユーザーを招待します。管理者はスペースの設定を編集できますが、スペースの削除や他の管理者の追加・削除はできません。
-        </p>
-      </div>
+      <SectionHeader
+        description="スペースを共同で管理できるユーザーを招待します。管理者はスペースの設定を編集できますが、スペースの削除や他の管理者の追加・削除はできません。"
+        icon={Users}
+      >
+        管理者設定
+      </SectionHeader>
 
       {/* Invite Admin Form */}
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
@@ -152,21 +150,10 @@ export function AdminManagement({ spaceId }: Props) {
                   type="email"
                   value={field.state.value as string}
                 />
-                {field.state.meta.errors.length > 0 && (
-                  <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2">
-                    {field.state.meta.errors.map((error, index) => {
-                      const message = getErrorMessage(error);
-                      return (
-                        <p
-                          className="text-red-800 text-sm"
-                          key={`${message.slice(0, 20)}-${index}`}
-                        >
-                          {message}
-                        </p>
-                      );
-                    })}
-                  </div>
-                )}
+                <FieldErrors
+                  className="mt-2"
+                  errors={field.state.meta.errors}
+                />
               </Field>
             )}
           </form.Field>
@@ -194,11 +181,7 @@ export function AdminManagement({ spaceId }: Props) {
       {/* Admin List */}
       <div>
         <h3 className="mb-3 font-semibold text-sm">現在の管理者</h3>
-        {removeError && (
-          <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3">
-            <p className="text-red-800 text-sm">{removeError}</p>
-          </div>
-        )}
+        {removeError && <FieldErrors className="mb-3" errors={[removeError]} />}
         {loading && (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
