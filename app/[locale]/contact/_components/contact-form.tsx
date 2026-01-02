@@ -11,6 +11,7 @@ import { Loader2, Mail, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
+import { FormErrors } from "@/components/form-errors";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { Button } from "@/components/ui/button";
 import {
@@ -93,24 +94,10 @@ export function ContactForm({ locale }: Props) {
       <p className="mb-6 text-gray-600">{t("description")}</p>
 
       <form action={action}>
-        {(() => {
-          const errorMessages = formErrors
-            .map((error) => getErrorMessage(error))
-            .filter(
-              (message) =>
-                message.trim() !== "" && message !== "[object Object]"
-            );
-
-          return (
-            errorMessages.length > 0 && (
-              <div className="mb-4 rounded-md bg-red-50 p-4 text-red-600 text-sm">
-                {errorMessages.map((message) => (
-                  <p key={message}>{message}</p>
-                ))}
-              </div>
-            )
-          );
-        })()}
+        <FormErrors
+          className="mb-4 rounded-md bg-red-50 p-4 text-red-600 text-sm"
+          errors={formErrors}
+        />
 
         <FieldGroup>
           <form.Field name="name">

@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
+import { FormErrors } from "@/components/form-errors";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
@@ -179,25 +180,10 @@ export function CreateSpaceForm() {
 
   return (
     <form action={action} className="space-y-6">
-      {(() => {
-        const errorMessages = formErrors
-          .map((error) => getErrorMessage(error))
-          .filter(
-            (message) => message.trim() !== "" && message !== "[object Object]"
-          );
-
-        return (
-          errorMessages.length > 0 && (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
-              {errorMessages.map((message) => (
-                <p className="text-red-800" key={message}>
-                  {message}
-                </p>
-              ))}
-            </div>
-          )
-        );
-      })()}
+      <FormErrors
+        className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4"
+        errors={formErrors}
+      />
 
       <form.Field name="share_key">
         {(field) => (

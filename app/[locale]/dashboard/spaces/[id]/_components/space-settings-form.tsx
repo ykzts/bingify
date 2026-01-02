@@ -11,6 +11,7 @@ import { CheckCircle, Loader2, Rocket } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
+import { FormErrors } from "@/components/form-errors";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -702,26 +703,10 @@ export function SpaceSettingsForm({
         </div>
 
         {/* Error Messages */}
-        {(() => {
-          const errorMessages = formErrors
-            .map((error) => getErrorMessage(error))
-            .filter(
-              (message) =>
-                message.trim() !== "" && message !== "[object Object]"
-            );
-
-          return (
-            errorMessages.length > 0 && (
-              <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-                {errorMessages.map((message) => (
-                  <p className="text-red-800" key={message}>
-                    {message}
-                  </p>
-                ))}
-              </div>
-            )
-          );
-        })()}
+        <FormErrors
+          className="rounded-lg border border-red-200 bg-red-50 p-4"
+          errors={formErrors}
+        />
         {publishState.error && (
           <div className="rounded-lg border border-red-200 bg-red-50 p-4">
             <p className="text-red-800">{publishState.error}</p>

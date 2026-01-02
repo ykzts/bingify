@@ -11,6 +11,7 @@ import { Loader2, Trash2, UserPlus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { FormErrors } from "@/components/form-errors";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -132,26 +133,10 @@ export function AdminManagement({ spaceId }: Props) {
       {/* Invite Admin Form */}
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
         <h3 className="mb-3 font-semibold text-sm">管理者を招待</h3>
-        {(() => {
-          const errorMessages = formErrors
-            .map((error) => getErrorMessage(error))
-            .filter(
-              (message) =>
-                message.trim() !== "" && message !== "[object Object]"
-            );
-
-          return (
-            errorMessages.length > 0 && (
-              <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3">
-                {errorMessages.map((message) => (
-                  <p className="text-red-800 text-sm" key={message}>
-                    {message}
-                  </p>
-                ))}
-              </div>
-            )
-          );
-        })()}
+        <FormErrors
+          className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3"
+          errors={formErrors}
+        />
         <form action={action} className="space-y-3">
           <form.Field name="email">
             {(field) => (

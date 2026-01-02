@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
+import { FormErrors } from "@/components/form-errors";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -86,25 +87,10 @@ export function SystemSettingsForm({ initialSettings }: Props) {
 
   return (
     <form action={action} className="space-y-6">
-      {(() => {
-        const errorMessages = formErrors
-          .map((error) => getErrorMessage(error))
-          .filter(
-            (message) => message.trim() !== "" && message !== "[object Object]"
-          );
-
-        return (
-          errorMessages.length > 0 && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-              {errorMessages.map((message) => (
-                <p className="text-red-800 text-sm" key={message}>
-                  {t(message, { default: t("errorGeneric") })}
-                </p>
-              ))}
-            </div>
-          )
-        );
-      })()}
+      <FormErrors
+        className="rounded-lg border border-red-200 bg-red-50 p-3"
+        errors={formErrors}
+      />
 
       <FieldSet>
         <FieldLegend>リソース制限</FieldLegend>
