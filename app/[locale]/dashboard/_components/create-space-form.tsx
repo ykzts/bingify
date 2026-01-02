@@ -118,38 +118,6 @@ export function CreateSpaceForm() {
     }
   };
 
-  const handleGenerateRandomKey = () => {
-    const randomKey = generateRandomKey();
-    setShareKey(randomKey);
-    setAvailable(null);
-  };
-
-  const handleAcceptSuggestion = () => {
-    // Extract suggestion from error map
-    const stateRecord = state as Record<string, unknown>;
-    if (
-      stateRecord?.errorMap &&
-      typeof stateRecord.errorMap === "object" &&
-      stateRecord.errorMap !== null &&
-      "onChange" in stateRecord.errorMap
-    ) {
-      const errorMap = stateRecord.errorMap as Record<string, unknown>;
-      const errorMsg = errorMap.onChange;
-      if (typeof errorMsg === "string" && errorMsg.includes("提案:")) {
-        const suggestionMatch = errorMsg.match(SUGGESTION_REGEX);
-        if (suggestionMatch) {
-          const suggestion = suggestionMatch[1];
-          const suggestionWithoutDate = suggestion.replace(
-            `-${dateSuffix}`,
-            ""
-          );
-          setShareKey(suggestionWithoutDate);
-          setAvailable(null);
-        }
-      }
-    }
-  };
-
   useEffect(() => {
     if (!debouncedShareKey || debouncedShareKey.length < 3) {
       return;
@@ -186,116 +154,152 @@ export function CreateSpaceForm() {
       />
 
       <form.Field name="share_key">
-        {(field) => (
-          <Field>
-            <FieldLabel>共有キー</FieldLabel>
+        {(field) => {
+          const handleGenerateRandomKey = () => {
+            const randomKey = generateRandomKey();
+            setShareKey(randomKey);
+            field.handleChange(randomKey);
+            setAvailable(null);
+          };
 
-            <InputGroup className="mb-2">
-              <InputGroupAddon align="inline-start">
-                <InputGroupText>@</InputGroupText>
-              </InputGroupAddon>
-              <InputGroupInput
-                className="rounded-none border-x-0 pr-10 font-mono"
-                disabled={isSubmitting}
-                maxLength={30}
-                minLength={3}
-                name={field.name}
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  const normalizedValue = newValue.toLowerCase();
-                  field.handleChange(normalizedValue);
-                  handleShareKeyChange(normalizedValue);
-                }}
-                pattern="[a-z0-9-]+"
-                placeholder="my-party"
-                required
-                type="text"
-                value={field.state.value as string}
-              />
-              <InputGroupAddon align="inline-end">
-                <InputGroupButton
-                  aria-label={t("generateRandomButtonAriaLabel")}
-                  onClick={handleGenerateRandomKey}
-                  size="icon-xs"
-                  title={t("generateRandomButton")}
-                  type="button"
-                >
-                  <Dices className="h-4 w-4" />
-                </InputGroupButton>
-              </InputGroupAddon>
-              <InputGroupAddon align="inline-end">
-                <InputGroupText className="rounded-lg rounded-l-none">
-                  -{dateSuffix}
-                </InputGroupText>
-              </InputGroupAddon>
-            </InputGroup>
+          return (
+            <Field>
+              <FieldLabel>共有キー</FieldLabel>
 
-            <div className="mb-2 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
-              <AlertTriangle className="h-4 w-4 text-amber-600" />
-              <p className="text-amber-800 text-sm">
-                この共有キーを知っているユーザーは誰でも参加できます
-              </p>
-            </div>
-
-            <p className="mb-2 text-gray-500 text-sm">
-              公開URL:{" "}
-              <span className="font-mono">
-                {getAbsoluteUrl()}/
-                <span className="font-semibold text-gray-900">
-                  @{(field.state.value as string) || "..."}-{dateSuffix}
-                </span>
-              </span>
-            </p>
-
-            {/* Status indicator */}
-            {field.state.value.length >= 3 && (
-              <div className="mt-2 flex items-center gap-2">
-                {checking && (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                    <span className="text-gray-500 text-sm">確認中...</span>
-                  </>
-                )}
-
-                {!checking && available === true && (
-                  <>
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-green-600 text-sm">
-                      この共有キーは使用可能です
-                    </span>
-                  </>
-                )}
-
-                {!checking && available === false && (
-                  <>
-                    <AlertCircle className="h-4 w-4 text-amber-600" />
-                    <span className="text-amber-600 text-sm">
-                      この共有キーは既に使用されています
-                    </span>
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* Field-level errors */}
-            {field.state.meta.errors.length > 0 && (
-              <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-3">
-                {field.state.meta.errors.map((error) => (
-                  <p
-                    className="text-red-800 text-sm"
-                    key={getErrorMessage(error)}
+              <InputGroup className="mb-2">
+                <InputGroupAddon align="inline-start">
+                  <InputGroupText>@</InputGroupText>
+                </InputGroupAddon>
+                <InputGroupInput
+                  className="rounded-none border-x-0 pr-10 font-mono"
+                  disabled={isSubmitting}
+                  maxLength={30}
+                  minLength={3}
+                  name={field.name}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    const normalizedValue = newValue.toLowerCase();
+                    field.handleChange(normalizedValue);
+                    handleShareKeyChange(normalizedValue);
+                  }}
+                  pattern="[a-z0-9-]+"
+                  placeholder="my-party"
+                  required
+                  type="text"
+                  value={field.state.value as string}
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    aria-label={t("generateRandomButtonAriaLabel")}
+                    onClick={handleGenerateRandomKey}
+                    size="icon-xs"
+                    title={t("generateRandomButton")}
+                    type="button"
                   >
-                    {getErrorMessage(error)}
-                  </p>
-                ))}
+                    <Dices className="h-4 w-4" />
+                  </InputGroupButton>
+                </InputGroupAddon>
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText className="rounded-lg rounded-l-none">
+                    -{dateSuffix}
+                  </InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
+
+              <div className="mb-2 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                <AlertTriangle className="h-4 w-4 text-amber-600" />
+                <p className="text-amber-800 text-sm">
+                  この共有キーを知っているユーザーは誰でも参加できます
+                </p>
               </div>
-            )}
-          </Field>
-        )}
+
+              <p className="mb-2 text-gray-500 text-sm">
+                公開URL:{" "}
+                <span className="font-mono">
+                  {getAbsoluteUrl()}/
+                  <span className="font-semibold text-gray-900">
+                    @{(field.state.value as string) || "..."}-{dateSuffix}
+                  </span>
+                </span>
+              </p>
+
+              {/* Status indicator */}
+              {field.state.value.length >= 3 && (
+                <div className="mt-2 flex items-center gap-2">
+                  {checking && (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                      <span className="text-gray-500 text-sm">確認中...</span>
+                    </>
+                  )}
+
+                  {!checking && available === true && (
+                    <>
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-green-600 text-sm">
+                        この共有キーは使用可能です
+                      </span>
+                    </>
+                  )}
+
+                  {!checking && available === false && (
+                    <>
+                      <AlertCircle className="h-4 w-4 text-amber-600" />
+                      <span className="text-amber-600 text-sm">
+                        この共有キーは既に使用されています
+                      </span>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Field-level errors */}
+              {field.state.meta.errors.length > 0 && (
+                <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-3">
+                  {field.state.meta.errors.map((error) => (
+                    <p
+                      className="text-red-800 text-sm"
+                      key={getErrorMessage(error)}
+                    >
+                      {getErrorMessage(error)}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </Field>
+          );
+        }}
       </form.Field>
 
       <SuggestionDisplay
-        onAcceptSuggestion={handleAcceptSuggestion}
+        onAcceptSuggestion={() => {
+          // Get field reference and call handleAcceptSuggestion
+          // Extract suggestion from error map
+          const stateRecord = state as Record<string, unknown>;
+          if (
+            stateRecord?.errorMap &&
+            typeof stateRecord.errorMap === "object" &&
+            stateRecord.errorMap !== null &&
+            "onChange" in stateRecord.errorMap
+          ) {
+            const errorMap = stateRecord.errorMap as Record<string, unknown>;
+            const errorMsg = errorMap.onChange;
+            if (typeof errorMsg === "string" && errorMsg.includes("提案:")) {
+              const suggestionMatch = errorMsg.match(SUGGESTION_REGEX);
+              if (suggestionMatch) {
+                const suggestion = suggestionMatch[1];
+                const suggestionWithoutDate = suggestion.replace(
+                  `-${dateSuffix}`,
+                  ""
+                );
+                setShareKey(suggestionWithoutDate);
+                // Need to update form field - will handle via form API
+                form.setFieldValue("share_key", suggestionWithoutDate);
+                setAvailable(null);
+              }
+            }
+          }
+        }}
         state={state}
         t={t}
       />
