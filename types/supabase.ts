@@ -237,7 +237,7 @@ export type Database = {
           description?: string | null
           gatekeeper_rules?: Json | null
           id?: string
-          max_participants: number
+          max_participants?: number
           owner_id?: string | null
           settings?: Json | null
           share_key: string
