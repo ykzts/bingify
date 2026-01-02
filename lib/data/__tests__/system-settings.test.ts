@@ -82,7 +82,7 @@ describe("getSystemSettings", () => {
     expect(result.settings).toBeUndefined();
   });
 
-  it("should return error when features validation fails", async () => {
+  it("should use defaults for invalid features and return warnings", async () => {
     const mockData = {
       default_user_role: "organizer",
       features: { invalid: "structure" }, // Invalid features structure
@@ -105,11 +105,19 @@ describe("getSystemSettings", () => {
 
     const result = await getSystemSettings();
 
-    expect(result.error).toBe("errorInvalidData");
-    expect(result.settings).toBeUndefined();
+    expect(result.error).toBeUndefined();
+    expect(result.settings).toBeDefined();
+    expect(result.warnings).toContain("features");
+    expect(result.settings?.features).toEqual({
+      gatekeeper: {
+        email: { enabled: true },
+        twitch: { enabled: true },
+        youtube: { enabled: true },
+      },
+    });
   });
 
-  it("should return error when system settings validation fails", async () => {
+  it("should use defaults for invalid numeric values and return warnings", async () => {
     const mockData = {
       default_user_role: "organizer",
       features: {
@@ -138,8 +146,10 @@ describe("getSystemSettings", () => {
 
     const result = await getSystemSettings();
 
-    expect(result.error).toBe("errorInvalidData");
-    expect(result.settings).toBeUndefined();
+    expect(result.error).toBeUndefined();
+    expect(result.settings).toBeDefined();
+    expect(result.warnings).toContain("max_participants_per_space");
+    expect(result.settings?.max_participants_per_space).toBe(50); // default value
   });
 
   it("should handle unexpected errors gracefully", async () => {
