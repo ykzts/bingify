@@ -27,7 +27,7 @@
     "@tailwindcss/typography": "0.5.19",
     "@tanstack/react-form": "1.27.7",
     "@tanstack/react-form-nextjs": "1.27.7",
-    "@tanstack/react-query": "5.90.15",
+    "@tanstack/react-query": "5.90.16",
     "@tanstack/zod-form-adapter": "0.42.1",
     "@twurple/api": "8.0.2",
     "@twurple/auth": "8.0.2",
