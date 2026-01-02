@@ -167,7 +167,7 @@ export function LoginForm({ providers }: Props) {
     if (provider === "twitch") {
       return undefined;
     }
-    return "outline" as const;
+    return "default" as const;
   };
 
   const displayError = error || oauthError;
