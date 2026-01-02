@@ -470,6 +470,12 @@
     "heading": "Support Development",
     "sponsorButton": "Sponsor on GitHub"
   },
+  "ThemeSwitcher": {
+    "dark": "Dark",
+    "label": "Theme",
+    "light": "Light",
+    "system": "System"
+  },
   "UserHeader": {
     "logout": "Sign out",
     "settings": "Settings"

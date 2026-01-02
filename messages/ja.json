@@ -470,6 +470,12 @@
     "heading": "開発を支援する",
     "sponsorButton": "GitHub Sponsorsで支援"
   },
+  "ThemeSwitcher": {
+    "dark": "ダーク",
+    "label": "テーマ",
+    "light": "ライト",
+    "system": "システム"
+  },
   "UserHeader": {
     "logout": "ログアウト",
     "settings": "設定"
