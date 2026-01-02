@@ -3,6 +3,7 @@
 import { Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -38,6 +39,11 @@ export function SpaceSettingsSheet({
   const t = useTranslations("AdminSpace");
   const [open, setOpen] = useState(false);
 
+  const handleSuccess = (message: string) => {
+    setOpen(false);
+    toast.success(message);
+  };
+
   return (
     <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger asChild>
@@ -62,6 +68,7 @@ export function SpaceSettingsSheet({
             currentParticipantCount={currentParticipantCount}
             features={features}
             locale={locale}
+            onSuccess={handleSuccess}
             space={space}
             systemMaxParticipants={systemMaxParticipants}
           />
