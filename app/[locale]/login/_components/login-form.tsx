@@ -188,12 +188,15 @@ export function LoginForm({ providers }: Props) {
         <div className="space-y-3">
           {providers.map((provider) => (
             <Button
-              aria-label={`Sign in with ${provider.label}`}
+              aria-label={t("signInWithProvider", {
+                provider: provider.label,
+              })}
               className={getProviderButtonClass(provider.provider)}
               disabled={isLoading}
               key={provider.provider}
               onClick={() => handleOAuthLogin(provider.provider)}
               type="button"
+              variant="default"
             >
               {isLoading ? (
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
