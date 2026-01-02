@@ -7,11 +7,13 @@ import {
   useStore,
   useTransform,
 } from "@tanstack/react-form-nextjs";
-import { AlertCircle, CheckCircle, Loader2, User } from "lucide-react";
+import { CheckCircle, Loader2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
+import { FieldErrors } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
+import { SectionHeader } from "@/components/section-header";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -21,7 +23,6 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { usernameSchema } from "@/lib/schemas/user";
-import { getErrorMessage } from "@/lib/utils";
 import { updateUsernameAction } from "../_lib/actions";
 import { usernameFormOpts } from "../_lib/form-options";
 
@@ -69,12 +70,9 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <div className="mb-4 flex items-center gap-2">
-        <User className="h-5 w-5 text-gray-600" />
-        <h2 className="font-semibold text-lg">{t("title")}</h2>
-      </div>
-
-      <p className="mb-6 text-gray-600 text-sm">{t("description")}</p>
+      <SectionHeader description={t("description")} icon={User}>
+        {t("title")}
+      </SectionHeader>
 
       <form action={action} className="space-y-4">
         <FormErrors errors={formErrors} variant="with-icon" />
@@ -95,25 +93,10 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
                   value={field.state.value as string}
                 />
                 <FieldDescription>{t("usernameHelp")}</FieldDescription>
-                {field.state.meta.errors.length > 0 && (
-                  <div
-                    aria-live="polite"
-                    className="mt-2 flex items-center gap-2 rounded-md bg-red-50 p-3 text-red-800 text-sm"
-                    role="alert"
-                  >
-                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                    <span>
-                      {field.state.meta.errors.map((error, index) => {
-                        const message = getErrorMessage(error);
-                        return (
-                          <span key={`${message.slice(0, 20)}-${index}`}>
-                            {message}
-                          </span>
-                        );
-                      })}
-                    </span>
-                  </div>
-                )}
+                <FieldErrors
+                  className="mt-2"
+                  errors={field.state.meta.errors}
+                />
               </FieldContent>
             </Field>
           )}
