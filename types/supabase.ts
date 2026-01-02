@@ -237,7 +237,7 @@ export type Database = {
           description?: string | null
           gatekeeper_rules?: Json | null
           id?: string
-          max_participants?: number
+          max_participants: number
           owner_id?: string | null
           settings?: Json | null
           share_key: string
@@ -310,6 +310,30 @@ export type Database = {
           title?: string | null
           updated_at?: string | null
           view_token?: string | null
+        }
+        Relationships: []
+      }
+      system_auth_providers: {
+        Row: {
+          created_at: string | null
+          is_enabled: boolean
+          label: string | null
+          provider: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          is_enabled?: boolean
+          label?: string | null
+          provider: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          is_enabled?: boolean
+          label?: string | null
+          provider?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
