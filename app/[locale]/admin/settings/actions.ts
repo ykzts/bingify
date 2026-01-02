@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-form-nextjs";
 import {
   type SystemSettings,
-  systemFeaturesSchema,
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
@@ -17,6 +16,10 @@ export interface GetSystemSettingsResult {
   settings?: SystemSettings;
 }
 
+/**
+ * Get system settings with validated JSONB features column
+ * @returns System settings with validated features, or error
+ */
 export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
   try {
     const supabase = await createClient();
@@ -24,7 +27,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
     const { data, error } = await supabase
       .from("system_settings")
       .select(
-        "max_participants_per_space, max_spaces_per_user, max_total_spaces, space_expiration_hours, features, default_user_role"
+        "default_user_role, features, max_participants_per_space, max_spaces_per_user, max_total_spaces, space_expiration_hours"
       )
       .eq("id", 1)
       .single();
@@ -36,28 +39,21 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
       };
     }
 
-    // Validate the features field using Zod schema
-    const featuresValidation = systemFeaturesSchema.safeParse(data.features);
-    if (!featuresValidation.success) {
-      console.error("Invalid features data from DB:", featuresValidation.error);
+    // Validate the entire settings object including the JSONB features field
+    const settingsValidation = systemSettingsSchema.safeParse(data);
+
+    if (!settingsValidation.success) {
+      console.error(
+        "Invalid system settings data from DB:",
+        settingsValidation.error
+      );
       return {
         error: "errorInvalidData",
       };
     }
 
-    const settings: SystemSettings = {
-      default_user_role: (data.default_user_role || "organizer") as
-        | "organizer"
-        | "user",
-      features: featuresValidation.data,
-      max_participants_per_space: data.max_participants_per_space,
-      max_spaces_per_user: data.max_spaces_per_user,
-      max_total_spaces: data.max_total_spaces,
-      space_expiration_hours: data.space_expiration_hours,
-    };
-
     return {
-      settings,
+      settings: settingsValidation.data,
     };
   } catch (error) {
     console.error("Error in getSystemSettings:", error);

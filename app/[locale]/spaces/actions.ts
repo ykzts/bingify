@@ -50,21 +50,16 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
     const gatekeeperValidation = gatekeeperRulesSchema.safeParse(
       data.gatekeeper_rules
     );
-    if (!gatekeeperValidation.success) {
-      console.error(
-        "Invalid gatekeeper_rules data from DB:",
-        gatekeeperValidation.error
-      );
-      return null;
-    }
 
     return {
+      gatekeeper_rules: gatekeeperValidation.success
+        ? gatekeeperValidation.data
+        : null,
       id: data.id,
+      max_participants: data.max_participants,
+      owner_id: data.owner_id,
       share_key: data.share_key,
       status: data.status,
-      owner_id: data.owner_id,
-      max_participants: data.max_participants,
-      gatekeeper_rules: gatekeeperValidation.data,
     };
   } catch (_error) {
     return null;
@@ -634,13 +629,21 @@ export async function getSpacePublicInfo(
       return null;
     }
 
-    // Parse settings to check if metadata should be hidden
-    const settings =
-      (data.settings as { hide_metadata_before_join?: boolean }) || {};
-    const hideMetadata = settings.hide_metadata_before_join === true;
+    // Validate and parse settings using Zod schema
+    const { spaceSettingsSchema } = await import("@/lib/types/space");
+    const settingsValidation = spaceSettingsSchema.safeParse(data.settings);
+    const hideMetadata =
+      settingsValidation.success &&
+      settingsValidation.data?.hide_metadata_before_join === true;
 
-    // Mask gatekeeper rules
-    const gatekeeperRules = data.gatekeeper_rules as GatekeeperRules | null;
+    // Validate gatekeeper_rules using Zod schema
+    const gatekeeperValidation = gatekeeperRulesSchema.safeParse(
+      data.gatekeeper_rules
+    );
+    const gatekeeperRules = gatekeeperValidation.success
+      ? gatekeeperValidation.data
+      : null;
+
     let maskedGatekeeperRules: PublicSpaceInfo["gatekeeper_rules"] = null;
 
     if (gatekeeperRules) {
