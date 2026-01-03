@@ -42,7 +42,7 @@ export function useScreen() {
   return context;
 }
 
-export function ColoredHtml({
+export function ScreenHtml({
   children,
   className,
 }: {

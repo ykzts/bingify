@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import type { ReactNode } from "react";
 import {
-  ColoredHtml,
+  ScreenHtml,
   ScreenProvider,
 } from "@/components/providers/screen-provider";
 import { cn } from "@/lib/utils";
@@ -26,9 +26,9 @@ export default async function StandaloneLayout({
 }) {
   return (
     <ScreenProvider>
-      <ColoredHtml className={cn("antialiased", nunito.variable)}>
+      <ScreenHtml className={cn("antialiased", nunito.variable)}>
         <body className="bg-transparent">{children}</body>
-      </ColoredHtml>
+      </ScreenHtml>
     </ScreenProvider>
   );
 }

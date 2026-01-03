@@ -60,26 +60,31 @@ export function ScreenDisplay({
   }, [initialBg, initialTheme, setBackground]);
 
   // Use useEffectEvent to handle screen settings changes without including functions in deps
-  const handleScreenSettingsChange = useEffectEvent((payload: any) => {
-    if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
-      const newSettings = payload.new as {
+  const handleScreenSettingsChange = useEffectEvent(
+    (payload: {
+      eventType: string;
+      new: {
         background: BackgroundType;
         display_mode: DisplayMode;
         locale?: string;
         theme: ThemeType;
       };
-      setMode(newSettings.display_mode);
-      setBackground(newSettings.background);
-      setTheme(newSettings.theme);
-      // Update locale via context - page will need reload for translations to update
-      if (newSettings.locale && newSettings.locale !== contextLocale) {
-        setLocale(newSettings.locale as "en" | "ja");
-        console.info(
-          `Locale changed to ${newSettings.locale}, page reload recommended for full translation update`
-        );
+    }) => {
+      if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+        const newSettings = payload.new;
+        setMode(newSettings.display_mode);
+        setBackground(newSettings.background);
+        setTheme(newSettings.theme);
+        // Update locale via context - page will need reload for translations to update
+        if (newSettings.locale && newSettings.locale !== contextLocale) {
+          setLocale(newSettings.locale as "en" | "ja");
+          console.info(
+            `Locale changed to ${newSettings.locale}, page reload recommended for full translation update`
+          );
+        }
       }
     }
-  });
+  );
 
   // Subscribe to realtime screen settings changes
   useEffect(() => {
@@ -88,14 +93,14 @@ export function ScreenDisplay({
     const channel = supabase
       .channel(`screen-settings-${spaceId}`)
       .on(
-        "postgres_changes",
+        "postgres_changes" as const,
         {
           event: "*",
           filter: `space_id=eq.${spaceId}`,
           schema: "public",
           table: "screen_settings",
         },
-        handleScreenSettingsChange
+        handleScreenSettingsChange as (payload: unknown) => void
       )
       .subscribe((status) => {
         if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
