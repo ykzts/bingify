@@ -51,7 +51,9 @@ export function Hero({
             alt="Bingify"
             className="h-16 w-auto sm:h-20"
             height={80}
-            priority
+            fetchPriority="high"
+            loading="eager"
+            preload
             src="/logo.svg"
             width={304}
           />
