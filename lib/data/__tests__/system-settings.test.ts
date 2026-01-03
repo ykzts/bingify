@@ -117,7 +117,7 @@ describe("getSystemSettings", () => {
     });
   });
 
-  it("should use defaults for invalid numeric values and return warnings", async () => {
+  it("should return error for invalid non-features fields", async () => {
     const mockData = {
       default_user_role: "organizer",
       features: {
@@ -146,10 +146,9 @@ describe("getSystemSettings", () => {
 
     const result = await getSystemSettings();
 
-    expect(result.error).toBeUndefined();
-    expect(result.settings).toBeDefined();
-    expect(result.warnings).toContain("max_participants_per_space");
-    expect(result.settings?.max_participants_per_space).toBe(50); // default value
+    // Should return error since non-features fields are invalid
+    expect(result.error).toBe("errorInvalidData");
+    expect(result.settings).toBeUndefined();
   });
 
   it("should handle unexpected errors gracefully", async () => {

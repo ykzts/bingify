@@ -39,7 +39,9 @@ async function checkAdminPermission(
   return { error: null, user };
 }
 
-// Create the server validation function
+// TanStack Form server validation - kept for future use if needed
+// Currently using manual parsing for better control over FormData transformation
+// biome-ignore lint/correctness/noUnusedVariables: Kept for reference
 const serverValidate = createServerValidate({
   ...systemSettingsFormOpts,
   onServerValidate: async () => {
@@ -55,17 +57,91 @@ const serverValidate = createServerValidate({
   },
 });
 
+/**
+ * Parse FormData into properly typed SystemSettings object
+ * Handles nested feature flags and boolean conversions
+ */
+function parseSystemSettingsFormData(
+  formData: FormData
+): Record<string, unknown> {
+  const data: Record<string, unknown> = {};
+
+  // Parse simple fields
+  const defaultUserRole = formData.get("default_user_role");
+  if (defaultUserRole) {
+    data.default_user_role = defaultUserRole;
+  }
+
+  // Parse numeric fields
+  const maxParticipants = formData.get("max_participants_per_space");
+  if (maxParticipants) {
+    data.max_participants_per_space = Number.parseInt(
+      maxParticipants as string,
+      10
+    );
+  }
+
+  const maxSpacesPerUser = formData.get("max_spaces_per_user");
+  if (maxSpacesPerUser) {
+    data.max_spaces_per_user = Number.parseInt(maxSpacesPerUser as string, 10);
+  }
+
+  const maxTotalSpaces = formData.get("max_total_spaces");
+  if (maxTotalSpaces) {
+    data.max_total_spaces = Number.parseInt(maxTotalSpaces as string, 10);
+  }
+
+  const expirationHours = formData.get("space_expiration_hours");
+  if (expirationHours) {
+    data.space_expiration_hours = Number.parseInt(
+      expirationHours as string,
+      10
+    );
+  }
+
+  // Parse nested features object with proper boolean handling
+  // Checkboxes send their value (or nothing) when checked, nothing when unchecked
+  data.features = {
+    gatekeeper: {
+      youtube: {
+        enabled: formData.has("features.gatekeeper.youtube.enabled"),
+      },
+      twitch: {
+        enabled: formData.has("features.gatekeeper.twitch.enabled"),
+      },
+      email: {
+        enabled: formData.has("features.gatekeeper.email.enabled"),
+      },
+    },
+  };
+
+  return data;
+}
+
 export async function updateSystemSettingsAction(
   _prevState: unknown,
   formData: FormData
 ) {
   try {
-    // Validate the form data
-    const validatedData = await serverValidate(formData);
+    // Parse FormData into proper object structure
+    const parsedData = parseSystemSettingsFormData(formData);
+
+    // Validate the parsed data
+    const validation = systemSettingsSchema.safeParse(parsedData);
+
+    if (!validation.success) {
+      console.error("Validation failed:", validation.error);
+      return {
+        ...initialFormState,
+        errors: validation.error.errors.map((e) => e.message),
+      };
+    }
+
+    const validatedData = validation.data;
 
     const supabase = await createClient();
 
-    // Double check admin permission
+    // Check admin permission
     const { error: permissionError } = await checkAdminPermission(supabase);
     if (permissionError) {
       return {
@@ -99,12 +175,6 @@ export async function updateSystemSettingsAction(
       },
     };
   } catch (e) {
-    // Check if it's a ServerValidateError from TanStack Form
-    if (e && typeof e === "object" && "formState" in e) {
-      return (e as { formState: unknown }).formState;
-    }
-
-    // Some other error occurred
     console.error("Error in updateSystemSettingsAction:", e);
     return {
       ...initialFormState,
