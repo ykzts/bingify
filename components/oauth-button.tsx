@@ -2,8 +2,8 @@
 
 import { cva } from "class-variance-authority";
 import { useTranslations } from "next-intl";
-import type { AuthProvider } from "@/lib/data/auth-providers";
 import { Button } from "@/components/ui/button";
+import type { AuthProvider } from "@/lib/data/auth-providers";
 import { cn } from "@/lib/utils";
 
 // OAuth provider button variants using class-variance-authority
@@ -34,7 +34,11 @@ export interface OAuthButtonProps {
   onClick: () => void;
 }
 
-export function OAuthButton({ provider, isLoading, onClick }: OAuthButtonProps) {
+export function OAuthButton({
+  provider,
+  isLoading,
+  onClick,
+}: OAuthButtonProps) {
   const t = useTranslations("Login");
 
   const getProviderIcon = (providerName: string) => {

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { z } from "zod";
+import { OAuthButton } from "@/components/oauth-button";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -13,7 +14,6 @@ import {
 } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { OAuthButton } from "@/components/ui/oauth-button";
 import { Separator } from "@/components/ui/separator";
 import {
   buildOAuthCallbackUrl,
