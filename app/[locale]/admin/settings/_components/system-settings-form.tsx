@@ -8,7 +8,8 @@ import {
 } from "@tanstack/react-form-nextjs";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useEffectEvent } from "react";
+import { toast } from "sonner";
 import { InlineFieldError } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
 import { Button } from "@/components/ui/button";
@@ -74,26 +75,28 @@ export function SystemSettingsForm({ initialSettings }: Props) {
     (formState) => formState.isSubmitting
   );
 
+  // Use useEffectEvent to separate event logic from effect dependencies
+  const handleUpdateSuccess = useEffectEvent(() => {
+    toast.success(t("updateSuccess"));
+    // Show success message briefly, then refresh
+    setTimeout(() => {
+      router.refresh();
+    }, 1500);
+  });
+
   useEffect(() => {
     // Check for successful update
     const meta = (state as Record<string, unknown>)?.meta as
       | { success?: boolean }
       | undefined;
     if (meta?.success) {
-      // Show success message briefly, then refresh
-      const timer = setTimeout(() => {
-        router.refresh();
-      }, 1500);
-      return () => clearTimeout(timer);
+      handleUpdateSuccess();
     }
-  }, [state, router]);
+  }, [state]);
 
   return (
     <form action={action} className="space-y-6">
-      <FormErrors
-        className="rounded-lg border border-red-200 bg-red-50 p-3"
-        errors={formErrors}
-      />
+      <FormErrors errors={formErrors} variant="with-icon" />
 
       <FieldSet>
         <FieldLegend>リソース制限</FieldLegend>
@@ -374,17 +377,6 @@ export function SystemSettingsForm({ initialSettings }: Props) {
           </form.Field>
         </div>
       </div>
-
-      {(() => {
-        const meta = (state as Record<string, unknown>)?.meta as
-          | { success?: boolean }
-          | undefined;
-        return meta?.success ? (
-          <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-            <p className="text-green-800 text-sm">{t("updateSuccess")}</p>
-          </div>
-        ) : null;
-      })()}
 
       <div className="flex justify-end">
         <Button disabled={isSubmitting} type="submit">
