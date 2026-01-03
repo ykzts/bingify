@@ -51,14 +51,15 @@ const oauthButtonVariants = cva("w-full", {
   },
 });
 
-// Type for supported OAuth button providers
-type OAuthButtonProvider = "github" | "google" | "twitch";
+// Supported OAuth button providers - single source of truth
+const SUPPORTED_PROVIDERS = ["github", "google", "twitch"] as const;
+type OAuthButtonProvider = (typeof SUPPORTED_PROVIDERS)[number];
 
 // Type guard to check if a provider is supported
 function isSupportedProvider(
   provider: string
 ): provider is OAuthButtonProvider {
-  return ["github", "google", "twitch"].includes(provider);
+  return SUPPORTED_PROVIDERS.includes(provider as OAuthButtonProvider);
 }
 
 interface Props {
