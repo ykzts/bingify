@@ -1,34 +1,15 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import type { BackgroundType, DisplayMode } from "@/lib/types/screen-settings";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import { ScreenDisplay } from "./_components/screen-display";
 
 interface Props {
   params: Promise<{ locale: string; token: string }>;
-  searchParams: Promise<{ bg?: string; mode?: string }>;
 }
 
-export default async function ScreenViewPage({ params, searchParams }: Props) {
+export default async function ScreenViewPage({ params }: Props) {
   const { locale, token } = await params;
-  const rawSearchParams = await searchParams;
-
-  // Validate query parameters
-  const ALLOWED_MODES = ["full", "minimal"] as const;
-  const ALLOWED_BGS = ["default", "transparent", "green", "blue"] as const;
-
-  const mode =
-    typeof rawSearchParams.mode === "string" &&
-    ALLOWED_MODES.includes(
-      rawSearchParams.mode as (typeof ALLOWED_MODES)[number]
-    )
-      ? rawSearchParams.mode
-      : "full";
-
-  const bg =
-    typeof rawSearchParams.bg === "string" &&
-    ALLOWED_BGS.includes(rawSearchParams.bg as (typeof ALLOWED_BGS)[number])
-      ? rawSearchParams.bg
-      : "default";
 
   setRequestLocale(locale);
 
@@ -55,14 +36,27 @@ export default async function ScreenViewPage({ params, searchParams }: Props) {
     );
   }
 
+  // Fetch screen settings for this space
+  const { data: screenSettings } = await supabase
+    .from("screen_settings")
+    .select("display_mode, background")
+    .eq("space_id", space.id)
+    .single();
+
+  // Use settings from database, fallback to defaults
+  const initialMode: DisplayMode =
+    (screenSettings?.display_mode as DisplayMode) || "full";
+  const initialBg: BackgroundType =
+    (screenSettings?.background as BackgroundType) || "default";
+
   // Get base URL for QR code generation
   const baseUrl = getAbsoluteUrl();
 
   return (
     <ScreenDisplay
       baseUrl={baseUrl}
-      initialBg={bg}
-      initialMode={mode}
+      initialBg={initialBg}
+      initialMode={initialMode}
       locale={locale}
       shareKey={space.share_key}
       spaceId={space.id}

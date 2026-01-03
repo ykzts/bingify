@@ -3,9 +3,11 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSpace } from "@/lib/data/spaces";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
+import type { BackgroundType, DisplayMode } from "@/lib/types/screen-settings";
 import { BingoGameManager } from "./_components/bingo-game-manager";
 import { DraftStatusView } from "./_components/draft-status-view";
 import { ParticipantsStatus } from "./_components/participants-status";
+import { ScreenSettingsDialog } from "./_components/screen-settings-dialog";
 import { SpaceSettingsSheet } from "./_components/space-settings-sheet";
 import { ViewingUrlDialog } from "./_components/viewing-url-dialog";
 
@@ -70,6 +72,18 @@ export default async function AdminSpacePage({ params }: Props) {
           },
         };
 
+  // Fetch screen settings for this space
+  const { data: screenSettings } = await supabase
+    .from("screen_settings")
+    .select("display_mode, background")
+    .eq("space_id", id)
+    .single();
+
+  const initialDisplayMode: DisplayMode =
+    (screenSettings?.display_mode as DisplayMode) || "full";
+  const initialBackground: BackgroundType =
+    (screenSettings?.background as BackgroundType) || "default";
+
   return (
     <div className="mx-auto min-h-screen max-w-3xl space-y-8 p-8">
       {/* Header with Action Buttons */}
@@ -82,6 +96,13 @@ export default async function AdminSpacePage({ params }: Props) {
         </div>
         <div className="flex gap-3">
           <ViewingUrlDialog
+            locale={locale}
+            spaceId={space.id}
+            viewToken={space.view_token}
+          />
+          <ScreenSettingsDialog
+            initialBackground={initialBackground}
+            initialDisplayMode={initialDisplayMode}
             locale={locale}
             spaceId={space.id}
             viewToken={space.view_token}

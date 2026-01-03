@@ -1,55 +1,31 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Settings } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useEffectEvent, useState } from "react";
-import { Button } from "@/components/ui/button";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { useDrumRoll } from "@/hooks/use-drum-roll";
 import { createClient } from "@/lib/supabase/client";
+import type { BackgroundType, DisplayMode } from "@/lib/types/screen-settings";
 import { cn } from "@/lib/utils";
 import { useBackground } from "../../_context/background-context";
 
 interface Props {
   baseUrl: string;
-  initialBg?: string;
-  initialMode?: string;
+  initialBg: BackgroundType;
+  initialMode: DisplayMode;
   locale: string;
   shareKey: string;
   spaceId: string;
 }
 
-type DisplayMode = "full" | "minimal";
-type BackgroundType = "default" | "transparent" | "green" | "blue";
-
-// Validation helpers
-function normalizeDisplayMode(value?: string): DisplayMode {
-  if (value === "full" || value === "minimal") {
-    return value;
-  }
-  return "full";
-}
-
-function normalizeBackgroundType(value?: string): BackgroundType {
-  if (
-    value === "default" ||
-    value === "transparent" ||
-    value === "green" ||
-    value === "blue"
-  ) {
-    return value;
-  }
-  return "default";
-}
-
 export function ScreenDisplay({
   baseUrl,
-  initialBg = "default",
-  initialMode = "full",
+  initialBg,
+  initialMode,
   locale,
   shareKey,
   spaceId,
@@ -57,10 +33,7 @@ export function ScreenDisplay({
   const t = useTranslations("ScreenView");
   const queryClient = useQueryClient();
   const { data: calledNumbers = [] } = useCalledNumbers(spaceId, { retry: 3 });
-  const [mode, setMode] = useState<DisplayMode>(
-    normalizeDisplayMode(initialMode)
-  );
-  const [showSettings, setShowSettings] = useState(false);
+  const [mode, setMode] = useState<DisplayMode>(initialMode);
   const {
     currentNumber: drumRollNumber,
     isAnimating,
@@ -70,12 +43,59 @@ export function ScreenDisplay({
   });
 
   // Use background context instead of local state
+  // biome-ignore lint/correctness/noUnusedVariables: background is managed via context and used by parent layout
   const { background, setBackground } = useBackground();
 
   // Initialize background from props
   useEffect(() => {
-    setBackground(normalizeBackgroundType(initialBg));
+    setBackground(initialBg);
   }, [initialBg, setBackground]);
+
+  // Subscribe to realtime screen settings changes
+  useEffect(() => {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel(`screen-settings-${spaceId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          filter: `space_id=eq.${spaceId}`,
+          schema: "public",
+          table: "screen_settings",
+        },
+        (payload) => {
+          if (
+            payload.eventType === "INSERT" ||
+            payload.eventType === "UPDATE"
+          ) {
+            const newSettings = payload.new as {
+              background: BackgroundType;
+              display_mode: DisplayMode;
+            };
+            setMode(newSettings.display_mode);
+            setBackground(newSettings.background);
+          }
+        }
+      )
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          console.error(
+            `Screen settings subscription error for space ${spaceId}:`,
+            status
+          );
+        } else if (status === "SUBSCRIBED") {
+          console.info(
+            `Screen settings subscription established for space ${spaceId}`
+          );
+        }
+      });
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [spaceId, setBackground]);
 
   // Use useEffectEvent to separate event logic from effect dependencies
   const onInsert = useEffectEvent(async (payload: { new: CalledNumber }) => {
@@ -288,87 +308,6 @@ export function ScreenDisplay({
           </div>
         </div>
       )}
-
-      {/* Settings Menu */}
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: Hover-only panel without primary interaction */}
-      {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: Hover-only panel without primary interaction */}
-      <div
-        className={cn(
-          "fixed top-4 right-4 z-50 transition-opacity duration-200",
-          showSettings ? "opacity-100" : "opacity-0 hover:opacity-100"
-        )}
-        onMouseEnter={() => setShowSettings(true)}
-        onMouseLeave={() => setShowSettings(false)}
-      >
-        <div className="rounded-lg border border-gray-600 bg-black/90 p-3 text-white backdrop-blur-sm">
-          <div className="mb-2 flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            <p className="font-semibold text-sm">{t("displaySettings")}</p>
-          </div>
-
-          <div className="space-y-2 text-xs">
-            <div>
-              <p className="mb-1 text-gray-400">{t("displayMode")}</p>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => setMode("full")}
-                  size="sm"
-                  type="button"
-                  variant={mode === "full" ? "default" : "outline"}
-                >
-                  {t("modeFull")}
-                </Button>
-                <Button
-                  onClick={() => setMode("minimal")}
-                  size="sm"
-                  type="button"
-                  variant={mode === "minimal" ? "default" : "outline"}
-                >
-                  {t("modeMinimal")}
-                </Button>
-              </div>
-            </div>
-
-            <div>
-              <p className="mb-1 text-gray-400">{t("background")}</p>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  onClick={() => setBackground("default")}
-                  size="sm"
-                  type="button"
-                  variant={background === "default" ? "default" : "outline"}
-                >
-                  {t("bgDefault")}
-                </Button>
-                <Button
-                  onClick={() => setBackground("transparent")}
-                  size="sm"
-                  type="button"
-                  variant={background === "transparent" ? "default" : "outline"}
-                >
-                  {t("bgTransparent")}
-                </Button>
-                <Button
-                  onClick={() => setBackground("green")}
-                  size="sm"
-                  type="button"
-                  variant={background === "green" ? "default" : "outline"}
-                >
-                  {t("bgGreen")}
-                </Button>
-                <Button
-                  onClick={() => setBackground("blue")}
-                  size="sm"
-                  type="button"
-                  variant={background === "blue" ? "default" : "outline"}
-                >
-                  {t("bgBlue")}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

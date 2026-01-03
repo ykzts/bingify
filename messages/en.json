@@ -394,6 +394,20 @@
     "scanToJoin": "Scan to Join",
     "waitingForNumbers": "Waiting for numbers..."
   },
+  "ScreenSettings": {
+    "backgroundDescription": "Change the screen background color. Transparent and chroma key (green/blue) options are available for streaming.",
+    "backgroundLabel": "Background",
+    "description": "Configure the display settings for the screen view. Changes are applied in real-time to connected screens.",
+    "displayModeDescription": "Choose between full layout (current number + history grid) or minimal (current number only).",
+    "displayModeLabel": "Display Mode",
+    "errorFetchFailed": "Failed to load screen settings",
+    "errorUpdateFailed": "Failed to update screen settings",
+    "heading": "Screen Display Settings",
+    "previewButton": "Preview",
+    "previewTitle": "Screen Preview",
+    "updateButton": "Update Settings",
+    "updateSuccess": "Screen settings updated successfully"
+  },
   "Setup": {
     "claimButton": "Claim Admin Role",
     "claimingButton": "Processing...",
