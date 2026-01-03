@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -12,13 +13,16 @@ export function Footer() {
     <footer className="border-border border-t bg-background py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <Link className="flex justify-center md:justify-start" href="/">
+            <Image
+              alt="Bingify"
+              className="h-10 w-auto"
+              height={40}
+              src="/logo.svg"
+              width={152}
+            />
+          </Link>
           <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm md:justify-start">
-            <Link
-              className="text-muted-foreground transition-colors hover:text-foreground"
-              href="/"
-            >
-              {t("backToHome")}
-            </Link>
             <Link
               className="text-muted-foreground transition-colors hover:text-foreground"
               href="/contact"
