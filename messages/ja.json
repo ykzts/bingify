@@ -371,6 +371,7 @@
   },
   "Metadata": {
     "description": "リアルタイムで盛り上がる、新しいビンゴ体験。OAuth ログインで簡単に始められます。",
+    "ogSpaceSubtitle": "このビンゴスペースに参加",
     "title": "Bingify - すべての画面を、熱狂の会場に。"
   },
   "NotFound": {
