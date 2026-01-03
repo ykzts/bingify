@@ -121,7 +121,12 @@
     "updateSuccess": "Settings updated successfully",
     "userSettingsTitle": "User Settings",
     "warningInvalidFields": "Some settings are using default values due to invalid data",
-    "warningInvalidFieldsDescription": "The following fields had issues: {fields}. Saving will update them with the displayed values."
+    "warningInvalidFieldsDescription": "The following fields had issues: {fields}. Saving will update them with the displayed values.",
+    "gatekeeperRequirementTypeLabel": "Requirement Type Controls",
+    "gatekeeperRequirementTypeHelp": "Control which requirement types are available for selection in space settings",
+    "youtubeSubscriberLabel": "YouTube Subscriber Requirement",
+    "twitchFollowerLabel": "Twitch Follower Requirement",
+    "twitchSubscriberLabel": "Twitch Subscriber Requirement"
   },
   "AdminSpace": {
     "allNumbersCalled": "All numbers have been called",

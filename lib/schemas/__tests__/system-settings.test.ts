@@ -6,8 +6,15 @@ describe("systemFeaturesSchema", () => {
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
         email: { enabled: true },
-        twitch: { enabled: true },
-        youtube: { enabled: true },
+        twitch: {
+          enabled: true,
+          follower: { enabled: true },
+          subscriber: { enabled: true },
+        },
+        youtube: {
+          enabled: true,
+          subscriber: { enabled: true },
+        },
       },
     });
     expect(result.success).toBe(true);
@@ -17,8 +24,15 @@ describe("systemFeaturesSchema", () => {
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
         email: { enabled: false },
-        twitch: { enabled: false },
-        youtube: { enabled: false },
+        twitch: {
+          enabled: false,
+          follower: { enabled: false },
+          subscriber: { enabled: false },
+        },
+        youtube: {
+          enabled: false,
+          subscriber: { enabled: false },
+        },
       },
     });
     expect(result.success).toBe(true);
@@ -32,8 +46,15 @@ describe("systemFeaturesSchema", () => {
   it("should reject missing email in gatekeeper", () => {
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
-        twitch: { enabled: true },
-        youtube: { enabled: true },
+        twitch: {
+          enabled: true,
+          follower: { enabled: true },
+          subscriber: { enabled: true },
+        },
+        youtube: {
+          enabled: true,
+          subscriber: { enabled: true },
+        },
       },
     });
     expect(result.success).toBe(false);
@@ -43,8 +64,15 @@ describe("systemFeaturesSchema", () => {
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
         email: { enabled: "true" },
-        twitch: { enabled: true },
-        youtube: { enabled: true },
+        twitch: {
+          enabled: true,
+          follower: { enabled: true },
+          subscriber: { enabled: true },
+        },
+        youtube: {
+          enabled: true,
+          subscriber: { enabled: true },
+        },
       },
     });
     expect(result.success).toBe(false);
@@ -58,8 +86,15 @@ describe("systemSettingsSchema", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 50,
@@ -85,8 +120,15 @@ describe("systemSettingsSchema", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 0,
@@ -103,8 +145,15 @@ describe("systemSettingsSchema", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 50,
@@ -122,8 +171,15 @@ describe("systemSettingsSchema", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 50,
@@ -139,8 +195,15 @@ describe("systemSettingsSchema", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 50,
@@ -156,8 +219,15 @@ describe("systemSettingsSchema", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 10_001,
@@ -173,8 +243,15 @@ describe("systemSettingsSchema", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 50,
@@ -190,8 +267,15 @@ describe("systemSettingsSchema", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 50,
@@ -208,8 +292,15 @@ describe("systemSettingsSchema", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 50,
@@ -225,8 +316,15 @@ describe("systemSettingsSchema", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 50,
@@ -242,8 +340,15 @@ describe("systemSettingsSchema", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 50,

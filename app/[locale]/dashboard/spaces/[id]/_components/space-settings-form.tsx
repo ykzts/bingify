@@ -249,6 +249,17 @@ export function SpaceSettingsForm({
     features.gatekeeper.twitch.enabled || isTwitchConfigured;
   const showSocialOption = showYoutubeOption || showTwitchOption;
 
+  // Show requirement type options based on system settings
+  const showYoutubeSubscriber =
+    features.gatekeeper.youtube.enabled &&
+    features.gatekeeper.youtube.subscriber.enabled;
+  const showTwitchFollower =
+    features.gatekeeper.twitch.enabled &&
+    features.gatekeeper.twitch.follower.enabled;
+  const showTwitchSubscriber =
+    features.gatekeeper.twitch.enabled &&
+    features.gatekeeper.twitch.subscriber.enabled;
+
   // Calculate effective gatekeeper mode (fallback to "none" if current mode is not available)
   const effectiveGatekeeperMode =
     (gatekeeperMode === "social" && !showSocialOption) ||
@@ -522,9 +533,11 @@ export function SpaceSettingsForm({
                                         <SelectItem value="none">
                                           {t("requirementNone")}
                                         </SelectItem>
-                                        <SelectItem value="subscriber">
-                                          {t("youtubeSubscriber")}
-                                        </SelectItem>
+                                        {showYoutubeSubscriber && (
+                                          <SelectItem value="subscriber">
+                                            {t("youtubeSubscriber")}
+                                          </SelectItem>
+                                        )}
                                         <SelectItem value="member">
                                           {t("youtubeMember")}
                                         </SelectItem>
@@ -601,12 +614,16 @@ export function SpaceSettingsForm({
                                         <SelectItem value="none">
                                           {t("requirementNone")}
                                         </SelectItem>
-                                        <SelectItem value="follower">
-                                          {t("twitchFollower")}
-                                        </SelectItem>
-                                        <SelectItem value="subscriber">
-                                          {t("twitchSubscriber")}
-                                        </SelectItem>
+                                        {showTwitchFollower && (
+                                          <SelectItem value="follower">
+                                            {t("twitchFollower")}
+                                          </SelectItem>
+                                        )}
+                                        {showTwitchSubscriber && (
+                                          <SelectItem value="subscriber">
+                                            {t("twitchSubscriber")}
+                                          </SelectItem>
+                                        )}
                                       </SelectContent>
                                     </Select>
                                   </FieldContent>

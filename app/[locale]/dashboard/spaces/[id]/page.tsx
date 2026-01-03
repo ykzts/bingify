@@ -70,8 +70,15 @@ export default async function AdminSpacePage({
       : {
           gatekeeper: {
             email: { enabled: true },
-            twitch: { enabled: true },
-            youtube: { enabled: true },
+            twitch: {
+              enabled: true,
+              follower: { enabled: true },
+              subscriber: { enabled: true },
+            },
+            youtube: {
+              enabled: true,
+              subscriber: { enabled: true },
+            },
           },
         };
 
