@@ -12,11 +12,9 @@ import type {
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import { ScreenDisplay } from "./_components/screen-display";
 
-interface Props {
-  params: Promise<{ token: string }>;
-}
-
-export default async function ScreenViewPage({ params }: Props) {
+export default async function ScreenViewPage({
+  params,
+}: PageProps<"/screen/[token]">) {
   const { token } = await params;
 
   const supabase = await createClient();

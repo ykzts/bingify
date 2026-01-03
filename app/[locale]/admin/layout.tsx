@@ -9,12 +9,10 @@ import { hasAdminUser } from "./_lib/actions";
 // This allows the build to succeed even when environment variables are not available
 export const dynamic = "force-dynamic";
 
-interface Props {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}
-
-export default async function AdminLayout({ children, params }: Props) {
+export default async function AdminLayout({
+  children,
+  params,
+}: LayoutProps<"/[locale]/admin">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

@@ -9,11 +9,9 @@ import { ClaimAdminButton } from "./_components/claim-admin-button";
 // This allows the build to succeed even when environment variables are not available
 export const dynamic = "force-dynamic";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export default async function SetupPage({ params }: Props) {
+export default async function SetupPage({
+  params,
+}: PageProps<"/[locale]/setup">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

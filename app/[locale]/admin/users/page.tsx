@@ -2,11 +2,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { UserList } from "../_components/user-list";
 import { getAllUsers } from "../_lib/actions";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export default async function AdminUsersPage({ params }: Props) {
+export default async function AdminUsersPage({
+  params,
+}: PageProps<"/[locale]/admin/users">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

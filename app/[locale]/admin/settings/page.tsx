@@ -2,11 +2,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSystemSettings } from "@/lib/data/system-settings";
 import { SystemSettingsForm } from "./_components/system-settings-form";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export default async function AdminSettingsPage({ params }: Props) {
+export default async function AdminSettingsPage({
+  params,
+}: PageProps<"/[locale]/admin/settings">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

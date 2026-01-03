@@ -2,11 +2,9 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ContactForm } from "./_components/contact-form";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/contact">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Contact" });
 
@@ -20,7 +18,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ContactPage({ params }: Props) {
+export default async function ContactPage({
+  params,
+}: PageProps<"/[locale]/contact">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

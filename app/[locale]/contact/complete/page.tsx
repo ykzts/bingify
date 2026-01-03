@@ -4,12 +4,9 @@ import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-  searchParams: Promise<{ email?: string }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/contact/complete">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Contact" });
 
@@ -22,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ContactCompletePage({
   params,
   searchParams,
-}: Props) {
+}: PageProps<"/[locale]/contact/complete">) {
   const { locale } = await params;
   const { email } = await searchParams;
   setRequestLocale(locale);

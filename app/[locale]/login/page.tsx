@@ -4,11 +4,9 @@ import { Suspense } from "react";
 import { getEnabledAuthProviders } from "@/lib/data/auth-providers";
 import { LoginForm } from "./_components/login-form";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/login">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Login" });
 
@@ -22,7 +20,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function LoginPage({ params }: Props) {
+export default async function LoginPage({
+  params,
+}: PageProps<"/[locale]/login">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

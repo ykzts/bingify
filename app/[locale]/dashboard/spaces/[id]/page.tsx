@@ -16,11 +16,9 @@ import { ScreenSettingsDialog } from "./_components/screen-settings-dialog";
 import { SpaceSettingsSheet } from "./_components/space-settings-sheet";
 import { ViewingUrlDialog } from "./_components/viewing-url-dialog";
 
-interface Props {
-  params: Promise<{ id: string; locale: string }>;
-}
-
-export default async function AdminSpacePage({ params }: Props) {
+export default async function AdminSpacePage({
+  params,
+}: PageProps<"/[locale]/dashboard/spaces/[id]">) {
   const { id, locale } = await params;
   setRequestLocale(locale);
 

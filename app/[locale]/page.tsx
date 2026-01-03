@@ -6,11 +6,7 @@ import { FloatingParticles } from "./_components/floating-particles";
 import { Hero } from "./_components/hero";
 import { Support } from "./_components/support";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export default async function Home({ params }: Props) {
+export default async function Home({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
   setRequestLocale(locale);
 
