@@ -20,15 +20,10 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-interface ScreenLayoutProps {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}
-
 export default async function ScreenLayout({
   children,
   params,
-}: ScreenLayoutProps) {
+}: LayoutProps<"/[locale]">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

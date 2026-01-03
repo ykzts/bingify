@@ -23,14 +23,9 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-interface LocaleLayoutProps {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}
-
 export async function generateMetadata({
   params,
-}: LocaleLayoutProps): Promise<Metadata> {
+}: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Metadata" });
 
@@ -47,7 +42,7 @@ export async function generateMetadata({
 export default async function LocaleLayout({
   children,
   params,
-}: LocaleLayoutProps) {
+}: LayoutProps<"/[locale]">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

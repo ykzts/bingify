@@ -11,13 +11,6 @@ export const actionInitialState = {
   errorMap: {} as Record<string, string>,
 };
 
-// Re-export getSystemSettings from the data layer to avoid duplication
-// biome-ignore lint/performance/noBarrelFile: Intentional re-export to centralize implementation
-export {
-  type GetSystemSettingsResult,
-  getSystemSettings,
-} from "@/lib/data/system-settings";
-
 async function checkAdminPermission(
   supabase: Awaited<ReturnType<typeof createClient>>
 ) {

@@ -1,10 +1,6 @@
 import { QueryProvider } from "@/components/providers/query-provider";
 import "./globals.css";
 
-interface RootLayoutProps {
-  children: React.ReactNode;
-}
-
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return <QueryProvider>{children}</QueryProvider>;
 }
