@@ -75,12 +75,11 @@ export function ScreenDisplay({
         setMode(newSettings.display_mode);
         setBackground(newSettings.background);
         setTheme(newSettings.theme);
-        // Update locale via context - page will need reload for translations to update
+        // Update locale and reload page for translations to update
         if (newSettings.locale && newSettings.locale !== contextLocale) {
           setLocale(newSettings.locale as "en" | "ja");
-          console.info(
-            `Locale changed to ${newSettings.locale}, page reload recommended for full translation update`
-          );
+          // Reload page to apply new translations
+          window.location.reload();
         }
       }
     }
