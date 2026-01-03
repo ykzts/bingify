@@ -249,6 +249,8 @@ export async function createSpaceAction(
       .insert({
         gatekeeper_rules: null,
         id: uuid,
+        // max_participants will be set by trigger from system_settings
+        max_participants: undefined as unknown as number,
         owner_id: user.id,
         settings: {},
         share_key: fullShareKey,
