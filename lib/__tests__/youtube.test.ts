@@ -118,8 +118,9 @@ describe("checkMembershipStatus", () => {
         items: [
           {
             snippet: {
+              creatorChannelId: "UC_test_channel",
               memberDetails: {
-                channelId: "UC_test_channel",
+                channelId: "UC_user_channel",
               },
             },
           },
@@ -162,8 +163,9 @@ describe("checkMembershipStatus", () => {
         items: [
           {
             snippet: {
+              creatorChannelId: "UC_different_channel",
               memberDetails: {
-                channelId: "UC_different_channel",
+                channelId: "UC_user_channel",
               },
             },
           },
