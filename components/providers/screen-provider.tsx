@@ -2,39 +2,42 @@
 
 import type React from "react";
 import { createContext, useContext, useState } from "react";
-import type { BackgroundType } from "@/lib/types/screen-settings";
+import type { BackgroundType, LocaleType } from "@/lib/types/screen-settings";
 import { cn } from "@/lib/utils";
 
-interface BackgroundContextType {
+interface ScreenContextType {
   background: BackgroundType;
+  locale: LocaleType;
   setBackground: (bg: BackgroundType) => void;
+  setLocale: (locale: LocaleType) => void;
 }
 
-const BackgroundContext = createContext<BackgroundContextType | undefined>(
-  undefined
-);
+const ScreenContext = createContext<ScreenContextType | undefined>(undefined);
 
-export function BackgroundProvider({
+export function ScreenProvider({
   children,
   initialBackground = "default",
+  initialLocale = "en",
 }: {
   children: React.ReactNode;
   initialBackground?: BackgroundType;
+  initialLocale?: LocaleType;
 }) {
   const [background, setBackground] =
     useState<BackgroundType>(initialBackground);
+  const [locale, setLocale] = useState<LocaleType>(initialLocale);
 
   return (
-    <BackgroundContext value={{ background, setBackground }}>
+    <ScreenContext value={{ background, locale, setBackground, setLocale }}>
       {children}
-    </BackgroundContext>
+    </ScreenContext>
   );
 }
 
-export function useBackground() {
-  const context = useContext(BackgroundContext);
+export function useScreen() {
+  const context = useContext(ScreenContext);
   if (context === undefined) {
-    throw new Error("useBackground must be used within a BackgroundProvider");
+    throw new Error("useScreen must be used within a ScreenProvider");
   }
   return context;
 }
@@ -42,13 +45,11 @@ export function useBackground() {
 export function ColoredHtml({
   children,
   className,
-  lang,
 }: {
   children?: React.ReactNode;
   className?: string;
-  lang: string;
 }) {
-  const { background } = useBackground();
+  const { background, locale } = useScreen();
 
   return (
     <html
@@ -57,7 +58,7 @@ export function ColoredHtml({
         className
       )}
       data-background={background}
-      lang={lang}
+      lang={locale}
     >
       {children}
     </html>

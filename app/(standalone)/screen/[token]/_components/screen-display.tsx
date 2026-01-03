@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useEffectEvent, useState } from "react";
-import { useBackground } from "@/components/providers/background-provider";
+import { useScreen } from "@/components/providers/screen-provider";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { useDrumRoll } from "@/hooks/use-drum-roll";
@@ -50,9 +50,8 @@ export function ScreenDisplay({
     duration: 1800, // 1.8 seconds
   });
 
-  // Use background context instead of local state
-  // biome-ignore lint/correctness/noUnusedVariables: background is managed via context and used by parent layout
-  const { background, setBackground } = useBackground();
+  // Use screen context for background and locale state
+  const { locale: contextLocale, setBackground, setLocale } = useScreen();
 
   // Initialize background and theme from props
   useEffect(() => {
@@ -88,10 +87,11 @@ export function ScreenDisplay({
             setMode(newSettings.display_mode);
             setBackground(newSettings.background);
             setTheme(newSettings.theme);
-            // Note: locale changes require page reload to update translations
-            if (newSettings.locale) {
+            // Update locale via context - page will need reload for translations to update
+            if (newSettings.locale && newSettings.locale !== contextLocale) {
+              setLocale(newSettings.locale as "en" | "ja");
               console.info(
-                `Locale changed to ${newSettings.locale}, consider reloading`
+                `Locale changed to ${newSettings.locale}, page reload recommended for full translation update`
               );
             }
           }
@@ -114,7 +114,7 @@ export function ScreenDisplay({
       channel.unsubscribe();
       supabase.removeChannel(channel);
     };
-  }, [spaceId, setBackground]);
+  }, [spaceId, setBackground, setLocale, contextLocale]);
 
   // Use useEffectEvent to separate event logic from effect dependencies
   const onInsert = useEffectEvent(async (payload: { new: CalledNumber }) => {

@@ -1,5 +1,7 @@
 import { headers } from "next/headers";
-import { getTranslations } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getTranslations } from "next-intl/server";
+import { ScreenInitializer } from "@/components/providers/screen-initializer";
 import { createClient } from "@/lib/supabase/server";
 import type {
   BackgroundType,
@@ -40,17 +42,21 @@ export default async function ScreenViewPage({ params }: Props) {
   const locale: LocaleType =
     (screenSettings?.locale as LocaleType) || browserLocale;
 
+  const messages = await getMessages({ locale });
+
   // If token is invalid or space not found, show error
   if (error || !space) {
     const t = await getTranslations({ locale, namespace: "ScreenView" });
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black">
-        <div className="text-center">
-          <h1 className="mb-4 font-bold text-4xl text-white">
-            {t("invalidToken")}
-          </h1>
+      <NextIntlClientProvider locale={locale} messages={messages}>
+        <div className="flex min-h-screen items-center justify-center bg-black">
+          <div className="text-center">
+            <h1 className="mb-4 font-bold text-4xl text-white">
+              {t("invalidToken")}
+            </h1>
+          </div>
         </div>
-      </div>
+      </NextIntlClientProvider>
     );
   }
 
@@ -66,14 +72,18 @@ export default async function ScreenViewPage({ params }: Props) {
   const baseUrl = getAbsoluteUrl();
 
   return (
-    <ScreenDisplay
-      baseUrl={baseUrl}
-      initialBg={initialBg}
-      initialMode={initialMode}
-      initialTheme={initialTheme}
-      locale={locale}
-      shareKey={space.share_key}
-      spaceId={space.id}
-    />
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <ScreenInitializer initialBackground={initialBg} initialLocale={locale}>
+        <ScreenDisplay
+          baseUrl={baseUrl}
+          initialBg={initialBg}
+          initialMode={initialMode}
+          initialTheme={initialTheme}
+          locale={locale}
+          shareKey={space.share_key}
+          spaceId={space.id}
+        />
+      </ScreenInitializer>
+    </NextIntlClientProvider>
   );
 }
