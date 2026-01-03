@@ -29,10 +29,7 @@ import {
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
 import { getErrorMessage } from "@/lib/utils";
-import {
-  actionInitialState,
-  updateSystemSettingsAction,
-} from "../_lib/actions";
+import { updateSystemSettingsAction } from "../_lib/actions";
 import { systemSettingsFormOpts } from "../_lib/form-options";
 
 interface Props {
@@ -44,10 +41,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
   const t = useTranslations("AdminSettings");
 
   // Use TanStack Form with Next.js server actions
-  const [state, action] = useActionState(
-    updateSystemSettingsAction,
-    actionInitialState
-  );
+  const [state, action] = useActionState(updateSystemSettingsAction, undefined);
 
   const form = useForm({
     ...systemSettingsFormOpts,
