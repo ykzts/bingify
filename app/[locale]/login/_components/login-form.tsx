@@ -39,6 +39,8 @@ const PROVIDER_CONFIG = {
 type Provider = keyof typeof PROVIDER_CONFIG;
 
 // OAuth provider button theme classes
+// Note: Includes all current and planned OAuth providers.
+// Providers not in PROVIDER_CONFIG don't require special scope configuration.
 const PROVIDER_BUTTON_CLASSES: Record<string, string> = {
   github: "bg-github hover:bg-github-hover",
   google: "bg-google hover:bg-google-hover",
