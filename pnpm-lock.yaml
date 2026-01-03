@@ -208,8 +208,8 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
       ultracite:
-        specifier: 6.5.0
-        version: 6.5.0(typescript@5.9.3)
+        specifier: 6.5.1
+        version: 6.5.1(typescript@5.9.3)
       vitest:
         specifier: 4.0.16
         version: 4.0.16(@types/node@24.10.4)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2)(tsx@4.21.0)
@@ -3959,8 +3959,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  ultracite@6.5.0:
-    resolution: {integrity: sha512-HrXvM0CX/S3t5HEoepWQ6kpMVD9mzNB5X0k/T7zvNObQ6X9+s1pAE4efDR3Nc4KwqDiemK/bwI7pgPApT7Fktw==}
+  ultracite@6.5.1:
+    resolution: {integrity: sha512-PeS2L9L4EDINVVUHW+H/pnmidCetWX2a9/baF+C7Foi3hF3lKLRn5oaBjaP7FGTURcTwfeoZg0ZaYB7ULDdtxQ==}
     hasBin: true
 
   undici-types@7.16.0:
@@ -8427,7 +8427,7 @@ snapshots:
 
   typescript@5.9.3: {}
 
-  ultracite@6.5.0(typescript@5.9.3):
+  ultracite@6.5.1(typescript@5.9.3):
     dependencies:
       '@clack/prompts': 0.11.0
       '@trpc/server': 11.8.1(typescript@5.9.3)
