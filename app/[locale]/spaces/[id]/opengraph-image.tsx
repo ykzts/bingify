@@ -80,13 +80,9 @@ export default async function Image({
             color: "#1f2937",
             fontSize: 56,
             fontWeight: "bold",
-            textAlign: "center",
+            lineHeight: 1.2,
             maxWidth: "800px",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
+            textAlign: "center",
           }}
         >
           {spaceTitle}
@@ -97,13 +93,9 @@ export default async function Image({
           style={{
             color: "#4b5563",
             fontSize: 28,
-            textAlign: "center",
+            lineHeight: 1.4,
             maxWidth: "800px",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
+            textAlign: "center",
           }}
         >
           {spaceDescription}
