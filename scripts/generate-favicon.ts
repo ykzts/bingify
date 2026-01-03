@@ -10,7 +10,7 @@ async function generateFavicon() {
   const svgBuffer = readFileSync(svgPath);
   const sizes = [16, 32, 48, 64, 128, 256];
   const pngBuffers = await Promise.all(
-    sizes.map((size) => sharp(svgBuffer).resize(size, size).png().toBuffer()),
+    sizes.map((size) => sharp(svgBuffer).resize(size, size).png().toBuffer())
   );
 
   // Build a proper ICO container with multiple resolutions for better rendering
