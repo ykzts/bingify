@@ -78,7 +78,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
   // Use useEffectEvent to separate event logic from effect dependencies
   const handleUpdateSuccess = useEffectEvent(() => {
     toast.success(t("updateSuccess"));
-    // Trigger refresh after showing toast
+    // Show success message briefly, then refresh
     setTimeout(() => {
       router.refresh();
     }, 1500);
