@@ -3,6 +3,7 @@ import {
   extractLocaleFromPath,
   isAdminPath,
   isDashboardPath,
+  isLoginPath,
 } from "../path-matchers";
 
 describe("path-matchers", () => {
@@ -61,6 +62,31 @@ describe("path-matchers", () => {
       expect(isDashboardPath("/")).toBe(false);
       expect(isDashboardPath("/en")).toBe(false);
       expect(isDashboardPath("/dashboards")).toBe(false);
+    });
+  });
+
+  describe("isLoginPath", () => {
+    it("should return true for /login path", () => {
+      expect(isLoginPath("/login")).toBe(true);
+    });
+
+    it("should return true for localized login paths", () => {
+      expect(isLoginPath("/en/login")).toBe(true);
+      expect(isLoginPath("/ja/login")).toBe(true);
+    });
+
+    it("should return false for non-login paths", () => {
+      expect(isLoginPath("/")).toBe(false);
+      expect(isLoginPath("/dashboard")).toBe(false);
+      expect(isLoginPath("/admin")).toBe(false);
+      expect(isLoginPath("/en")).toBe(false);
+      expect(isLoginPath("/ja")).toBe(false);
+    });
+
+    it("should return false for login subpaths", () => {
+      expect(isLoginPath("/login/")).toBe(false);
+      expect(isLoginPath("/login/callback")).toBe(false);
+      expect(isLoginPath("/en/login/")).toBe(false);
     });
   });
 
