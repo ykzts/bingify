@@ -1,9 +1,9 @@
 import { describe, expect, test, vi } from "vitest";
-import * as ogImage from "../opengraph-image";
+import { alt, contentType, default as Image, size } from "../opengraph-image";
 
 // Mock next-intl
 vi.mock("next-intl/server", () => ({
-  getTranslations: vi.fn(async ({ locale, namespace }) => {
+  getTranslations: vi.fn(({ locale }) => {
     return (key: string) => {
       if (locale === "ja" && key === "ogSpaceSubtitle") {
         return "このビンゴスペースに参加";
@@ -15,7 +15,7 @@ vi.mock("next-intl/server", () => ({
 
 // Mock the actions module
 vi.mock("../_lib/actions", () => ({
-  getSpacePublicInfo: vi.fn(async (id: string) => {
+  getSpacePublicInfo: vi.fn((id: string) => {
     if (id === "invalid-id") {
       return null;
     }
@@ -33,17 +33,17 @@ vi.mock("../_lib/actions", () => ({
 
 describe("Space OGP Image", () => {
   test("should export correct size constants", () => {
-    expect(ogImage.size).toEqual({
+    expect(size).toEqual({
       height: 630,
       width: 1200,
     });
-    expect(ogImage.contentType).toBe("image/png");
-    expect(ogImage.alt).toBe("Bingify Space");
+    expect(contentType).toBe("image/png");
+    expect(alt).toBe("Bingify Space");
   });
 
   test("should generate image with space data", async () => {
     const params = Promise.resolve({ id: "test-id", locale: "en" });
-    const result = await ogImage.default({ params });
+    const result = await Image({ params });
 
     // ImageResponse is a special Next.js type that we can't easily test,
     // but we can verify it's returned
@@ -53,21 +53,20 @@ describe("Space OGP Image", () => {
 
   test("should handle different locales", async () => {
     const paramsEn = Promise.resolve({ id: "test-id", locale: "en" });
-    const resultEn = await ogImage.default({ params: paramsEn });
+    const resultEn = await Image({ params: paramsEn });
     expect(resultEn).toBeDefined();
 
     const paramsJa = Promise.resolve({ id: "test-id", locale: "ja" });
-    const resultJa = await ogImage.default({ params: paramsJa });
+    const resultJa = await Image({ params: paramsJa });
     expect(resultJa).toBeDefined();
   });
 
   test("should handle missing space data gracefully", async () => {
     const params = Promise.resolve({ id: "invalid-id", locale: "en" });
-    const result = await ogImage.default({ params });
+    const result = await Image({ params });
 
     // Should still generate an image even when space is not found
     expect(result).toBeDefined();
     expect(result.constructor.name).toBe("ImageResponse");
   });
 });
-
