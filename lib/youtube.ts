@@ -63,8 +63,8 @@ export async function checkSubscriptionStatus(
  * 2. Webhooks: Integrate with YouTube webhooks for membership status changes
  * 3. Manual verification: Implement a manual verification process
  *
- * @param userAccessToken - OAuth access token for the user (not used)
- * @param channelId - ID of the channel to check membership for (not used)
+ * @param userAccessToken - OAuth access token for the user (required, validated)
+ * @param channelId - ID of the channel to check membership for (required, validated)
  * @returns Promise indicating the feature is not supported
  */
 export function checkMembershipStatus(
