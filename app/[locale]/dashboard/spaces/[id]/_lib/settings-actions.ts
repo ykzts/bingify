@@ -144,10 +144,10 @@ export async function updateSpaceSettings(
       };
     }
 
-    // Validation 1: Check system settings for max_participants_per_space
+    // Validation 1: Check system settings for max_participants_per_space and gatekeeper features
     const { data: systemSettings, error: settingsError } = await supabase
       .from("system_settings")
-      .select("max_participants_per_space")
+      .select("max_participants_per_space, features")
       .eq("id", 1)
       .single();
 
@@ -168,6 +168,76 @@ export async function updateSpaceSettings(
         errors: [
           `システムの上限設定（${systemSettings.max_participants_per_space}人）を超える値にはできません。`,
         ],
+      };
+    }
+
+    // Validation 1.5: Check gatekeeper requirement types against system settings
+    if (systemSettings?.features?.gatekeeper && gatekeeperMode === "social") {
+      const features = systemSettings.features.gatekeeper;
+
+      // Validate YouTube requirements
+      if (socialPlatform === "youtube" && youtubeRequirement !== "none") {
+        if (!features.youtube?.enabled) {
+          return {
+            ...initialFormState,
+            errors: ["YouTube認証は現在システム設定で無効になっています"],
+          };
+        }
+        if (
+          youtubeRequirement === "subscriber" &&
+          !features.youtube?.subscriber?.enabled
+        ) {
+          return {
+            ...initialFormState,
+            errors: [
+              "YouTubeチャンネル登録者要件は現在システム設定で無効になっています",
+            ],
+          };
+        }
+      }
+
+      // Validate Twitch requirements
+      if (socialPlatform === "twitch" && twitchRequirement !== "none") {
+        if (!features.twitch?.enabled) {
+          return {
+            ...initialFormState,
+            errors: ["Twitch認証は現在システム設定で無効になっています"],
+          };
+        }
+        if (
+          twitchRequirement === "follower" &&
+          !features.twitch?.follower?.enabled
+        ) {
+          return {
+            ...initialFormState,
+            errors: [
+              "Twitchフォロワー要件は現在システム設定で無効になっています",
+            ],
+          };
+        }
+        if (
+          twitchRequirement === "subscriber" &&
+          !features.twitch?.subscriber?.enabled
+        ) {
+          return {
+            ...initialFormState,
+            errors: [
+              "Twitchサブスクライバー要件は現在システム設定で無効になっています",
+            ],
+          };
+        }
+      }
+    }
+
+    // Validate email mode
+    if (
+      gatekeeperMode === "email" &&
+      systemSettings?.features?.gatekeeper?.email &&
+      !systemSettings.features.gatekeeper.email.enabled
+    ) {
+      return {
+        ...initialFormState,
+        errors: ["メール認証は現在システム設定で無効になっています"],
       };
     }
 
