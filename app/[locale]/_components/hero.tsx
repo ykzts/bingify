@@ -50,8 +50,8 @@ export function Hero({
           <Image
             alt="Bingify"
             className="h-16 w-auto sm:h-20"
-            height={80}
             fetchPriority="high"
+            height={80}
             loading="eager"
             preload
             src="/logo.svg"
