@@ -1,15 +1,8 @@
 "use server";
 
+import { initialFormState } from "@tanstack/react-form-nextjs";
 import { systemSettingsSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
-
-// Define initial state for the action
-export const actionInitialState = {
-  errors: [] as string[],
-  // biome-ignore lint/suspicious/noExplicitAny: Type is determined at runtime by form values
-  values: undefined as any,
-  errorMap: {} as Record<string, string>,
-};
 
 async function checkAdminPermission(
   supabase: Awaited<ReturnType<typeof createClient>>
@@ -110,7 +103,7 @@ export async function updateSystemSettingsAction(
     if (!validation.success) {
       console.error("Validation failed:", validation.error);
       return {
-        ...actionInitialState,
+        ...initialFormState,
         errors: validation.error.issues.map(
           (e: { message: string }) => e.message
         ),
@@ -125,7 +118,7 @@ export async function updateSystemSettingsAction(
     const { error: permissionError } = await checkAdminPermission(supabase);
     if (permissionError) {
       return {
-        ...actionInitialState,
+        ...initialFormState,
         errors: [permissionError],
       };
     }
@@ -141,14 +134,14 @@ export async function updateSystemSettingsAction(
     if (error) {
       console.error("Error updating system settings:", error);
       return {
-        ...actionInitialState,
+        ...initialFormState,
         errors: ["errorUpdateFailed"],
       };
     }
 
     // Return success state with consistent shape
     return {
-      ...actionInitialState,
+      ...initialFormState,
       values: validatedData,
       meta: {
         success: true,
@@ -157,7 +150,7 @@ export async function updateSystemSettingsAction(
   } catch (e) {
     console.error("Error in updateSystemSettingsAction:", e);
     return {
-      ...actionInitialState,
+      ...initialFormState,
       errors: ["errorGeneric"],
     };
   }
