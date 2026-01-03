@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-form-nextjs";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useEffectEvent } from "react";
 import { toast } from "sonner";
 import { InlineFieldError } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
@@ -75,20 +75,25 @@ export function SystemSettingsForm({ initialSettings }: Props) {
     (formState) => formState.isSubmitting
   );
 
+  // Use useEffectEvent to separate event logic from effect dependencies
+  const handleUpdateSuccess = useEffectEvent(() => {
+    toast.success(t("updateSuccess"));
+    // Show success message briefly, then refresh
+    const timer = setTimeout(() => {
+      router.refresh();
+    }, 1500);
+    return () => clearTimeout(timer);
+  });
+
   useEffect(() => {
     // Check for successful update
     const meta = (state as Record<string, unknown>)?.meta as
       | { success?: boolean }
       | undefined;
     if (meta?.success) {
-      toast.success(t("updateSuccess"));
-      // Show success message briefly, then refresh
-      const timer = setTimeout(() => {
-        router.refresh();
-      }, 1500);
-      return () => clearTimeout(timer);
+      handleUpdateSuccess();
     }
-  }, [state, router, t]);
+  }, [state]);
 
   return (
     <form action={action} className="space-y-6">
