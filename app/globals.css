@@ -60,7 +60,11 @@
   --background-color-chroma-key-green: #00ff00; /* Chroma Key Green */
   --background-color-chroma-key-blue: #0000ff; /* Chroma Key Blue */
 
-  /* Brand Colors for OAuth */
+  /* OAuth Provider Brand Colors */
+  --color-github: #24292e;
+  --color-github-hover: #1b1f23;
+  --color-google: #4285f4;
+  --color-google-hover: #357ae8;
   --color-twitch: #9146ff;
   --color-twitch-hover: #7d3be6;
 }

@@ -217,10 +217,15 @@ export function LoginForm({ providers }: Props) {
   };
 
   const getProviderButtonClass = (provider: string) => {
-    if (provider === "twitch") {
-      return "w-full bg-twitch hover:bg-twitch-hover";
-    }
-    return "w-full";
+    // Use provider-specific colors when available, otherwise use default primary colors
+    const providerColors: Record<string, string> = {
+      github: "bg-github hover:bg-github-hover",
+      google: "bg-google hover:bg-google-hover",
+      twitch: "bg-twitch hover:bg-twitch-hover",
+    };
+
+    const customClass = providerColors[provider];
+    return customClass ? `w-full ${customClass}` : "w-full";
   };
 
   const displayError = error || oauthError;
