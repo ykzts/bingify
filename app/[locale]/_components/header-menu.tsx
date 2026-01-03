@@ -1,16 +1,9 @@
 "use client";
 
-import {
-  Globe,
-  LayoutDashboard,
-  LogOut,
-  Settings,
-  Shield,
-  User,
-} from "lucide-react";
+import { LayoutDashboard, LogOut, Settings, Shield, User } from "lucide-react";
 import Image from "next/image";
-import { useLocale, useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,15 +11,10 @@ import {
   DropdownMenuItem,
   DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link, usePathname, useRouter } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
 
 interface HeaderMenuProps {
   user: {
@@ -37,19 +25,10 @@ interface HeaderMenuProps {
   } | null;
 }
 
-const localeNames: Record<string, string> = {
-  en: "English",
-  ja: "日本語",
-};
-
 export function HeaderMenu({ user }: HeaderMenuProps) {
   const t = useTranslations("HeaderMenu");
-  const tLang = useTranslations("LanguageSwitcher");
   const router = useRouter();
-  const pathname = usePathname();
-  const locale = useLocale();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -67,55 +46,14 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
     }
   };
 
-  const handleLocaleChange = (newLocale: string) => {
-    startTransition(() => {
-      router.replace(pathname, { locale: newLocale });
-      setOpen(false);
-    });
-  };
-
   if (!user) {
     return (
-      <div className="flex items-center gap-3">
-        <DropdownMenu onOpenChange={setOpen} open={open}>
-          <DropdownMenuTrigger asChild>
-            <Button
-              aria-label={tLang("label")}
-              size="icon"
-              type="button"
-              variant="outline"
-            >
-              <Globe className="h-4 w-4 text-gray-600" />
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuPortal>
-            <DropdownMenuContent
-              align="end"
-              className="z-[100] min-w-[200px]"
-              sideOffset={8}
-            >
-              {routing.locales.map((loc) => (
-                <DropdownMenuItem
-                  className={cn(locale === loc && "bg-gray-50 font-medium")}
-                  disabled={isPending}
-                  key={loc}
-                  onSelect={() => handleLocaleChange(loc)}
-                >
-                  {localeNames[loc] || loc.toUpperCase()}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenuPortal>
-        </DropdownMenu>
-
-        <Link
-          className="rounded-md border border-gray-300 bg-white px-4 py-1.5 font-medium text-sm transition hover:bg-gray-50"
-          href="/login"
-        >
-          {t("login")}
-        </Link>
-      </div>
+      <Link
+        className="rounded-md border border-gray-300 bg-white px-4 py-1.5 font-medium text-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
+        href="/login"
+      >
+        {t("login")}
+      </Link>
     );
   }
 
@@ -137,8 +75,8 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
               width={32}
             />
           ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
-              <User className="h-4 w-4 text-gray-600" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+              <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
             </div>
           )}
         </Button>
@@ -155,7 +93,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
               {user.full_name || user.email}
             </p>
             {user.full_name && user.email && (
-              <p className="text-gray-500 text-sm">{user.email}</p>
+              <p className="text-muted-foreground text-sm">{user.email}</p>
             )}
           </div>
 
@@ -194,30 +132,6 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
               {t("settings")}
             </Link>
           </DropdownMenuItem>
-
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <Globe className="h-4 w-4" />
-              {t("language")}
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                className="z-[100] min-w-[180px]"
-                sideOffset={8}
-              >
-                {routing.locales.map((loc) => (
-                  <DropdownMenuItem
-                    className={cn(locale === loc && "bg-gray-50 font-medium")}
-                    disabled={isPending}
-                    key={loc}
-                    onSelect={() => handleLocaleChange(loc)}
-                  >
-                    {localeNames[loc] || loc.toUpperCase()}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
 
           <DropdownMenuSeparator />
 

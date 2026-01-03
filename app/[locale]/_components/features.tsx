@@ -52,10 +52,10 @@ export function Features({
           viewport={{ once: true }}
           whileInView={{ opacity: 1, y: 0 }}
         >
-          <h2 className="mb-4 font-bold text-3xl text-text-main sm:text-4xl">
+          <h2 className="mb-4 font-bold text-3xl text-foreground sm:text-4xl">
             {heading}
           </h2>
-          <p className="text-lg text-text-muted">{subheading}</p>
+          <p className="text-lg text-muted-foreground">{subheading}</p>
         </motion.div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -64,7 +64,7 @@ export function Features({
             return (
               <motion.div
                 aria-labelledby={`feature-title-${index}`}
-                className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-shadow hover:shadow-xl"
+                className="group relative overflow-hidden rounded-2xl border border-border bg-card p-8 shadow-sm transition-shadow hover:shadow-xl"
                 initial={{ opacity: 0, y: 20 }}
                 key={feature.title}
                 role="article"
@@ -85,12 +85,12 @@ export function Features({
                 </motion.div>
 
                 <h3
-                  className="mb-3 font-bold text-text-main text-xl"
+                  className="mb-3 font-bold text-card-foreground text-xl"
                   id={`feature-title-${index}`}
                 >
                   {feature.title}
                 </h3>
-                <p className="text-text-muted leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed">
                   {feature.description}
                 </p>
 

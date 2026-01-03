@@ -28,7 +28,9 @@ export function SectionHeader({
         {Icon && <Icon className="h-5 w-5" />}
         {children}
       </h2>
-      {description && <p className="text-gray-600 text-sm">{description}</p>}
+      {description && (
+        <p className="text-muted-foreground text-sm">{description}</p>
+      )}
     </div>
   );
 }
