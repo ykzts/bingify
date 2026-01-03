@@ -38,6 +38,13 @@ const PROVIDER_CONFIG = {
 
 type Provider = keyof typeof PROVIDER_CONFIG;
 
+// OAuth provider button theme classes
+const PROVIDER_BUTTON_CLASSES: Record<string, string> = {
+  github: "bg-github hover:bg-github-hover",
+  google: "bg-google hover:bg-google-hover",
+  twitch: "bg-twitch hover:bg-twitch-hover",
+};
+
 interface Props {
   providers: AuthProvider[];
 }
@@ -218,13 +225,7 @@ export function LoginForm({ providers }: Props) {
 
   const getProviderButtonClass = (provider: string) => {
     // Use provider-specific colors when available, otherwise use default primary colors
-    const providerColors: Record<string, string> = {
-      github: "bg-github hover:bg-github-hover",
-      google: "bg-google hover:bg-google-hover",
-      twitch: "bg-twitch hover:bg-twitch-hover",
-    };
-
-    const customClass = providerColors[provider];
+    const customClass = PROVIDER_BUTTON_CLASSES[provider];
     return customClass ? `w-full ${customClass}` : "w-full";
   };
 
