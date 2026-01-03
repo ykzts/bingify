@@ -3,8 +3,11 @@ import { Nunito } from "next/font/google";
 import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import {
+  BackgroundProvider,
+  ColoredHtml,
+} from "@/components/providers/background-provider";
 import { cn } from "@/lib/utils";
-import { BackgroundProvider, ColoredHtml } from "./_context/background-context";
 
 const nunito = Nunito({
   display: "swap",

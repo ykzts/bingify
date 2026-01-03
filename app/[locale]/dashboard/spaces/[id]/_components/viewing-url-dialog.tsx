@@ -32,7 +32,7 @@ export function ViewingUrlDialog({ locale, spaceId, viewToken }: Props) {
   const [open, setOpen] = useState(false);
 
   // Build URL without query parameters (settings are now managed via database)
-  const viewingUrl = getAbsoluteUrl(`/${locale}/screen/${currentToken}`);
+  const viewingUrl = getAbsoluteUrl(`/screen/${currentToken}`);
 
   const handleCopyUrl = async () => {
     try {

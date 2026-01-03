@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useEffectEvent, useState } from "react";
+import { useBackground } from "@/components/providers/background-provider";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { useDrumRoll } from "@/hooks/use-drum-roll";
@@ -15,7 +16,6 @@ import type {
   ThemeType,
 } from "@/lib/types/screen-settings";
 import { cn } from "@/lib/utils";
-import { useBackground } from "../../_context/background-context";
 
 interface Props {
   baseUrl: string;
@@ -194,6 +194,7 @@ export function ScreenDisplay({
 
     return () => {
       channel.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [spaceId]);
 
@@ -250,8 +251,14 @@ export function ScreenDisplay({
           ) : (
             <div className="text-center">
               <p
-                className="font-bold text-4xl text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]"
-                style={{ WebkitTextStroke: "1px black" }}
+                className={cn(
+                  "font-bold text-4xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]",
+                  textColor
+                )}
+                style={{
+                  WebkitTextStroke:
+                    theme === "light" ? "1px rgba(0,0,0,0.2)" : "1px black",
+                }}
               >
                 {t("waitingForNumbers")}
               </p>
@@ -268,13 +275,19 @@ export function ScreenDisplay({
               {displayNumber !== null ? (
                 <motion.h1
                   animate={{ scale: 1, opacity: 1 }}
-                  className="font-black text-[clamp(6rem,15vw,12rem)] text-white drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)] lg:text-[clamp(8rem,20vh,20rem)]"
+                  className={cn(
+                    "font-black text-[clamp(6rem,15vw,12rem)] drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)] lg:text-[clamp(8rem,20vh,20rem)]",
+                    textColor
+                  )}
                   initial={{ scale: 0, opacity: 0 }}
                   key={displayNumber}
                   style={{
-                    WebkitTextStroke: "3px black",
+                    WebkitTextStroke:
+                      theme === "light" ? "3px rgba(0,0,0,0.2)" : "3px black",
                     textShadow:
-                      "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
+                      theme === "light"
+                        ? "0 0 20px rgba(0,0,0,0.3), 2px 2px 0 rgba(0,0,0,0.2)"
+                        : "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
                   }}
                   transition={{
                     type: "spring",
@@ -287,8 +300,14 @@ export function ScreenDisplay({
               ) : (
                 <div className="text-center">
                   <p
-                    className="font-bold text-3xl text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] lg:text-4xl"
-                    style={{ WebkitTextStroke: "1px black" }}
+                    className={cn(
+                      "font-bold text-3xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] lg:text-4xl",
+                      textColor
+                    )}
+                    style={{
+                      WebkitTextStroke:
+                        theme === "light" ? "1px rgba(0,0,0,0.2)" : "1px black",
+                    }}
                   >
                     {t("waitingForNumbers")}
                   </p>
@@ -306,7 +325,7 @@ export function ScreenDisplay({
                   value={participationUrl}
                 />
               </div>
-              <p className="text-center font-bold text-sm text-white">
+              <p className={cn("text-center font-bold text-sm", textColor)}>
                 {t("scanToJoin")}
               </p>
             </div>
@@ -315,7 +334,7 @@ export function ScreenDisplay({
           {/* Right Panel: History Grid */}
           <div className="flex flex-1 items-center rounded-xl bg-black/70 p-4 backdrop-blur-md lg:w-[65%] lg:p-6">
             <div className="w-full">
-              <h2 className="mb-3 font-bold text-white text-xl lg:mb-4">
+              <h2 className={cn("mb-3 font-bold text-xl lg:mb-4", textColor)}>
                 {t("calledNumbers")}
               </h2>
               <div className="grid grid-cols-10 gap-1.5 lg:grid-cols-[repeat(15,minmax(0,1fr))] lg:gap-2">

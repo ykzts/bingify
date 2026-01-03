@@ -2,9 +2,8 @@
 
 import type React from "react";
 import { createContext, useContext, useState } from "react";
+import type { BackgroundType } from "@/lib/types/screen-settings";
 import { cn } from "@/lib/utils";
-
-type BackgroundType = "default" | "transparent" | "green" | "blue";
 
 interface BackgroundContextType {
   background: BackgroundType;

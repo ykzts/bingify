@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
-import { cn } from "@/lib/utils";
 import {
   BackgroundProvider,
   ColoredHtml,
-} from "./screen/_context/background-context";
+} from "@/components/providers/background-provider";
+import { cn } from "@/lib/utils";
 
 const nunito = Nunito({
   display: "swap",

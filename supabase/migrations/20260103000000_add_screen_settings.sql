@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS screen_settings (
   space_id UUID NOT NULL REFERENCES spaces(id) ON DELETE CASCADE,
   display_mode TEXT NOT NULL DEFAULT 'full' CHECK (display_mode IN ('full', 'minimal')),
   background TEXT NOT NULL DEFAULT 'default' CHECK (background IN ('default', 'transparent', 'green', 'blue')),
+  locale TEXT DEFAULT 'en' CHECK (locale IN ('en', 'ja')),
+  theme TEXT NOT NULL DEFAULT 'dark' CHECK (theme IN ('light', 'dark')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   CONSTRAINT unique_screen_settings_per_space UNIQUE (space_id)
@@ -68,4 +70,4 @@ CREATE TRIGGER trigger_update_screen_settings_updated_at
   EXECUTE FUNCTION update_screen_settings_updated_at();
 
 -- Add comment to document the table
-COMMENT ON TABLE screen_settings IS 'Real-time screen display settings for each space. Settings are synced to screen display via Supabase Realtime.';
+COMMENT ON TABLE screen_settings IS 'Real-time screen display settings for each space including locale and theme preferences.';
