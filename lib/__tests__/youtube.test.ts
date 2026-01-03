@@ -112,74 +112,18 @@ describe("checkMembershipStatus", () => {
     vi.clearAllMocks();
   });
 
-  it("should return isMember true when membership exists", async () => {
-    mockMembersList.mockResolvedValue({
-      data: {
-        items: [
-          {
-            snippet: {
-              creatorChannelId: "UC_test_channel",
-              memberDetails: {
-                channelId: "UC_user_channel",
-              },
-            },
-          },
-        ],
-      },
-    });
-
-    const result = await checkMembershipStatus(
-      "test_access_token",
-      "UC_test_channel"
-    );
-
-    expect(result.isMember).toBe(true);
-    expect(result.error).toBeUndefined();
-    expect(mockMembersList).toHaveBeenCalledWith({
-      filterByMemberChannelId: "mine",
-      part: ["snippet"],
-    });
-  });
-
-  it("should return isMember false when membership does not exist", async () => {
-    mockMembersList.mockResolvedValue({
-      data: {
-        items: [],
-      },
-    });
-
+  it("should return error indicating feature is not supported", async () => {
     const result = await checkMembershipStatus(
       "test_access_token",
       "UC_test_channel"
     );
 
     expect(result.isMember).toBe(false);
-    expect(result.error).toBeUndefined();
-  });
-
-  it("should return isMember false when channel ID does not match", async () => {
-    mockMembersList.mockResolvedValue({
-      data: {
-        items: [
-          {
-            snippet: {
-              creatorChannelId: "UC_different_channel",
-              memberDetails: {
-                channelId: "UC_user_channel",
-              },
-            },
-          },
-        ],
-      },
-    });
-
-    const result = await checkMembershipStatus(
-      "test_access_token",
-      "UC_test_channel"
+    expect(result.error).toBe(
+      "YouTube membership verification is not supported. The API requires channel owner credentials."
     );
-
-    expect(result.isMember).toBe(false);
-    expect(result.error).toBeUndefined();
+    // Verify that the API was not called
+    expect(mockMembersList).not.toHaveBeenCalled();
   });
 
   it("should return error when access token is missing", async () => {
@@ -187,6 +131,7 @@ describe("checkMembershipStatus", () => {
 
     expect(result.isMember).toBe(false);
     expect(result.error).toBe("Missing required parameters");
+    expect(mockMembersList).not.toHaveBeenCalled();
   });
 
   it("should return error when channel ID is missing", async () => {
@@ -194,31 +139,6 @@ describe("checkMembershipStatus", () => {
 
     expect(result.isMember).toBe(false);
     expect(result.error).toBe("Missing required parameters");
-  });
-
-  it("should return error when API request fails", async () => {
-    mockMembersList.mockRejectedValue(
-      new Error("API Error: Invalid credentials")
-    );
-
-    const result = await checkMembershipStatus(
-      "invalid_token",
-      "UC_test_channel"
-    );
-
-    expect(result.isMember).toBe(false);
-    expect(result.error).toBe("API Error: Invalid credentials");
-  });
-
-  it("should handle network errors gracefully", async () => {
-    mockMembersList.mockRejectedValue(new Error("Network error"));
-
-    const result = await checkMembershipStatus(
-      "test_access_token",
-      "UC_test_channel"
-    );
-
-    expect(result.isMember).toBe(false);
-    expect(result.error).toBe("Network error");
+    expect(mockMembersList).not.toHaveBeenCalled();
   });
 });

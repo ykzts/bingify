@@ -50,65 +50,41 @@ export async function checkSubscriptionStatus(
 /**
  * Check if a user is a member of a YouTube channel
  *
- * IMPORTANT LIMITATION:
- * The YouTube Data API v3 does not provide a direct endpoint for users to check
- * their own membership status. The members.list endpoint requires the channel
- * owner's credentials and is designed for owners to list their members.
+ * IMPORTANT: YouTube membership verification is currently not supported.
  *
- * This function attempts to use the members.list endpoint with the user's token
- * and filterByMemberChannelId parameter to check membership, but this approach
- * has limitations:
+ * The YouTube Data API v3 does not provide an endpoint for users to check
+ * their own membership status. The members.list endpoint requires channel
+ * owner credentials and will return 403 errors when called with regular
+ * user tokens.
  *
- * 1. The user needs to have appropriate OAuth scopes
- * 2. The API behavior may not work as intended for checking own membership
- * 3. This is not the official/documented way to check membership status
+ * To implement YouTube membership verification, consider these alternatives:
+ * 1. Channel-owner flow: Require channel owners to verify members through
+ *    their own OAuth credentials and store verification tokens
+ * 2. Webhooks: Integrate with YouTube webhooks for membership status changes
+ * 3. Manual verification: Implement a manual verification process
  *
- * Alternative approaches that could be considered:
- * - Store membership verification tokens provided by channel owners
- * - Use webhooks/notifications from YouTube when membership changes
- * - Manual verification process
- *
- * @param userAccessToken - OAuth access token for the user
- * @param channelId - ID of the channel to check membership for
- * @returns Promise with isMember status and optional error
+ * @param userAccessToken - OAuth access token for the user (not used)
+ * @param channelId - ID of the channel to check membership for (not used)
+ * @returns Promise indicating the feature is not supported
  */
-export async function checkMembershipStatus(
+export function checkMembershipStatus(
   userAccessToken: string,
   channelId: string
 ): Promise<YouTubeMembershipCheckResult> {
-  try {
-    if (!(userAccessToken && channelId)) {
-      return {
-        error: "Missing required parameters",
-        isMember: false,
-      };
-    }
-
-    const youtube = new youtube_v3.Youtube({
-      auth: userAccessToken,
-    });
-
-    // Attempt to check membership using members.list with filterByMemberChannelId
-    // Note: This may not work as expected due to API limitations mentioned above
-    const response = await youtube.members.list({
-      filterByMemberChannelId: "mine",
-      part: ["snippet"],
-    });
-
-    // Check if user is a member of the specified channel
-    const isMember = Boolean(
-      response.data.items?.some(
-        (item) => item.snippet?.creatorChannelId === channelId
-      )
-    );
-
-    return {
-      isMember,
-    };
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : "Unknown error",
+  // Validate required parameters
+  if (!(userAccessToken && channelId)) {
+    return Promise.resolve({
+      error: "Missing required parameters",
       isMember: false,
-    };
+    });
   }
+
+  // Return error indicating this feature is not supported
+  // The members.list endpoint requires channel owner credentials and will
+  // produce 403 errors when called with regular user access tokens
+  return Promise.resolve({
+    error:
+      "YouTube membership verification is not supported. The API requires channel owner credentials.",
+    isMember: false,
+  });
 }
