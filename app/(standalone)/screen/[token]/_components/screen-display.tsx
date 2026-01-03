@@ -59,6 +59,28 @@ export function ScreenDisplay({
     setTheme(initialTheme);
   }, [initialBg, initialTheme, setBackground]);
 
+  // Use useEffectEvent to handle screen settings changes without including functions in deps
+  const handleScreenSettingsChange = useEffectEvent((payload: any) => {
+    if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+      const newSettings = payload.new as {
+        background: BackgroundType;
+        display_mode: DisplayMode;
+        locale?: string;
+        theme: ThemeType;
+      };
+      setMode(newSettings.display_mode);
+      setBackground(newSettings.background);
+      setTheme(newSettings.theme);
+      // Update locale via context - page will need reload for translations to update
+      if (newSettings.locale && newSettings.locale !== contextLocale) {
+        setLocale(newSettings.locale as "en" | "ja");
+        console.info(
+          `Locale changed to ${newSettings.locale}, page reload recommended for full translation update`
+        );
+      }
+    }
+  });
+
   // Subscribe to realtime screen settings changes
   useEffect(() => {
     const supabase = createClient();
@@ -73,29 +95,7 @@ export function ScreenDisplay({
           schema: "public",
           table: "screen_settings",
         },
-        (payload) => {
-          if (
-            payload.eventType === "INSERT" ||
-            payload.eventType === "UPDATE"
-          ) {
-            const newSettings = payload.new as {
-              background: BackgroundType;
-              display_mode: DisplayMode;
-              locale?: string;
-              theme: ThemeType;
-            };
-            setMode(newSettings.display_mode);
-            setBackground(newSettings.background);
-            setTheme(newSettings.theme);
-            // Update locale via context - page will need reload for translations to update
-            if (newSettings.locale && newSettings.locale !== contextLocale) {
-              setLocale(newSettings.locale as "en" | "ja");
-              console.info(
-                `Locale changed to ${newSettings.locale}, page reload recommended for full translation update`
-              );
-            }
-          }
-        }
+        handleScreenSettingsChange
       )
       .subscribe((status) => {
         if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
@@ -114,7 +114,7 @@ export function ScreenDisplay({
       channel.unsubscribe();
       supabase.removeChannel(channel);
     };
-  }, [spaceId, setBackground, setLocale, contextLocale]);
+  }, [spaceId]);
 
   // Use useEffectEvent to separate event logic from effect dependencies
   const onInsert = useEffectEvent(async (payload: { new: CalledNumber }) => {
