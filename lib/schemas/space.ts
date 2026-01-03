@@ -117,7 +117,11 @@ export const twitchBroadcasterIdSchema = z
   );
 
 // YouTube requirement levels
-export const youtubeRequirementSchema = z.enum(["none", "subscriber"]);
+export const youtubeRequirementSchema = z.enum([
+  "none",
+  "subscriber",
+  "member",
+]);
 
 // Twitch requirement levels
 export const twitchRequirementSchema = z.enum([
@@ -170,7 +174,7 @@ export const updateSpaceFormSchema = z
     twitch_broadcaster_id: z.string().trim().optional(),
     twitch_requirement: z.enum(["none", "follower", "subscriber"]),
     youtube_channel_id: z.string().trim().optional(),
-    youtube_requirement: z.enum(["none", "subscriber"]),
+    youtube_requirement: z.enum(["none", "subscriber", "member"]),
   })
   .refine(
     (data) => {
@@ -291,7 +295,9 @@ export const createSpaceFormSchema = z
       .enum(["none", "follower", "subscriber"])
       .default("none"),
     youtube_channel_id: z.string().trim().optional(),
-    youtube_requirement: z.enum(["none", "subscriber"]).default("none"),
+    youtube_requirement: z
+      .enum(["none", "subscriber", "member"])
+      .default("none"),
   })
   .refine(
     (data) => {

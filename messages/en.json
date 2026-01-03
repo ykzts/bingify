@@ -489,6 +489,7 @@
     "updateError": "Failed to update settings",
     "updateSuccess": "Settings updated successfully",
     "youtubeChannelIdLabel": "YouTube Channel ID",
+    "youtubeMember": "Members only",
     "youtubeRequirementLabel": "YouTube Requirement",
     "youtubeSubscriber": "Subscribers only"
   },
@@ -529,6 +530,7 @@
     "errorTwitchVerificationFailed": "Twitch verification failed. Please try again.",
     "errorTwitchVerificationRequired": "Twitch account verification is required to join this space",
     "errorUnauthorized": "Authentication required. Please sign in.",
+    "errorYouTubeNotMember": "You must be a member of the specified YouTube channel to join this space",
     "errorYouTubeNotSubscribed": "You must subscribe to the specified YouTube channel to join this space",
     "errorYouTubeVerificationFailed": "YouTube verification failed. Please try again.",
     "errorYouTubeVerificationRequired": "YouTube account verification is required to join this space",

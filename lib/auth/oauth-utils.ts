@@ -23,6 +23,16 @@ export function buildOAuthCallbackUrl(redirectPath?: string): string {
 /**
  * Default OAuth scopes for Google authentication
  * Includes YouTube readonly access for space gatekeeper verification
+ *
+ * Note: The sensitive scope "youtube.channel-memberships.creator" is not
+ * included because:
+ * 1. It requires Google OAuth verification before production use
+ * 2. The YouTube membership verification feature is not currently supported
+ *    (the members.list endpoint requires channel owner credentials)
+ *
+ * If YouTube membership verification is implemented in the future using
+ * a channel-owner flow, this scope should be added conditionally based on
+ * system configuration and only after Google OAuth verification is complete.
  */
 export const GOOGLE_OAUTH_SCOPES =
   "https://www.googleapis.com/auth/youtube.readonly";

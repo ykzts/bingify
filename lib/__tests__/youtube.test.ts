@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { checkSubscriptionStatus } from "../youtube";
+import { checkMembershipStatus, checkSubscriptionStatus } from "../youtube";
 
 // Create shared mock functions
 const mockList = vi.fn();
+const mockMembersList = vi.fn();
 
 // Mock the YouTube API module
 vi.mock("@googleapis/youtube", () => ({
@@ -10,6 +11,9 @@ vi.mock("@googleapis/youtube", () => ({
     Youtube: class {
       subscriptions = {
         list: mockList,
+      };
+      members = {
+        list: mockMembersList,
       };
     },
   },
@@ -100,5 +104,41 @@ describe("checkSubscriptionStatus", () => {
 
     expect(result.isSubscribed).toBe(false);
     expect(result.error).toBe("Network error");
+  });
+});
+
+describe("checkMembershipStatus", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should return error indicating feature is not supported", async () => {
+    const result = await checkMembershipStatus(
+      "test_access_token",
+      "UC_test_channel"
+    );
+
+    expect(result.isMember).toBe(false);
+    expect(result.error).toBe(
+      "YouTube membership verification is not supported. The API requires channel owner credentials."
+    );
+    // Verify that the API was not called
+    expect(mockMembersList).not.toHaveBeenCalled();
+  });
+
+  it("should return error when access token is missing", async () => {
+    const result = await checkMembershipStatus("", "UC_test_channel");
+
+    expect(result.isMember).toBe(false);
+    expect(result.error).toBe("Missing required parameters");
+    expect(mockMembersList).not.toHaveBeenCalled();
+  });
+
+  it("should return error when channel ID is missing", async () => {
+    const result = await checkMembershipStatus("test_access_token", "");
+
+    expect(result.isMember).toBe(false);
+    expect(result.error).toBe("Missing required parameters");
+    expect(mockMembersList).not.toHaveBeenCalled();
   });
 });
