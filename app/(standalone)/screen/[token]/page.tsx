@@ -28,24 +28,15 @@ export default async function ScreenViewPage({ params }: Props) {
     .eq("view_token", token)
     .single();
 
-  // Fetch screen settings for this space
-  const { data: screenSettings } = await supabase
-    .from("screen_settings")
-    .select("display_mode, background, theme, locale")
-    .eq("space_id", space?.id || "")
-    .single();
-
-  // Use locale from settings, fallback to Accept-Language header, then 'en'
+  // Use locale from Accept-Language header for error messages if space not found
   const headersList = await headers();
   const acceptLanguage = headersList.get("accept-language") || "";
   const browserLocale = acceptLanguage.startsWith("ja") ? "ja" : "en";
-  const locale: LocaleType =
-    (screenSettings?.locale as LocaleType) || browserLocale;
-
-  const messages = await getMessages({ locale });
 
   // If token is invalid or space not found, show error
   if (error || !space) {
+    const locale: LocaleType = browserLocale;
+    const messages = await getMessages({ locale });
     const t = await getTranslations({ locale, namespace: "ScreenView" });
     return (
       <NextIntlClientProvider locale={locale} messages={messages}>
@@ -59,6 +50,19 @@ export default async function ScreenViewPage({ params }: Props) {
       </NextIntlClientProvider>
     );
   }
+
+  // Fetch screen settings for this space (only after confirming space exists)
+  const { data: screenSettings } = await supabase
+    .from("screen_settings")
+    .select("display_mode, background, theme, locale")
+    .eq("space_id", space.id)
+    .single();
+
+  // Use locale from settings, fallback to Accept-Language header
+  const locale: LocaleType =
+    (screenSettings?.locale as LocaleType) || browserLocale;
+
+  const messages = await getMessages({ locale });
 
   // Use settings from database, fallback to defaults
   const initialMode: DisplayMode =

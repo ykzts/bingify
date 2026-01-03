@@ -338,7 +338,12 @@ export function ScreenDisplay({
           </div>
 
           {/* Right Panel: History Grid */}
-          <div className="flex flex-1 items-center rounded-xl bg-black/70 p-4 backdrop-blur-md lg:w-[65%] lg:p-6">
+          <div
+            className={cn(
+              "flex flex-1 items-center rounded-xl p-4 backdrop-blur-md lg:w-[65%] lg:p-6",
+              theme === "light" ? "bg-white/80" : "bg-black/70"
+            )}
+          >
             <div className="w-full">
               <h2 className={cn("mb-3 font-bold text-xl lg:mb-4", textColor)}>
                 {t("calledNumbers")}
