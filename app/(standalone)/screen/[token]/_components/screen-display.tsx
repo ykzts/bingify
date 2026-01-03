@@ -1,55 +1,38 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Settings } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useEffectEvent, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useScreen } from "@/components/providers/screen-provider";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { useDrumRoll } from "@/hooks/use-drum-roll";
 import { createClient } from "@/lib/supabase/client";
+import type {
+  BackgroundType,
+  DisplayMode,
+  ThemeType,
+} from "@/lib/types/screen-settings";
 import { cn } from "@/lib/utils";
-import { useBackground } from "../../_context/background-context";
 
 interface Props {
   baseUrl: string;
-  initialBg?: string;
-  initialMode?: string;
+  initialBg: BackgroundType;
+  initialMode: DisplayMode;
+  initialTheme: ThemeType;
   locale: string;
   shareKey: string;
   spaceId: string;
 }
 
-type DisplayMode = "full" | "minimal";
-type BackgroundType = "default" | "transparent" | "green" | "blue";
-
-// Validation helpers
-function normalizeDisplayMode(value?: string): DisplayMode {
-  if (value === "full" || value === "minimal") {
-    return value;
-  }
-  return "full";
-}
-
-function normalizeBackgroundType(value?: string): BackgroundType {
-  if (
-    value === "default" ||
-    value === "transparent" ||
-    value === "green" ||
-    value === "blue"
-  ) {
-    return value;
-  }
-  return "default";
-}
-
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Complex UI component with multiple state management and realtime subscriptions
 export function ScreenDisplay({
   baseUrl,
-  initialBg = "default",
-  initialMode = "full",
+  initialBg,
+  initialMode,
+  initialTheme,
   locale,
   shareKey,
   spaceId,
@@ -57,10 +40,8 @@ export function ScreenDisplay({
   const t = useTranslations("ScreenView");
   const queryClient = useQueryClient();
   const { data: calledNumbers = [] } = useCalledNumbers(spaceId, { retry: 3 });
-  const [mode, setMode] = useState<DisplayMode>(
-    normalizeDisplayMode(initialMode)
-  );
-  const [showSettings, setShowSettings] = useState(false);
+  const [mode, setMode] = useState<DisplayMode>(initialMode);
+  const [theme, setTheme] = useState<ThemeType>(initialTheme);
   const {
     currentNumber: drumRollNumber,
     isAnimating,
@@ -69,13 +50,75 @@ export function ScreenDisplay({
     duration: 1800, // 1.8 seconds
   });
 
-  // Use background context instead of local state
-  const { background, setBackground } = useBackground();
+  // Use screen context for background and locale state
+  const { locale: contextLocale, setBackground, setLocale } = useScreen();
 
-  // Initialize background from props
+  // Initialize background and theme from props
   useEffect(() => {
-    setBackground(normalizeBackgroundType(initialBg));
-  }, [initialBg, setBackground]);
+    setBackground(initialBg);
+    setTheme(initialTheme);
+  }, [initialBg, initialTheme, setBackground]);
+
+  // Use useEffectEvent to handle screen settings changes without including functions in deps
+  const handleScreenSettingsChange = useEffectEvent(
+    (payload: {
+      eventType: string;
+      new: {
+        background: BackgroundType;
+        display_mode: DisplayMode;
+        locale?: string;
+        theme: ThemeType;
+      };
+    }) => {
+      if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+        const newSettings = payload.new;
+        setMode(newSettings.display_mode);
+        setBackground(newSettings.background);
+        setTheme(newSettings.theme);
+        // Update locale and reload page for translations to update
+        if (newSettings.locale && newSettings.locale !== contextLocale) {
+          setLocale(newSettings.locale as "en" | "ja");
+          // Reload page to apply new translations
+          window.location.reload();
+        }
+      }
+    }
+  );
+
+  // Subscribe to realtime screen settings changes
+  useEffect(() => {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel(`screen-settings-${spaceId}`)
+      .on(
+        "postgres_changes" as const,
+        {
+          event: "*",
+          filter: `space_id=eq.${spaceId}`,
+          schema: "public",
+          table: "screen_settings",
+        },
+        handleScreenSettingsChange as (payload: unknown) => void
+      )
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          console.error(
+            `Screen settings subscription error for space ${spaceId}:`,
+            status
+          );
+        } else if (status === "SUBSCRIBED") {
+          console.info(
+            `Screen settings subscription established for space ${spaceId}`
+          );
+        }
+      });
+
+    return () => {
+      channel.unsubscribe();
+      supabase.removeChannel(channel);
+    };
+  }, [spaceId]);
 
   // Use useEffectEvent to separate event logic from effect dependencies
   const onInsert = useEffectEvent(async (payload: { new: CalledNumber }) => {
@@ -156,6 +199,7 @@ export function ScreenDisplay({
 
     return () => {
       channel.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [spaceId]);
 
@@ -171,21 +215,35 @@ export function ScreenDisplay({
 
   const isMinimal = mode === "minimal";
 
+  // Theme-aware text colors
+  const textColor = theme === "light" ? "text-gray-900" : "text-white";
+
   return (
-    <div className="fixed inset-0 min-h-screen w-full overflow-hidden transition-colors duration-300">
+    <div
+      className={cn(
+        "fixed inset-0 min-h-screen w-full overflow-hidden transition-colors duration-300",
+        theme === "light" ? "bg-white" : ""
+      )}
+    >
       {isMinimal ? (
         /* Minimal Mode: Current Number Only */
         <div className="flex h-screen w-full items-center justify-center">
           {displayNumber !== null ? (
             <motion.h1
               animate={{ scale: 1, opacity: 1 }}
-              className="font-black text-[clamp(8rem,20vw,16rem)] text-white drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)]"
+              className={cn(
+                "font-black text-[clamp(8rem,20vw,16rem)] drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)]",
+                textColor
+              )}
               initial={{ scale: 0, opacity: 0 }}
               key={displayNumber}
               style={{
-                WebkitTextStroke: "3px black",
+                WebkitTextStroke:
+                  theme === "light" ? "3px rgba(0,0,0,0.2)" : "3px black",
                 textShadow:
-                  "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
+                  theme === "light"
+                    ? "0 0 20px rgba(0,0,0,0.3), 2px 2px 0 rgba(0,0,0,0.2)"
+                    : "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
               }}
               transition={{
                 type: "spring",
@@ -198,8 +256,14 @@ export function ScreenDisplay({
           ) : (
             <div className="text-center">
               <p
-                className="font-bold text-4xl text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]"
-                style={{ WebkitTextStroke: "1px black" }}
+                className={cn(
+                  "font-bold text-4xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]",
+                  textColor
+                )}
+                style={{
+                  WebkitTextStroke:
+                    theme === "light" ? "1px rgba(0,0,0,0.2)" : "1px black",
+                }}
               >
                 {t("waitingForNumbers")}
               </p>
@@ -216,13 +280,19 @@ export function ScreenDisplay({
               {displayNumber !== null ? (
                 <motion.h1
                   animate={{ scale: 1, opacity: 1 }}
-                  className="font-black text-[clamp(6rem,15vw,12rem)] text-white drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)] lg:text-[clamp(8rem,20vh,20rem)]"
+                  className={cn(
+                    "font-black text-[clamp(6rem,15vw,12rem)] drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)] lg:text-[clamp(8rem,20vh,20rem)]",
+                    textColor
+                  )}
                   initial={{ scale: 0, opacity: 0 }}
                   key={displayNumber}
                   style={{
-                    WebkitTextStroke: "3px black",
+                    WebkitTextStroke:
+                      theme === "light" ? "3px rgba(0,0,0,0.2)" : "3px black",
                     textShadow:
-                      "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
+                      theme === "light"
+                        ? "0 0 20px rgba(0,0,0,0.3), 2px 2px 0 rgba(0,0,0,0.2)"
+                        : "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
                   }}
                   transition={{
                     type: "spring",
@@ -235,8 +305,14 @@ export function ScreenDisplay({
               ) : (
                 <div className="text-center">
                   <p
-                    className="font-bold text-3xl text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] lg:text-4xl"
-                    style={{ WebkitTextStroke: "1px black" }}
+                    className={cn(
+                      "font-bold text-3xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] lg:text-4xl",
+                      textColor
+                    )}
+                    style={{
+                      WebkitTextStroke:
+                        theme === "light" ? "1px rgba(0,0,0,0.2)" : "1px black",
+                    }}
                   >
                     {t("waitingForNumbers")}
                   </p>
@@ -254,16 +330,21 @@ export function ScreenDisplay({
                   value={participationUrl}
                 />
               </div>
-              <p className="text-center font-bold text-sm text-white">
+              <p className={cn("text-center font-bold text-sm", textColor)}>
                 {t("scanToJoin")}
               </p>
             </div>
           </div>
 
           {/* Right Panel: History Grid */}
-          <div className="flex flex-1 items-center rounded-xl bg-black/70 p-4 backdrop-blur-md lg:w-[65%] lg:p-6">
+          <div
+            className={cn(
+              "flex flex-1 items-center rounded-xl p-4 backdrop-blur-md lg:w-[65%] lg:p-6",
+              theme === "light" ? "bg-white/80" : "bg-black/70"
+            )}
+          >
             <div className="w-full">
-              <h2 className="mb-3 font-bold text-white text-xl lg:mb-4">
+              <h2 className={cn("mb-3 font-bold text-xl lg:mb-4", textColor)}>
                 {t("calledNumbers")}
               </h2>
               <div className="grid grid-cols-10 gap-1.5 lg:grid-cols-[repeat(15,minmax(0,1fr))] lg:gap-2">
@@ -288,87 +369,6 @@ export function ScreenDisplay({
           </div>
         </div>
       )}
-
-      {/* Settings Menu */}
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: Hover-only panel without primary interaction */}
-      {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: Hover-only panel without primary interaction */}
-      <div
-        className={cn(
-          "fixed top-4 right-4 z-50 transition-opacity duration-200",
-          showSettings ? "opacity-100" : "opacity-0 hover:opacity-100"
-        )}
-        onMouseEnter={() => setShowSettings(true)}
-        onMouseLeave={() => setShowSettings(false)}
-      >
-        <div className="rounded-lg border border-gray-600 bg-black/90 p-3 text-white backdrop-blur-sm">
-          <div className="mb-2 flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            <p className="font-semibold text-sm">{t("displaySettings")}</p>
-          </div>
-
-          <div className="space-y-2 text-xs">
-            <div>
-              <p className="mb-1 text-gray-400">{t("displayMode")}</p>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => setMode("full")}
-                  size="sm"
-                  type="button"
-                  variant={mode === "full" ? "default" : "outline"}
-                >
-                  {t("modeFull")}
-                </Button>
-                <Button
-                  onClick={() => setMode("minimal")}
-                  size="sm"
-                  type="button"
-                  variant={mode === "minimal" ? "default" : "outline"}
-                >
-                  {t("modeMinimal")}
-                </Button>
-              </div>
-            </div>
-
-            <div>
-              <p className="mb-1 text-gray-400">{t("background")}</p>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  onClick={() => setBackground("default")}
-                  size="sm"
-                  type="button"
-                  variant={background === "default" ? "default" : "outline"}
-                >
-                  {t("bgDefault")}
-                </Button>
-                <Button
-                  onClick={() => setBackground("transparent")}
-                  size="sm"
-                  type="button"
-                  variant={background === "transparent" ? "default" : "outline"}
-                >
-                  {t("bgTransparent")}
-                </Button>
-                <Button
-                  onClick={() => setBackground("green")}
-                  size="sm"
-                  type="button"
-                  variant={background === "green" ? "default" : "outline"}
-                >
-                  {t("bgGreen")}
-                </Button>
-                <Button
-                  onClick={() => setBackground("blue")}
-                  size="sm"
-                  type="button"
-                  variant={background === "blue" ? "default" : "outline"}
-                >
-                  {t("bgBlue")}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

@@ -178,6 +178,54 @@ export type Database = {
         }
         Relationships: []
       }
+      screen_settings: {
+        Row: {
+          background: string
+          created_at: string | null
+          display_mode: string
+          id: string
+          locale: string | null
+          space_id: string
+          theme: string
+          updated_at: string | null
+        }
+        Insert: {
+          background?: string
+          created_at?: string | null
+          display_mode?: string
+          id?: string
+          locale?: string | null
+          space_id: string
+          theme?: string
+          updated_at?: string | null
+        }
+        Update: {
+          background?: string
+          created_at?: string | null
+          display_mode?: string
+          id?: string
+          locale?: string | null
+          space_id?: string
+          theme?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "screen_settings_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: true
+            referencedRelation: "active_spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "screen_settings_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: true
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       space_roles: {
         Row: {
           created_at: string | null
@@ -237,7 +285,7 @@ export type Database = {
           description?: string | null
           gatekeeper_rules?: Json | null
           id?: string
-          max_participants?: number
+          max_participants: number
           owner_id?: string | null
           settings?: Json | null
           share_key: string

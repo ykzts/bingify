@@ -15,52 +15,23 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import { regenerateViewToken } from "../../../_lib/actions";
 
 interface Props {
-  locale: string;
   spaceId: string;
   viewToken: string;
 }
 
-export function ViewingUrlDialog({ locale, spaceId, viewToken }: Props) {
+export function ViewingUrlDialog({ spaceId, viewToken }: Props) {
   const t = useTranslations("AdminSpace");
   const confirm = useConfirm();
   const [currentToken, setCurrentToken] = useState(viewToken);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [open, setOpen] = useState(false);
 
-  // URL builder options (actual screen page parameters)
-  const [mode, setMode] = useState<"full" | "minimal">("full");
-  const [bg, setBg] = useState<"default" | "transparent" | "green" | "blue">(
-    "default"
-  );
-
-  // Build URL with query parameters
-  const buildUrl = () => {
-    const baseUrl = getAbsoluteUrl(`/${locale}/screen/${currentToken}`);
-    const params = new URLSearchParams();
-
-    if (mode !== "full") {
-      params.append("mode", mode);
-    }
-    if (bg !== "default") {
-      params.append("bg", bg);
-    }
-
-    const queryString = params.toString();
-    return queryString ? `${baseUrl}?${queryString}` : baseUrl;
-  };
-
-  const viewingUrl = buildUrl();
+  // Build URL without query parameters (settings are now managed via database)
+  const viewingUrl = getAbsoluteUrl(`/screen/${currentToken}`);
 
   const handleCopyUrl = async () => {
     try {
@@ -145,59 +116,6 @@ export function ViewingUrlDialog({ locale, spaceId, viewToken }: Props) {
                 <ExternalLink className="h-4 w-4" />
               </Button>
             </div>
-          </div>
-
-          {/* Display Options */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-sm">
-              {t("urlBuilderOptionsTitle")}
-            </h3>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="mode-select">{t("urlOptionMode")}</Label>
-                <Select
-                  onValueChange={(value) =>
-                    setMode(value as "full" | "minimal")
-                  }
-                  value={mode}
-                >
-                  <SelectTrigger id="mode-select">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="full">{t("urlModeFull")}</SelectItem>
-                    <SelectItem value="minimal">
-                      {t("urlModeMinimal")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="bg-select">{t("urlOptionBackground")}</Label>
-                <Select
-                  onValueChange={(value) =>
-                    setBg(value as "default" | "transparent" | "green" | "blue")
-                  }
-                  value={bg}
-                >
-                  <SelectTrigger id="bg-select">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="default">{t("urlBgDefault")}</SelectItem>
-                    <SelectItem value="transparent">
-                      {t("urlBgTransparent")}
-                    </SelectItem>
-                    <SelectItem value="green">{t("urlBgGreen")}</SelectItem>
-                    <SelectItem value="blue">{t("urlBgBlue")}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <p className="text-muted-foreground text-xs">
-              {t("urlBuilderHelpText")}
-            </p>
           </div>
 
           {/* Regenerate URL */}
