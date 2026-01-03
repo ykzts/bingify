@@ -19,12 +19,11 @@ import { getAbsoluteUrl } from "@/lib/utils/url";
 import { regenerateViewToken } from "../../../_lib/actions";
 
 interface Props {
-  locale: string;
   spaceId: string;
   viewToken: string;
 }
 
-export function ViewingUrlDialog({ locale, spaceId, viewToken }: Props) {
+export function ViewingUrlDialog({ spaceId, viewToken }: Props) {
   const t = useTranslations("AdminSpace");
   const confirm = useConfirm();
   const [currentToken, setCurrentToken] = useState(viewToken);

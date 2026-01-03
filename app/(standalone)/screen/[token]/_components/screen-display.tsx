@@ -27,6 +27,7 @@ interface Props {
   spaceId: string;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Complex UI component with multiple state management and realtime subscriptions
 export function ScreenDisplay({
   baseUrl,
   initialBg,

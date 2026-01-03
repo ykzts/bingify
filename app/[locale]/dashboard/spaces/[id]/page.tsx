@@ -105,11 +105,7 @@ export default async function AdminSpacePage({ params }: Props) {
           </p>
         </div>
         <div className="flex gap-3">
-          <ViewingUrlDialog
-            locale={locale}
-            spaceId={space.id}
-            viewToken={space.view_token}
-          />
+          <ViewingUrlDialog spaceId={space.id} viewToken={space.view_token} />
           <ScreenSettingsDialog
             initialBackground={initialBackground}
             initialDisplayMode={initialDisplayMode}
