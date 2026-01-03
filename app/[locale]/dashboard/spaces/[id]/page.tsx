@@ -3,7 +3,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSpace } from "@/lib/data/spaces";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
-import type { BackgroundType, DisplayMode } from "@/lib/types/screen-settings";
+import type {
+  BackgroundType,
+  DisplayMode,
+  LocaleType,
+  ThemeType,
+} from "@/lib/types/screen-settings";
 import { BingoGameManager } from "./_components/bingo-game-manager";
 import { DraftStatusView } from "./_components/draft-status-view";
 import { ParticipantsStatus } from "./_components/participants-status";
@@ -75,7 +80,7 @@ export default async function AdminSpacePage({ params }: Props) {
   // Fetch screen settings for this space
   const { data: screenSettings } = await supabase
     .from("screen_settings")
-    .select("display_mode, background")
+    .select("display_mode, background, theme, locale")
     .eq("space_id", id)
     .single();
 
@@ -83,6 +88,11 @@ export default async function AdminSpacePage({ params }: Props) {
     (screenSettings?.display_mode as DisplayMode) || "full";
   const initialBackground: BackgroundType =
     (screenSettings?.background as BackgroundType) || "default";
+  const initialTheme: ThemeType =
+    (screenSettings?.theme as ThemeType) || "dark";
+  const initialScreenLocale: LocaleType | undefined = screenSettings?.locale as
+    | LocaleType
+    | undefined;
 
   return (
     <div className="mx-auto min-h-screen max-w-3xl space-y-8 p-8">
@@ -103,6 +113,8 @@ export default async function AdminSpacePage({ params }: Props) {
           <ScreenSettingsDialog
             initialBackground={initialBackground}
             initialDisplayMode={initialDisplayMode}
+            initialLocale={initialScreenLocale}
+            initialTheme={initialTheme}
             locale={locale}
             spaceId={space.id}
             viewToken={space.view_token}

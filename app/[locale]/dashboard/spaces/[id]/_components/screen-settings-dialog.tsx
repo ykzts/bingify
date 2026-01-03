@@ -22,12 +22,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { updateScreenSettings } from "@/lib/actions/screen-settings";
-import type { BackgroundType, DisplayMode } from "@/lib/types/screen-settings";
+import type {
+  BackgroundType,
+  DisplayMode,
+  LocaleType,
+  ThemeType,
+} from "@/lib/types/screen-settings";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 
 interface Props {
   initialBackground: BackgroundType;
   initialDisplayMode: DisplayMode;
+  initialLocale?: LocaleType;
+  initialTheme: ThemeType;
   locale: string;
   spaceId: string;
   viewToken: string;
@@ -36,6 +43,8 @@ interface Props {
 export function ScreenSettingsDialog({
   initialBackground,
   initialDisplayMode,
+  initialLocale,
+  initialTheme,
   locale,
   spaceId,
   viewToken,
@@ -47,13 +56,28 @@ export function ScreenSettingsDialog({
     useState<DisplayMode>(initialDisplayMode);
   const [background, setBackground] =
     useState<BackgroundType>(initialBackground);
+  const [theme, setTheme] = useState<ThemeType>(initialTheme);
+  const [screenLocale, setScreenLocale] = useState<LocaleType>(
+    initialLocale || (locale as LocaleType)
+  );
+  const [screenLocale, setScreenLocale] = useState<LocaleType>(
+    initialLocale || (locale as LocaleType)
+  );
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Reset state when initial values change
   useEffect(() => {
     setDisplayMode(initialDisplayMode);
     setBackground(initialBackground);
-  }, [initialDisplayMode, initialBackground]);
+    setTheme(initialTheme);
+    setScreenLocale(initialLocale || (locale as LocaleType));
+  }, [
+    initialDisplayMode,
+    initialBackground,
+    initialTheme,
+    initialLocale,
+    locale,
+  ]);
 
   const handleUpdate = async () => {
     setIsUpdating(true);
@@ -62,6 +86,8 @@ export function ScreenSettingsDialog({
       const result = await updateScreenSettings(spaceId, {
         background,
         display_mode: displayMode,
+        locale: screenLocale,
+        theme,
       });
 
       if (result.success) {
@@ -78,7 +104,7 @@ export function ScreenSettingsDialog({
   };
 
   const handlePreview = () => {
-    const previewUrl = getAbsoluteUrl(`/${locale}/screen/${viewToken}`);
+    const previewUrl = getAbsoluteUrl(`/screen/${viewToken}`);
     window.open(previewUrl, "_blank");
   };
 
@@ -140,6 +166,46 @@ export function ScreenSettingsDialog({
             </Select>
             <p className="text-muted-foreground text-xs">
               {t("backgroundDescription")}
+            </p>
+          </div>
+
+          {/* Theme */}
+          <div className="space-y-2">
+            <Label htmlFor="theme-select">{t("themeLabel")}</Label>
+            <Select
+              onValueChange={(value) => setTheme(value as ThemeType)}
+              value={theme}
+            >
+              <SelectTrigger id="theme-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="dark">{t("themeDark")}</SelectItem>
+                <SelectItem value="light">{t("themeLight")}</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-muted-foreground text-xs">
+              {t("themeDescription")}
+            </p>
+          </div>
+
+          {/* Locale */}
+          <div className="space-y-2">
+            <Label htmlFor="locale-select">{t("localeLabel")}</Label>
+            <Select
+              onValueChange={(value) => setScreenLocale(value as LocaleType)}
+              value={screenLocale}
+            >
+              <SelectTrigger id="locale-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="ja">日本語</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-muted-foreground text-xs">
+              {t("localeDescription")}
             </p>
           </div>
 

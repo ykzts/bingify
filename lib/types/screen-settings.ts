@@ -5,8 +5,12 @@ export type ScreenSettings =
 
 export type DisplayMode = "full" | "minimal";
 export type BackgroundType = "default" | "transparent" | "green" | "blue";
+export type ThemeType = "light" | "dark";
+export type LocaleType = "en" | "ja";
 
 export interface ScreenSettingsFormData {
   background: BackgroundType;
   display_mode: DisplayMode;
+  locale?: LocaleType;
+  theme: ThemeType;
 }

@@ -132,9 +132,6 @@ export function ViewingUrlDialog({ locale, spaceId, viewToken }: Props) {
               />
               {t("regenerateUrlButton")}
             </Button>
-            <p className="mt-2 text-muted-foreground text-xs">
-              {t("regenerateNote")}
-            </p>
           </div>
         </div>
       </DialogContent>

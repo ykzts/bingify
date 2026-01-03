@@ -184,7 +184,9 @@ export type Database = {
           created_at: string | null
           display_mode: string
           id: string
+          locale: string | null
           space_id: string
+          theme: string
           updated_at: string | null
         }
         Insert: {
@@ -192,7 +194,9 @@ export type Database = {
           created_at?: string | null
           display_mode?: string
           id?: string
+          locale?: string | null
           space_id: string
+          theme?: string
           updated_at?: string | null
         }
         Update: {
@@ -200,7 +204,9 @@ export type Database = {
           created_at?: string | null
           display_mode?: string
           id?: string
+          locale?: string | null
           space_id?: string
+          theme?: string
           updated_at?: string | null
         }
         Relationships: [
