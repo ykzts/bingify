@@ -1,4 +1,5 @@
 import {
+  DEFAULT_SYSTEM_SETTINGS,
   type SystemSettings,
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
@@ -68,18 +69,10 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
         featuresValidation.error
       );
 
-      const defaultFeatures = {
-        gatekeeper: {
-          email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
-        },
-      };
-
       // Try validation again with default features
       const retryValidation = systemSettingsSchema.safeParse({
         ...data,
-        features: defaultFeatures,
+        features: DEFAULT_SYSTEM_SETTINGS.features,
       });
 
       if (retryValidation.success) {

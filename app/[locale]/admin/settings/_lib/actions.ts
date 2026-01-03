@@ -1,12 +1,8 @@
 "use server";
 
-import {
-  createServerValidate,
-  initialFormState,
-} from "@tanstack/react-form-nextjs";
+import { initialFormState } from "@tanstack/react-form-nextjs";
 import { systemSettingsSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
-import { systemSettingsFormOpts } from "./form-options";
 
 // Re-export getSystemSettings from the data layer to avoid duplication
 // biome-ignore lint/performance/noBarrelFile: Intentional re-export to centralize implementation
@@ -38,24 +34,6 @@ async function checkAdminPermission(
 
   return { error: null, user };
 }
-
-// TanStack Form server validation - kept for future use if needed
-// Currently using manual parsing for better control over FormData transformation
-// biome-ignore lint/correctness/noUnusedVariables: Kept for reference
-const serverValidate = createServerValidate({
-  ...systemSettingsFormOpts,
-  onServerValidate: async () => {
-    const supabase = await createClient();
-
-    // Check admin permission
-    const { error: permissionError } = await checkAdminPermission(supabase);
-    if (permissionError) {
-      return { form: permissionError };
-    }
-
-    return undefined;
-  },
-});
 
 /**
  * Parse FormData into properly typed SystemSettings object
