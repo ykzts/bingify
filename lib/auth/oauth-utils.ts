@@ -22,10 +22,10 @@ export function buildOAuthCallbackUrl(redirectPath?: string): string {
 
 /**
  * Default OAuth scopes for Google authentication
- * Includes YouTube readonly access for space gatekeeper verification
+ * Includes YouTube readonly and channel memberships for space gatekeeper verification
  */
 export const GOOGLE_OAUTH_SCOPES =
-  "https://www.googleapis.com/auth/youtube.readonly";
+  "https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.channel-memberships.creator";
 
 /**
  * Default OAuth scopes for Twitch authentication

@@ -488,6 +488,7 @@
     "updateError": "設定の更新に失敗しました",
     "updateSuccess": "設定を更新しました",
     "youtubeChannelIdLabel": "YouTubeチャンネルID",
+    "youtubeMember": "メンバーのみ",
     "youtubeRequirementLabel": "YouTube要件",
     "youtubeSubscriber": "チャンネル登録者のみ"
   },
@@ -528,6 +529,7 @@
     "errorTwitchVerificationFailed": "Twitch連携の確認に失敗しました。もう一度お試しください。",
     "errorTwitchVerificationRequired": "このスペースに参加するには、Twitchアカウントの確認が必要です",
     "errorUnauthorized": "認証が必要です。ログインしてください。",
+    "errorYouTubeNotMember": "このスペースに参加するには、指定されたYouTubeチャンネルのメンバーシップに加入する必要があります",
     "errorYouTubeNotSubscribed": "このスペースに参加するには、指定されたYouTubeチャンネルを登録する必要があります",
     "errorYouTubeVerificationFailed": "YouTube連携の確認に失敗しました。もう一度お試しください。",
     "errorYouTubeVerificationRequired": "このスペースに参加するには、YouTubeアカウントの確認が必要です",

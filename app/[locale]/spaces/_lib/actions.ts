@@ -68,7 +68,8 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
 
 async function verifyYouTubeSubscription(
   youtubeAccessToken: string | undefined,
-  youtubeChannelId: string
+  youtubeChannelId: string,
+  requirement: "subscriber" | "member"
 ): Promise<JoinSpaceState | null> {
   if (!youtubeAccessToken) {
     return {
@@ -77,6 +78,32 @@ async function verifyYouTubeSubscription(
     };
   }
 
+  // Check membership if required
+  if (requirement === "member") {
+    const { checkMembershipStatus } = await import("@/lib/youtube");
+    const result = await checkMembershipStatus(
+      youtubeAccessToken,
+      youtubeChannelId
+    );
+
+    if (result.error) {
+      return {
+        errorKey: "errorYouTubeVerificationFailed",
+        success: false,
+      };
+    }
+
+    if (!result.isMember) {
+      return {
+        errorKey: "errorYouTubeNotMember",
+        success: false,
+      };
+    }
+
+    return null;
+  }
+
+  // Check subscription (original behavior)
   const result = await checkSubscriptionStatus(
     youtubeAccessToken,
     youtubeChannelId
@@ -216,15 +243,21 @@ async function verifyGatekeeperRules(
   // Check YouTube subscription requirement if configured
   if (gatekeeperRules?.youtube?.channelId) {
     // Support both new format (requirement) and legacy format (required)
+    const requirement = gatekeeperRules.youtube.requirement;
     const hasRequirement =
-      gatekeeperRules.youtube.requirement === "subscriber" ||
-      gatekeeperRules.youtube.requirement === "member" ||
+      requirement === "subscriber" ||
+      requirement === "member" ||
       gatekeeperRules.youtube.required;
 
     if (hasRequirement) {
+      // Determine the actual requirement level
+      const requirementLevel: "subscriber" | "member" =
+        requirement === "member" ? "member" : "subscriber";
+
       const verificationResult = await verifyYouTubeSubscription(
         youtubeAccessToken,
-        gatekeeperRules.youtube.channelId
+        gatekeeperRules.youtube.channelId,
+        requirementLevel
       );
       if (verificationResult) {
         return verificationResult;

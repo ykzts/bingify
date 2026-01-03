@@ -525,6 +525,9 @@ export function SpaceSettingsForm({
                                         <SelectItem value="subscriber">
                                           {t("youtubeSubscriber")}
                                         </SelectItem>
+                                        <SelectItem value="member">
+                                          {t("youtubeMember")}
+                                        </SelectItem>
                                       </SelectContent>
                                     </Select>
                                   </FieldContent>
