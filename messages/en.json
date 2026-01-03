@@ -93,6 +93,8 @@
     "description": "Configure server resource management and space limits",
     "errorFetchFailed": "Failed to fetch system settings",
     "errorGeneric": "An unexpected error occurred",
+    "errorInvalidData": "The settings data retrieved from the database is invalid. Please check the database.",
+    "errorNoData": "System settings not found",
     "errorNoPermission": "Admin permission required",
     "errorUnauthorized": "Authentication required",
     "errorUpdateFailed": "Failed to update settings",
@@ -109,13 +111,17 @@
     "maxTotalSpacesHelp": "Set the maximum total number of spaces allowed system-wide (0 for unlimited)",
     "maxTotalSpacesLabel": "Max Total Spaces (System-wide)",
     "resourceLimitsTitle": "Resource Limit Settings",
+    "roleOrganizer": "Organizer",
+    "roleUser": "User",
     "saveButton": "Save Settings",
     "saving": "Saving...",
     "spaceExpirationHelp": "Set how many hours after creation a space expires (0 for unlimited)",
     "spaceExpirationLabel": "Space Expiration (Hours)",
     "title": "System Settings",
     "updateSuccess": "Settings updated successfully",
-    "userSettingsTitle": "User Settings"
+    "userSettingsTitle": "User Settings",
+    "warningInvalidFields": "Some settings are using default values due to invalid data",
+    "warningInvalidFieldsDescription": "The following fields had issues: {fields}. Saving will update them with the displayed values."
   },
   "AdminSpace": {
     "allNumbersCalled": "All numbers have been called",

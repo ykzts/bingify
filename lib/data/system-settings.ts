@@ -1,4 +1,5 @@
 import {
+  DEFAULT_SYSTEM_SETTINGS,
   type SystemSettings,
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
@@ -7,10 +8,12 @@ import { createClient } from "@/lib/supabase/server";
 export interface GetSystemSettingsResult {
   error?: string;
   settings?: SystemSettings;
+  warnings?: string[];
 }
 
 /**
  * Get system settings with validated JSONB features column
+ * Only applies fallback for the features JSONB field if corrupted
  * @returns System settings with validated features, or error
  */
 export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
@@ -32,21 +35,61 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
       };
     }
 
-    // Validate the entire settings object including the JSONB features field
-    const settingsValidation = systemSettingsSchema.safeParse(data);
-
-    if (!settingsValidation.success) {
-      console.error(
-        "Invalid system settings data from DB:",
-        settingsValidation.error
-      );
+    if (!data) {
       return {
-        error: "errorInvalidData",
+        error: "errorNoData",
       };
     }
 
+    // Validate the entire settings object
+    const settingsValidation = systemSettingsSchema.safeParse(data);
+
+    if (settingsValidation.success) {
+      return {
+        settings: settingsValidation.data,
+      };
+    }
+
+    // Only apply fallback for the features JSONB field
+    // Other fields are database columns with constraints and should fail validation
+    console.warn(
+      "System settings validation failed, checking if features field is corrupted:",
+      settingsValidation.error
+    );
+
+    // Check if the issue is with the features field specifically
+    const featuresValidation = systemSettingsSchema.shape.features.safeParse(
+      data.features
+    );
+
+    if (!featuresValidation.success) {
+      // Features field is corrupted, use default
+      console.warn(
+        "Features JSONB field is corrupted, using default:",
+        featuresValidation.error
+      );
+
+      // Try validation again with default features
+      const retryValidation = systemSettingsSchema.safeParse({
+        ...data,
+        features: DEFAULT_SYSTEM_SETTINGS.features,
+      });
+
+      if (retryValidation.success) {
+        return {
+          settings: retryValidation.data,
+          warnings: ["features"],
+        };
+      }
+    }
+
+    // If validation still fails, it's not just the features field
+    console.error(
+      "System settings validation failed for non-features fields:",
+      settingsValidation.error
+    );
     return {
-      settings: settingsValidation.data,
+      error: "errorInvalidData",
     };
   } catch (error) {
     console.error("Error in getSystemSettings:", error);

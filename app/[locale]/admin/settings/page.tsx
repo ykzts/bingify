@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getSystemSettings } from "@/lib/data/system-settings";
 import { SystemSettingsForm } from "./_components/system-settings-form";
-import { getSystemSettings } from "./_lib/actions";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -12,7 +12,7 @@ export default async function AdminSettingsPage({ params }: Props) {
 
   const t = await getTranslations("AdminSettings");
 
-  const { settings, error } = await getSystemSettings();
+  const { settings, error, warnings } = await getSystemSettings();
 
   if (error) {
     return (
@@ -30,6 +30,19 @@ export default async function AdminSettingsPage({ params }: Props) {
         <h2 className="font-bold text-2xl">{t("title")}</h2>
         <p className="mt-2 text-gray-600">{t("description")}</p>
       </div>
+
+      {warnings && warnings.length > 0 && (
+        <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+          <p className="font-medium text-yellow-800">
+            {t("warningInvalidFields")}
+          </p>
+          <p className="mt-1 text-sm text-yellow-700">
+            {t("warningInvalidFieldsDescription", {
+              fields: warnings.join(", "),
+            })}
+          </p>
+        </div>
+      )}
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h3 className="mb-4 font-semibold text-lg">

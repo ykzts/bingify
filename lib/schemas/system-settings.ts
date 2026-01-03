@@ -45,3 +45,21 @@ export const systemSettingsSchema = z.object({
 });
 
 export type SystemSettings = z.infer<typeof systemSettingsSchema>;
+
+/**
+ * Default system settings used as fallback when database values are invalid
+ */
+export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
+  default_user_role: "organizer",
+  features: {
+    gatekeeper: {
+      email: { enabled: true },
+      twitch: { enabled: true },
+      youtube: { enabled: true },
+    },
+  },
+  max_participants_per_space: 50,
+  max_spaces_per_user: 5,
+  max_total_spaces: 1000,
+  space_expiration_hours: 48,
+} as const satisfies SystemSettings;
