@@ -1,5 +1,6 @@
 "use client";
 
+import { cva } from "class-variance-authority";
 import { AlertCircle, CheckCircle, Mail } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -21,6 +22,7 @@ import {
 } from "@/lib/auth/oauth-utils";
 import type { AuthProvider } from "@/lib/data/auth-providers";
 import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 
 const emailSchema = z.object({
   email: z.string().email(),
@@ -38,14 +40,16 @@ const PROVIDER_CONFIG = {
 
 type Provider = keyof typeof PROVIDER_CONFIG;
 
-// OAuth provider button theme classes
-// Note: Includes all current and planned OAuth providers.
-// Providers not in PROVIDER_CONFIG don't require special scope configuration.
-const PROVIDER_BUTTON_CLASSES: Record<string, string> = {
-  github: "bg-github hover:bg-github-hover",
-  google: "bg-google hover:bg-google-hover",
-  twitch: "bg-twitch hover:bg-twitch-hover",
-};
+// OAuth provider button variants using class-variance-authority
+const oauthButtonVariants = cva("w-full", {
+  variants: {
+    provider: {
+      github: "bg-github hover:bg-github-hover",
+      google: "bg-google hover:bg-google-hover",
+      twitch: "bg-twitch hover:bg-twitch-hover",
+    },
+  },
+});
 
 interface Props {
   providers: AuthProvider[];
@@ -226,9 +230,12 @@ export function LoginForm({ providers }: Props) {
   };
 
   const getProviderButtonClass = (provider: string) => {
-    // Use provider-specific colors when available, otherwise use default primary colors
-    const customClass = PROVIDER_BUTTON_CLASSES[provider];
-    return customClass ? `w-full ${customClass}` : "w-full";
+    // Use provider-specific colors when available, otherwise use default styling
+    return cn(
+      oauthButtonVariants({
+        provider: provider as "github" | "google" | "twitch",
+      })
+    );
   };
 
   const displayError = error || oauthError;
