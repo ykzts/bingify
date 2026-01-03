@@ -2,6 +2,7 @@
 
 import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -36,6 +37,26 @@ export function Hero({
         initial={{ opacity: 0, y: 20 }}
         transition={{ delay: 0.2, duration: 0.8 }}
       >
+        <motion.div
+          animate={{ opacity: 1, scale: 1 }}
+          className="mb-8 flex justify-center"
+          initial={{ opacity: 0, scale: 0.9 }}
+          transition={{
+            delay: 0.1,
+            duration: 0.5,
+            type: "spring",
+          }}
+        >
+          <Image
+            alt="Bingify"
+            className="h-16 w-auto sm:h-20"
+            height={80}
+            priority
+            src="/logo.svg"
+            width={304}
+          />
+        </motion.div>
+
         <motion.h1
           animate={{ opacity: 1, scale: 1 }}
           className="mb-6 font-bold text-4xl text-text-main sm:text-5xl md:text-6xl"
@@ -48,7 +69,7 @@ export function Hero({
         >
           {title}
           <br />
-          <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
             {titleHighlight}
           </span>
         </motion.h1>
