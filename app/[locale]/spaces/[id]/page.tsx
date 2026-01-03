@@ -13,11 +13,9 @@ import { EventEndedView } from "./_components/event-ended-view";
 import { SpaceLandingPage } from "./_components/space-landing-page";
 import { SpaceParticipation } from "./_components/space-participation";
 
-interface Props {
-  params: Promise<{ id: string; locale: string }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/spaces/[id]">): Promise<Metadata> {
   const { id, locale } = await params;
   const publicInfo = await getSpacePublicInfo(id);
 
@@ -54,7 +52,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function UserSpacePage({ params }: Props) {
+export default async function UserSpacePage({
+  params,
+}: PageProps<"/[locale]/spaces/[id]">) {
   const { id, locale } = await params;
   setRequestLocale(locale);
 

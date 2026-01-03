@@ -42,6 +42,26 @@ pnpm dev
   - `useForm` + `useActionState` + `mergeForm` でクライアント/サーバー状態を統合。
   - フィールドレベルのバリデーションには `form.Field` コンポーネントを使用。
   - エラー表示は `field.state.meta.errors` から取得。
+- **Next.js v16 型安全な Props**：
+  - レイアウトコンポーネントには `LayoutProps<Route>` を使用。
+  - ページコンポーネントには `PageProps<Route>` を使用。
+  - これらの型は `pnpm typegen` で自動生成される（`.next/types/routes.d.ts`）。
+  - `params` と `searchParams` は `Promise` として扱い、`await` で解決する。
+  - 例:
+    ```tsx
+    // Layout
+    export default async function Layout(props: LayoutProps<'/[locale]'>) {
+      const { locale } = await props.params
+      return <div>{props.children}</div>
+    }
+
+    // Page
+    export default async function Page(props: PageProps<'/blog/[slug]'>) {
+      const { slug } = await props.params
+      const query = await props.searchParams
+      return <h1>Blog Post: {slug}</h1>
+    }
+    ```
 - **エラー・成功フィードバックの統一** (#267):
   - **エラー表示**: shadcn/ui `Alert` コンポーネント（`destructive` variant）+ `AlertCircle` アイコン
   - **成功通知**: Sonner `toast.success()` を使用（フォーム内メッセージは廃止）

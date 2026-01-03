@@ -2,11 +2,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SpaceList } from "../_components/space-list";
 import { getAllSpaces } from "../_lib/actions";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export default async function AdminSpacesPage({ params }: Props) {
+export default async function AdminSpacesPage({
+  params,
+}: PageProps<"/[locale]/admin/spaces">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

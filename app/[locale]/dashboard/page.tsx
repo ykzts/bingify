@@ -9,11 +9,9 @@ import { SpaceActionsDropdown } from "./_components/space-actions-dropdown";
 import { StatusBadge } from "./_components/status-badge";
 import { getUserSpaces } from "./_lib/actions";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/dashboard">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Dashboard" });
 
@@ -27,7 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function DashboardPage({ params }: Props) {
+export default async function DashboardPage({
+  params,
+}: PageProps<"/[locale]/dashboard">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

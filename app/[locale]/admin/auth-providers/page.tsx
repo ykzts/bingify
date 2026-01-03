@@ -4,11 +4,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthProvidersManagement } from "./_components/auth-providers-management";
 import { getAuthProviders } from "./_lib/actions";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export default async function AdminAuthProvidersPage({ params }: Props) {
+export default async function AdminAuthProvidersPage({
+  params,
+}: PageProps<"/[locale]/admin/auth-providers">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

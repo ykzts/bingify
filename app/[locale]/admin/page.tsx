@@ -1,11 +1,9 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export default async function AdminPage({ params }: Props) {
+export default async function AdminPage({
+  params,
+}: PageProps<"/[locale]/admin">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

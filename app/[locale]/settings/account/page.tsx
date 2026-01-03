@@ -5,10 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import { AccountLinkingForm } from "./_components/account-linking-form";
 import { UsernameForm } from "./_components/username-form";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
 async function AccountSettingsContent({ locale }: { locale: string }) {
   const supabase = await createClient();
   const {
@@ -38,7 +34,9 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
   );
 }
 
-export default async function AccountSettingsPage({ params }: Props) {
+export default async function AccountSettingsPage({
+  params,
+}: PageProps<"/[locale]/settings/account">) {
   const { locale } = await params;
   setRequestLocale(locale);
 
