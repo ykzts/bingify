@@ -79,7 +79,7 @@ export function ThemeToggle() {
               <DropdownMenuItem
                 className={cn(
                   "flex cursor-pointer items-center gap-2",
-                  theme === option.value && "bg-gray-50 font-medium"
+                  theme === option.value && "bg-accent font-medium"
                 )}
                 key={option.value}
                 onSelect={() => setTheme(option.value)}

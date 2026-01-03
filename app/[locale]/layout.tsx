@@ -7,6 +7,7 @@ import {
   setRequestLocale,
 } from "next-intl/server";
 import { ConfirmProvider } from "@/components/providers/confirm-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import { getAbsoluteUrl } from "@/lib/utils/url";
@@ -51,18 +52,20 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={`${nunito.variable} antialiased`}>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ConfirmProvider>
-            <div className="flex min-h-screen flex-col">
-              <header className="fixed top-4 right-4 z-50">
-                <HeaderMenuWrapper />
-              </header>
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
-            <Toaster />
-          </ConfirmProvider>
-        </NextIntlClientProvider>
+        <ThemeProvider>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <ConfirmProvider>
+              <div className="flex min-h-screen flex-col">
+                <header className="fixed top-4 right-4 z-50">
+                  <HeaderMenuWrapper />
+                </header>
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </div>
+              <Toaster />
+            </ConfirmProvider>
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

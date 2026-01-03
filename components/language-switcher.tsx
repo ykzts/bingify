@@ -52,7 +52,7 @@ export function LanguageSwitcher() {
             <DropdownMenuItem
               className={cn(
                 "cursor-pointer",
-                locale === loc && "bg-gray-50 font-medium"
+                locale === loc && "bg-accent font-medium"
               )}
               disabled={isPending}
               key={loc}
