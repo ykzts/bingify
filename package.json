@@ -70,6 +70,7 @@
     "sharp": "0.34.5",
     "supabase": "2.70.5",
     "tailwindcss": "4.1.18",
+    "to-ico": "1.1.5",
     "typescript": "5.9.3",
     "ultracite": "6.5.0",
     "vitest": "4.0.16"
