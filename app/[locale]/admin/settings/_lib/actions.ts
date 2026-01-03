@@ -1,8 +1,15 @@
 "use server";
 
-import { initialFormState } from "@tanstack/react-form-nextjs";
 import { systemSettingsSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
+
+// Define initial state for the action
+export const actionInitialState = {
+  errors: [] as string[],
+  // biome-ignore lint/suspicious/noExplicitAny: Type is determined at runtime by form values
+  values: undefined as any,
+  errorMap: {} as Record<string, string>,
+};
 
 // Re-export getSystemSettings from the data layer to avoid duplication
 // biome-ignore lint/performance/noBarrelFile: Intentional re-export to centralize implementation
@@ -110,8 +117,10 @@ export async function updateSystemSettingsAction(
     if (!validation.success) {
       console.error("Validation failed:", validation.error);
       return {
-        ...initialFormState,
-        errors: validation.error.errors.map((e) => e.message),
+        ...actionInitialState,
+        errors: validation.error.issues.map(
+          (e: { message: string }) => e.message
+        ),
       };
     }
 
@@ -123,7 +132,7 @@ export async function updateSystemSettingsAction(
     const { error: permissionError } = await checkAdminPermission(supabase);
     if (permissionError) {
       return {
-        ...initialFormState,
+        ...actionInitialState,
         errors: [permissionError],
       };
     }
@@ -139,14 +148,13 @@ export async function updateSystemSettingsAction(
     if (error) {
       console.error("Error updating system settings:", error);
       return {
-        ...initialFormState,
+        ...actionInitialState,
         errors: ["errorUpdateFailed"],
       };
     }
 
-    // Return success state
+    // Return success state (don't spread initialFormState for success)
     return {
-      ...initialFormState,
       values: validatedData,
       meta: {
         success: true,
@@ -155,7 +163,7 @@ export async function updateSystemSettingsAction(
   } catch (e) {
     console.error("Error in updateSystemSettingsAction:", e);
     return {
-      ...initialFormState,
+      ...actionInitialState,
       errors: ["errorGeneric"],
     };
   }

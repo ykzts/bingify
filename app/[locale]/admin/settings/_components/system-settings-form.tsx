@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  initialFormState,
   mergeForm,
   useForm,
   useStore,
@@ -29,7 +28,10 @@ import {
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
 import { getErrorMessage } from "@/lib/utils";
-import { updateSystemSettingsAction } from "../_lib/actions";
+import {
+  actionInitialState,
+  updateSystemSettingsAction,
+} from "../_lib/actions";
 import { systemSettingsFormOpts } from "../_lib/form-options";
 
 interface Props {
@@ -43,7 +45,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
   // Use TanStack Form with Next.js server actions
   const [state, action] = useActionState(
     updateSystemSettingsAction,
-    initialFormState
+    actionInitialState
   );
 
   const form = useForm({
