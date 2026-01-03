@@ -51,6 +51,16 @@ const oauthButtonVariants = cva("w-full", {
   },
 });
 
+// Type for supported OAuth button providers
+type OAuthButtonProvider = "github" | "google" | "twitch";
+
+// Type guard to check if a provider is supported
+function isSupportedProvider(
+  provider: string
+): provider is OAuthButtonProvider {
+  return ["github", "google", "twitch"].includes(provider);
+}
+
 interface Props {
   providers: AuthProvider[];
 }
@@ -231,11 +241,10 @@ export function LoginForm({ providers }: Props) {
 
   const getProviderButtonClass = (provider: string) => {
     // Use provider-specific colors when available, otherwise use default styling
-    return cn(
-      oauthButtonVariants({
-        provider: provider as "github" | "google" | "twitch",
-      })
-    );
+    if (isSupportedProvider(provider)) {
+      return cn(oauthButtonVariants({ provider }));
+    }
+    return "w-full";
   };
 
   const displayError = error || oauthError;
