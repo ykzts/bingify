@@ -1,5 +1,5 @@
-import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import type {
   BackgroundType,

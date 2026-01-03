@@ -9,7 +9,11 @@ import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { useDrumRoll } from "@/hooks/use-drum-roll";
 import { createClient } from "@/lib/supabase/client";
-import type { BackgroundType, DisplayMode } from "@/lib/types/screen-settings";
+import type {
+  BackgroundType,
+  DisplayMode,
+  ThemeType,
+} from "@/lib/types/screen-settings";
 import { cn } from "@/lib/utils";
 import { useBackground } from "../../_context/background-context";
 
@@ -17,6 +21,7 @@ interface Props {
   baseUrl: string;
   initialBg: BackgroundType;
   initialMode: DisplayMode;
+  initialTheme: ThemeType;
   locale: string;
   shareKey: string;
   spaceId: string;
@@ -26,6 +31,7 @@ export function ScreenDisplay({
   baseUrl,
   initialBg,
   initialMode,
+  initialTheme,
   locale,
   shareKey,
   spaceId,
@@ -34,6 +40,7 @@ export function ScreenDisplay({
   const queryClient = useQueryClient();
   const { data: calledNumbers = [] } = useCalledNumbers(spaceId, { retry: 3 });
   const [mode, setMode] = useState<DisplayMode>(initialMode);
+  const [theme, setTheme] = useState<ThemeType>(initialTheme);
   const {
     currentNumber: drumRollNumber,
     isAnimating,
@@ -46,10 +53,11 @@ export function ScreenDisplay({
   // biome-ignore lint/correctness/noUnusedVariables: background is managed via context and used by parent layout
   const { background, setBackground } = useBackground();
 
-  // Initialize background from props
+  // Initialize background and theme from props
   useEffect(() => {
     setBackground(initialBg);
-  }, [initialBg, setBackground]);
+    setTheme(initialTheme);
+  }, [initialBg, initialTheme, setBackground]);
 
   // Subscribe to realtime screen settings changes
   useEffect(() => {
@@ -73,9 +81,18 @@ export function ScreenDisplay({
             const newSettings = payload.new as {
               background: BackgroundType;
               display_mode: DisplayMode;
+              locale?: string;
+              theme: ThemeType;
             };
             setMode(newSettings.display_mode);
             setBackground(newSettings.background);
+            setTheme(newSettings.theme);
+            // Note: locale changes require page reload to update translations
+            if (newSettings.locale) {
+              console.info(
+                `Locale changed to ${newSettings.locale}, consider reloading`
+              );
+            }
           }
         }
       )
@@ -192,21 +209,35 @@ export function ScreenDisplay({
 
   const isMinimal = mode === "minimal";
 
+  // Theme-aware text colors
+  const textColor = theme === "light" ? "text-gray-900" : "text-white";
+
   return (
-    <div className="fixed inset-0 min-h-screen w-full overflow-hidden transition-colors duration-300">
+    <div
+      className={cn(
+        "fixed inset-0 min-h-screen w-full overflow-hidden transition-colors duration-300",
+        theme === "light" ? "bg-white" : ""
+      )}
+    >
       {isMinimal ? (
         /* Minimal Mode: Current Number Only */
         <div className="flex h-screen w-full items-center justify-center">
           {displayNumber !== null ? (
             <motion.h1
               animate={{ scale: 1, opacity: 1 }}
-              className="font-black text-[clamp(8rem,20vw,16rem)] text-white drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)]"
+              className={cn(
+                "font-black text-[clamp(8rem,20vw,16rem)] drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)]",
+                textColor
+              )}
               initial={{ scale: 0, opacity: 0 }}
               key={displayNumber}
               style={{
-                WebkitTextStroke: "3px black",
+                WebkitTextStroke:
+                  theme === "light" ? "3px rgba(0,0,0,0.2)" : "3px black",
                 textShadow:
-                  "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
+                  theme === "light"
+                    ? "0 0 20px rgba(0,0,0,0.3), 2px 2px 0 rgba(0,0,0,0.2)"
+                    : "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
               }}
               transition={{
                 type: "spring",

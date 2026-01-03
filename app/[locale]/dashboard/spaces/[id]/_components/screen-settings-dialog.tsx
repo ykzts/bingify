@@ -60,9 +60,6 @@ export function ScreenSettingsDialog({
   const [screenLocale, setScreenLocale] = useState<LocaleType>(
     initialLocale || (locale as LocaleType)
   );
-  const [screenLocale, setScreenLocale] = useState<LocaleType>(
-    initialLocale || (locale as LocaleType)
-  );
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Reset state when initial values change
