@@ -1,5 +1,17 @@
 import { ApiClient } from "@twurple/api";
-import { StaticAuthProvider } from "@twurple/auth";
+import { getAppToken, StaticAuthProvider } from "@twurple/auth";
+
+// Regex patterns for parsing Twitch input
+export const TWITCH_ID_REGEX = /^\d+$/;
+const TWITCH_URL_REGEX =
+  /^(?:https?:\/\/)?(?:www\.)?twitch\.tv\/([a-zA-Z0-9_]{4,25})$/;
+const TWITCH_USERNAME_REGEX = /^[a-zA-Z0-9_]{4,25}$/;
+
+// App access token cache
+let cachedAppToken: {
+  accessToken: string;
+  expiresAt: number;
+} | null = null;
 
 export interface TwitchFollowCheckResult {
   error?: string;
@@ -9,6 +21,16 @@ export interface TwitchFollowCheckResult {
 export interface TwitchSubCheckResult {
   error?: string;
   isSubscribed: boolean;
+}
+
+export interface TwitchUserLookupResult {
+  broadcasterId?: string;
+  error?: string;
+}
+
+export interface ParsedTwitchInput {
+  type: "id" | "username" | "invalid";
+  value: string;
 }
 
 /**
@@ -50,6 +72,194 @@ function createApiClient(userAccessToken: string): ApiClient {
 
   const authProvider = new StaticAuthProvider(clientId, userAccessToken);
   return new ApiClient({ authProvider });
+}
+
+/**
+ * Create Twurple API client with app access token for server-side operations
+ */
+function createAppApiClient(appAccessToken: string): ApiClient {
+  const clientId = process.env.TWITCH_CLIENT_ID;
+  if (!clientId) {
+    throw new Error("Twitch client ID not configured");
+  }
+
+  const authProvider = new StaticAuthProvider(clientId, appAccessToken);
+  return new ApiClient({ authProvider });
+}
+
+/**
+ * Get app access token for Twitch API using client credentials flow
+ * Tokens are cached and reused until they expire
+ * @returns Promise with access token or null if failed
+ */
+export async function getAppAccessToken(): Promise<string | null> {
+  const clientId = process.env.TWITCH_CLIENT_ID;
+  const clientSecret = process.env.TWITCH_CLIENT_SECRET;
+
+  if (!(clientId && clientSecret)) {
+    return null;
+  }
+
+  // Check if we have a valid cached token
+  const now = Date.now();
+  if (cachedAppToken && cachedAppToken.expiresAt > now) {
+    return cachedAppToken.accessToken;
+  }
+
+  try {
+    const token = await getAppToken(clientId, clientSecret);
+
+    // Cache the token with expiration
+    // Expire 5 minutes before actual expiration for safety margin
+    const expiresInMs = (token.expiresIn || 3600) * 1000;
+    const safetyMarginMs = 5 * 60 * 1000; // 5 minutes
+    cachedAppToken = {
+      accessToken: token.accessToken,
+      expiresAt: now + expiresInMs - safetyMarginMs,
+    };
+
+    return token.accessToken;
+  } catch (error) {
+    console.error("Failed to get Twitch app access token:", error);
+    return null;
+  }
+}
+
+/**
+ * Parse Twitch input to extract username or detect if it's already a numeric ID
+ * Supports:
+ * - Numeric ID: "123456789"
+ * - Username: "ninja"
+ * - URL: "https://www.twitch.tv/ninja" or "https://twitch.tv/ninja" or "twitch.tv/ninja"
+ */
+export function parseTwitchInput(input: string): ParsedTwitchInput {
+  const trimmed = input.trim();
+
+  if (!trimmed) {
+    return { type: "invalid", value: "" };
+  }
+
+  // Check if it's a numeric ID (digits only)
+  if (TWITCH_ID_REGEX.test(trimmed)) {
+    return { type: "id", value: trimmed };
+  }
+
+  // Check if it's a URL
+  const match = trimmed.match(TWITCH_URL_REGEX);
+  if (match?.[1]) {
+    return { type: "username", value: match[1].toLowerCase() };
+  }
+
+  // Check if it's a valid username (4-25 characters, alphanumeric + underscore)
+  if (TWITCH_USERNAME_REGEX.test(trimmed)) {
+    return { type: "username", value: trimmed.toLowerCase() };
+  }
+
+  return { type: "invalid", value: trimmed };
+}
+
+/**
+ * Get Twitch broadcaster ID from username using app access token
+ * @param username - Twitch username
+ * @param appAccessToken - App access token for Twitch API
+ * @returns Promise with broadcaster ID or error
+ */
+export async function getBroadcasterIdFromUsername(
+  username: string,
+  appAccessToken: string
+): Promise<TwitchUserLookupResult> {
+  try {
+    if (!username) {
+      return { error: "Username is required" };
+    }
+
+    if (!appAccessToken) {
+      return { error: "App access token is required" };
+    }
+
+    const clientId = process.env.TWITCH_CLIENT_ID;
+    if (!clientId) {
+      return { error: "Twitch client ID not configured" };
+    }
+
+    const apiClient = createAppApiClient(appAccessToken);
+    const users = await apiClient.users.getUsersByNames([username]);
+
+    if (users.length === 0) {
+      return { error: "User not found" };
+    }
+
+    return { broadcasterId: users[0].id };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+export interface TwitchLookupResult {
+  broadcasterId?: string;
+  error?: string;
+  source?: "id" | "username";
+  username?: string;
+}
+
+/**
+ * Lookup Twitch broadcaster ID from username, URL, or numeric ID
+ * This combines parsing and API lookup in a single function
+ * @param input - Twitch username, channel URL, or numeric ID
+ * @returns Promise with broadcaster ID or error
+ */
+export async function lookupTwitchBroadcaster(
+  input: string
+): Promise<TwitchLookupResult> {
+  try {
+    if (!input || typeof input !== "string") {
+      return { error: "Input is required" };
+    }
+
+    // Parse the input to determine type
+    const parsed = parseTwitchInput(input);
+
+    if (parsed.type === "invalid") {
+      return {
+        error:
+          "Invalid input. Please enter a Twitch username, channel URL, or numeric ID.",
+      };
+    }
+
+    // If it's already an ID, return it as-is
+    if (parsed.type === "id") {
+      return {
+        broadcasterId: parsed.value,
+        source: "id",
+      };
+    }
+
+    // It's a username, so look it up using twurple
+    const appAccessToken = await getAppAccessToken();
+    if (!appAccessToken) {
+      return { error: "Service temporarily unavailable" };
+    }
+
+    const result = await getBroadcasterIdFromUsername(
+      parsed.value,
+      appAccessToken
+    );
+
+    if (result.error) {
+      return { error: result.error };
+    }
+
+    return {
+      broadcasterId: result.broadcasterId,
+      source: "username",
+      username: parsed.value,
+    };
+  } catch (error) {
+    console.error("Error in Twitch lookup:", error);
+    return { error: "Internal server error" };
+  }
 }
 
 /**
