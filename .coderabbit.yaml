@@ -10,13 +10,13 @@ reviews:
   labeling_instructions:
     - Apply "scope: frontend" label when changes include files in app/** or components/** directories.
     - Apply "scope: backend" label when changes include files in lib/** or app/api/** directories.
-    - Apply "scope: ci/cd" label when changes include files in .github/**, **/workflows/**, or CI/CD configuration files.
+    - Apply "scope: ci/cd" label when changes include files in .github/** directory or CI/CD configuration files.
     - Apply "scope: tooling" label when changes include configuration files like biome.json, next.config.ts, tsconfig.json, vitest.config.ts, .coderabbit.yaml, postcss.config.mjs, or components.json.
     - Apply "type: bug" label when PR title or description contains keywords like "fix", "bug", "修正", "バグ", or indicates bug fixes.
     - Apply "type: feature" label when PR title or description contains keywords like "feat", "add", "新機能", "追加", or indicates new features.
     - Apply "type: enhancement" label when PR title or description contains keywords like "improve", "enhance", "改善", or indicates improvements.
     - Apply "type: refactoring" label when PR title or description contains keywords like "refactor", "リファクタリング", or indicates code refactoring.
-    - Apply "type: test" label when changes include test files (**/__tests__/**, **/test/**, *.test.ts, *.test.tsx, *.spec.ts, *.spec.tsx).
+    - Apply "type: test" label when changes include test files (**/__tests__/**, test/**, *.test.ts, *.test.tsx, *.spec.ts, *.spec.tsx).
     - Apply "type: documentation" label when changes include documentation files (**/*.md, docs/**) or when PR title contains "docs".
     - Apply "type: performance" label when PR title or description contains keywords like "perf", "performance", "optimize", "パフォーマンス", "最適化".
     - Apply "type: security" label when PR title or description contains keywords like "security", "vulnerability", "CVE", "セキュリティ", "脆弱性".
