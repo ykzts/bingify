@@ -300,6 +300,18 @@ describe("validateRedirectPath", () => {
     expect(validateRedirectPath("%2F%2Fevil.com")).toBe("/");
   });
 
+  test("rejects double-encoded protocol-relative URL", () => {
+    expect(validateRedirectPath("%252F%252Fevil.com")).toBe("/");
+  });
+
+  test("rejects triple-encoded protocol-relative URL", () => {
+    expect(validateRedirectPath("%25252F%25252Fevil.com")).toBe("/");
+  });
+
+  test("rejects double-encoded absolute URL", () => {
+    expect(validateRedirectPath("https%253A%252F%252Fevil.com")).toBe("/");
+  });
+
   test("rejects malformed encoded paths", () => {
     expect(validateRedirectPath("%XX%invalid")).toBe("/");
   });
