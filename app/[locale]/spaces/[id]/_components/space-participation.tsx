@@ -171,7 +171,8 @@ export function SpaceParticipation({
   const checkProviderOAuth = useCallback(
     async (
       storageKey: string,
-      setTokenFn: (value: boolean) => void
+      setTokenFn: (value: boolean) => void,
+      providerName: string
     ): Promise<boolean> => {
       const oauthComplete = sessionStorage.getItem(storageKey);
 
@@ -196,7 +197,7 @@ export function SpaceParticipation({
 
       // Session not ready yet, keep the flag and check again
       console.warn(
-        "OAuth complete flag found but session not ready yet, will retry"
+        `OAuth complete flag found for ${providerName} (key: ${storageKey}) but session not ready yet, will retry on next check`
       );
       return false;
     },
@@ -216,7 +217,8 @@ export function SpaceParticipation({
       if (requiresYouTube) {
         const hasToken = await checkProviderOAuth(
           YOUTUBE_OAUTH_COMPLETE_KEY,
-          setHasYouTubeToken
+          setHasYouTubeToken,
+          "YouTube"
         );
         if (hasToken) {
           shouldTriggerJoin = true;
@@ -227,7 +229,8 @@ export function SpaceParticipation({
       if (requiresTwitch) {
         const hasToken = await checkProviderOAuth(
           TWITCH_OAUTH_COMPLETE_KEY,
-          setHasTwitchToken
+          setHasTwitchToken,
+          "Twitch"
         );
         if (hasToken) {
           shouldTriggerJoin = true;
