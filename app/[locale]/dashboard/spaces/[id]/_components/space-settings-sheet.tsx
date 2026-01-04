@@ -71,7 +71,7 @@ export function SpaceSettingsSheet({
               : t("settingsStatusActive")}
           </SheetDescription>
         </SheetHeader>
-        <div className="mt-6 space-y-8">
+        <div className="mt-6 space-y-8 px-6">
           {/* Space Settings Form */}
           <SpaceSettingsForm
             currentParticipantCount={currentParticipantCount}
