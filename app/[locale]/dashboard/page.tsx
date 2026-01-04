@@ -1,9 +1,9 @@
 import { format } from "date-fns";
 import { FileText, Users } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SectionHeader } from "@/components/section-header";
+import { Link } from "@/i18n/navigation";
 import { CreateSpaceForm } from "./_components/create-space-form";
 import { SpaceActionsDropdown } from "./_components/space-actions-dropdown";
 import { StatusBadge } from "./_components/status-badge";
@@ -145,7 +145,7 @@ export default async function DashboardPage({
                     <td className="px-4 py-3 font-medium text-gray-900">
                       <Link
                         className="flex flex-col gap-1 transition-colors hover:text-purple-600"
-                        href={`/${locale}/dashboard/spaces/${space.id}`}
+                        href={`/dashboard/spaces/${space.id}`}
                       >
                         <div className="flex items-center gap-2">
                           {space.share_key}
