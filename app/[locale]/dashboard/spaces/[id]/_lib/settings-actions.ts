@@ -5,7 +5,9 @@ import {
   initialFormState,
 } from "@tanstack/react-form-nextjs";
 import { updateSpaceFormSchema } from "@/lib/schemas/space";
+import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
+import type { SystemFeatures } from "@/lib/types/settings";
 import type { SpaceAdmin } from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";
 import { spaceSettingsFormOpts } from "./form-options";
@@ -171,13 +173,21 @@ export async function updateSpaceSettings(
       };
     }
 
+    // Validate and parse features field
+    const featuresValidation = systemFeaturesSchema.safeParse(
+      systemSettings?.features
+    );
+    const features: SystemFeatures | null = featuresValidation.success
+      ? featuresValidation.data
+      : null;
+
     // Validation 1.5: Check gatekeeper requirement types against system settings
-    if (systemSettings?.features?.gatekeeper && gatekeeperMode === "social") {
-      const features = systemSettings.features.gatekeeper;
+    if (features?.gatekeeper && gatekeeperMode === "social") {
+      const gatekeeper = features.gatekeeper;
 
       // Validate YouTube requirements
       if (socialPlatform === "youtube" && youtubeRequirement !== "none") {
-        if (!features.youtube?.enabled) {
+        if (!gatekeeper.youtube?.enabled) {
           return {
             ...initialFormState,
             errors: ["YouTube認証は現在システム設定で無効になっています"],
@@ -185,7 +195,7 @@ export async function updateSpaceSettings(
         }
         if (
           youtubeRequirement === "subscriber" &&
-          !features.youtube?.subscriber?.enabled
+          !gatekeeper.youtube?.subscriber?.enabled
         ) {
           return {
             ...initialFormState,
@@ -198,7 +208,7 @@ export async function updateSpaceSettings(
 
       // Validate Twitch requirements
       if (socialPlatform === "twitch" && twitchRequirement !== "none") {
-        if (!features.twitch?.enabled) {
+        if (!gatekeeper.twitch?.enabled) {
           return {
             ...initialFormState,
             errors: ["Twitch認証は現在システム設定で無効になっています"],
@@ -206,7 +216,7 @@ export async function updateSpaceSettings(
         }
         if (
           twitchRequirement === "follower" &&
-          !features.twitch?.follower?.enabled
+          !gatekeeper.twitch?.follower?.enabled
         ) {
           return {
             ...initialFormState,
@@ -217,7 +227,7 @@ export async function updateSpaceSettings(
         }
         if (
           twitchRequirement === "subscriber" &&
-          !features.twitch?.subscriber?.enabled
+          !gatekeeper.twitch?.subscriber?.enabled
         ) {
           return {
             ...initialFormState,
@@ -232,8 +242,8 @@ export async function updateSpaceSettings(
     // Validate email mode
     if (
       gatekeeperMode === "email" &&
-      systemSettings?.features?.gatekeeper?.email &&
-      !systemSettings.features.gatekeeper.email.enabled
+      features?.gatekeeper?.email &&
+      !features.gatekeeper.email.enabled
     ) {
       return {
         ...initialFormState,
