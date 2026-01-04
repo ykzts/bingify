@@ -6,12 +6,12 @@ describe("getBaseUrl", () => {
     vi.unstubAllEnvs();
   });
 
-  test("returns NEXT_PUBLIC_SITE_URL when explicitly defined", () => {
+  test("明示的に定義されたNEXT_PUBLIC_SITE_URLを返す", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://example.com");
     expect(getBaseUrl()).toBe("https://example.com");
   });
 
-  test("returns Vercel Branch URL in preview environment", () => {
+  test("プレビュー環境でVercel Branch URLを返す", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("VERCEL_ENV", "preview");
     vi.stubEnv("VERCEL_BRANCH_URL", "my-branch-abc123.vercel.app");
@@ -19,7 +19,7 @@ describe("getBaseUrl", () => {
     expect(getBaseUrl()).toBe("https://my-branch-abc123.vercel.app");
   });
 
-  test("returns Vercel Branch URL using NEXT_PUBLIC_* variables in preview", () => {
+  test("プレビューでNEXT_PUBLIC_*変数を使用してVercel Branch URLを返す", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "preview");
     vi.stubEnv("NEXT_PUBLIC_VERCEL_BRANCH_URL", "my-branch-abc123.vercel.app");
@@ -27,7 +27,7 @@ describe("getBaseUrl", () => {
     expect(getBaseUrl()).toBe("https://my-branch-abc123.vercel.app");
   });
 
-  test("prioritizes NEXT_PUBLIC_VERCEL_BRANCH_URL over VERCEL_BRANCH_URL", () => {
+  test("NEXT_PUBLIC_VERCEL_BRANCH_URLがVERCEL_BRANCH_URLより優先される", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "preview");
     vi.stubEnv(
@@ -39,7 +39,7 @@ describe("getBaseUrl", () => {
     expect(getBaseUrl()).toBe("https://next-public-branch.vercel.app");
   });
 
-  test("returns Vercel URL when Branch URL is not available in preview", () => {
+  test("プレビューでBranch URLが利用できない場合にVercel URLを返す", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("VERCEL_ENV", "preview");
     vi.stubEnv("VERCEL_URL", "my-preview-xyz789.vercel.app");
@@ -47,7 +47,7 @@ describe("getBaseUrl", () => {
     expect(getBaseUrl()).toBe("https://my-preview-xyz789.vercel.app");
   });
 
-  test("returns NEXT_PUBLIC_VERCEL_URL when Branch URL is not available in preview", () => {
+  test("プレビューでBranch URLが利用できない場合にNEXT_PUBLIC_VERCEL_URLを返す", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "preview");
     vi.stubEnv("NEXT_PUBLIC_VERCEL_URL", "my-preview-xyz789.vercel.app");
@@ -55,7 +55,7 @@ describe("getBaseUrl", () => {
     expect(getBaseUrl()).toBe("https://my-preview-xyz789.vercel.app");
   });
 
-  test("returns production URL in Vercel production environment", () => {
+  test("Vercel本番環境で本番URLを返す", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("VERCEL_ENV", "production");
     vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "myapp.vercel.app");
@@ -63,7 +63,7 @@ describe("getBaseUrl", () => {
     expect(getBaseUrl()).toBe("https://myapp.vercel.app");
   });
 
-  test("returns production URL using NEXT_PUBLIC_* variable", () => {
+  test("NEXT_PUBLIC_*変数を使用して本番URLを返す", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "production");
     vi.stubEnv("NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL", "myapp.vercel.app");
@@ -71,7 +71,7 @@ describe("getBaseUrl", () => {
     expect(getBaseUrl()).toBe("https://myapp.vercel.app");
   });
 
-  test("prioritizes NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL over VERCEL_PROJECT_PRODUCTION_URL", () => {
+  test("NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URLがVERCEL_PROJECT_PRODUCTION_URLより優先される", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "production");
     vi.stubEnv(
@@ -83,13 +83,13 @@ describe("getBaseUrl", () => {
     expect(getBaseUrl()).toBe("https://next-public-production.vercel.app");
   });
 
-  test("returns localhost in local development", () => {
+  test("ローカル開発でlocalhostを返す", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", undefined);
     vi.stubEnv("NODE_ENV", undefined);
     expect(getBaseUrl()).toBe("http://localhost:3000");
   });
 
-  test("NEXT_PUBLIC_SITE_URL takes precedence over Vercel variables", () => {
+  test("NEXT_PUBLIC_SITE_URLがVercel変数より優先される", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://custom-domain.com");
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "preview");
@@ -98,7 +98,7 @@ describe("getBaseUrl", () => {
     expect(getBaseUrl()).toBe("https://custom-domain.com");
   });
 
-  test("returns localhost when no Vercel URLs are available in production", () => {
+  test("本番環境でVercel URLが利用できない場合にlocalhostを返す", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", undefined);
     vi.stubEnv("VERCEL_ENV", undefined);
@@ -117,70 +117,66 @@ describe("getAbsoluteUrl", () => {
     vi.unstubAllEnvs();
   });
 
-  test("returns base URL when no path is provided", () => {
+  test("パスが提供されない場合にベースURLを返す", () => {
     expect(getAbsoluteUrl()).toBe("https://example.com/");
   });
 
-  test("returns base URL when empty string path is provided", () => {
+  test("空文字列のパスが提供された場合にベースURLを返す", () => {
     expect(getAbsoluteUrl("")).toBe("https://example.com/");
   });
 
-  test("correctly joins base URL with path", () => {
+  test("ベースURLとパスを正しく結合する", () => {
     expect(getAbsoluteUrl("/spaces/123")).toBe(
       "https://example.com/spaces/123"
     );
   });
 
-  test("correctly joins base URL with path without leading slash", () => {
+  test("先頭のスラッシュがないパスとベースURLを正しく結合する", () => {
     expect(getAbsoluteUrl("spaces/123")).toBe("https://example.com/spaces/123");
   });
 
-  test("correctly joins base URL with path containing query params", () => {
+  test("クエリパラメータを含むパスとベースURLを正しく結合する", () => {
     expect(getAbsoluteUrl("/search?q=test")).toBe(
       "https://example.com/search?q=test"
     );
   });
 
-  test("handles path with hash", () => {
+  test("ハッシュを含むパスを処理する", () => {
     expect(getAbsoluteUrl("/page#section")).toBe(
       "https://example.com/page#section"
     );
   });
 
-  test("handles protocol-relative URLs correctly", () => {
-    // When path starts with //, new URL treats it as protocol-relative
-    // This is expected behavior
+  test("プロトコル相対URLを正しく処理する", () => {
     expect(getAbsoluteUrl("//spaces//123")).toBe("https://spaces//123");
   });
 
-  test("handles complex paths", () => {
+  test("複雑なパスを処理する", () => {
     expect(getAbsoluteUrl("/api/v1/users/123/posts?sort=desc&limit=10")).toBe(
       "https://example.com/api/v1/users/123/posts?sort=desc&limit=10"
     );
   });
 
-  test("handles relative paths correctly", () => {
+  test("相対パスを正しく処理する", () => {
     expect(getAbsoluteUrl("../relative/path")).toBe(
       "https://example.com/relative/path"
     );
   });
 
-  test("handles special characters in path", () => {
-    // new URL() is quite permissive with special characters in paths
-    // It only throws on truly invalid URLs like missing protocol
+  test("パス内の特殊文字を処理する", () => {
     expect(getAbsoluteUrl("/path/with!special@chars")).toBe(
       "https://example.com/path/with!special@chars"
     );
   });
 
-  test("works with different base URLs", () => {
+  test("異なるベースURLで動作する", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "http://localhost:3000");
     expect(getAbsoluteUrl("/dashboard")).toBe(
       "http://localhost:3000/dashboard"
     );
   });
 
-  test("preserves trailing slash in path", () => {
+  test("パスの末尾のスラッシュを保持する", () => {
     expect(getAbsoluteUrl("/spaces/")).toBe("https://example.com/spaces/");
   });
 });
@@ -194,158 +190,157 @@ describe("validateRedirectPath", () => {
     vi.unstubAllEnvs();
   });
 
-  test("returns valid relative path", () => {
+  test("有効な相対パスを返す", () => {
     expect(validateRedirectPath("/dashboard")).toBe("/dashboard");
   });
 
-  test("returns valid path with query parameters", () => {
+  test("クエリパラメータ付きの有効なパスを返す", () => {
     expect(validateRedirectPath("/spaces?id=123")).toBe("/spaces?id=123");
   });
 
-  test("returns valid path with hash", () => {
+  test("ハッシュ付きの有効なパスを返す", () => {
     expect(validateRedirectPath("/page#section")).toBe("/page#section");
   });
 
-  test("returns fallback for null input", () => {
+  test("null入力に対してフォールバックを返す", () => {
     expect(validateRedirectPath(null)).toBe("/");
   });
 
-  test("returns fallback for undefined input", () => {
+  test("undefined入力に対してフォールバックを返す", () => {
     expect(validateRedirectPath(undefined)).toBe("/");
   });
 
-  test("returns fallback for empty string", () => {
+  test("空文字列に対してフォールバックを返す", () => {
     expect(validateRedirectPath("")).toBe("/");
   });
 
-  test("returns fallback for whitespace-only string", () => {
+  test("空白のみの文字列に対してフォールバックを返す", () => {
     expect(validateRedirectPath("   ")).toBe("/");
   });
 
-  test("uses custom fallback path", () => {
+  test("カスタムフォールバックパスを使用する", () => {
     expect(validateRedirectPath(null, "/en")).toBe("/en");
   });
 
-  test("rejects protocol-relative URLs (//)", () => {
+  test("プロトコル相対URL (//)を拒否する", () => {
     expect(validateRedirectPath("//evil.com")).toBe("/");
   });
 
-  test("rejects absolute URLs with http protocol", () => {
+  test("httpプロトコル付きの絶対URLを拒否する", () => {
     expect(validateRedirectPath("http://evil.com")).toBe("/");
   });
 
-  test("rejects absolute URLs with https protocol", () => {
+  test("httpsプロトコル付きの絶対URLを拒否する", () => {
     expect(validateRedirectPath("https://evil.com")).toBe("/");
   });
 
-  test("rejects javascript: protocol", () => {
+  test("javascript:プロトコルを拒否する", () => {
     expect(validateRedirectPath("javascript:alert(1)")).toBe("/");
   });
 
-  test("rejects data: protocol", () => {
+  test("data:プロトコルを拒否する", () => {
     expect(
       validateRedirectPath("data:text/html,<script>alert(1)</script>")
     ).toBe("/");
   });
 
-  test("rejects vbscript: protocol", () => {
+  test("vbscript:プロトコルを拒否する", () => {
     expect(validateRedirectPath("vbscript:alert(1)")).toBe("/");
   });
 
-  test("rejects file: protocol", () => {
+  test("file:プロトコルを拒否する", () => {
     expect(validateRedirectPath("file:///etc/passwd")).toBe("/");
   });
 
-  test("rejects about: protocol", () => {
+  test("about:プロトコルを拒否する", () => {
     expect(validateRedirectPath("about:blank")).toBe("/");
   });
 
-  test("rejects path traversal with ..", () => {
+  test("..を含むパストラバーサルを拒否する", () => {
     expect(validateRedirectPath("/../../etc/passwd")).toBe("/");
   });
 
-  test("rejects path traversal in middle", () => {
+  test("中間のパストラバーサルを拒否する", () => {
     expect(validateRedirectPath("/safe/../dangerous")).toBe("/");
   });
 
-  test("rejects path traversal with backslash", () => {
+  test("バックスラッシュ付きのパストラバーサルを拒否する", () => {
     expect(validateRedirectPath("/..\\etc\\passwd")).toBe("/");
   });
 
-  test("rejects path traversal at start with backslash", () => {
+  test("先頭のバックスラッシュ付きのパストラバーサルを拒否する", () => {
     expect(validateRedirectPath("\\..\\file")).toBe("/");
   });
 
-  test("rejects newline characters", () => {
+  test("改行文字を拒否する", () => {
     expect(validateRedirectPath("/path\nwith\nnewlines")).toBe("/");
   });
 
-  test("rejects carriage return characters", () => {
+  test("キャリッジリターン文字を拒否する", () => {
     expect(validateRedirectPath("/path\rwith\rreturns")).toBe("/");
   });
 
-  test("rejects tab characters", () => {
+  test("タブ文字を拒否する", () => {
     expect(validateRedirectPath("/path\twith\ttabs")).toBe("/");
   });
 
-  test("rejects null bytes", () => {
+  test("ヌルバイトを拒否する", () => {
     expect(validateRedirectPath("/path\0with\0nulls")).toBe("/");
   });
 
-  test("handles URL-encoded valid path", () => {
+  test("URLエンコードされた有効なパスを処理する", () => {
     expect(validateRedirectPath("/spaces%2F123")).toBe("/spaces/123");
   });
 
-  test("rejects URL-encoded protocol-relative URL", () => {
+  test("URLエンコードされたプロトコル相対URLを拒否する", () => {
     expect(validateRedirectPath("%2F%2Fevil.com")).toBe("/");
   });
 
-  test("rejects double-encoded protocol-relative URL", () => {
+  test("二重エンコードされたプロトコル相対URLを拒否する", () => {
     expect(validateRedirectPath("%252F%252Fevil.com")).toBe("/");
   });
 
-  test("rejects triple-encoded protocol-relative URL", () => {
+  test("三重エンコードされたプロトコル相対URLを拒否する", () => {
     expect(validateRedirectPath("%25252F%25252Fevil.com")).toBe("/");
   });
 
-  test("rejects double-encoded absolute URL", () => {
+  test("二重エンコードされた絶対URLを拒否する", () => {
     expect(validateRedirectPath("https%253A%252F%252Fevil.com")).toBe("/");
   });
 
-  test("rejects malformed encoded paths", () => {
+  test("不正なエンコードパスを拒否する", () => {
     expect(validateRedirectPath("%XX%invalid")).toBe("/");
   });
 
-  test("accepts paths with safe special characters", () => {
+  test("安全な特殊文字を含むパスを受け入れる", () => {
     expect(validateRedirectPath("/path/with-dash_underscore")).toBe(
       "/path/with-dash_underscore"
     );
   });
 
-  test("accepts paths with encoded spaces", () => {
-    // URL.pathname preserves encoded spaces as %20
+  test("エンコードされたスペースを含むパスを受け入れる", () => {
     expect(validateRedirectPath("/path%20with%20spaces")).toBe(
       "/path%20with%20spaces"
     );
   });
 
-  test("normalizes path correctly", () => {
+  test("パスを正しく正規化する", () => {
     expect(validateRedirectPath("/path//double//slash")).toBe(
       "/path//double//slash"
     );
   });
 
-  test("preserves query parameters after validation", () => {
+  test("検証後にクエリパラメータを保持する", () => {
     expect(validateRedirectPath("/search?q=test&page=2")).toBe(
       "/search?q=test&page=2"
     );
   });
 
-  test("preserves hash after validation", () => {
+  test("検証後にハッシュを保持する", () => {
     expect(validateRedirectPath("/page#section-1")).toBe("/page#section-1");
   });
 
-  test("handles complex valid path", () => {
+  test("複雑な有効なパスを処理する", () => {
     expect(
       validateRedirectPath("/en/dashboard/spaces/123?view=edit#settings")
     ).toBe("/en/dashboard/spaces/123?view=edit#settings");

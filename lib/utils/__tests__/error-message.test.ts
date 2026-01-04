@@ -2,40 +2,40 @@ import { describe, expect, it } from "vitest";
 import { getErrorMessage } from "../error-message";
 
 describe("getErrorMessage", () => {
-  describe("handles null and undefined", () => {
-    it("returns empty string for null", () => {
+  describe("nullとundefinedを処理する", () => {
+    it("nullに対して空文字列を返す", () => {
       expect(getErrorMessage(null)).toBe("");
     });
 
-    it("returns empty string for undefined", () => {
+    it("undefinedに対して空文字列を返す", () => {
       expect(getErrorMessage(undefined)).toBe("");
     });
   });
 
-  describe("handles string errors", () => {
-    it("returns the string as-is", () => {
+  describe("文字列エラーを処理する", () => {
+    it("文字列をそのまま返す", () => {
       expect(getErrorMessage("Simple error message")).toBe(
         "Simple error message"
       );
     });
 
-    it("returns empty string for empty string input", () => {
+    it("空文字列入力に対して空文字列を返す", () => {
       expect(getErrorMessage("")).toBe("");
     });
   });
 
-  describe("handles Error instances", () => {
-    it("extracts message from Error object", () => {
+  describe("Errorインスタンスを処理する", () => {
+    it("ErrorオブジェクトからメッセージをExtractする", () => {
       const error = new Error("Error instance message");
       expect(getErrorMessage(error)).toBe("Error instance message");
     });
 
-    it("handles TypeError", () => {
+    it("TypeErrorを処理する", () => {
       const error = new TypeError("Type error message");
       expect(getErrorMessage(error)).toBe("Type error message");
     });
 
-    it("handles custom Error subclasses", () => {
+    it("カスタムErrorサブクラスを処理する", () => {
       class CustomError extends Error {
         constructor(message: string) {
           super(message);
@@ -47,13 +47,13 @@ describe("getErrorMessage", () => {
     });
   });
 
-  describe("handles objects with message property", () => {
-    it("extracts message from object", () => {
+  describe("messageプロパティを持つオブジェクトを処理する", () => {
+    it("オブジェクトからメッセージをExtractする", () => {
       const error = { message: "Object with message" };
       expect(getErrorMessage(error)).toBe("Object with message");
     });
 
-    it("handles Zod-like issue objects", () => {
+    it("Zod風のissueオブジェクトを処理する", () => {
       const error = {
         code: "invalid_type",
         message: "Expected string, received number",
@@ -62,31 +62,30 @@ describe("getErrorMessage", () => {
       expect(getErrorMessage(error)).toBe("Expected string, received number");
     });
 
-    it("ignores message property if not a string", () => {
+    it("messageプロパティが文字列でない場合は無視する", () => {
       const error = { message: 123 };
       expect(getErrorMessage(error)).toBe("[object Object]");
     });
   });
 
-  describe("handles arrays of errors", () => {
-    it("extracts message from first element", () => {
+  describe("エラーの配列を処理する", () => {
+    it("最初の要素からメッセージをExtractする", () => {
       const errors = ["First error", "Second error", "Third error"];
       expect(getErrorMessage(errors)).toBe("First error");
     });
 
-    it("recursively processes first element", () => {
+    it("最初の要素を再帰的に処理する", () => {
       const errors = [{ message: "Nested error message" }];
       expect(getErrorMessage(errors)).toBe("Nested error message");
     });
 
-    it("handles empty arrays", () => {
-      // Empty arrays fall through to the String() conversion
+    it("空の配列を処理する", () => {
       expect(getErrorMessage([])).toBe("");
     });
   });
 
-  describe("handles Zod error structure with issues array", () => {
-    it("extracts message from first issue", () => {
+  describe("issues配列を持つZodエラー構造を処理する", () => {
+    it("最初のissueからメッセージをExtractする", () => {
       const zodError = {
         issues: [
           {
@@ -106,42 +105,42 @@ describe("getErrorMessage", () => {
       );
     });
 
-    it("handles issues with non-message properties", () => {
+    it("メッセージ以外のプロパティを持つissuesを処理する", () => {
       const zodError = {
         issues: [{ code: "custom", path: [] }],
       };
       expect(getErrorMessage(zodError)).toBe("[object Object]");
     });
 
-    it("handles empty issues array", () => {
+    it("空のissues配列を処理する", () => {
       const zodError = { issues: [] };
       expect(getErrorMessage(zodError)).toBe("[object Object]");
     });
   });
 
-  describe("fallback behavior", () => {
-    it("converts plain objects to string", () => {
+  describe("フォールバック動作", () => {
+    it("プレーンオブジェクトを文字列に変換する", () => {
       const obj = { foo: "bar", baz: 123 };
       expect(getErrorMessage(obj)).toBe("[object Object]");
     });
 
-    it("converts numbers to string", () => {
+    it("数値を文字列に変換する", () => {
       expect(getErrorMessage(42)).toBe("42");
     });
 
-    it("converts booleans to string", () => {
+    it("真偽値を文字列に変換する", () => {
       expect(getErrorMessage(true)).toBe("true");
       expect(getErrorMessage(false)).toBe("false");
     });
 
-    it("handles symbols", () => {
+    it("シンボルを処理する", () => {
       const sym = Symbol("test");
       expect(getErrorMessage(sym)).toContain("Symbol");
     });
   });
 
-  describe("complex nested scenarios", () => {
-    it("handles deeply nested error structures", () => {
+  describe("複雑なネストされたシナリオ", () => {
+    it("深くネストされたエラー構造を処理する", () => {
       const error = {
         issues: [
           {
@@ -155,12 +154,12 @@ describe("getErrorMessage", () => {
       expect(getErrorMessage(error)).toBe("Validation failed");
     });
 
-    it("handles array of Error instances", () => {
+    it("Errorインスタンスの配列を処理する", () => {
       const errors = [new Error("First error"), new Error("Second error")];
       expect(getErrorMessage(errors)).toBe("First error");
     });
 
-    it("handles mixed error types in arrays", () => {
+    it("配列内の混在したエラータイプを処理する", () => {
       const errors = [
         "String error",
         new Error("Error instance"),
@@ -170,18 +169,18 @@ describe("getErrorMessage", () => {
     });
   });
 
-  describe("edge cases", () => {
-    it("handles objects with null message", () => {
+  describe("エッジケース", () => {
+    it("nullのmessageを持つオブジェクトを処理する", () => {
       const error = { message: null };
       expect(getErrorMessage(error)).toBe("[object Object]");
     });
 
-    it("handles objects with undefined message", () => {
+    it("undefinedのmessageを持つオブジェクトを処理する", () => {
       const error = { message: undefined };
       expect(getErrorMessage(error)).toBe("[object Object]");
     });
 
-    it("handles circular references gracefully", () => {
+    it("循環参照を適切に処理する", () => {
       const error: { message?: string; self?: unknown } = {
         message: "Circular error",
       };

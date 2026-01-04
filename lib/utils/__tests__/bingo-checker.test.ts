@@ -2,16 +2,15 @@ import { describe, expect, test } from "vitest";
 import { checkBingoLines } from "../bingo-checker";
 
 describe("checkBingoLines", () => {
-  // Standard 5x5 bingo card with free space at [2][2]
   const testCard = [
     [1, 16, 31, 46, 61],
     [2, 17, 32, 47, 62],
-    [3, 18, 0, 48, 63], // 0 is FREE space
+    [3, 18, 0, 48, 63],
     [4, 19, 34, 49, 64],
     [5, 20, 35, 50, 65],
   ];
 
-  test("no bingo or reach with no numbers called", () => {
+  test("番号が呼ばれていない場合はビンゴもリーチもない", () => {
     const result = checkBingoLines(testCard, new Set());
 
     expect(result.hasBingo).toBe(false);
@@ -20,7 +19,7 @@ describe("checkBingoLines", () => {
     expect(result.reachLines).toHaveLength(0);
   });
 
-  test("detects horizontal bingo (row 0)", () => {
+  test("横のビンゴを検出する（行0）", () => {
     const calledNumbers = new Set([1, 16, 31, 46, 61]);
     const result = checkBingoLines(testCard, calledNumbers);
 
@@ -31,7 +30,7 @@ describe("checkBingoLines", () => {
     expect(result.bingoLines[0].index).toBe(0);
   });
 
-  test("detects vertical bingo (col 1)", () => {
+  test("縦のビンゴを検出する（列1）", () => {
     const calledNumbers = new Set([16, 17, 18, 19, 20]);
     const result = checkBingoLines(testCard, calledNumbers);
 
@@ -42,8 +41,7 @@ describe("checkBingoLines", () => {
     expect(result.bingoLines[0].index).toBe(1);
   });
 
-  test("detects diagonal bingo (top-left to bottom-right)", () => {
-    // Numbers: 1, 17, FREE, 49, 65
+  test("斜めのビンゴを検出する（左上から右下）", () => {
     const calledNumbers = new Set([1, 17, 49, 65]);
     const result = checkBingoLines(testCard, calledNumbers);
 
@@ -54,8 +52,7 @@ describe("checkBingoLines", () => {
     expect(result.bingoLines[0].index).toBe(0);
   });
 
-  test("detects diagonal bingo (top-right to bottom-left)", () => {
-    // Numbers: 61, 47, FREE, 19, 5
+  test("斜めのビンゴを検出する（右上から左下）", () => {
     const calledNumbers = new Set([61, 47, 19, 5]);
     const result = checkBingoLines(testCard, calledNumbers);
 
@@ -66,8 +63,8 @@ describe("checkBingoLines", () => {
     expect(result.bingoLines[0].index).toBe(1);
   });
 
-  test("detects reach (one number away from horizontal bingo)", () => {
-    const calledNumbers = new Set([1, 16, 31, 46]); // Missing 61
+  test("リーチを検出する（横のビンゴまであと1つ）", () => {
+    const calledNumbers = new Set([1, 16, 31, 46]);
     const result = checkBingoLines(testCard, calledNumbers);
 
     expect(result.hasBingo).toBe(false);
@@ -77,8 +74,8 @@ describe("checkBingoLines", () => {
     expect(result.reachLines[0].index).toBe(0);
   });
 
-  test("detects reach (one number away from vertical bingo)", () => {
-    const calledNumbers = new Set([16, 17, 18, 19]); // Missing 20
+  test("リーチを検出する（縦のビンゴまであと1つ）", () => {
+    const calledNumbers = new Set([16, 17, 18, 19]);
     const result = checkBingoLines(testCard, calledNumbers);
 
     expect(result.hasBingo).toBe(false);
@@ -88,8 +85,7 @@ describe("checkBingoLines", () => {
     expect(result.reachLines[0].index).toBe(1);
   });
 
-  test("detects reach with free space (one number away from diagonal)", () => {
-    // Diagonal: 1, 17, FREE, 49, 65 - missing 65
+  test("フリースペースを含むリーチを検出する（斜めまであと1つ）", () => {
     const calledNumbers = new Set([1, 17, 49]);
     const result = checkBingoLines(testCard, calledNumbers);
 
@@ -99,8 +95,7 @@ describe("checkBingoLines", () => {
     expect(result.reachLines[0].type).toBe("diagonal");
   });
 
-  test("detects multiple bingo lines", () => {
-    // Complete row 0 and col 1
+  test("複数のビンゴラインを検出する", () => {
     const calledNumbers = new Set([1, 16, 31, 46, 61, 17, 18, 19, 20]);
     const result = checkBingoLines(testCard, calledNumbers);
 
@@ -108,8 +103,7 @@ describe("checkBingoLines", () => {
     expect(result.bingoLines.length).toBeGreaterThanOrEqual(2);
   });
 
-  test("detects both bingo and reach lines", () => {
-    // Complete row 0, and almost complete col 1 (missing 20)
+  test("ビンゴとリーチの両方を検出する", () => {
     const calledNumbers = new Set([1, 16, 31, 46, 61, 17, 18, 19]);
     const result = checkBingoLines(testCard, calledNumbers);
 
@@ -119,8 +113,7 @@ describe("checkBingoLines", () => {
     expect(result.reachLines.length).toBeGreaterThanOrEqual(1);
   });
 
-  test("free space is always marked in center row", () => {
-    // Row 2: 3, 18, FREE, 48, 63 - only need 4 numbers
+  test("フリースペースは中央行で常にマークされている", () => {
     const calledNumbers = new Set([3, 18, 48, 63]);
     const result = checkBingoLines(testCard, calledNumbers);
 
@@ -130,16 +123,13 @@ describe("checkBingoLines", () => {
     expect(result.bingoLines[0].index).toBe(2);
   });
 
-  test("detects cross pattern (horizontal + vertical through center)", () => {
-    // Complete row 2 (horizontal): 3, 18, FREE, 48, 63
-    // Complete col 2 (vertical): 31, 32, FREE, 34, 35
+  test("クロスパターンを検出する（中央を通る横と縦）", () => {
     const calledNumbers = new Set([3, 18, 48, 63, 31, 32, 34, 35]);
     const result = checkBingoLines(testCard, calledNumbers);
 
     expect(result.hasBingo).toBe(true);
     expect(result.bingoLines).toHaveLength(2);
 
-    // Find horizontal and vertical lines
     const horizontalLine = result.bingoLines.find(
       (l) => l.type === "horizontal"
     );
@@ -151,23 +141,20 @@ describe("checkBingoLines", () => {
     expect(verticalLine?.index).toBe(2);
   });
 
-  test("detects all three line types simultaneously (horizontal + vertical + diagonal)", () => {
-    // Row 0 (horizontal): 1, 16, 31, 46, 61
-    // Col 0 (vertical): 1, 2, 3, 4, 5
-    // Diagonal 0 (top-left to bottom-right): 1, 17, FREE, 49, 65
+  test("3つのラインタイプを同時に検出する（横+縦+斜め）", () => {
     const calledNumbers = new Set([
       1,
       16,
       31,
       46,
-      61, // row 0
+      61,
       2,
       3,
       4,
-      5, // col 0 (1 already counted)
+      5,
       17,
       49,
-      65, // diagonal 0 (1 already counted, FREE is always marked)
+      65,
     ]);
     const result = checkBingoLines(testCard, calledNumbers);
 
