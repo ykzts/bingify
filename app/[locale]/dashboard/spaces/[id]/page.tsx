@@ -1,5 +1,6 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { redirect } from "@/i18n/navigation";
 import { getSpace } from "@/lib/data/spaces";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
@@ -31,7 +32,7 @@ export default async function AdminSpacePage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}/login?redirect=/dashboard/spaces/${id}`);
+    redirect({ href: `/login?redirect=/dashboard/spaces/${id}`, locale });
   }
 
   // Fetch space with validated JSONB columns using DAL
@@ -42,7 +43,7 @@ export default async function AdminSpacePage({
   }
 
   // Check if current user is owner
-  const isOwner = space.owner_id === user.id;
+  const isOwner = space.owner_id === user?.id;
 
   // Get current participant count
   const { data: participantsData } = await supabase

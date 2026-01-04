@@ -1,8 +1,9 @@
 "use client";
 
 import { Settings } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +38,15 @@ export function SpaceSettingsSheet({
   systemMaxParticipants,
 }: Props) {
   const t = useTranslations("AdminSpace");
+  const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
+
+  // Open settings sheet if ?open=settings query parameter is present
+  useEffect(() => {
+    if (searchParams.get("open") === "settings") {
+      setOpen(true);
+    }
+  }, [searchParams]);
 
   const handleSuccess = (message: string) => {
     setOpen(false);

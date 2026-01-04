@@ -1,9 +1,9 @@
 import { format } from "date-fns";
 import { FileText, Users } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SectionHeader } from "@/components/section-header";
+import { Link } from "@/i18n/navigation";
 import { CreateSpaceForm } from "./_components/create-space-form";
 import { SpaceActionsDropdown } from "./_components/space-actions-dropdown";
 import { StatusBadge } from "./_components/status-badge";
@@ -104,7 +104,7 @@ export default async function DashboardPage({
             </div>
             <Link
               className="w-full rounded border border-green-200 bg-white px-4 py-2 font-bold text-green-700 text-sm shadow-sm transition hover:bg-green-100 sm:w-auto"
-              href={`/${locale}/dashboard/spaces/${activeSpace.id}`}
+              href={`/dashboard/spaces/${activeSpace.id}`}
             >
               {t("activeSpaceBackToAdmin")}
             </Link>
@@ -143,7 +143,10 @@ export default async function DashboardPage({
                     key={space.id}
                   >
                     <td className="px-4 py-3 font-medium text-gray-900">
-                      <div className="flex flex-col gap-1">
+                      <Link
+                        className="flex flex-col gap-1 transition-colors hover:text-purple-600"
+                        href={`/dashboard/spaces/${space.id}`}
+                      >
                         <div className="flex items-center gap-2">
                           {space.share_key}
                           {space.is_owner === false && (
@@ -161,7 +164,7 @@ export default async function DashboardPage({
                               })}
                             </p>
                           )}
-                      </div>
+                      </Link>
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge

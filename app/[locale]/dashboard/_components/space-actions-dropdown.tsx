@@ -2,6 +2,7 @@
 
 import {
   Copy,
+  DoorClosed,
   ExternalLink,
   MoreHorizontal,
   RefreshCw,
@@ -32,6 +33,7 @@ import { useRouter } from "@/i18n/navigation";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import type { UserSpace } from "../_lib/actions";
 import { deleteSpace } from "../_lib/actions";
+import { closeSpace } from "../spaces/[id]/_lib/actions";
 
 interface SpaceActionsDropdownProps {
   space: UserSpace;
@@ -42,9 +44,11 @@ export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [showCloseDialog, setShowCloseDialog] = useState(false);
 
   const handleManage = () => {
-    router.push(`/dashboard/spaces/${space.id}`);
+    router.push(`/dashboard/spaces/${space.id}?open=settings`);
   };
 
   const handleCopyLink = async () => {
@@ -61,6 +65,25 @@ export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
   const handleOpenPublicView = () => {
     const url = `/@${space.share_key}`;
     window.open(url, "_blank");
+  };
+
+  const handleClose = async () => {
+    setIsClosing(true);
+    try {
+      const result = await closeSpace(space.id);
+      if (result.success) {
+        toast.success(t("closeSuccess"));
+        router.refresh();
+        setShowCloseDialog(false);
+      } else {
+        toast.error(result.error || t("closeError"));
+      }
+    } catch (error) {
+      console.error("Close error:", error);
+      toast.error(t("closeError"));
+    } finally {
+      setIsClosing(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -90,6 +113,7 @@ export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
   const isActive = space.status === "active";
   const isDraft = space.status === "draft";
   const isClosed = space.status === "closed";
+  const isOwner = space.is_owner !== false; // Default to true if undefined for backward compatibility
 
   return (
     <>
@@ -126,16 +150,53 @@ export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
 
           <DropdownMenuSeparator />
 
-          <DropdownMenuItem
-            className="text-red-600 focus:text-red-600"
-            onClick={() => setShowDeleteDialog(true)}
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            {t("deleteAction")}
-          </DropdownMenuItem>
+          {/* Show close action for non-closed spaces */}
+          {!isClosed && (
+            <DropdownMenuItem
+              className="text-red-600 focus:text-red-600"
+              onClick={() => setShowCloseDialog(true)}
+            >
+              <DoorClosed className="mr-2 h-4 w-4" />
+              {t("closeAction")}
+            </DropdownMenuItem>
+          )}
+
+          {/* Only show delete action for owners */}
+          {isOwner && (
+            <DropdownMenuItem
+              className="text-red-600 focus:text-red-600"
+              onClick={() => setShowDeleteDialog(true)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {t("deleteAction")}
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Close Space Dialog */}
+      <AlertDialog onOpenChange={setShowCloseDialog} open={showCloseDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("closeAction")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("closeConfirm")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isClosing}>
+              {t("cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              disabled={isClosing}
+              onClick={handleClose}
+            >
+              {isClosing ? t("closeInProgress") : t("closeAction")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Space Dialog */}
       <AlertDialog onOpenChange={setShowDeleteDialog} open={showDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
