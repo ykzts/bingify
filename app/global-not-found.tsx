@@ -3,6 +3,7 @@ import { FileQuestion } from "lucide-react";
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import { headers } from "next/headers";
+import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import {
@@ -67,6 +68,7 @@ function detectLocaleFromHeaders(headersList: Headers): string {
 }
 
 export default async function GlobalNotFound() {
+  await connection();
   const headersList = await headers();
   const locale = detectLocaleFromHeaders(headersList);
   const t = await getTranslations({ locale, namespace: "NotFound" });

@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { connection } from "next/server";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { ScreenInitializer } from "@/components/providers/screen-initializer";
@@ -15,6 +16,7 @@ import { ScreenDisplay } from "./_components/screen-display";
 export default async function ScreenViewPage({
   params,
 }: PageProps<"/screen/[token]">) {
+  await connection();
   const { token } = await params;
 
   const supabase = await createClient();
