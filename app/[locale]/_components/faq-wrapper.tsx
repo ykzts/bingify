@@ -1,12 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public-server";
 import { Faq } from "./faq";
 
 async function FaqData() {
   const tFaq = await getTranslations("Faq");
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data: systemSettings, error } = await supabase
     .from("system_settings")
     .select("max_participants_per_space")
