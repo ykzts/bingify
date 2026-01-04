@@ -350,6 +350,7 @@
     "selectLanguage": "Select language"
   },
   "Login": {
+    "closeEmailForm": "Close Email Form",
     "description": "Sign in to host games or manage your account.",
     "descriptionSpace": "Sign in to join this bingo space and participate in the game.",
     "emailButton": "Sign in with Email",
@@ -364,10 +365,10 @@
     "metaDescription": "Sign in to Bingify to create bingo spaces, host events, and manage your account.",
     "metaTitle": "Sign in",
     "orDivider": "or",
+    "signInWithProvider": "Sign in with {provider}",
     "title": "Sign in to Bingify",
     "titleSpace": "Sign in to Join Space",
-    "twitchButton": "Sign in with Twitch",
-    "signInWithProvider": "Sign in with {provider}"
+    "twitchButton": "Sign in with Twitch"
   },
   "Metadata": {
     "description": "Experience a new kind of bingo that brings everyone together in real-time. Sign in with OAuth and get started easily.",

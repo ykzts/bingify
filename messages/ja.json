@@ -350,6 +350,7 @@
     "selectLanguage": "言語を選択"
   },
   "Login": {
+    "closeEmailForm": "メールフォームを閉じる",
     "description": "ゲームのホストやアカウント管理のためにログインしてください。",
     "descriptionSpace": "ログインして、このビンゴスペースに参加しましょう。",
     "emailButton": "メールアドレスでログイン",
@@ -364,10 +365,10 @@
     "metaDescription": "Bingifyにログインして、ビンゴスペースの作成、イベントの主催、アカウントの管理を行いましょう。",
     "metaTitle": "ログイン",
     "orDivider": "または",
+    "signInWithProvider": "{provider}でログイン",
     "title": "Bingifyにログイン",
     "titleSpace": "スペースに参加",
-    "twitchButton": "Twitchでログイン",
-    "signInWithProvider": "{provider}でログイン"
+    "twitchButton": "Twitchでログイン"
   },
   "Metadata": {
     "description": "リアルタイムで盛り上がる、新しいビンゴ体験。OAuth ログインで簡単に始められます。",
