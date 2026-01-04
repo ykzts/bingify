@@ -48,20 +48,22 @@ pnpm dev
   - これらの型は `pnpm typegen` で自動生成される（`.next/types/routes.d.ts`）。
   - `params` と `searchParams` は `Promise` として扱い、`await` で解決する。
   - 例:
+
     ```tsx
     // Layout
-    export default async function Layout(props: LayoutProps<'/[locale]'>) {
-      const { locale } = await props.params
-      return <div>{props.children}</div>
+    export default async function Layout(props: LayoutProps<"/[locale]">) {
+      const { locale } = await props.params;
+      return <div>{props.children}</div>;
     }
 
     // Page
-    export default async function Page(props: PageProps<'/blog/[slug]'>) {
-      const { slug } = await props.params
-      const query = await props.searchParams
-      return <h1>Blog Post: {slug}</h1>
+    export default async function Page(props: PageProps<"/blog/[slug]">) {
+      const { slug } = await props.params;
+      const query = await props.searchParams;
+      return <h1>Blog Post: {slug}</h1>;
     }
     ```
+
 - **エラー・成功フィードバックの統一** (#267):
   - **エラー表示**: shadcn/ui `Alert` コンポーネント（`destructive` variant）+ `AlertCircle` アイコン
   - **成功通知**: Sonner `toast.success()` を使用（フォーム内メッセージは廃止）
@@ -85,12 +87,14 @@ pnpm dev
 - サポート言語: 英語 (en) / 日本語 (ja)。
 - メッセージファイル: `messages/en.json`, `messages/ja.json`。
 - 使用方法:
+
   ```tsx
   import { useTranslations } from "next-intl";
-  
+
   const t = useTranslations("namespace");
   return <div>{t("key")}</div>;
   ```
+
 - 新規テキスト追加時は両言語のメッセージファイルを更新すること。
 
 ## テスト
@@ -109,6 +113,7 @@ pnpm dev
 - 最新のベストプラクティスとコード例を取得できる。
 
 **例:**
+
 - 「Supabase で RLS を設定したい」→ Context7 で Supabase ドキュメントを検索
 - 「TanStack Form のフィールドバリデーション」→ Context7 で API リファレンスを取得
 - 「Next.js の新機能」→ Context7 で最新ドキュメントを参照

@@ -228,13 +228,13 @@ pnpm supabase:typegen
 ### 型定義の使用例
 
 ```typescript
-import type { Database, Tables } from '@/types/supabase';
+import type { Database, Tables } from "@/types/supabase";
 
 // テーブルの Row 型を取得
-type Space = Tables<'spaces'>;
-type BingoCard = Tables<'bingo_cards'>;
+type Space = Tables<"spaces">;
+type BingoCard = Tables<"bingo_cards">;
 
 // Database 型を使用して Supabase クライアントを型付け
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 const supabase = createClient<Database>(url, key);
 ```
