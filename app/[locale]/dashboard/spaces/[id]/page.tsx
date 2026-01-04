@@ -32,7 +32,7 @@ export default async function AdminSpacePage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/login?redirect=/dashboard/spaces/${id}`);
+    redirect({ href: `/login?redirect=/dashboard/spaces/${id}`, locale });
   }
 
   // Fetch space with validated JSONB columns using DAL
@@ -43,7 +43,7 @@ export default async function AdminSpacePage({
   }
 
   // Check if current user is owner
-  const isOwner = space.owner_id === user.id;
+  const isOwner = space.owner_id === user?.id;
 
   // Get current participant count
   const { data: participantsData } = await supabase
