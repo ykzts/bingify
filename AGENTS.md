@@ -19,6 +19,31 @@
 - コンポーネントは `@/components/ui` に配置。
 - メインアクションのボタンには `primary` バリアント（デフォルト）を使用し、ブランド一貫性を保つ。
 
+### Shadcn/ui コンポーネント管理
+
+**重要: `@/components/ui` ディレクトリには shadcn/ui が生成したファイル以外を配置しないこと。**
+
+- `@/components/ui` は shadcn/ui 専用のディレクトリです。
+- カスタムコンポーネントは `@/components` 直下に配置してください。
+- shadcn/ui コンポーネントの追加・更新は必ず以下のコマンドを使用：
+
+```bash
+# 新規追加
+pnpm dlx shadcn@latest add <component-name>
+
+# 既存コンポーネントの更新（上書き）
+pnpm dlx shadcn@latest add --yes --overwrite <component-name>
+
+# すべてのコンポーネントを最新版に更新
+for file in components/ui/*.tsx; do
+  component=$(basename "$file" .tsx)
+  pnpm dlx shadcn@latest add --yes --overwrite "$component"
+done
+```
+
+- shadcn/ui コンポーネントを手動で編集しないこと。
+- 変更が必要な場合は、shadcn/ui の最新版を取得してから対応すること。
+
 ## 環境 / サービス
 
 - Supabase: `lib/supabase/server.ts` / `client.ts` を利用。
