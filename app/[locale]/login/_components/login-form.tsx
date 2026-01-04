@@ -7,6 +7,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { OAuthButton } from "@/components/oauth-button";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Collapsible,
   CollapsibleContent,
@@ -220,10 +221,28 @@ export function LoginForm({ providers }: Props) {
           <CollapsibleTrigger asChild>
             <Button className="w-full" type="button" variant="ghost">
               <Mail className="h-4 w-4" />
-              {t("emailButton")}
+              {showEmailForm ? t("closeEmailForm") : t("emailButton")}
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-4 pt-4">
+          <CollapsibleContent className="pt-4">
+            <Card>
+              <CardContent className="pt-6">
+                <EmailLoginForm
+                  email={email}
+                  emailError={emailError}
+                  emailSuccess={emailSuccess}
+                  isEmailSending={isEmailSending}
+                  onEmailChange={setEmail}
+                  onSubmit={handleMagicLinkLogin}
+                  t={t}
+                />
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
+      ) : (
+        <Card>
+          <CardContent className="pt-6">
             <EmailLoginForm
               email={email}
               emailError={emailError}
@@ -233,18 +252,8 @@ export function LoginForm({ providers }: Props) {
               onSubmit={handleMagicLinkLogin}
               t={t}
             />
-          </CollapsibleContent>
-        </Collapsible>
-      ) : (
-        <EmailLoginForm
-          email={email}
-          emailError={emailError}
-          emailSuccess={emailSuccess}
-          isEmailSending={isEmailSending}
-          onEmailChange={setEmail}
-          onSubmit={handleMagicLinkLogin}
-          t={t}
-        />
+          </CardContent>
+        </Card>
       )}
     </div>
   );
