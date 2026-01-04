@@ -1,5 +1,6 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { redirect } from "@/i18n/navigation";
 import { getSpace } from "@/lib/data/spaces";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
@@ -31,7 +32,7 @@ export default async function AdminSpacePage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}/login?redirect=/dashboard/spaces/${id}`);
+    redirect(`/login?redirect=/dashboard/spaces/${id}`);
   }
 
   // Fetch space with validated JSONB columns using DAL

@@ -104,7 +104,7 @@ export default async function DashboardPage({
             </div>
             <Link
               className="w-full rounded border border-green-200 bg-white px-4 py-2 font-bold text-green-700 text-sm shadow-sm transition hover:bg-green-100 sm:w-auto"
-              href={`/${locale}/dashboard/spaces/${activeSpace.id}`}
+              href={`/dashboard/spaces/${activeSpace.id}`}
             >
               {t("activeSpaceBackToAdmin")}
             </Link>
