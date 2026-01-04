@@ -1,8 +1,9 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -20,11 +21,13 @@ import type { ResetGameState } from "../_lib/actions";
 import { resetGame } from "../_lib/actions";
 
 interface ResetGameButtonProps {
+  onSuccess?: () => void;
   spaceId: string;
 }
 
-export function ResetGameButton({ spaceId }: ResetGameButtonProps) {
+export function ResetGameButton({ onSuccess, spaceId }: ResetGameButtonProps) {
   const t = useTranslations("AdminSpace");
+  const queryClient = useQueryClient();
   const [showConfirm, setShowConfirm] = useState(false);
 
   const [resetState, resetAction, isPending] = useActionState<
@@ -34,14 +37,24 @@ export function ResetGameButton({ spaceId }: ResetGameButtonProps) {
     success: false,
   });
 
+  // Use useEffectEvent to separate event logic from effect dependencies
+  const handleResetSuccess = useEffectEvent(() => {
+    toast.success(t("resetGameSuccess"), {
+      duration: 3000,
+    });
+    setShowConfirm(false);
+    // Invalidate the called numbers query to trigger immediate refetch
+    queryClient.invalidateQueries({
+      queryKey: ["called-numbers", spaceId],
+    });
+    onSuccess?.();
+  });
+
   useEffect(() => {
     if (resetState.success) {
-      toast.success(t("resetGameSuccess"), {
-        duration: 3000,
-      });
-      setShowConfirm(false);
+      handleResetSuccess();
     }
-  }, [resetState.success, t]);
+  }, [resetState.success]);
 
   return (
     <div>

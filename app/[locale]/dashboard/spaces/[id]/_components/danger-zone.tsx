@@ -5,10 +5,11 @@ import { CloseSpaceButton } from "./close-space-button";
 import { ResetGameButton } from "./reset-game-button";
 
 interface DangerZoneProps {
+  onResetSuccess?: () => void;
   spaceId: string;
 }
 
-export function DangerZone({ spaceId }: DangerZoneProps) {
+export function DangerZone({ onResetSuccess, spaceId }: DangerZoneProps) {
   const t = useTranslations("AdminSpace");
 
   return (
@@ -26,7 +27,7 @@ export function DangerZone({ spaceId }: DangerZoneProps) {
           <p className="mb-3 text-gray-700 text-xs">
             {t("resetGameDescription")}
           </p>
-          <ResetGameButton spaceId={spaceId} />
+          <ResetGameButton onSuccess={onResetSuccess} spaceId={spaceId} />
         </div>
 
         <div className="rounded-lg border border-red-200 bg-red-50 p-4">
