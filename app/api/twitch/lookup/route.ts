@@ -73,8 +73,8 @@ export async function POST(request: NextRequest) {
     const appAccessToken = await getAppAccessToken();
     if (!appAccessToken) {
       return NextResponse.json(
-        { error: "Failed to authenticate with Twitch API" },
-        { status: 500 }
+        { error: "Service temporarily unavailable" },
+        { status: 503 }
       );
     }
 
