@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
@@ -20,11 +21,13 @@ import type { ResetGameState } from "../_lib/actions";
 import { resetGame } from "../_lib/actions";
 
 interface ResetGameButtonProps {
+  onSuccess?: () => void;
   spaceId: string;
 }
 
-export function ResetGameButton({ spaceId }: ResetGameButtonProps) {
+export function ResetGameButton({ onSuccess, spaceId }: ResetGameButtonProps) {
   const t = useTranslations("AdminSpace");
+  const queryClient = useQueryClient();
   const [showConfirm, setShowConfirm] = useState(false);
 
   const [resetState, resetAction, isPending] = useActionState<
@@ -40,8 +43,13 @@ export function ResetGameButton({ spaceId }: ResetGameButtonProps) {
         duration: 3000,
       });
       setShowConfirm(false);
+      // Invalidate the called numbers query to trigger immediate refetch
+      queryClient.invalidateQueries({
+        queryKey: ["called-numbers", spaceId],
+      });
+      onSuccess?.();
     }
-  }, [resetState.success, t]);
+  }, [resetState.success, t, onSuccess, queryClient, spaceId]);
 
   return (
     <div>

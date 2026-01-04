@@ -91,7 +91,10 @@ export function SpaceSettingsSheet({
 
           {/* Danger Zone - Always visible for destructive actions */}
           <div className="border-red-200 border-t pt-8">
-            <DangerZone spaceId={space.id} />
+            <DangerZone
+              onResetSuccess={() => setOpen(false)}
+              spaceId={space.id}
+            />
           </div>
         </div>
       </SheetContent>
