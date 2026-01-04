@@ -37,7 +37,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
-import { cn, getErrorMessage } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { getErrorMessage } from "@/lib/utils/error-message";
 import {
   spaceSettingsFormOpts,
   spaceSettingsFormSchema,

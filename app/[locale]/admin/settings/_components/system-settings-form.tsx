@@ -28,7 +28,7 @@ import {
   type SystemSettings,
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage } from "@/lib/utils/error-message";
 import { updateSystemSettingsAction } from "../_lib/actions";
 import { systemSettingsFormOpts } from "../_lib/form-options";
 

@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { escapeHtml } from "./utils";
+import { escapeHtml } from "@/lib/utils/escape-html";
 
 /**
  * Create SMTP transporter for sending emails
