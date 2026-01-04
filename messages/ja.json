@@ -496,7 +496,15 @@
     "youtubeChannelIdLabel": "YouTubeチャンネルID",
     "youtubeMember": "メンバーのみ",
     "youtubeRequirementLabel": "YouTube要件",
-    "youtubeSubscriber": "チャンネル登録者のみ"
+    "youtubeSubscriber": "チャンネル登録者のみ",
+    "errorYoutubeDisabled": "YouTube認証は現在システム設定で無効になっています",
+    "errorYoutubeSubscriberDisabled": "YouTubeチャンネル登録者要件は現在システム設定で無効になっています",
+    "errorTwitchDisabled": "Twitch認証は現在システム設定で無効になっています",
+    "errorTwitchFollowerDisabled": "Twitchフォロワー要件は現在システム設定で無効になっています",
+    "errorTwitchSubscriberDisabled": "Twitchサブスクライバー要件は現在システム設定で無効になっています",
+    "errorEmailDisabled": "メール認証は現在システム設定で無効になっています",
+    "warningRequirementDisabled": "現在選択されている要件種別がシステム設定で無効になっています。有効な要件を選択し直してください。",
+    "warning": "警告"
   },
   "Support": {
     "description": "Bingifyはボランティアによって運営されているオープンソースプロジェクトです。あなたのサポートが、ホスティング費用や継続的な開発を支えます。",

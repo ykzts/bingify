@@ -184,7 +184,9 @@ export function SpaceSettingsForm({
   });
 
   const handleUpdateError = useEffectEvent((error: string) => {
-    setServerError(error);
+    // Translate error keys if they start with "error" prefix (our i18n keys)
+    const translatedError = error.startsWith("error") ? t(error) : error;
+    setServerError(translatedError);
   });
 
   const handlePublishSuccess = useEffectEvent(() => {
@@ -193,7 +195,9 @@ export function SpaceSettingsForm({
   });
 
   const handlePublishError = useEffectEvent((error: string) => {
-    setServerError(error);
+    // Translate error keys if they start with "error" prefix (our i18n keys)
+    const translatedError = error.startsWith("error") ? t(error) : error;
+    setServerError(translatedError);
   });
 
   // Handle update success/error
@@ -259,6 +263,32 @@ export function SpaceSettingsForm({
   const showTwitchSubscriber =
     features.gatekeeper.twitch.enabled &&
     features.gatekeeper.twitch.subscriber.enabled;
+
+  // Check if currently selected requirement is disabled
+  const isCurrentRequirementDisabled =
+    (gatekeeperMode === "social" &&
+      socialPlatform === "youtube" &&
+      youtubeRequirement === "subscriber" &&
+      !showYoutubeSubscriber) ||
+    (gatekeeperMode === "social" &&
+      socialPlatform === "twitch" &&
+      twitchRequirement === "follower" &&
+      !showTwitchFollower) ||
+    (gatekeeperMode === "social" &&
+      socialPlatform === "twitch" &&
+      twitchRequirement === "subscriber" &&
+      !showTwitchSubscriber);
+
+  // Auto-reset to "none" if current requirement is disabled
+  useEffect(() => {
+    if (isCurrentRequirementDisabled) {
+      if (socialPlatform === "youtube") {
+        form.setFieldValue("youtube_requirement", "none");
+      } else if (socialPlatform === "twitch") {
+        form.setFieldValue("twitch_requirement", "none");
+      }
+    }
+  }, [isCurrentRequirementDisabled, socialPlatform, form]);
 
   // Calculate effective gatekeeper mode (fallback to "none" if current mode is not available)
   const effectiveGatekeeperMode =
@@ -767,6 +797,17 @@ export function SpaceSettingsForm({
             )}
           </form.Field>
         </div>
+
+        {/* Warning for disabled requirement */}
+        {isCurrentRequirementDisabled && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>{t("warning")}</AlertTitle>
+            <AlertDescription>
+              {t("warningRequirementDisabled")}
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Server Error Display */}
         {serverError && (

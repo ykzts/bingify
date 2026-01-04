@@ -496,7 +496,15 @@
     "youtubeChannelIdLabel": "YouTube Channel ID",
     "youtubeMember": "Members only",
     "youtubeRequirementLabel": "YouTube Requirement",
-    "youtubeSubscriber": "Subscribers only"
+    "youtubeSubscriber": "Subscribers only",
+    "errorYoutubeDisabled": "YouTube authentication is currently disabled in system settings",
+    "errorYoutubeSubscriberDisabled": "YouTube subscriber requirement is currently disabled in system settings",
+    "errorTwitchDisabled": "Twitch authentication is currently disabled in system settings",
+    "errorTwitchFollowerDisabled": "Twitch follower requirement is currently disabled in system settings",
+    "errorTwitchSubscriberDisabled": "Twitch subscriber requirement is currently disabled in system settings",
+    "errorEmailDisabled": "Email authentication is currently disabled in system settings",
+    "warningRequirementDisabled": "The currently selected requirement type is disabled in system settings. Please select a valid requirement.",
+    "warning": "Warning"
   },
   "Support": {
     "description": "Bingify is an open-source project maintained by volunteers. Your support helps cover hosting costs and enables continued development.",

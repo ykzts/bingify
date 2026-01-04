@@ -190,7 +190,7 @@ export async function updateSpaceSettings(
         if (!gatekeeper.youtube?.enabled) {
           return {
             ...initialFormState,
-            errors: ["YouTube認証は現在システム設定で無効になっています"],
+            errors: ["errorYoutubeDisabled"],
           };
         }
         if (
@@ -199,9 +199,7 @@ export async function updateSpaceSettings(
         ) {
           return {
             ...initialFormState,
-            errors: [
-              "YouTubeチャンネル登録者要件は現在システム設定で無効になっています",
-            ],
+            errors: ["errorYoutubeSubscriberDisabled"],
           };
         }
       }
@@ -211,7 +209,7 @@ export async function updateSpaceSettings(
         if (!gatekeeper.twitch?.enabled) {
           return {
             ...initialFormState,
-            errors: ["Twitch認証は現在システム設定で無効になっています"],
+            errors: ["errorTwitchDisabled"],
           };
         }
         if (
@@ -220,9 +218,7 @@ export async function updateSpaceSettings(
         ) {
           return {
             ...initialFormState,
-            errors: [
-              "Twitchフォロワー要件は現在システム設定で無効になっています",
-            ],
+            errors: ["errorTwitchFollowerDisabled"],
           };
         }
         if (
@@ -231,9 +227,7 @@ export async function updateSpaceSettings(
         ) {
           return {
             ...initialFormState,
-            errors: [
-              "Twitchサブスクライバー要件は現在システム設定で無効になっています",
-            ],
+            errors: ["errorTwitchSubscriberDisabled"],
           };
         }
       }
@@ -247,7 +241,7 @@ export async function updateSpaceSettings(
     ) {
       return {
         ...initialFormState,
-        errors: ["メール認証は現在システム設定で無効になっています"],
+        errors: ["errorEmailDisabled"],
       };
     }
 
