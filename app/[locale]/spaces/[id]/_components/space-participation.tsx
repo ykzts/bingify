@@ -103,6 +103,7 @@ export function SpaceParticipation({
   const [hasYouTubeToken, setHasYouTubeToken] = useState(false);
   const [hasTwitchToken, setHasTwitchToken] = useState(false);
   const [waitingForOAuth, setWaitingForOAuth] = useState(false);
+  const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
 
   // Use queries for participant data
   const {
@@ -166,56 +167,151 @@ export function SpaceParticipation({
     };
   }, [waitingForOAuth]);
 
+  // Helper function to check OAuth completion for a provider
+  const checkProviderOAuth = useCallback(
+    async (
+      storageKey: string,
+      setTokenFn: (value: boolean) => void
+    ): Promise<boolean> => {
+      const oauthComplete = sessionStorage.getItem(storageKey);
+
+      if (!oauthComplete) {
+        setTokenFn(false);
+        return false;
+      }
+
+      // Verify that the session actually has a provider_token
+      // This prevents a race condition where the flag exists but session isn't ready yet
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session?.provider_token) {
+        // Session is ready with provider_token, clear the flag and proceed
+        sessionStorage.removeItem(storageKey);
+        setTokenFn(true);
+        return true;
+      }
+
+      // Session not ready yet, keep the flag and check again
+      console.warn(
+        "OAuth complete flag found but session not ready yet, will retry"
+      );
+      return false;
+    },
+    []
+  );
+
   // Check OAuth completion flags in sessionStorage for YouTube and Twitch
   const checkOAuthTokens = useCallback(
-    (joined: boolean) => {
-      // Check for YouTube token if YouTube verification is required
-      // Note: We cannot reliably determine if session.provider_token belongs to
-      // the Google identity, as Supabase's provider_token is always from the most
-      // recent OAuth provider and doesn't include metadata about which provider it's from.
-      //
-      // To prevent OAuth redirect loops, we use sessionStorage to track when OAuth
-      // has just completed. If the flag exists, we know the user just authenticated
-      // and can proceed with joining.
-      if (requiresYouTube && !joined) {
-        const youtubeOAuthComplete = sessionStorage.getItem(
-          YOUTUBE_OAUTH_COMPLETE_KEY
-        );
+    async (joined: boolean) => {
+      if (joined) {
+        return;
+      }
 
-        if (youtubeOAuthComplete) {
-          // User just completed OAuth, clear the flag and set token as valid
-          sessionStorage.removeItem(YOUTUBE_OAUTH_COMPLETE_KEY);
-          setHasYouTubeToken(true);
-        } else {
-          // No OAuth completion detected, require verification
-          setHasYouTubeToken(false);
+      let shouldTriggerJoin = false;
+
+      // Check for YouTube token if YouTube verification is required
+      if (requiresYouTube) {
+        const hasToken = await checkProviderOAuth(
+          YOUTUBE_OAUTH_COMPLETE_KEY,
+          setHasYouTubeToken
+        );
+        if (hasToken) {
+          shouldTriggerJoin = true;
         }
       }
 
       // Check for Twitch token if Twitch verification is required
-      // Same logic as YouTube: use sessionStorage to track OAuth completion
-      if (requiresTwitch && !joined) {
-        const twitchOAuthComplete = sessionStorage.getItem(
-          TWITCH_OAUTH_COMPLETE_KEY
+      if (requiresTwitch) {
+        const hasToken = await checkProviderOAuth(
+          TWITCH_OAUTH_COMPLETE_KEY,
+          setHasTwitchToken
         );
-
-        if (twitchOAuthComplete) {
-          // User just completed OAuth, clear the flag and set token as valid
-          sessionStorage.removeItem(TWITCH_OAUTH_COMPLETE_KEY);
-          setHasTwitchToken(true);
-        } else {
-          // No OAuth completion detected, require verification
-          setHasTwitchToken(false);
+        if (hasToken) {
+          shouldTriggerJoin = true;
         }
       }
+
+      if (shouldTriggerJoin) {
+        setShouldAutoJoin(true);
+      }
     },
-    [requiresYouTube, requiresTwitch]
+    [requiresYouTube, requiresTwitch, checkProviderOAuth]
   );
+
+  const handleJoin = useCallback(async () => {
+    setIsJoining(true);
+    setError(null);
+
+    // Get session with provider tokens
+    // Note: provider_token will be from the most recent OAuth provider used.
+    const supabase = createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    // Pass credentials based on which provider is required (YouTube OR Twitch, not both)
+    // This simplifies token management since Supabase only stores one provider_token at a time
+    let result: JoinSpaceState;
+
+    if (requiresYouTube) {
+      // YouTube verification: pass only YouTube token (Google OAuth with YouTube scope)
+      result = await joinSpace(
+        spaceId,
+        session?.provider_token ?? undefined,
+        undefined,
+        undefined
+      );
+    } else if (requiresTwitch) {
+      // Twitch verification: pass only Twitch token and user ID
+      const twitchIdentity = session?.user?.identities?.find(
+        (identity) => identity.provider === "twitch"
+      );
+      const twitchUserId = twitchIdentity?.id;
+
+      result = await joinSpace(
+        spaceId,
+        undefined,
+        session?.provider_token ?? undefined,
+        twitchUserId
+      );
+    } else {
+      // No special verification required: regular join
+      result = await joinSpace(spaceId, undefined, undefined, undefined);
+    }
+
+    if (result.success) {
+      await Promise.all([refetchJoined(), refetchInfo()]);
+      router.refresh();
+    } else {
+      setError(result.errorKey ? t(result.errorKey) : t("errorJoinFailed"));
+    }
+
+    setIsJoining(false);
+  }, [
+    requiresYouTube,
+    requiresTwitch,
+    spaceId,
+    refetchJoined,
+    refetchInfo,
+    router,
+    t,
+  ]);
 
   // Check OAuth tokens when hasJoined changes
   useEffect(() => {
     checkOAuthTokens(hasJoined);
   }, [hasJoined, checkOAuthTokens]);
+
+  // Auto-join after OAuth completion
+  useEffect(() => {
+    if (shouldAutoJoin && !hasJoined && !isJoining) {
+      setShouldAutoJoin(false);
+      handleJoin();
+    }
+  }, [shouldAutoJoin, hasJoined, isJoining, handleJoin]);
 
   const handleYouTubeVerify = async () => {
     setIsJoining(true);
@@ -297,57 +393,6 @@ export function SpaceParticipation({
       setError(t("errorTwitchVerificationFailed"));
       setIsJoining(false);
     }
-  };
-
-  const handleJoin = async () => {
-    setIsJoining(true);
-    setError(null);
-
-    // Get session with provider tokens
-    // Note: provider_token will be from the most recent OAuth provider used.
-    const supabase = createClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    // Pass credentials based on which provider is required (YouTube OR Twitch, not both)
-    // This simplifies token management since Supabase only stores one provider_token at a time
-    let result: JoinSpaceState;
-
-    if (requiresYouTube) {
-      // YouTube verification: pass only YouTube token (Google OAuth with YouTube scope)
-      result = await joinSpace(
-        spaceId,
-        session?.provider_token ?? undefined,
-        undefined,
-        undefined
-      );
-    } else if (requiresTwitch) {
-      // Twitch verification: pass only Twitch token and user ID
-      const twitchIdentity = session?.user?.identities?.find(
-        (identity) => identity.provider === "twitch"
-      );
-      const twitchUserId = twitchIdentity?.id;
-
-      result = await joinSpace(
-        spaceId,
-        undefined,
-        session?.provider_token ?? undefined,
-        twitchUserId
-      );
-    } else {
-      // No special verification required: regular join
-      result = await joinSpace(spaceId, undefined, undefined, undefined);
-    }
-
-    if (result.success) {
-      await Promise.all([refetchJoined(), refetchInfo()]);
-      router.refresh();
-    } else {
-      setError(result.errorKey ? t(result.errorKey) : t("errorJoinFailed"));
-    }
-
-    setIsJoining(false);
   };
 
   const handleLeave = async () => {
