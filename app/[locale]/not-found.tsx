@@ -8,7 +8,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty";
+} from "@/components/empty";
 import { Link } from "@/i18n/navigation";
 
 export default async function NotFound() {

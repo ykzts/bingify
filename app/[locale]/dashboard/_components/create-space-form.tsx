@@ -22,14 +22,14 @@ import { useDebounce } from "use-debounce";
 import { FormErrors } from "@/components/form-errors";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field, FieldLabel } from "@/components/field";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
   InputGroupText,
-} from "@/components/ui/input-group";
+} from "@/components/input-group";
 import { getErrorMessage } from "@/lib/utils";
 import { generateRandomKey } from "@/lib/utils/random-key";
 import { getAbsoluteUrl } from "@/lib/utils/url";

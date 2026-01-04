@@ -21,7 +21,7 @@ import {
   FieldLabel,
   FieldLegend,
   FieldSet,
-} from "@/components/ui/field";
+} from "@/components/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
