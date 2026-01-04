@@ -31,6 +31,7 @@ describe("getSystemSettings", () => {
           },
           youtube: {
             enabled: true,
+            member: { enabled: true },
             subscriber: { enabled: true },
           },
         },
@@ -67,6 +68,7 @@ describe("getSystemSettings", () => {
           },
           youtube: {
             enabled: true,
+            member: { enabled: true },
             subscriber: { enabled: true },
           },
         },
@@ -131,9 +133,10 @@ describe("getSystemSettings", () => {
           subscriber: { enabled: true },
         },
         youtube: {
-          enabled: true,
-          subscriber: { enabled: true },
-        },
+            enabled: true,
+            member: { enabled: true },
+            subscriber: { enabled: true },
+          },
       },
     });
   });
@@ -151,6 +154,7 @@ describe("getSystemSettings", () => {
           },
           youtube: {
             enabled: true,
+            member: { enabled: true },
             subscriber: { enabled: true },
           },
         },

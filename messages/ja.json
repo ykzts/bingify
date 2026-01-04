@@ -126,6 +126,7 @@
     "userSettingsTitle": "ユーザー設定",
     "warningInvalidFields": "一部の設定値が不正なため、デフォルト値を使用しています",
     "warningInvalidFieldsDescription": "次のフィールドに問題がありました: {fields}。設定を保存すると、表示されている値で更新されます。",
+    "youtubeMemberLabel": "YouTubeメンバー要件",
     "youtubeSubscriberLabel": "YouTubeチャンネル登録者要件"
   },
   "AdminSpace": {
@@ -467,6 +468,7 @@
     "errorTwitchFollowerDisabled": "Twitchフォロワー要件は現在システム設定で無効になっています",
     "errorTwitchSubscriberDisabled": "Twitchサブスクライバー要件は現在システム設定で無効になっています",
     "errorYoutubeDisabled": "YouTube認証は現在システム設定で無効になっています",
+    "errorYoutubeMemberDisabled": "YouTubeメンバー要件は現在システム設定で無効になっています",
     "errorYoutubeSubscriberDisabled": "YouTubeチャンネル登録者要件は現在システム設定で無効になっています",
     "gatekeeperModeEmail": "メールアドレス制限",
     "gatekeeperModeNone": "制限なし",

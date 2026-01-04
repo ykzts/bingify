@@ -19,6 +19,9 @@ export const systemSettingsFormSchema = z.object({
       }),
       youtube: z.object({
         enabled: z.boolean(),
+        member: z.object({
+          enabled: z.boolean(),
+        }),
         subscriber: z.object({
           enabled: z.boolean(),
         }),
@@ -62,6 +65,7 @@ export const systemSettingsFormOpts = formOptions({
         },
         youtube: {
           enabled: true,
+          member: { enabled: true },
           subscriber: { enabled: true },
         },
       },

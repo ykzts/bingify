@@ -338,6 +338,28 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             {/* YouTube Requirement Types */}
             {youtubeEnabled && (
               <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4">
+                <form.Field name="features.gatekeeper.youtube.member.enabled">
+                  {(field) => (
+                    <div className="flex items-center space-x-2">
+                      <input
+                        checked={field.state.value as boolean}
+                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        disabled={isSubmitting}
+                        id="features.gatekeeper.youtube.member.enabled"
+                        name={field.name}
+                        onChange={(e) => field.handleChange(e.target.checked)}
+                        type="checkbox"
+                      />
+                      <Label
+                        className="cursor-pointer font-normal text-sm"
+                        htmlFor="features.gatekeeper.youtube.member.enabled"
+                      >
+                        {t("youtubeMemberLabel")}
+                      </Label>
+                    </div>
+                  )}
+                </form.Field>
+
                 <form.Field name="features.gatekeeper.youtube.subscriber.enabled">
                   {(field) => (
                     <div className="flex items-center space-x-2">

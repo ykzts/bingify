@@ -126,6 +126,7 @@
     "userSettingsTitle": "User Settings",
     "warningInvalidFields": "Some settings are using default values due to invalid data",
     "warningInvalidFieldsDescription": "The following fields had issues: {fields}. Saving will update them with the displayed values.",
+    "youtubeMemberLabel": "YouTube Member Requirement",
     "youtubeSubscriberLabel": "YouTube Subscriber Requirement"
   },
   "AdminSpace": {
@@ -467,6 +468,7 @@
     "errorTwitchFollowerDisabled": "Twitch follower requirement is currently disabled in system settings",
     "errorTwitchSubscriberDisabled": "Twitch subscriber requirement is currently disabled in system settings",
     "errorYoutubeDisabled": "YouTube authentication is currently disabled in system settings",
+    "errorYoutubeMemberDisabled": "YouTube member requirement is currently disabled in system settings",
     "errorYoutubeSubscriberDisabled": "YouTube subscriber requirement is currently disabled in system settings",
     "gatekeeperModeEmail": "Email Restriction",
     "gatekeeperModeNone": "No Restriction",

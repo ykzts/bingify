@@ -18,6 +18,9 @@ export const systemFeaturesSchema = z.object({
     }),
     youtube: z.object({
       enabled: z.boolean(),
+      member: z.object({
+        enabled: z.boolean(),
+      }),
       subscriber: z.object({
         enabled: z.boolean(),
       }),
@@ -70,6 +73,7 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
       },
       youtube: {
         enabled: true,
+        member: { enabled: true },
         subscriber: { enabled: true },
       },
     },

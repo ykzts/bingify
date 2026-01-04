@@ -14,6 +14,9 @@ export interface SystemFeatures {
     };
     youtube: {
       enabled: boolean;
+      member: {
+        enabled: boolean;
+      };
       subscriber: {
         enabled: boolean;
       };

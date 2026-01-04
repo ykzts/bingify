@@ -77,6 +77,7 @@ export default async function AdminSpacePage({
             },
             youtube: {
               enabled: true,
+              member: { enabled: true },
               subscriber: { enabled: true },
             },
           },

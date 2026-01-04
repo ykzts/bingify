@@ -7,7 +7,11 @@ UPDATE system_settings
 SET features = jsonb_set(
   jsonb_set(
     jsonb_set(
-      features,
+      jsonb_set(
+        features,
+        '{gatekeeper,youtube,member}',
+        '{"enabled": true}'::jsonb
+      ),
       '{gatekeeper,youtube,subscriber}',
       '{"enabled": true}'::jsonb
     ),
@@ -19,7 +23,8 @@ SET features = jsonb_set(
 )
 WHERE id = 1
   AND (
-    features #> '{gatekeeper,youtube,subscriber}' IS NULL
+    features #> '{gatekeeper,youtube,member}' IS NULL
+    OR features #> '{gatekeeper,youtube,subscriber}' IS NULL
     OR features #> '{gatekeeper,twitch,follower}' IS NULL
     OR features #> '{gatekeeper,twitch,subscriber}' IS NULL
   );

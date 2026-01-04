@@ -194,6 +194,15 @@ export async function updateSpaceSettings(
           };
         }
         if (
+          youtubeRequirement === "member" &&
+          !gatekeeper.youtube?.member?.enabled
+        ) {
+          return {
+            ...initialFormState,
+            errors: ["errorYoutubeMemberDisabled"],
+          };
+        }
+        if (
           youtubeRequirement === "subscriber" &&
           !gatekeeper.youtube?.subscriber?.enabled
         ) {

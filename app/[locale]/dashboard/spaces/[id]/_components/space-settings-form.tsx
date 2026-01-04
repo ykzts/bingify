@@ -187,6 +187,7 @@ export function SpaceSettingsForm({
     // List of known error keys for translation
     const errorKeys = [
       "errorYoutubeDisabled",
+      "errorYoutubeMemberDisabled",
       "errorYoutubeSubscriberDisabled",
       "errorTwitchDisabled",
       "errorTwitchFollowerDisabled",
@@ -207,6 +208,7 @@ export function SpaceSettingsForm({
     // List of known error keys for translation
     const errorKeys = [
       "errorYoutubeDisabled",
+      "errorYoutubeMemberDisabled",
       "errorYoutubeSubscriberDisabled",
       "errorTwitchDisabled",
       "errorTwitchFollowerDisabled",
@@ -272,6 +274,9 @@ export function SpaceSettingsForm({
   const showSocialOption = showYoutubeOption || showTwitchOption;
 
   // Show requirement type options based on system settings
+  const showYoutubeMember =
+    features.gatekeeper.youtube.enabled &&
+    features.gatekeeper.youtube.member.enabled;
   const showYoutubeSubscriber =
     features.gatekeeper.youtube.enabled &&
     features.gatekeeper.youtube.subscriber.enabled;
@@ -284,6 +289,10 @@ export function SpaceSettingsForm({
 
   // Check if currently selected requirement is disabled
   const isCurrentRequirementDisabled =
+    (gatekeeperMode === "social" &&
+      socialPlatform === "youtube" &&
+      youtubeRequirement === "member" &&
+      !showYoutubeMember) ||
     (gatekeeperMode === "social" &&
       socialPlatform === "youtube" &&
       youtubeRequirement === "subscriber" &&
@@ -581,14 +590,16 @@ export function SpaceSettingsForm({
                                         <SelectItem value="none">
                                           {t("requirementNone")}
                                         </SelectItem>
+                                        {showYoutubeMember && (
+                                          <SelectItem value="member">
+                                            {t("youtubeMember")}
+                                          </SelectItem>
+                                        )}
                                         {showYoutubeSubscriber && (
                                           <SelectItem value="subscriber">
                                             {t("youtubeSubscriber")}
                                           </SelectItem>
                                         )}
-                                        <SelectItem value="member">
-                                          {t("youtubeMember")}
-                                        </SelectItem>
                                       </SelectContent>
                                     </Select>
                                   </FieldContent>
