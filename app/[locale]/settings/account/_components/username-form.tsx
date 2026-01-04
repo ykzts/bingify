@@ -21,7 +21,7 @@ import {
   FieldContent,
   FieldDescription,
   FieldLabel,
-} from "@/components/field";
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { usernameSchema } from "@/lib/schemas/user";
 import { updateUsernameAction } from "../_lib/actions";

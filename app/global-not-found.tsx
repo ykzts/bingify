@@ -12,7 +12,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/empty";
+} from "@/components/ui/empty";
 import { routing } from "@/i18n/routing";
 
 const nunito = Nunito({

@@ -17,7 +17,7 @@ import { useConfirm } from "@/components/providers/confirm-provider";
 import { SectionHeader } from "@/components/section-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Field, FieldLabel } from "@/components/field";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { SpaceAdmin } from "@/lib/types/space";
 import {

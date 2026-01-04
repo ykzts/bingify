@@ -22,7 +22,7 @@ import {
   FieldLabel,
   FieldLegend,
   FieldSet,
-} from "@/components/field";
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
