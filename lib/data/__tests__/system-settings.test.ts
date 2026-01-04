@@ -24,8 +24,16 @@ describe("getSystemSettings", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            member: { enabled: true },
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 1000,
@@ -53,8 +61,16 @@ describe("getSystemSettings", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            member: { enabled: true },
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: 1000,
@@ -111,8 +127,16 @@ describe("getSystemSettings", () => {
     expect(result.settings?.features).toEqual({
       gatekeeper: {
         email: { enabled: true },
-        twitch: { enabled: true },
-        youtube: { enabled: true },
+        twitch: {
+          enabled: true,
+          follower: { enabled: true },
+          subscriber: { enabled: true },
+        },
+        youtube: {
+          enabled: true,
+          member: { enabled: true },
+          subscriber: { enabled: true },
+        },
       },
     });
   });
@@ -123,8 +147,16 @@ describe("getSystemSettings", () => {
       features: {
         gatekeeper: {
           email: { enabled: true },
-          twitch: { enabled: true },
-          youtube: { enabled: true },
+          twitch: {
+            enabled: true,
+            follower: { enabled: true },
+            subscriber: { enabled: true },
+          },
+          youtube: {
+            enabled: true,
+            member: { enabled: true },
+            subscriber: { enabled: true },
+          },
         },
       },
       max_participants_per_space: -1, // Invalid negative value

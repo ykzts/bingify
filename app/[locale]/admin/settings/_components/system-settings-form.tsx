@@ -69,6 +69,13 @@ export function SystemSettingsForm({ initialSettings }: Props) {
     (formState) => formState.isSubmitting
   );
 
+  // Get platform-level enabled states from nested form values
+  const formValues = useStore(form.store, (state) => state.values);
+  const youtubeEnabled =
+    formValues.features?.gatekeeper?.youtube?.enabled ?? true;
+  const twitchEnabled =
+    formValues.features?.gatekeeper?.twitch?.enabled ?? true;
+
   // Use useEffectEvent to separate event logic from effect dependencies
   const handleUpdateSuccess = useEffectEvent(() => {
     toast.success(t("updateSuccess"));
@@ -304,50 +311,155 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             {t("gatekeeperFeaturesTitle")}
           </h5>
 
-          <form.Field name="features.gatekeeper.youtube.enabled">
-            {(field) => (
-              <div className="flex items-center space-x-2">
-                <input
-                  checked={field.state.value as boolean}
-                  className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                  disabled={isSubmitting}
-                  id="features.gatekeeper.youtube.enabled"
-                  name={field.name}
-                  onChange={(e) => field.handleChange(e.target.checked)}
-                  type="checkbox"
-                />
-                <Label
-                  className="cursor-pointer font-normal"
-                  htmlFor="features.gatekeeper.youtube.enabled"
-                >
-                  {t("gatekeeperYoutubeLabel")}
-                </Label>
+          {/* YouTube Platform */}
+          <div className="space-y-2">
+            <form.Field name="features.gatekeeper.youtube.enabled">
+              {(field) => (
+                <div className="flex items-center space-x-2">
+                  <input
+                    checked={field.state.value as boolean}
+                    className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    disabled={isSubmitting}
+                    id="features.gatekeeper.youtube.enabled"
+                    name={field.name}
+                    onChange={(e) => field.handleChange(e.target.checked)}
+                    type="checkbox"
+                  />
+                  <Label
+                    className="cursor-pointer font-normal"
+                    htmlFor="features.gatekeeper.youtube.enabled"
+                  >
+                    {t("gatekeeperYoutubeLabel")}
+                  </Label>
+                </div>
+              )}
+            </form.Field>
+
+            {/* YouTube Requirement Types */}
+            {youtubeEnabled && (
+              <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4">
+                <form.Field name="features.gatekeeper.youtube.member.enabled">
+                  {(field) => (
+                    <div className="flex items-center space-x-2">
+                      <input
+                        checked={field.state.value as boolean}
+                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        disabled={isSubmitting}
+                        id="features.gatekeeper.youtube.member.enabled"
+                        name={field.name}
+                        onChange={(e) => field.handleChange(e.target.checked)}
+                        type="checkbox"
+                      />
+                      <Label
+                        className="cursor-pointer font-normal text-sm"
+                        htmlFor="features.gatekeeper.youtube.member.enabled"
+                      >
+                        {t("youtubeMemberLabel")}
+                      </Label>
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="features.gatekeeper.youtube.subscriber.enabled">
+                  {(field) => (
+                    <div className="flex items-center space-x-2">
+                      <input
+                        checked={field.state.value as boolean}
+                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        disabled={isSubmitting}
+                        id="features.gatekeeper.youtube.subscriber.enabled"
+                        name={field.name}
+                        onChange={(e) => field.handleChange(e.target.checked)}
+                        type="checkbox"
+                      />
+                      <Label
+                        className="cursor-pointer font-normal text-sm"
+                        htmlFor="features.gatekeeper.youtube.subscriber.enabled"
+                      >
+                        {t("youtubeSubscriberLabel")}
+                      </Label>
+                    </div>
+                  )}
+                </form.Field>
               </div>
             )}
-          </form.Field>
+          </div>
 
-          <form.Field name="features.gatekeeper.twitch.enabled">
-            {(field) => (
-              <div className="flex items-center space-x-2">
-                <input
-                  checked={field.state.value as boolean}
-                  className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                  disabled={isSubmitting}
-                  id="features.gatekeeper.twitch.enabled"
-                  name={field.name}
-                  onChange={(e) => field.handleChange(e.target.checked)}
-                  type="checkbox"
-                />
-                <Label
-                  className="cursor-pointer font-normal"
-                  htmlFor="features.gatekeeper.twitch.enabled"
-                >
-                  {t("gatekeeperTwitchLabel")}
-                </Label>
+          {/* Twitch Platform */}
+          <div className="space-y-2">
+            <form.Field name="features.gatekeeper.twitch.enabled">
+              {(field) => (
+                <div className="flex items-center space-x-2">
+                  <input
+                    checked={field.state.value as boolean}
+                    className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    disabled={isSubmitting}
+                    id="features.gatekeeper.twitch.enabled"
+                    name={field.name}
+                    onChange={(e) => field.handleChange(e.target.checked)}
+                    type="checkbox"
+                  />
+                  <Label
+                    className="cursor-pointer font-normal"
+                    htmlFor="features.gatekeeper.twitch.enabled"
+                  >
+                    {t("gatekeeperTwitchLabel")}
+                  </Label>
+                </div>
+              )}
+            </form.Field>
+
+            {/* Twitch Requirement Types */}
+            {twitchEnabled && (
+              <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4">
+                <form.Field name="features.gatekeeper.twitch.follower.enabled">
+                  {(field) => (
+                    <div className="flex items-center space-x-2">
+                      <input
+                        checked={field.state.value as boolean}
+                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        disabled={isSubmitting}
+                        id="features.gatekeeper.twitch.follower.enabled"
+                        name={field.name}
+                        onChange={(e) => field.handleChange(e.target.checked)}
+                        type="checkbox"
+                      />
+                      <Label
+                        className="cursor-pointer font-normal text-sm"
+                        htmlFor="features.gatekeeper.twitch.follower.enabled"
+                      >
+                        {t("twitchFollowerLabel")}
+                      </Label>
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="features.gatekeeper.twitch.subscriber.enabled">
+                  {(field) => (
+                    <div className="flex items-center space-x-2">
+                      <input
+                        checked={field.state.value as boolean}
+                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        disabled={isSubmitting}
+                        id="features.gatekeeper.twitch.subscriber.enabled"
+                        name={field.name}
+                        onChange={(e) => field.handleChange(e.target.checked)}
+                        type="checkbox"
+                      />
+                      <Label
+                        className="cursor-pointer font-normal text-sm"
+                        htmlFor="features.gatekeeper.twitch.subscriber.enabled"
+                      >
+                        {t("twitchSubscriberLabel")}
+                      </Label>
+                    </div>
+                  )}
+                </form.Field>
               </div>
             )}
-          </form.Field>
+          </div>
 
+          {/* Email */}
           <form.Field name="features.gatekeeper.email.enabled">
             {(field) => (
               <div className="flex items-center space-x-2">
