@@ -1,18 +1,16 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { hasAdminUser } from "./_lib/actions";
 
-// Force dynamic rendering to ensure Supabase credentials are only required at runtime
-// This allows the build to succeed even when environment variables are not available
-export const dynamic = "force-dynamic";
-
 export default async function AdminLayout({
   children,
   params,
 }: LayoutProps<"/[locale]/admin">) {
+  await connection();
   const { locale } = await params;
   setRequestLocale(locale);
 
