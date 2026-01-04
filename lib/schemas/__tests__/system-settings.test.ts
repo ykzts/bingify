@@ -81,6 +81,102 @@ describe("systemFeaturesSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("should reject when platform is enabled but nested requirement field is missing", () => {
+    const result = systemFeaturesSchema.safeParse({
+      gatekeeper: {
+        email: { enabled: true },
+        twitch: {
+          enabled: true,
+          follower: { enabled: true },
+          // subscriber is missing
+        },
+        youtube: {
+          enabled: true,
+          member: { enabled: true },
+          subscriber: { enabled: true },
+        },
+      },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("should reject when nested field has wrong type (string instead of object)", () => {
+    const result = systemFeaturesSchema.safeParse({
+      gatekeeper: {
+        email: { enabled: true },
+        twitch: {
+          enabled: true,
+          follower: "true", // Should be { enabled: boolean }
+          subscriber: { enabled: true },
+        },
+        youtube: {
+          enabled: true,
+          member: { enabled: true },
+          subscriber: { enabled: true },
+        },
+      },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("should reject when nested enabled field has wrong type (string instead of boolean)", () => {
+    const result = systemFeaturesSchema.safeParse({
+      gatekeeper: {
+        email: { enabled: true },
+        twitch: {
+          enabled: true,
+          follower: { enabled: "true" }, // Should be boolean
+          subscriber: { enabled: true },
+        },
+        youtube: {
+          enabled: true,
+          member: { enabled: true },
+          subscriber: { enabled: true },
+        },
+      },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("should accept mixed requirement states when platform is disabled", () => {
+    const result = systemFeaturesSchema.safeParse({
+      gatekeeper: {
+        email: { enabled: true },
+        twitch: {
+          enabled: false, // Platform disabled
+          follower: { enabled: true }, // But requirements can be any state
+          subscriber: { enabled: false },
+        },
+        youtube: {
+          enabled: true,
+          member: { enabled: true },
+          subscriber: { enabled: true },
+        },
+      },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("should accept when youtube member is missing from old data but member is present", () => {
+    // This tests backward compatibility - old data may not have member field
+    const result = systemFeaturesSchema.safeParse({
+      gatekeeper: {
+        email: { enabled: true },
+        twitch: {
+          enabled: true,
+          follower: { enabled: true },
+          subscriber: { enabled: true },
+        },
+        youtube: {
+          enabled: true,
+          member: { enabled: true },
+          subscriber: { enabled: true },
+        },
+      },
+    });
+    expect(result.success).toBe(true);
+  });
 });
 
 describe("systemSettingsSchema", () => {

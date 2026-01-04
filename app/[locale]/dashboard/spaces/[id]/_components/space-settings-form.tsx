@@ -183,7 +183,8 @@ export function SpaceSettingsForm({
     setServerError(null);
   });
 
-  const handleUpdateError = useEffectEvent((error: string) => {
+  // Common error translation logic
+  const translateError = useEffectEvent((error: string): string => {
     // List of known error keys for translation
     const errorKeys = [
       "errorYoutubeDisabled",
@@ -195,8 +196,11 @@ export function SpaceSettingsForm({
       "errorEmailDisabled",
     ];
     // Translate error keys, otherwise use the error string as-is
-    const translatedError = errorKeys.includes(error) ? t(error) : error;
-    setServerError(translatedError);
+    return errorKeys.includes(error) ? t(error) : error;
+  });
+
+  const handleUpdateError = useEffectEvent((error: string) => {
+    setServerError(translateError(error));
   });
 
   const handlePublishSuccess = useEffectEvent(() => {
@@ -205,19 +209,7 @@ export function SpaceSettingsForm({
   });
 
   const handlePublishError = useEffectEvent((error: string) => {
-    // List of known error keys for translation
-    const errorKeys = [
-      "errorYoutubeDisabled",
-      "errorYoutubeMemberDisabled",
-      "errorYoutubeSubscriberDisabled",
-      "errorTwitchDisabled",
-      "errorTwitchFollowerDisabled",
-      "errorTwitchSubscriberDisabled",
-      "errorEmailDisabled",
-    ];
-    // Translate error keys, otherwise use the error string as-is
-    const translatedError = errorKeys.includes(error) ? t(error) : error;
-    setServerError(translatedError);
+    setServerError(translateError(error));
   });
 
   // Handle update success/error

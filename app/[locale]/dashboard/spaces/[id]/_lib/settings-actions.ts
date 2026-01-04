@@ -373,7 +373,10 @@ export async function updateSpaceSettings(
           | "follower"
           | "subscriber",
         youtube_channel_id: youtubeChannelId,
-        youtube_requirement: youtubeRequirement as "none" | "subscriber",
+        youtube_requirement: youtubeRequirement as
+          | "none"
+          | "member"
+          | "subscriber",
       },
       meta: { success: true },
     };
