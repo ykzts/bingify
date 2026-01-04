@@ -268,6 +268,14 @@ describe("validateRedirectPath", () => {
     expect(validateRedirectPath("/safe/../dangerous")).toBe("/");
   });
 
+  test("rejects path traversal with backslash", () => {
+    expect(validateRedirectPath("/..\\etc\\passwd")).toBe("/");
+  });
+
+  test("rejects path traversal at start with backslash", () => {
+    expect(validateRedirectPath("\\..\\file")).toBe("/");
+  });
+
   test("rejects newline characters", () => {
     expect(validateRedirectPath("/path\nwith\nnewlines")).toBe("/");
   });

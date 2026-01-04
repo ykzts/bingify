@@ -62,6 +62,7 @@ export function getAbsoluteUrl(path = ""): string {
 const PROTOCOL_PATTERN = /^[a-zA-Z][a-zA-Z0-9+.-]*:/;
 const DANGEROUS_PROTOCOLS = /(?:javascript|data|vbscript|file|about):/i;
 const CONTROL_CHARS_PATTERN = /[\r\n\t\0]/;
+const PATH_TRAVERSAL_PATTERN = /(\.\.[/\\]|[/\\]\.\.)/;
 
 /**
  * Validate and sanitize a redirect path to prevent open redirect vulnerabilities
@@ -84,7 +85,7 @@ export function validateRedirectPath(
   }
 
   // Check for path traversal patterns
-  if (redirectPath.includes("..")) {
+  if (PATH_TRAVERSAL_PATTERN.test(redirectPath)) {
     return fallbackPath;
   }
 
