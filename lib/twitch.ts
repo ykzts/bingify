@@ -82,6 +82,40 @@ function createAppApiClient(appAccessToken: string): ApiClient {
 }
 
 /**
+ * Get app access token for Twitch API using client credentials flow
+ * @returns Promise with access token or null if failed
+ */
+export async function getAppAccessToken(): Promise<string | null> {
+  const clientId = process.env.TWITCH_CLIENT_ID;
+  const clientSecret = process.env.TWITCH_CLIENT_SECRET;
+
+  if (!(clientId && clientSecret)) {
+    return null;
+  }
+
+  try {
+    const response = await fetch("https://id.twitch.tv/oauth2/token", {
+      body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        grant_type: "client_credentials",
+      }),
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    return data.access_token;
+  } catch (error) {
+    console.error("Failed to get Twitch app access token:", error);
+    return null;
+  }
+}
+
+/**
  * Parse Twitch input to extract username or detect if it's already a numeric ID
  * Supports:
  * - Numeric ID: "123456789"
@@ -150,6 +184,71 @@ export async function getBroadcasterIdFromUsername(
     return {
       error: error instanceof Error ? error.message : "Unknown error",
     };
+  }
+}
+
+export interface TwitchLookupResult {
+  broadcasterId?: string;
+  error?: string;
+  source?: "id" | "username";
+  username?: string;
+}
+
+/**
+ * Lookup Twitch broadcaster ID from username, URL, or numeric ID
+ * This combines parsing and API lookup in a single function
+ * @param input - Twitch username, channel URL, or numeric ID
+ * @returns Promise with broadcaster ID or error
+ */
+export async function lookupTwitchBroadcaster(
+  input: string
+): Promise<TwitchLookupResult> {
+  try {
+    if (!input || typeof input !== "string") {
+      return { error: "Input is required" };
+    }
+
+    // Parse the input to determine type
+    const parsed = parseTwitchInput(input);
+
+    if (parsed.type === "invalid") {
+      return {
+        error:
+          "Invalid input. Please enter a Twitch username, channel URL, or numeric ID.",
+      };
+    }
+
+    // If it's already an ID, return it as-is
+    if (parsed.type === "id") {
+      return {
+        broadcasterId: parsed.value,
+        source: "id",
+      };
+    }
+
+    // It's a username, so look it up using twurple
+    const appAccessToken = await getAppAccessToken();
+    if (!appAccessToken) {
+      return { error: "Service temporarily unavailable" };
+    }
+
+    const result = await getBroadcasterIdFromUsername(
+      parsed.value,
+      appAccessToken
+    );
+
+    if (result.error) {
+      return { error: result.error };
+    }
+
+    return {
+      broadcasterId: result.broadcasterId,
+      source: "username",
+      username: parsed.value,
+    };
+  } catch (error) {
+    console.error("Error in Twitch lookup:", error);
+    return { error: "Internal server error" };
   }
 }
 
