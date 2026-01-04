@@ -133,10 +133,10 @@ describe("getSystemSettings", () => {
           subscriber: { enabled: true },
         },
         youtube: {
-            enabled: true,
-            member: { enabled: true },
-            subscriber: { enabled: true },
-          },
+          enabled: true,
+          member: { enabled: true },
+          subscriber: { enabled: true },
+        },
       },
     });
   });
