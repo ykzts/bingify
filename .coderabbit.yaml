@@ -7,26 +7,69 @@ reviews:
   auto_review:
     ignore_usernames:
       - renovate[bot]
+  labeling_instructions:
+    - label: "scope: frontend"
+      instructions: |
+        app/** または components/** ディレクトリ内のファイルに変更が含まれる場合、このラベルを適用してください。
+    - label: "scope: backend"
+      instructions: |
+        lib/** または app/api/** ディレクトリ内のファイルに変更が含まれる場合、このラベルを適用してください。
+    - label: "scope: ci/cd"
+      instructions: |
+        .github/** ディレクトリ内のファイルまたはCI/CD設定ファイルに変更が含まれる場合、このラベルを適用してください。
+    - label: "scope: tooling"
+      instructions: |
+        biome.json、next.config.ts、tsconfig.json、vitest.config.ts、.coderabbit.yaml、postcss.config.mjs、components.json などの設定ファイルに変更が含まれる場合、このラベルを適用してください。
+    - label: "type: bug"
+      instructions: |
+        PRのタイトルまたは説明に「fix」「bug」「修正」「バグ」などのキーワードが含まれる場合、またはバグ修正を示す場合、このラベルを適用してください。
+    - label: "type: feature"
+      instructions: |
+        PRのタイトルまたは説明に「feat」「add」「新機能」「追加」などのキーワードが含まれる場合、または新機能を示す場合、このラベルを適用してください。
+    - label: "type: enhancement"
+      instructions: |
+        PRのタイトルまたは説明に「improve」「enhance」「改善」などのキーワードが含まれる場合、または改善を示す場合、このラベルを適用してください。
+    - label: "type: refactoring"
+      instructions: |
+        PRのタイトルまたは説明に「refactor」「リファクタリング」などのキーワードが含まれる場合、またはコードのリファクタリングを示す場合、このラベルを適用してください。
+    - label: "type: test"
+      instructions: |
+        テストファイル（**/__tests__/**、test/**、*.test.ts、*.test.tsx、*.spec.ts、*.spec.tsx）に変更が含まれる場合、このラベルを適用してください。
+    - label: "type: documentation"
+      instructions: |
+        ドキュメントファイル（**/*.md、docs/**）に変更が含まれる場合、またはPRタイトルに「docs」が含まれる場合、このラベルを適用してください。
+    - label: "type: performance"
+      instructions: |
+        PRのタイトルまたは説明に「perf」「performance」「optimize」「パフォーマンス」「最適化」などのキーワードが含まれる場合、このラベルを適用してください。
+    - label: "type: security"
+      instructions: |
+        PRのタイトルまたは説明に「security」「vulnerability」「CVE」「セキュリティ」「脆弱性」などのキーワードが含まれる場合、このラベルを適用してください。
+    - label: "dependencies"
+      instructions: |
+        package.json、pnpm-lock.yaml、またはその他の依存関係管理ファイルに変更が含まれる場合、このラベルを適用してください。
+    - label: "breaking change"
+      instructions: |
+        PRのタイトルまたは説明に「breaking」「BREAKING CHANGE」「破壊的」などのキーワードが含まれる場合、または破壊的変更を示す場合、このラベルを適用してください。
   path_instructions:
     - instructions: |
         各指摘コメントの冒頭には、必ずPull Requestの作成者（Author）へのメンションを含めてください。
-        
+
         【メンションのルール】
         1. Authorが "copilot", "copilot[bot]", またはその他のCopilot関連のBotであると判断できる場合:
            必ず "@copilot" とメンションしてください。
         2. それ以外（人間のユーザー）の場合:
            Authorの正しいユーザー名（例: @username）をメンションしてください。
-        
+
         形式例:
         "@copilot ここは修正が必要です..."
         "@user123 提案ですが..."
-        
+
         理由:
         コメントの通知漏れを防ぐため、例外なくメンションが必要です。
       path: "**/*"
     - instructions: |
         これらのファイルは shadcn/ui によって生成されたUIコンポーネントです。
-        
+
         以下のルールに従ってレビューしてください：
         1. **重大なバグ**や**セキュリティ上の脆弱性**が見つかった場合のみ指摘してください。
         2. コードスタイル、型定義の厳密化、軽微なリファクタリング提案は**行わないでください**。
@@ -34,7 +77,7 @@ reviews:
       path: "components/ui/**/*.tsx"
     - instructions: |
         このファイルは Supabase CLI によって自動生成された型定義ファイルです。
-        
+
         以下のルールに従ってレビューしてください：
         1. **レビュー対象外**とし、指摘は行わないでください。
         2. 機械生成されたファイルのため、コードスタイルや型定義の指摘は不要です。
