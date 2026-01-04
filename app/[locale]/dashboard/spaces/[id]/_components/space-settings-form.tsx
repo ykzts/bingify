@@ -183,8 +183,24 @@ export function SpaceSettingsForm({
     setServerError(null);
   });
 
+  // Common error translation logic
+  const translateError = useEffectEvent((error: string): string => {
+    // List of known error keys for translation
+    const errorKeys = [
+      "errorYoutubeDisabled",
+      "errorYoutubeMemberDisabled",
+      "errorYoutubeSubscriberDisabled",
+      "errorTwitchDisabled",
+      "errorTwitchFollowerDisabled",
+      "errorTwitchSubscriberDisabled",
+      "errorEmailDisabled",
+    ];
+    // Translate error keys, otherwise use the error string as-is
+    return errorKeys.includes(error) ? t(error) : error;
+  });
+
   const handleUpdateError = useEffectEvent((error: string) => {
-    setServerError(error);
+    setServerError(translateError(error));
   });
 
   const handlePublishSuccess = useEffectEvent(() => {
@@ -193,7 +209,7 @@ export function SpaceSettingsForm({
   });
 
   const handlePublishError = useEffectEvent((error: string) => {
-    setServerError(error);
+    setServerError(translateError(error));
   });
 
   // Handle update success/error
@@ -248,6 +264,55 @@ export function SpaceSettingsForm({
   const showTwitchOption =
     features.gatekeeper.twitch.enabled || isTwitchConfigured;
   const showSocialOption = showYoutubeOption || showTwitchOption;
+
+  // Show requirement type options based on system settings
+  const showYoutubeMember =
+    features.gatekeeper.youtube.enabled &&
+    features.gatekeeper.youtube.member.enabled;
+  const showYoutubeSubscriber =
+    features.gatekeeper.youtube.enabled &&
+    features.gatekeeper.youtube.subscriber.enabled;
+  const showTwitchFollower =
+    features.gatekeeper.twitch.enabled &&
+    features.gatekeeper.twitch.follower.enabled;
+  const showTwitchSubscriber =
+    features.gatekeeper.twitch.enabled &&
+    features.gatekeeper.twitch.subscriber.enabled;
+
+  // Check if currently selected requirement is disabled
+  const isCurrentRequirementDisabled =
+    (gatekeeperMode === "social" &&
+      socialPlatform === "youtube" &&
+      youtubeRequirement === "member" &&
+      !showYoutubeMember) ||
+    (gatekeeperMode === "social" &&
+      socialPlatform === "youtube" &&
+      youtubeRequirement === "subscriber" &&
+      !showYoutubeSubscriber) ||
+    (gatekeeperMode === "social" &&
+      socialPlatform === "twitch" &&
+      twitchRequirement === "follower" &&
+      !showTwitchFollower) ||
+    (gatekeeperMode === "social" &&
+      socialPlatform === "twitch" &&
+      twitchRequirement === "subscriber" &&
+      !showTwitchSubscriber);
+
+  // Use useEffectEvent to separate reset logic from effect dependencies
+  const resetRequirementToNone = useEffectEvent(() => {
+    if (socialPlatform === "youtube") {
+      form.setFieldValue("youtube_requirement", "none");
+    } else if (socialPlatform === "twitch") {
+      form.setFieldValue("twitch_requirement", "none");
+    }
+  });
+
+  // Auto-reset to "none" if current requirement is disabled
+  useEffect(() => {
+    if (isCurrentRequirementDisabled) {
+      resetRequirementToNone();
+    }
+  }, [isCurrentRequirementDisabled]);
 
   // Calculate effective gatekeeper mode (fallback to "none" if current mode is not available)
   const effectiveGatekeeperMode =
@@ -522,12 +587,16 @@ export function SpaceSettingsForm({
                                         <SelectItem value="none">
                                           {t("requirementNone")}
                                         </SelectItem>
-                                        <SelectItem value="subscriber">
-                                          {t("youtubeSubscriber")}
-                                        </SelectItem>
-                                        <SelectItem value="member">
-                                          {t("youtubeMember")}
-                                        </SelectItem>
+                                        {showYoutubeMember && (
+                                          <SelectItem value="member">
+                                            {t("youtubeMember")}
+                                          </SelectItem>
+                                        )}
+                                        {showYoutubeSubscriber && (
+                                          <SelectItem value="subscriber">
+                                            {t("youtubeSubscriber")}
+                                          </SelectItem>
+                                        )}
                                       </SelectContent>
                                     </Select>
                                   </FieldContent>
@@ -601,12 +670,16 @@ export function SpaceSettingsForm({
                                         <SelectItem value="none">
                                           {t("requirementNone")}
                                         </SelectItem>
-                                        <SelectItem value="follower">
-                                          {t("twitchFollower")}
-                                        </SelectItem>
-                                        <SelectItem value="subscriber">
-                                          {t("twitchSubscriber")}
-                                        </SelectItem>
+                                        {showTwitchFollower && (
+                                          <SelectItem value="follower">
+                                            {t("twitchFollower")}
+                                          </SelectItem>
+                                        )}
+                                        {showTwitchSubscriber && (
+                                          <SelectItem value="subscriber">
+                                            {t("twitchSubscriber")}
+                                          </SelectItem>
+                                        )}
                                       </SelectContent>
                                     </Select>
                                   </FieldContent>
@@ -750,6 +823,17 @@ export function SpaceSettingsForm({
             )}
           </form.Field>
         </div>
+
+        {/* Warning for disabled requirement */}
+        {isCurrentRequirementDisabled && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>{t("warning")}</AlertTitle>
+            <AlertDescription>
+              {t("warningRequirementDisabled")}
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Server Error Display */}
         {serverError && (

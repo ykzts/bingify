@@ -9,9 +9,21 @@ export const systemFeaturesSchema = z.object({
     }),
     twitch: z.object({
       enabled: z.boolean(),
+      follower: z.object({
+        enabled: z.boolean(),
+      }),
+      subscriber: z.object({
+        enabled: z.boolean(),
+      }),
     }),
     youtube: z.object({
       enabled: z.boolean(),
+      member: z.object({
+        enabled: z.boolean(),
+      }),
+      subscriber: z.object({
+        enabled: z.boolean(),
+      }),
     }),
   }),
 }) satisfies z.ZodType<SystemFeatures>;
@@ -54,8 +66,16 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
   features: {
     gatekeeper: {
       email: { enabled: true },
-      twitch: { enabled: true },
-      youtube: { enabled: true },
+      twitch: {
+        enabled: true,
+        follower: { enabled: true },
+        subscriber: { enabled: true },
+      },
+      youtube: {
+        enabled: true,
+        member: { enabled: true },
+        subscriber: { enabled: true },
+      },
     },
   },
   max_participants_per_space: 50,

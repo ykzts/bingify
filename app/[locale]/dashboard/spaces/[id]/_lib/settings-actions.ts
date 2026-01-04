@@ -5,7 +5,9 @@ import {
   initialFormState,
 } from "@tanstack/react-form-nextjs";
 import { updateSpaceFormSchema } from "@/lib/schemas/space";
+import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
+import type { SystemFeatures } from "@/lib/types/settings";
 import type { SpaceAdmin } from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";
 import { spaceSettingsFormOpts } from "./form-options";
@@ -144,10 +146,10 @@ export async function updateSpaceSettings(
       };
     }
 
-    // Validation 1: Check system settings for max_participants_per_space
+    // Validation 1: Check system settings for max_participants_per_space and gatekeeper features
     const { data: systemSettings, error: settingsError } = await supabase
       .from("system_settings")
-      .select("max_participants_per_space")
+      .select("max_participants_per_space, features")
       .eq("id", 1)
       .single();
 
@@ -168,6 +170,88 @@ export async function updateSpaceSettings(
         errors: [
           `システムの上限設定（${systemSettings.max_participants_per_space}人）を超える値にはできません。`,
         ],
+      };
+    }
+
+    // Validate and parse features field
+    const featuresValidation = systemFeaturesSchema.safeParse(
+      systemSettings?.features
+    );
+    const features: SystemFeatures | null = featuresValidation.success
+      ? featuresValidation.data
+      : null;
+
+    // Validation 1.5: Check gatekeeper requirement types against system settings
+    if (features?.gatekeeper && gatekeeperMode === "social") {
+      const gatekeeper = features.gatekeeper;
+
+      // Validate YouTube requirements
+      if (socialPlatform === "youtube" && youtubeRequirement !== "none") {
+        if (!gatekeeper.youtube?.enabled) {
+          return {
+            ...initialFormState,
+            errors: ["errorYoutubeDisabled"],
+          };
+        }
+        if (
+          youtubeRequirement === "member" &&
+          !gatekeeper.youtube?.member?.enabled
+        ) {
+          return {
+            ...initialFormState,
+            errors: ["errorYoutubeMemberDisabled"],
+          };
+        }
+        if (
+          youtubeRequirement === "subscriber" &&
+          !gatekeeper.youtube?.subscriber?.enabled
+        ) {
+          return {
+            ...initialFormState,
+            errors: ["errorYoutubeSubscriberDisabled"],
+          };
+        }
+      }
+
+      // Validate Twitch requirements
+      if (socialPlatform === "twitch" && twitchRequirement !== "none") {
+        if (!gatekeeper.twitch?.enabled) {
+          return {
+            ...initialFormState,
+            errors: ["errorTwitchDisabled"],
+          };
+        }
+        if (
+          twitchRequirement === "follower" &&
+          !gatekeeper.twitch?.follower?.enabled
+        ) {
+          return {
+            ...initialFormState,
+            errors: ["errorTwitchFollowerDisabled"],
+          };
+        }
+        if (
+          twitchRequirement === "subscriber" &&
+          !gatekeeper.twitch?.subscriber?.enabled
+        ) {
+          return {
+            ...initialFormState,
+            errors: ["errorTwitchSubscriberDisabled"],
+          };
+        }
+      }
+    }
+
+    // Validate email mode
+    if (
+      gatekeeperMode === "email" &&
+      features?.gatekeeper &&
+      features.gatekeeper.email &&
+      !features.gatekeeper.email.enabled
+    ) {
+      return {
+        ...initialFormState,
+        errors: ["errorEmailDisabled"],
       };
     }
 
@@ -290,7 +374,10 @@ export async function updateSpaceSettings(
           | "follower"
           | "subscriber",
         youtube_channel_id: youtubeChannelId,
-        youtube_requirement: youtubeRequirement as "none" | "subscriber",
+        youtube_requirement: youtubeRequirement as
+          | "none"
+          | "member"
+          | "subscriber",
       },
       meta: { success: true },
     };
