@@ -245,7 +245,8 @@ export async function updateSpaceSettings(
     // Validate email mode
     if (
       gatekeeperMode === "email" &&
-      features?.gatekeeper?.email &&
+      features?.gatekeeper &&
+      features.gatekeeper.email &&
       !features.gatekeeper.email.enabled
     ) {
       return {

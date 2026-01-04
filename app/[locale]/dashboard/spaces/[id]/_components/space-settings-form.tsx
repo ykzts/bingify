@@ -298,16 +298,21 @@ export function SpaceSettingsForm({
       twitchRequirement === "subscriber" &&
       !showTwitchSubscriber);
 
+  // Use useEffectEvent to separate reset logic from effect dependencies
+  const resetRequirementToNone = useEffectEvent(() => {
+    if (socialPlatform === "youtube") {
+      form.setFieldValue("youtube_requirement", "none");
+    } else if (socialPlatform === "twitch") {
+      form.setFieldValue("twitch_requirement", "none");
+    }
+  });
+
   // Auto-reset to "none" if current requirement is disabled
   useEffect(() => {
     if (isCurrentRequirementDisabled) {
-      if (socialPlatform === "youtube") {
-        form.setFieldValue("youtube_requirement", "none");
-      } else if (socialPlatform === "twitch") {
-        form.setFieldValue("twitch_requirement", "none");
-      }
+      resetRequirementToNone();
     }
-  }, [isCurrentRequirementDisabled, socialPlatform, form.setFieldValue]);
+  }, [isCurrentRequirementDisabled]);
 
   // Calculate effective gatekeeper mode (fallback to "none" if current mode is not available)
   const effectiveGatekeeperMode =
