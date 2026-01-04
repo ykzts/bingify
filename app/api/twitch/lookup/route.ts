@@ -33,7 +33,8 @@ async function getAppAccessToken(): Promise<string | null> {
 
     const data = await response.json();
     return data.access_token;
-  } catch {
+  } catch (error) {
+    console.error("Failed to get Twitch app access token:", error);
     return null;
   }
 }
@@ -91,7 +92,8 @@ export async function POST(request: NextRequest) {
       source: "username",
       username: parsed.value,
     });
-  } catch (_error) {
+  } catch (error) {
+    console.error("Error in Twitch lookup:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

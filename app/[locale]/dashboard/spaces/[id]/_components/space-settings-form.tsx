@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { TWITCH_ID_REGEX } from "@/lib/twitch";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { cn, getErrorMessage } from "@/lib/utils";
@@ -48,9 +49,6 @@ import {
   updateAndPublishSpace,
   updateSpaceSettings,
 } from "../_lib/settings-actions";
-
-// Regex pattern for checking if input is already a numeric ID
-const NUMERIC_ID_REGEX = /^\d+$/;
 
 interface Props {
   currentParticipantCount: number;
@@ -136,7 +134,7 @@ export function SpaceSettingsForm({
       }
 
       // If it's already a numeric ID, no conversion needed
-      if (NUMERIC_ID_REGEX.test(input.trim())) {
+      if (TWITCH_ID_REGEX.test(input.trim())) {
         setTwitchIdConverting(false);
         setTwitchIdError(null);
         return;
