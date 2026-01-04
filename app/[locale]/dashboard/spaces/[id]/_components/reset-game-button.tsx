@@ -3,7 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -37,20 +37,24 @@ export function ResetGameButton({ onSuccess, spaceId }: ResetGameButtonProps) {
     success: false,
   });
 
+  // Use useEffectEvent to separate event logic from effect dependencies
+  const handleResetSuccess = useEffectEvent(() => {
+    toast.success(t("resetGameSuccess"), {
+      duration: 3000,
+    });
+    setShowConfirm(false);
+    // Invalidate the called numbers query to trigger immediate refetch
+    queryClient.invalidateQueries({
+      queryKey: ["called-numbers", spaceId],
+    });
+    onSuccess?.();
+  });
+
   useEffect(() => {
     if (resetState.success) {
-      toast.success(t("resetGameSuccess"), {
-        duration: 3000,
-      });
-      setShowConfirm(false);
-      // Invalidate the called numbers query to trigger immediate refetch
-      queryClient.invalidateQueries({
-        queryKey: ["called-numbers", spaceId],
-      });
-      onSuccess?.();
+      handleResetSuccess();
     }
-    // queryClient is stable and doesn't need to be in deps, but included to satisfy linter
-  }, [resetState.success, t, onSuccess, spaceId, queryClient]);
+  }, [resetState.success]);
 
   return (
     <div>
