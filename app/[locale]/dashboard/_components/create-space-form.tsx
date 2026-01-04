@@ -30,7 +30,7 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/input-group";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage } from "@/lib/utils/error-message";
 import { generateRandomKey } from "@/lib/utils/random-key";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import {

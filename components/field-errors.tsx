@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { cn, getErrorMessage } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { getErrorMessage } from "@/lib/utils/error-message";
 
 interface FieldErrorsProps {
   className?: string;
