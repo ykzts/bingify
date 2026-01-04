@@ -18,6 +18,7 @@ CREATE INDEX IF NOT EXISTS idx_screen_settings_space_id ON screen_settings(space
 ALTER TABLE screen_settings ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Space owners and admins can manage settings
+DROP POLICY IF EXISTS "Space owners can manage screen settings" ON screen_settings;
 CREATE POLICY "Space owners can manage screen settings"
   ON screen_settings
   FOR ALL
@@ -47,13 +48,23 @@ CREATE POLICY "Space owners can manage screen settings"
   );
 
 -- Policy: Public read access for screen display
+DROP POLICY IF EXISTS "Public can read screen settings" ON screen_settings;
 CREATE POLICY "Public can read screen settings"
   ON screen_settings
   FOR SELECT
   USING (true);
 
 -- Enable Realtime for screen_settings
-ALTER PUBLICATION supabase_realtime ADD TABLE screen_settings;
+DO $$
+BEGIN
+  -- Add table to publication if not already present
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND tablename = 'screen_settings'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE screen_settings;
+  END IF;
+END $$;
 
 -- Trigger to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_screen_settings_updated_at()
@@ -64,6 +75,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_screen_settings_updated_at ON screen_settings;
 CREATE TRIGGER trigger_update_screen_settings_updated_at
   BEFORE UPDATE ON screen_settings
   FOR EACH ROW
