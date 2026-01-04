@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { getAbsoluteUrl, getBaseUrl } from "../url";
+import { getAbsoluteUrl, getBaseUrl, validateRedirectPath } from "../url";
 
 describe("getBaseUrl", () => {
   afterEach(() => {
@@ -182,5 +182,172 @@ describe("getAbsoluteUrl", () => {
 
   test("preserves trailing slash in path", () => {
     expect(getAbsoluteUrl("/spaces/")).toBe("https://example.com/spaces/");
+  });
+});
+
+describe("validateRedirectPath", () => {
+  beforeEach(() => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://example.com");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test("returns valid relative path", () => {
+    expect(validateRedirectPath("/dashboard")).toBe("/dashboard");
+  });
+
+  test("returns valid path with query parameters", () => {
+    expect(validateRedirectPath("/spaces?id=123")).toBe("/spaces?id=123");
+  });
+
+  test("returns valid path with hash", () => {
+    expect(validateRedirectPath("/page#section")).toBe("/page#section");
+  });
+
+  test("returns fallback for null input", () => {
+    expect(validateRedirectPath(null)).toBe("/");
+  });
+
+  test("returns fallback for undefined input", () => {
+    expect(validateRedirectPath(undefined)).toBe("/");
+  });
+
+  test("returns fallback for empty string", () => {
+    expect(validateRedirectPath("")).toBe("/");
+  });
+
+  test("returns fallback for whitespace-only string", () => {
+    expect(validateRedirectPath("   ")).toBe("/");
+  });
+
+  test("uses custom fallback path", () => {
+    expect(validateRedirectPath(null, "/en")).toBe("/en");
+  });
+
+  test("rejects protocol-relative URLs (//)", () => {
+    expect(validateRedirectPath("//evil.com")).toBe("/");
+  });
+
+  test("rejects absolute URLs with http protocol", () => {
+    expect(validateRedirectPath("http://evil.com")).toBe("/");
+  });
+
+  test("rejects absolute URLs with https protocol", () => {
+    expect(validateRedirectPath("https://evil.com")).toBe("/");
+  });
+
+  test("rejects javascript: protocol", () => {
+    expect(validateRedirectPath("javascript:alert(1)")).toBe("/");
+  });
+
+  test("rejects data: protocol", () => {
+    expect(
+      validateRedirectPath("data:text/html,<script>alert(1)</script>")
+    ).toBe("/");
+  });
+
+  test("rejects vbscript: protocol", () => {
+    expect(validateRedirectPath("vbscript:alert(1)")).toBe("/");
+  });
+
+  test("rejects file: protocol", () => {
+    expect(validateRedirectPath("file:///etc/passwd")).toBe("/");
+  });
+
+  test("rejects about: protocol", () => {
+    expect(validateRedirectPath("about:blank")).toBe("/");
+  });
+
+  test("rejects path traversal with ..", () => {
+    expect(validateRedirectPath("/../../etc/passwd")).toBe("/");
+  });
+
+  test("rejects path traversal in middle", () => {
+    expect(validateRedirectPath("/safe/../dangerous")).toBe("/");
+  });
+
+  test("rejects path traversal with backslash", () => {
+    expect(validateRedirectPath("/..\\etc\\passwd")).toBe("/");
+  });
+
+  test("rejects path traversal at start with backslash", () => {
+    expect(validateRedirectPath("\\..\\file")).toBe("/");
+  });
+
+  test("rejects newline characters", () => {
+    expect(validateRedirectPath("/path\nwith\nnewlines")).toBe("/");
+  });
+
+  test("rejects carriage return characters", () => {
+    expect(validateRedirectPath("/path\rwith\rreturns")).toBe("/");
+  });
+
+  test("rejects tab characters", () => {
+    expect(validateRedirectPath("/path\twith\ttabs")).toBe("/");
+  });
+
+  test("rejects null bytes", () => {
+    expect(validateRedirectPath("/path\0with\0nulls")).toBe("/");
+  });
+
+  test("handles URL-encoded valid path", () => {
+    expect(validateRedirectPath("/spaces%2F123")).toBe("/spaces/123");
+  });
+
+  test("rejects URL-encoded protocol-relative URL", () => {
+    expect(validateRedirectPath("%2F%2Fevil.com")).toBe("/");
+  });
+
+  test("rejects double-encoded protocol-relative URL", () => {
+    expect(validateRedirectPath("%252F%252Fevil.com")).toBe("/");
+  });
+
+  test("rejects triple-encoded protocol-relative URL", () => {
+    expect(validateRedirectPath("%25252F%25252Fevil.com")).toBe("/");
+  });
+
+  test("rejects double-encoded absolute URL", () => {
+    expect(validateRedirectPath("https%253A%252F%252Fevil.com")).toBe("/");
+  });
+
+  test("rejects malformed encoded paths", () => {
+    expect(validateRedirectPath("%XX%invalid")).toBe("/");
+  });
+
+  test("accepts paths with safe special characters", () => {
+    expect(validateRedirectPath("/path/with-dash_underscore")).toBe(
+      "/path/with-dash_underscore"
+    );
+  });
+
+  test("accepts paths with encoded spaces", () => {
+    // URL.pathname preserves encoded spaces as %20
+    expect(validateRedirectPath("/path%20with%20spaces")).toBe(
+      "/path%20with%20spaces"
+    );
+  });
+
+  test("normalizes path correctly", () => {
+    expect(validateRedirectPath("/path//double//slash")).toBe(
+      "/path//double//slash"
+    );
+  });
+
+  test("preserves query parameters after validation", () => {
+    expect(validateRedirectPath("/search?q=test&page=2")).toBe(
+      "/search?q=test&page=2"
+    );
+  });
+
+  test("preserves hash after validation", () => {
+    expect(validateRedirectPath("/page#section-1")).toBe("/page#section-1");
+  });
+
+  test("handles complex valid path", () => {
+    expect(
+      validateRedirectPath("/en/dashboard/spaces/123?view=edit#settings")
+    ).toBe("/en/dashboard/spaces/123?view=edit#settings");
   });
 });

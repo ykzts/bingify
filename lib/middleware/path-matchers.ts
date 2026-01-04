@@ -5,6 +5,7 @@ const DASHBOARD_PATTERN = new RegExp(
   `^/(${routing.locales.join("|")})/dashboard(/|$)`
 );
 const ADMIN_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/admin(/|$)`);
+const LOGIN_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/login$`);
 
 export function isAdminPath(pathname: string): boolean {
   return (
@@ -20,6 +21,10 @@ export function isDashboardPath(pathname: string): boolean {
     pathname.startsWith("/dashboard/") ||
     Boolean(pathname.match(DASHBOARD_PATTERN))
   );
+}
+
+export function isLoginPath(pathname: string): boolean {
+  return pathname === "/login" || Boolean(pathname.match(LOGIN_PATTERN));
 }
 
 export function extractLocaleFromPath(pathname: string): string | null {

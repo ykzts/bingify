@@ -58,3 +58,73 @@ export function getAbsoluteUrl(path = ""): string {
     return baseUrl;
   }
 }
+
+const PROTOCOL_PATTERN = /^[a-zA-Z][a-zA-Z0-9+.-]*:/;
+const DANGEROUS_PROTOCOLS = /(?:javascript|data|vbscript|file|about):/i;
+const CONTROL_CHARS_PATTERN = /[\r\n\t\0]/;
+const PATH_TRAVERSAL_PATTERN = /(\.\.[/\\]|[/\\]\.\.)/;
+
+/**
+ * Validate and sanitize a redirect path to prevent open redirect vulnerabilities
+ * @param redirect - The redirect path to validate (from query parameter)
+ * @param fallbackPath - The fallback path to use if validation fails (default: "/")
+ * @returns A safe redirect path
+ */
+export function validateRedirectPath(
+  redirect: string | null | undefined,
+  fallbackPath = "/"
+): string {
+  let redirectPath =
+    redirect && redirect.trim() !== "" ? redirect : fallbackPath;
+
+  // Decode URI component to handle encoded characters
+  try {
+    redirectPath = decodeURIComponent(redirectPath);
+  } catch {
+    return fallbackPath;
+  }
+
+  // Check for path traversal patterns
+  if (PATH_TRAVERSAL_PATTERN.test(redirectPath)) {
+    return fallbackPath;
+  }
+
+  // Must start with single slash, reject protocol-relative URLs (//)
+  if (!redirectPath.startsWith("/") || redirectPath.startsWith("//")) {
+    return fallbackPath;
+  }
+
+  // Check for protocol schemes
+  if (PROTOCOL_PATTERN.test(redirectPath)) {
+    return fallbackPath;
+  }
+
+  // Check for dangerous protocol handlers
+  if (DANGEROUS_PROTOCOLS.test(redirectPath)) {
+    return fallbackPath;
+  }
+
+  // Reject control characters and newlines
+  if (CONTROL_CHARS_PATTERN.test(redirectPath)) {
+    return fallbackPath;
+  }
+
+  // Normalize and validate using URL constructor with base URL
+  try {
+    const origin = getBaseUrl();
+    const testUrl = new URL(redirectPath, origin);
+
+    // Verify origin matches and protocol is safe
+    if (
+      testUrl.origin !== origin ||
+      (testUrl.protocol !== "http:" && testUrl.protocol !== "https:")
+    ) {
+      return fallbackPath;
+    }
+
+    // Use the normalized pathname from the URL object
+    return testUrl.pathname + testUrl.search + testUrl.hash;
+  } catch {
+    return fallbackPath;
+  }
+}
