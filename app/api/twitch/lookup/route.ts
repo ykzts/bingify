@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import {
-  type ParsedTwitchInput,
   getBroadcasterIdFromUsername,
+  type ParsedTwitchInput,
   parseTwitchInput,
 } from "@/lib/twitch";
 
@@ -13,7 +13,7 @@ async function getAppAccessToken(): Promise<string | null> {
   const clientId = process.env.TWITCH_CLIENT_ID;
   const clientSecret = process.env.TWITCH_CLIENT_SECRET;
 
-  if (!clientId || !clientSecret) {
+  if (!(clientId && clientSecret)) {
     return null;
   }
 
@@ -44,10 +44,7 @@ export async function POST(request: NextRequest) {
     const { input } = body;
 
     if (!input || typeof input !== "string") {
-      return NextResponse.json(
-        { error: "Input is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Input is required" }, { status: 400 });
     }
 
     // Parse the input to determine type
@@ -94,7 +91,7 @@ export async function POST(request: NextRequest) {
       source: "username",
       username: parsed.value,
     });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

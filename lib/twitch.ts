@@ -1,6 +1,13 @@
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
 
+// Regex patterns for parsing Twitch input
+const TWITCH_ID_REGEX = /^\d+$/;
+const TWITCH_URL_REGEX_WITH_WWW =
+  /^(?:https?:\/\/)?(?:www\.)?twitch\.tv\/([a-zA-Z0-9_]{4,25})$/;
+const TWITCH_URL_REGEX_NO_WWW = /^twitch\.tv\/([a-zA-Z0-9_]{4,25})$/;
+const TWITCH_USERNAME_REGEX = /^[a-zA-Z0-9_]{4,25}$/;
+
 export interface TwitchFollowCheckResult {
   error?: string;
   isFollowing: boolean;
@@ -90,15 +97,12 @@ export function parseTwitchInput(input: string): ParsedTwitchInput {
   }
 
   // Check if it's a numeric ID (digits only)
-  if (/^\d+$/.test(trimmed)) {
+  if (TWITCH_ID_REGEX.test(trimmed)) {
     return { type: "id", value: trimmed };
   }
 
   // Check if it's a URL
-  const urlPatterns = [
-    /^(?:https?:\/\/)?(?:www\.)?twitch\.tv\/([a-zA-Z0-9_]{4,25})$/,
-    /^twitch\.tv\/([a-zA-Z0-9_]{4,25})$/,
-  ];
+  const urlPatterns = [TWITCH_URL_REGEX_WITH_WWW, TWITCH_URL_REGEX_NO_WWW];
 
   for (const pattern of urlPatterns) {
     const match = trimmed.match(pattern);
@@ -108,7 +112,7 @@ export function parseTwitchInput(input: string): ParsedTwitchInput {
   }
 
   // Check if it's a valid username (4-25 characters, alphanumeric + underscore)
-  if (/^[a-zA-Z0-9_]{4,25}$/.test(trimmed)) {
+  if (TWITCH_USERNAME_REGEX.test(trimmed)) {
     return { type: "username", value: trimmed.toLowerCase() };
   }
 

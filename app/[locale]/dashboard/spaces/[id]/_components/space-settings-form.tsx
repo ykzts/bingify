@@ -11,6 +11,7 @@ import { AlertCircle, Loader2, Rocket } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useEffectEvent, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,6 +48,9 @@ import {
   updateAndPublishSpace,
   updateSpaceSettings,
 } from "../_lib/settings-actions";
+
+// Regex pattern for checking if input is already a numeric ID
+const NUMERIC_ID_REGEX = /^\d+$/;
 
 interface Props {
   currentParticipantCount: number;
@@ -119,6 +123,58 @@ export function SpaceSettingsForm({
   const router = useRouter();
   const t = useTranslations("SpaceSettings");
   const [serverError, setServerError] = useState<string | null>(null);
+  const [twitchIdConverting, setTwitchIdConverting] = useState(false);
+  const [twitchIdError, setTwitchIdError] = useState<string | null>(null);
+
+  // Debounced function to convert Twitch username/URL to ID
+  const convertTwitchInput = useDebouncedCallback(
+    async (input: string, fieldApi: { setValue: (value: string) => void }) => {
+      if (!input || input.trim() === "") {
+        setTwitchIdConverting(false);
+        setTwitchIdError(null);
+        return;
+      }
+
+      // If it's already a numeric ID, no conversion needed
+      if (NUMERIC_ID_REGEX.test(input.trim())) {
+        setTwitchIdConverting(false);
+        setTwitchIdError(null);
+        return;
+      }
+
+      setTwitchIdConverting(true);
+      setTwitchIdError(null);
+
+      try {
+        const response = await fetch("/api/twitch/lookup", {
+          body: JSON.stringify({ input: input.trim() }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setTwitchIdError(data.error || t("twitchBroadcasterIdConvertError"));
+          setTwitchIdConverting(false);
+          return;
+        }
+
+        if (data.broadcasterId) {
+          // Update the field value with the converted ID
+          fieldApi.setValue(data.broadcasterId);
+          setTwitchIdError(null);
+        }
+      } catch (_error) {
+        setTwitchIdError(t("twitchBroadcasterIdConvertError"));
+      } finally {
+        setTwitchIdConverting(false);
+      }
+    },
+    800
+  );
 
   // Use TanStack Form with Next.js server actions for update
   const [updateState, updateAction] = useActionState(
@@ -695,17 +751,35 @@ export function SpaceSettingsForm({
                                       <FieldLabel>
                                         {t("twitchBroadcasterIdLabel")}
                                       </FieldLabel>
-                                      <Input
-                                        disabled={isPending}
-                                        name={field.name}
-                                        onChange={(e) =>
-                                          field.handleChange(e.target.value)
-                                        }
-                                        placeholder="123456789"
-                                        required={twitchRequirement !== "none"}
-                                        type="text"
-                                        value={field.state.value as string}
-                                      />
+                                      <div className="relative">
+                                        <Input
+                                          disabled={
+                                            isPending || twitchIdConverting
+                                          }
+                                          name={field.name}
+                                          onChange={(e) => {
+                                            const value = e.target.value;
+                                            field.handleChange(value);
+                                            convertTwitchInput(value, {
+                                              setValue: (newValue: string) =>
+                                                field.handleChange(newValue),
+                                            });
+                                          }}
+                                          placeholder={t(
+                                            "twitchBroadcasterIdPlaceholder"
+                                          )}
+                                          required={
+                                            twitchRequirement !== "none"
+                                          }
+                                          type="text"
+                                          value={field.state.value as string}
+                                        />
+                                        {twitchIdConverting && (
+                                          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                                          </div>
+                                        )}
+                                      </div>
                                       {field.state.meta.errors.length > 0 && (
                                         <FieldError>
                                           {getErrorMessage(
@@ -713,6 +787,12 @@ export function SpaceSettingsForm({
                                           )}
                                         </FieldError>
                                       )}
+                                      {twitchIdError && (
+                                        <FieldError>{twitchIdError}</FieldError>
+                                      )}
+                                      <FieldDescription>
+                                        {t("twitchBroadcasterIdHelp")}
+                                      </FieldDescription>
                                     </FieldContent>
                                   </Field>
                                 )}

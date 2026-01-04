@@ -299,7 +299,10 @@ describe("parseTwitchInput", () => {
 
   it("should return invalid for malformed URL", () => {
     const result = parseTwitchInput("https://youtube.com/ninja");
-    expect(result).toEqual({ type: "invalid", value: "https://youtube.com/ninja" });
+    expect(result).toEqual({
+      type: "invalid",
+      value: "https://youtube.com/ninja",
+    });
   });
 
   it("should trim whitespace before parsing", () => {
@@ -340,7 +343,10 @@ describe("getBroadcasterIdFromUsername", () => {
       },
     ]);
 
-    const result = await getBroadcasterIdFromUsername("ninja", "test_app_token");
+    const result = await getBroadcasterIdFromUsername(
+      "ninja",
+      "test_app_token"
+    );
 
     expect(result.broadcasterId).toBe("19571641");
     expect(result.error).toBeUndefined();
@@ -367,7 +373,10 @@ describe("getBroadcasterIdFromUsername", () => {
     const clientId = process.env.TWITCH_CLIENT_ID;
     process.env.TWITCH_CLIENT_ID = "";
 
-    const result = await getBroadcasterIdFromUsername("ninja", "test_app_token");
+    const result = await getBroadcasterIdFromUsername(
+      "ninja",
+      "test_app_token"
+    );
 
     expect(result.broadcasterId).toBeUndefined();
     expect(result.error).toBe("Twitch client ID not configured");
@@ -390,7 +399,9 @@ describe("getBroadcasterIdFromUsername", () => {
   });
 
   it("should return error when API request fails", async () => {
-    mockGetUsersByNames.mockRejectedValue(new Error("API Error: Rate limit exceeded"));
+    mockGetUsersByNames.mockRejectedValue(
+      new Error("API Error: Rate limit exceeded")
+    );
 
     const result = await getBroadcasterIdFromUsername("ninja", "invalid_token");
 
@@ -401,7 +412,10 @@ describe("getBroadcasterIdFromUsername", () => {
   it("should handle network errors gracefully", async () => {
     mockGetUsersByNames.mockRejectedValue(new Error("Network error"));
 
-    const result = await getBroadcasterIdFromUsername("ninja", "test_app_token");
+    const result = await getBroadcasterIdFromUsername(
+      "ninja",
+      "test_app_token"
+    );
 
     expect(result.broadcasterId).toBeUndefined();
     expect(result.error).toBe("Network error");
