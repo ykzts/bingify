@@ -1,5 +1,5 @@
 import { ApiClient } from "@twurple/api";
-import { StaticAuthProvider } from "@twurple/auth";
+import { getAppToken, StaticAuthProvider } from "@twurple/auth";
 
 // Regex patterns for parsing Twitch input
 export const TWITCH_ID_REGEX = /^\d+$/;
@@ -94,21 +94,8 @@ export async function getAppAccessToken(): Promise<string | null> {
   }
 
   try {
-    const response = await fetch("https://id.twitch.tv/oauth2/token", {
-      body: new URLSearchParams({
-        client_id: clientId,
-        client_secret: clientSecret,
-        grant_type: "client_credentials",
-      }),
-      method: "POST",
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-    return data.access_token;
+    const token = await getAppToken(clientId, clientSecret);
+    return token.accessToken;
   } catch (error) {
     console.error("Failed to get Twitch app access token:", error);
     return null;
