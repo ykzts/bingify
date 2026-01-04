@@ -184,8 +184,17 @@ export function SpaceSettingsForm({
   });
 
   const handleUpdateError = useEffectEvent((error: string) => {
-    // Translate error keys if they start with "error" prefix (our i18n keys)
-    const translatedError = error.startsWith("error") ? t(error) : error;
+    // List of known error keys for translation
+    const errorKeys = [
+      "errorYoutubeDisabled",
+      "errorYoutubeSubscriberDisabled",
+      "errorTwitchDisabled",
+      "errorTwitchFollowerDisabled",
+      "errorTwitchSubscriberDisabled",
+      "errorEmailDisabled",
+    ];
+    // Translate error keys, otherwise use the error string as-is
+    const translatedError = errorKeys.includes(error) ? t(error) : error;
     setServerError(translatedError);
   });
 
@@ -195,8 +204,17 @@ export function SpaceSettingsForm({
   });
 
   const handlePublishError = useEffectEvent((error: string) => {
-    // Translate error keys if they start with "error" prefix (our i18n keys)
-    const translatedError = error.startsWith("error") ? t(error) : error;
+    // List of known error keys for translation
+    const errorKeys = [
+      "errorYoutubeDisabled",
+      "errorYoutubeSubscriberDisabled",
+      "errorTwitchDisabled",
+      "errorTwitchFollowerDisabled",
+      "errorTwitchSubscriberDisabled",
+      "errorEmailDisabled",
+    ];
+    // Translate error keys, otherwise use the error string as-is
+    const translatedError = errorKeys.includes(error) ? t(error) : error;
     setServerError(translatedError);
   });
 
@@ -288,7 +306,7 @@ export function SpaceSettingsForm({
         form.setFieldValue("twitch_requirement", "none");
       }
     }
-  }, [isCurrentRequirementDisabled, socialPlatform, form]);
+  }, [isCurrentRequirementDisabled, socialPlatform, form.setFieldValue]);
 
   // Calculate effective gatekeeper mode (fallback to "none" if current mode is not available)
   const effectiveGatekeeperMode =
