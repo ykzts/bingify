@@ -49,7 +49,8 @@ export function ResetGameButton({ onSuccess, spaceId }: ResetGameButtonProps) {
       });
       onSuccess?.();
     }
-  }, [resetState.success, t, onSuccess, queryClient, spaceId]);
+    // queryClient is stable and doesn't need to be in deps, but included to satisfy linter
+  }, [resetState.success, t, onSuccess, spaceId, queryClient]);
 
   return (
     <div>
