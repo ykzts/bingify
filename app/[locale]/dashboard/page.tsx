@@ -143,7 +143,10 @@ export default async function DashboardPage({
                     key={space.id}
                   >
                     <td className="px-4 py-3 font-medium text-gray-900">
-                      <div className="flex flex-col gap-1">
+                      <Link
+                        className="flex flex-col gap-1 transition-colors hover:text-purple-600"
+                        href={`/${locale}/dashboard/spaces/${space.id}`}
+                      >
                         <div className="flex items-center gap-2">
                           {space.share_key}
                           {space.is_owner === false && (
@@ -161,7 +164,7 @@ export default async function DashboardPage({
                               })}
                             </p>
                           )}
-                      </div>
+                      </Link>
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge
