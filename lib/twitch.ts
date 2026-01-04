@@ -4,8 +4,8 @@ import { StaticAuthProvider } from "@twurple/auth";
 // Regex patterns for parsing Twitch input
 export const TWITCH_ID_REGEX = /^\d+$/;
 const TWITCH_URL_REGEX =
-  /^(?:https?:\/\/)?(?:www\.)?twitch\.tv\/([a-zA-Z0-9_]{3,25})$/;
-const TWITCH_USERNAME_REGEX = /^[a-zA-Z0-9_]{3,25}$/;
+  /^(?:https?:\/\/)?(?:www\.)?twitch\.tv\/([a-zA-Z0-9_]{4,25})$/;
+const TWITCH_USERNAME_REGEX = /^[a-zA-Z0-9_]{4,25}$/;
 
 export interface TwitchFollowCheckResult {
   error?: string;

@@ -282,9 +282,9 @@ describe("parseTwitchInput", () => {
     expect(result).toEqual({ type: "invalid", value: "" });
   });
 
-  it("should return invalid for username too short (less than 3 chars)", () => {
-    const result = parseTwitchInput("ab");
-    expect(result).toEqual({ type: "invalid", value: "ab" });
+  it("should return invalid for username too short (less than 4 chars)", () => {
+    const result = parseTwitchInput("abc");
+    expect(result).toEqual({ type: "invalid", value: "abc" });
   });
 
   it("should return invalid for username too long (more than 25 chars)", () => {
@@ -310,9 +310,9 @@ describe("parseTwitchInput", () => {
     expect(result).toEqual({ type: "username", value: "ninja" });
   });
 
-  it("should parse 3-character username (minimum length)", () => {
-    const result = parseTwitchInput("abc");
-    expect(result).toEqual({ type: "username", value: "abc" });
+  it("should parse 4-character username (minimum length)", () => {
+    const result = parseTwitchInput("abcd");
+    expect(result).toEqual({ type: "username", value: "abcd" });
   });
 
   it("should parse 25-character username (maximum length)", () => {

@@ -49,6 +49,7 @@ import {
   updateAndPublishSpace,
   updateSpaceSettings,
 } from "../_lib/settings-actions";
+import { lookupTwitchBroadcasterId } from "../_lib/twitch-lookup-actions";
 
 interface Props {
   currentParticipantCount: number;
@@ -144,25 +145,18 @@ export function SpaceSettingsForm({
       setTwitchIdError(null);
 
       try {
-        const response = await fetch("/api/twitch/lookup", {
-          body: JSON.stringify({ input: input.trim() }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-        });
+        // Use Server Function instead of API route
+        const result = await lookupTwitchBroadcasterId(input.trim());
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          setTwitchIdError(data.error || t("twitchBroadcasterIdConvertError"));
+        if (result.error) {
+          setTwitchIdError(result.error);
           setTwitchIdConverting(false);
           return;
         }
 
-        if (data.broadcasterId) {
+        if (result.broadcasterId) {
           // Update the field value with the converted ID
-          fieldApi.setValue(data.broadcasterId);
+          fieldApi.setValue(result.broadcasterId);
           setTwitchIdError(null);
         }
       } catch (_error) {

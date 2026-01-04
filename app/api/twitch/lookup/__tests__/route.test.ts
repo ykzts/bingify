@@ -36,7 +36,7 @@ describe("Twitch lookup route", () => {
     });
 
     it("should handle invalid inputs", () => {
-      const result = parseTwitchInput("ab");
+      const result = parseTwitchInput("abc");
       expect(result.type).toBe("invalid");
     });
   });
