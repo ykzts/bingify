@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { getEnabledAuthProviders } from "@/lib/data/auth-providers";
 import { createClient } from "@/lib/supabase/server";
+import { validateRedirectPath } from "@/lib/utils/url";
 import { LoginForm } from "./_components/login-form";
 
 export async function generateMetadata({
@@ -30,15 +31,17 @@ export default async function LoginPage({
 
   const supabase = await createClient();
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (session) {
+  if (user) {
     const query = await searchParams;
     const redirectParam = query?.redirect;
-    const redirectUrl =
-      typeof redirectParam === "string" ? redirectParam : `/${locale}`;
-    redirect(redirectUrl);
+    const redirectPath =
+      typeof redirectParam === "string"
+        ? validateRedirectPath(redirectParam, `/${locale}`)
+        : `/${locale}`;
+    redirect(redirectPath);
   }
 
   setRequestLocale(locale);
