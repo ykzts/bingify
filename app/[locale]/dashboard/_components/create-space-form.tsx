@@ -239,7 +239,7 @@ export function CreateSpaceForm() {
               <p className="mb-2 text-gray-500 text-sm">
                 公開URL:{" "}
                 <span className="font-mono">
-                  {getAbsoluteUrl()}/
+                  {getAbsoluteUrl()}
                   <span className="font-semibold text-gray-900">
                     @{(field.state.value as string) || "..."}-{dateSuffix}
                   </span>
