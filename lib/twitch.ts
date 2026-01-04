@@ -7,6 +7,12 @@ const TWITCH_URL_REGEX =
   /^(?:https?:\/\/)?(?:www\.)?twitch\.tv\/([a-zA-Z0-9_]{4,25})$/;
 const TWITCH_USERNAME_REGEX = /^[a-zA-Z0-9_]{4,25}$/;
 
+// App access token cache
+let cachedAppToken: {
+  accessToken: string;
+  expiresAt: number;
+} | null = null;
+
 export interface TwitchFollowCheckResult {
   error?: string;
   isFollowing: boolean;
@@ -83,6 +89,7 @@ function createAppApiClient(appAccessToken: string): ApiClient {
 
 /**
  * Get app access token for Twitch API using client credentials flow
+ * Tokens are cached and reused until they expire
  * @returns Promise with access token or null if failed
  */
 export async function getAppAccessToken(): Promise<string | null> {
@@ -93,8 +100,24 @@ export async function getAppAccessToken(): Promise<string | null> {
     return null;
   }
 
+  // Check if we have a valid cached token
+  const now = Date.now();
+  if (cachedAppToken && cachedAppToken.expiresAt > now) {
+    return cachedAppToken.accessToken;
+  }
+
   try {
     const token = await getAppToken(clientId, clientSecret);
+
+    // Cache the token with expiration
+    // Expire 5 minutes before actual expiration for safety margin
+    const expiresInMs = (token.expiresIn || 3600) * 1000;
+    const safetyMarginMs = 5 * 60 * 1000; // 5 minutes
+    cachedAppToken = {
+      accessToken: token.accessToken,
+      expiresAt: now + expiresInMs - safetyMarginMs,
+    };
+
     return token.accessToken;
   } catch (error) {
     console.error("Failed to get Twitch app access token:", error);
