@@ -1,6 +1,7 @@
 "use server";
 
 import { initialFormState } from "@tanstack/react-form-nextjs";
+import { revalidateTag } from "next/cache";
 import { systemSettingsSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
 
@@ -138,6 +139,9 @@ export async function updateSystemSettingsAction(
         errors: ["errorUpdateFailed"],
       };
     }
+
+    // Invalidate system settings cache
+    revalidateTag("system-settings", "max");
 
     // Return success state with consistent shape
     return {

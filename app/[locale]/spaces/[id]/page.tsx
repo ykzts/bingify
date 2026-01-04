@@ -13,6 +13,17 @@ import { EventEndedView } from "./_components/event-ended-view";
 import { SpaceLandingPage } from "./_components/space-landing-page";
 import { SpaceParticipation } from "./_components/space-participation";
 
+export const dynamic = "force-dynamic";
+
+async function getCurrentUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return user;
+}
+
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/spaces/[id]">): Promise<Metadata> {
@@ -70,10 +81,7 @@ export default async function UserSpacePage({
   }
 
   // Get current user
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   // If space is draft, only owner can access - others get 404
   if (space.status === "draft") {

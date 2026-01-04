@@ -1,4 +1,5 @@
 import { AlertCircle } from "lucide-react";
+import { connection } from "next/server";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthProvidersManagement } from "./_components/auth-providers-management";
@@ -7,6 +8,9 @@ import { getAuthProviders } from "./_lib/actions";
 export default async function AdminAuthProvidersPage({
   params,
 }: PageProps<"/[locale]/admin/auth-providers">) {
+  // Defer to request time
+  await connection();
+
   const { locale } = await params;
   setRequestLocale(locale);
 

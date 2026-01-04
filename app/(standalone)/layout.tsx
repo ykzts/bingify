@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function StandaloneLayout({
+export default function StandaloneLayout({
   children,
 }: {
   children: ReactNode;

@@ -1,7 +1,7 @@
 "use server";
 
 import type { User } from "@supabase/supabase-js";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 export interface AuthProviderRow {
@@ -108,6 +108,8 @@ export async function updateAuthProvider(
 
     // Revalidate login page to reflect changes
     revalidatePath("/[locale]/login", "page");
+    // Invalidate auth providers cache
+    revalidateTag("auth-providers", "max");
 
     return { success: true };
   } catch (error) {

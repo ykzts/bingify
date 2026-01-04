@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSystemSettings } from "@/lib/data/system-settings";
 import { SystemSettingsForm } from "./_components/system-settings-form";
@@ -5,6 +6,9 @@ import { SystemSettingsForm } from "./_components/system-settings-form";
 export default async function AdminSettingsPage({
   params,
 }: PageProps<"/[locale]/admin/settings">) {
+  // Defer to request time
+  await connection();
+
   const { locale } = await params;
   setRequestLocale(locale);
 

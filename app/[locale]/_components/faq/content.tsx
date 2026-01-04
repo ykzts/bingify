@@ -1,56 +1,20 @@
 "use client";
 
 import { motion } from "motion/react";
+import type { ReactNode } from "react";
 
-interface FaqProps {
-  answer1: string;
-  answer2: string;
-  answer3: string;
-  heading: string;
-  maxParticipants: number;
-  question1: string;
-  question2: string;
-  question3: string;
+interface FaqItem {
+  answer: ReactNode;
+  id: string;
+  question: string;
 }
 
-export function Faq({
-  answer1,
-  answer2,
-  answer3,
-  heading,
-  maxParticipants: _maxParticipants,
-  question1,
-  question2,
-  question3,
-}: FaqProps) {
-  const faqs = [
-    {
-      answer: answer1,
-      id: "usage-limits",
-      question: question1,
-    },
-    {
-      answer: (
-        <>
-          {answer2.split("GitHub")[0]}
-          <a
-            aria-label="View source code on GitHub (opens in a new window)"
-            className="text-primary underline hover:text-primary/80"
-            href="https://github.com/ykzts/bingify"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            GitHub
-          </a>
-          {answer2.split("GitHub")[1]}
-        </>
-      ),
-      id: "source-code",
-      question: question2,
-    },
-    { answer: answer3, id: "funding", question: question3 },
-  ];
+interface FaqContentProps {
+  faqs: FaqItem[];
+  heading: string;
+}
 
+export function FaqContent({ faqs, heading }: FaqContentProps) {
   return (
     <section className="px-6 py-20">
       <div className="mx-auto max-w-4xl">

@@ -3,7 +3,7 @@
 import { LayoutDashboard, LogOut, Settings, Shield, User } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useCallback, useEffectEvent, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,47 +15,39 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
+import type { Tables } from "@/types/supabase";
 
-interface HeaderMenuProps {
-  user: {
-    avatar_url?: string | null;
-    email?: string | null;
-    full_name?: string | null;
-    role?: string | null;
-  } | null;
-}
-
-export function HeaderMenu({ user }: HeaderMenuProps) {
-  const t = useTranslations("HeaderMenu");
-  const router = useRouter();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+export function HeaderMenuContent({
+  user,
+}: {
+  user: Pick<Tables<"profiles">, "avatar_url" | "email" | "full_name" | "role">;
+}) {
+  const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const t = useTranslations("HeaderMenu");
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
+  const returnToHome = useEffectEvent(() => {
+    router.push("/");
+    router.refresh();
+  });
+
+  const handleLogout = useCallback(() => {
+    startTransition(async () => {
       const supabase = createClient();
-      await supabase.auth.signOut();
-      setOpen(false);
-      router.push("/");
-      router.refresh();
-    } catch (error) {
-      console.error("Logout error:", error);
-      setIsLoggingOut(false);
-      setOpen(true);
-    }
-  };
 
-  if (!user) {
-    return (
-      <Link
-        className="rounded-md border border-gray-300 bg-white px-4 py-1.5 font-medium text-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
-        href="/login"
-      >
-        {t("login")}
-      </Link>
-    );
-  }
+      try {
+        await supabase.auth.signOut();
+      } catch (error) {
+        console.error("Logout error:", error);
+
+        return;
+      }
+
+      setOpen(false);
+      returnToHome();
+    });
+  }, []);
 
   return (
     <DropdownMenu onOpenChange={setOpen} open={open}>
@@ -85,7 +77,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
       <DropdownMenuPortal>
         <DropdownMenuContent
           align="end"
-          className="z-[100] min-w-[240px]"
+          className="z-100 min-w-60"
           sideOffset={8}
         >
           <div className="px-3 py-2">
@@ -137,7 +129,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
 
           <DropdownMenuItem
             className="disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={isLoggingOut}
+            disabled={isPending}
             onSelect={handleLogout}
           >
             <LogOut className="h-4 w-4" />

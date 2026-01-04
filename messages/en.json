@@ -312,7 +312,7 @@
   },
   "Faq": {
     "answer1": "The free version allows up to {maxParticipants} concurrent participants per space. For larger events or commercial use, please contact us.",
-    "answer2": "Yes! Bingify is open source under the MIT License. You can view, modify, and contribute to the source code on GitHub.",
+    "answer2": "Yes! Bingify is open source under the MIT License. You can view, modify, and contribute to the source code on <githubLink>GitHub</githubLink>.",
     "answer3": "This project is maintained by volunteers. You can support development through GitHub Sponsors, which helps cover hosting costs and development time.",
     "heading": "Frequently Asked Questions",
     "question1": "What are the usage limits?",

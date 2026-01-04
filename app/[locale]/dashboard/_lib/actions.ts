@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { format } from "date-fns";
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 import { generateSecureToken } from "@/lib/crypto";
 import { createClient } from "@/lib/supabase/server";
@@ -257,6 +258,10 @@ export async function createSpace(
       };
     }
 
+    // Invalidate space cache after creation
+    revalidateTag(`space-${uuid}`, "max");
+    revalidateTag(`space-share-${fullShareKey}`, "max");
+
     return {
       shareKey: fullShareKey,
       spaceId: uuid,
@@ -321,6 +326,9 @@ export async function regenerateViewToken(
         success: false,
       };
     }
+
+    // Invalidate space cache after token regeneration
+    revalidateTag(`space-${spaceId}`, "max");
 
     return {
       success: true,
@@ -548,6 +556,9 @@ export async function deleteSpace(spaceId: string): Promise<DeleteSpaceResult> {
         success: false,
       };
     }
+
+    // Invalidate space cache after deletion
+    revalidateTag(`space-${spaceId}`, "max");
 
     return {
       success: true,

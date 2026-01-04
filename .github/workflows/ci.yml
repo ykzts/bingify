@@ -34,5 +34,11 @@ jobs:
       - name: Run tests
         run: pnpm test:ci
 
+      - name: Setup local environment
+        run: pnpm local:setup
+
+      - name: Save .env.local for development
+        run: pnpm dev:env
+
       - name: Build
         run: pnpm build

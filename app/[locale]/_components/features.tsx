@@ -2,43 +2,26 @@
 
 import { Globe, Users, Zap } from "lucide-react";
 import { motion } from "motion/react";
+import { useTranslations } from "next-intl";
 
-interface FeaturesProps {
-  communityDescription: string;
-  communityTitle: string;
-  heading: string;
-  noAppDescription: string;
-  noAppTitle: string;
-  realtimeDescription: string;
-  realtimeTitle: string;
-  subheading: string;
-}
+export function Features() {
+  const t = useTranslations("Features");
 
-export function Features({
-  communityDescription,
-  communityTitle,
-  heading,
-  noAppDescription,
-  noAppTitle,
-  realtimeDescription,
-  realtimeTitle,
-  subheading,
-}: FeaturesProps) {
   const features = [
     {
-      description: realtimeDescription,
+      description: t("realtimeDescription"),
       icon: Zap,
-      title: realtimeTitle,
+      title: t("realtimeTitle"),
     },
     {
-      description: communityDescription,
+      description: t("communityDescription"),
       icon: Users,
-      title: communityTitle,
+      title: t("communityTitle"),
     },
     {
-      description: noAppDescription,
+      description: t("noAppDescription"),
       icon: Globe,
-      title: noAppTitle,
+      title: t("noAppTitle"),
     },
   ];
 
@@ -53,9 +36,9 @@ export function Features({
           whileInView={{ opacity: 1, y: 0 }}
         >
           <h2 className="mb-4 font-bold text-3xl text-foreground sm:text-4xl">
-            {heading}
+            {t("heading")}
           </h2>
-          <p className="text-lg text-muted-foreground">{subheading}</p>
+          <p className="text-lg text-muted-foreground">{t("subheading")}</p>
         </motion.div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">

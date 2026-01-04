@@ -4,29 +4,11 @@ import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
-interface HeroProps {
-  badge1: string;
-  badge2: string;
-  badge3: string;
-  ctaButton: string;
-  description: string;
-  descriptionLine2: string;
-  title: string;
-  titleHighlight: string;
-}
-
-export function Hero({
-  badge1,
-  badge2,
-  badge3,
-  ctaButton,
-  description,
-  descriptionLine2,
-  title,
-  titleHighlight,
-}: HeroProps) {
+export function Hero() {
+  const t = useTranslations("Hero");
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -69,10 +51,10 @@ export function Hero({
             type: "spring",
           }}
         >
-          {title}
+          {t("title")}
           <br />
           <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
-            {titleHighlight}
+            {t("titleHighlight")}
           </span>
         </motion.h1>
 
@@ -82,9 +64,9 @@ export function Hero({
           initial={{ opacity: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
         >
-          {description}
+          {t("description")}
           <br />
-          {descriptionLine2}
+          {t("descriptionLine2")}
         </motion.p>
 
         <motion.div
@@ -104,7 +86,7 @@ export function Hero({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                {ctaButton}
+                {t("ctaButton")}
                 <motion.span
                   animate={shouldReduceMotion ? {} : { x: [0, 4, 0] }}
                   className="inline-block"
@@ -129,15 +111,15 @@ export function Hero({
         >
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 rounded-full bg-accent" />
-            {badge1}
+            {t("badge1")}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 rounded-full bg-secondary" />
-            {badge2}
+            {t("badge2")}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 rounded-full bg-primary" />
-            {badge3}
+            {t("badge3")}
           </span>
         </motion.div>
       </motion.div>

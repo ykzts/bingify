@@ -4,6 +4,9 @@ import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 
+// Uses searchParams, so keep dynamic rendering
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/contact/complete">): Promise<Metadata> {

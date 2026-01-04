@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ContactForm } from "./_components/contact-form";
 
+export const dynamic = "force-static";
+
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/contact">): Promise<Metadata> {

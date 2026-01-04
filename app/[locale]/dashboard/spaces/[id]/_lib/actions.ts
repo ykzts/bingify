@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidateTag } from "next/cache";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
@@ -236,6 +237,9 @@ export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
         success: false,
       };
     }
+
+    // Invalidate space cache after closing
+    revalidateTag(`space-${spaceId}`, "max");
 
     return {
       success: true,

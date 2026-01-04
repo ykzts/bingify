@@ -7,6 +7,17 @@ import { createClient } from "@/lib/supabase/server";
 import { validateRedirectPath } from "@/lib/utils/url";
 import { LoginForm } from "./_components/login-form";
 
+export const dynamic = "force-dynamic";
+
+async function getCurrentUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return user;
+}
+
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/login">): Promise<Metadata> {
@@ -23,16 +34,14 @@ export async function generateMetadata({
   };
 }
 
-export default async function LoginPage({
-  params,
+async function LoginPageContent({
+  locale,
   searchParams,
-}: PageProps<"/[locale]/login">) {
-  const { locale } = await params;
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+}: {
+  locale: string;
+  searchParams: Promise<{ redirect?: string | string[] } | undefined>;
+}) {
+  const user = await getCurrentUser();
 
   if (user) {
     const query = await searchParams;
@@ -44,9 +53,18 @@ export default async function LoginPage({
     redirect(redirectPath);
   }
 
-  setRequestLocale(locale);
-
   const providers = await getEnabledAuthProviders();
+
+  return <LoginForm providers={providers} />;
+}
+
+export default async function LoginPage({
+  params,
+  searchParams,
+}: PageProps<"/[locale]/login">) {
+  const { locale } = await params;
+
+  setRequestLocale(locale);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-red-100 via-amber-50 to-sky-100">
@@ -57,7 +75,7 @@ export default async function LoginPage({
           </div>
         }
       >
-        <LoginForm providers={providers} />
+        <LoginPageContent locale={locale} searchParams={searchParams} />
       </Suspense>
     </div>
   );

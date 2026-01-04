@@ -17,6 +17,21 @@ import { ScreenSettingsDialog } from "./_components/screen-settings-dialog";
 import { SpaceSettingsSheet } from "./_components/space-settings-sheet";
 import { ViewingUrlDialog } from "./_components/viewing-url-dialog";
 
+export const dynamic = "force-dynamic";
+
+async function getCurrentUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("No authenticated user found");
+  }
+
+  return user;
+}
+
 export default async function AdminSpacePage({
   params,
 }: PageProps<"/[locale]/dashboard/spaces/[id]">) {
@@ -24,16 +39,16 @@ export default async function AdminSpacePage({
   setRequestLocale(locale);
 
   const t = await getTranslations("AdminSpace");
-  const supabase = await createClient();
 
   // Get current user
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  let user: Awaited<ReturnType<typeof getCurrentUser>> | undefined;
+  try {
+    user = await getCurrentUser();
+  } catch {
     redirect({ href: `/login?redirect=/dashboard/spaces/${id}`, locale });
   }
+
+  const supabase = await createClient();
 
   // Fetch space with validated JSONB columns using DAL
   const space = await getSpace(id);

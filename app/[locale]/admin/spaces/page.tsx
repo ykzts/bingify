@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SpaceList } from "../_components/space-list";
 import { getAllSpaces } from "../_lib/actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminSpacesPage({
   params,
 }: PageProps<"/[locale]/admin/spaces">) {

@@ -3,6 +3,8 @@ import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getMDXMetadata, MDXContent } from "@/lib/components/mdx-content";
 
+export const dynamic = "force-static";
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }

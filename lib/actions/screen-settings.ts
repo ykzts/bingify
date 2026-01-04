@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type {
   BackgroundType,
@@ -125,6 +125,8 @@ export async function updateScreenSettings(
 
   // Revalidate the space page (use pattern form for dynamic routes)
   revalidatePath("/[locale]/dashboard/spaces/[id]", "page");
+  // Invalidate screen settings cache
+  revalidateTag(`screen-settings-${spaceId}`, "max");
 
   return {
     success: true,

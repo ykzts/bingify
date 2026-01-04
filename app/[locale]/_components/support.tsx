@@ -2,15 +2,12 @@
 
 import { Heart } from "lucide-react";
 import { motion } from "motion/react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
-interface SupportProps {
-  description: string;
-  heading: string;
-  sponsorButton: string;
-}
+export function Support() {
+  const t = useTranslations("Support");
 
-export function Support({ description, heading, sponsorButton }: SupportProps) {
   return (
     <section className="px-6 py-20">
       <div className="mx-auto max-w-4xl">
@@ -38,7 +35,7 @@ export function Support({ description, heading, sponsorButton }: SupportProps) {
             viewport={{ once: true }}
             whileInView={{ opacity: 1, y: 0 }}
           >
-            {heading}
+            {t("heading")}
           </motion.h2>
 
           <motion.p
@@ -48,12 +45,12 @@ export function Support({ description, heading, sponsorButton }: SupportProps) {
             viewport={{ once: true }}
             whileInView={{ opacity: 1 }}
           >
-            {description}
+            {t("description")}
           </motion.p>
 
           <Button asChild className="rounded-full px-8 py-4 text-lg" size="lg">
             <motion.a
-              aria-label={`${sponsorButton} (opens in a new window)`}
+              aria-label={`${t("sponsorButton")} (opens in a new window)`}
               href="https://github.com/sponsors/ykzts"
               initial={{ opacity: 0, y: 20 }}
               rel="noopener noreferrer"
@@ -63,7 +60,7 @@ export function Support({ description, heading, sponsorButton }: SupportProps) {
               whileInView={{ opacity: 1, y: 0 }}
             >
               <Heart className="h-5 w-5" />
-              {sponsorButton}
+              {t("sponsorButton")}
             </motion.a>
           </Button>
         </motion.div>

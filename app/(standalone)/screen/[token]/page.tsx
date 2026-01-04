@@ -1,6 +1,8 @@
 import { headers } from "next/headers";
+import { connection } from "next/server";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
+import { Suspense } from "react";
 import { ScreenInitializer } from "@/components/providers/screen-initializer";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -12,9 +14,30 @@ import type {
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import { ScreenDisplay } from "./_components/screen-display";
 
-export default async function ScreenViewPage({
+export default function ScreenViewPage({
   params,
 }: PageProps<"/screen/[token]">) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-black">
+          <div className="text-white">Loading...</div>
+        </div>
+      }
+    >
+      <ScreenContent params={params} />
+    </Suspense>
+  );
+}
+
+async function ScreenContent({
+  params,
+}: {
+  params: Promise<{ token: string }>;
+}) {
+  // Defer to request time
+  await connection();
+
   const { token } = await params;
 
   const supabase = await createClient();

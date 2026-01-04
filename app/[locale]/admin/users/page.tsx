@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { UserList } from "../_components/user-list";
 import { getAllUsers } from "../_lib/actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminUsersPage({
   params,
 }: PageProps<"/[locale]/admin/users">) {

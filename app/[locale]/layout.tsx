@@ -12,7 +12,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import { Footer } from "./_components/footer";
-import { HeaderMenuWrapper } from "./_components/header-menu-wrapper";
+import { HeaderMenu } from "./_components/header-menu";
 
 const nunito = Nunito({
   display: "swap",
@@ -20,7 +20,9 @@ const nunito = Nunito({
   variable: "--font-nunito",
 });
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  // Return locale params but routes will still be dynamic at runtime
+  // This satisfies Cache Components' requirement for at least one static param
   return routing.locales.map((locale) => ({ locale }));
 }
 
@@ -57,7 +59,7 @@ export default async function LocaleLayout({
             <ConfirmProvider>
               <div className="flex min-h-screen flex-col">
                 <header className="fixed top-4 right-4 z-50">
-                  <HeaderMenuWrapper />
+                  <HeaderMenu />
                 </header>
                 <main className="flex-1">{children}</main>
                 <Footer />

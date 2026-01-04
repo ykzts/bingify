@@ -4,6 +4,7 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
+import { revalidateTag } from "next/cache";
 import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
@@ -358,6 +359,9 @@ export async function updateSpaceSettings(
       };
     }
 
+    // Invalidate space cache after settings update
+    revalidateTag(`space-${spaceId}`, "max");
+
     return {
       ...initialFormState,
       values: {
@@ -484,6 +488,9 @@ export async function publishSpace(
         success: false,
       };
     }
+
+    // Invalidate space cache after publishing
+    revalidateTag(`space-${spaceId}`, "max");
 
     return {
       success: true,
