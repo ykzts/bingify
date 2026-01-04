@@ -16,7 +16,7 @@
 - **Shadcn/ui** + **Tailwind CSS** を使用。
 - Theme Color: **Purple** (Primary: `#a78bfa`)。
 - Icons: **Lucide React**。
-- コンポーネントは `@/components/ui` に配置。
+- Shadcn/ui コンポーネントは `@/components/ui` に配置、カスタムコンポーネントは `@/components` に配置。
 - メインアクションのボタンには `primary` バリアント（デフォルト）を使用し、ブランド一貫性を保つ。
 
 ### Shadcn/ui コンポーネント管理
