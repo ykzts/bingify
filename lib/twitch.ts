@@ -11,6 +11,16 @@ export interface TwitchSubCheckResult {
   isSubscribed: boolean;
 }
 
+export interface TwitchUserLookupResult {
+  broadcasterId?: string;
+  error?: string;
+}
+
+export interface ParsedTwitchInput {
+  type: "id" | "username" | "invalid";
+  value: string;
+}
+
 /**
  * Validate common parameters for Twitch API calls
  */
@@ -50,6 +60,98 @@ function createApiClient(userAccessToken: string): ApiClient {
 
   const authProvider = new StaticAuthProvider(clientId, userAccessToken);
   return new ApiClient({ authProvider });
+}
+
+/**
+ * Create Twurple API client with app access token for server-side operations
+ */
+function createAppApiClient(appAccessToken: string): ApiClient {
+  const clientId = process.env.TWITCH_CLIENT_ID;
+  if (!clientId) {
+    throw new Error("Twitch client ID not configured");
+  }
+
+  const authProvider = new StaticAuthProvider(clientId, appAccessToken);
+  return new ApiClient({ authProvider });
+}
+
+/**
+ * Parse Twitch input to extract username or detect if it's already a numeric ID
+ * Supports:
+ * - Numeric ID: "123456789"
+ * - Username: "ninja"
+ * - URL: "https://www.twitch.tv/ninja" or "https://twitch.tv/ninja" or "twitch.tv/ninja"
+ */
+export function parseTwitchInput(input: string): ParsedTwitchInput {
+  const trimmed = input.trim();
+
+  if (!trimmed) {
+    return { type: "invalid", value: "" };
+  }
+
+  // Check if it's a numeric ID (digits only)
+  if (/^\d+$/.test(trimmed)) {
+    return { type: "id", value: trimmed };
+  }
+
+  // Check if it's a URL
+  const urlPatterns = [
+    /^(?:https?:\/\/)?(?:www\.)?twitch\.tv\/([a-zA-Z0-9_]{4,25})$/,
+    /^twitch\.tv\/([a-zA-Z0-9_]{4,25})$/,
+  ];
+
+  for (const pattern of urlPatterns) {
+    const match = trimmed.match(pattern);
+    if (match?.[1]) {
+      return { type: "username", value: match[1].toLowerCase() };
+    }
+  }
+
+  // Check if it's a valid username (4-25 characters, alphanumeric + underscore)
+  if (/^[a-zA-Z0-9_]{4,25}$/.test(trimmed)) {
+    return { type: "username", value: trimmed.toLowerCase() };
+  }
+
+  return { type: "invalid", value: trimmed };
+}
+
+/**
+ * Get Twitch broadcaster ID from username using app access token
+ * @param username - Twitch username
+ * @param appAccessToken - App access token for Twitch API
+ * @returns Promise with broadcaster ID or error
+ */
+export async function getBroadcasterIdFromUsername(
+  username: string,
+  appAccessToken: string
+): Promise<TwitchUserLookupResult> {
+  try {
+    if (!username) {
+      return { error: "Username is required" };
+    }
+
+    if (!appAccessToken) {
+      return { error: "App access token is required" };
+    }
+
+    const clientId = process.env.TWITCH_CLIENT_ID;
+    if (!clientId) {
+      return { error: "Twitch client ID not configured" };
+    }
+
+    const apiClient = createAppApiClient(appAccessToken);
+    const users = await apiClient.users.getUsersByNames([username]);
+
+    if (users.length === 0) {
+      return { error: "User not found" };
+    }
+
+    return { broadcasterId: users[0].id };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
 }
 
 /**
