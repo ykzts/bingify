@@ -36,7 +36,12 @@ export function proxy(request: NextRequest) {
     return handleShareKeyRoute(request, shareKey);
   }
 
-  // --- 5. Internationalization Routing ---
+  // --- 5. Screen Display URLs (Skip Internationalization) ---
+  if (pathname.startsWith("/screen")) {
+    return;
+  }
+
+  // --- 6. Internationalization Routing ---
   return intlMiddleware(request);
 }
 
