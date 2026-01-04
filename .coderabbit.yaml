@@ -3,6 +3,7 @@ chat:
   art: false
 language: ja-JP
 reviews:
+  auto_apply_labels: true
   auto_review:
     ignore_usernames:
       - renovate[bot]
