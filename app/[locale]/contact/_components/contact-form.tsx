@@ -25,10 +25,7 @@ import {
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Textarea } from "@/components/ui/textarea";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import {
-  revalidateLogic,
-  zodValidatorAdapter,
-} from "@/lib/utils/form-validation";
+import { revalidateLogic } from "@/lib/utils/form-validation";
 import { submitContactFormAction } from "../_lib/actions";
 import { contactFormOpts, contactFormSchema } from "../_lib/form-options";
 
@@ -54,7 +51,7 @@ export function ContactForm({ locale }: Props) {
       modeAfterSubmission: "change",
     }),
     validators: {
-      onDynamic: zodValidatorAdapter(contactFormSchema),
+      onDynamic: contactFormSchema,
     },
     transform: useTransform(
       (baseForm) => (state ? mergeForm(baseForm, state) : baseForm),

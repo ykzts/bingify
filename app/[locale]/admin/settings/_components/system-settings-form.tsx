@@ -29,10 +29,7 @@ import {
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import {
-  revalidateLogic,
-  zodValidatorAdapter,
-} from "@/lib/utils/form-validation";
+import { revalidateLogic } from "@/lib/utils/form-validation";
 import { updateSystemSettingsAction } from "../_lib/actions";
 import { systemSettingsFormOpts } from "../_lib/form-options";
 
@@ -65,7 +62,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
       modeAfterSubmission: "change",
     }),
     validators: {
-      onDynamic: zodValidatorAdapter(systemSettingsSchema),
+      onDynamic: systemSettingsSchema,
     },
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),

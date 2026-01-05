@@ -31,10 +31,7 @@ import {
   InputGroupText,
 } from "@/components/ui/input-group";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import {
-  revalidateLogic,
-  zodValidatorAdapter,
-} from "@/lib/utils/form-validation";
+import { revalidateLogic } from "@/lib/utils/form-validation";
 import { generateRandomKey } from "@/lib/utils/random-key";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import {
@@ -107,7 +104,7 @@ export function CreateSpaceForm() {
       modeAfterSubmission: "change",
     }),
     validators: {
-      onDynamic: zodValidatorAdapter(createSpaceFormSchema),
+      onDynamic: createSpaceFormSchema,
     },
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),

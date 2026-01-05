@@ -41,10 +41,7 @@ import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { cn } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import {
-  revalidateLogic,
-  zodValidatorAdapter,
-} from "@/lib/utils/form-validation";
+import { revalidateLogic } from "@/lib/utils/form-validation";
 import { YOUTUBE_CHANNEL_ID_REGEX } from "@/lib/youtube-constants";
 import {
   spaceSettingsFormOpts,
@@ -257,7 +254,7 @@ export function SpaceSettingsForm({
       modeAfterSubmission: "change",
     }),
     validators: {
-      onDynamic: zodValidatorAdapter(spaceSettingsFormSchema),
+      onDynamic: spaceSettingsFormSchema,
     },
     transform: useTransform(
       // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
