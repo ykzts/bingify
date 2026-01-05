@@ -101,7 +101,7 @@
     "supabase:start": "supabase start",
     "supabase:status": "supabase status",
     "supabase:stop": "supabase stop",
-    "supabase:test": "supabase test db",
+    "supabase:test-migrations": "supabase test db",
     "supabase:typegen": "supabase gen types typescript --local > types/supabase.ts",
     "test": "vitest",
     "test:ci": "vitest run",

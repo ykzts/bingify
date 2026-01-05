@@ -136,7 +136,7 @@ lib/
 - `pnpm build` — 本番ビルド
 - `pnpm local:setup` — Supabase ローカルインスタンス起動
 - `pnpm local:stop` — Supabase ローカルインスタンス停止
-- `pnpm supabase:test` — データベーステスト実行（PgTAP）
+- `pnpm supabase:test-migrations` — データベーステスト実行（PgTAP）
 - `pnpm supabase:typegen` — Supabase の型定義を生成（DB 変更後に実行）
 - `pnpm lint` — ESLint 実行
 - `pnpm test` — フロントエンドテスト実行（Vitest）
@@ -152,7 +152,7 @@ Bingify では [PgTAP](https://pgtap.org/) を使用してデータベース層�
 pnpm local:setup
 
 # データベーステストを実行
-pnpm supabase:test
+pnpm supabase:test-migrations
 ```
 
 ### テストファイルの構成
