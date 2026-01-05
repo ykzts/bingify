@@ -1,14 +1,11 @@
 import { youtube_v3 } from "@googleapis/youtube";
+import { YOUTUBE_CHANNEL_ID_REGEX } from "./youtube-constants";
 
 // 正規表現をトップレベルに定義（パフォーマンス向上）
-const YOUTUBE_CHANNEL_ID_REGEX = /^UC[a-zA-Z0-9_-]{22}$/;
 const YOUTUBE_HANDLE_PATH_REGEX = /^\/@([^/]+)/;
 const YOUTUBE_CHANNEL_PATH_REGEX = /^\/channel\/(UC[a-zA-Z0-9_-]{22})/;
 const YOUTUBE_CUSTOM_PATH_REGEX = /^\/c\/([^/]+)/;
 const YOUTUBE_USER_PATH_REGEX = /^\/user\/([^/]+)/;
-
-// エクスポートして他のモジュールでも使用可能にする
-export { YOUTUBE_CHANNEL_ID_REGEX };
 
 export interface YouTubeSubscriptionCheckResult {
   error?: string;

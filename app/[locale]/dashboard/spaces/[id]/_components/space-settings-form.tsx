@@ -41,7 +41,7 @@ import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { cn } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import { YOUTUBE_CHANNEL_ID_REGEX } from "@/lib/youtube";
+import { YOUTUBE_CHANNEL_ID_REGEX } from "@/lib/youtube-constants";
 import {
   spaceSettingsFormOpts,
   spaceSettingsFormSchema,
