@@ -45,13 +45,18 @@ CREATE TABLE private.oauth_tokens (
 
 ### 暗号化の仕組み
 
+**ローカル開発環境:**
+- トークンは `private` スキーマに保存され、PostgREST API から直接アクセス不可
+- データベースレベルでの暗号化は未設定（開発用途では十分なセキュリティ）
+
+**本番環境（推奨）:**
 ```sql
--- access_token と refresh_token は自動的に暗号化される
+-- Supabase Dashboard で Vault にキーを作成後、以下を実行:
 SECURITY LABEL FOR pgsodium ON COLUMN private.oauth_tokens.access_token
-  IS 'ENCRYPT WITH KEY COLUMN id';
+  IS 'ENCRYPT WITH KEY ID <vault_key_id>';
 
 SECURITY LABEL FOR pgsodium ON COLUMN private.oauth_tokens.refresh_token
-  IS 'ENCRYPT WITH KEY COLUMN id';
+  IS 'ENCRYPT WITH KEY ID <vault_key_id>';
 ```
 
 ## 使用方法
@@ -101,29 +106,26 @@ if (isTokenExpired(result.expires_at)) {
 
 ### ✅ 実現されたセキュリティ
 
-1. **暗号化されたストレージ**
-   - データベースの生テーブルでトークンは暗号化された状態
-   - バックアップやログにも暗号化された状態で保存
-
-2. **API からの隔離**
+1. **Private スキーマによる隔離**
    - PostgREST API から直接アクセス不可
    - フロントエンドから直接テーブルを読み書き不可
+   - アクセスは必ず RPC 関数経由
 
-3. **アクセス制御**
+2. **アクセス制御**
    - RPC 関数は認証済みユーザーのみアクセス可能
    - ユーザーは自分のトークンのみ操作可能
+   - `SECURITY DEFINER` による権限昇格の制御
 
-4. **監査可能性**
+3. **監査可能性**
    - すべてのアクセスは RPC 関数を経由
    - ログとモニタリングが容易
 
-### 🔒 推奨される追加対策
+### 🔒 本番環境で推奨される追加対策
 
-本番環境では以下の対策も検討してください：
-
-1. **Supabase Vault の使用**
-   - ホスト版 Supabase では Vault を使用可能
-   - より強固な鍵管理が実現できる
+1. **Transparent Column Encryption (TCE) の有効化**
+   - Supabase Dashboard で Vault にキーを作成
+   - `SECURITY LABEL` で暗号化を適用
+   - データベースバックアップでもトークンが暗号化される
 
 2. **トークンのローテーション**
    - 定期的にトークンをリフレッシュ
@@ -132,6 +134,10 @@ if (isTokenExpired(result.expires_at)) {
 3. **監査ログ**
    - トークンアクセスのログ記録
    - 異常なアクセスパターンの検知
+
+4. **ネットワーク制限**
+   - データベースへの直接アクセスを制限
+   - IP ホワイトリストの設定
 
 ## テスト
 
@@ -150,10 +156,13 @@ pnpm supabase:typegen
 
 ### マイグレーションエラー
 
-```bash
-# ローカル環境で vault 拡張が使えない場合
-# pgsodium の KEY COLUMN 方式を使用しているため問題なし
-```
+**ローカル環境:**
+- TCE（透過的カラム暗号化）はローカル開発では未設定
+- Private スキーマによる保護で開発には十分
+
+**本番環境:**
+- Supabase Dashboard から Vault でキーを作成
+- SQL エディタで `SECURITY LABEL` を適用してTCEを有効化
 
 ### トークンが保存されない
 
