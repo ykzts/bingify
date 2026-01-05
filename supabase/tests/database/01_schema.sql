@@ -4,7 +4,7 @@
 BEGIN;
 
 -- テストプランの設定（実行するテスト数を宣言）
-SELECT plan(45);
+SELECT plan(47);
 
 -- ========================================
 -- テーブル存在確認
@@ -63,7 +63,16 @@ SELECT has_column('public', 'bingo_cards', 'created_at', 'bingo_cards.created_at
 SELECT has_column('public', 'participants', 'id', 'participants.id カラムが存在すること');
 SELECT has_column('public', 'participants', 'space_id', 'participants.space_id カラムが存在すること');
 SELECT has_column('public', 'participants', 'user_id', 'participants.user_id カラムが存在すること');
-SELECT has_column('public', 'participants', 'created_at', 'participants.created_at カラムが存在すること');
+SELECT has_column('public', 'participants', 'joined_at', 'participants.joined_at カラムが存在すること');
+
+-- ========================================
+-- called_numbers テーブルのカラム検証
+-- ========================================
+
+SELECT has_column('public', 'called_numbers', 'id', 'called_numbers.id カラムが存在すること');
+SELECT has_column('public', 'called_numbers', 'space_id', 'called_numbers.space_id カラムが存在すること');
+SELECT has_column('public', 'called_numbers', 'value', 'called_numbers.value カラムが存在すること');
+SELECT has_column('public', 'called_numbers', 'called_at', 'called_numbers.called_at カラムが存在すること');
 
 -- ========================================
 -- space_roles テーブルのカラム検証

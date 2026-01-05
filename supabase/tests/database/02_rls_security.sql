@@ -66,8 +66,8 @@ BEGIN
     (test_user_id_2, 'test2@example.com', 'Test User 2');
 
   -- スペースを作成（user_1 が所有者）
-  INSERT INTO spaces (id, share_key, owner_id, status)
-  VALUES (test_space_id, 'test-space-20260105', test_user_id_1, 'active');
+  INSERT INTO spaces (id, share_key, owner_id, status, view_token)
+  VALUES (test_space_id, 'test-space-20260105', test_user_id_1, 'active', 'test-view-token-001');
 END $$;
 
 -- ========================================
@@ -148,7 +148,7 @@ SELECT ok(
   EXISTS (
     SELECT 1 FROM pg_policies
     WHERE tablename = 'space_roles'
-      AND policyname LIKE '%owner%'
+      AND policyname LIKE '%Owners%'
   ),
   'space_roles テーブルに所有者向けの RLS ポリシーが存在すること'
 );
@@ -158,7 +158,7 @@ SELECT ok(
   EXISTS (
     SELECT 1 FROM pg_policies
     WHERE tablename = 'space_roles'
-      AND policyname LIKE '%admin%'
+      AND policyname LIKE '%Admins%'
       AND cmd = 'SELECT'
   ),
   'space_roles テーブルに管理者が自分のロールを読み取れるポリシーが存在すること'
@@ -208,7 +208,7 @@ SELECT ok(
   EXISTS (
     SELECT 1 FROM pg_policies
     WHERE tablename = 'called_numbers'
-      AND policyname LIKE '%public%'
+      AND policyname LIKE '%Public%'
       AND cmd = 'SELECT'
   ),
   'called_numbers テーブルに公開読み取りポリシーが存在すること（表示専用画面用）'
@@ -219,7 +219,7 @@ SELECT ok(
   EXISTS (
     SELECT 1 FROM pg_policies
     WHERE tablename = 'called_numbers'
-      AND policyname LIKE '%owner%'
+      AND policyname LIKE '%Owners%'
       AND cmd = 'INSERT'
   ),
   'called_numbers テーブルに所有者が INSERT できるポリシーが存在すること'
