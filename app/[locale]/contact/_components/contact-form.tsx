@@ -1,5 +1,6 @@
 "use client";
 
+import { revalidateLogic } from "@tanstack/react-form";
 import {
   initialFormState,
   mergeForm,
@@ -25,7 +26,6 @@ import {
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Textarea } from "@/components/ui/textarea";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import { revalidateLogic } from "@/lib/utils/form-validation";
 import { submitContactFormAction } from "../_lib/actions";
 import { contactFormOpts, contactFormSchema } from "../_lib/form-options";
 

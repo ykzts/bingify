@@ -1,5 +1,6 @@
 "use client";
 
+import { revalidateLogic } from "@tanstack/react-form";
 import {
   mergeForm,
   useForm,
@@ -29,7 +30,6 @@ import {
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import { revalidateLogic } from "@/lib/utils/form-validation";
 import { updateSystemSettingsAction } from "../_lib/actions";
 import { systemSettingsFormOpts } from "../_lib/form-options";
 

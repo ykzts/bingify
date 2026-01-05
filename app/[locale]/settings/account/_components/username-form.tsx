@@ -1,5 +1,6 @@
 "use client";
 
+import { revalidateLogic } from "@tanstack/react-form";
 import {
   initialFormState,
   mergeForm,
@@ -24,7 +25,6 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { usernameSchema } from "@/lib/schemas/user";
-import { revalidateLogic } from "@/lib/utils/form-validation";
 import { updateUsernameAction } from "../_lib/actions";
 import { usernameFormOpts } from "../_lib/form-options";
 
