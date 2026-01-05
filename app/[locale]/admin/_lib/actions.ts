@@ -308,13 +308,14 @@ export async function getAllUsers(
   page = 1,
   perPage = 50
 ): Promise<{
+  currentUserId?: string;
   error?: string;
   hasMore?: boolean;
   users?: Tables<"profiles">[];
 }> {
   try {
     // Verify admin role
-    const { isAdmin } = await verifyAdminRole();
+    const { isAdmin, userId: currentUserId } = await verifyAdminRole();
     if (!isAdmin) {
       return {
         error: "errorNoPermission",
@@ -339,6 +340,7 @@ export async function getAllUsers(
     }
 
     return {
+      currentUserId,
       hasMore: (data?.length || 0) === perPage,
       users: data || [],
     };

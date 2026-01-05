@@ -11,7 +11,7 @@ export default async function AdminUsersPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("Admin");
-  const { error, users } = await getAllUsers();
+  const { currentUserId, error, users } = await getAllUsers();
 
   if (error) {
     return (
@@ -30,7 +30,7 @@ export default async function AdminUsersPage({
         </p>
       </div>
 
-      <UserList initialUsers={users || []} />
+      <UserList currentUserId={currentUserId} initialUsers={users || []} />
     </div>
   );
 }

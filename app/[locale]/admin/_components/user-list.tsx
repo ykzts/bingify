@@ -25,10 +25,11 @@ interface User {
 }
 
 interface UserListProps {
+  currentUserId?: string;
   initialUsers: User[];
 }
 
-export function UserList({ initialUsers }: UserListProps) {
+export function UserList({ currentUserId, initialUsers }: UserListProps) {
   const t = useTranslations("Admin");
   const confirm = useConfirm();
   const [users, setUsers] = useState(initialUsers);
@@ -135,7 +136,9 @@ export function UserList({ initialUsers }: UserListProps) {
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   <Select
-                    disabled={updatingRole === user.id}
+                    disabled={
+                      updatingRole === user.id || user.id === currentUserId
+                    }
                     onValueChange={(value) =>
                       handleRoleChange(
                         user.id,
