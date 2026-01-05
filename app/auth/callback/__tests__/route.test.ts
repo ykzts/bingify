@@ -28,7 +28,7 @@ describe("Auth Callback Route", () => {
     );
   });
 
-  it("should redirect to login with error when code parameter is empty", async () => {
+  it("codeパラメータが空の場合エラー付きでログインにリダイレクトする", async () => {
     const request = new NextRequest(`${origin}/auth/callback?code=`, {
       headers: {
         referer: `${origin}/login`,
@@ -43,7 +43,7 @@ describe("Auth Callback Route", () => {
     );
   });
 
-  it("should redirect to login with error when code parameter contains only whitespace", async () => {
+  it("codeパラメータが空白のみの場合エラー付きでログインにリダイレクトする", async () => {
     const request = new NextRequest(`${origin}/auth/callback?code=%20`, {
       headers: {
         referer: `${origin}/login`,
@@ -58,7 +58,7 @@ describe("Auth Callback Route", () => {
     );
   });
 
-  it("should redirect to localized login with error when code is missing and referer has locale", async () => {
+  it("codeが欠落しrefererにロケールがある場合エラー付きでローカライズされたログインにリダイレクトする", async () => {
     const request = new NextRequest(`${origin}/auth/callback`, {
       headers: {
         referer: `${origin}/ja/login`,
@@ -73,7 +73,7 @@ describe("Auth Callback Route", () => {
     );
   });
 
-  it("should redirect to login with error when session exchange fails", async () => {
+  it("セッション交換が失敗した場合エラー付きでログインにリダイレクトする", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -100,7 +100,7 @@ describe("Auth Callback Route", () => {
     );
   });
 
-  it("should redirect to dashboard on successful authentication", async () => {
+  it("認証成功時にダッシュボードにリダイレクトする", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -120,7 +120,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should redirect to localized dashboard on successful authentication with locale in referer", async () => {
+  it("refererにロケールがある場合認証成功時にローカライズされたダッシュボードにリダイレクトする", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -140,7 +140,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/ja/`);
   });
 
-  it("should handle missing referer header gracefully", async () => {
+  it("refererヘッダーの欠落を適切に処理する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -156,7 +156,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should handle malformed referer URL gracefully", async () => {
+  it("不正なreferer URLを適切に処理する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -176,7 +176,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should ignore invalid locale in referer and redirect to non-localized path", async () => {
+  it("referer内の無効なロケールを無視し非ローカライズパスにリダイレクトする", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -196,7 +196,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should handle malformed referer URL on authentication error", async () => {
+  it("認証エラー時に不正なreferer URLを処理する", async () => {
     const request = new NextRequest(`${origin}/auth/callback`, {
       headers: {
         referer: "invalid-url-format",
@@ -211,7 +211,7 @@ describe("Auth Callback Route", () => {
     );
   });
 
-  it("should ignore invalid locale in referer on authentication error", async () => {
+  it("認証エラー時にreferer内の無効なロケールを無視する", async () => {
     const request = new NextRequest(`${origin}/auth/callback`, {
       headers: {
         referer: `${origin}/xyz/login`,
@@ -226,7 +226,7 @@ describe("Auth Callback Route", () => {
     );
   });
 
-  it("should redirect to specified path when redirect parameter is provided", async () => {
+  it("redirectパラメータが指定されている場合指定されたパスにリダイレクトする", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -249,7 +249,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/dashboard`);
   });
 
-  it("should redirect to localized specified path when redirect parameter is provided with locale", async () => {
+  it("redirectパラメータがロケール付きで指定されている場合ローカライズされた指定パスにリダイレクトする", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -272,7 +272,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/ja/admin`);
   });
 
-  it("should handle redirect parameter with locale already included", async () => {
+  it("redirectパラメータに既にロケールが含まれている場合を処理する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -295,7 +295,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/ja/dashboard`);
   });
 
-  it("should reject protocol-relative URLs in redirect parameter", async () => {
+  it("redirectパラメータ内のプロトコル相対URLを拒否する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -318,7 +318,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should reject absolute URLs in redirect parameter", async () => {
+  it("redirectパラメータ内の絶対URLを拒否する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -341,7 +341,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should accept redirect with query parameters containing colons", async () => {
+  it("コロンを含むクエリパラメータ付きのredirectを受け入れる", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -366,7 +366,7 @@ describe("Auth Callback Route", () => {
     );
   });
 
-  it("should accept redirect with @ symbol in query parameters", async () => {
+  it("クエリパラメータに@記号を含むredirectを受け入れる", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -391,7 +391,7 @@ describe("Auth Callback Route", () => {
     );
   });
 
-  it("should reject redirect with whitespace-only value", async () => {
+  it("空白のみの値を含むredirectを拒否する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -414,7 +414,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should reject redirect with empty string", async () => {
+  it("空文字列のredirectを拒否する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -437,7 +437,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should reject redirect with encoded slashes", async () => {
+  it("エンコードされたスラッシュを含むredirectを拒否する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -460,7 +460,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should reject redirect with path traversal", async () => {
+  it("パストラバーサルを含むredirectを拒否する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -483,7 +483,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should reject redirect with encoded path traversal", async () => {
+  it("エンコードされたパストラバーサルを含むredirectを拒否する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -506,7 +506,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should handle paths with backslashes", async () => {
+  it("バックスラッシュを含むパスを処理する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -531,7 +531,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toContain(`${origin}/`);
   });
 
-  it("should reject redirect with javascript: protocol", async () => {
+  it("javascript:プロトコルを含むredirectを拒否する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -554,7 +554,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should reject redirect with data: protocol", async () => {
+  it("data:プロトコルを含むredirectを拒否する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
@@ -577,7 +577,7 @@ describe("Auth Callback Route", () => {
     expect(response.headers.get("location")).toBe(`${origin}/`);
   });
 
-  it("should reject redirect with vbscript: protocol in fragment", async () => {
+  it("フラグメント内のvbscript:プロトコルを含むredirectを拒否する", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {

@@ -24,7 +24,7 @@ describe("checkSubscriptionStatus", () => {
     vi.clearAllMocks();
   });
 
-  it("should return isSubscribed true when subscription exists", async () => {
+  it("サブスクリプションが存在する場合にisSubscribed trueを返す", async () => {
     mockList.mockResolvedValue({
       data: {
         items: [
@@ -52,7 +52,7 @@ describe("checkSubscriptionStatus", () => {
     });
   });
 
-  it("should return isSubscribed false when subscription does not exist", async () => {
+  it("サブスクリプションが存在しない場合にisSubscribed falseを返す", async () => {
     mockList.mockResolvedValue({
       data: {
         items: [],
@@ -68,21 +68,21 @@ describe("checkSubscriptionStatus", () => {
     expect(result.error).toBeUndefined();
   });
 
-  it("should return error when access token is missing", async () => {
+  it("アクセストークンが欠落している場合にエラーを返す", async () => {
     const result = await checkSubscriptionStatus("", "UC_test_channel");
 
     expect(result.isSubscribed).toBe(false);
     expect(result.error).toBe("Missing required parameters");
   });
 
-  it("should return error when channel ID is missing", async () => {
+  it("チャンネルIDが欠落している場合にエラーを返す", async () => {
     const result = await checkSubscriptionStatus("test_access_token", "");
 
     expect(result.isSubscribed).toBe(false);
     expect(result.error).toBe("Missing required parameters");
   });
 
-  it("should return error when API request fails", async () => {
+  it("APIリクエストが失敗した場合にエラーを返す", async () => {
     mockList.mockRejectedValue(new Error("API Error: Invalid credentials"));
 
     const result = await checkSubscriptionStatus(
@@ -94,7 +94,7 @@ describe("checkSubscriptionStatus", () => {
     expect(result.error).toBe("API Error: Invalid credentials");
   });
 
-  it("should handle network errors gracefully", async () => {
+  it("ネットワークエラーを適切に処理する", async () => {
     mockList.mockRejectedValue(new Error("Network error"));
 
     const result = await checkSubscriptionStatus(
@@ -112,7 +112,7 @@ describe("checkMembershipStatus", () => {
     vi.clearAllMocks();
   });
 
-  it("should return error indicating feature is not supported", async () => {
+  it("機能がサポートされていないことを示すエラーを返す", async () => {
     const result = await checkMembershipStatus(
       "test_access_token",
       "UC_test_channel"
@@ -122,11 +122,10 @@ describe("checkMembershipStatus", () => {
     expect(result.error).toBe(
       "YouTube membership verification is not supported. The API requires channel owner credentials."
     );
-    // Verify that the API was not called
     expect(mockMembersList).not.toHaveBeenCalled();
   });
 
-  it("should return error when access token is missing", async () => {
+  it("アクセストークンが欠落している場合にエラーを返す", async () => {
     const result = await checkMembershipStatus("", "UC_test_channel");
 
     expect(result.isMember).toBe(false);
@@ -134,7 +133,7 @@ describe("checkMembershipStatus", () => {
     expect(mockMembersList).not.toHaveBeenCalled();
   });
 
-  it("should return error when channel ID is missing", async () => {
+  it("チャンネルIDが欠落している場合にエラーを返す", async () => {
     const result = await checkMembershipStatus("test_access_token", "");
 
     expect(result.isMember).toBe(false);

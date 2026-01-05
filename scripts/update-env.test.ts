@@ -17,7 +17,7 @@ describe("update-env script", () => {
     }
   });
 
-  it("creates new .env.local with Supabase keys", () => {
+  it("Supabaseキーで新しい.env.localを作成する", () => {
     const mockSupabaseConfig = {
       ANON_KEY: "test-anon-key",
       API_URL: "http://127.0.0.1:54321",
@@ -78,7 +78,7 @@ describe("update-env script", () => {
     );
   });
 
-  it("updates existing .env.local while preserving other variables", () => {
+  it("他の変数を保持しながら既存の.env.localを更新する", () => {
     const existingContent = `# Comment
 NEXT_PUBLIC_SUPABASE_URL=http://old-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=old-key
@@ -153,7 +153,7 @@ ANOTHER_VAR=also-preserved
     expect(content).not.toContain("old-url");
   });
 
-  it("handles environment variables with '=' in the value", () => {
+  it("値に'='を含む環境変数を処理する", () => {
     const existingContent = `# Test
 BASE64_KEY=aGVsbG8=d29ybGQ=
 NEXT_PUBLIC_SUPABASE_URL=http://old-url

@@ -15,7 +15,7 @@ describe("publishSpace", () => {
     vi.clearAllMocks();
   });
 
-  it("should successfully publish space by owner", async () => {
+  it("オーナーがスペースを正常に公開する", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     const { isValidUUID } = await import("@/lib/utils/uuid");
 
@@ -100,7 +100,7 @@ describe("publishSpace", () => {
     expect(mockUpdate).toHaveBeenCalledWith({ status: "active" });
   });
 
-  it("should successfully publish space by admin", async () => {
+  it("管理者がスペースを正常に公開する", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     const { isValidUUID } = await import("@/lib/utils/uuid");
 
@@ -184,7 +184,7 @@ describe("publishSpace", () => {
     expect(result).toEqual({ success: true });
   });
 
-  it("should reject unauthorized user", async () => {
+  it("権限のないユーザーを拒否する", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     const { isValidUUID } = await import("@/lib/utils/uuid");
 
@@ -251,7 +251,7 @@ describe("publishSpace", () => {
     });
   });
 
-  it("should handle space not found", async () => {
+  it("スペースが見つからない場合を処理する", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     const { isValidUUID } = await import("@/lib/utils/uuid");
 
@@ -293,7 +293,7 @@ describe("publishSpace", () => {
     });
   });
 
-  it("should handle update failure", async () => {
+  it("更新失敗を処理する", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     const { isValidUUID } = await import("@/lib/utils/uuid");
 
@@ -376,7 +376,7 @@ describe("publishSpace", () => {
     });
   });
 
-  it("should handle invalid UUID", async () => {
+  it("無効なUUIDを処理する", async () => {
     const { isValidUUID } = await import("@/lib/utils/uuid");
 
     vi.mocked(isValidUUID).mockReturnValue(false);
@@ -395,7 +395,7 @@ describe("publishSpace", () => {
     });
   });
 
-  it("should handle missing user authentication", async () => {
+  it("ユーザー認証の欠落を処理する", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     const { isValidUUID } = await import("@/lib/utils/uuid");
 
@@ -425,7 +425,7 @@ describe("publishSpace", () => {
     });
   });
 
-  it("should reject publishing an already published space", async () => {
+  it("既に公開されているスペースの公開を拒否する", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     const { isValidUUID } = await import("@/lib/utils/uuid");
 

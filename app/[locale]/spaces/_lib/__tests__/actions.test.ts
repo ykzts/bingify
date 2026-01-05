@@ -27,12 +27,12 @@ describe("getSpacePublicInfo", () => {
     vi.clearAllMocks();
   });
 
-  test("should return null for invalid UUID", async () => {
+  test("無効なUUIDに対してnullを返す", async () => {
     const result = await getSpacePublicInfo("invalid-uuid");
     expect(result).toBeNull();
   });
 
-  test("should return null when space not found", async () => {
+  test("スペースが見つからない場合nullを返す", async () => {
     mockSupabase.from.mockReturnValue({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
@@ -50,7 +50,7 @@ describe("getSpacePublicInfo", () => {
     expect(result).toBeNull();
   });
 
-  test("should return space info with masked emails for active space", async () => {
+  test("アクティブなスペースに対してマスクされたメールを含むスペース情報を返す", async () => {
     const mockSpace = {
       description: "Test space description",
       gatekeeper_rules: {
@@ -97,7 +97,7 @@ describe("getSpacePublicInfo", () => {
     expect(result?.gatekeeper_rules?.youtube?.requirement).toBe("subscriber");
   });
 
-  test("should return space info for draft space with status", async () => {
+  test("ドラフトスペースに対してステータス付きのスペース情報を返す", async () => {
     const mockSpace = {
       description: "Draft space",
       gatekeeper_rules: null,
@@ -128,7 +128,7 @@ describe("getSpacePublicInfo", () => {
     expect(result?.hideMetadata).toBe(false);
   });
 
-  test("should respect hide_metadata_before_join setting", async () => {
+  test("hide_metadata_before_join設定を尊重する", async () => {
     const mockSpace = {
       description: "Private space",
       gatekeeper_rules: null,
@@ -160,7 +160,7 @@ describe("getSpacePublicInfo", () => {
     expect(result?.hideMetadata).toBe(true);
   });
 
-  test("should return null gatekeeper_rules when all rules are none", async () => {
+  test("すべてのルールがnoneの場合nullのgatekeeper_rulesを返す", async () => {
     const mockSpace = {
       description: "Space with no restrictions",
       gatekeeper_rules: {
@@ -195,7 +195,7 @@ describe("getSpacePublicInfo", () => {
     expect(result?.gatekeeper_rules).toBeNull();
   });
 
-  test("should handle legacy YouTube format", async () => {
+  test("レガシーYouTubeフォーマットを処理する", async () => {
     const mockSpace = {
       description: "Legacy YouTube",
       gatekeeper_rules: {
@@ -230,7 +230,7 @@ describe("getSpacePublicInfo", () => {
     expect(result?.gatekeeper_rules?.youtube?.requirement).toBe("subscriber");
   });
 
-  test("should handle legacy Twitch format", async () => {
+  test("レガシーTwitchフォーマットを処理する", async () => {
     const mockSpace = {
       description: "Legacy Twitch",
       gatekeeper_rules: {

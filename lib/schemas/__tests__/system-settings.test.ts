@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { systemFeaturesSchema, systemSettingsSchema } from "../system-settings";
 
 describe("systemFeaturesSchema", () => {
-  it("should accept valid feature flags structure", () => {
+  it("有効な機能フラグ構造を受け入れる", () => {
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
         email: { enabled: true },
@@ -21,7 +21,7 @@ describe("systemFeaturesSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("should accept feature flags with all disabled", () => {
+  it("すべて無効の機能フラグを受け入れる", () => {
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
         email: { enabled: false },
@@ -40,12 +40,12 @@ describe("systemFeaturesSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("should reject missing gatekeeper object", () => {
+  it("gatekeeperオブジェクトが欠落している場合は拒否する", () => {
     const result = systemFeaturesSchema.safeParse({});
     expect(result.success).toBe(false);
   });
 
-  it("should reject missing email in gatekeeper", () => {
+  it("gatekeeperにemailが欠落している場合は拒否する", () => {
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
         twitch: {
@@ -63,7 +63,7 @@ describe("systemFeaturesSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject non-boolean enabled value", () => {
+  it("真偽値でないenabled値を拒否する", () => {
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
         email: { enabled: "true" },
@@ -82,7 +82,7 @@ describe("systemFeaturesSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject when platform is enabled but nested requirement field is missing", () => {
+  it("プラットフォームが有効だがネストされた要件フィールドが欠落している場合は拒否する", () => {
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
         email: { enabled: true },
@@ -101,7 +101,7 @@ describe("systemFeaturesSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject when nested field has wrong type (string instead of object)", () => {
+  it("ネストされたフィールドの型が間違っている場合は拒否する（オブジェクトではなく文字列）", () => {
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
         email: { enabled: true },
@@ -120,7 +120,7 @@ describe("systemFeaturesSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject when nested enabled field has wrong type (string instead of boolean)", () => {
+  it("ネストされたenabledフィールドの型が間違っている場合は拒否する（真偽値ではなく文字列）", () => {
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
         email: { enabled: true },
@@ -139,7 +139,7 @@ describe("systemFeaturesSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should accept mixed requirement states when platform is disabled", () => {
+  it("プラットフォームが無効の場合、混在した要件状態を受け入れる", () => {
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
         email: { enabled: true },
@@ -158,7 +158,7 @@ describe("systemFeaturesSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("should accept when youtube member is missing from old data but member is present", () => {
+  it("古いデータでyoutube memberが欠落しているがmemberが存在する場合は受け入れる", () => {
     // This tests backward compatibility - old data may not have member field
     const result = systemFeaturesSchema.safeParse({
       gatekeeper: {
@@ -180,7 +180,7 @@ describe("systemFeaturesSchema", () => {
 });
 
 describe("systemSettingsSchema", () => {
-  it("should accept valid system settings with features", () => {
+  it("機能を含む有効なシステム設定を受け入れる", () => {
     const result = systemSettingsSchema.safeParse({
       default_user_role: "organizer",
       features: {
@@ -206,7 +206,7 @@ describe("systemSettingsSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("should reject settings without features", () => {
+  it("機能がない設定を拒否する", () => {
     const result = systemSettingsSchema.safeParse({
       max_participants_per_space: 50,
       max_spaces_per_user: 5,
@@ -216,7 +216,7 @@ describe("systemSettingsSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject invalid max_participants_per_space values", () => {
+  it("無効なmax_participants_per_space値を拒否する", () => {
     const settings = {
       features: {
         gatekeeper: {
@@ -242,7 +242,7 @@ describe("systemSettingsSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject invalid max_spaces_per_user values", () => {
+  it("無効なmax_spaces_per_user値を拒否する", () => {
     const settings = {
       features: {
         gatekeeper: {
@@ -268,7 +268,7 @@ describe("systemSettingsSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should accept space_expiration_hours as 0 (unlimited)", () => {
+  it("space_expiration_hoursが0（無制限）の場合は受け入れる", () => {
     const result = systemSettingsSchema.safeParse({
       default_user_role: "organizer",
       features: {
@@ -294,7 +294,7 @@ describe("systemSettingsSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("should reject negative space_expiration_hours", () => {
+  it("負のspace_expiration_hoursを拒否する", () => {
     const result = systemSettingsSchema.safeParse({
       features: {
         gatekeeper: {
@@ -319,7 +319,7 @@ describe("systemSettingsSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject max_participants_per_space over limit", () => {
+  it("制限を超えるmax_participants_per_spaceを拒否する", () => {
     const result = systemSettingsSchema.safeParse({
       features: {
         gatekeeper: {
@@ -344,7 +344,7 @@ describe("systemSettingsSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject max_spaces_per_user over limit", () => {
+  it("制限を超えるmax_spaces_per_userを拒否する", () => {
     const result = systemSettingsSchema.safeParse({
       features: {
         gatekeeper: {
@@ -369,7 +369,7 @@ describe("systemSettingsSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject space_expiration_hours over limit", () => {
+  it("制限を超えるspace_expiration_hoursを拒否する", () => {
     const result = systemSettingsSchema.safeParse({
       features: {
         gatekeeper: {
@@ -394,7 +394,7 @@ describe("systemSettingsSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should accept max_total_spaces as 0 (unlimited)", () => {
+  it("max_total_spacesが0（無制限）の場合は受け入れる", () => {
     const result = systemSettingsSchema.safeParse({
       default_user_role: "organizer",
       features: {
@@ -420,7 +420,7 @@ describe("systemSettingsSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("should reject negative max_total_spaces", () => {
+  it("負のmax_total_spacesを拒否する", () => {
     const result = systemSettingsSchema.safeParse({
       features: {
         gatekeeper: {
@@ -445,7 +445,7 @@ describe("systemSettingsSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject max_total_spaces over limit", () => {
+  it("制限を超えるmax_total_spacesを拒否する", () => {
     const result = systemSettingsSchema.safeParse({
       features: {
         gatekeeper: {

@@ -4,17 +4,17 @@ import { generateSecureToken } from "../crypto";
 const HEX_PATTERN = /^[0-9a-f]{64}$/;
 
 describe("generateSecureToken", () => {
-  it("should generate a 64-character token", () => {
+  it("64文字のトークンを生成する", () => {
     const token = generateSecureToken();
     expect(token).toHaveLength(64);
   });
 
-  it("should contain only hexadecimal characters", () => {
+  it("16進数文字のみを含む", () => {
     const token = generateSecureToken();
     expect(token).toMatch(HEX_PATTERN);
   });
 
-  it("should generate unique tokens", () => {
+  it("一意なトークンを生成する", () => {
     const token1 = generateSecureToken();
     const token2 = generateSecureToken();
     const token3 = generateSecureToken();
@@ -24,15 +24,14 @@ describe("generateSecureToken", () => {
     expect(token1).not.toBe(token3);
   });
 
-  it("should use all lowercase hex characters", () => {
+  it("すべて小文字の16進数文字を使用する", () => {
     const token = generateSecureToken();
     expect(token).toBe(token.toLowerCase());
     expect(token).not.toContain("A");
     expect(token).not.toContain("F");
   });
 
-  it("should generate tokens with sufficient entropy", () => {
-    // Generate multiple tokens and check they're all different
+  it("十分なエントロピーを持つトークンを生成する", () => {
     const tokens = new Set();
     const count = 100;
 
@@ -40,7 +39,6 @@ describe("generateSecureToken", () => {
       tokens.add(generateSecureToken());
     }
 
-    // All tokens should be unique
     expect(tokens.size).toBe(count);
   });
 });

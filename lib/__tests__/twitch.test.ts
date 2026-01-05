@@ -41,7 +41,7 @@ describe("checkFollowStatus", () => {
     process.env.TWITCH_CLIENT_ID = originalClientId;
   });
 
-  it("should return isFollowing true when user follows broadcaster", async () => {
+  it("ユーザーが配信者をフォローしている場合にisFollowing trueを返す", async () => {
     mockGetChannelFollowers.mockResolvedValue({
       data: [
         {
@@ -59,7 +59,7 @@ describe("checkFollowStatus", () => {
     expect(mockGetChannelFollowers).toHaveBeenCalledWith("456", "123");
   });
 
-  it("should return isFollowing false when user does not follow broadcaster", async () => {
+  it("ユーザーが配信者をフォローしていない場合にisFollowing falseを返す", async () => {
     mockGetChannelFollowers.mockResolvedValue({
       data: [],
     });
@@ -70,7 +70,7 @@ describe("checkFollowStatus", () => {
     expect(result.error).toBeUndefined();
   });
 
-  it("should return error when access token is missing", async () => {
+  it("アクセストークンが欠落している場合にエラーを返す", async () => {
     const result = await checkFollowStatus("", "123", "456");
 
     expect(result.isFollowing).toBe(false);
@@ -78,7 +78,7 @@ describe("checkFollowStatus", () => {
     expect(mockGetChannelFollowers).not.toHaveBeenCalled();
   });
 
-  it("should return error when user ID is missing", async () => {
+  it("ユーザーIDが欠落している場合にエラーを返す", async () => {
     const result = await checkFollowStatus("test_access_token", "", "456");
 
     expect(result.isFollowing).toBe(false);
@@ -86,7 +86,7 @@ describe("checkFollowStatus", () => {
     expect(mockGetChannelFollowers).not.toHaveBeenCalled();
   });
 
-  it("should return error when broadcaster ID is missing", async () => {
+  it("配信者IDが欠落している場合にエラーを返す", async () => {
     const result = await checkFollowStatus("test_access_token", "123", "");
 
     expect(result.isFollowing).toBe(false);
@@ -94,7 +94,7 @@ describe("checkFollowStatus", () => {
     expect(mockGetChannelFollowers).not.toHaveBeenCalled();
   });
 
-  it("should return error when client ID is not configured", async () => {
+  it("クライアントIDが設定されていない場合にエラーを返す", async () => {
     const clientId = process.env.TWITCH_CLIENT_ID;
     process.env.TWITCH_CLIENT_ID = "";
 
@@ -104,11 +104,10 @@ describe("checkFollowStatus", () => {
     expect(result.error).toBe("Twitch client ID not configured");
     expect(mockGetChannelFollowers).not.toHaveBeenCalled();
 
-    // Restore
     process.env.TWITCH_CLIENT_ID = clientId;
   });
 
-  it("should return error when API request fails", async () => {
+  it("APIリクエストが失敗した場合にエラーを返す", async () => {
     mockGetChannelFollowers.mockRejectedValue(
       new Error("API Error: Invalid credentials")
     );
@@ -119,7 +118,7 @@ describe("checkFollowStatus", () => {
     expect(result.error).toBe("API Error: Invalid credentials");
   });
 
-  it("should handle network errors gracefully", async () => {
+  it("ネットワークエラーを適切に処理する", async () => {
     mockGetChannelFollowers.mockRejectedValue(new Error("Network error"));
 
     const result = await checkFollowStatus("test_access_token", "123", "456");
@@ -141,7 +140,7 @@ describe("checkSubStatus", () => {
     process.env.TWITCH_CLIENT_ID = originalClientId;
   });
 
-  it("should return isSubscribed true when user is subscribed", async () => {
+  it("ユーザーがサブスクライブしている場合にisSubscribed trueを返す", async () => {
     mockCheckUserSubscription.mockResolvedValue({
       broadcasterId: "456",
       broadcasterName: "testbroadcaster",
@@ -156,7 +155,7 @@ describe("checkSubStatus", () => {
     expect(mockCheckUserSubscription).toHaveBeenCalledWith("123", "456");
   });
 
-  it("should return isSubscribed false when checkUserSubscription returns null", async () => {
+  it("checkUserSubscriptionがnullを返す場合にisSubscribed falseを返す", async () => {
     mockCheckUserSubscription.mockResolvedValue(null);
 
     const result = await checkSubStatus("test_access_token", "123", "456");
@@ -165,7 +164,7 @@ describe("checkSubStatus", () => {
     expect(result.error).toBeUndefined();
   });
 
-  it("should return isSubscribed false when API throws 404 error", async () => {
+  it("APIが404エラーをスローする場合にisSubscribed falseを返す", async () => {
     mockCheckUserSubscription.mockRejectedValue(new Error("404 Not Found"));
 
     const result = await checkSubStatus("test_access_token", "123", "456");
@@ -174,7 +173,7 @@ describe("checkSubStatus", () => {
     expect(result.error).toBeUndefined();
   });
 
-  it("should return error when access token is missing", async () => {
+  it("アクセストークンが欠落している場合にエラーを返す", async () => {
     const result = await checkSubStatus("", "123", "456");
 
     expect(result.isSubscribed).toBe(false);
@@ -182,7 +181,7 @@ describe("checkSubStatus", () => {
     expect(mockCheckUserSubscription).not.toHaveBeenCalled();
   });
 
-  it("should return error when user ID is missing", async () => {
+  it("ユーザーIDが欠落している場合にエラーを返す", async () => {
     const result = await checkSubStatus("test_access_token", "", "456");
 
     expect(result.isSubscribed).toBe(false);
@@ -190,7 +189,7 @@ describe("checkSubStatus", () => {
     expect(mockCheckUserSubscription).not.toHaveBeenCalled();
   });
 
-  it("should return error when broadcaster ID is missing", async () => {
+  it("配信者IDが欠落している場合にエラーを返す", async () => {
     const result = await checkSubStatus("test_access_token", "123", "");
 
     expect(result.isSubscribed).toBe(false);
@@ -198,7 +197,7 @@ describe("checkSubStatus", () => {
     expect(mockCheckUserSubscription).not.toHaveBeenCalled();
   });
 
-  it("should return error when client ID is not configured", async () => {
+  it("クライアントIDが設定されていない場合にエラーを返す", async () => {
     const clientId = process.env.TWITCH_CLIENT_ID;
     process.env.TWITCH_CLIENT_ID = "";
 
@@ -208,11 +207,10 @@ describe("checkSubStatus", () => {
     expect(result.error).toBe("Twitch client ID not configured");
     expect(mockCheckUserSubscription).not.toHaveBeenCalled();
 
-    // Restore
     process.env.TWITCH_CLIENT_ID = clientId;
   });
 
-  it("should return error when API returns non-404 error", async () => {
+  it("APIが404以外のエラーを返す場合にエラーを返す", async () => {
     mockCheckUserSubscription.mockRejectedValue(new Error("401 Unauthorized"));
 
     const result = await checkSubStatus("invalid_token", "123", "456");
@@ -221,7 +219,7 @@ describe("checkSubStatus", () => {
     expect(result.error).toBe("401 Unauthorized");
   });
 
-  it("should handle network errors gracefully", async () => {
+  it("ネットワークエラーを適切に処理する", async () => {
     mockCheckUserSubscription.mockRejectedValue(new Error("Network error"));
 
     const result = await checkSubStatus("test_access_token", "123", "456");
@@ -232,72 +230,72 @@ describe("checkSubStatus", () => {
 });
 
 describe("parseTwitchInput", () => {
-  it("should parse numeric ID", () => {
+  it("数値IDをパースする", () => {
     const result = parseTwitchInput("123456789");
     expect(result).toEqual({ type: "id", value: "123456789" });
   });
 
-  it("should parse username", () => {
+  it("ユーザー名をパースする", () => {
     const result = parseTwitchInput("ninja");
     expect(result).toEqual({ type: "username", value: "ninja" });
   });
 
-  it("should parse username with underscores", () => {
+  it("アンダースコア付きのユーザー名をパースする", () => {
     const result = parseTwitchInput("test_user_123");
     expect(result).toEqual({ type: "username", value: "test_user_123" });
   });
 
-  it("should parse username and convert to lowercase", () => {
+  it("ユーザー名をパースして小文字に変換する", () => {
     const result = parseTwitchInput("NinJa");
     expect(result).toEqual({ type: "username", value: "ninja" });
   });
 
-  it("should parse full Twitch URL with https", () => {
+  it("httpsを含む完全なTwitch URLをパースする", () => {
     const result = parseTwitchInput("https://www.twitch.tv/ninja");
     expect(result).toEqual({ type: "username", value: "ninja" });
   });
 
-  it("should parse full Twitch URL without www", () => {
+  it("wwwなしの完全なTwitch URLをパースする", () => {
     const result = parseTwitchInput("https://twitch.tv/shroud");
     expect(result).toEqual({ type: "username", value: "shroud" });
   });
 
-  it("should parse Twitch URL without protocol", () => {
+  it("プロトコルなしのTwitch URLをパースする", () => {
     const result = parseTwitchInput("twitch.tv/ninja");
     expect(result).toEqual({ type: "username", value: "ninja" });
   });
 
-  it("should handle URLs with uppercase and convert username to lowercase", () => {
+  it("大文字を含むURLを処理しユーザー名を小文字に変換する", () => {
     const result = parseTwitchInput("https://www.twitch.tv/NiNjA");
     expect(result).toEqual({ type: "username", value: "ninja" });
   });
 
-  it("should return invalid for empty input", () => {
+  it("空の入力に対してinvalidを返す", () => {
     const result = parseTwitchInput("");
     expect(result).toEqual({ type: "invalid", value: "" });
   });
 
-  it("should return invalid for whitespace only", () => {
+  it("空白のみに対してinvalidを返す", () => {
     const result = parseTwitchInput("   ");
     expect(result).toEqual({ type: "invalid", value: "" });
   });
 
-  it("should return invalid for username too short (less than 4 chars)", () => {
+  it("短すぎるユーザー名（4文字未満）に対してinvalidを返す", () => {
     const result = parseTwitchInput("abc");
     expect(result).toEqual({ type: "invalid", value: "abc" });
   });
 
-  it("should return invalid for username too long (more than 25 chars)", () => {
+  it("長すぎるユーザー名（25文字超）に対してinvalidを返す", () => {
     const result = parseTwitchInput("a".repeat(26));
     expect(result).toEqual({ type: "invalid", value: "a".repeat(26) });
   });
 
-  it("should return invalid for username with special characters", () => {
+  it("特殊文字を含むユーザー名に対してinvalidを返す", () => {
     const result = parseTwitchInput("test-user");
     expect(result).toEqual({ type: "invalid", value: "test-user" });
   });
 
-  it("should return invalid for malformed URL", () => {
+  it("不正なURLに対してinvalidを返す", () => {
     const result = parseTwitchInput("https://youtube.com/ninja");
     expect(result).toEqual({
       type: "invalid",
@@ -305,17 +303,17 @@ describe("parseTwitchInput", () => {
     });
   });
 
-  it("should trim whitespace before parsing", () => {
+  it("パース前に空白をトリムする", () => {
     const result = parseTwitchInput("  ninja  ");
     expect(result).toEqual({ type: "username", value: "ninja" });
   });
 
-  it("should parse 4-character username (minimum length)", () => {
+  it("4文字のユーザー名（最小長）をパースする", () => {
     const result = parseTwitchInput("abcd");
     expect(result).toEqual({ type: "username", value: "abcd" });
   });
 
-  it("should parse 25-character username (maximum length)", () => {
+  it("25文字のユーザー名（最大長）をパースする", () => {
     const username = "a".repeat(25);
     const result = parseTwitchInput(username);
     expect(result).toEqual({ type: "username", value: username });
@@ -334,7 +332,7 @@ describe("getBroadcasterIdFromUsername", () => {
     process.env.TWITCH_CLIENT_ID = originalClientId;
   });
 
-  it("should return broadcaster ID for valid username", async () => {
+  it("有効なユーザー名に対して配信者IDを返す", async () => {
     mockGetUsersByNames.mockResolvedValue([
       {
         id: "19571641",
@@ -353,7 +351,7 @@ describe("getBroadcasterIdFromUsername", () => {
     expect(mockGetUsersByNames).toHaveBeenCalledWith(["ninja"]);
   });
 
-  it("should return error when username is empty", async () => {
+  it("ユーザー名が空の場合にエラーを返す", async () => {
     const result = await getBroadcasterIdFromUsername("", "test_app_token");
 
     expect(result.broadcasterId).toBeUndefined();
@@ -361,7 +359,7 @@ describe("getBroadcasterIdFromUsername", () => {
     expect(mockGetUsersByNames).not.toHaveBeenCalled();
   });
 
-  it("should return error when app access token is missing", async () => {
+  it("アプリアクセストークンが欠落している場合にエラーを返す", async () => {
     const result = await getBroadcasterIdFromUsername("ninja", "");
 
     expect(result.broadcasterId).toBeUndefined();
@@ -369,7 +367,7 @@ describe("getBroadcasterIdFromUsername", () => {
     expect(mockGetUsersByNames).not.toHaveBeenCalled();
   });
 
-  it("should return error when client ID is not configured", async () => {
+  it("クライアントIDが設定されていない場合にエラーを返す", async () => {
     const clientId = process.env.TWITCH_CLIENT_ID;
     process.env.TWITCH_CLIENT_ID = "";
 
@@ -382,11 +380,10 @@ describe("getBroadcasterIdFromUsername", () => {
     expect(result.error).toBe("Twitch client ID not configured");
     expect(mockGetUsersByNames).not.toHaveBeenCalled();
 
-    // Restore
     process.env.TWITCH_CLIENT_ID = clientId;
   });
 
-  it("should return error when user is not found", async () => {
+  it("ユーザーが見つからない場合にエラーを返す", async () => {
     mockGetUsersByNames.mockResolvedValue([]);
 
     const result = await getBroadcasterIdFromUsername(
@@ -398,7 +395,7 @@ describe("getBroadcasterIdFromUsername", () => {
     expect(result.error).toBe("User not found");
   });
 
-  it("should return error when API request fails", async () => {
+  it("APIリクエストが失敗した場合にエラーを返す", async () => {
     mockGetUsersByNames.mockRejectedValue(
       new Error("API Error: Rate limit exceeded")
     );
@@ -409,7 +406,7 @@ describe("getBroadcasterIdFromUsername", () => {
     expect(result.error).toBe("API Error: Rate limit exceeded");
   });
 
-  it("should handle network errors gracefully", async () => {
+  it("ネットワークエラーを適切に処理する", async () => {
     mockGetUsersByNames.mockRejectedValue(new Error("Network error"));
 
     const result = await getBroadcasterIdFromUsername(

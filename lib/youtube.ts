@@ -48,30 +48,30 @@ export async function checkSubscriptionStatus(
 }
 
 /**
- * Check if a user is a member of a YouTube channel
+ * ユーザーがYouTubeチャンネルのメンバーかどうかをチェックする
  *
- * IMPORTANT: YouTube membership verification is currently not supported.
+ * 重要: YouTubeメンバーシップ検証は現在サポートされていません。
  *
- * The YouTube Data API v3 does not provide an endpoint for users to check
- * their own membership status. The members.list endpoint requires channel
- * owner credentials and will return 403 errors when called with regular
- * user tokens.
+ * YouTube Data API v3は、ユーザーが自分のメンバーシップステータスを
+ * チェックするエンドポイントを提供していません。members.listエンドポイントは
+ * チャンネルオーナーの認証情報を必要とし、通常のユーザートークンで呼び出すと
+ * 403エラーを返します。
  *
- * To implement YouTube membership verification, consider these alternatives:
- * 1. Channel-owner flow: Require channel owners to verify members through
- *    their own OAuth credentials and store verification tokens
- * 2. Webhooks: Integrate with YouTube webhooks for membership status changes
- * 3. Manual verification: Implement a manual verification process
+ * YouTubeメンバーシップ検証を実装するには、以下の代替案を検討してください:
+ * 1. チャンネルオーナーフロー: チャンネルオーナー自身のOAuth認証情報を通じて
+ *    メンバーを検証し、検証トークンを保存する
+ * 2. Webhook: メンバーシップステータス変更のためのYouTube webhookと統合
+ * 3. 手動検証: 手動検証プロセスを実装
  *
- * @param userAccessToken - OAuth access token for the user (required, validated)
- * @param channelId - ID of the channel to check membership for (required, validated)
- * @returns Promise indicating the feature is not supported
+ * @param userAccessToken - ユーザーのOAuthアクセストークン（必須、検証済み）
+ * @param channelId - メンバーシップをチェックするチャンネルのID（必須、検証済み）
+ * @returns この機能がサポートされていないことを示すPromise
  */
 export function checkMembershipStatus(
   userAccessToken: string,
   channelId: string
 ): Promise<YouTubeMembershipCheckResult> {
-  // Validate required parameters
+  // 必須パラメータを検証
   if (!(userAccessToken && channelId)) {
     return Promise.resolve({
       error: "Missing required parameters",
@@ -79,9 +79,9 @@ export function checkMembershipStatus(
     });
   }
 
-  // Return error indicating this feature is not supported
-  // The members.list endpoint requires channel owner credentials and will
-  // produce 403 errors when called with regular user access tokens
+  // この機能がサポートされていないことを示すエラーを返す
+  // members.listエンドポイントはチャンネルオーナーの認証情報を必要とし、
+  // 通常のユーザーアクセストークンで呼び出すと403エラーが発生する
   return Promise.resolve({
     error:
       "YouTube membership verification is not supported. The API requires channel owner credentials.",
