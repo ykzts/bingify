@@ -24,7 +24,7 @@ describe("getSpace", () => {
     vi.clearAllMocks();
   });
 
-  it("should return space with validated JSONB columns", async () => {
+  it("検証されたJSONB列を含むスペースを返す", async () => {
     const mockSpaceData: Tables<"spaces"> = {
       created_at: "2024-01-01T00:00:00Z",
       description: "Test space",
@@ -67,7 +67,7 @@ describe("getSpace", () => {
     });
   });
 
-  it("should return null when space not found", async () => {
+  it("スペースが見つからない場合にnullを返す", async () => {
     mockSupabase.from.mockReturnValue({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
@@ -84,7 +84,7 @@ describe("getSpace", () => {
     expect(result).toBeNull();
   });
 
-  it("should handle invalid JSONB data with null fallback", async () => {
+  it("無効なJSONBデータをnullフォールバックで処理する", async () => {
     const mockSpaceData: Tables<"spaces"> = {
       created_at: "2024-01-01T00:00:00Z",
       description: "Test space",
@@ -120,7 +120,7 @@ describe("getSpace", () => {
     expect(result?.gatekeeper_rules).toBeNull();
   });
 
-  it("should handle null JSONB columns", async () => {
+  it("nullのJSONB列を処理する", async () => {
     const mockSpaceData: Tables<"spaces"> = {
       created_at: "2024-01-01T00:00:00Z",
       description: "Test space",
@@ -161,7 +161,7 @@ describe("getSpaceByShareKey", () => {
     vi.clearAllMocks();
   });
 
-  it("should return space when found by share key", async () => {
+  it("共有キーでスペースが見つかった場合にスペースを返す", async () => {
     const mockSpaceData: Tables<"spaces"> = {
       created_at: "2024-01-01T00:00:00Z",
       description: "Test space",
@@ -194,7 +194,7 @@ describe("getSpaceByShareKey", () => {
     expect(result?.share_key).toBe("test-key-20240101");
   });
 
-  it("should return null when space not found by share key", async () => {
+  it("共有キーでスペースが見つからない場合にnullを返す", async () => {
     mockSupabase.from.mockReturnValue({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
@@ -217,14 +217,14 @@ describe("getSpaces", () => {
     vi.clearAllMocks();
   });
 
-  it("should return empty array for empty ids", async () => {
+  it("空のidsに対して空の配列を返す", async () => {
     const result = await getSpaces([]);
 
     expect(result).toEqual([]);
     expect(mockSupabase.from).not.toHaveBeenCalled();
   });
 
-  it("should return multiple spaces with validated JSONB columns", async () => {
+  it("検証されたJSONB列を含む複数のスペースを返す", async () => {
     const mockSpacesData: Tables<"spaces">[] = [
       {
         created_at: "2024-01-01T00:00:00Z",
@@ -278,7 +278,7 @@ describe("getSpaces", () => {
     });
   });
 
-  it("should return empty array on error", async () => {
+  it("エラー時に空の配列を返す", async () => {
     mockSupabase.from.mockReturnValue({
       select: vi.fn().mockReturnValue({
         in: vi.fn().mockResolvedValue({
@@ -295,7 +295,7 @@ describe("getSpaces", () => {
 });
 
 describe("validateSpaceData", () => {
-  it("should validate valid JSONB data", () => {
+  it("有効なJSONBデータを検証する", () => {
     const mockSpaceData: Tables<"spaces"> = {
       created_at: "2024-01-01T00:00:00Z",
       description: "Test space",
@@ -325,7 +325,7 @@ describe("validateSpaceData", () => {
     });
   });
 
-  it("should return null for invalid JSONB data", () => {
+  it("無効なJSONBデータに対してnullを返す", () => {
     const mockSpaceData: Tables<"spaces"> = {
       created_at: "2024-01-01T00:00:00Z",
       description: "Test space",

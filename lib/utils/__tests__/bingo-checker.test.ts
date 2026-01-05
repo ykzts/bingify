@@ -142,20 +142,7 @@ describe("checkBingoLines", () => {
   });
 
   test("3つのラインタイプを同時に検出する（横+縦+斜め）", () => {
-    const calledNumbers = new Set([
-      1,
-      16,
-      31,
-      46,
-      61,
-      2,
-      3,
-      4,
-      5,
-      17,
-      49,
-      65,
-    ]);
+    const calledNumbers = new Set([1, 16, 31, 46, 61, 2, 3, 4, 5, 17, 49, 65]);
     const result = checkBingoLines(testCard, calledNumbers);
 
     expect(result.hasBingo).toBe(true);

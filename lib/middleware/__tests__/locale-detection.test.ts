@@ -8,18 +8,18 @@ import {
 
 describe("locale-detection", () => {
   describe("isValidLocale", () => {
-    it("should return true for valid locales", () => {
+    it("有効なロケールに対してtrueを返す", () => {
       expect(isValidLocale("en")).toBe(true);
       expect(isValidLocale("ja")).toBe(true);
     });
 
-    it("should return false for invalid locales", () => {
+    it("無効なロケールに対してfalseを返す", () => {
       expect(isValidLocale("fr")).toBe(false);
       expect(isValidLocale("de")).toBe(false);
       expect(isValidLocale("")).toBe(false);
     });
 
-    it("should provide type guard for Locale type", () => {
+    it("Locale型の型ガードを提供する", () => {
       const locale: string = "en";
       if (isValidLocale(locale)) {
         const typedLocale: Locale = locale;
@@ -29,7 +29,7 @@ describe("locale-detection", () => {
   });
 
   describe("detectLocaleFromRequest", () => {
-    it("should detect locale from NEXT_LOCALE cookie", () => {
+    it("NEXT_LOCALEクッキーからロケールを検出する", () => {
       const request = new NextRequest("http://localhost:3000/@test", {
         headers: {
           cookie: "NEXT_LOCALE=ja",
@@ -39,7 +39,7 @@ describe("locale-detection", () => {
       expect(detectLocaleFromRequest(request)).toBe("ja");
     });
 
-    it("should detect locale from Accept-Language header", () => {
+    it("Accept-Languageヘッダーからロケールを検出する", () => {
       const request = new NextRequest("http://localhost:3000/@test", {
         headers: {
           "accept-language": "ja,en-US;q=0.9,en;q=0.8",
@@ -49,7 +49,7 @@ describe("locale-detection", () => {
       expect(detectLocaleFromRequest(request)).toBe("ja");
     });
 
-    it("should prefer cookie over Accept-Language header", () => {
+    it("Accept-Languageヘッダーよりクッキーを優先する", () => {
       const request = new NextRequest("http://localhost:3000/@test", {
         headers: {
           cookie: "NEXT_LOCALE=en",
@@ -60,7 +60,7 @@ describe("locale-detection", () => {
       expect(detectLocaleFromRequest(request)).toBe("en");
     });
 
-    it("should handle Accept-Language with region codes", () => {
+    it("地域コード付きのAccept-Languageを処理する", () => {
       const request = new NextRequest("http://localhost:3000/@test", {
         headers: {
           "accept-language": "ja-JP,en-US;q=0.9,en;q=0.8",
@@ -70,7 +70,7 @@ describe("locale-detection", () => {
       expect(detectLocaleFromRequest(request)).toBe("ja");
     });
 
-    it("should return default locale when no valid locale found", () => {
+    it("有効なロケールが見つからない場合デフォルトロケールを返す", () => {
       const request = new NextRequest("http://localhost:3000/@test", {
         headers: {
           "accept-language": "fr,de;q=0.9",
@@ -80,13 +80,13 @@ describe("locale-detection", () => {
       expect(detectLocaleFromRequest(request)).toBe("en");
     });
 
-    it("should return default locale when no headers present", () => {
+    it("ヘッダーが存在しない場合デフォルトロケールを返す", () => {
       const request = new NextRequest("http://localhost:3000/@test");
 
       expect(detectLocaleFromRequest(request)).toBe("en");
     });
 
-    it("should handle invalid cookie values gracefully", () => {
+    it("無効なクッキー値を適切に処理する", () => {
       const request = new NextRequest("http://localhost:3000/@test", {
         headers: {
           cookie: "NEXT_LOCALE=invalid",
@@ -97,7 +97,7 @@ describe("locale-detection", () => {
       expect(detectLocaleFromRequest(request)).toBe("ja");
     });
 
-    it("should handle multiple cookies correctly", () => {
+    it("複数のクッキーを正しく処理する", () => {
       const request = new NextRequest("http://localhost:3000/@test", {
         headers: {
           cookie: "OTHER_COOKIE=value; NEXT_LOCALE=ja; ANOTHER=test",

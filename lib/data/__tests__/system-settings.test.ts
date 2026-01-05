@@ -18,7 +18,7 @@ describe("getSystemSettings", () => {
     vi.clearAllMocks();
   });
 
-  it("should return validated system settings", async () => {
+  it("検証されたシステム設定を返す", async () => {
     const mockData = {
       default_user_role: "organizer",
       features: {
@@ -80,7 +80,7 @@ describe("getSystemSettings", () => {
     });
   });
 
-  it("should return error when database query fails", async () => {
+  it("データベースクエリが失敗した場合にエラーを返す", async () => {
     mockSupabase.from.mockReturnValue({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
@@ -98,7 +98,7 @@ describe("getSystemSettings", () => {
     expect(result.settings).toBeUndefined();
   });
 
-  it("should use defaults for invalid features and return warnings", async () => {
+  it("無効な機能に対してデフォルトを使用し警告を返す", async () => {
     const mockData = {
       default_user_role: "organizer",
       features: { invalid: "structure" }, // Invalid features structure
@@ -141,7 +141,7 @@ describe("getSystemSettings", () => {
     });
   });
 
-  it("should return error for invalid non-features fields", async () => {
+  it("無効な非機能フィールドに対してエラーを返す", async () => {
     const mockData = {
       default_user_role: "organizer",
       features: {
@@ -183,7 +183,7 @@ describe("getSystemSettings", () => {
     expect(result.settings).toBeUndefined();
   });
 
-  it("should handle unexpected errors gracefully", async () => {
+  it("予期しないエラーを適切に処理する", async () => {
     mockSupabase.from.mockImplementation(() => {
       throw new Error("Unexpected error");
     });
