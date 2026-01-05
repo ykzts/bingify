@@ -38,6 +38,10 @@ export async function sendContactEmail(options: ContactEmailOptions) {
     throw new Error("Mail configuration is missing");
   }
 
+  if (recipients.length === 0) {
+    throw new Error("No recipients provided");
+  }
+
   const transporter = createTransporter();
 
   // Escape user inputs to prevent HTML injection

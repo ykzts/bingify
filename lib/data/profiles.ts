@@ -27,8 +27,8 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
 
     // メールアドレスが null でないものだけを抽出
     const emails = data
-      .map((profile) => profile.email)
-      .filter((email): email is string => email !== null);
+      .filter((profile): profile is { email: string } => profile.email !== null)
+      .map((profile) => profile.email);
 
     if (emails.length === 0) {
       console.error("No admin users found with valid email addresses");
