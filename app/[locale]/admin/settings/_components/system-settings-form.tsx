@@ -101,7 +101,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
   }, [state]);
 
   return (
-    <form action={action} className="space-y-6">
+    <form action={action} className="space-y-6" noValidate>
       <FormErrors errors={formErrors} variant="with-icon" />
 
       <FieldSet>

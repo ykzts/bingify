@@ -140,7 +140,7 @@ export function AdminManagement({ spaceId }: Props) {
           className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3"
           errors={formErrors}
         />
-        <form action={action} className="space-y-3">
+        <form action={action} className="space-y-3" noValidate>
           <form.Field name="email">
             {(field) => (
               <Field>

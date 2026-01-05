@@ -81,7 +81,7 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
         {t("title")}
       </SectionHeader>
 
-      <form action={action} className="space-y-4">
+      <form action={action} className="space-y-4" noValidate>
         <FormErrors errors={formErrors} variant="with-icon" />
 
         <form.Field name="username">

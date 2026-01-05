@@ -98,7 +98,7 @@ export function ContactForm({ locale }: Props) {
 
       <p className="mb-6 text-gray-600">{t("description")}</p>
 
-      <form action={action}>
+      <form action={action} noValidate>
         <FormErrors
           className="mb-4"
           errors={formErrors}
