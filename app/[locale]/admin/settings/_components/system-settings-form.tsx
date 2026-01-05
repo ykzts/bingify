@@ -107,17 +107,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
       <FieldSet>
         <FieldLegend>リソース制限</FieldLegend>
         <FieldGroup>
-          <form.Field
-            name="max_participants_per_space"
-            validators={{
-              onChange: ({ value }: { value: number }) => {
-                if (value < 1 || value > 10_000) {
-                  return "1から10000の範囲で入力してください";
-                }
-                return undefined;
-              },
-            }}
-          >
+          <form.Field name="max_participants_per_space">
             {(field) => (
               <Field>
                 <FieldContent>
@@ -148,17 +138,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          <form.Field
-            name="max_spaces_per_user"
-            validators={{
-              onChange: ({ value }: { value: number }) => {
-                if (value < 1 || value > 100) {
-                  return "1から100の範囲で入力してください";
-                }
-                return undefined;
-              },
-            }}
-          >
+          <form.Field name="max_spaces_per_user">
             {(field) => (
               <Field>
                 <FieldContent>
@@ -189,17 +169,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          <form.Field
-            name="max_total_spaces"
-            validators={{
-              onChange: ({ value }: { value: number }) => {
-                if (value < 0 || value > 100_000) {
-                  return "0から100000の範囲で入力してください";
-                }
-                return undefined;
-              },
-            }}
-          >
+          <form.Field name="max_total_spaces">
             {(field) => (
               <Field>
                 <FieldContent>
@@ -228,17 +198,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          <form.Field
-            name="space_expiration_hours"
-            validators={{
-              onChange: ({ value }: { value: number }) => {
-                if (value < 0 || value > 8760) {
-                  return "0から8760の範囲で入力してください";
-                }
-                return undefined;
-              },
-            }}
-          >
+          <form.Field name="space_expiration_hours">
             {(field) => (
               <Field>
                 <FieldContent>
