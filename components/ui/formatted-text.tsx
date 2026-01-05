@@ -19,9 +19,9 @@ export const FormattedText = ({ text, className }: FormattedTextProps) => {
   return (
     <div className={cn(className)}>
       {paragraphs.map((paragraph, i) => (
-        <p key={i} className="mb-4 last:mb-0 leading-relaxed">
+        <p key={`p-${i}-${paragraph.slice(0, 20)}`} className="mb-4 last:mb-0 leading-relaxed">
           {paragraph.split("\n").map((line, j, arr) => (
-            <Fragment key={j}>
+            <Fragment key={`l-${i}-${j}-${line.slice(0, 15)}`}>
               {line}
               {j < arr.length - 1 && <br />}
             </Fragment>
