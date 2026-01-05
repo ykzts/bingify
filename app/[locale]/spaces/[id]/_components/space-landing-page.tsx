@@ -2,7 +2,7 @@
 
 import { Lock, Mail, Twitch, Youtube } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { FormattedText } from "@/components/ui/formatted-text";
+import { FormattedText } from "@/components/formatted-text";
 import type { PublicSpaceInfo } from "@/lib/types/space";
 
 interface Props {

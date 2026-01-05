@@ -19,7 +19,7 @@ describe("FormattedText", () => {
   });
 
   it("改行なしテキストを単一段落として表示する", () => {
-    const { container} = render(
+    const { container } = render(
       <FormattedText text="これは改行のないテキストです。" />
     );
     const paragraphs = container.querySelectorAll("p");
@@ -30,7 +30,7 @@ describe("FormattedText", () => {
   it("単一改行（\\n）を<br>タグとして表示する", () => {
     const text = "一行目\n二行目\n三行目";
     const { container } = render(<FormattedText text={text} />);
-    
+
     const paragraphs = container.querySelectorAll("p");
     expect(paragraphs).toHaveLength(1);
 
@@ -42,7 +42,7 @@ describe("FormattedText", () => {
   it("連続改行（\\n\\n）を段落として分割する", () => {
     const text = "第一段落です。\n\n第二段落です。\n\n第三段落です。";
     const { container } = render(<FormattedText text={text} />);
-    
+
     const paragraphs = container.querySelectorAll("p");
     expect(paragraphs).toHaveLength(3);
     expect(paragraphs[0]).toHaveTextContent("第一段落です。");
@@ -53,7 +53,7 @@ describe("FormattedText", () => {
   it("3回以上の連続改行も段落として分割する", () => {
     const text = "段落1\n\n\n段落2\n\n\n\n段落3";
     const { container } = render(<FormattedText text={text} />);
-    
+
     const paragraphs = container.querySelectorAll("p");
     expect(paragraphs).toHaveLength(3);
     expect(paragraphs[0]).toHaveTextContent("段落1");
@@ -64,7 +64,7 @@ describe("FormattedText", () => {
   it("段落内の単一改行と段落分けを正しく処理する", () => {
     const text = "段落1の一行目\n段落1の二行目\n\n段落2の内容";
     const { container } = render(<FormattedText text={text} />);
-    
+
     const paragraphs = container.querySelectorAll("p");
     expect(paragraphs).toHaveLength(2);
 
@@ -80,7 +80,7 @@ describe("FormattedText", () => {
   it("\\r\\n を \\n に正規化する", () => {
     const text = "Windows改行\r\n2行目\r\n\r\n段落2";
     const { container } = render(<FormattedText text={text} />);
-    
+
     const paragraphs = container.querySelectorAll("p");
     expect(paragraphs).toHaveLength(2);
 
@@ -104,7 +104,7 @@ describe("FormattedText", () => {
 
   it("classNameプロパティが適用される", () => {
     const { container } = render(
-      <FormattedText text="テスト" className="text-red-500 font-bold" />
+      <FormattedText className="font-bold text-red-500" text="テスト" />
     );
     const div = container.firstChild as HTMLElement;
     expect(div).toHaveClass("text-red-500", "font-bold");
@@ -113,18 +113,15 @@ describe("FormattedText", () => {
   it("段落に適切なスタイルが適用される", () => {
     const text = "段落1\n\n段落2";
     const { container } = render(<FormattedText text={text} />);
-    
+
+    const div = container.firstChild as HTMLElement;
+
+    // prose クラスが適用されていることを確認
+    expect(div).toHaveClass("prose");
+    expect(div).toHaveClass("max-w-none");
+
     const paragraphs = container.querySelectorAll("p");
-
-    paragraphs.forEach((p) => {
-      expect(p).toHaveClass("leading-relaxed");
-    });
-
-    // 最後の段落以外は mb-4 を持つ
-    expect(paragraphs[0]).toHaveClass("mb-4");
-    // 最後の段落も mb-4 と last:mb-0 の両方を持つ
-    expect(paragraphs[1]).toHaveClass("mb-4");
-    expect(paragraphs[1]).toHaveClass("last:mb-0");
+    expect(paragraphs).toHaveLength(2);
   });
 
   it("HTMLタグをエスケープする（XSS防止）", () => {
