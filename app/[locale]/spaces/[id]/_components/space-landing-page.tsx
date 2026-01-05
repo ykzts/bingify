@@ -2,6 +2,7 @@
 
 import { Lock, Mail, Twitch, Youtube } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { FormattedText } from "@/components/formatted-text";
 import type { PublicSpaceInfo } from "@/lib/types/space";
 
 interface Props {
@@ -39,11 +40,10 @@ export function SpaceLandingPage({ publicInfo }: Props) {
         <h1 className="font-bold text-3xl">
           {publicInfo.title || publicInfo.share_key}
         </h1>
-        {publicInfo.description && (
-          <p className="text-gray-600 text-lg leading-relaxed">
-            {publicInfo.description}
-          </p>
-        )}
+        <FormattedText
+          className="text-gray-600 text-lg"
+          text={publicInfo.description}
+        />
       </div>
 
       {/* Requirements Section */}
