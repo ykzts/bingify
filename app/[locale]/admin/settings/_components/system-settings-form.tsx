@@ -101,7 +101,12 @@ export function SystemSettingsForm({ initialSettings }: Props) {
   }, [state]);
 
   return (
-    <form action={action} className="space-y-6" noValidate>
+    <form
+      action={action}
+      className="space-y-6"
+      noValidate
+      onSubmit={() => form.handleSubmit()}
+    >
       <FormErrors errors={formErrors} variant="with-icon" />
 
       <FieldSet>

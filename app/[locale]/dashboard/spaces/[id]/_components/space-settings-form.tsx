@@ -449,7 +449,12 @@ export function SpaceSettingsForm({
 
   return (
     <div className="space-y-8">
-      <form action={updateAction} className="space-y-6" noValidate>
+      <form
+        action={updateAction}
+        className="space-y-6"
+        noValidate
+        onSubmit={() => form.handleSubmit()}
+      >
         {/* Basic Information */}
         <FieldSet>
           <FieldLegend>{t("basicInfoTitle")}</FieldLegend>

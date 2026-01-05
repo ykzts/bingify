@@ -175,7 +175,12 @@ export function CreateSpaceForm() {
   }, [state]);
 
   return (
-    <form action={action} className="space-y-6" noValidate>
+    <form
+      action={action}
+      className="space-y-6"
+      noValidate
+      onSubmit={() => form.handleSubmit()}
+    >
       <FormErrors
         className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4"
         errors={formErrors}

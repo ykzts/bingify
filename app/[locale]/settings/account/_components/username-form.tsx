@@ -52,7 +52,7 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
       modeAfterSubmission: "change",
     }),
     validators: {
-      onDynamic: usernameSchema,
+      onChange: usernameSchema,
     },
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
@@ -81,7 +81,12 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
         {t("title")}
       </SectionHeader>
 
-      <form action={action} className="space-y-4" noValidate>
+      <form
+        action={action}
+        className="space-y-4"
+        noValidate
+        onSubmit={() => form.handleSubmit()}
+      >
         <FormErrors errors={formErrors} variant="with-icon" />
 
         <form.Field name="username">
