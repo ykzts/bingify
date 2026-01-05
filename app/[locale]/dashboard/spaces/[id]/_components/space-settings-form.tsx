@@ -267,6 +267,7 @@ export function SpaceSettingsForm({
     form.store,
     (formState) => formState.isSubmitting
   );
+  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   // Get field values directly from form state
   const formValues = useStore(form.store, (state) => state.values);
@@ -1002,14 +1003,18 @@ export function SpaceSettingsForm({
 
         {/* Action Buttons */}
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
-          <Button disabled={isPending} type="submit" variant="outline">
+          <Button
+            disabled={!canSubmit || isPending}
+            type="submit"
+            variant="outline"
+          >
             {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
             {t("updateButton")}
           </Button>
 
           {isDraft && (
             <Button
-              disabled={isPending}
+              disabled={!canSubmit || isPending}
               formAction={publishAction}
               type="submit"
             >

@@ -63,6 +63,7 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
     form.store,
     (formState) => formState.isSubmitting
   );
+  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   useEffect(() => {
     // Check for successful update
@@ -114,7 +115,7 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
           )}
         </form.Field>
 
-        <Button disabled={isSubmitting} type="submit">
+        <Button disabled={!canSubmit || isSubmitting} type="submit">
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />

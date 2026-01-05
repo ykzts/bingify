@@ -73,6 +73,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
     form.store,
     (formState) => formState.isSubmitting
   );
+  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   // Get platform-level enabled states from nested form values
   const formValues = useStore(form.store, (state) => state.values);
@@ -455,7 +456,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
       </div>
 
       <div className="flex justify-end">
-        <Button disabled={isSubmitting} type="submit">
+        <Button disabled={!canSubmit || isSubmitting} type="submit">
           {isSubmitting ? t("saving") : t("saveButton")}
         </Button>
       </div>

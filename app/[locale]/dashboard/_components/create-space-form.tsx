@@ -115,6 +115,7 @@ export function CreateSpaceForm() {
     form.store,
     (formState) => formState.isSubmitting
   );
+  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   const handleShareKeyChange = (normalizedKey: string) => {
     setShareKey(normalizedKey);
@@ -345,7 +346,12 @@ export function CreateSpaceForm() {
 
       <Button
         className="w-full"
-        disabled={isSubmitting || available === false || shareKey.length < 3}
+        disabled={
+          !canSubmit ||
+          isSubmitting ||
+          available === false ||
+          shareKey.length < 3
+        }
         type="submit"
       >
         {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}

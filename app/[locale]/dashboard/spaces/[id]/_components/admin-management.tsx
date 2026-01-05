@@ -69,6 +69,7 @@ export function AdminManagement({ spaceId }: Props) {
     form.store,
     (formState) => formState.isSubmitting
   );
+  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: spaceId is stable and doesn't need to be in deps
   useEffect(() => {
@@ -169,7 +170,7 @@ export function AdminManagement({ spaceId }: Props) {
           </form.Field>
           <Button
             className="w-full"
-            disabled={isSubmitting}
+            disabled={!canSubmit || isSubmitting}
             size="sm"
             type="submit"
           >

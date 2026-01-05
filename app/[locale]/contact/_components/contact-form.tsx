@@ -64,6 +64,7 @@ export function ContactForm({ locale }: Props) {
     form.store,
     (formState) => formState.isSubmitting
   );
+  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   useEffect(() => {
     if (
@@ -194,7 +195,9 @@ export function ContactForm({ locale }: Props) {
 
           <div className="flex justify-end">
             <Button
-              disabled={isSubmitting || (hasTurnstile && !turnstileToken)}
+              disabled={
+                !canSubmit || isSubmitting || (hasTurnstile && !turnstileToken)
+              }
               size="lg"
               type="submit"
             >
