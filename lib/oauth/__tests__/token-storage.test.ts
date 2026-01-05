@@ -25,10 +25,10 @@ describe("OAuth Token Storage", () => {
       });
 
       const result = await upsertOAuthToken(mockSupabase, {
-        access_token: "test_access_token",
-        expires_at: "2025-01-10T00:00:00Z",
         provider: "google",
+        access_token: "test_access_token",
         refresh_token: "test_refresh_token",
+        expires_at: "2025-01-10T00:00:00Z",
       });
 
       expect(result.success).toBe(true);
@@ -48,8 +48,8 @@ describe("OAuth Token Storage", () => {
       });
 
       const result = await upsertOAuthToken(mockSupabase, {
-        access_token: "test_access_token",
         provider: "twitch",
+        access_token: "test_access_token",
       });
 
       expect(result.success).toBe(false);
@@ -64,8 +64,8 @@ describe("OAuth Token Storage", () => {
       });
 
       const result = await upsertOAuthToken(mockSupabase, {
-        access_token: "test_access_token",
         provider: "google",
+        access_token: "test_access_token",
       });
 
       expect(result.success).toBe(true);

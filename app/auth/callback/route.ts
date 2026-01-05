@@ -231,10 +231,10 @@ export async function GET(request: NextRequest) {
 
       // Store token in encrypted database
       const result = await upsertOAuthToken(supabase, {
-        access_token: provider_token,
-        expires_at: expiresAt,
         provider,
+        access_token: provider_token,
         refresh_token: provider_refresh_token || null,
+        expires_at: expiresAt,
       });
 
       if (!result.success) {
