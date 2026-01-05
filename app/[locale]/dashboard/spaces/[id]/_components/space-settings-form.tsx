@@ -41,6 +41,7 @@ import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { cn } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/utils/error-message";
+import { YOUTUBE_CHANNEL_ID_REGEX } from "@/lib/youtube";
 import {
   spaceSettingsFormOpts,
   spaceSettingsFormSchema,
@@ -52,9 +53,6 @@ import {
 } from "../_lib/settings-actions";
 import { lookupTwitchBroadcasterId } from "../_lib/twitch-lookup-actions";
 import { lookupYouTubeChannelId } from "../_lib/youtube-lookup-actions";
-
-// チャンネルIDの正規表現（UCで始まる24文字）
-const YOUTUBE_CHANNEL_ID_REGEX = /^UC[a-zA-Z0-9_-]{22}$/;
 
 interface Props {
   currentParticipantCount: number;

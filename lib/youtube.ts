@@ -7,6 +7,9 @@ const YOUTUBE_CHANNEL_PATH_REGEX = /^\/channel\/(UC[a-zA-Z0-9_-]{22})/;
 const YOUTUBE_CUSTOM_PATH_REGEX = /^\/c\/([^/]+)/;
 const YOUTUBE_USER_PATH_REGEX = /^\/user\/([^/]+)/;
 
+// エクスポートして他のモジュールでも使用可能にする
+export { YOUTUBE_CHANNEL_ID_REGEX };
+
 export interface YouTubeSubscriptionCheckResult {
   error?: string;
   isSubscribed: boolean;
@@ -72,6 +75,7 @@ function parseYouTubeInput(input: string): {
       }
 
       // カスタムURL形式: /c/CustomName
+      // Note: カスタムURLは内部的にハンドルとして解決を試みます
       const customMatch = pathname.match(YOUTUBE_CUSTOM_PATH_REGEX);
       if (customMatch) {
         return { handle: `@${customMatch[1]}` };
@@ -193,13 +197,13 @@ export async function resolveYouTubeChannelId(
     // 入力値の検証
     if (!input?.trim()) {
       return {
-        error: "入力値が空です",
+        error: "Input is required",
       };
     }
 
     if (!apiKey?.trim()) {
       return {
-        error: "YouTube APIキーが設定されていません",
+        error: "YouTube API key is not configured",
       };
     }
 
@@ -230,17 +234,17 @@ export async function resolveYouTubeChannelId(
     // パースできなかった場合
     return {
       error:
-        "入力形式が不正です。チャンネルID、ハンドル（@username）、またはYouTube URLを入力してください",
+        "Invalid input format. Please provide a channel ID, handle (@username), or YouTube URL",
     };
   } catch (error) {
     // APIエラーの詳細を返す
     if (error instanceof Error) {
       return {
-        error: `YouTube API エラー: ${error.message}`,
+        error: `YouTube API error: ${error.message}`,
       };
     }
     return {
-      error: "YouTubeチャンネルIDの解決中に不明なエラーが発生しました",
+      error: "An unknown error occurred while resolving YouTube channel ID",
     };
   }
 }
@@ -265,7 +269,7 @@ async function resolveByHandle(
   }
 
   return {
-    error: `ハンドル '${handle}' に対応するチャンネルが見つかりませんでした`,
+    error: `Channel not found for handle '${handle}'`,
   };
 }
 
@@ -289,6 +293,6 @@ async function resolveByUsername(
   }
 
   return {
-    error: `ユーザー名 '${username}' に対応するチャンネルが見つかりませんでした`,
+    error: `Channel not found for username '${username}'`,
   };
 }

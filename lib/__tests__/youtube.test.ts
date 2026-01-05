@@ -306,7 +306,7 @@ describe("resolveYouTubeChannelId", () => {
       const result = await resolveYouTubeChannelId("", "test_api_key");
 
       expect(result.channelId).toBeUndefined();
-      expect(result.error).toBe("入力値が空です");
+      expect(result.error).toBe("Input is required");
       expect(mockChannelsList).not.toHaveBeenCalled();
     });
 
@@ -314,14 +314,14 @@ describe("resolveYouTubeChannelId", () => {
       const result = await resolveYouTubeChannelId("   ", "test_api_key");
 
       expect(result.channelId).toBeUndefined();
-      expect(result.error).toBe("入力値が空です");
+      expect(result.error).toBe("Input is required");
     });
 
     it("APIキーが空の場合にエラーを返す", async () => {
       const result = await resolveYouTubeChannelId("@TestChannel", "");
 
       expect(result.channelId).toBeUndefined();
-      expect(result.error).toBe("YouTube APIキーが設定されていません");
+      expect(result.error).toBe("YouTube API key is not configured");
       expect(mockChannelsList).not.toHaveBeenCalled();
     });
 
@@ -332,7 +332,7 @@ describe("resolveYouTubeChannelId", () => {
       );
 
       expect(result.channelId).toBeUndefined();
-      expect(result.error).toContain("入力形式が不正です");
+      expect(result.error).toContain("Invalid input format");
     });
 
     it("APIエラーを適切に処理する", async () => {
@@ -344,7 +344,7 @@ describe("resolveYouTubeChannelId", () => {
       );
 
       expect(result.channelId).toBeUndefined();
-      expect(result.error).toContain("YouTube API エラー");
+      expect(result.error).toContain("YouTube API error");
       expect(result.error).toContain("API quota exceeded");
     });
 
@@ -357,7 +357,7 @@ describe("resolveYouTubeChannelId", () => {
       );
 
       expect(result.channelId).toBeUndefined();
-      expect(result.error).toContain("不明なエラー");
+      expect(result.error).toContain("unknown error");
     });
   });
 
