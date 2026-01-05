@@ -28,7 +28,7 @@ import { createSpace, getUserSpaces } from "../_lib/actions";
 
 describe("Dashboard Actions", () => {
   describe("getUserSpaces", () => {
-    it("should return spaces with active space and participant count", async () => {
+    it("アクティブなスペースと参加者数を含むスペースを返す", async () => {
       const userId = "test-user-id";
       const mockSpaces = [
         {
@@ -109,7 +109,7 @@ describe("Dashboard Actions", () => {
       expect(result.error).toBeUndefined();
     });
 
-    it("should return error when user is not authenticated", async () => {
+    it("ユーザーが認証されていない場合エラーを返す", async () => {
       const mockClient = {
         auth: {
           getUser: vi.fn().mockResolvedValue({
@@ -126,7 +126,7 @@ describe("Dashboard Actions", () => {
       expect(result.error).toBe("Authentication required");
     });
 
-    it("should return error on database fetch failure", async () => {
+    it("データベース取得失敗時にエラーを返す", async () => {
       const userId = "test-user-id";
 
       const mockClient = {
@@ -155,7 +155,7 @@ describe("Dashboard Actions", () => {
       expect(result.error).toBe("Failed to fetch spaces");
     });
 
-    it("should handle no active spaces", async () => {
+    it("アクティブなスペースがない場合を処理する", async () => {
       const userId = "test-user-id";
       const mockSpaces = [
         {
@@ -224,7 +224,7 @@ describe("Dashboard Actions", () => {
       expect(result.error).toBeUndefined();
     });
 
-    it("should handle multiple active spaces and log warning", async () => {
+    it("複数のアクティブなスペースを処理し警告をログ出力する", async () => {
       const userId = "test-user-id";
       const consoleWarnSpy = vi
         .spyOn(console, "warn")
@@ -308,7 +308,7 @@ describe("Dashboard Actions", () => {
       consoleWarnSpy.mockRestore();
     });
 
-    it("should handle empty spaces list", async () => {
+    it("空のスペースリストを処理する", async () => {
       const userId = "test-user-id";
 
       const mockClient = {
@@ -355,7 +355,7 @@ describe("Dashboard Actions", () => {
   });
 
   describe("createSpace", () => {
-    it("should reject space creation when max active spaces limit is reached", async () => {
+    it("アクティブなスペースの最大数に達した場合スペース作成を拒否する", async () => {
       const userId = "test-user-id";
       const shareKey = "test-space";
 
@@ -418,7 +418,7 @@ describe("Dashboard Actions", () => {
       expect(result.errorData?.max).toBe(5);
     });
 
-    it("should require user authentication", async () => {
+    it("ユーザー認証を必要とする", async () => {
       const mockClient = {
         auth: {
           getUser: vi.fn().mockResolvedValue({
@@ -438,7 +438,7 @@ describe("Dashboard Actions", () => {
       expect(result.error).toBe("認証が必要です。ログインしてください。");
     });
 
-    it("should validate share key format", async () => {
+    it("共有キーのフォーマットを検証する", async () => {
       const mockClient = {
         auth: {
           getUser: vi.fn().mockResolvedValue({
@@ -458,7 +458,7 @@ describe("Dashboard Actions", () => {
       expect(result.error).toContain("3文字以上");
     });
 
-    it("should count only active spaces (exclude closed) when checking max limit", async () => {
+    it("最大制限をチェックする際にアクティブなスペースのみカウントする（クローズ済みは除外）", async () => {
       const userId = "test-user-id";
       const shareKey = "test-space";
 
@@ -534,7 +534,7 @@ describe("Dashboard Actions", () => {
       expect(neqCalledWithClosed).toBe(true);
     });
 
-    it("should reject space creation when global max total spaces limit is reached", async () => {
+    it("グローバルの合計スペース最大数に達した場合スペース作成を拒否する", async () => {
       const userId = "test-user-id";
       const shareKey = "test-space";
 
