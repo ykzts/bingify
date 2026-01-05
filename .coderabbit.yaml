@@ -1,6 +1,52 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 chat:
   art: false
+issue_enrichment:
+  labeling:
+    auto_apply_labels: true
+    labeling_instructions:
+      - label: "type: bug"
+        instructions: |
+          バグ、エラー、クラッシュ、誤った動作、予期しない結果を報告するIssue。ランタイムエラー、ロジックエラー、機能の破損、リグレッション、期待される動作からの逸脱などが含まれます。
+      - label: "type: feature"
+        instructions: |
+          新機能の追加リクエスト。新しい機能、新しいコンポーネント、新しいAPIエンドポイント、新しいページなど、プロジェクトに新しい機能を追加する提案が含まれます。
+      - label: "type: enhancement"
+        instructions: |
+          既存機能の改善リクエスト。パフォーマンス最適化、UI/UXの改善、コードの改善、より良いエラーハンドリング、より良いユーザー体験など、既存機能を改善する提案が含まれます。
+      - label: "type: refactoring"
+        instructions: |
+          コードのリファクタリングに関するIssue。コードの再構築、コードの整理、アーキテクチャの改善、技術的負債の削減など、機能を変えずにコードの内部構造を改善する提案が含まれます。
+      - label: "type: test"
+        instructions: |
+          テストに関するIssue。テストの追加、テストの改善、テストカバレッジの向上、テストの修正、E2Eテスト、ユニットテスト、統合テストなどが含まれます。
+      - label: "type: documentation"
+        instructions: |
+          ドキュメントに関するIssue。ドキュメントの更新、追加、修正、明確化が必要なもの。欠落したドキュメント、古い情報、不明確な説明、APIドキュメント、コード例、READMEの改善などが含まれます。
+      - label: "type: performance"
+        instructions: |
+          パフォーマンスに関するIssue。パフォーマンスの最適化、速度の改善、メモリ使用量の削減、レンダリングの最適化、バンドルサイズの削減、読み込み時間の短縮などが含まれます。
+      - label: "type: security"
+        instructions: |
+          セキュリティに関するIssue。セキュリティの脆弱性、セキュリティの改善、脆弱性の報告、CVE、認証・認可の問題、データ保護、XSS、CSRF、SQLインジェクションなどが含まれます。
+      - label: "scope: frontend"
+        instructions: |
+          フロントエンドに関するIssue。UIコンポーネント、ページ、スタイリング、クライアントサイドのロジック、Reactコンポーネント、Next.jsのページ、app/** または components/** ディレクトリに関連するものが含まれます。
+      - label: "scope: backend"
+        instructions: |
+          バックエンドに関するIssue。サーバーサイドのロジック、API、データベース、認証、lib/** または app/api/** ディレクトリに関連するもの、Supabaseとの統合などが含まれます。
+      - label: "scope: ci/cd"
+        instructions: |
+          CI/CDに関するIssue。GitHub Actions、ワークフロー、デプロイメント、ビルドプロセス、.github/** ディレクトリ内のファイル、自動化、継続的インテグレーション・デリバリーに関するものが含まれます。
+      - label: "scope: tooling"
+        instructions: |
+          開発ツールや設定に関するIssue。biome.json、next.config.ts、tsconfig.json、vitest.config.ts、.coderabbit.yaml、postcss.config.mjs、components.jsonなどの設定ファイル、開発環境、リンター、フォーマッター、ビルドツールに関するものが含まれます。
+      - label: "dependencies"
+        instructions: |
+          依存関係に関するIssue。パッケージの更新、依存関係の追加、依存関係の削除、package.json、pnpm-lock.yaml、セキュリティアップデート、バージョンアップグレードなどが含まれます。
+      - label: "breaking change"
+        instructions: |
+          破壊的変更に関するIssue。後方互換性のない変更、APIの変更、既存のコードを壊す可能性のある変更、メジャーバージョンアップグレード、移行が必要な変更などが含まれます。
 language: ja-JP
 reviews:
   auto_apply_labels: true

@@ -136,8 +136,35 @@ lib/
 - `pnpm build` — 本番ビルド
 - `pnpm local:setup` — Supabase ローカルインスタンス起動
 - `pnpm local:stop` — Supabase ローカルインスタンス停止
+- `pnpm supabase:test` — データベーステスト実行（PgTAP）
 - `pnpm supabase:typegen` — Supabase の型定義を生成（DB 変更後に実行）
 - `pnpm lint` — ESLint 実行
+- `pnpm test` — フロントエンドテスト実行（Vitest）
+
+## データベーステスト
+
+Bingify では [PgTAP](https://pgtap.org/) を使用してデータベース層のテストを実施しています。これにより、RLS (Row Level Security) ポリシーやスキーマ定義が意図通りに動作することを検証できます。
+
+### テストの実行
+
+```bash
+# Supabase ローカルインスタンスを起動
+pnpm local:setup
+
+# データベーステストを実行
+pnpm supabase:test
+```
+
+### テストファイルの構成
+
+テストファイルは `supabase/tests/database/` ディレクトリに配置されています：
+
+- `01_schema.sql` — スキーマ定義のテスト（テーブル、カラム、外部キー制約）
+- `02_rls_security.sql` — RLS ポリシーのテスト（権限とセキュリティ）
+
+### 新しいテストの追加
+
+新しいデータベーステストを追加する場合は、`supabase/tests/database/` ディレクトリに `.sql` ファイルを作成してください。PgTAP の関数を使用してテストを記述します。詳細は [PgTAP ドキュメント](https://pgtap.org/documentation.html)を参照してください。
 
 ## 環境変数
 
