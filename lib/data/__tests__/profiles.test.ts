@@ -38,9 +38,9 @@ describe("getAdminEmails", () => {
 
     expect(result.error).toBeUndefined();
     expect(result.data).toEqual([
-      '"Admin One" <admin1@example.com>',
-      '"Admin Two" <admin2@example.com>',
-      "admin3@example.com",
+      { address: "admin1@example.com", name: "Admin One" },
+      { address: "admin2@example.com", name: "Admin Two" },
+      { address: "admin3@example.com", name: undefined },
     ]);
   });
 
@@ -64,8 +64,8 @@ describe("getAdminEmails", () => {
 
     expect(result.error).toBeUndefined();
     expect(result.data).toEqual([
-      '"Admin One" <admin1@example.com>',
-      "admin2@example.com",
+      { address: "admin1@example.com", name: "Admin One" },
+      { address: "admin2@example.com", name: undefined },
     ]);
   });
 
@@ -133,7 +133,7 @@ describe("getAdminEmails", () => {
     expect(result.data).toBeUndefined();
   });
 
-  it("表示名に特殊文字が含まれる場合に適切にエスケープする", async () => {
+  it("特殊文字を含む表示名を持つ管理者のメールアドレスを返す", async () => {
     const mockData = [
       { email: "admin1@example.com", full_name: 'John "Johnny" Doe' },
       { email: "admin2@example.com", full_name: "Path\\User" },
@@ -154,14 +154,14 @@ describe("getAdminEmails", () => {
 
     expect(result.error).toBeUndefined();
     expect(result.data).toEqual([
-      '"John \\"Johnny\\" Doe" <admin1@example.com>',
-      '"Path\\\\User" <admin2@example.com>',
-      '"Quote\\" and Slash\\\\" <admin3@example.com>',
-      '"Normal Name" <admin4@example.com>',
+      { address: "admin1@example.com", name: 'John "Johnny" Doe' },
+      { address: "admin2@example.com", name: "Path\\User" },
+      { address: "admin3@example.com", name: 'Quote" and Slash\\' },
+      { address: "admin4@example.com", name: "Normal Name" },
     ]);
   });
 
-  it("表示名に制御文字が含まれる場合に削除する", async () => {
+  it("制御文字を含む表示名を持つ管理者のメールアドレスを返す", async () => {
     const mockData = [
       { email: "admin1@example.com", full_name: "Name\x00With\x1FControl" },
       { email: "admin2@example.com", full_name: "Tab\tName" },
@@ -181,9 +181,9 @@ describe("getAdminEmails", () => {
 
     expect(result.error).toBeUndefined();
     expect(result.data).toEqual([
-      '"NameWithControl" <admin1@example.com>',
-      '"TabName" <admin2@example.com>',
-      '"NewlineName" <admin3@example.com>',
+      { address: "admin1@example.com", name: "Name\x00With\x1FControl" },
+      { address: "admin2@example.com", name: "Tab\tName" },
+      { address: "admin3@example.com", name: "Newline\nName" },
     ]);
   });
 });

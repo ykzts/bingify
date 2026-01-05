@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import type Mail from "nodemailer/lib/mailer";
 import { escapeHtml } from "@/lib/utils/escape-html";
 
 /**
@@ -22,7 +23,7 @@ export interface ContactEmailOptions {
   email: string;
   message: string;
   name: string;
-  recipients: string[];
+  recipients: Mail.Address[];
 }
 
 /**
