@@ -226,13 +226,10 @@ export async function GET(request: NextRequest) {
 
     if (provider_token && isValidProvider(providerValue)) {
       // Calculate token expiry if available from session
-      // Prefer provider_expires_at (OAuth token expiry) over session.expires_at (Supabase session expiry)
+      // Use session.expires_at which represents when the OAuth session expires
       let expiresAt: string | null = null;
-      if (session.provider_expires_at) {
-        // provider_expires_at is a Unix timestamp (seconds)
-        expiresAt = new Date(session.provider_expires_at * 1000).toISOString();
-      } else if (session.expires_at) {
-        // Fallback to Supabase session expires_at if provider expiry not available
+      if (session.expires_at) {
+        // session.expires_at is a Unix timestamp (seconds)
         expiresAt = new Date(session.expires_at * 1000).toISOString();
       }
 
