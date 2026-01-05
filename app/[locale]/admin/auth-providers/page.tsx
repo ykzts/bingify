@@ -4,6 +4,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthProvidersManagement } from "./_components/auth-providers-management";
 import { getAuthProviders } from "./_lib/actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminAuthProvidersPage({
   params,
 }: PageProps<"/[locale]/admin/auth-providers">) {

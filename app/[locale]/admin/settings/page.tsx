@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSystemSettings } from "@/lib/data/system-settings";
 import { SystemSettingsForm } from "./_components/system-settings-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminSettingsPage({
   params,
 }: PageProps<"/[locale]/admin/settings">) {

@@ -9,6 +9,8 @@ import { SpaceActionsDropdown } from "./_components/space-actions-dropdown";
 import { StatusBadge } from "./_components/status-badge";
 import { getUserSpaces } from "./_lib/actions";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/dashboard">): Promise<Metadata> {
