@@ -4,7 +4,7 @@
 BEGIN;
 
 -- テストプランの設定
-SELECT plan(20);
+SELECT plan(22);
 
 -- ========================================
 -- private スキーマとテーブルの存在確認
@@ -14,7 +14,7 @@ SELECT has_schema('private', 'private スキーマが存在すること');
 SELECT has_table('private', 'oauth_tokens', 'oauth_tokens テーブルが存在すること');
 
 -- ========================================
--- oauth_tokens テーブルのカラム検証
+-- oauth_tokens テーブルのカラム検証 (Vault暗号化対応)
 -- ========================================
 
 SELECT has_column('private', 'oauth_tokens', 'id', 'oauth_tokens.id カラムが存在すること');
@@ -23,8 +23,10 @@ SELECT has_column('private', 'oauth_tokens', 'user_id', 'oauth_tokens.user_id �
 SELECT col_type_is('private', 'oauth_tokens', 'user_id', 'uuid', 'oauth_tokens.user_id は uuid 型であること');
 SELECT has_column('private', 'oauth_tokens', 'provider', 'oauth_tokens.provider カラムが存在すること');
 SELECT col_type_is('private', 'oauth_tokens', 'provider', 'text', 'oauth_tokens.provider は text 型であること');
-SELECT has_column('private', 'oauth_tokens', 'access_token', 'oauth_tokens.access_token カラムが存在すること');
-SELECT has_column('private', 'oauth_tokens', 'refresh_token', 'oauth_tokens.refresh_token カラムが存在すること');
+SELECT has_column('private', 'oauth_tokens', 'access_token_secret_id', 'oauth_tokens.access_token_secret_id カラムが存在すること (Vault暗号化)');
+SELECT col_type_is('private', 'oauth_tokens', 'access_token_secret_id', 'uuid', 'oauth_tokens.access_token_secret_id は uuid 型であること');
+SELECT has_column('private', 'oauth_tokens', 'refresh_token_secret_id', 'oauth_tokens.refresh_token_secret_id カラムが存在すること (Vault暗号化)');
+SELECT col_type_is('private', 'oauth_tokens', 'refresh_token_secret_id', 'uuid', 'oauth_tokens.refresh_token_secret_id は uuid 型であること');
 SELECT has_column('private', 'oauth_tokens', 'expires_at', 'oauth_tokens.expires_at カラムが存在すること');
 SELECT has_column('private', 'oauth_tokens', 'created_at', 'oauth_tokens.created_at カラムが存在すること');
 SELECT has_column('private', 'oauth_tokens', 'updated_at', 'oauth_tokens.updated_at カラムが存在すること');
