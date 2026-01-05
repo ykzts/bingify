@@ -1,5 +1,6 @@
 "use client";
 
+import { revalidateLogic } from "@tanstack/react-form";
 import {
   initialFormState,
   mergeForm,
@@ -248,6 +249,10 @@ export function SpaceSettingsForm({
       youtube_requirement:
         space.gatekeeper_rules?.youtube?.requirement || "none",
     },
+    validationLogic: revalidateLogic({
+      mode: "submit",
+      modeAfterSubmission: "change",
+    }),
     validators: {
       onChange: spaceSettingsFormSchema,
     },
@@ -262,6 +267,7 @@ export function SpaceSettingsForm({
     form.store,
     (formState) => formState.isSubmitting
   );
+  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   // Get field values directly from form state
   const formValues = useStore(form.store, (state) => state.values);
@@ -444,7 +450,12 @@ export function SpaceSettingsForm({
 
   return (
     <div className="space-y-8">
-      <form action={updateAction} className="space-y-6">
+      <form
+        action={updateAction}
+        className="space-y-6"
+        noValidate
+        onSubmit={() => form.handleSubmit()}
+      >
         {/* Basic Information */}
         <FieldSet>
           <FieldLegend>{t("basicInfoTitle")}</FieldLegend>
@@ -992,14 +1003,18 @@ export function SpaceSettingsForm({
 
         {/* Action Buttons */}
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
-          <Button disabled={isPending} type="submit" variant="outline">
+          <Button
+            disabled={!canSubmit || isPending}
+            type="submit"
+            variant="outline"
+          >
             {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
             {t("updateButton")}
           </Button>
 
           {isDraft && (
             <Button
-              disabled={isPending}
+              disabled={!canSubmit || isPending}
               formAction={publishAction}
               type="submit"
             >

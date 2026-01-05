@@ -1,5 +1,6 @@
 "use client";
 
+import { revalidateLogic } from "@tanstack/react-form";
 import {
   initialFormState,
   mergeForm,
@@ -45,6 +46,10 @@ export function ContactForm({ locale }: Props) {
 
   const form = useForm({
     ...contactFormOpts,
+    validationLogic: revalidateLogic({
+      mode: "submit",
+      modeAfterSubmission: "change",
+    }),
     validators: {
       onChange: contactFormSchema,
     },
@@ -59,6 +64,7 @@ export function ContactForm({ locale }: Props) {
     form.store,
     (formState) => formState.isSubmitting
   );
+  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   useEffect(() => {
     if (
@@ -93,7 +99,7 @@ export function ContactForm({ locale }: Props) {
 
       <p className="mb-6 text-gray-600">{t("description")}</p>
 
-      <form action={action}>
+      <form action={action} noValidate onSubmit={() => form.handleSubmit()}>
         <FormErrors
           className="mb-4"
           errors={formErrors}
@@ -189,7 +195,9 @@ export function ContactForm({ locale }: Props) {
 
           <div className="flex justify-end">
             <Button
-              disabled={isSubmitting || (hasTurnstile && !turnstileToken)}
+              disabled={
+                !canSubmit || isSubmitting || (hasTurnstile && !turnstileToken)
+              }
               size="lg"
               type="submit"
             >

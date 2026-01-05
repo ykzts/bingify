@@ -1,5 +1,6 @@
 "use client";
 
+import { revalidateLogic } from "@tanstack/react-form";
 import {
   initialFormState,
   mergeForm,
@@ -98,6 +99,10 @@ export function CreateSpaceForm() {
 
   const form = useForm({
     ...createSpaceFormOpts,
+    validationLogic: revalidateLogic({
+      mode: "submit",
+      modeAfterSubmission: "change",
+    }),
     validators: {
       onChange: createSpaceFormSchema,
     },
@@ -110,6 +115,7 @@ export function CreateSpaceForm() {
     form.store,
     (formState) => formState.isSubmitting
   );
+  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   const handleShareKeyChange = (normalizedKey: string) => {
     setShareKey(normalizedKey);
@@ -170,7 +176,12 @@ export function CreateSpaceForm() {
   }, [state]);
 
   return (
-    <form action={action} className="space-y-6">
+    <form
+      action={action}
+      className="space-y-6"
+      noValidate
+      onSubmit={() => form.handleSubmit()}
+    >
       <FormErrors
         className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4"
         errors={formErrors}
@@ -335,7 +346,12 @@ export function CreateSpaceForm() {
 
       <Button
         className="w-full"
-        disabled={isSubmitting || available === false || shareKey.length < 3}
+        disabled={
+          !canSubmit ||
+          isSubmitting ||
+          available === false ||
+          shareKey.length < 3
+        }
         type="submit"
       >
         {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}

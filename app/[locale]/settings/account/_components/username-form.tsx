@@ -1,5 +1,6 @@
 "use client";
 
+import { revalidateLogic } from "@tanstack/react-form";
 import {
   initialFormState,
   mergeForm,
@@ -46,6 +47,10 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
     defaultValues: {
       username: currentUsername || "",
     },
+    validationLogic: revalidateLogic({
+      mode: "submit",
+      modeAfterSubmission: "change",
+    }),
     validators: {
       onChange: usernameSchema,
     },
@@ -58,6 +63,7 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
     form.store,
     (formState) => formState.isSubmitting
   );
+  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   useEffect(() => {
     // Check for successful update
@@ -76,7 +82,12 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
         {t("title")}
       </SectionHeader>
 
-      <form action={action} className="space-y-4">
+      <form
+        action={action}
+        className="space-y-4"
+        noValidate
+        onSubmit={() => form.handleSubmit()}
+      >
         <FormErrors errors={formErrors} variant="with-icon" />
 
         <form.Field name="username">
@@ -104,7 +115,7 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
           )}
         </form.Field>
 
-        <Button disabled={isSubmitting} type="submit">
+        <Button disabled={!canSubmit || isSubmitting} type="submit">
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />

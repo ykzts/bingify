@@ -1,5 +1,6 @@
 "use client";
 
+import { revalidateLogic } from "@tanstack/react-form";
 import {
   initialFormState,
   mergeForm,
@@ -52,8 +53,12 @@ export function AdminManagement({ spaceId }: Props) {
 
   const form = useForm({
     ...inviteAdminFormOpts,
+    validationLogic: revalidateLogic({
+      mode: "submit",
+      modeAfterSubmission: "change",
+    }),
     validators: {
-      onChange: inviteAdminFormSchema,
+      onDynamic: inviteAdminFormSchema,
     },
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
@@ -64,6 +69,7 @@ export function AdminManagement({ spaceId }: Props) {
     form.store,
     (formState) => formState.isSubmitting
   );
+  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: spaceId is stable and doesn't need to be in deps
   useEffect(() => {
@@ -135,7 +141,12 @@ export function AdminManagement({ spaceId }: Props) {
           className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3"
           errors={formErrors}
         />
-        <form action={action} className="space-y-3">
+        <form
+          action={action}
+          className="space-y-3"
+          noValidate
+          onSubmit={() => form.handleSubmit()}
+        >
           <form.Field name="email">
             {(field) => (
               <Field>
@@ -159,7 +170,7 @@ export function AdminManagement({ spaceId }: Props) {
           </form.Field>
           <Button
             className="w-full"
-            disabled={isSubmitting}
+            disabled={!canSubmit || isSubmitting}
             size="sm"
             type="submit"
           >

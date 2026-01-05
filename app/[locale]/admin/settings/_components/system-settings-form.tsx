@@ -1,5 +1,6 @@
 "use client";
 
+import { revalidateLogic } from "@tanstack/react-form";
 import {
   mergeForm,
   useForm,
@@ -56,8 +57,12 @@ export function SystemSettingsForm({ initialSettings }: Props) {
           space_expiration_hours: initialSettings.space_expiration_hours,
         }
       : systemSettingsFormOpts.defaultValues,
+    validationLogic: revalidateLogic({
+      mode: "submit",
+      modeAfterSubmission: "change",
+    }),
     validators: {
-      onChange: systemSettingsSchema,
+      onDynamic: systemSettingsSchema,
     },
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
@@ -68,6 +73,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
     form.store,
     (formState) => formState.isSubmitting
   );
+  const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   // Get platform-level enabled states from nested form values
   const formValues = useStore(form.store, (state) => state.values);
@@ -96,23 +102,18 @@ export function SystemSettingsForm({ initialSettings }: Props) {
   }, [state]);
 
   return (
-    <form action={action} className="space-y-6">
+    <form
+      action={action}
+      className="space-y-6"
+      noValidate
+      onSubmit={() => form.handleSubmit()}
+    >
       <FormErrors errors={formErrors} variant="with-icon" />
 
       <FieldSet>
         <FieldLegend>リソース制限</FieldLegend>
         <FieldGroup>
-          <form.Field
-            name="max_participants_per_space"
-            validators={{
-              onChange: ({ value }: { value: number }) => {
-                if (value < 1 || value > 10_000) {
-                  return "1から10000の範囲で入力してください";
-                }
-                return undefined;
-              },
-            }}
-          >
+          <form.Field name="max_participants_per_space">
             {(field) => (
               <Field>
                 <FieldContent>
@@ -143,17 +144,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          <form.Field
-            name="max_spaces_per_user"
-            validators={{
-              onChange: ({ value }: { value: number }) => {
-                if (value < 1 || value > 100) {
-                  return "1から100の範囲で入力してください";
-                }
-                return undefined;
-              },
-            }}
-          >
+          <form.Field name="max_spaces_per_user">
             {(field) => (
               <Field>
                 <FieldContent>
@@ -184,17 +175,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          <form.Field
-            name="max_total_spaces"
-            validators={{
-              onChange: ({ value }: { value: number }) => {
-                if (value < 0 || value > 100_000) {
-                  return "0から100000の範囲で入力してください";
-                }
-                return undefined;
-              },
-            }}
-          >
+          <form.Field name="max_total_spaces">
             {(field) => (
               <Field>
                 <FieldContent>
@@ -223,17 +204,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          <form.Field
-            name="space_expiration_hours"
-            validators={{
-              onChange: ({ value }: { value: number }) => {
-                if (value < 0 || value > 8760) {
-                  return "0から8760の範囲で入力してください";
-                }
-                return undefined;
-              },
-            }}
-          >
+          <form.Field name="space_expiration_hours">
             {(field) => (
               <Field>
                 <FieldContent>
@@ -485,7 +456,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
       </div>
 
       <div className="flex justify-end">
-        <Button disabled={isSubmitting} type="submit">
+        <Button disabled={!canSubmit || isSubmitting} type="submit">
           {isSubmitting ? t("saving") : t("saveButton")}
         </Button>
       </div>
