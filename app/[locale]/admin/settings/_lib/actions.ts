@@ -76,9 +76,25 @@ function parseSystemSettingsFormData(
     gatekeeper: {
       youtube: {
         enabled: formData.has("features.gatekeeper.youtube.enabled"),
+        member: {
+          enabled: formData.has("features.gatekeeper.youtube.member.enabled"),
+        },
+        subscriber: {
+          enabled: formData.has(
+            "features.gatekeeper.youtube.subscriber.enabled"
+          ),
+        },
       },
       twitch: {
         enabled: formData.has("features.gatekeeper.twitch.enabled"),
+        follower: {
+          enabled: formData.has("features.gatekeeper.twitch.follower.enabled"),
+        },
+        subscriber: {
+          enabled: formData.has(
+            "features.gatekeeper.twitch.subscriber.enabled"
+          ),
+        },
       },
       email: {
         enabled: formData.has("features.gatekeeper.email.enabled"),
