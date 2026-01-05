@@ -3,7 +3,8 @@
 CREATE SCHEMA IF NOT EXISTS private;
 
 -- Grant necessary permissions
-GRANT USAGE ON SCHEMA private TO postgres, anon, authenticated, service_role;
+-- Only postgres, authenticated, and service_role should have access to private schema
+GRANT USAGE ON SCHEMA private TO postgres, authenticated, service_role;
 
 -- Create OAuth tokens table in private schema
 -- This table stores provider tokens for YouTube, Twitch, etc.
@@ -12,7 +13,7 @@ CREATE TABLE IF NOT EXISTS private.oauth_tokens (
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   provider TEXT NOT NULL,
   -- Store tokens as TEXT (not encrypted at database level)
-  -- In production with Supabase hosted, enable TCE with Vault
+  -- In production: use Vault for key management + application-level encryption
   access_token TEXT NOT NULL,
   refresh_token TEXT,
   expires_at TIMESTAMPTZ,
@@ -27,10 +28,11 @@ CREATE TABLE IF NOT EXISTS private.oauth_tokens (
 -- 1. Store encryption key in Vault via Supabase Dashboard:
 --    INSERT INTO vault.secrets (name, secret)
 --    VALUES ('oauth_token_encryption_key', 'your-generated-key-here');
--- 2. Use Vault secrets in application code via vault.decrypted_secrets view
+-- 2. Use Vault secrets in application code for encryption/decryption
+-- 3. Perform encryption at application level before storing tokens
 --
--- For Transparent Column Encryption (if needed):
--- TCE/pgsodium is being deprecated by Supabase. Use Vault + application-level encryption instead.
+-- Note: pgsodium/TCE is not used as it's being deprecated by Supabase
+-- Use Vault + application-level encryption instead
 -- Reference: https://supabase.com/docs/guides/database/vault
 --
 -- For local development:
@@ -43,7 +45,9 @@ CREATE INDEX IF NOT EXISTS idx_oauth_tokens_user_provider
 
 -- Create updated_at trigger
 CREATE OR REPLACE FUNCTION private.update_oauth_tokens_updated_at()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+SET search_path = private, pg_temp
+AS $$
 BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
@@ -55,9 +59,26 @@ CREATE TRIGGER oauth_tokens_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION private.update_oauth_tokens_updated_at();
 
--- Grant permissions
--- Only authenticated users can access through RPC functions
--- service_role has full access for admin operations
+-- Enable Row Level Security
+ALTER TABLE private.oauth_tokens ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS policy for authenticated users (can only access their own tokens)
+CREATE POLICY oauth_tokens_user_policy ON private.oauth_tokens
+  FOR ALL
+  TO authenticated
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+
+-- Create RLS policy for service_role (full access for admin operations)
+CREATE POLICY oauth_tokens_service_role_policy ON private.oauth_tokens
+  FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
+-- Grant minimal permissions
+-- authenticated role needs table access for RLS policies to work
+-- Actual access is controlled by RLS policies above
 GRANT SELECT, INSERT, UPDATE, DELETE ON private.oauth_tokens TO authenticated;
 GRANT ALL ON private.oauth_tokens TO service_role;
 
