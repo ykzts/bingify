@@ -22,19 +22,19 @@ export interface ContactEmailOptions {
   email: string;
   message: string;
   name: string;
+  recipients: string[];
 }
 
 /**
- * Send contact form email to administrator
+ * Send contact form email to administrators
  * User's email is set in Reply-To header for easy replies
  */
 export async function sendContactEmail(options: ContactEmailOptions) {
-  const { email, message, name } = options;
+  const { email, message, name, recipients } = options;
 
   const mailFrom = process.env.MAIL_FROM;
-  const mailTo = process.env.CONTACT_MAIL_TO;
 
-  if (!(mailFrom && mailTo)) {
+  if (!mailFrom) {
     throw new Error("Mail configuration is missing");
   }
 
@@ -65,7 +65,7 @@ export async function sendContactEmail(options: ContactEmailOptions) {
 本文:
 ${message}
     `,
-    to: mailTo,
+    to: recipients,
   };
 
   await transporter.sendMail(mailOptions);
