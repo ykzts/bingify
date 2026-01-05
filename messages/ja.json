@@ -515,7 +515,10 @@
     "updateSuccess": "設定を更新しました",
     "warning": "警告",
     "warningRequirementDisabled": "現在選択されている要件種別がシステム設定で無効になっています。有効な要件を選択し直してください。",
+    "youtubeChannelIdConvertError": "チャンネルIDの解決に失敗しました",
+    "youtubeChannelIdHelp": "チャンネルID、ハンドル（@username）、またはチャンネルURLを入力してください。例: UCxxxxxxxxxxxxxxxxxxxxxx, @GoogleDevelopers, https://www.youtube.com/@GoogleDevelopers",
     "youtubeChannelIdLabel": "YouTubeチャンネルID",
+    "youtubeChannelIdPlaceholder": "チャンネルID、ハンドル、またはURL",
     "youtubeMember": "メンバーのみ",
     "youtubeRequirementLabel": "YouTube要件",
     "youtubeSubscriber": "チャンネル登録者のみ"

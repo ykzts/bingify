@@ -51,6 +51,10 @@ import {
   updateSpaceSettings,
 } from "../_lib/settings-actions";
 import { lookupTwitchBroadcasterId } from "../_lib/twitch-lookup-actions";
+import { lookupYouTubeChannelId } from "../_lib/youtube-lookup-actions";
+
+// チャンネルIDの正規表現（UCで始まる24文字）
+const YOUTUBE_CHANNEL_ID_REGEX = /^UC[a-zA-Z0-9_-]{22}$/;
 
 interface Props {
   currentParticipantCount: number;
@@ -125,6 +129,51 @@ export function SpaceSettingsForm({
   const [serverError, setServerError] = useState<string | null>(null);
   const [twitchIdConverting, setTwitchIdConverting] = useState(false);
   const [twitchIdError, setTwitchIdError] = useState<string | null>(null);
+  const [youtubeIdConverting, setYoutubeIdConverting] = useState(false);
+  const [youtubeIdError, setYoutubeIdError] = useState<string | null>(null);
+
+  // Debounced function to convert YouTube handle/URL to channel ID
+  const convertYoutubeInput = useDebouncedCallback(
+    async (input: string, fieldApi: { setValue: (value: string) => void }) => {
+      if (!input || input.trim() === "") {
+        setYoutubeIdConverting(false);
+        setYoutubeIdError(null);
+        return;
+      }
+
+      // すでにチャンネルIDの場合は変換不要
+      if (YOUTUBE_CHANNEL_ID_REGEX.test(input.trim())) {
+        setYoutubeIdConverting(false);
+        setYoutubeIdError(null);
+        return;
+      }
+
+      setYoutubeIdConverting(true);
+      setYoutubeIdError(null);
+
+      try {
+        // Server Functionを使用してチャンネルIDを解決
+        const result = await lookupYouTubeChannelId(input.trim());
+
+        if (result.error) {
+          setYoutubeIdError(result.error);
+          setYoutubeIdConverting(false);
+          return;
+        }
+
+        if (result.channelId) {
+          // フィールドの値を解決されたチャンネルIDで更新
+          fieldApi.setValue(result.channelId);
+          setYoutubeIdError(null);
+        }
+      } catch (_error) {
+        setYoutubeIdError(t("youtubeChannelIdConvertError"));
+      } finally {
+        setYoutubeIdConverting(false);
+      }
+    },
+    800
+  );
 
   // Debounced function to convert Twitch username/URL to ID
   const convertTwitchInput = useDebouncedCallback(
@@ -661,17 +710,35 @@ export function SpaceSettingsForm({
                                       <FieldLabel>
                                         {t("youtubeChannelIdLabel")}
                                       </FieldLabel>
-                                      <Input
-                                        disabled={isPending}
-                                        name={field.name}
-                                        onChange={(e) =>
-                                          field.handleChange(e.target.value)
-                                        }
-                                        placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
-                                        required={youtubeRequirement !== "none"}
-                                        type="text"
-                                        value={field.state.value as string}
-                                      />
+                                      <div className="relative">
+                                        <Input
+                                          disabled={
+                                            isPending || youtubeIdConverting
+                                          }
+                                          name={field.name}
+                                          onChange={(e) => {
+                                            const value = e.target.value;
+                                            field.handleChange(value);
+                                            convertYoutubeInput(value, {
+                                              setValue: (newValue: string) =>
+                                                field.handleChange(newValue),
+                                            });
+                                          }}
+                                          placeholder={t(
+                                            "youtubeChannelIdPlaceholder"
+                                          )}
+                                          required={
+                                            youtubeRequirement !== "none"
+                                          }
+                                          type="text"
+                                          value={field.state.value as string}
+                                        />
+                                        {youtubeIdConverting && (
+                                          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                                          </div>
+                                        )}
+                                      </div>
                                       {field.state.meta.errors.length > 0 && (
                                         <FieldError>
                                           {getErrorMessage(
@@ -679,6 +746,14 @@ export function SpaceSettingsForm({
                                           )}
                                         </FieldError>
                                       )}
+                                      {youtubeIdError && (
+                                        <FieldError>
+                                          {youtubeIdError}
+                                        </FieldError>
+                                      )}
+                                      <FieldDescription>
+                                        {t("youtubeChannelIdHelp")}
+                                      </FieldDescription>
                                     </FieldContent>
                                   </Field>
                                 )}

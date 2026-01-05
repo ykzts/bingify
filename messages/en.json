@@ -515,7 +515,10 @@
     "updateSuccess": "Settings updated successfully",
     "warning": "Warning",
     "warningRequirementDisabled": "The currently selected requirement type is disabled in system settings. Please select a valid requirement.",
+    "youtubeChannelIdConvertError": "Failed to resolve channel ID",
+    "youtubeChannelIdHelp": "Enter a channel ID, handle (@username), or channel URL. Examples: UCxxxxxxxxxxxxxxxxxxxxxx, @GoogleDevelopers, https://www.youtube.com/@GoogleDevelopers",
     "youtubeChannelIdLabel": "YouTube Channel ID",
+    "youtubeChannelIdPlaceholder": "Channel ID, handle, or URL",
     "youtubeMember": "Members only",
     "youtubeRequirementLabel": "YouTube Requirement",
     "youtubeSubscriber": "Subscribers only"
