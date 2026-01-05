@@ -2,7 +2,7 @@ import type Mail from "nodemailer/lib/mailer";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export interface GetAdminEmailsResult {
-  data?: Mail.Address[];
+  data?: Array<string | Mail.Address>;
   error?: string;
 }
 
@@ -26,16 +26,21 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
       };
     }
 
-    // メールアドレスが null でないものだけを抽出し、Address オブジェクトに変換
+    // メールアドレスが null でないものだけを抽出し、Address オブジェクトまたは文字列に変換
     const emails = data
       .filter(
         (profile): profile is { email: string; full_name: string | null } =>
           profile.email !== null
       )
-      .map((profile) => ({
-        address: profile.email,
-        name: profile.full_name || undefined,
-      }));
+      .map((profile): string | Mail.Address => {
+        if (profile.full_name) {
+          return {
+            address: profile.email,
+            name: profile.full_name,
+          };
+        }
+        return profile.email;
+      });
 
     if (emails.length === 0) {
       console.error("No admin users found with valid email addresses");

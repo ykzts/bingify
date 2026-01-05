@@ -40,7 +40,7 @@ describe("getAdminEmails", () => {
     expect(result.data).toEqual([
       { address: "admin1@example.com", name: "Admin One" },
       { address: "admin2@example.com", name: "Admin Two" },
-      { address: "admin3@example.com", name: undefined },
+      "admin3@example.com",
     ]);
   });
 
@@ -65,7 +65,7 @@ describe("getAdminEmails", () => {
     expect(result.error).toBeUndefined();
     expect(result.data).toEqual([
       { address: "admin1@example.com", name: "Admin One" },
-      { address: "admin2@example.com", name: undefined },
+      "admin2@example.com",
     ]);
   });
 

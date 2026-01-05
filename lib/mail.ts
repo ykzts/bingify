@@ -23,7 +23,7 @@ export interface ContactEmailOptions {
   email: string;
   message: string;
   name: string;
-  recipients: Mail.Address[];
+  recipients: Array<string | Mail.Address>;
 }
 
 /**
