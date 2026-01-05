@@ -4,6 +4,7 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
+import { getAdminEmails } from "@/lib/data/profiles";
 import { sendContactEmail } from "@/lib/mail";
 import { contactFormOpts, contactFormSchema } from "./form-options";
 
@@ -93,11 +94,28 @@ export async function submitContactFormAction(
       }
     }
 
+    // Get admin emails from database
+    const adminEmailsResult = await getAdminEmails();
+
+    if (adminEmailsResult.error || !adminEmailsResult.data) {
+      console.error(
+        "Failed to get admin emails:",
+        adminEmailsResult.error || "No admin users found"
+      );
+      return {
+        ...initialFormState,
+        errors: [
+          "管理者のメールアドレスが取得できませんでした。しばらくしてからもう一度お試しください。",
+        ],
+      };
+    }
+
     // Send email with parsed data
     await sendContactEmail({
       email: parsed.email,
       message: parsed.message,
       name: parsed.name,
+      recipients: adminEmailsResult.data,
     });
 
     // Return success state with user email for redirect
