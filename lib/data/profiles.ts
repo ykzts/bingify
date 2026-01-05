@@ -6,6 +6,23 @@ export interface GetAdminEmailsResult {
 }
 
 /**
+ * RFC 5322 の quoted-string 用に表示名をエスケープ
+ * バックスラッシュと二重引用符をエスケープし、制御文字を削除
+ */
+function escapeDisplayName(name: string): string {
+  return (
+    name
+      // 制御文字 (0x00-0x1F, 0x7F) を削除
+      // biome-ignore lint/suspicious/noControlCharactersInRegex: Control characters are intentionally matched and removed for RFC 5322 compliance
+      .replace(/[\x00-\x1F\x7F]/g, "")
+      // バックスラッシュをエスケープ
+      .replace(/\\/g, "\\\\")
+      // 二重引用符をエスケープ
+      .replace(/"/g, '\\"')
+  );
+}
+
+/**
  * profiles テーブルから role = 'admin' のユーザーのメールアドレスを取得
  * @returns 管理者のメールアドレス配列、またはエラー
  */
@@ -34,7 +51,7 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
       .map((profile) => {
         // full_name がある場合は "Full Name" <email@example.com> 形式にする
         if (profile.full_name) {
-          return `"${profile.full_name}" <${profile.email}>`;
+          return `"${escapeDisplayName(profile.full_name)}" <${profile.email}>`;
         }
         return profile.email;
       });
