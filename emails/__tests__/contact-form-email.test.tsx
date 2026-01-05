@@ -1,4 +1,4 @@
-import { render } from "@react-email/render";
+import { render, toPlainText } from "@react-email/render";
 import { describe, expect, it } from "vitest";
 import { ContactFormEmail } from "../contact-form-email";
 
@@ -59,9 +59,8 @@ describe("ContactFormEmail", () => {
 
   describe("テキスト版のレンダリング", () => {
     it("正しくプレーンテキストメールをレンダリングする", async () => {
-      const text = await render(ContactFormEmail(testProps), {
-        plainText: true,
-      });
+      const html = await render(ContactFormEmail(testProps));
+      const text = toPlainText(html);
 
       // テキスト版の内容確認
       expect(text).toContain("お問い合わせ");
@@ -76,9 +75,8 @@ describe("ContactFormEmail", () => {
     });
 
     it("HTMLタグを含まない", async () => {
-      const text = await render(ContactFormEmail(testProps), {
-        plainText: true,
-      });
+      const html = await render(ContactFormEmail(testProps));
+      const text = toPlainText(html);
 
       // HTMLタグが含まれていないことを確認
       expect(text).not.toContain("<");
@@ -88,9 +86,8 @@ describe("ContactFormEmail", () => {
     });
 
     it("不要な空白や改行が整形されている", async () => {
-      const text = await render(ContactFormEmail(testProps), {
-        plainText: true,
-      });
+      const html = await render(ContactFormEmail(testProps));
+      const text = toPlainText(html);
 
       // テンプレートリテラルのインデント由来の不要な空白がないことを確認
       const lines = text.split("\n");
@@ -114,9 +111,8 @@ describe("ContactFormEmail", () => {
         name: "テストユーザー",
       };
 
-      const text = await render(ContactFormEmail(propsWithNewlines), {
-        plainText: true,
-      });
+      const html = await render(ContactFormEmail(propsWithNewlines));
+      const text = toPlainText(html);
 
       // プレーンテキスト版では改行がスペースに変換される
       expect(text).toContain("1行目");

@@ -1,4 +1,4 @@
-import { render } from "@react-email/render";
+import { render, toPlainText } from "@react-email/render";
 import nodemailer from "nodemailer";
 import type Mail from "nodemailer/lib/mailer";
 import { ContactFormEmail } from "@/emails/contact-form-email";
@@ -55,16 +55,7 @@ export async function sendContactEmail(options: ContactEmailOptions) {
     })
   );
 
-  const emailText = await render(
-    ContactFormEmail({
-      email,
-      message,
-      name,
-    }),
-    {
-      plainText: true,
-    }
-  );
+  const emailText = toPlainText(emailHtml);
 
   const mailOptions = {
     from: mailFrom,
