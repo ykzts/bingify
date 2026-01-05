@@ -1,6 +1,7 @@
+import { render, toPlainText } from "@react-email/render";
 import nodemailer from "nodemailer";
 import type Mail from "nodemailer/lib/mailer";
-import { escapeHtml } from "@/lib/utils/escape-html";
+import { ContactFormEmail } from "@/emails/contact-form-email";
 
 /**
  * Create SMTP transporter for sending emails
@@ -45,31 +46,23 @@ export async function sendContactEmail(options: ContactEmailOptions) {
 
   const transporter = createTransporter();
 
-  // Escape user inputs to prevent HTML injection
-  const escapedName = escapeHtml(name);
-  const escapedEmail = escapeHtml(email);
-  const escapedMessage = escapeHtml(message).replace(/\n/g, "<br>");
+  // React Emailを使用してHTMLとテキスト版を自動生成
+  const emailHtml = await render(
+    ContactFormEmail({
+      email,
+      message,
+      name,
+    })
+  );
+
+  const emailText = toPlainText(emailHtml);
 
   const mailOptions = {
     from: mailFrom,
-    html: `
-      <h2>お問い合わせ</h2>
-      <p><strong>名前:</strong> ${escapedName}</p>
-      <p><strong>メールアドレス:</strong> ${escapedEmail}</p>
-      <p><strong>本文:</strong></p>
-      <p>${escapedMessage}</p>
-    `,
+    html: emailHtml,
     replyTo: email,
     subject: `【お問い合わせ】${name}様より`,
-    text: `
-お問い合わせ
-
-名前: ${name}
-メールアドレス: ${email}
-
-本文:
-${message}
-    `,
+    text: emailText,
     to: recipients,
   };
 
