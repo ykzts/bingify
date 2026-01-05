@@ -39,10 +39,6 @@ CREATE TABLE IF NOT EXISTS private.oauth_tokens (
 -- Tokens are stored in private schema which is not exposed via API
 -- This provides reasonable security for development purposes without encryption
 
--- Create index for efficient lookups
-CREATE INDEX IF NOT EXISTS idx_oauth_tokens_user_provider 
-  ON private.oauth_tokens(user_id, provider);
-
 -- Create updated_at trigger
 CREATE OR REPLACE FUNCTION private.update_oauth_tokens_updated_at()
 RETURNS TRIGGER

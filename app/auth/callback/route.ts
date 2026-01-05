@@ -217,21 +217,28 @@ export async function GET(request: NextRequest) {
   if (session) {
     // Save OAuth tokens to database if available
     const { provider_token, provider_refresh_token } = session;
-    const provider = session.user?.app_metadata?.provider as
-      | OAuthProvider
-      | undefined;
+    const providerValue = session.user?.app_metadata?.provider;
 
-    if (provider_token && provider) {
+    // Validate provider is a supported OAuth provider
+    const isValidProvider = (p: unknown): p is OAuthProvider => {
+      return p === "google" || p === "twitch";
+    };
+
+    if (provider_token && isValidProvider(providerValue)) {
       // Calculate token expiry if available from session
+      // Prefer provider_expires_at (OAuth token expiry) over session.expires_at (Supabase session expiry)
       let expiresAt: string | null = null;
-      if (session.expires_at) {
-        // Supabase session expires_at is a Unix timestamp
+      if (session.provider_expires_at) {
+        // provider_expires_at is a Unix timestamp (seconds)
+        expiresAt = new Date(session.provider_expires_at * 1000).toISOString();
+      } else if (session.expires_at) {
+        // Fallback to Supabase session expires_at if provider expiry not available
         expiresAt = new Date(session.expires_at * 1000).toISOString();
       }
 
       // Store token in encrypted database
       const result = await upsertOAuthToken(supabase, {
-        provider,
+        provider: providerValue,
         access_token: provider_token,
         refresh_token: provider_refresh_token || null,
         expires_at: expiresAt,
@@ -239,7 +246,7 @@ export async function GET(request: NextRequest) {
 
       if (!result.success) {
         console.warn(
-          `Failed to store OAuth token for provider ${provider}:`,
+          `Failed to store OAuth token for provider ${providerValue}:`,
           result.error
         );
         // Continue anyway - token storage failure shouldn't block authentication

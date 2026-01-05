@@ -4,7 +4,7 @@
 BEGIN;
 
 -- テストプランの設定
-SELECT plan(21);
+SELECT plan(20);
 
 -- ========================================
 -- private スキーマとテーブルの存在確認
@@ -79,15 +79,6 @@ SELECT fk_ok(
   'private', 'oauth_tokens', 'user_id',
   'auth', 'users', 'id',
   'oauth_tokens.user_id は auth.users.id への外部キー制約があること'
-);
-
--- ========================================
--- インデックスの検証
--- ========================================
-
-SELECT has_index(
-  'private', 'oauth_tokens', 'idx_oauth_tokens_user_provider',
-  'oauth_tokens テーブルに idx_oauth_tokens_user_provider インデックスが存在すること'
 );
 
 -- ========================================

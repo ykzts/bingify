@@ -61,5 +61,6 @@ WHERE id = 'b3e3f3f3-3f3f-3f3f-3f3f-3f3f3f3f3f3f'::uuid;
 
 -- Expected Results:
 -- ✅ upsert_result should show success: true
--- ✅ get_result should show the stored token in plaintext
--- ✅ Raw table query shows encrypted data if Vault/TCE is enabled in production
+-- ✅ get_result should show the stored token in plaintext (RPC function handles decryption)
+-- ✅ Raw table query in production with Vault + app-level encryption shows ciphertext
+--    In local dev (private schema only), raw table shows plaintext
