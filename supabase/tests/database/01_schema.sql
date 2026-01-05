@@ -89,16 +89,32 @@ SELECT has_column('public', 'space_roles', 'created_at', 'space_roles.created_at
 -- ========================================
 
 -- bingo_cards.space_id -> spaces.id
-SELECT has_fk('public', 'bingo_cards', 'bingo_cards.space_id は spaces.id への外部キー制約があること');
+SELECT fk_ok(
+  'public', 'bingo_cards', 'space_id',
+  'public', 'spaces', 'id',
+  'bingo_cards.space_id は spaces.id への外部キー制約があること'
+);
 
 -- called_numbers.space_id -> spaces.id
-SELECT has_fk('public', 'called_numbers', 'called_numbers.space_id は spaces.id への外部キー制約があること');
+SELECT fk_ok(
+  'public', 'called_numbers', 'space_id',
+  'public', 'spaces', 'id',
+  'called_numbers.space_id は spaces.id への外部キー制約があること'
+);
 
 -- participants.space_id -> spaces.id
-SELECT has_fk('public', 'participants', 'participants.space_id は spaces.id への外部キー制約があること');
+SELECT fk_ok(
+  'public', 'participants', 'space_id',
+  'public', 'spaces', 'id',
+  'participants.space_id は spaces.id への外部キー制約があること'
+);
 
 -- space_roles.space_id -> spaces.id
-SELECT has_fk('public', 'space_roles', 'space_roles.space_id は spaces.id への外部キー制約があること');
+SELECT fk_ok(
+  'public', 'space_roles', 'space_id',
+  'public', 'spaces', 'id',
+  'space_roles.space_id は spaces.id への外部キー制約があること'
+);
 
 -- テスト終了
 SELECT * FROM finish();
