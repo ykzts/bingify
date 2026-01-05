@@ -5,12 +5,14 @@ on:
     branches: [main]
     paths:
       - "supabase/migrations/**/*.sql"
+      - "supabase/tests/**/*.sql"
       - "supabase/config.toml"
       - "supabase/seed.sql"
   pull_request:
     branches: [main]
     paths:
       - "supabase/migrations/**/*.sql"
+      - "supabase/tests/**/*.sql"
       - "supabase/config.toml"
       - "supabase/seed.sql"
 
@@ -47,6 +49,11 @@ jobs:
           echo "=== Verifying Supabase is still running after reset ==="
           supabase status
           echo "✅ Database reset completed successfully"
+
+      - name: Run database tests
+        run: |
+          echo "=== Running PgTAP database tests ==="
+          supabase test db
 
       - name: Stop Supabase
         if: always()
