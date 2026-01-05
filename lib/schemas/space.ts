@@ -1,7 +1,7 @@
 import { z } from "zod";
+import { YOUTUBE_CHANNEL_ID_REGEX } from "../youtube-constants";
 
 // Regex constants
-const YOUTUBE_CHANNEL_ID_REGEX = /^UC[a-zA-Z0-9_-]{22}$/;
 const TWITCH_BROADCASTER_ID_REGEX = /^\d+$/;
 const EMAIL_PATTERN_SPLIT_REGEX = /[\n,]+/;
 const EMAIL_FORMAT_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
