@@ -22,18 +22,20 @@ CREATE TABLE IF NOT EXISTS private.oauth_tokens (
   UNIQUE (user_id, provider)
 );
 
--- Note: Transparent Column Encryption (TCE) setup
+-- Note: Encryption with Supabase Vault
 -- For production Supabase hosted environment:
--- 1. Create encryption key in Vault via Supabase Dashboard
--- 2. Apply SECURITY LABEL to columns:
---    SECURITY LABEL FOR pgsodium ON COLUMN private.oauth_tokens.access_token
---      IS 'ENCRYPT WITH KEY ID <vault_key_id>';
---    SECURITY LABEL FOR pgsodium ON COLUMN private.oauth_tokens.refresh_token
---      IS 'ENCRYPT WITH KEY ID <vault_key_id>';
+-- 1. Store encryption key in Vault via Supabase Dashboard:
+--    INSERT INTO vault.secrets (name, secret)
+--    VALUES ('oauth_token_encryption_key', 'your-generated-key-here');
+-- 2. Use Vault secrets in application code via vault.decrypted_secrets view
+--
+-- For Transparent Column Encryption (if needed):
+-- TCE/pgsodium is being deprecated by Supabase. Use Vault + application-level encryption instead.
+-- Reference: https://supabase.com/docs/guides/database/vault
 --
 -- For local development:
 -- Tokens are stored in private schema which is not exposed via API
--- This provides reasonable security for development purposes
+-- This provides reasonable security for development purposes without encryption
 
 -- Create index for efficient lookups
 CREATE INDEX IF NOT EXISTS idx_oauth_tokens_user_provider 
@@ -60,6 +62,6 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON private.oauth_tokens TO authenticated;
 GRANT ALL ON private.oauth_tokens TO service_role;
 
 -- Add comment to document the table
-COMMENT ON TABLE private.oauth_tokens IS 'Stores OAuth provider tokens (YouTube, Twitch, etc.) in private schema. For production, enable TCE with Supabase Vault. Access only through RPC functions.';
-COMMENT ON COLUMN private.oauth_tokens.access_token IS 'OAuth access token. For production, apply TCE encryption with Supabase Vault.';
-COMMENT ON COLUMN private.oauth_tokens.refresh_token IS 'OAuth refresh token. For production, apply TCE encryption with Supabase Vault.';
+COMMENT ON TABLE private.oauth_tokens IS 'Stores OAuth provider tokens (YouTube, Twitch, etc.) in private schema isolated from PostgREST API. For production encryption, use Supabase Vault. Access only through RPC functions.';
+COMMENT ON COLUMN private.oauth_tokens.access_token IS 'OAuth access token. For production, consider application-level encryption with keys stored in Supabase Vault.';
+COMMENT ON COLUMN private.oauth_tokens.refresh_token IS 'OAuth refresh token. For production, consider application-level encryption with keys stored in Supabase Vault.';

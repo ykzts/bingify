@@ -13,11 +13,11 @@ Gatekeeper 機能（YouTube チャンネル登録確認、Twitch サブスク確
    - PostgREST API から自動公開されないため、フロントエンドから直接アクセス不可
    - アクセスは必ずバックエンド（Server Actions / RPC）を経由
 
-2. **透過的カラム暗号化（TCE）**
-   - `pgsodium` 拡張機能を使用
-   - `SECURITY LABEL` でカラムに暗号化を指定
-   - データベース層で自動的に暗号化・復号化
-   - アプリケーション側では暗号化ロジックを記述不要
+2. **Supabase Vault によるセキュア key 管理**
+   - Supabase Vault を使用してシークレットと暗号化キーを管理
+   - pgsodium/TCE は Supabase により非推奨化が進行中
+   - Vault は将来的に pgsodium から独立した実装に移行予定だが、API 互換性は維持
+   - アプリケーションレベルでの暗号化を推奨（Vault から取得したキーを使用）
 
 3. **RPC 関数によるアクセス制御**
    - `upsert_oauth_token`: トークンの保存・更新
@@ -41,6 +41,19 @@ CREATE TABLE private.oauth_tokens (
   updated_at TIMESTAMPTZ,
   UNIQUE (user_id, provider)
 );
+```sql
+-- private スキーマのトークンテーブル
+CREATE TABLE private.oauth_tokens (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id),
+  provider TEXT NOT NULL,
+  access_token TEXT NOT NULL,
+  refresh_token TEXT,
+  expires_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ,
+  UNIQUE (user_id, provider)
+);
 ```
 
 ### 暗号化の仕組み
@@ -49,15 +62,26 @@ CREATE TABLE private.oauth_tokens (
 - トークンは `private` スキーマに保存され、PostgREST API から直接アクセス不可
 - データベースレベルでの暗号化は未設定（開発用途では十分なセキュリティ）
 
-**本番環境（推奨）:**
-```sql
--- Supabase Dashboard で Vault にキーを作成後、以下を実行:
-SECURITY LABEL FOR pgsodium ON COLUMN private.oauth_tokens.access_token
-  IS 'ENCRYPT WITH KEY ID <vault_key_id>';
+**本番環境（推奨アプローチ）:**
 
-SECURITY LABEL FOR pgsodium ON COLUMN private.oauth_tokens.refresh_token
-  IS 'ENCRYPT WITH KEY ID <vault_key_id>';
+Supabase は pgsodium/TCE の非推奨化を進めているため、以下のアプローチを推奨します：
+
+1. **Supabase Vault でシークレットキーを管理:**
+```sql
+-- Vault にキーを保存
+INSERT INTO vault.secrets (name, secret)
+VALUES ('oauth_token_encryption_key', encode(gen_random_bytes(32), 'base64'));
 ```
+
+2. **アプリケーションレベルで暗号化:**
+- Next.js Server Actions で Vault からキーを取得
+- トークンを保存/取得時にアプリケーション側で暗号化/復号化
+- 参考: Node.js の `crypto` モジュールや Web Crypto API を使用
+
+3. **または Row Level Security (RLS) のみに依存:**
+- Private スキーマ + RPC 関数によるアクセス制御のみ
+- データベース内では平文保存（ただし直接アクセス不可）
+- ディスク暗号化は Supabase により自動適用済み
 
 ## 使用方法
 
@@ -122,10 +146,10 @@ if (isTokenExpired(result.expires_at)) {
 
 ### 🔒 本番環境で推奨される追加対策
 
-1. **Transparent Column Encryption (TCE) の有効化**
-   - Supabase Dashboard で Vault にキーを作成
-   - `SECURITY LABEL` で暗号化を適用
-   - データベースバックアップでもトークンが暗号化される
+1. **アプリケーションレベル暗号化の実装**
+   - Supabase Vault でキーを管理
+   - Server Actions でトークンを暗号化/復号化
+   - 参考: [Supabase Vault ドキュメント](https://supabase.com/docs/guides/database/vault)
 
 2. **トークンのローテーション**
    - 定期的にトークンをリフレッシュ
@@ -138,6 +162,8 @@ if (isTokenExpired(result.expires_at)) {
 4. **ネットワーク制限**
    - データベースへの直接アクセスを制限
    - IP ホワイトリストの設定
+
+**注意:** pgsodium/TCE は Supabase により非推奨化が進行中です。新規実装では Vault + アプリケーションレベル暗号化を使用してください。
 
 ## テスト
 
@@ -154,15 +180,19 @@ pnpm supabase:typegen
 
 ## トラブルシューティング
 
-### マイグレーションエラー
+### 暗号化について
 
 **ローカル環境:**
-- TCE（透過的カラム暗号化）はローカル開発では未設定
 - Private スキーマによる保護で開発には十分
+- データベースレベルの暗号化は不要
 
 **本番環境:**
-- Supabase Dashboard から Vault でキーを作成
-- SQL エディタで `SECURITY LABEL` を適用してTCEを有効化
+- Supabase Vault でキーを管理
+- アプリケーションレベルで暗号化を実装（推奨）
+- または RLS + Private スキーマのみで運用（シンプル）
+
+**重要:** pgsodium の TCE (Transparent Column Encryption) は非推奨化されています。
+新規実装では使用しないでください。
 
 ### トークンが保存されない
 
