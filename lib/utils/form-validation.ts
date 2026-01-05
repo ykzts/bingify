@@ -1,5 +1,8 @@
-import { revalidateLogic } from "@tanstack/react-form";
 import type { z } from "zod";
+
+// revalidateLogic を再エクスポート
+// biome-ignore lint/performance/noBarrelFile: revalidateLogic は zodValidatorAdapter と一緒に使用されるため、一箇所から提供する
+export { revalidateLogic } from "@tanstack/react-form";
 
 /**
  * Zod スキーマを TanStack Form の onDynamic バリデーター関数に変換する
@@ -7,7 +10,7 @@ import type { z } from "zod";
  * @returns TanStack Form の onDynamic バリデーター関数
  */
 export function zodValidatorAdapter<T extends z.ZodTypeAny>(schema: T) {
-  return ({ value }: { value: z.infer<T> }) => {
+  return ({ value }: { value: unknown }) => {
     // Zod の safeParse() を使用してフォーム値を検証
     const result = schema.safeParse(value);
 
@@ -39,6 +42,3 @@ export function zodValidatorAdapter<T extends z.ZodTypeAny>(schema: T) {
     return Object.keys(errorMap).length > 0 ? errorMap : undefined;
   };
 }
-
-// revalidateLogic を再エクスポート
-export { revalidateLogic };

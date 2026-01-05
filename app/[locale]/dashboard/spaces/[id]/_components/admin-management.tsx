@@ -21,6 +21,10 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { SpaceAdmin } from "@/lib/types/space";
 import {
+  revalidateLogic,
+  zodValidatorAdapter,
+} from "@/lib/utils/form-validation";
+import {
   inviteAdminFormOpts,
   inviteAdminFormSchema,
 } from "../_lib/form-options";
@@ -52,8 +56,12 @@ export function AdminManagement({ spaceId }: Props) {
 
   const form = useForm({
     ...inviteAdminFormOpts,
+    validationLogic: revalidateLogic({
+      mode: "submit",
+      modeAfterSubmission: "change",
+    }),
     validators: {
-      onChange: inviteAdminFormSchema,
+      onDynamic: zodValidatorAdapter(inviteAdminFormSchema),
     },
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),

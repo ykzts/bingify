@@ -24,6 +24,10 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { usernameSchema } from "@/lib/schemas/user";
+import {
+  revalidateLogic,
+  zodValidatorAdapter,
+} from "@/lib/utils/form-validation";
 import { updateUsernameAction } from "../_lib/actions";
 import { usernameFormOpts } from "../_lib/form-options";
 
@@ -46,8 +50,12 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
     defaultValues: {
       username: currentUsername || "",
     },
+    validationLogic: revalidateLogic({
+      mode: "submit",
+      modeAfterSubmission: "change",
+    }),
     validators: {
-      onChange: usernameSchema,
+      onDynamic: zodValidatorAdapter(usernameSchema),
     },
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),

@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import { zodValidatorAdapter } from "../form-validation";
 
+// テスト用の正規表現を定数として定義
+const SHARE_KEY_REGEX = /^[a-z0-9-]+$/;
+const UPPERCASE_REGEX = /[A-Z]/;
+
 describe("zodValidatorAdapter", () => {
   describe("シンプルなスキーマの検証", () => {
     it("有効な値に対して undefined を返す", () => {
@@ -118,7 +122,7 @@ describe("zodValidatorAdapter", () => {
       const schema = z.object({
         shareKey: z
           .string()
-          .regex(/^[a-z0-9-]+$/, "小文字の英数字とハイフンのみ使用できます"),
+          .regex(SHARE_KEY_REGEX, "小文字の英数字とハイフンのみ使用できます"),
       });
       const validator = zodValidatorAdapter(schema);
       const result = validator({
@@ -135,7 +139,7 @@ describe("zodValidatorAdapter", () => {
           .string()
           .min(8, "パスワードは8文字以上必要です")
           .refine(
-            (val) => /[A-Z]/.test(val),
+            (val) => UPPERCASE_REGEX.test(val),
             "少なくとも1つの大文字が必要です"
           ),
       });
@@ -150,7 +154,10 @@ describe("zodValidatorAdapter", () => {
 
     it("数値の範囲バリデーションを処理する", () => {
       const schema = z.object({
-        age: z.number().min(0, "年齢は0以上である必要があります").max(150, "年齢は150以下である必要があります"),
+        age: z
+          .number()
+          .min(0, "年齢は0以上である必要があります")
+          .max(150, "年齢は150以下である必要があります"),
       });
       const validator = zodValidatorAdapter(schema);
       const result = validator({
@@ -258,7 +265,7 @@ describe("zodValidatorAdapter", () => {
           .string()
           .min(3, "3文字以上入力してください")
           .max(30, "30文字以内で入力してください")
-          .regex(/^[a-z0-9-]+$/, "小文字の英数字とハイフンのみ使用できます"),
+          .regex(SHARE_KEY_REGEX, "小文字の英数字とハイフンのみ使用できます"),
       });
 
       const validator = zodValidatorAdapter(createSpaceFormSchema);
