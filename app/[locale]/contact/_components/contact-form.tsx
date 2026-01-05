@@ -51,7 +51,7 @@ export function ContactForm({ locale }: Props) {
       modeAfterSubmission: "change",
     }),
     validators: {
-      onDynamic: contactFormSchema,
+      onChange: contactFormSchema,
     },
     transform: useTransform(
       (baseForm) => (state ? mergeForm(baseForm, state) : baseForm),

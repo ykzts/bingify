@@ -104,7 +104,7 @@ export function CreateSpaceForm() {
       modeAfterSubmission: "change",
     }),
     validators: {
-      onDynamic: createSpaceFormSchema,
+      onChange: createSpaceFormSchema,
     },
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
