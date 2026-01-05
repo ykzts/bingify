@@ -15,7 +15,7 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
 
     const { data, error } = await adminClient
       .from("profiles")
-      .select("email")
+      .select("email, full_name")
       .eq("role", "admin");
 
     if (error) {
@@ -25,10 +25,19 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
       };
     }
 
-    // メールアドレスが null でないものだけを抽出
+    // メールアドレスが null でないものだけを抽出し、フォーマットする
     const emails = data
-      .filter((profile): profile is { email: string } => profile.email !== null)
-      .map((profile) => profile.email);
+      .filter(
+        (profile): profile is { email: string; full_name: string | null } =>
+          profile.email !== null
+      )
+      .map((profile) => {
+        // full_name がある場合は "Full Name" <email@example.com> 形式にする
+        if (profile.full_name) {
+          return `"${profile.full_name}" <${profile.email}>`;
+        }
+        return profile.email;
+      });
 
     if (emails.length === 0) {
       console.error("No admin users found with valid email addresses");

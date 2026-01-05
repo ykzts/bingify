@@ -20,9 +20,9 @@ describe("getAdminEmails", () => {
 
   it("管理者のメールアドレス配列を返す", async () => {
     const mockData = [
-      { email: "admin1@example.com" },
-      { email: "admin2@example.com" },
-      { email: "admin3@example.com" },
+      { email: "admin1@example.com", full_name: "Admin One" },
+      { email: "admin2@example.com", full_name: "Admin Two" },
+      { email: "admin3@example.com", full_name: null },
     ];
 
     mockAdminClient.from.mockReturnValue({
@@ -38,17 +38,17 @@ describe("getAdminEmails", () => {
 
     expect(result.error).toBeUndefined();
     expect(result.data).toEqual([
-      "admin1@example.com",
-      "admin2@example.com",
+      '"Admin One" <admin1@example.com>',
+      '"Admin Two" <admin2@example.com>',
       "admin3@example.com",
     ]);
   });
 
   it("null のメールアドレスを除外する", async () => {
     const mockData = [
-      { email: "admin1@example.com" },
-      { email: null },
-      { email: "admin2@example.com" },
+      { email: "admin1@example.com", full_name: "Admin One" },
+      { email: null, full_name: "No Email Admin" },
+      { email: "admin2@example.com", full_name: null },
     ];
 
     mockAdminClient.from.mockReturnValue({
@@ -63,7 +63,10 @@ describe("getAdminEmails", () => {
     const result = await getAdminEmails();
 
     expect(result.error).toBeUndefined();
-    expect(result.data).toEqual(["admin1@example.com", "admin2@example.com"]);
+    expect(result.data).toEqual([
+      '"Admin One" <admin1@example.com>',
+      "admin2@example.com",
+    ]);
   });
 
   it("管理者が存在しない場合にエラーを返す", async () => {
@@ -83,7 +86,10 @@ describe("getAdminEmails", () => {
   });
 
   it("有効なメールアドレスを持つ管理者が存在しない場合にエラーを返す", async () => {
-    const mockData = [{ email: null }, { email: null }];
+    const mockData = [
+      { email: null, full_name: "Admin One" },
+      { email: null, full_name: "Admin Two" },
+    ];
 
     mockAdminClient.from.mockReturnValue({
       select: vi.fn().mockReturnValue({
