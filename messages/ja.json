@@ -28,6 +28,8 @@
     "banSuccess": "ユーザーをBANしました",
     "createDate": "作成日",
     "dashboardTitle": "管理ダッシュボード",
+    "metaDescription": "スペース、ユーザー、認証プロバイダー、システム設定を管理",
+    "metaTitle": "管理ダッシュボード",
     "deleteAction": "削除",
     "deleteConfirm": "このスペースを削除しますか？この操作は元に戻せません。（アーカイブには保存されます）",
     "deleteError": "スペースの削除に失敗しました",

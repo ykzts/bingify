@@ -28,6 +28,8 @@
     "banSuccess": "User has been banned",
     "createDate": "Created",
     "dashboardTitle": "Admin Dashboard",
+    "metaDescription": "Manage spaces, users, authentication providers, and system settings",
+    "metaTitle": "Admin Dashboard",
     "deleteAction": "Delete",
     "deleteConfirm": "Are you sure you want to delete this space? This action cannot be undone. (It will be archived)",
     "deleteError": "Failed to delete space",

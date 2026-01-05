@@ -1,10 +1,27 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { hasAdminUser } from "./_lib/actions";
+
+export async function generateMetadata({
+  params,
+}: LayoutProps<"/[locale]/admin">): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Admin" });
+
+  return {
+    description: t("metaDescription"),
+    openGraph: {
+      description: t("metaDescription"),
+      title: t("metaTitle"),
+    },
+    title: t("metaTitle"),
+  };
+}
 
 export default async function AdminLayout({
   children,
