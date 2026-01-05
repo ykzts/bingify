@@ -53,9 +53,9 @@ export async function upsertOAuthToken(
   try {
     const { data, error } = await supabase.rpc("upsert_oauth_token", {
       p_access_token: params.access_token,
-      p_expires_at: params.expires_at || null,
+      p_expires_at: params.expires_at ?? undefined,
       p_provider: params.provider,
-      p_refresh_token: params.refresh_token || null,
+      p_refresh_token: params.refresh_token ?? undefined,
     });
 
     if (error) {
@@ -73,7 +73,7 @@ export async function upsertOAuthToken(
       };
     }
 
-    const result = data as TokenResult;
+    const result = data as unknown as TokenResult;
     return result;
   } catch (err) {
     console.error("Exception upserting OAuth token:", err);
@@ -116,7 +116,7 @@ export async function getOAuthToken(
       };
     }
 
-    const result = data as GetTokenResult;
+    const result = data as unknown as GetTokenResult;
     return result;
   } catch (err) {
     console.error("Exception getting OAuth token:", err);
@@ -158,7 +158,7 @@ export async function deleteOAuthToken(
       };
     }
 
-    const result = data as DeleteTokenResult;
+    const result = data as unknown as DeleteTokenResult;
     return result;
   } catch (err) {
     console.error("Exception deleting OAuth token:", err);

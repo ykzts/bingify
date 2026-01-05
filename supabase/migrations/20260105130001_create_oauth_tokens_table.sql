@@ -5,17 +5,6 @@ CREATE SCHEMA IF NOT EXISTS private;
 -- Grant necessary permissions
 GRANT USAGE ON SCHEMA private TO postgres, anon, authenticated, service_role;
 
--- Create encryption key in Supabase Vault
--- This key will be used for transparent column encryption (TCE)
--- The key is stored securely in the vault and never exposed directly
-INSERT INTO vault.secrets (name, secret)
-VALUES (
-  'oauth_token_encryption_key',
-  -- Generate a 256-bit key for encryption
-  encode(pgsodium.crypto_secretbox_keygen(), 'base64')
-)
-ON CONFLICT (name) DO NOTHING;
-
 -- Create OAuth tokens table in private schema
 -- This table stores provider tokens for YouTube, Twitch, etc.
 CREATE TABLE IF NOT EXISTS private.oauth_tokens (
@@ -33,12 +22,13 @@ CREATE TABLE IF NOT EXISTS private.oauth_tokens (
 
 -- Apply Transparent Column Encryption (TCE) to sensitive columns
 -- SECURITY LABEL tells pgsodium to automatically encrypt/decrypt these columns
--- The encryption key is fetched from vault using the specified key_id
+-- Using ENCRYPT WITHOUT SALT for simpler key management in local environments
+-- In production, consider using Supabase Vault for enhanced key security
 SECURITY LABEL FOR pgsodium ON COLUMN private.oauth_tokens.access_token
-  IS 'ENCRYPT WITH KEY ID ' || (SELECT id FROM vault.secrets WHERE name = 'oauth_token_encryption_key')::text;
+  IS 'ENCRYPT WITH KEY COLUMN id';
 
 SECURITY LABEL FOR pgsodium ON COLUMN private.oauth_tokens.refresh_token
-  IS 'ENCRYPT WITH KEY ID ' || (SELECT id FROM vault.secrets WHERE name = 'oauth_token_encryption_key')::text;
+  IS 'ENCRYPT WITH KEY COLUMN id';
 
 -- Create index for efficient lookups
 CREATE INDEX IF NOT EXISTS idx_oauth_tokens_user_provider 

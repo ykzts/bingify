@@ -71,9 +71,9 @@ describe("OAuth Token Storage", () => {
       expect(result.success).toBe(true);
       expect(mockSupabase.rpc).toHaveBeenCalledWith("upsert_oauth_token", {
         p_access_token: "test_access_token",
-        p_expires_at: null,
+        p_expires_at: undefined,
         p_provider: "google",
-        p_refresh_token: null,
+        p_refresh_token: undefined,
       });
     });
   });

@@ -447,6 +447,8 @@ export type Database = {
           expired_space_ids: string[]
         }[]
       }
+      delete_oauth_token: { Args: { p_provider: string }; Returns: Json }
+      get_oauth_token: { Args: { p_provider: string }; Returns: Json }
       get_system_settings: {
         Args: never
         Returns: {
@@ -459,6 +461,15 @@ export type Database = {
         }[]
       }
       is_space_expired: { Args: { space_created_at: string }; Returns: boolean }
+      upsert_oauth_token: {
+        Args: {
+          p_access_token: string
+          p_expires_at?: string
+          p_provider: string
+          p_refresh_token?: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
