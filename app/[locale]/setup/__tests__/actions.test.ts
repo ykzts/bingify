@@ -16,7 +16,7 @@ import { claimAdmin, hasAdminUser } from "../../admin/_lib/actions";
 
 describe("Setup Actions", () => {
   describe("hasAdminUser", () => {
-    it("should return true when admin user exists", async () => {
+    it("管理者ユーザーが存在する場合trueを返す", async () => {
       const mockAdminClient = {
         from: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
@@ -34,7 +34,7 @@ describe("Setup Actions", () => {
       expect(result).toBe(true);
     });
 
-    it("should return false when no admin user exists", async () => {
+    it("管理者ユーザーが存在しない場合falseを返す", async () => {
       const mockAdminClient = {
         from: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
@@ -52,7 +52,7 @@ describe("Setup Actions", () => {
       expect(result).toBe(false);
     });
 
-    it("should throw error on database error", async () => {
+    it("データベースエラー時にエラーをスローする", async () => {
       const mockAdminClient = {
         from: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
@@ -73,7 +73,7 @@ describe("Setup Actions", () => {
   });
 
   describe("claimAdmin", () => {
-    it("should grant admin role when no admin exists and user is authenticated", async () => {
+    it("管理者が存在せずユーザーが認証済みの場合管理者ロールを付与する", async () => {
       const userId = "test-user-id";
 
       const mockClient = {
@@ -113,7 +113,7 @@ describe("Setup Actions", () => {
       expect(result.error).toBeUndefined();
     });
 
-    it("should return error when user is not authenticated", async () => {
+    it("ユーザーが認証されていない場合エラーを返す", async () => {
       const mockClient = {
         auth: {
           getUser: vi.fn().mockResolvedValue({
@@ -129,7 +129,7 @@ describe("Setup Actions", () => {
       expect(result.error).toBe("errorUnauthorized");
     });
 
-    it("should return error when admin already exists", async () => {
+    it("管理者が既に存在する場合エラーを返す", async () => {
       const userId = "test-user-id";
 
       const mockClient = {
@@ -159,7 +159,7 @@ describe("Setup Actions", () => {
       expect(result.error).toBe("errorSetupCompleted");
     });
 
-    it("should return error on database update failure", async () => {
+    it("データベース更新失敗時にエラーを返す", async () => {
       const userId = "test-user-id";
 
       const mockClient = {
@@ -198,7 +198,7 @@ describe("Setup Actions", () => {
       expect(result.error).toBe("errorGeneric");
     });
 
-    it("should return error when profile does not exist", async () => {
+    it("プロフィールが存在しない場合エラーを返す", async () => {
       const userId = "test-user-id";
 
       const mockClient = {

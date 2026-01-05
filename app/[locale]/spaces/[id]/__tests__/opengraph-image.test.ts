@@ -32,7 +32,7 @@ vi.mock("../_lib/actions", () => ({
 }));
 
 describe("Space OGP Image", () => {
-  test("should export correct size constants", () => {
+  test("正しいサイズ定数をエクスポートする", () => {
     expect(size).toEqual({
       height: 630,
       width: 1200,
@@ -41,17 +41,15 @@ describe("Space OGP Image", () => {
     expect(alt).toBe("Bingify Space");
   });
 
-  test("should generate image with space data", async () => {
+  test("スペースデータで画像を生成する", async () => {
     const params = Promise.resolve({ id: "test-id", locale: "en" });
     const result = await Image({ params });
 
-    // ImageResponse is a special Next.js type that we can't easily test,
-    // but we can verify it's returned
     expect(result).toBeDefined();
     expect(result.constructor.name).toBe("ImageResponse");
   });
 
-  test("should handle different locales", async () => {
+  test("異なるロケールを処理する", async () => {
     const paramsEn = Promise.resolve({ id: "test-id", locale: "en" });
     const resultEn = await Image({ params: paramsEn });
     expect(resultEn).toBeDefined();
@@ -61,11 +59,10 @@ describe("Space OGP Image", () => {
     expect(resultJa).toBeDefined();
   });
 
-  test("should handle missing space data gracefully", async () => {
+  test("スペースデータが見つからない場合を適切に処理する", async () => {
     const params = Promise.resolve({ id: "invalid-id", locale: "en" });
     const result = await Image({ params });
 
-    // Should still generate an image even when space is not found
     expect(result).toBeDefined();
     expect(result.constructor.name).toBe("ImageResponse");
   });
