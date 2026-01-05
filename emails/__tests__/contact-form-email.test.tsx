@@ -1,6 +1,9 @@
-import { describe, expect, it } from "vitest";
 import { render } from "@react-email/render";
+import { describe, expect, it } from "vitest";
 import { ContactFormEmail } from "../contact-form-email";
+
+// 行頭の連続スペース検出用の正規表現（トップレベルで定義）
+const THREE_OR_MORE_LEADING_SPACES = /^ {3}/;
 
 describe("ContactFormEmail", () => {
   const testProps = {
@@ -96,7 +99,7 @@ describe("ContactFormEmail", () => {
       for (const line of lines) {
         if (line.trim() !== "") {
           // 空行以外で、行頭に3つ以上の連続スペースがないことを確認
-          expect(line).not.toMatch(/^   /);
+          expect(line).not.toMatch(THREE_OR_MORE_LEADING_SPACES);
         }
       }
 
