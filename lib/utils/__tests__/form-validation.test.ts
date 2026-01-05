@@ -74,7 +74,7 @@ describe("zodValidatorAdapter", () => {
       });
 
       expect(result).toBeDefined();
-      // Zodのflatten()はネストされたパスをドット記法で返す
+      // zodValidatorAdapter はネストされたパスをドット記法で返す
       expect(result?.["features.gatekeeper.email.enabled"]).toBeDefined();
     });
 
@@ -205,7 +205,7 @@ describe("zodValidatorAdapter", () => {
       expect(result?.form).toBe("フィールドは異なる値である必要があります");
     });
 
-    it("複数のエラーがある場合、最初のエラーのみを返す", () => {
+    it("複数のエラーがある場合、各パスの最初のエラーのみを返す", () => {
       const schema = z.object({
         email: z
           .string()
@@ -218,7 +218,7 @@ describe("zodValidatorAdapter", () => {
       });
 
       expect(result).toBeDefined();
-      // Zodは最初のエラーを返す
+      // zodValidatorAdapter は各パスの最初のエラーを返す
       expect(result?.email).toBe("メールアドレスを入力してください");
     });
 

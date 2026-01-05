@@ -30,8 +30,9 @@ export function zodValidatorAdapter<T extends z.ZodTypeAny>(schema: T) {
       } else {
         // パス配列をドット記法の文字列に変換
         // 例: ["features", "gatekeeper", "email"] → "features.gatekeeper.email"
+        // 配列インデックスも同様に変換: ["tags", 0] → "tags.0"
         const path = issue.path.join(".");
-        // 最初のエラーのみを保持（同じパスに複数のエラーがある場合）
+        // 各パスの最初のエラーのみを保持（Zodは検証優先順でエラーを返す）
         if (!errorMap[path]) {
           errorMap[path] = issue.message;
         }
