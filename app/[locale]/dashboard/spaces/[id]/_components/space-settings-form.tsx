@@ -611,27 +611,32 @@ export function SpaceSettingsForm({
 
                 <Tabs
                   defaultValue={effectiveGatekeeperMode}
-                  onValueChange={(value) =>
-                    gatekeeperField.handleChange(
-                      value as "none" | "social" | "email"
-                    )
-                  }
+                  onValueChange={(value) => {
+                    if (!isGatekeeperDisabled) {
+                      gatekeeperField.handleChange(
+                        value as "none" | "social" | "email"
+                      );
+                    }
+                  }}
                   value={effectiveGatekeeperMode}
                 >
-                  <TabsList
-                    className={cn("grid w-full", gridColsClass)}
-                    disabled={isGatekeeperDisabled}
-                  >
-                    <TabsTrigger value="none">
+                  <TabsList className={cn("grid w-full", gridColsClass)}>
+                    <TabsTrigger disabled={isGatekeeperDisabled} value="none">
                       {t("gatekeeperModeNone")}
                     </TabsTrigger>
                     {showSocialOption && (
-                      <TabsTrigger value="social">
+                      <TabsTrigger
+                        disabled={isGatekeeperDisabled}
+                        value="social"
+                      >
                         {t("gatekeeperModeSocial")}
                       </TabsTrigger>
                     )}
                     {showEmailOption && (
-                      <TabsTrigger value="email">
+                      <TabsTrigger
+                        disabled={isGatekeeperDisabled}
+                        value="email"
+                      >
                         {t("gatekeeperModeEmail")}
                       </TabsTrigger>
                     )}
