@@ -99,6 +99,15 @@ BEGIN
     SELECT vault.create_secret(p_refresh_token) INTO v_refresh_secret_id;
   END IF;
 
+  -- Clean up old Vault secrets BEFORE inserting new ones
+  -- This prevents secret leaks if the INSERT fails
+  IF v_existing_access_id IS NOT NULL AND v_existing_access_id != v_access_secret_id THEN
+    PERFORM vault.delete_secret(v_existing_access_id);
+  END IF;
+  IF v_existing_refresh_id IS NOT NULL AND v_existing_refresh_id != v_refresh_secret_id THEN
+    PERFORM vault.delete_secret(v_existing_refresh_id);
+  END IF;
+
   -- Upsert the token record
   INSERT INTO private.oauth_tokens (user_id, provider, access_token_secret_id, refresh_token_secret_id, expires_at)
   VALUES (v_user_id, p_provider, v_access_secret_id, v_refresh_secret_id, p_expires_at)
@@ -108,14 +117,6 @@ BEGIN
     refresh_token_secret_id = EXCLUDED.refresh_token_secret_id,
     expires_at = EXCLUDED.expires_at,
     updated_at = NOW();
-
-  -- Clean up old Vault secrets if they existed
-  IF v_existing_access_id IS NOT NULL THEN
-    PERFORM vault.delete_secret(v_existing_access_id);
-  END IF;
-  IF v_existing_refresh_id IS NOT NULL THEN
-    PERFORM vault.delete_secret(v_existing_refresh_id);
-  END IF;
 
   RETURN jsonb_build_object('success', true);
 EXCEPTION
