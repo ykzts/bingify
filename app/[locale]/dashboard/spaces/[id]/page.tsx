@@ -11,11 +11,14 @@ import type {
   ThemeType,
 } from "@/lib/types/screen-settings";
 import { BingoGameManager } from "./_components/bingo-game-manager";
+import { DisplaySettingsDialog } from "./_components/display-settings-dialog";
 import { DraftStatusView } from "./_components/draft-status-view";
 import { ParticipantsStatus } from "./_components/participants-status";
-import { ScreenSettingsDialog } from "./_components/screen-settings-dialog";
 import { SpaceSettingsSheet } from "./_components/space-settings-sheet";
-import { ViewingUrlDialog } from "./_components/viewing-url-dialog";
+
+function isValidLocale(locale: string): locale is LocaleType {
+  return locale === "en" || locale === "ja";
+}
 
 export default async function AdminSpacePage({
   params,
@@ -112,13 +115,12 @@ export default async function AdminSpacePage({
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <ViewingUrlDialog spaceId={space.id} viewToken={space.view_token} />
-          <ScreenSettingsDialog
+          <DisplaySettingsDialog
             initialBackground={initialBackground}
             initialDisplayMode={initialDisplayMode}
             initialLocale={initialScreenLocale}
             initialTheme={initialTheme}
-            locale={locale}
+            locale={isValidLocale(locale) ? locale : "en"}
             spaceId={space.id}
             viewToken={space.view_token}
           />
