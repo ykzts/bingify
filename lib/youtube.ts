@@ -98,6 +98,48 @@ function parseYouTubeInput(input: string): {
 }
 
 /**
+ * エラーからYouTubeのエラーコードを取得するヘルパー関数
+ */
+function getYouTubeErrorCode(error: unknown): string {
+  if (!error || typeof error !== "object") {
+    return "ERROR_YOUTUBE_UNKNOWN";
+  }
+
+  // 構造化されたステータスコードチェック
+  const errorObj = error as {
+    status?: number;
+    response?: { status?: number };
+    code?: number;
+  };
+  const status = errorObj.status || errorObj.response?.status || errorObj.code;
+
+  if (status === 401) {
+    return "ERROR_YOUTUBE_TOKEN_EXPIRED";
+  }
+  if (status === 403) {
+    return "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS";
+  }
+
+  // フォールバック: メッセージベースのチェック
+  if (error instanceof Error) {
+    const errorMessage = error.message.toLowerCase();
+    if (
+      errorMessage.includes("401") ||
+      errorMessage.includes("unauthorized") ||
+      errorMessage.includes("invalid credentials")
+    ) {
+      return "ERROR_YOUTUBE_TOKEN_EXPIRED";
+    }
+    if (errorMessage.includes("403") || errorMessage.includes("forbidden")) {
+      return "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS";
+    }
+    return error.message;
+  }
+
+  return "ERROR_YOUTUBE_UNKNOWN";
+}
+
+/**
  * 参加者のYouTubeチャンネルIDを取得する
  * 参加者自身のアクセストークンを使用してチャンネルIDを取得
  *
@@ -135,8 +177,9 @@ export async function getUserYouTubeChannelId(
       error: "No channel found for this user",
     };
   } catch (error) {
+    const errorCode = getYouTubeErrorCode(error);
     return {
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorCode,
     };
   }
 }
@@ -171,8 +214,9 @@ export async function checkSubscriptionStatus(
       isSubscribed,
     };
   } catch (error) {
+    const errorCode = getYouTubeErrorCode(error);
     return {
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorCode,
       isSubscribed: false,
     };
   }
@@ -386,7 +430,7 @@ export async function checkMembershipWithAdminToken(
  */
 export async function resolveYouTubeChannelId(
   input: string,
-  apiKey: string
+  auth: string
 ): Promise<YouTubeChannelResolveResult> {
   try {
     // 入力値の検証
@@ -396,9 +440,9 @@ export async function resolveYouTubeChannelId(
       };
     }
 
-    if (!apiKey?.trim()) {
+    if (!auth?.trim()) {
       return {
-        error: "YouTube API key is not configured",
+        error: "YouTube API key or OAuth token is not provided",
       };
     }
 
@@ -412,8 +456,9 @@ export async function resolveYouTubeChannelId(
     }
 
     // YouTube API クライアントを初期化
+    // auth には API key または OAuth access token を渡すことができる
     const youtube = new youtube_v3.Youtube({
-      auth: apiKey,
+      auth,
     });
 
     // ハンドルから解決

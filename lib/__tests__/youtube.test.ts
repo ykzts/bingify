@@ -99,7 +99,7 @@ describe("checkSubscriptionStatus", () => {
     );
 
     expect(result.isSubscribed).toBe(false);
-    expect(result.error).toBe("API Error: Invalid credentials");
+    expect(result.error).toBe("ERROR_YOUTUBE_TOKEN_EXPIRED");
   });
 
   it("ネットワークエラーを適切に処理する", async () => {
@@ -321,7 +321,9 @@ describe("resolveYouTubeChannelId", () => {
       const result = await resolveYouTubeChannelId("@TestChannel", "");
 
       expect(result.channelId).toBeUndefined();
-      expect(result.error).toBe("YouTube API key is not configured");
+      expect(result.error).toBe(
+        "YouTube API key or OAuth token is not provided"
+      );
       expect(mockChannelsList).not.toHaveBeenCalled();
     });
 

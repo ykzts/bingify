@@ -12,7 +12,6 @@ import { AlertCircle, Loader2, Rocket } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useEffectEvent, useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,23 +36,25 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { TWITCH_ID_REGEX } from "@/lib/twitch";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { cn } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import { YOUTUBE_CHANNEL_ID_REGEX } from "@/lib/youtube-constants";
 import {
   spaceSettingsFormOpts,
   spaceSettingsFormSchema,
 } from "../_lib/form-options";
+import {
+  getOperatorTwitchBroadcasterId,
+  getOperatorYouTubeChannelId,
+} from "../_lib/get-user-channel-actions";
 import type { PublishSpaceState } from "../_lib/settings-actions";
 import {
   updateAndPublishSpace,
   updateSpaceSettings,
 } from "../_lib/settings-actions";
-import { lookupTwitchBroadcasterId } from "../_lib/twitch-lookup-actions";
-import { lookupYouTubeChannelId } from "../_lib/youtube-lookup-actions";
+import { TwitchBroadcasterIdField } from "./twitch-broadcaster-id-field";
+import { YoutubeChannelIdField } from "./youtube-channel-id-field";
 
 interface Props {
   currentParticipantCount: number;
@@ -126,96 +127,17 @@ export function SpaceSettingsForm({
   const router = useRouter();
   const t = useTranslations("SpaceSettings");
   const [serverError, setServerError] = useState<string | null>(null);
-  const [twitchIdConverting, setTwitchIdConverting] = useState(false);
-  const [twitchIdError, setTwitchIdError] = useState<string | null>(null);
-  const [youtubeIdConverting, setYoutubeIdConverting] = useState(false);
-  const [youtubeIdError, setYoutubeIdError] = useState<string | null>(null);
 
-  // Debounced function to convert YouTube handle/URL to channel ID
-  const convertYoutubeInput = useDebouncedCallback(
-    async (input: string, fieldApi: { setValue: (value: string) => void }) => {
-      if (!input || input.trim() === "") {
-        setYoutubeIdConverting(false);
-        setYoutubeIdError(null);
-        return;
-      }
-
-      // すでにチャンネルIDの場合は変換不要
-      if (YOUTUBE_CHANNEL_ID_REGEX.test(input.trim())) {
-        setYoutubeIdConverting(false);
-        setYoutubeIdError(null);
-        return;
-      }
-
-      setYoutubeIdConverting(true);
-      setYoutubeIdError(null);
-
-      try {
-        // Server Functionを使用してチャンネルIDを解決
-        const result = await lookupYouTubeChannelId(input.trim());
-
-        if (result.error) {
-          setYoutubeIdError(result.error);
-          setYoutubeIdConverting(false);
-          return;
-        }
-
-        if (result.channelId) {
-          // フィールドの値を解決されたチャンネルIDで更新
-          fieldApi.setValue(result.channelId);
-          setYoutubeIdError(null);
-        }
-      } catch (_error) {
-        setYoutubeIdError(t("youtubeChannelIdConvertError"));
-      } finally {
-        setYoutubeIdConverting(false);
-      }
-    },
-    800
-  );
-
-  // Debounced function to convert Twitch username/URL to ID
-  const convertTwitchInput = useDebouncedCallback(
-    async (input: string, fieldApi: { setValue: (value: string) => void }) => {
-      if (!input || input.trim() === "") {
-        setTwitchIdConverting(false);
-        setTwitchIdError(null);
-        return;
-      }
-
-      // If it's already a numeric ID, no conversion needed
-      if (TWITCH_ID_REGEX.test(input.trim())) {
-        setTwitchIdConverting(false);
-        setTwitchIdError(null);
-        return;
-      }
-
-      setTwitchIdConverting(true);
-      setTwitchIdError(null);
-
-      try {
-        // Use Server Function instead of API route
-        const result = await lookupTwitchBroadcasterId(input.trim());
-
-        if (result.error) {
-          setTwitchIdError(result.error);
-          setTwitchIdConverting(false);
-          return;
-        }
-
-        if (result.broadcasterId) {
-          // Update the field value with the converted ID
-          fieldApi.setValue(result.broadcasterId);
-          setTwitchIdError(null);
-        }
-      } catch (_error) {
-        setTwitchIdError(t("twitchBroadcasterIdConvertError"));
-      } finally {
-        setTwitchIdConverting(false);
-      }
-    },
-    800
-  );
+  // 操作者自身のチャンネルID（権限チェック用）
+  const [operatorYoutubeChannelId, setOperatorYoutubeChannelId] = useState<
+    string | null
+  >(null);
+  const [operatorTwitchBroadcasterId, setOperatorTwitchBroadcasterId] =
+    useState<string | null>(null);
+  const [fetchingOperatorYoutubeId, setFetchingOperatorYoutubeId] =
+    useState(false);
+  const [fetchingOperatorTwitchId, setFetchingOperatorTwitchId] =
+    useState(false);
 
   // Use TanStack Form with Next.js server actions for update
   const [updateState, updateAction] = useActionState(
@@ -278,6 +200,30 @@ export function SpaceSettingsForm({
   const youtubeRequirement =
     (formValues.youtube_requirement as string) || "none";
   const twitchRequirement = (formValues.twitch_requirement as string) || "none";
+
+  // 入力されたチャンネルIDと操作者のチャンネルIDを取得
+  const enteredYoutubeChannelId =
+    (formValues.youtube_channel_id as string) || "";
+  const enteredTwitchBroadcasterId =
+    (formValues.twitch_broadcaster_id as string) || "";
+
+  // 入力されたIDが操作者自身のものかチェック
+  const isYoutubeOwnChannel =
+    operatorYoutubeChannelId &&
+    enteredYoutubeChannelId &&
+    operatorYoutubeChannelId === enteredYoutubeChannelId;
+  const isTwitchOwnChannel =
+    operatorTwitchBroadcasterId &&
+    enteredTwitchBroadcasterId &&
+    operatorTwitchBroadcasterId === enteredTwitchBroadcasterId;
+
+  // メンバーシップ/サブスクライバー限定の設定は自分のチャンネルのみ許可
+  const canUseYoutubeMemberSubscriber = Boolean(
+    !enteredYoutubeChannelId || isYoutubeOwnChannel
+  );
+  const canUseTwitchSubscriber = Boolean(
+    !enteredTwitchBroadcasterId || isTwitchOwnChannel
+  );
 
   // Use useEffectEvent to separate event logic from effect dependencies
   const handleUpdateSuccess = useEffectEvent(() => {
@@ -415,6 +361,100 @@ export function SpaceSettingsForm({
       resetRequirementToNone();
     }
   }, [isCurrentRequirementDisabled]);
+
+  // 自動的に操作者のYouTubeチャンネルIDを取得（手動入力時の所有権チェック用）
+  const fetchYoutubeOperatorId = useEffectEvent(async (signal: AbortSignal) => {
+    setFetchingOperatorYoutubeId(true);
+    try {
+      const result = await getOperatorYouTubeChannelId();
+
+      // AbortSignalをチェック（コンポーネントがアンマウントされた場合は更新しない）
+      if (signal.aborted) {
+        return;
+      }
+
+      if (result.success && result.channelId) {
+        setOperatorYoutubeChannelId(result.channelId);
+      }
+    } catch (_error) {
+      // エラーは無視（所有権チェックができないだけ）
+    } finally {
+      if (!signal.aborted) {
+        setFetchingOperatorYoutubeId(false);
+      }
+    }
+  });
+
+  useEffect(() => {
+    // YouTubeチャンネルIDが入力されているが、操作者のIDがまだ取得されていない場合
+    if (
+      enteredYoutubeChannelId &&
+      !operatorYoutubeChannelId &&
+      !fetchingOperatorYoutubeId &&
+      socialPlatform === "youtube" &&
+      gatekeeperMode === "social"
+    ) {
+      const controller = new AbortController();
+      fetchYoutubeOperatorId(controller.signal);
+
+      return () => {
+        controller.abort();
+      };
+    }
+  }, [
+    enteredYoutubeChannelId,
+    operatorYoutubeChannelId,
+    fetchingOperatorYoutubeId,
+    socialPlatform,
+    gatekeeperMode,
+  ]);
+
+  // 自動的に操作者のTwitchブロードキャスターIDを取得（手動入力時の所有権チェック用）
+  const fetchTwitchOperatorId = useEffectEvent(async (signal: AbortSignal) => {
+    setFetchingOperatorTwitchId(true);
+    try {
+      const result = await getOperatorTwitchBroadcasterId();
+
+      // AbortSignalをチェック（コンポーネントがアンマウントされた場合は更新しない）
+      if (signal.aborted) {
+        return;
+      }
+
+      if (result.success && result.channelId) {
+        setOperatorTwitchBroadcasterId(result.channelId);
+      }
+    } catch (_error) {
+      // エラーは無視（所有権チェックができないだけ）
+    } finally {
+      if (!signal.aborted) {
+        setFetchingOperatorTwitchId(false);
+      }
+    }
+  });
+
+  useEffect(() => {
+    // TwitchブロードキャスターIDが入力されているが、操作者のIDがまだ取得されていない場合
+    if (
+      enteredTwitchBroadcasterId &&
+      !operatorTwitchBroadcasterId &&
+      !fetchingOperatorTwitchId &&
+      socialPlatform === "twitch" &&
+      gatekeeperMode === "social"
+    ) {
+      const controller = new AbortController();
+      fetchTwitchOperatorId(controller.signal);
+
+      return () => {
+        controller.abort();
+      };
+    }
+  }, [
+    enteredTwitchBroadcasterId,
+    operatorTwitchBroadcasterId,
+    fetchingOperatorTwitchId,
+    socialPlatform,
+    gatekeeperMode,
+  ]);
 
   // Calculate effective gatekeeper mode (fallback to "none" if current mode is not available)
   const effectiveGatekeeperMode =
@@ -695,12 +735,22 @@ export function SpaceSettingsForm({
                                           {t("requirementNone")}
                                         </SelectItem>
                                         {showYoutubeMember && (
-                                          <SelectItem value="member">
+                                          <SelectItem
+                                            disabled={
+                                              !canUseYoutubeMemberSubscriber
+                                            }
+                                            value="member"
+                                          >
                                             {t("youtubeMember")}
                                           </SelectItem>
                                         )}
                                         {showYoutubeSubscriber && (
-                                          <SelectItem value="subscriber">
+                                          <SelectItem
+                                            disabled={
+                                              !canUseYoutubeMemberSubscriber
+                                            }
+                                            value="subscriber"
+                                          >
                                             {t("youtubeSubscriber")}
                                           </SelectItem>
                                         )}
@@ -711,63 +761,22 @@ export function SpaceSettingsForm({
                               )}
                             </form.Field>
 
-                            {youtubeRequirement !== "none" && (
-                              <form.Field name="youtube_channel_id">
-                                {(field) => (
-                                  <Field>
-                                    <FieldContent>
-                                      <FieldLabel>
-                                        {t("youtubeChannelIdLabel")}
-                                      </FieldLabel>
-                                      <div className="relative">
-                                        <Input
-                                          disabled={
-                                            isPending || youtubeIdConverting
-                                          }
-                                          name={field.name}
-                                          onChange={(e) => {
-                                            const value = e.target.value;
-                                            field.handleChange(value);
-                                            convertYoutubeInput(value, {
-                                              setValue: (newValue: string) =>
-                                                field.handleChange(newValue),
-                                            });
-                                          }}
-                                          placeholder={t(
-                                            "youtubeChannelIdPlaceholder"
-                                          )}
-                                          required={
-                                            youtubeRequirement !== "none"
-                                          }
-                                          type="text"
-                                          value={field.state.value as string}
-                                        />
-                                        {youtubeIdConverting && (
-                                          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                                          </div>
-                                        )}
-                                      </div>
-                                      {field.state.meta.errors.length > 0 && (
-                                        <FieldError>
-                                          {getErrorMessage(
-                                            field.state.meta.errors[0]
-                                          )}
-                                        </FieldError>
-                                      )}
-                                      {youtubeIdError && (
-                                        <FieldError>
-                                          {youtubeIdError}
-                                        </FieldError>
-                                      )}
-                                      <FieldDescription>
-                                        {t("youtubeChannelIdHelp")}
-                                      </FieldDescription>
-                                    </FieldContent>
-                                  </Field>
-                                )}
-                              </form.Field>
-                            )}
+                            <form.Field name="youtube_channel_id">
+                              {(field) => (
+                                <YoutubeChannelIdField
+                                  canUseMemberSubscriber={
+                                    canUseYoutubeMemberSubscriber
+                                  }
+                                  enteredChannelId={enteredYoutubeChannelId}
+                                  field={field}
+                                  isPending={isPending}
+                                  onOperatorIdFetched={
+                                    setOperatorYoutubeChannelId
+                                  }
+                                  requirement={youtubeRequirement}
+                                />
+                              )}
+                            </form.Field>
                           </>
                         )}
 
@@ -809,7 +818,10 @@ export function SpaceSettingsForm({
                                           </SelectItem>
                                         )}
                                         {showTwitchSubscriber && (
-                                          <SelectItem value="subscriber">
+                                          <SelectItem
+                                            disabled={!canUseTwitchSubscriber}
+                                            value="subscriber"
+                                          >
                                             {t("twitchSubscriber")}
                                           </SelectItem>
                                         )}
@@ -820,61 +832,22 @@ export function SpaceSettingsForm({
                               )}
                             </form.Field>
 
-                            {twitchRequirement !== "none" && (
-                              <form.Field name="twitch_broadcaster_id">
-                                {(field) => (
-                                  <Field>
-                                    <FieldContent>
-                                      <FieldLabel>
-                                        {t("twitchBroadcasterIdLabel")}
-                                      </FieldLabel>
-                                      <div className="relative">
-                                        <Input
-                                          disabled={
-                                            isPending || twitchIdConverting
-                                          }
-                                          name={field.name}
-                                          onChange={(e) => {
-                                            const value = e.target.value;
-                                            field.handleChange(value);
-                                            convertTwitchInput(value, {
-                                              setValue: (newValue: string) =>
-                                                field.handleChange(newValue),
-                                            });
-                                          }}
-                                          placeholder={t(
-                                            "twitchBroadcasterIdPlaceholder"
-                                          )}
-                                          required={
-                                            twitchRequirement !== "none"
-                                          }
-                                          type="text"
-                                          value={field.state.value as string}
-                                        />
-                                        {twitchIdConverting && (
-                                          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                                          </div>
-                                        )}
-                                      </div>
-                                      {field.state.meta.errors.length > 0 && (
-                                        <FieldError>
-                                          {getErrorMessage(
-                                            field.state.meta.errors[0]
-                                          )}
-                                        </FieldError>
-                                      )}
-                                      {twitchIdError && (
-                                        <FieldError>{twitchIdError}</FieldError>
-                                      )}
-                                      <FieldDescription>
-                                        {t("twitchBroadcasterIdHelp")}
-                                      </FieldDescription>
-                                    </FieldContent>
-                                  </Field>
-                                )}
-                              </form.Field>
-                            )}
+                            <form.Field name="twitch_broadcaster_id">
+                              {(field) => (
+                                <TwitchBroadcasterIdField
+                                  canUseSubscriber={canUseTwitchSubscriber}
+                                  enteredBroadcasterId={
+                                    enteredTwitchBroadcasterId
+                                  }
+                                  field={field}
+                                  isPending={isPending}
+                                  onOperatorIdFetched={
+                                    setOperatorTwitchBroadcasterId
+                                  }
+                                  requirement={twitchRequirement}
+                                />
+                              )}
+                            </form.Field>
                           </>
                         )}
                     </TabsContent>
