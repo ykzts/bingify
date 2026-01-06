@@ -16,6 +16,10 @@ import { DraftStatusView } from "./_components/draft-status-view";
 import { ParticipantsStatus } from "./_components/participants-status";
 import { SpaceSettingsSheet } from "./_components/space-settings-sheet";
 
+function isValidLocale(locale: string): locale is LocaleType {
+  return locale === "en" || locale === "ja";
+}
+
 export default async function AdminSpacePage({
   params,
 }: PageProps<"/[locale]/dashboard/spaces/[id]">) {
@@ -116,7 +120,7 @@ export default async function AdminSpacePage({
             initialDisplayMode={initialDisplayMode}
             initialLocale={initialScreenLocale}
             initialTheme={initialTheme}
-            locale={locale}
+            locale={isValidLocale(locale) ? locale : "en"}
             spaceId={space.id}
             viewToken={space.view_token}
           />

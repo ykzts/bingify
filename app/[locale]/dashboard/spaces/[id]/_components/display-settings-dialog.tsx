@@ -38,7 +38,7 @@ interface Props {
   initialDisplayMode: DisplayMode;
   initialLocale?: LocaleType;
   initialTheme: ThemeType;
-  locale: string;
+  locale: LocaleType;
   spaceId: string;
   viewToken: string;
 }
@@ -64,7 +64,7 @@ export function DisplaySettingsDialog({
     useState<BackgroundType>(initialBackground);
   const [theme, setTheme] = useState<ThemeType>(initialTheme);
   const [screenLocale, setScreenLocale] = useState<LocaleType>(
-    initialLocale || (locale as LocaleType)
+    initialLocale || locale
   );
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -76,7 +76,7 @@ export function DisplaySettingsDialog({
     setDisplayMode(initialDisplayMode);
     setBackground(initialBackground);
     setTheme(initialTheme);
-    setScreenLocale(initialLocale || (locale as LocaleType));
+    setScreenLocale(initialLocale || locale);
   }, [
     initialDisplayMode,
     initialBackground,
