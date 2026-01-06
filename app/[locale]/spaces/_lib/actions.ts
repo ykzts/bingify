@@ -3,14 +3,12 @@
 import { getOAuthToken } from "@/lib/oauth/token-storage";
 import { checkEmailAllowed } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
-import { checkFollowStatus, checkSubStatus } from "@/lib/twitch";
 import {
   type GatekeeperRules,
   gatekeeperRulesSchema,
   type PublicSpaceInfo,
 } from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";
-import { checkSubscriptionStatus } from "@/lib/youtube";
 
 export interface JoinSpaceState {
   error?: string;
@@ -69,26 +67,44 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
 
 async function verifyYouTubeSubscription(
   youtubeChannelId: string,
-  requirement: "subscriber" | "member"
+  requirement: "subscriber" | "member",
+  spaceOwnerId: string
 ): Promise<JoinSpaceState | null> {
-  // 保存されたトークンをデータベースから取得
   const supabase = await createClient();
-  const tokenResult = await getOAuthToken(supabase, "google");
 
-  if (!(tokenResult.success && tokenResult.access_token)) {
+  // 1. 参加者のトークンを取得
+  const participantTokenResult = await getOAuthToken(supabase, "google");
+
+  if (
+    !(participantTokenResult.success && participantTokenResult.access_token)
+  ) {
     return {
       errorKey: "errorYouTubeVerificationRequired",
       success: false,
     };
   }
 
-  const youtubeAccessToken = tokenResult.access_token;
+  const participantAccessToken = participantTokenResult.access_token;
+
+  // 2. スペース所有者のトークンを取得
+  const { getOAuthTokenForUser } = await import("@/lib/oauth/token-storage");
+  const ownerTokenResult = await getOAuthTokenForUser(spaceOwnerId, "google");
+
+  if (!(ownerTokenResult.success && ownerTokenResult.access_token)) {
+    return {
+      errorKey: "errorYouTubeVerificationFailed",
+      success: false,
+    };
+  }
+
+  const ownerAccessToken = ownerTokenResult.access_token;
 
   // Check membership if required
   if (requirement === "member") {
-    const { checkMembershipStatus } = await import("@/lib/youtube");
-    const result = await checkMembershipStatus(
-      youtubeAccessToken,
+    const { checkMembershipWithAdminToken } = await import("@/lib/youtube");
+    const result = await checkMembershipWithAdminToken(
+      participantAccessToken,
+      ownerAccessToken,
       youtubeChannelId
     );
 
@@ -109,9 +125,11 @@ async function verifyYouTubeSubscription(
     return null;
   }
 
-  // Check subscription (original behavior)
-  const result = await checkSubscriptionStatus(
-    youtubeAccessToken,
+  // Check subscription
+  const { checkSubscriptionWithAdminToken } = await import("@/lib/youtube");
+  const result = await checkSubscriptionWithAdminToken(
+    participantAccessToken,
+    ownerAccessToken,
     youtubeChannelId
   );
 
@@ -135,42 +153,44 @@ async function verifyYouTubeSubscription(
 async function verifyTwitchRequirements(
   broadcasterId: string,
   requireFollow: boolean,
-  requireSub: boolean
+  requireSub: boolean,
+  spaceOwnerId: string
 ): Promise<JoinSpaceState | null> {
-  // 保存されたトークンをデータベースから取得
   const supabase = await createClient();
-  const tokenResult = await getOAuthToken(supabase, "twitch");
 
-  if (!(tokenResult.success && tokenResult.access_token)) {
+  // 1. 参加者のトークンを取得
+  const participantTokenResult = await getOAuthToken(supabase, "twitch");
+
+  if (
+    !(participantTokenResult.success && participantTokenResult.access_token)
+  ) {
     return {
       errorKey: "errorTwitchVerificationRequired",
       success: false,
     };
   }
 
-  const twitchAccessToken = tokenResult.access_token;
+  const participantAccessToken = participantTokenResult.access_token;
 
-  // Twitchユーザー IDを取得
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const twitchIdentity = session?.user?.identities?.find(
-    (identity) => identity.provider === "twitch"
-  );
-  const twitchUserId = twitchIdentity?.id;
+  // 2. スペース所有者のトークンを取得
+  const { getOAuthTokenForUser } = await import("@/lib/oauth/token-storage");
+  const ownerTokenResult = await getOAuthTokenForUser(spaceOwnerId, "twitch");
 
-  if (!twitchUserId) {
+  if (!(ownerTokenResult.success && ownerTokenResult.access_token)) {
     return {
-      errorKey: "errorTwitchVerificationRequired",
+      errorKey: "errorTwitchVerificationFailed",
       success: false,
     };
   }
+
+  const ownerAccessToken = ownerTokenResult.access_token;
 
   // Check follow requirement
   if (requireFollow) {
-    const followResult = await checkFollowStatus(
-      twitchAccessToken,
-      twitchUserId,
+    const { checkFollowWithAdminToken } = await import("@/lib/twitch");
+    const followResult = await checkFollowWithAdminToken(
+      participantAccessToken,
+      ownerAccessToken,
       broadcasterId
     );
 
@@ -191,9 +211,10 @@ async function verifyTwitchRequirements(
 
   // Check subscription requirement
   if (requireSub) {
-    const subResult = await checkSubStatus(
-      twitchAccessToken,
-      twitchUserId,
+    const { checkSubWithAdminToken } = await import("@/lib/twitch");
+    const subResult = await checkSubWithAdminToken(
+      participantAccessToken,
+      ownerAccessToken,
       broadcasterId
     );
 
@@ -246,7 +267,8 @@ function verifyEmailAllowlist(
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Gatekeeper verification requires multiple conditional checks
 async function verifyGatekeeperRules(
   gatekeeperRules: GatekeeperRules | null,
-  userEmail: string
+  userEmail: string,
+  spaceOwnerId: string
 ): Promise<JoinSpaceState | null> {
   // Check email allowlist if configured
   if (
@@ -279,7 +301,8 @@ async function verifyGatekeeperRules(
 
       const verificationResult = await verifyYouTubeSubscription(
         gatekeeperRules.youtube.channelId,
-        requirementLevel
+        requirementLevel,
+        spaceOwnerId
       );
       if (verificationResult) {
         return verificationResult;
@@ -302,7 +325,8 @@ async function verifyGatekeeperRules(
       const verificationResult = await verifyTwitchRequirements(
         gatekeeperRules.twitch.broadcasterId,
         requireFollow,
-        requireSub
+        requireSub,
+        spaceOwnerId
       );
       if (verificationResult) {
         return verificationResult;
@@ -349,7 +373,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
     // Check if space exists and is active (and not expired)
     const { data: space } = await supabase
       .from("spaces")
-      .select("id, status, gatekeeper_rules, created_at")
+      .select("id, status, gatekeeper_rules, created_at, owner_id")
       .eq("id", spaceId)
       .single();
 
@@ -363,6 +387,15 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
     if (space.status !== "active") {
       return {
         errorKey: "errorSpaceClosed",
+        success: false,
+      };
+    }
+
+    // スペース所有者IDを取得
+    if (!space.owner_id) {
+      console.error("Space owner_id is null:", space.id);
+      return {
+        errorKey: "errorInvalidSpace",
         success: false,
       };
     }
@@ -401,7 +434,8 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
     const gatekeeperRules = space.gatekeeper_rules as GatekeeperRules | null;
     const verificationResult = await verifyGatekeeperRules(
       gatekeeperRules,
-      userEmail
+      userEmail,
+      space.owner_id
     );
     if (verificationResult) {
       return verificationResult;

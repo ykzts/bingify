@@ -22,6 +22,11 @@ export interface YouTubeChannelResolveResult {
   error?: string;
 }
 
+export interface YouTubeUserChannelResult {
+  channelId?: string;
+  error?: string;
+}
+
 /**
  * YouTubeの入力値からチャンネルIDを抽出または解決する
  *
@@ -92,6 +97,50 @@ function parseYouTubeInput(input: string): {
   return {};
 }
 
+/**
+ * 参加者のYouTubeチャンネルIDを取得する
+ * 参加者自身のアクセストークンを使用してチャンネルIDを取得
+ *
+ * @param userAccessToken - 参加者のYouTube OAuthアクセストークン
+ * @returns チャンネルID or エラー
+ */
+export async function getUserYouTubeChannelId(
+  userAccessToken: string
+): Promise<YouTubeUserChannelResult> {
+  try {
+    if (!userAccessToken) {
+      return {
+        error: "Missing access token",
+      };
+    }
+
+    const youtube = new youtube_v3.Youtube({
+      auth: userAccessToken,
+    });
+
+    // 自分のチャンネル情報を取得
+    const response = await youtube.channels.list({
+      mine: true,
+      part: ["id"],
+    });
+
+    if (response.data.items && response.data.items.length > 0) {
+      const channelId = response.data.items[0].id;
+      if (channelId) {
+        return { channelId };
+      }
+    }
+
+    return {
+      error: "No channel found for this user",
+    };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
 export async function checkSubscriptionStatus(
   userAccessToken: string,
   channelId: string
@@ -121,6 +170,59 @@ export async function checkSubscriptionStatus(
     return {
       isSubscribed,
     };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Unknown error",
+      isSubscribed: false,
+    };
+  }
+}
+
+/**
+ * 参加者がYouTubeチャンネルのサブスクライバーかチェックする（管理者トークン使用）
+ *
+ * 検証フロー:
+ * 1. 参加者のトークンで参加者のチャンネルIDを取得
+ * 2. 管理者のトークンで参加者が対象チャンネルをサブスクライブしているかチェック
+ *
+ * @param participantAccessToken - 参加者のYouTube OAuthアクセストークン
+ * @param adminAccessToken - スペース管理者のYouTube OAuthアクセストークン
+ * @param targetChannelId - サブスクリプションをチェックする対象チャンネルID
+ * @returns サブスクリプション状態
+ */
+export async function checkSubscriptionWithAdminToken(
+  participantAccessToken: string,
+  adminAccessToken: string,
+  targetChannelId: string
+): Promise<YouTubeSubscriptionCheckResult> {
+  try {
+    if (!(participantAccessToken && adminAccessToken && targetChannelId)) {
+      return {
+        error: "Missing required parameters",
+        isSubscribed: false,
+      };
+    }
+
+    // 1. 参加者のチャンネルIDを取得
+    const participantChannelResult = await getUserYouTubeChannelId(
+      participantAccessToken
+    );
+
+    if (participantChannelResult.error || !participantChannelResult.channelId) {
+      return {
+        error:
+          participantChannelResult.error || "Failed to get participant channel",
+        isSubscribed: false,
+      };
+    }
+
+    // 2. 管理者のトークンで参加者がサブスクライブしているかチェック
+    // Note: このAPIは参加者自身のトークンでチェックする必要がある
+    // 管理者トークンでは他のユーザーのサブスクリプション状態を確認できない
+    return await checkSubscriptionStatus(
+      participantAccessToken,
+      targetChannelId
+    );
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : "Unknown error",
@@ -169,6 +271,102 @@ export function checkMembershipStatus(
       "YouTube membership verification is not supported. The API requires channel owner credentials.",
     isMember: false,
   });
+}
+
+/**
+ * 参加者がYouTubeチャンネルのメンバーかチェックする（管理者トークン使用）
+ *
+ * 検証フロー:
+ * 1. 参加者のトークンで参加者のチャンネルIDを取得
+ * 2. 管理者のトークン（チャンネル所有者）でメンバーリストから参加者を検索
+ *
+ * @param participantAccessToken - 参加者のYouTube OAuthアクセストークン
+ * @param adminAccessToken - スペース管理者（チャンネル所有者）のYouTube OAuthアクセストークン
+ * @param targetChannelId - メンバーシップをチェックする対象チャンネルID
+ * @returns メンバーシップ状態
+ */
+export async function checkMembershipWithAdminToken(
+  participantAccessToken: string,
+  adminAccessToken: string,
+  targetChannelId: string
+): Promise<YouTubeMembershipCheckResult> {
+  try {
+    if (!(participantAccessToken && adminAccessToken && targetChannelId)) {
+      return {
+        error: "Missing required parameters",
+        isMember: false,
+      };
+    }
+
+    // 1. 参加者のチャンネルIDを取得
+    const participantChannelResult = await getUserYouTubeChannelId(
+      participantAccessToken
+    );
+
+    if (participantChannelResult.error || !participantChannelResult.channelId) {
+      return {
+        error:
+          participantChannelResult.error || "Failed to get participant channel",
+        isMember: false,
+      };
+    }
+
+    const participantChannelId = participantChannelResult.channelId;
+
+    // 2. 管理者（チャンネル所有者）のトークンでメンバーリストを取得
+    const youtube = new youtube_v3.Youtube({
+      auth: adminAccessToken,
+    });
+
+    // members.list APIを使用してメンバーを検索
+    // このAPIはチャンネル所有者の権限が必要
+    // ページネーションを処理して全メンバーを確認
+    let pageToken: string | undefined;
+    let isMember = false;
+
+    do {
+      const response = await youtube.members.list({
+        pageToken,
+        part: ["snippet"],
+      });
+
+      // 現在のページでメンバーを検索
+      if (response.data.items) {
+        isMember = response.data.items.some(
+          (item) =>
+            item.snippet?.memberDetails?.channelId === participantChannelId
+        );
+
+        // メンバーが見つかったら早期終了
+        if (isMember) {
+          break;
+        }
+      }
+
+      // 次のページトークンを取得
+      pageToken = response.data.nextPageToken ?? undefined;
+    } while (pageToken);
+
+    return {
+      isMember,
+    };
+  } catch (error) {
+    // 403エラーの場合は権限不足
+    if (
+      error instanceof Error &&
+      (error.message.includes("403") || error.message.includes("insufficient"))
+    ) {
+      return {
+        error: "Channel owner credentials required for membership verification",
+        isMember: false,
+      };
+    }
+
+    return {
+      error: error instanceof Error ? error.message : "Unknown error",
+      isMember: false,
+    };
+  }
 }
 
 /**

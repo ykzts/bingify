@@ -28,6 +28,11 @@ export interface TwitchUserLookupResult {
   error?: string;
 }
 
+export interface TwitchUserIdResult {
+  error?: string;
+  userId?: string;
+}
+
 export interface ParsedTwitchInput {
   type: "id" | "username" | "invalid";
   value: string;
@@ -85,6 +90,41 @@ function createAppApiClient(appAccessToken: string): ApiClient {
 
   const authProvider = new StaticAuthProvider(clientId, appAccessToken);
   return new ApiClient({ authProvider });
+}
+
+/**
+ * 参加者のTwitchユーザーIDを取得する
+ * 参加者自身のアクセストークンを使用してユーザーIDを取得
+ *
+ * @param userAccessToken - 参加者のTwitch OAuthアクセストークン
+ * @returns ユーザーID or エラー
+ */
+export async function getUserTwitchId(
+  userAccessToken: string
+): Promise<TwitchUserIdResult> {
+  try {
+    if (!userAccessToken) {
+      return {
+        error: "Missing access token",
+      };
+    }
+
+    const apiClient = createApiClient(userAccessToken);
+    // getUsersByIds with empty array returns the authenticated user
+    const users = await apiClient.users.getUsersByIds([]);
+
+    if (users.length > 0) {
+      return { userId: users[0].id };
+    }
+
+    return {
+      error: "Failed to get user information",
+    };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
 }
 
 /**
@@ -305,6 +345,59 @@ export async function checkFollowStatus(
 }
 
 /**
+ * 参加者が配信者をフォローしているかチェックする（管理者トークン使用）
+ *
+ * 検証フロー:
+ * 1. 参加者のトークンで参加者のTwitchユーザーIDを取得
+ * 2. 管理者（配信者）のトークンでフォロー状態をチェック
+ *
+ * @param participantAccessToken - 参加者のTwitch OAuthアクセストークン
+ * @param adminAccessToken - スペース管理者（配信者）のTwitch OAuthアクセストークン
+ * @param broadcasterId - チェック対象の配信者ID
+ * @returns フォロー状態
+ */
+export async function checkFollowWithAdminToken(
+  participantAccessToken: string,
+  adminAccessToken: string,
+  broadcasterId: string
+): Promise<TwitchFollowCheckResult> {
+  try {
+    if (!(participantAccessToken && adminAccessToken && broadcasterId)) {
+      return {
+        error: "Missing required parameters",
+        isFollowing: false,
+      };
+    }
+
+    // 1. 参加者のTwitchユーザーIDを取得
+    const participantIdResult = await getUserTwitchId(participantAccessToken);
+
+    if (participantIdResult.error || !participantIdResult.userId) {
+      return {
+        error: participantIdResult.error || "Failed to get participant ID",
+        isFollowing: false,
+      };
+    }
+
+    // 2. 管理者（配信者）のトークンでフォロー状態をチェック
+    const apiClient = createApiClient(adminAccessToken);
+    const follow = await apiClient.channels.getChannelFollowers(
+      broadcasterId,
+      participantIdResult.userId
+    );
+
+    return {
+      isFollowing: follow.data.length > 0,
+    };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Unknown error",
+      isFollowing: false,
+    };
+  }
+}
+
+/**
  * Check if a user is subscribed to a broadcaster on Twitch
  * @param userAccessToken - User's Twitch access token
  * @param userId - Twitch user ID to check
@@ -332,6 +425,66 @@ export async function checkSubStatus(
     const apiClient = createApiClient(userAccessToken);
     const subscription = await apiClient.subscriptions.checkUserSubscription(
       userId,
+      broadcasterId
+    );
+
+    return {
+      isSubscribed: subscription !== null,
+    };
+  } catch (error) {
+    // Twurple throws an error if not subscribed
+    if (error instanceof Error && error.message.includes("404")) {
+      return {
+        isSubscribed: false,
+      };
+    }
+
+    return {
+      error: error instanceof Error ? error.message : "Unknown error",
+      isSubscribed: false,
+    };
+  }
+}
+
+/**
+ * 参加者が配信者にサブスクライブしているかチェックする（管理者トークン使用）
+ *
+ * 検証フロー:
+ * 1. 参加者のトークンで参加者のTwitchユーザーIDを取得
+ * 2. 管理者（配信者）のトークンでサブスクリプション状態をチェック
+ *
+ * @param participantAccessToken - 参加者のTwitch OAuthアクセストークン
+ * @param adminAccessToken - スペース管理者（配信者）のTwitch OAuthアクセストークン
+ * @param broadcasterId - チェック対象の配信者ID
+ * @returns サブスクリプション状態
+ */
+export async function checkSubWithAdminToken(
+  participantAccessToken: string,
+  adminAccessToken: string,
+  broadcasterId: string
+): Promise<TwitchSubCheckResult> {
+  try {
+    if (!(participantAccessToken && adminAccessToken && broadcasterId)) {
+      return {
+        error: "Missing required parameters",
+        isSubscribed: false,
+      };
+    }
+
+    // 1. 参加者のTwitchユーザーIDを取得
+    const participantIdResult = await getUserTwitchId(participantAccessToken);
+
+    if (participantIdResult.error || !participantIdResult.userId) {
+      return {
+        error: participantIdResult.error || "Failed to get participant ID",
+        isSubscribed: false,
+      };
+    }
+
+    // 2. 管理者（配信者）のトークンでサブスクリプション状態をチェック
+    const apiClient = createApiClient(adminAccessToken);
+    const subscription = await apiClient.subscriptions.checkUserSubscription(
+      participantIdResult.userId,
       broadcasterId
     );
 
