@@ -433,7 +433,7 @@ export async function checkMembershipWithAdminToken(
  */
 export async function resolveYouTubeChannelId(
   input: string,
-  apiKey: string
+  auth: string
 ): Promise<YouTubeChannelResolveResult> {
   try {
     // 入力値の検証
@@ -443,9 +443,9 @@ export async function resolveYouTubeChannelId(
       };
     }
 
-    if (!apiKey?.trim()) {
+    if (!auth?.trim()) {
       return {
-        error: "YouTube API key is not configured",
+        error: "YouTube API key or OAuth token is not provided",
       };
     }
 
@@ -459,8 +459,9 @@ export async function resolveYouTubeChannelId(
     }
 
     // YouTube API クライアントを初期化
+    // auth には API key または OAuth access token を渡すことができる
     const youtube = new youtube_v3.Youtube({
-      auth: apiKey,
+      auth,
     });
 
     // ハンドルから解決
