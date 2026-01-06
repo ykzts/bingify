@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { getEnabledAuthProviders } from "@/lib/data/auth-providers";
+import { getSystemSettings } from "@/lib/data/system-settings";
+import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
 import { validateRedirectPath } from "@/lib/utils/url";
 import { LoginForm } from "./_components/login-form";
@@ -47,6 +49,9 @@ export default async function LoginPage({
   setRequestLocale(locale);
 
   const providers = await getEnabledAuthProviders();
+  const systemSettingsResult = await getSystemSettings();
+  const systemSettings =
+    systemSettingsResult.settings || DEFAULT_SYSTEM_SETTINGS;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-red-100 via-amber-50 to-sky-100">
@@ -57,7 +62,7 @@ export default async function LoginPage({
           </div>
         }
       >
-        <LoginForm providers={providers} />
+        <LoginForm providers={providers} systemSettings={systemSettings} />
       </Suspense>
     </div>
   );

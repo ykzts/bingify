@@ -2,6 +2,7 @@
  * Utility functions for OAuth authentication flows
  */
 
+import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 
 /**
@@ -42,3 +43,31 @@ export const GOOGLE_OAUTH_SCOPES =
  * Includes follower and subscription read access for space gatekeeper verification
  */
 export const TWITCH_OAUTH_SCOPES = "user:read:follows user:read:subscriptions";
+
+/**
+ * Generates OAuth scopes for Google authentication based on system settings
+ * @param settings - System settings containing feature flags
+ * @returns OAuth scopes string or undefined if no scopes are needed
+ */
+export function getGoogleOAuthScopes(
+  settings: SystemSettings
+): string | undefined {
+  if (settings.features.gatekeeper.youtube.enabled) {
+    return GOOGLE_OAUTH_SCOPES;
+  }
+  return undefined;
+}
+
+/**
+ * Generates OAuth scopes for Twitch authentication based on system settings
+ * @param settings - System settings containing feature flags
+ * @returns OAuth scopes string or undefined if no scopes are needed
+ */
+export function getTwitchOAuthScopes(
+  settings: SystemSettings
+): string | undefined {
+  if (settings.features.gatekeeper.twitch.enabled) {
+    return TWITCH_OAUTH_SCOPES;
+  }
+  return undefined;
+}

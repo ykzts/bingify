@@ -1,5 +1,3 @@
-"use client";
-
 import { AlertCircle, CheckCircle, Mail } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -18,30 +16,20 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import {
   buildOAuthCallbackUrl,
-  GOOGLE_OAUTH_SCOPES,
-  TWITCH_OAUTH_SCOPES,
+  getGoogleOAuthScopes,
+  getTwitchOAuthScopes,
 } from "@/lib/auth/oauth-utils";
 import type { AuthProvider } from "@/lib/data/auth-providers";
+import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/client";
 
 const emailSchema = z.object({
   email: z.string().email(),
 });
 
-// Centralized provider configuration
-const PROVIDER_CONFIG = {
-  google: {
-    scopes: GOOGLE_OAUTH_SCOPES,
-  },
-  twitch: {
-    scopes: TWITCH_OAUTH_SCOPES,
-  },
-} as const;
-
-type Provider = keyof typeof PROVIDER_CONFIG;
-
 interface Props {
   providers: AuthProvider[];
+  systemSettings: SystemSettings;
 }
 
 // Email form component to reduce complexity
@@ -101,7 +89,7 @@ function EmailLoginForm({
   );
 }
 
-export function LoginForm({ providers }: Props) {
+export function LoginForm({ providers, systemSettings }: Props) {
   const t = useTranslations("Login");
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
@@ -119,30 +107,27 @@ export function LoginForm({ providers }: Props) {
     setIsLoading(true);
     const supabase = createClient();
 
-    // Validate provider configuration exists
-    const config = PROVIDER_CONFIG[provider as Provider];
-    if (!config) {
-      console.error("Unsupported OAuth provider:", provider);
-      setOauthError("Unsupported authentication provider");
-      setIsLoading(false);
-      return;
+    // システム設定に基づいてスコープを取得
+    let scopes: string | undefined;
+    if (provider === "google") {
+      scopes = getGoogleOAuthScopes(systemSettings);
+    } else if (provider === "twitch") {
+      scopes = getTwitchOAuthScopes(systemSettings);
     }
-
-    const typedProvider = provider as Provider;
 
     const { error } = await supabase.auth.signInWithOAuth({
       options: {
         queryParams:
-          typedProvider === "google"
+          provider === "google"
             ? {
                 access_type: "offline",
                 prompt: "consent",
               }
             : undefined,
         redirectTo: buildOAuthCallbackUrl(redirect ?? undefined),
-        scopes: config.scopes,
+        scopes,
       },
-      provider: typedProvider,
+      provider: provider as "google" | "twitch",
     });
 
     if (error) {
