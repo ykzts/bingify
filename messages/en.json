@@ -466,6 +466,7 @@
     "emailModeDescription": "Only users with specified email addresses or domains can join.",
     "errorEmailDisabled": "Email authentication is currently disabled in system settings",
     "errorFetchParticipantCount": "Failed to fetch participant count. Using default value.",
+    "errorGatekeeperOwnerOnly": "Only the owner can modify participation requirements",
     "errorTwitchDisabled": "Twitch authentication is currently disabled in system settings",
     "errorTwitchFollowerDisabled": "Twitch follower requirement is currently disabled in system settings",
     "errorTwitchSubscriberDisabled": "Twitch subscriber requirement is currently disabled in system settings",

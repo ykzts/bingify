@@ -466,6 +466,7 @@
     "emailModeDescription": "指定したメールアドレスまたはドメインを持つユーザーのみ参加できます。",
     "errorEmailDisabled": "メール認証は現在システム設定で無効になっています",
     "errorFetchParticipantCount": "参加者数の取得に失敗しました。デフォルト値を使用しています。",
+    "errorGatekeeperOwnerOnly": "参加条件設定の変更はオーナーのみが行えます",
     "errorTwitchDisabled": "Twitch認証は現在システム設定で無効になっています",
     "errorTwitchFollowerDisabled": "Twitchフォロワー要件は現在システム設定で無効になっています",
     "errorTwitchSubscriberDisabled": "Twitchサブスクライバー要件は現在システム設定で無効になっています",

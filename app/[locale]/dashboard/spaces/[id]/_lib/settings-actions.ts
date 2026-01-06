@@ -116,7 +116,7 @@ export async function updateSpaceSettings(
     // Get current space data
     const { data: space, error: spaceError } = await supabase
       .from("spaces")
-      .select("owner_id, max_participants, settings")
+      .select("owner_id, max_participants, settings, gatekeeper_rules")
       .eq("id", spaceId)
       .single();
 
@@ -143,6 +143,86 @@ export async function updateSpaceSettings(
       return {
         ...initialFormState,
         errors: ["権限がありません"],
+      };
+    }
+
+    // Check if gatekeeper settings are being changed
+    // Helper function to check if gatekeeper rules are different
+    const isGatekeeperRulesChanged = (
+      currentRules: unknown,
+      newMode: string,
+      newSocialPlatform: string,
+      newYoutubeRequirement: string,
+      newYoutubeChannelId: string,
+      newTwitchRequirement: string,
+      newTwitchBroadcasterId: string,
+      newEmailAllowlist: string[]
+    ): boolean => {
+      // Build the new gatekeeper rules structure
+      let newRules: {
+        email?: { allowed: string[] };
+        twitch?: {
+          broadcasterId: string;
+          requirement: string;
+        };
+        youtube?: { channelId: string; requirement: string };
+      } | null = null;
+
+      if (newMode === "none") {
+        newRules = null;
+      } else if (newMode === "social") {
+        newRules = {};
+        if (
+          newSocialPlatform === "youtube" &&
+          newYoutubeRequirement !== "none" &&
+          newYoutubeChannelId
+        ) {
+          newRules.youtube = {
+            channelId: newYoutubeChannelId,
+            requirement: newYoutubeRequirement,
+          };
+        } else if (
+          newSocialPlatform === "twitch" &&
+          newTwitchRequirement !== "none" &&
+          newTwitchBroadcasterId
+        ) {
+          newRules.twitch = {
+            broadcasterId: newTwitchBroadcasterId,
+            requirement: newTwitchRequirement,
+          };
+        }
+        if (Object.keys(newRules).length === 0) {
+          newRules = null;
+        }
+      } else if (newMode === "email" && newEmailAllowlist.length > 0) {
+        newRules = {
+          email: {
+            allowed: newEmailAllowlist,
+          },
+        };
+      }
+
+      // Compare current and new rules by JSON stringification
+      return JSON.stringify(currentRules) !== JSON.stringify(newRules);
+    };
+
+    // Check if gatekeeper settings are being changed and restrict to owner
+    if (
+      !isOwner &&
+      isGatekeeperRulesChanged(
+        space.gatekeeper_rules,
+        gatekeeperMode,
+        socialPlatform,
+        youtubeRequirement,
+        youtubeChannelId,
+        twitchRequirement,
+        twitchBroadcasterId,
+        emailAllowlist
+      )
+    ) {
+      return {
+        ...initialFormState,
+        errors: ["errorGatekeeperOwnerOnly"],
       };
     }
 
