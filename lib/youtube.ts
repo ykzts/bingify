@@ -135,8 +135,32 @@ export async function getUserYouTubeChannelId(
       error: "No channel found for this user",
     };
   } catch (error) {
+    // 401 Unauthorizedエラーの場合はトークンの有効期限切れを示唆
+    if (error instanceof Error) {
+      const errorMessage = error.message.toLowerCase();
+      if (
+        errorMessage.includes("401") ||
+        errorMessage.includes("unauthorized") ||
+        errorMessage.includes("invalid credentials")
+      ) {
+        return {
+          error:
+            "Token has expired or is invalid. Please reconnect your YouTube account.",
+        };
+      }
+      // 403エラーの場合は権限不足
+      if (errorMessage.includes("403") || errorMessage.includes("forbidden")) {
+        return {
+          error:
+            "Insufficient permissions. Please ensure your YouTube account has the required permissions.",
+        };
+      }
+      return {
+        error: error.message,
+      };
+    }
     return {
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: "Unknown error",
     };
   }
 }
@@ -171,8 +195,35 @@ export async function checkSubscriptionStatus(
       isSubscribed,
     };
   } catch (error) {
+    // 401 Unauthorizedエラーの場合はトークンの有効期限切れを示唆
+    if (error instanceof Error) {
+      const errorMessage = error.message.toLowerCase();
+      if (
+        errorMessage.includes("401") ||
+        errorMessage.includes("unauthorized") ||
+        errorMessage.includes("invalid credentials")
+      ) {
+        return {
+          error:
+            "Token has expired or is invalid. Please reconnect your YouTube account.",
+          isSubscribed: false,
+        };
+      }
+      // 403エラーの場合は権限不足
+      if (errorMessage.includes("403") || errorMessage.includes("forbidden")) {
+        return {
+          error:
+            "Insufficient permissions. Please ensure your YouTube account has the required permissions.",
+          isSubscribed: false,
+        };
+      }
+      return {
+        error: error.message,
+        isSubscribed: false,
+      };
+    }
     return {
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: "Unknown error",
       isSubscribed: false,
     };
   }

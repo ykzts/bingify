@@ -50,10 +50,26 @@ export async function getOperatorYouTubeChannelId(): Promise<UserChannelResult> 
     );
 
     if (channelResult.error || !channelResult.channelId) {
+      // エラーメッセージを日本語に変換
+      let errorMessage =
+        channelResult.error || "チャンネルが見つかりませんでした";
+
+      // 英語のエラーメッセージを日本語に変換
+      if (errorMessage.includes("Token has expired or is invalid")) {
+        errorMessage =
+          "トークンの有効期限が切れているか無効です。YouTubeアカウントを再度連携してください。";
+      } else if (errorMessage.includes("Insufficient permissions")) {
+        errorMessage =
+          "権限が不足しています。YouTubeアカウントに必要な権限があることを確認してください。";
+      } else if (errorMessage === "No channel found for this user") {
+        errorMessage =
+          "YouTubeチャンネルが見つかりませんでした。YouTubeアカウントにチャンネルがあることを確認してください。";
+      } else if (errorMessage === "Missing access token") {
+        errorMessage = "アクセストークンが見つかりません";
+      }
+
       return {
-        error:
-          channelResult.error ||
-          "YouTubeチャンネルが見つかりませんでした。YouTubeアカウントにチャンネルがあることを確認してください。",
+        error: errorMessage,
         success: false,
       };
     }
