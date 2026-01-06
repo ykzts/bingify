@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import type { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GET } from "../route";
 
@@ -11,7 +12,7 @@ vi.mock("@supabase/supabase-js", () => ({
 global.fetch = vi.fn();
 
 // NextRequest のモック作成ヘルパー
-function createMockRequest(authHeader?: string) {
+function createMockRequest(authHeader?: string): NextRequest {
   return {
     headers: {
       get: vi.fn((name: string) => {
@@ -21,7 +22,7 @@ function createMockRequest(authHeader?: string) {
         return null;
       }),
     },
-  } as unknown as Request;
+  } as unknown as NextRequest;
 }
 
 describe("Token Refresh Cron Endpoint", () => {
@@ -185,7 +186,7 @@ describe("Token Refresh Cron Endpoint", () => {
     const originalNodeEnv = process.env.NODE_ENV;
     // biome-ignore lint/performance/noDelete: Required for testing undefined environment variables
     delete process.env.CRON_SECRET;
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
 
     const request = createMockRequest();
     const response = await GET(request);
@@ -198,8 +199,9 @@ describe("Token Refresh Cron Endpoint", () => {
     if (originalSecret) {
       process.env.CRON_SECRET = originalSecret;
     }
+    vi.unstubAllEnvs();
     if (originalNodeEnv) {
-      process.env.NODE_ENV = originalNodeEnv;
+      vi.stubEnv("NODE_ENV", originalNodeEnv);
     }
   });
 
@@ -208,7 +210,7 @@ describe("Token Refresh Cron Endpoint", () => {
     const originalNodeEnv = process.env.NODE_ENV;
     // biome-ignore lint/performance/noDelete: Required for testing undefined environment variables
     delete process.env.CRON_SECRET;
-    process.env.NODE_ENV = "development";
+    vi.stubEnv("NODE_ENV", "development");
 
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
@@ -231,8 +233,9 @@ describe("Token Refresh Cron Endpoint", () => {
     if (originalSecret) {
       process.env.CRON_SECRET = originalSecret;
     }
+    vi.unstubAllEnvs();
     if (originalNodeEnv) {
-      process.env.NODE_ENV = originalNodeEnv;
+      vi.stubEnv("NODE_ENV", originalNodeEnv);
     }
   });
 

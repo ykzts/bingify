@@ -18,6 +18,28 @@ interface RefreshSummary {
 }
 
 /**
+ * get_oauth_token_for_user RPC のレスポンス型
+ */
+interface GetOAuthTokenForUserResult {
+  data: {
+    access_token: string;
+    expires_at: string | null;
+    provider: string;
+    refresh_token: string | null;
+  };
+  error?: string;
+  success: boolean;
+}
+
+/**
+ * upsert_oauth_token_for_user RPC のレスポンス型
+ */
+interface UpsertOAuthTokenForUserResult {
+  error?: string;
+  success: boolean;
+}
+
+/**
  * OAuth トークンを定期的にリフレッシュするCronエンドポイント
  *
  * このエンドポイントは、すべてのユーザーのOAuthトークンをチェックし、
@@ -117,7 +139,7 @@ export async function GET(request: NextRequest) {
     for (const token of tokens) {
       try {
         // Get OAuth token with decrypted refresh token
-        const { data: tokenData, error: tokenError } = await supabase.rpc(
+        const { data: tokenDataRaw, error: tokenError } = await supabase.rpc(
           "get_oauth_token_for_user",
           {
             p_provider: token.provider,
@@ -125,12 +147,14 @@ export async function GET(request: NextRequest) {
           }
         );
 
-        if (tokenError || !tokenData?.success) {
-          throw new Error(
-            tokenError?.message ||
-              tokenData?.error ||
-              "Failed to get OAuth token"
-          );
+        if (tokenError) {
+          throw new Error(tokenError.message || "Failed to get OAuth token");
+        }
+
+        const tokenData = tokenDataRaw as unknown as GetOAuthTokenForUserResult;
+
+        if (!tokenData?.success) {
+          throw new Error(tokenData?.error || "Failed to get OAuth token");
         }
 
         const refreshToken = tokenData.data.refresh_token;
@@ -155,24 +179,25 @@ export async function GET(request: NextRequest) {
         // 新しいトークンを保存（upsert_oauth_token_for_user RPC を使用）
         const expiresAt = newTokenData.expires_in
           ? new Date(Date.now() + newTokenData.expires_in * 1000).toISOString()
-          : null;
+          : undefined;
 
-        const { data: upsertResult, error: upsertError } = await supabase.rpc(
-          "upsert_oauth_token_for_user",
-          {
+        const { data: upsertResultRaw, error: upsertError } =
+          await supabase.rpc("upsert_oauth_token_for_user", {
             p_access_token: newTokenData.access_token,
             p_expires_at: expiresAt,
             p_provider: token.provider,
             p_refresh_token: newTokenData.refresh_token || refreshToken,
             p_user_id: token.user_id,
-          }
-        );
+          });
 
         if (upsertError) {
           throw new Error(
             `Failed to save token: ${upsertError.message || "Unknown error"}`
           );
         }
+
+        const upsertResult =
+          upsertResultRaw as unknown as UpsertOAuthTokenForUserResult;
 
         // Check if upsert was successful
         if (!upsertResult?.success) {
