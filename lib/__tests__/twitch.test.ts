@@ -30,15 +30,15 @@ vi.mock("@twurple/auth", () => ({
 }));
 
 describe("checkFollowStatus", () => {
-  const originalClientId = process.env.TWITCH_CLIENT_ID;
+  const originalClientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.TWITCH_CLIENT_ID = "test_client_id";
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "test_client_id";
   });
 
   afterEach(() => {
-    process.env.TWITCH_CLIENT_ID = originalClientId;
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = originalClientId;
   });
 
   it("ユーザーが配信者をフォローしている場合にisFollowing trueを返す", async () => {
@@ -95,8 +95,8 @@ describe("checkFollowStatus", () => {
   });
 
   it("クライアントIDが設定されていない場合にエラーを返す", async () => {
-    const clientId = process.env.TWITCH_CLIENT_ID;
-    process.env.TWITCH_CLIENT_ID = "";
+    const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "";
 
     const result = await checkFollowStatus("test_access_token", "123", "456");
 
@@ -104,7 +104,7 @@ describe("checkFollowStatus", () => {
     expect(result.error).toBe("Twitch client ID not configured");
     expect(mockGetChannelFollowers).not.toHaveBeenCalled();
 
-    process.env.TWITCH_CLIENT_ID = clientId;
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = clientId;
   });
 
   it("APIリクエストが失敗した場合にエラーを返す", async () => {
@@ -129,15 +129,15 @@ describe("checkFollowStatus", () => {
 });
 
 describe("checkSubStatus", () => {
-  const originalClientId = process.env.TWITCH_CLIENT_ID;
+  const originalClientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.TWITCH_CLIENT_ID = "test_client_id";
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "test_client_id";
   });
 
   afterEach(() => {
-    process.env.TWITCH_CLIENT_ID = originalClientId;
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = originalClientId;
   });
 
   it("ユーザーがサブスクライブしている場合にisSubscribed trueを返す", async () => {
@@ -198,8 +198,8 @@ describe("checkSubStatus", () => {
   });
 
   it("クライアントIDが設定されていない場合にエラーを返す", async () => {
-    const clientId = process.env.TWITCH_CLIENT_ID;
-    process.env.TWITCH_CLIENT_ID = "";
+    const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "";
 
     const result = await checkSubStatus("test_access_token", "123", "456");
 
@@ -207,7 +207,7 @@ describe("checkSubStatus", () => {
     expect(result.error).toBe("Twitch client ID not configured");
     expect(mockCheckUserSubscription).not.toHaveBeenCalled();
 
-    process.env.TWITCH_CLIENT_ID = clientId;
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = clientId;
   });
 
   it("APIが404以外のエラーを返す場合にエラーを返す", async () => {
@@ -321,15 +321,15 @@ describe("parseTwitchInput", () => {
 });
 
 describe("getBroadcasterIdFromUsername", () => {
-  const originalClientId = process.env.TWITCH_CLIENT_ID;
+  const originalClientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.TWITCH_CLIENT_ID = "test_client_id";
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "test_client_id";
   });
 
   afterEach(() => {
-    process.env.TWITCH_CLIENT_ID = originalClientId;
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = originalClientId;
   });
 
   it("有効なユーザー名に対して配信者IDを返す", async () => {
@@ -368,8 +368,8 @@ describe("getBroadcasterIdFromUsername", () => {
   });
 
   it("クライアントIDが設定されていない場合にエラーを返す", async () => {
-    const clientId = process.env.TWITCH_CLIENT_ID;
-    process.env.TWITCH_CLIENT_ID = "";
+    const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "";
 
     const result = await getBroadcasterIdFromUsername(
       "ninja",
@@ -380,7 +380,7 @@ describe("getBroadcasterIdFromUsername", () => {
     expect(result.error).toBe("Twitch client ID not configured");
     expect(mockGetUsersByNames).not.toHaveBeenCalled();
 
-    process.env.TWITCH_CLIENT_ID = clientId;
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = clientId;
   });
 
   it("ユーザーが見つからない場合にエラーを返す", async () => {
