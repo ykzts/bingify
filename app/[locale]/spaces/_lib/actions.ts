@@ -1,5 +1,6 @@
 "use server";
 
+import { getOAuthToken } from "@/lib/oauth/token-storage";
 import { checkEmailAllowed } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import { checkFollowStatus, checkSubStatus } from "@/lib/twitch";
@@ -67,16 +68,21 @@ export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
 }
 
 async function verifyYouTubeSubscription(
-  youtubeAccessToken: string | undefined,
   youtubeChannelId: string,
   requirement: "subscriber" | "member"
 ): Promise<JoinSpaceState | null> {
-  if (!youtubeAccessToken) {
+  // 保存されたトークンをデータベースから取得
+  const supabase = await createClient();
+  const tokenResult = await getOAuthToken(supabase, "google");
+
+  if (!(tokenResult.success && tokenResult.access_token)) {
     return {
       errorKey: "errorYouTubeVerificationRequired",
       success: false,
     };
   }
+
+  const youtubeAccessToken = tokenResult.access_token;
 
   // Check membership if required
   if (requirement === "member") {
@@ -127,13 +133,33 @@ async function verifyYouTubeSubscription(
 }
 
 async function verifyTwitchRequirements(
-  twitchAccessToken: string | undefined,
-  twitchUserId: string | undefined,
   broadcasterId: string,
   requireFollow: boolean,
   requireSub: boolean
 ): Promise<JoinSpaceState | null> {
-  if (!(twitchAccessToken && twitchUserId)) {
+  // 保存されたトークンをデータベースから取得
+  const supabase = await createClient();
+  const tokenResult = await getOAuthToken(supabase, "twitch");
+
+  if (!(tokenResult.success && tokenResult.access_token)) {
+    return {
+      errorKey: "errorTwitchVerificationRequired",
+      success: false,
+    };
+  }
+
+  const twitchAccessToken = tokenResult.access_token;
+
+  // Twitchユーザー IDを取得
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const twitchIdentity = session?.user?.identities?.find(
+    (identity) => identity.provider === "twitch"
+  );
+  const twitchUserId = twitchIdentity?.id;
+
+  if (!twitchUserId) {
     return {
       errorKey: "errorTwitchVerificationRequired",
       success: false,
@@ -220,10 +246,7 @@ function verifyEmailAllowlist(
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Gatekeeper verification requires multiple conditional checks
 async function verifyGatekeeperRules(
   gatekeeperRules: GatekeeperRules | null,
-  userEmail: string,
-  youtubeAccessToken: string | undefined,
-  twitchAccessToken: string | undefined,
-  twitchUserId: string | undefined
+  userEmail: string
 ): Promise<JoinSpaceState | null> {
   // Check email allowlist if configured
   if (
@@ -255,7 +278,6 @@ async function verifyGatekeeperRules(
         requirement === "member" ? "member" : "subscriber";
 
       const verificationResult = await verifyYouTubeSubscription(
-        youtubeAccessToken,
         gatekeeperRules.youtube.channelId,
         requirementLevel
       );
@@ -278,8 +300,6 @@ async function verifyGatekeeperRules(
 
     if (requireFollow || requireSub) {
       const verificationResult = await verifyTwitchRequirements(
-        twitchAccessToken,
-        twitchUserId,
         gatekeeperRules.twitch.broadcasterId,
         requireFollow,
         requireSub
@@ -293,13 +313,7 @@ async function verifyGatekeeperRules(
   return null;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Space joining requires expiration check, gatekeeper verification, and quota validation
-export async function joinSpace(
-  spaceId: string,
-  youtubeAccessToken?: string,
-  twitchAccessToken?: string,
-  twitchUserId?: string
-): Promise<JoinSpaceState> {
+export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
   try {
     // Validate UUID format
     if (!isValidUUID(spaceId)) {
@@ -387,10 +401,7 @@ export async function joinSpace(
     const gatekeeperRules = space.gatekeeper_rules as GatekeeperRules | null;
     const verificationResult = await verifyGatekeeperRules(
       gatekeeperRules,
-      userEmail,
-      youtubeAccessToken,
-      twitchAccessToken,
-      twitchUserId
+      userEmail
     );
     if (verificationResult) {
       return verificationResult;
