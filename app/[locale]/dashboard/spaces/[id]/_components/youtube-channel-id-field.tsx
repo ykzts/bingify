@@ -64,7 +64,9 @@ export function YoutubeChannelIdField({
 
       try {
         // Use operator's OAuth token for lookup
-        const result = await lookupYouTubeChannelIdWithOperatorToken(input.trim());
+        const result = await lookupYouTubeChannelIdWithOperatorToken(
+          input.trim()
+        );
 
         if (result.error) {
           // Translate error key

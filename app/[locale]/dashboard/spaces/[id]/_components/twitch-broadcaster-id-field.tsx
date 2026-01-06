@@ -64,7 +64,9 @@ export function TwitchBroadcasterIdField({
 
       try {
         // Use operator's OAuth token for lookup
-        const result = await lookupTwitchBroadcasterIdWithOperatorToken(input.trim());
+        const result = await lookupTwitchBroadcasterIdWithOperatorToken(
+          input.trim()
+        );
 
         if (result.error) {
           // Translate error key
