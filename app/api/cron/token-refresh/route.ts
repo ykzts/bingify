@@ -1,0 +1,280 @@
+import { createClient } from "@supabase/supabase-js";
+import { type NextRequest, NextResponse } from "next/server";
+import type { OAuthProvider } from "@/lib/oauth/token-storage";
+import type { RefreshTokenResponse } from "@/lib/oauth/token-refresh";
+import type { Database } from "@/types/supabase";
+
+/**
+ * トークンリフレッシュの結果サマリー
+ */
+interface RefreshSummary {
+  failed: number;
+  refreshed: number;
+  skipped: number;
+  total: number;
+}
+
+/**
+ * OAuth プロバイダーごとのトークンリフレッシュエンドポイント
+ */
+const REFRESH_ENDPOINTS = {
+  google: "https://oauth2.googleapis.com/token",
+  twitch: "https://id.twitch.tv/oauth2/token",
+} as const;
+
+/**
+ * Google OAuth のトークンをリフレッシュする
+ */
+async function refreshGoogleToken(
+  refreshToken: string
+): Promise<RefreshTokenResponse> {
+  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET;
+
+  if (!clientId || !clientSecret) {
+    throw new Error("Google OAuth credentials not configured");
+  }
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    client_secret: clientSecret,
+    grant_type: "refresh_token",
+    refresh_token: refreshToken,
+  });
+
+  const response = await fetch(REFRESH_ENDPOINTS.google, {
+    body: params.toString(),
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Twitch OAuth のトークンをリフレッシュする
+ */
+async function refreshTwitchToken(
+  refreshToken: string
+): Promise<RefreshTokenResponse> {
+  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
+  const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET;
+
+  if (!clientId || !clientSecret) {
+    throw new Error("Twitch OAuth credentials not configured");
+  }
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    client_secret: clientSecret,
+    grant_type: "refresh_token",
+    refresh_token: refreshToken,
+  });
+
+  const response = await fetch(REFRESH_ENDPOINTS.twitch, {
+    body: params.toString(),
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * OAuth トークンを定期的にリフレッシュするCronエンドポイント
+ *
+ * このエンドポイントは、すべてのユーザーのOAuthトークンをチェックし、
+ * 期限切れまたは期限切れ間近（5分以内）のトークンをリフレッシュします。
+ *
+ * @param request - Next.js リクエスト
+ * @returns レスポンス
+ */
+export async function GET(request: NextRequest) {
+  try {
+    // Cron シークレットで認証
+    const authHeader = request.headers.get("authorization");
+    const cronSecret = process.env.CRON_SECRET;
+
+    if (!cronSecret) {
+      if (process.env.NODE_ENV !== "development") {
+        console.error(
+          "CRON_SECRET is not set. Token refresh endpoint is disabled in non-development environments."
+        );
+        return NextResponse.json(
+          { error: "Missing CRON_SECRET" },
+          { status: 500 }
+        );
+      }
+
+      console.warn(
+        "CRON_SECRET is not set. Authentication is bypassed for token refresh endpoint in development."
+      );
+    } else if (authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Supabase service role クライアントを作成（全ユーザーのトークンにアクセス可能）
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl) {
+      return NextResponse.json(
+        { error: "Missing NEXT_PUBLIC_SUPABASE_URL" },
+        { status: 500 }
+      );
+    }
+
+    if (!supabaseServiceKey) {
+      return NextResponse.json(
+        { error: "Missing SUPABASE_SERVICE_ROLE_KEY" },
+        { status: 500 }
+      );
+    }
+
+    const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey, {
+      db: { schema: "private" },
+    });
+
+    // private.oauth_tokens テーブルから、期限切れ間近または期限切れのトークンを取得
+    // 注: expires_at が null の場合は期限なしとみなしスキップ
+    const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
+    const { data: tokens, error: fetchError } = await supabase
+      .from("oauth_tokens")
+      .select("user_id, provider, expires_at, refresh_token_secret_id")
+      .not("expires_at", "is", null)
+      .not("refresh_token_secret_id", "is", null)
+      .lt("expires_at", fiveMinutesFromNow.toISOString());
+
+    if (fetchError) {
+      console.error("Error fetching tokens to refresh:", fetchError);
+      return NextResponse.json(
+        { error: "Failed to fetch tokens" },
+        { status: 500 }
+      );
+    }
+
+    // トークンが見つからない場合は早期リターン
+    if (!tokens || tokens.length === 0) {
+      console.log("No tokens found that need refreshing");
+      return NextResponse.json({
+        data: {
+          failed: 0,
+          message: "No tokens found that need refreshing",
+          refreshed: 0,
+          skipped: 0,
+          total: 0,
+        },
+      });
+    }
+
+    console.log(`Found ${tokens.length} token(s) that need refreshing`);
+
+    // 各トークンをリフレッシュ
+    const summary: RefreshSummary = {
+      failed: 0,
+      refreshed: 0,
+      skipped: 0,
+      total: tokens.length,
+    };
+
+    const failedTokens: Array<{
+      error: string;
+      provider: string;
+      user_id: string;
+    }> = [];
+
+    for (const token of tokens) {
+      try {
+        // リフレッシュトークンを復号化
+        const { data: refreshTokenData } = await supabase
+          .from("decrypted_secrets")
+          .select("decrypted_secret")
+          .eq("id", token.refresh_token_secret_id)
+          .single();
+
+        if (!refreshTokenData?.decrypted_secret) {
+          throw new Error("Failed to decrypt refresh token");
+        }
+
+        // プロバイダーごとにリフレッシュ
+        let newTokenData: RefreshTokenResponse;
+        if (token.provider === "google") {
+          newTokenData = await refreshGoogleToken(
+            refreshTokenData.decrypted_secret
+          );
+        } else if (token.provider === "twitch") {
+          newTokenData = await refreshTwitchToken(
+            refreshTokenData.decrypted_secret
+          );
+        } else {
+          throw new Error(`Unsupported provider: ${token.provider}`);
+        }
+
+        // 新しいトークンをVaultに保存し、レコードを更新
+        // RPC関数を使用
+        const expiresAt = newTokenData.expires_in
+          ? new Date(Date.now() + newTokenData.expires_in * 1000).toISOString()
+          : null;
+
+        const { error: updateError } = await supabase.rpc("upsert_oauth_token", {
+          p_access_token: newTokenData.access_token,
+          p_expires_at: expiresAt,
+          p_provider: token.provider,
+          p_refresh_token: newTokenData.refresh_token || refreshTokenData.decrypted_secret,
+        });
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        summary.refreshed++;
+        console.log(
+          `Successfully refreshed token for user ${token.user_id} (${token.provider})`
+        );
+      } catch (err) {
+        summary.failed++;
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        console.error(
+          `Failed to refresh token for user ${token.user_id} (${token.provider}): ${errorMsg}`
+        );
+        failedTokens.push({
+          error: errorMsg,
+          provider: token.provider,
+          user_id: token.user_id,
+        });
+      }
+    }
+
+    console.log(
+      `Token refresh completed: ${summary.refreshed} refreshed, ${summary.skipped} skipped, ${summary.failed} failed`
+    );
+
+    return NextResponse.json({
+      data: {
+        ...summary,
+        failedTokens: failedTokens.length > 0 ? failedTokens : undefined,
+        message: `Token refresh completed: ${summary.refreshed} refreshed, ${summary.skipped} skipped, ${summary.failed} failed`,
+      },
+    });
+  } catch (error) {
+    console.error("Token refresh cron error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
