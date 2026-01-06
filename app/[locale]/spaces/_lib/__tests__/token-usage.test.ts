@@ -545,7 +545,7 @@ describe("OAuth Token Usage in joinSpace", () => {
       expect(result.errorKey).toBe("errorYouTubeVerificationRequired");
     });
 
-    test("アクセストークンがnullの場合エラーを返す", async () => {
+    test("アクセストークンが存在しない場合エラーを返す", async () => {
       const mockSpace = {
         created_at: new Date().toISOString(),
         gatekeeper_rules: {
@@ -595,11 +595,10 @@ describe("OAuth Token Usage in joinSpace", () => {
         return {};
       });
 
-      // アクセストークンがnullの場合
+      // アクセストークンがundefinedの場合
       vi.mocked(getOAuthToken).mockResolvedValue({
-        access_token: undefined,
         success: true,
-      });
+      } as never);
 
       const result = await joinSpace("123e4567-e89b-12d3-a456-426614174000");
 
