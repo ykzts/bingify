@@ -15,12 +15,14 @@ import { useConfirm } from "@/components/providers/confirm-provider";
 import { Button } from "@/components/ui/button";
 import {
   buildOAuthCallbackUrl,
-  GOOGLE_OAUTH_SCOPES,
+  getScopesForProvider,
 } from "@/lib/auth/oauth-utils";
+import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/client";
 import { unlinkIdentity } from "../_lib/actions";
 
 interface AccountLinkingFormProps {
+  systemSettings: SystemSettings;
   user: User;
 }
 
@@ -32,7 +34,10 @@ interface ProviderConfig {
   name: Provider;
 }
 
-export function AccountLinkingForm({ user }: AccountLinkingFormProps) {
+export function AccountLinkingForm({
+  systemSettings,
+  user,
+}: AccountLinkingFormProps) {
   const t = useTranslations("AccountSettings");
   const router = useRouter();
   const confirm = useConfirm();
@@ -100,8 +105,8 @@ export function AccountLinkingForm({ user }: AccountLinkingFormProps) {
             },
           }),
           redirectTo: buildOAuthCallbackUrl(),
-          // Request YouTube scope for Google to enable space gatekeeper verification
-          ...(provider === "google" && { scopes: GOOGLE_OAUTH_SCOPES }),
+          // Request scopes based on system settings for enabled gatekeeper features
+          scopes: getScopesForProvider(provider, systemSettings),
         },
         provider,
       });

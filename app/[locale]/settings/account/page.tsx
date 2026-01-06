@@ -1,6 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { redirect } from "@/i18n/navigation";
+import { getSystemSettings } from "@/lib/data/system-settings";
+import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
 import { AccountLinkingForm } from "./_components/account-linking-form";
 import { UsernameForm } from "./_components/username-form";
@@ -26,10 +28,15 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
     console.error("Error fetching profile for user", user.id, profileError);
   }
 
+  // Fetch system settings for OAuth scope configuration
+  const systemSettingsResult = await getSystemSettings();
+  const systemSettings =
+    systemSettingsResult.settings || DEFAULT_SYSTEM_SETTINGS;
+
   return (
     <div className="space-y-8">
       <UsernameForm currentUsername={profile?.full_name} />
-      <AccountLinkingForm user={user} />
+      <AccountLinkingForm systemSettings={systemSettings} user={user} />
     </div>
   );
 }
