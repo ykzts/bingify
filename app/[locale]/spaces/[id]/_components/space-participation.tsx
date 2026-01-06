@@ -248,42 +248,9 @@ export function SpaceParticipation({
     setIsJoining(true);
     setError(null);
 
-    // Get session with provider tokens
-    // Note: provider_token will be from the most recent OAuth provider used.
-    const supabase = createClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    // Pass credentials based on which provider is required (YouTube OR Twitch, not both)
-    // This simplifies token management since Supabase only stores one provider_token at a time
-    let result: JoinSpaceState;
-
-    if (requiresYouTube) {
-      // YouTube verification: pass only YouTube token (Google OAuth with YouTube scope)
-      result = await joinSpace(
-        spaceId,
-        session?.provider_token ?? undefined,
-        undefined,
-        undefined
-      );
-    } else if (requiresTwitch) {
-      // Twitch verification: pass only Twitch token and user ID
-      const twitchIdentity = session?.user?.identities?.find(
-        (identity) => identity.provider === "twitch"
-      );
-      const twitchUserId = twitchIdentity?.id;
-
-      result = await joinSpace(
-        spaceId,
-        undefined,
-        session?.provider_token ?? undefined,
-        twitchUserId
-      );
-    } else {
-      // No special verification required: regular join
-      result = await joinSpace(spaceId, undefined, undefined, undefined);
-    }
+    // トークンはサーバー側でデータベースから取得されるため、
+    // ここでは何も渡す必要がない
+    const result = await joinSpace(spaceId);
 
     if (result.success) {
       await Promise.all([refetchJoined(), refetchInfo()]);
@@ -293,15 +260,7 @@ export function SpaceParticipation({
     }
 
     setIsJoining(false);
-  }, [
-    requiresYouTube,
-    requiresTwitch,
-    spaceId,
-    refetchJoined,
-    refetchInfo,
-    router,
-    t,
-  ]);
+  }, [spaceId, refetchJoined, refetchInfo, router, t]);
 
   // Check OAuth tokens when hasJoined changes
   useEffect(() => {

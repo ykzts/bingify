@@ -102,7 +102,6 @@ export async function inviteAdminAction(
     // Create the server validation function
     const serverValidate = createServerValidate({
       ...inviteAdminFormOpts,
-      // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Comprehensive validation requires multiple checks for authentication, ownership, user lookup, and admin status
       onServerValidate: async ({ value }: { value: InviteAdminFormValues }) => {
         if (!isValidUUID(spaceId)) {
           return { form: "無効なスペースIDです" };
