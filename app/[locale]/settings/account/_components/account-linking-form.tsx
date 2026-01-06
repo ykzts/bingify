@@ -93,6 +93,12 @@ export function AccountLinkingForm({ user }: AccountLinkingFormProps) {
       const supabase = createClient();
       const { error } = await supabase.auth.linkIdentity({
         options: {
+          ...(provider === "google" && {
+            queryParams: {
+              access_type: "offline",
+              prompt: "consent",
+            },
+          }),
           redirectTo: buildOAuthCallbackUrl(),
           // Request YouTube scope for Google to enable space gatekeeper verification
           ...(provider === "google" && { scopes: GOOGLE_OAUTH_SCOPES }),

@@ -282,6 +282,10 @@ export function SpaceParticipation({
       // This is the correct method for authenticated users requesting additional OAuth scopes
       const { error: oauthError } = await supabase.auth.linkIdentity({
         options: {
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
           redirectTo: buildOAuthCallbackUrl(window.location.pathname),
           scopes: GOOGLE_OAUTH_SCOPES,
         },
