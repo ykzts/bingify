@@ -58,7 +58,7 @@ function validateTwitchParameters(
     return { error: "Missing required parameters", valid: false };
   }
 
-  const clientId = process.env.TWITCH_CLIENT_ID;
+  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
   if (!clientId) {
     return { error: "Twitch client ID not configured", valid: false };
   }
@@ -70,7 +70,7 @@ function validateTwitchParameters(
  * Create Twurple API client with user access token
  */
 function createApiClient(userAccessToken: string): ApiClient {
-  const clientId = process.env.TWITCH_CLIENT_ID;
+  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
   if (!clientId) {
     throw new Error("Twitch client ID not configured");
   }
@@ -83,7 +83,7 @@ function createApiClient(userAccessToken: string): ApiClient {
  * Create Twurple API client with app access token for server-side operations
  */
 function createAppApiClient(appAccessToken: string): ApiClient {
-  const clientId = process.env.TWITCH_CLIENT_ID;
+  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
   if (!clientId) {
     throw new Error("Twitch client ID not configured");
   }
@@ -133,8 +133,8 @@ export async function getUserTwitchId(
  * @returns Promise with access token or null if failed
  */
 export async function getAppAccessToken(): Promise<string | null> {
-  const clientId = process.env.TWITCH_CLIENT_ID;
-  const clientSecret = process.env.TWITCH_CLIENT_SECRET;
+  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
+  const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET;
 
   if (!(clientId && clientSecret)) {
     return null;
@@ -217,7 +217,7 @@ export async function getBroadcasterIdFromUsername(
       return { error: "App access token is required" };
     }
 
-    const clientId = process.env.TWITCH_CLIENT_ID;
+    const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
     if (!clientId) {
       return { error: "Twitch client ID not configured" };
     }
