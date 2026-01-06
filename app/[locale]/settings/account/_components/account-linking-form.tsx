@@ -105,8 +105,8 @@ export function AccountLinkingForm({
             },
           }),
           redirectTo: buildOAuthCallbackUrl(),
-          // Request YouTube scope for Google to enable space gatekeeper verification
-          ...(provider === "google" && { scopes: GOOGLE_OAUTH_SCOPES }),
+          // Request scopes based on system settings for enabled gatekeeper features
+          scopes: getScopesForProvider(provider, systemSettings),
         },
         provider,
       });
