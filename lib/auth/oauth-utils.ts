@@ -71,3 +71,23 @@ export function getTwitchOAuthScopes(
   }
   return undefined;
 }
+
+/**
+ * Generates OAuth scopes for a given provider based on system settings
+ * @param provider - OAuth provider name
+ * @param settings - System settings containing feature flags
+ * @returns OAuth scopes string or undefined if no scopes are needed
+ */
+export function getScopesForProvider(
+  provider: string,
+  settings: SystemSettings
+): string | undefined {
+  switch (provider) {
+    case "google":
+      return getGoogleOAuthScopes(settings);
+    case "twitch":
+      return getTwitchOAuthScopes(settings);
+    default:
+      return undefined;
+  }
+}

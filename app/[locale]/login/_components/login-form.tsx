@@ -16,8 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import {
   buildOAuthCallbackUrl,
-  getGoogleOAuthScopes,
-  getTwitchOAuthScopes,
+  getScopesForProvider,
 } from "@/lib/auth/oauth-utils";
 import type { AuthProvider } from "@/lib/data/auth-providers";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
@@ -108,12 +107,7 @@ export function LoginForm({ providers, systemSettings }: Props) {
     const supabase = createClient();
 
     // システム設定に基づいてスコープを取得
-    let scopes: string | undefined;
-    if (provider === "google") {
-      scopes = getGoogleOAuthScopes(systemSettings);
-    } else if (provider === "twitch") {
-      scopes = getTwitchOAuthScopes(systemSettings);
-    }
+    const scopes = getScopesForProvider(provider, systemSettings);
 
     const { error } = await supabase.auth.signInWithOAuth({
       options: {

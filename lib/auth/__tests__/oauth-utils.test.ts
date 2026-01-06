@@ -4,9 +4,39 @@ import {
   buildOAuthCallbackUrl,
   GOOGLE_OAUTH_SCOPES,
   getGoogleOAuthScopes,
+  getScopesForProvider,
   getTwitchOAuthScopes,
   TWITCH_OAUTH_SCOPES,
 } from "../oauth-utils";
+
+// テスト用のシステム設定を生成するヘルパー関数
+function createTestSystemSettings(
+  overrides?: Partial<SystemSettings>
+): SystemSettings {
+  return {
+    default_user_role: "organizer",
+    features: {
+      gatekeeper: {
+        email: { enabled: true },
+        twitch: {
+          enabled: true,
+          follower: { enabled: true },
+          subscriber: { enabled: true },
+        },
+        youtube: {
+          enabled: true,
+          member: { enabled: true },
+          subscriber: { enabled: true },
+        },
+      },
+    },
+    max_participants_per_space: 50,
+    max_spaces_per_user: 5,
+    max_total_spaces: 1000,
+    space_expiration_hours: 48,
+    ...overrides,
+  };
+}
 
 describe("buildOAuthCallbackUrl", () => {
   it("リダイレクトパスなしでコールバックURLを生成できる", () => {
@@ -23,36 +53,13 @@ describe("buildOAuthCallbackUrl", () => {
 
 describe("getGoogleOAuthScopes", () => {
   it("YouTubeゲートキーパーが有効な場合、YouTubeスコープを返す", () => {
-    const settings: SystemSettings = {
-      default_user_role: "organizer",
-      features: {
-        gatekeeper: {
-          email: { enabled: true },
-          twitch: {
-            enabled: true,
-            follower: { enabled: true },
-            subscriber: { enabled: true },
-          },
-          youtube: {
-            enabled: true,
-            member: { enabled: true },
-            subscriber: { enabled: true },
-          },
-        },
-      },
-      max_participants_per_space: 50,
-      max_spaces_per_user: 5,
-      max_total_spaces: 1000,
-      space_expiration_hours: 48,
-    };
-
+    const settings = createTestSystemSettings();
     const scopes = getGoogleOAuthScopes(settings);
     expect(scopes).toBe(GOOGLE_OAUTH_SCOPES);
   });
 
   it("YouTubeゲートキーパーが無効な場合、undefinedを返す", () => {
-    const settings: SystemSettings = {
-      default_user_role: "organizer",
+    const settings = createTestSystemSettings({
       features: {
         gatekeeper: {
           email: { enabled: true },
@@ -68,12 +75,7 @@ describe("getGoogleOAuthScopes", () => {
           },
         },
       },
-      max_participants_per_space: 50,
-      max_spaces_per_user: 5,
-      max_total_spaces: 1000,
-      space_expiration_hours: 48,
-    };
-
+    });
     const scopes = getGoogleOAuthScopes(settings);
     expect(scopes).toBeUndefined();
   });
@@ -81,36 +83,13 @@ describe("getGoogleOAuthScopes", () => {
 
 describe("getTwitchOAuthScopes", () => {
   it("Twitchゲートキーパーが有効な場合、Twitchスコープを返す", () => {
-    const settings: SystemSettings = {
-      default_user_role: "organizer",
-      features: {
-        gatekeeper: {
-          email: { enabled: true },
-          twitch: {
-            enabled: true,
-            follower: { enabled: true },
-            subscriber: { enabled: true },
-          },
-          youtube: {
-            enabled: true,
-            member: { enabled: true },
-            subscriber: { enabled: true },
-          },
-        },
-      },
-      max_participants_per_space: 50,
-      max_spaces_per_user: 5,
-      max_total_spaces: 1000,
-      space_expiration_hours: 48,
-    };
-
+    const settings = createTestSystemSettings();
     const scopes = getTwitchOAuthScopes(settings);
     expect(scopes).toBe(TWITCH_OAUTH_SCOPES);
   });
 
   it("Twitchゲートキーパーが無効な場合、undefinedを返す", () => {
-    const settings: SystemSettings = {
-      default_user_role: "organizer",
+    const settings = createTestSystemSettings({
       features: {
         gatekeeper: {
           email: { enabled: true },
@@ -126,13 +105,28 @@ describe("getTwitchOAuthScopes", () => {
           },
         },
       },
-      max_participants_per_space: 50,
-      max_spaces_per_user: 5,
-      max_total_spaces: 1000,
-      space_expiration_hours: 48,
-    };
-
+    });
     const scopes = getTwitchOAuthScopes(settings);
+    expect(scopes).toBeUndefined();
+  });
+});
+
+describe("getScopesForProvider", () => {
+  it("googleプロバイダーの場合、YouTube設定に基づいてスコープを返す", () => {
+    const settings = createTestSystemSettings();
+    const scopes = getScopesForProvider("google", settings);
+    expect(scopes).toBe(GOOGLE_OAUTH_SCOPES);
+  });
+
+  it("twitchプロバイダーの場合、Twitch設定に基づいてスコープを返す", () => {
+    const settings = createTestSystemSettings();
+    const scopes = getScopesForProvider("twitch", settings);
+    expect(scopes).toBe(TWITCH_OAUTH_SCOPES);
+  });
+
+  it("未対応のプロバイダーの場合、undefinedを返す", () => {
+    const settings = createTestSystemSettings();
+    const scopes = getScopesForProvider("unknown", settings);
     expect(scopes).toBeUndefined();
   });
 });
