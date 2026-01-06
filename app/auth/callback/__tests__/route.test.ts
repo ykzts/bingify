@@ -829,7 +829,10 @@ describe("Auth Callback Route", () => {
         error: "Database error",
       });
 
-      const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation();
+      const consoleWarnSpy = vi
+        .spyOn(console, "warn")
+        // biome-ignore lint/suspicious/noEmptyBlockStatements: Mock implementation intentionally does nothing
+        .mockImplementation(() => {});
 
       const mockCreateClient = vi.mocked(createClient);
       const mockSupabase = {

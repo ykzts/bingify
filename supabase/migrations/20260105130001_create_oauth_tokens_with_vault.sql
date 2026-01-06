@@ -108,21 +108,37 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'Not authenticated');
   END IF;
 
-  -- Get existing secret IDs if token already exists (for cleanup after success)
+  -- Get existing secret IDs if token already exists
   SELECT access_token_secret_id, refresh_token_secret_id
   INTO v_existing_access_id, v_existing_refresh_id
   FROM private.oauth_tokens
   WHERE user_id = v_user_id AND provider = p_provider;
 
-  -- Encrypt access token with Vault
-  SELECT vault.create_secret(p_access_token) INTO v_access_secret_id;
-
-  -- Encrypt refresh token if provided
-  IF p_refresh_token IS NOT NULL THEN
-    SELECT vault.create_secret(p_refresh_token) INTO v_refresh_secret_id;
+  -- Update or create access token secret
+  IF v_existing_access_id IS NOT NULL THEN
+    -- Update existing secret
+    SELECT vault.update_secret(v_existing_access_id, p_access_token) INTO v_access_secret_id;
+  ELSE
+    -- Create new secret
+    SELECT vault.create_secret(p_access_token) INTO v_access_secret_id;
   END IF;
 
-  -- Upsert the token record (must succeed before cleanup)
+  -- Update or create refresh token secret if provided
+  IF p_refresh_token IS NOT NULL THEN
+    IF v_existing_refresh_id IS NOT NULL THEN
+      -- Update existing secret
+      SELECT vault.update_secret(v_existing_refresh_id, p_refresh_token) INTO v_refresh_secret_id;
+    ELSE
+      -- Create new secret
+      SELECT vault.create_secret(p_refresh_token) INTO v_refresh_secret_id;
+    END IF;
+  ELSIF v_existing_refresh_id IS NOT NULL THEN
+    -- Refresh token was removed, delete the old secret
+    DELETE FROM vault.secrets WHERE id = v_existing_refresh_id;
+    v_refresh_secret_id := NULL;
+  END IF;
+
+  -- Upsert the token record
   INSERT INTO private.oauth_tokens (user_id, provider, access_token_secret_id, refresh_token_secret_id, expires_at)
   VALUES (v_user_id, p_provider, v_access_secret_id, v_refresh_secret_id, p_expires_at)
   ON CONFLICT (user_id, provider)
@@ -131,15 +147,6 @@ BEGIN
     refresh_token_secret_id = EXCLUDED.refresh_token_secret_id,
     expires_at = EXCLUDED.expires_at,
     updated_at = NOW();
-
-  -- Clean up old Vault secrets AFTER successful insert/update
-  -- Note: vault.delete_secret() doesn't exist, use DELETE FROM vault.secrets
-  IF v_existing_access_id IS NOT NULL AND v_existing_access_id != v_access_secret_id THEN
-    DELETE FROM vault.secrets WHERE id = v_existing_access_id;
-  END IF;
-  IF v_existing_refresh_id IS NOT NULL AND v_existing_refresh_id != v_refresh_secret_id THEN
-    DELETE FROM vault.secrets WHERE id = v_existing_refresh_id;
-  END IF;
 
   RETURN jsonb_build_object('success', true);
 EXCEPTION
