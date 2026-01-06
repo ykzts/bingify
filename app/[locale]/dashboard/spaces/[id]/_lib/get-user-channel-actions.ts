@@ -28,7 +28,7 @@ export async function getOperatorYouTubeChannelId(): Promise<UserChannelResult> 
 
     if (userError || !user) {
       return {
-        error: "認証が必要です",
+        error: "errorAuthRequired",
         success: false,
       };
     }
@@ -38,8 +38,7 @@ export async function getOperatorYouTubeChannelId(): Promise<UserChannelResult> 
 
     if (!(tokenResult.success && tokenResult.access_token)) {
       return {
-        error:
-          "YouTubeアカウントが連携されていません。アカウント設定からYouTubeアカウントを連携してください。",
+        error: "errorYoutubeNotLinked",
         success: false,
       };
     }
@@ -50,26 +49,21 @@ export async function getOperatorYouTubeChannelId(): Promise<UserChannelResult> 
     );
 
     if (channelResult.error || !channelResult.channelId) {
-      // エラーメッセージを日本語に変換
-      let errorMessage =
-        channelResult.error || "チャンネルが見つかりませんでした";
+      // エラーキーをマッピング
+      let errorKey = "youtubeChannelIdConvertError";
 
-      // 英語のエラーメッセージを日本語に変換
-      if (errorMessage.includes("Token has expired or is invalid")) {
-        errorMessage =
-          "トークンの有効期限が切れているか無効です。YouTubeアカウントを再度連携してください。";
-      } else if (errorMessage.includes("Insufficient permissions")) {
-        errorMessage =
-          "権限が不足しています。YouTubeアカウントに必要な権限があることを確認してください。";
-      } else if (errorMessage === "No channel found for this user") {
-        errorMessage =
-          "YouTubeチャンネルが見つかりませんでした。YouTubeアカウントにチャンネルがあることを確認してください。";
-      } else if (errorMessage === "Missing access token") {
-        errorMessage = "アクセストークンが見つかりません";
+      if (channelResult.error === "ERROR_YOUTUBE_TOKEN_EXPIRED") {
+        errorKey = "errorYoutubeTokenExpired";
+      } else if (
+        channelResult.error === "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS"
+      ) {
+        errorKey = "errorYoutubeInsufficientPermissions";
+      } else if (channelResult.error === "No channel found for this user") {
+        errorKey = "errorYoutubeChannelNotFound";
       }
 
       return {
-        error: errorMessage,
+        error: errorKey,
         success: false,
       };
     }
@@ -81,7 +75,7 @@ export async function getOperatorYouTubeChannelId(): Promise<UserChannelResult> 
   } catch (error) {
     console.error("Error getting operator YouTube channel ID:", error);
     return {
-      error: "チャンネルIDの取得中にエラーが発生しました",
+      error: "youtubeChannelIdConvertError",
       success: false,
     };
   }
@@ -104,7 +98,7 @@ export async function getOperatorTwitchBroadcasterId(): Promise<UserChannelResul
 
     if (userError || !user) {
       return {
-        error: "認証が必要です",
+        error: "errorAuthRequired",
         success: false,
       };
     }
@@ -114,8 +108,7 @@ export async function getOperatorTwitchBroadcasterId(): Promise<UserChannelResul
 
     if (!(tokenResult.success && tokenResult.access_token)) {
       return {
-        error:
-          "Twitchアカウントが連携されていません。アカウント設定からTwitchアカウントを連携してください。",
+        error: "errorTwitchNotLinked",
         success: false,
       };
     }
@@ -125,9 +118,7 @@ export async function getOperatorTwitchBroadcasterId(): Promise<UserChannelResul
 
     if (userIdResult.error || !userIdResult.userId) {
       return {
-        error:
-          userIdResult.error ||
-          "Twitchユーザー情報の取得に失敗しました。もう一度お試しください。",
+        error: userIdResult.error || "twitchBroadcasterIdConvertError",
         success: false,
       };
     }
@@ -139,7 +130,7 @@ export async function getOperatorTwitchBroadcasterId(): Promise<UserChannelResul
   } catch (error) {
     console.error("Error getting operator Twitch broadcaster ID:", error);
     return {
-      error: "ブロードキャスターIDの取得中にエラーが発生しました",
+      error: "twitchBroadcasterIdConvertError",
       success: false,
     };
   }

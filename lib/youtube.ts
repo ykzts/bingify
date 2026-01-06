@@ -144,15 +144,13 @@ export async function getUserYouTubeChannelId(
         errorMessage.includes("invalid credentials")
       ) {
         return {
-          error:
-            "Token has expired or is invalid. Please reconnect your YouTube account.",
+          error: "ERROR_YOUTUBE_TOKEN_EXPIRED",
         };
       }
       // 403エラーの場合は権限不足
       if (errorMessage.includes("403") || errorMessage.includes("forbidden")) {
         return {
-          error:
-            "Insufficient permissions. Please ensure your YouTube account has the required permissions.",
+          error: "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS",
         };
       }
       return {
@@ -204,16 +202,14 @@ export async function checkSubscriptionStatus(
         errorMessage.includes("invalid credentials")
       ) {
         return {
-          error:
-            "Token has expired or is invalid. Please reconnect your YouTube account.",
+          error: "ERROR_YOUTUBE_TOKEN_EXPIRED",
           isSubscribed: false,
         };
       }
       // 403エラーの場合は権限不足
       if (errorMessage.includes("403") || errorMessage.includes("forbidden")) {
         return {
-          error:
-            "Insufficient permissions. Please ensure your YouTube account has the required permissions.",
+          error: "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS",
           isSubscribed: false,
         };
       }

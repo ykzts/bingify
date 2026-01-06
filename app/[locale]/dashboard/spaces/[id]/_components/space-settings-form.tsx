@@ -243,7 +243,8 @@ export function SpaceSettingsForm({
       const result = await getOperatorYouTubeChannelId();
 
       if (result.error || !result.channelId) {
-        setYoutubeIdError(result.error || t("youtubeChannelIdConvertError"));
+        // エラーキーを翻訳
+        setYoutubeIdError(t(result.error || "youtubeChannelIdConvertError"));
         return;
       }
 
@@ -271,7 +272,8 @@ export function SpaceSettingsForm({
       const result = await getOperatorTwitchBroadcasterId();
 
       if (result.error || !result.channelId) {
-        setTwitchIdError(result.error || t("twitchBroadcasterIdConvertError"));
+        // エラーキーを翻訳
+        setTwitchIdError(t(result.error || "twitchBroadcasterIdConvertError"));
         return;
       }
 

@@ -75,7 +75,7 @@ describe("getOperatorYouTubeChannelId", () => {
     const result = await getOperatorYouTubeChannelId();
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe("認証が必要です");
+    expect(result.error).toBe("errorAuthRequired");
     expect(result.channelId).toBeUndefined();
   });
 
@@ -101,7 +101,7 @@ describe("getOperatorYouTubeChannelId", () => {
     const result = await getOperatorYouTubeChannelId();
 
     expect(result.success).toBe(false);
-    expect(result.error).toContain("YouTubeアカウントが連携されていません");
+    expect(result.error).toBe("errorYoutubeNotLinked");
     expect(result.channelId).toBeUndefined();
   });
 
@@ -131,13 +131,11 @@ describe("getOperatorYouTubeChannelId", () => {
     const result = await getOperatorYouTubeChannelId();
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe(
-      "YouTubeチャンネルが見つかりませんでした。YouTubeアカウントにチャンネルがあることを確認してください。"
-    );
+    expect(result.error).toBe("errorYoutubeChannelNotFound");
     expect(result.channelId).toBeUndefined();
   });
 
-  it("トークンの有効期限切れエラーを日本語で返す", async () => {
+  it("トークンの有効期限切れエラーキーを返す", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     const { getOAuthToken } = await import("@/lib/oauth/token-storage");
     const { getUserYouTubeChannelId } = await import("@/lib/youtube");
@@ -157,20 +155,17 @@ describe("getOperatorYouTubeChannelId", () => {
       success: true,
     });
     vi.mocked(getUserYouTubeChannelId).mockResolvedValue({
-      error:
-        "Token has expired or is invalid. Please reconnect your YouTube account.",
+      error: "ERROR_YOUTUBE_TOKEN_EXPIRED",
     });
 
     const result = await getOperatorYouTubeChannelId();
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe(
-      "トークンの有効期限が切れているか無効です。YouTubeアカウントを再度連携してください。"
-    );
+    expect(result.error).toBe("errorYoutubeTokenExpired");
     expect(result.channelId).toBeUndefined();
   });
 
-  it("権限不足エラーを日本語で返す", async () => {
+  it("権限不足エラーキーを返す", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     const { getOAuthToken } = await import("@/lib/oauth/token-storage");
     const { getUserYouTubeChannelId } = await import("@/lib/youtube");
@@ -190,16 +185,13 @@ describe("getOperatorYouTubeChannelId", () => {
       success: true,
     });
     vi.mocked(getUserYouTubeChannelId).mockResolvedValue({
-      error:
-        "Insufficient permissions. Please ensure your YouTube account has the required permissions.",
+      error: "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS",
     });
 
     const result = await getOperatorYouTubeChannelId();
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe(
-      "権限が不足しています。YouTubeアカウントに必要な権限があることを確認してください。"
-    );
+    expect(result.error).toBe("errorYoutubeInsufficientPermissions");
     expect(result.channelId).toBeUndefined();
   });
 });
@@ -258,7 +250,7 @@ describe("getOperatorTwitchBroadcasterId", () => {
     const result = await getOperatorTwitchBroadcasterId();
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe("認証が必要です");
+    expect(result.error).toBe("errorAuthRequired");
     expect(result.channelId).toBeUndefined();
   });
 
@@ -284,7 +276,7 @@ describe("getOperatorTwitchBroadcasterId", () => {
     const result = await getOperatorTwitchBroadcasterId();
 
     expect(result.success).toBe(false);
-    expect(result.error).toContain("Twitchアカウントが連携されていません");
+    expect(result.error).toBe("errorTwitchNotLinked");
     expect(result.channelId).toBeUndefined();
   });
 

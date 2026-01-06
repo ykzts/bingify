@@ -99,9 +99,7 @@ describe("checkSubscriptionStatus", () => {
     );
 
     expect(result.isSubscribed).toBe(false);
-    expect(result.error).toBe(
-      "Token has expired or is invalid. Please reconnect your YouTube account."
-    );
+    expect(result.error).toBe("ERROR_YOUTUBE_TOKEN_EXPIRED");
   });
 
   it("ネットワークエラーを適切に処理する", async () => {
