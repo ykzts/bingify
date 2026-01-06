@@ -22,54 +22,80 @@ export function buildOAuthCallbackUrl(redirectPath?: string): string {
 }
 
 /**
- * Default OAuth scopes for Google authentication
- * Includes YouTube readonly access for space gatekeeper verification
- *
- * Note: The sensitive scope "youtube.channel-memberships.creator" is not
- * included because:
- * 1. It requires Google OAuth verification before production use
- * 2. The YouTube membership verification feature is not currently supported
- *    (the members.list endpoint requires channel owner credentials)
- *
- * If YouTube membership verification is implemented in the future using
- * a channel-owner flow, this scope should be added conditionally based on
- * system configuration and only after Google OAuth verification is complete.
+ * OAuth scope for YouTube subscription verification
  */
-export const GOOGLE_OAUTH_SCOPES =
+export const YOUTUBE_SUBSCRIPTION_SCOPE =
   "https://www.googleapis.com/auth/youtube.readonly";
 
 /**
- * Default OAuth scopes for Twitch authentication
- * Includes follower and subscription read access for space gatekeeper verification
+ * OAuth scope for YouTube membership verification
+ * Note: This requires channel owner credentials and Google OAuth verification before production use.
  */
-export const TWITCH_OAUTH_SCOPES = "user:read:follows user:read:subscriptions";
+export const YOUTUBE_MEMBERSHIP_SCOPE =
+  "https://www.googleapis.com/auth/youtube.channel-memberships.creator";
+
+/**
+ * OAuth scope for Twitch follower verification
+ */
+export const TWITCH_FOLLOWER_SCOPE = "user:read:follows";
+
+/**
+ * OAuth scope for Twitch subscription verification
+ */
+export const TWITCH_SUBSCRIPTION_SCOPE = "user:read:subscriptions";
 
 /**
  * Generates OAuth scopes for Google authentication based on system settings
+ * Only requests scopes for enabled features
  * @param settings - System settings containing feature flags
  * @returns OAuth scopes string or undefined if no scopes are needed
  */
 export function getGoogleOAuthScopes(
   settings: SystemSettings
 ): string | undefined {
+  const scopes: string[] = [];
+
+  // YouTube機能が有効な場合のみスコープを追加
   if (settings.features.gatekeeper.youtube.enabled) {
-    return GOOGLE_OAUTH_SCOPES;
+    // サブスクライバーチェックが有効な場合
+    if (settings.features.gatekeeper.youtube.subscriber.enabled) {
+      scopes.push(YOUTUBE_SUBSCRIPTION_SCOPE);
+    }
+
+    // メンバーシップチェックが有効な場合
+    if (settings.features.gatekeeper.youtube.member.enabled) {
+      scopes.push(YOUTUBE_MEMBERSHIP_SCOPE);
+    }
   }
-  return undefined;
+
+  return scopes.length > 0 ? scopes.join(" ") : undefined;
 }
 
 /**
  * Generates OAuth scopes for Twitch authentication based on system settings
+ * Only requests scopes for enabled features
  * @param settings - System settings containing feature flags
  * @returns OAuth scopes string or undefined if no scopes are needed
  */
 export function getTwitchOAuthScopes(
   settings: SystemSettings
 ): string | undefined {
+  const scopes: string[] = [];
+
+  // Twitch機能が有効な場合のみスコープを追加
   if (settings.features.gatekeeper.twitch.enabled) {
-    return TWITCH_OAUTH_SCOPES;
+    // フォロワーチェックが有効な場合
+    if (settings.features.gatekeeper.twitch.follower.enabled) {
+      scopes.push(TWITCH_FOLLOWER_SCOPE);
+    }
+
+    // サブスクライバーチェックが有効な場合
+    if (settings.features.gatekeeper.twitch.subscriber.enabled) {
+      scopes.push(TWITCH_SUBSCRIPTION_SCOPE);
+    }
   }
-  return undefined;
+
+  return scopes.length > 0 ? scopes.join(" ") : undefined;
 }
 
 /**
