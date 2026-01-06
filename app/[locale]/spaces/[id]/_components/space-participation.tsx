@@ -12,7 +12,11 @@ import {
 } from "@/lib/auth/oauth-utils";
 import { createClient } from "@/lib/supabase/client";
 import type { JoinSpaceState, SpaceInfo } from "../../_lib/actions";
-import { joinSpace, leaveSpace } from "../../_lib/actions";
+import {
+  checkOAuthTokenAvailability,
+  joinSpace,
+  leaveSpace,
+} from "../../_lib/actions";
 import {
   useParticipantInfo,
   useUserParticipation,
@@ -261,6 +265,42 @@ export function SpaceParticipation({
 
     setIsJoining(false);
   }, [spaceId, refetchJoined, refetchInfo, router, t]);
+
+  // Check for existing OAuth tokens in database on mount
+  useEffect(() => {
+    // Only check if user hasn't joined yet
+    if (hasJoined) {
+      return;
+    }
+
+    const checkExistingTokens = async () => {
+      // Check YouTube token if required
+      if (requiresYouTube && !hasYouTubeToken) {
+        const result = await checkOAuthTokenAvailability("google");
+        if (result.available) {
+          setHasYouTubeToken(true);
+          console.log("既存の有効なYouTubeトークンが見つかりました");
+        }
+      }
+
+      // Check Twitch token if required
+      if (requiresTwitch && !hasTwitchToken) {
+        const result = await checkOAuthTokenAvailability("twitch");
+        if (result.available) {
+          setHasTwitchToken(true);
+          console.log("既存の有効なTwitchトークンが見つかりました");
+        }
+      }
+    };
+
+    checkExistingTokens();
+  }, [
+    requiresYouTube,
+    requiresTwitch,
+    hasYouTubeToken,
+    hasTwitchToken,
+    hasJoined,
+  ]);
 
   // Check OAuth tokens when hasJoined changes
   useEffect(() => {

@@ -1,6 +1,10 @@
 "use server";
 
-import { getOAuthToken } from "@/lib/oauth/token-storage";
+import {
+  getOAuthToken,
+  isTokenExpired,
+  type OAuthProvider,
+} from "@/lib/oauth/token-storage";
 import { checkEmailAllowed } from "@/lib/schemas/space";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -16,6 +20,11 @@ export interface JoinSpaceState {
   success: boolean;
 }
 
+export interface OAuthTokenAvailability {
+  available: boolean;
+  error?: string;
+}
+
 export interface SpaceInfo {
   gatekeeper_rules: GatekeeperRules | null;
   id: string;
@@ -23,6 +32,67 @@ export interface SpaceInfo {
   owner_id: string | null;
   share_key: string;
   status: string | null;
+}
+
+/**
+ * 指定されたプロバイダーの有効なOAuthトークンが存在するかチェックする
+ *
+ * @param provider - OAuth プロバイダー ('google' または 'twitch')
+ * @returns トークンが利用可能かどうか
+ */
+export async function checkOAuthTokenAvailability(
+  provider: OAuthProvider
+): Promise<OAuthTokenAvailability> {
+  try {
+    const supabase = await createClient();
+
+    // ユーザー認証チェック
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        available: false,
+        error: "User not authenticated",
+      };
+    }
+
+    // トークンを取得
+    const tokenResult = await getOAuthToken(supabase, provider);
+
+    if (!tokenResult.success) {
+      return {
+        available: false,
+        error: tokenResult.error,
+      };
+    }
+
+    // トークンが存在しない場合
+    if (!tokenResult.access_token) {
+      return {
+        available: false,
+      };
+    }
+
+    // トークンの有効期限をチェック
+    if (isTokenExpired(tokenResult.expires_at)) {
+      return {
+        available: false,
+        error: "Token expired",
+      };
+    }
+
+    return {
+      available: true,
+    };
+  } catch (error) {
+    console.error("Error checking OAuth token availability:", error);
+    return {
+      available: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
 }
 
 export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
