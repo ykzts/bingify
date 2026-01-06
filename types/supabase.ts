@@ -452,6 +452,7 @@ export type Database = {
         Args: never
         Returns: {
           expires_at: string
+          lock_key: number
           provider: string
           refresh_token_secret_id: string
           user_id: string
@@ -474,6 +475,10 @@ export type Database = {
         }[]
       }
       is_space_expired: { Args: { space_created_at: string }; Returns: boolean }
+      release_oauth_token_lock: {
+        Args: { p_lock_key: number }
+        Returns: boolean
+      }
       upsert_oauth_token: {
         Args: {
           p_access_token: string
