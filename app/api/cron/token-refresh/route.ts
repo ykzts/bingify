@@ -1,12 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
+import { handleOAuthError } from "@/lib/oauth/token-error-handler";
 import {
   type RefreshTokenResponse,
   refreshGoogleToken,
   refreshTwitchToken,
 } from "@/lib/oauth/token-refresh";
-import { handleOAuthError } from "@/lib/oauth/token-error-handler";
-import { deleteOAuthToken } from "@/lib/oauth/token-storage";
 import type { Database } from "@/types/supabase";
 
 /**
@@ -227,7 +226,10 @@ export async function GET(request: NextRequest) {
 
         // エラーハンドリング：無効なトークンの場合は削除
         try {
-          const supabaseForUser = createClient<Database>(supabaseUrl, supabaseServiceKey);
+          const supabaseForUser = createClient<Database>(
+            supabaseUrl,
+            supabaseServiceKey
+          );
           const errorResult = await handleOAuthError(
             supabaseForUser,
             err,
