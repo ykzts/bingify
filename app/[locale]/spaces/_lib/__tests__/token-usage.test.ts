@@ -32,10 +32,10 @@ vi.mock("@/lib/youtube", () => ({
   checkSubscriptionStatus: vi.fn(),
 }));
 
+import { getOAuthToken } from "@/lib/oauth/token-storage";
 // テスト用にモック関数をインポート
 import { checkFollowStatus, checkSubStatus } from "@/lib/twitch";
 import { checkSubscriptionStatus } from "@/lib/youtube";
-import { getOAuthToken } from "@/lib/oauth/token-storage";
 import { joinSpace } from "../actions";
 
 describe("OAuth Token Usage in joinSpace", () => {
