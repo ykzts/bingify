@@ -116,14 +116,13 @@ export async function GET(request: NextRequest) {
 
     for (const token of tokens) {
       try {
-        // リフレッシュトークンを復号化（vault.decrypted_secrets view を使用）
-        const { data: secretData, error: secretError } = await supabase
-          .from("decrypted_secrets")
-          .select("decrypted_secret")
-          .eq("id", token.refresh_token_secret_id)
-          .single();
+        // リフレッシュトークンを復号化（RPC関数を使用）
+        const { data: decryptedSecret, error: secretError } =
+          await supabase.rpc("decrypt_secret", {
+            p_secret_id: token.refresh_token_secret_id,
+          });
 
-        if (secretError || !secretData?.decrypted_secret) {
+        if (secretError || !decryptedSecret) {
           throw new Error(
             secretError?.message || "Failed to decrypt refresh token"
           );
@@ -132,9 +131,9 @@ export async function GET(request: NextRequest) {
         // プロバイダーごとにリフレッシュ
         let newTokenData: RefreshTokenResponse;
         if (token.provider === "google") {
-          newTokenData = await refreshGoogleToken(secretData.decrypted_secret);
+          newTokenData = await refreshGoogleToken(decryptedSecret);
         } else if (token.provider === "twitch") {
-          newTokenData = await refreshTwitchToken(secretData.decrypted_secret);
+          newTokenData = await refreshTwitchToken(decryptedSecret);
         } else {
           throw new Error(`Unsupported provider: ${token.provider}`);
         }
@@ -150,8 +149,7 @@ export async function GET(request: NextRequest) {
             p_access_token: newTokenData.access_token,
             p_expires_at: expiresAt,
             p_provider: token.provider,
-            p_refresh_token:
-              newTokenData.refresh_token || secretData.decrypted_secret,
+            p_refresh_token: newTokenData.refresh_token || decryptedSecret,
             p_user_id: token.user_id,
           }
         );

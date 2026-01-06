@@ -78,16 +78,15 @@ describe("Token Refresh Cron Endpoint", () => {
           error: null,
         })
         .mockResolvedValueOnce({
+          // decrypt_secret
+          data: "refresh_token_value",
+          error: null,
+        })
+        .mockResolvedValueOnce({
           // upsert_oauth_token_for_user
           data: { success: true },
           error: null,
         }),
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
-        data: { decrypted_secret: "refresh_token_value" },
-        error: null,
-      }),
     };
 
     vi.mocked(createClient).mockReturnValue(mockSupabase as never);
@@ -123,16 +122,18 @@ describe("Token Refresh Cron Endpoint", () => {
 
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
-      rpc: vi.fn().mockResolvedValueOnce({
-        data: mockTokens,
-        error: null,
-      }),
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
-        data: { decrypted_secret: "refresh_token_value" },
-        error: null,
-      }),
+      rpc: vi
+        .fn()
+        .mockResolvedValueOnce({
+          // get_expired_oauth_tokens
+          data: mockTokens,
+          error: null,
+        })
+        .mockResolvedValueOnce({
+          // decrypt_secret
+          data: "refresh_token_value",
+          error: null,
+        }),
     };
 
     vi.mocked(createClient).mockReturnValue(mockSupabase as never);

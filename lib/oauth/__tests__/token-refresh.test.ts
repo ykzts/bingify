@@ -305,12 +305,12 @@ describe("Token Refresh", () => {
       } as Response);
 
       vi.mocked(tokenStorage.upsertOAuthToken).mockImplementationOnce(
-        async (_supabase, token) => {
+        (_supabase, token) => {
           // expires_at が null であることを確認
           expect(token.expires_at).toBeNull();
-          return {
+          return Promise.resolve({
             success: true,
-          };
+          });
         }
       );
 
