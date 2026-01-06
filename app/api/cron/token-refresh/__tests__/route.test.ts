@@ -174,7 +174,10 @@ describe("Token Refresh Cron Endpoint", () => {
   });
 
   it("CRON_SECRETが設定されていない場合（本番環境）にエラーを返す", async () => {
-    process.env.CRON_SECRET = undefined;
+    const originalSecret = process.env.CRON_SECRET;
+    const originalNodeEnv = process.env.NODE_ENV;
+    // biome-ignore lint/performance/noDelete: Required for testing undefined environment variables
+    delete process.env.CRON_SECRET;
     process.env.NODE_ENV = "production";
 
     const request = createMockRequest();
@@ -183,10 +186,21 @@ describe("Token Refresh Cron Endpoint", () => {
 
     expect(response.status).toBe(500);
     expect(data.error).toBe("Missing CRON_SECRET");
+
+    // 環境変数を復元
+    if (originalSecret) {
+      process.env.CRON_SECRET = originalSecret;
+    }
+    if (originalNodeEnv) {
+      process.env.NODE_ENV = originalNodeEnv;
+    }
   });
 
   it("CRON_SECRETが設定されていない場合（開発環境）に警告を出すが処理を続行する", async () => {
-    process.env.CRON_SECRET = undefined;
+    const originalSecret = process.env.CRON_SECRET;
+    const originalNodeEnv = process.env.NODE_ENV;
+    // biome-ignore lint/performance/noDelete: Required for testing undefined environment variables
+    delete process.env.CRON_SECRET;
     process.env.NODE_ENV = "development";
 
     const mockSupabase = {
@@ -205,10 +219,20 @@ describe("Token Refresh Cron Endpoint", () => {
 
     expect(response.status).toBe(200);
     expect(data.data.total).toBe(0);
+
+    // 環境変数を復元
+    if (originalSecret) {
+      process.env.CRON_SECRET = originalSecret;
+    }
+    if (originalNodeEnv) {
+      process.env.NODE_ENV = originalNodeEnv;
+    }
   });
 
   it("SUPABASE_URLが設定されていない場合にエラーを返す", async () => {
-    process.env.NEXT_PUBLIC_SUPABASE_URL = undefined;
+    const originalUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    // biome-ignore lint/performance/noDelete: Required for testing undefined environment variables
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
 
     const request = createMockRequest("Bearer test-cron-secret");
     const response = await GET(request);
@@ -216,10 +240,17 @@ describe("Token Refresh Cron Endpoint", () => {
 
     expect(response.status).toBe(500);
     expect(data.error).toBe("Missing NEXT_PUBLIC_SUPABASE_URL");
+
+    // 環境変数を復元
+    if (originalUrl) {
+      process.env.NEXT_PUBLIC_SUPABASE_URL = originalUrl;
+    }
   });
 
   it("SERVICE_ROLE_KEYが設定されていない場合にエラーを返す", async () => {
-    process.env.SUPABASE_SERVICE_ROLE_KEY = undefined;
+    const originalKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    // biome-ignore lint/performance/noDelete: Required for testing undefined environment variables
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     const request = createMockRequest("Bearer test-cron-secret");
     const response = await GET(request);
@@ -227,6 +258,11 @@ describe("Token Refresh Cron Endpoint", () => {
 
     expect(response.status).toBe(500);
     expect(data.error).toBe("Missing SUPABASE_SERVICE_ROLE_KEY");
+
+    // 環境変数を復元
+    if (originalKey) {
+      process.env.SUPABASE_SERVICE_ROLE_KEY = originalKey;
+    }
   });
 
   it("データベースエラー時にエラーを返す", async () => {

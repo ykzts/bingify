@@ -273,7 +273,9 @@ describe("Token Refresh", () => {
       const expiredTime = new Date(Date.now() - 10 * 60 * 1000).toISOString();
 
       // 環境変数をクリア
-      process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID = undefined;
+      const originalClientId = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
+      // biome-ignore lint/performance/noDelete: Required for testing undefined environment variables
+      delete process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
 
       vi.mocked(tokenStorage.getOAuthToken).mockResolvedValueOnce({
         access_token: "old_access_token",
@@ -287,6 +289,11 @@ describe("Token Refresh", () => {
 
       expect(result.refreshed).toBe(false);
       expect(result.error).toContain("credentials not configured");
+
+      // 環境変数を復元
+      if (originalClientId) {
+        process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID = originalClientId;
+      }
     });
 
     it("expires_inがない場合はexpiresAtをnullにする", async () => {
