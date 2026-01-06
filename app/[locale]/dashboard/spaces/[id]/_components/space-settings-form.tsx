@@ -511,6 +511,74 @@ export function SpaceSettingsForm({
     }
   }, [isCurrentRequirementDisabled]);
 
+  // 自動的に操作者のYouTubeチャンネルIDを取得（手動入力時の所有権チェック用）
+  useEffect(() => {
+    // YouTubeチャンネルIDが入力されているが、操作者のIDがまだ取得されていない場合
+    if (
+      enteredYoutubeChannelId &&
+      !operatorYoutubeChannelId &&
+      !fetchingOperatorYoutubeId &&
+      socialPlatform === "youtube" &&
+      gatekeeperMode === "social"
+    ) {
+      // バックグラウンドで操作者のIDを取得
+      const fetchOperatorId = async () => {
+        setFetchingOperatorYoutubeId(true);
+        try {
+          const result = await getOperatorYouTubeChannelId();
+          if (result.success && result.channelId) {
+            setOperatorYoutubeChannelId(result.channelId);
+          }
+        } catch (_error) {
+          // エラーは無視（所有権チェックができないだけ）
+        } finally {
+          setFetchingOperatorYoutubeId(false);
+        }
+      };
+      fetchOperatorId();
+    }
+  }, [
+    enteredYoutubeChannelId,
+    operatorYoutubeChannelId,
+    fetchingOperatorYoutubeId,
+    socialPlatform,
+    gatekeeperMode,
+  ]);
+
+  // 自動的に操作者のTwitchブロードキャスターIDを取得（手動入力時の所有権チェック用）
+  useEffect(() => {
+    // TwitchブロードキャスターIDが入力されているが、操作者のIDがまだ取得されていない場合
+    if (
+      enteredTwitchBroadcasterId &&
+      !operatorTwitchBroadcasterId &&
+      !fetchingOperatorTwitchId &&
+      socialPlatform === "twitch" &&
+      gatekeeperMode === "social"
+    ) {
+      // バックグラウンドで操作者のIDを取得
+      const fetchOperatorId = async () => {
+        setFetchingOperatorTwitchId(true);
+        try {
+          const result = await getOperatorTwitchBroadcasterId();
+          if (result.success && result.channelId) {
+            setOperatorTwitchBroadcasterId(result.channelId);
+          }
+        } catch (_error) {
+          // エラーは無視（所有権チェックができないだけ）
+        } finally {
+          setFetchingOperatorTwitchId(false);
+        }
+      };
+      fetchOperatorId();
+    }
+  }, [
+    enteredTwitchBroadcasterId,
+    operatorTwitchBroadcasterId,
+    fetchingOperatorTwitchId,
+    socialPlatform,
+    gatekeeperMode,
+  ]);
+
   // Calculate effective gatekeeper mode (fallback to "none" if current mode is not available)
   const effectiveGatekeeperMode =
     (gatekeeperMode === "social" && !showSocialOption) ||
