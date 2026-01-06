@@ -273,7 +273,8 @@ describe("Token Refresh", () => {
       const expiredTime = new Date(Date.now() - 10 * 60 * 1000).toISOString();
 
       // 環境変数をクリア
-      const originalClientId = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
+      const originalClientId =
+        process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
       // biome-ignore lint/performance/noDelete: Required for testing undefined environment variables
       delete process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
 

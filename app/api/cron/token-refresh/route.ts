@@ -1,6 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
-import type { RefreshTokenResponse } from "@/lib/oauth/token-refresh";
+import {
+  type RefreshTokenResponse,
+  refreshGoogleToken,
+  refreshTwitchToken,
+} from "@/lib/oauth/token-refresh";
 import type { Database } from "@/types/supabase";
 
 /**
@@ -11,86 +15,6 @@ interface RefreshSummary {
   refreshed: number;
   skipped: number;
   total: number;
-}
-
-/**
- * OAuth プロバイダーごとのトークンリフレッシュエンドポイント
- */
-const REFRESH_ENDPOINTS = {
-  google: "https://oauth2.googleapis.com/token",
-  twitch: "https://id.twitch.tv/oauth2/token",
-} as const;
-
-/**
- * Google OAuth のトークンをリフレッシュする
- */
-async function refreshGoogleToken(
-  refreshToken: string
-): Promise<RefreshTokenResponse> {
-  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET;
-
-  if (!(clientId && clientSecret)) {
-    throw new Error("Google OAuth credentials not configured");
-  }
-
-  const params = new URLSearchParams({
-    client_id: clientId,
-    client_secret: clientSecret,
-    grant_type: "refresh_token",
-    refresh_token: refreshToken,
-  });
-
-  const response = await fetch(REFRESH_ENDPOINTS.google, {
-    body: params.toString(),
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    method: "POST",
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`HTTP ${response.status}: ${errorText}`);
-  }
-
-  return response.json();
-}
-
-/**
- * Twitch OAuth のトークンをリフレッシュする
- */
-async function refreshTwitchToken(
-  refreshToken: string
-): Promise<RefreshTokenResponse> {
-  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
-  const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET;
-
-  if (!(clientId && clientSecret)) {
-    throw new Error("Twitch OAuth credentials not configured");
-  }
-
-  const params = new URLSearchParams({
-    client_id: clientId,
-    client_secret: clientSecret,
-    grant_type: "refresh_token",
-    refresh_token: refreshToken,
-  });
-
-  const response = await fetch(REFRESH_ENDPOINTS.twitch, {
-    body: params.toString(),
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    method: "POST",
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`HTTP ${response.status}: ${errorText}`);
-  }
-
-  return response.json();
 }
 
 /**
@@ -148,19 +72,9 @@ export async function GET(request: NextRequest) {
     const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey);
 
     // 期限切れ間近または期限切れのトークンを取得（RPC関数を使用）
-    const { data: tokens, error: fetchError } = (await supabase.rpc(
+    const { data: tokens, error: fetchError } = await supabase.rpc(
       "get_expired_oauth_tokens"
-    )) as {
-      data:
-        | Array<{
-            expires_at: string;
-            provider: string;
-            refresh_token_secret_id: string;
-            user_id: string;
-          }>
-        | null;
-      error: { message: string } | null;
-    };
+    );
 
     if (fetchError) {
       console.error("Error fetching tokens to refresh:", fetchError);
@@ -203,14 +117,11 @@ export async function GET(request: NextRequest) {
     for (const token of tokens) {
       try {
         // リフレッシュトークンを復号化（vault.decrypted_secrets view を使用）
-        const { data: secretData, error: secretError } = (await supabase
+        const { data: secretData, error: secretError } = await supabase
           .from("decrypted_secrets")
           .select("decrypted_secret")
           .eq("id", token.refresh_token_secret_id)
-          .single()) as {
-          data: { decrypted_secret: string } | null;
-          error: { message: string } | null;
-        };
+          .single();
 
         if (secretError || !secretData?.decrypted_secret) {
           throw new Error(
