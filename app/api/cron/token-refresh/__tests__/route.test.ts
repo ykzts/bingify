@@ -63,6 +63,7 @@ describe("Token Refresh Cron Endpoint", () => {
     const mockTokens = [
       {
         expires_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+        lock_key: 123_456_789,
         provider: "google",
         refresh_token_secret_id: "secret-1",
         user_id: "user-1",
@@ -89,6 +90,11 @@ describe("Token Refresh Cron Endpoint", () => {
         .mockResolvedValueOnce({
           // upsert_oauth_token_for_user
           data: { success: true },
+          error: null,
+        })
+        .mockResolvedValueOnce({
+          // release_oauth_token_lock
+          data: true,
           error: null,
         }),
     };
@@ -118,6 +124,7 @@ describe("Token Refresh Cron Endpoint", () => {
     const mockTokens = [
       {
         expires_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+        lock_key: 123_456_789,
         provider: "google",
         refresh_token_secret_id: "secret-1",
         user_id: "user-1",
@@ -139,6 +146,11 @@ describe("Token Refresh Cron Endpoint", () => {
             data: { refresh_token: "refresh_token_value" },
             success: true,
           },
+          error: null,
+        })
+        .mockResolvedValueOnce({
+          // release_oauth_token_lock
+          data: true,
           error: null,
         }),
     };

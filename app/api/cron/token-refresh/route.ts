@@ -219,6 +219,20 @@ export async function GET(request: NextRequest) {
           provider: token.provider,
           user_id: token.user_id,
         });
+      } finally {
+        // Release advisory lock after processing (success or failure)
+        if (token.lock_key) {
+          try {
+            await supabase.rpc("release_oauth_token_lock", {
+              p_lock_key: token.lock_key,
+            });
+          } catch (lockErr) {
+            console.error(
+              `Failed to release lock for user ${token.user_id} (${token.provider}):`,
+              lockErr
+            );
+          }
+        }
       }
     }
 
