@@ -1,7 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/supabase";
-import { getOAuthToken, isTokenExpired, upsertOAuthToken } from "./token-storage";
 import type { OAuthProvider } from "./token-storage";
+import {
+  getOAuthToken,
+  isTokenExpired,
+  upsertOAuthToken,
+} from "./token-storage";
 
 /**
  * OAuth プロバイダーごとのトークンリフレッシュエンドポイント
@@ -51,14 +55,14 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
  * @param retryConfig - リトライ設定
  * @returns 新しいアクセストークン情報
  */
-async function refreshGoogleToken(
+function refreshGoogleToken(
   refreshToken: string,
   retryConfig: RetryConfig = DEFAULT_RETRY_CONFIG
 ): Promise<RefreshTokenResponse> {
   const clientId = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
   const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET;
 
-  if (!clientId || !clientSecret) {
+  if (!(clientId && clientSecret)) {
     throw new Error("Google OAuth credentials not configured");
   }
 
@@ -86,17 +90,17 @@ async function refreshGoogleToken(
  * Twitch OAuth のトークンをリフレッシュする
  *
  * @param refreshToken - リフレッシュトークン
- * @param retryConfig - リトライ設定
+ * @retryConfig - リトライ設定
  * @returns 新しいアクセストークン情報
  */
-async function refreshTwitchToken(
+function refreshTwitchToken(
   refreshToken: string,
   retryConfig: RetryConfig = DEFAULT_RETRY_CONFIG
 ): Promise<RefreshTokenResponse> {
   const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
   const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET;
 
-  if (!clientId || !clientSecret) {
+  if (!(clientId && clientSecret)) {
     throw new Error("Twitch OAuth credentials not configured");
   }
 
@@ -128,6 +132,7 @@ async function refreshTwitchToken(
  * @param retryConfig - リトライ設定
  * @returns レスポンスデータ
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Retry logic requires checking multiple error conditions
 async function fetchWithRetry(
   url: string,
   options: RequestInit,
@@ -150,7 +155,8 @@ async function fetchWithRetry(
         let errorMessage = `HTTP ${response.status}`;
         try {
           const errorData = JSON.parse(errorText);
-          errorMessage = errorData.error_description || errorData.error || errorMessage;
+          errorMessage =
+            errorData.error_description || errorData.error || errorMessage;
         } catch {
           errorMessage = errorText || errorMessage;
         }

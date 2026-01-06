@@ -1,6 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
-import type { OAuthProvider } from "@/lib/oauth/token-storage";
 import type { RefreshTokenResponse } from "@/lib/oauth/token-refresh";
 import type { Database } from "@/types/supabase";
 
@@ -31,7 +30,7 @@ async function refreshGoogleToken(
   const clientId = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
   const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET;
 
-  if (!clientId || !clientSecret) {
+  if (!(clientId && clientSecret)) {
     throw new Error("Google OAuth credentials not configured");
   }
 
@@ -67,7 +66,7 @@ async function refreshTwitchToken(
   const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
   const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET;
 
-  if (!clientId || !clientSecret) {
+  if (!(clientId && clientSecret)) {
     throw new Error("Twitch OAuth credentials not configured");
   }
 
@@ -103,6 +102,7 @@ async function refreshTwitchToken(
  * @param request - Next.js リクエスト
  * @returns レスポンス
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Cron endpoint with multiple auth and error handling checks
 export async function GET(request: NextRequest) {
   try {
     // Cron シークレットで認証
@@ -145,19 +145,22 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey, {
-      db: { schema: "private" },
-    });
+    const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey);
 
-    // private.oauth_tokens テーブルから、期限切れ間近または期限切れのトークンを取得
-    // 注: expires_at が null の場合は期限なしとみなしスキップ
-    const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
-    const { data: tokens, error: fetchError } = await supabase
-      .from("oauth_tokens")
-      .select("user_id, provider, expires_at, refresh_token_secret_id")
-      .not("expires_at", "is", null)
-      .not("refresh_token_secret_id", "is", null)
-      .lt("expires_at", fiveMinutesFromNow.toISOString());
+    // 期限切れ間近または期限切れのトークンを取得（RPC関数を使用）
+    const { data: tokens, error: fetchError } = (await supabase.rpc(
+      "get_expired_oauth_tokens"
+    )) as {
+      data:
+        | Array<{
+            expires_at: string;
+            provider: string;
+            refresh_token_secret_id: string;
+            user_id: string;
+          }>
+        | null;
+      error: { message: string } | null;
+    };
 
     if (fetchError) {
       console.error("Error fetching tokens to refresh:", fetchError);
@@ -199,46 +202,58 @@ export async function GET(request: NextRequest) {
 
     for (const token of tokens) {
       try {
-        // リフレッシュトークンを復号化
-        const { data: refreshTokenData } = await supabase
+        // リフレッシュトークンを復号化（vault.decrypted_secrets view を使用）
+        const { data: secretData, error: secretError } = (await supabase
           .from("decrypted_secrets")
           .select("decrypted_secret")
           .eq("id", token.refresh_token_secret_id)
-          .single();
+          .single()) as {
+          data: { decrypted_secret: string } | null;
+          error: { message: string } | null;
+        };
 
-        if (!refreshTokenData?.decrypted_secret) {
-          throw new Error("Failed to decrypt refresh token");
+        if (secretError || !secretData?.decrypted_secret) {
+          throw new Error(
+            secretError?.message || "Failed to decrypt refresh token"
+          );
         }
 
         // プロバイダーごとにリフレッシュ
         let newTokenData: RefreshTokenResponse;
         if (token.provider === "google") {
-          newTokenData = await refreshGoogleToken(
-            refreshTokenData.decrypted_secret
-          );
+          newTokenData = await refreshGoogleToken(secretData.decrypted_secret);
         } else if (token.provider === "twitch") {
-          newTokenData = await refreshTwitchToken(
-            refreshTokenData.decrypted_secret
-          );
+          newTokenData = await refreshTwitchToken(secretData.decrypted_secret);
         } else {
           throw new Error(`Unsupported provider: ${token.provider}`);
         }
 
-        // 新しいトークンをVaultに保存し、レコードを更新
-        // RPC関数を使用
+        // 新しいトークンを保存（upsert_oauth_token_for_user RPC を使用）
         const expiresAt = newTokenData.expires_in
           ? new Date(Date.now() + newTokenData.expires_in * 1000).toISOString()
           : null;
 
-        const { error: updateError } = await supabase.rpc("upsert_oauth_token", {
-          p_access_token: newTokenData.access_token,
-          p_expires_at: expiresAt,
-          p_provider: token.provider,
-          p_refresh_token: newTokenData.refresh_token || refreshTokenData.decrypted_secret,
-        });
+        const { data: upsertResult, error: upsertError } = await supabase.rpc(
+          "upsert_oauth_token_for_user",
+          {
+            p_access_token: newTokenData.access_token,
+            p_expires_at: expiresAt,
+            p_provider: token.provider,
+            p_refresh_token:
+              newTokenData.refresh_token || secretData.decrypted_secret,
+            p_user_id: token.user_id,
+          }
+        );
 
-        if (updateError) {
-          throw updateError;
+        if (upsertError) {
+          throw new Error(
+            `Failed to save token: ${upsertError.message || "Unknown error"}`
+          );
+        }
+
+        // Check if upsert was successful
+        if (!upsertResult?.success) {
+          throw new Error(upsertResult?.error || "Failed to save token");
         }
 
         summary.refreshed++;

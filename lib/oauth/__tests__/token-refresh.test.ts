@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Database } from "@/types/supabase";
 import { refreshOAuthToken } from "../token-refresh";
+// biome-ignore lint/performance/noNamespaceImport: Used in test mocks for clarity
 import * as tokenStorage from "../token-storage";
 
 // モックSupabaseクライアントの作成
@@ -272,7 +273,7 @@ describe("Token Refresh", () => {
       const expiredTime = new Date(Date.now() - 10 * 60 * 1000).toISOString();
 
       // 環境変数をクリア
-      delete process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
+      process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID = undefined;
 
       vi.mocked(tokenStorage.getOAuthToken).mockResolvedValueOnce({
         access_token: "old_access_token",

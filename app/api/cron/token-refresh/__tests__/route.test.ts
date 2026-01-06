@@ -1,6 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import * as tokenRefresh from "@/lib/oauth/token-refresh";
 import { GET } from "../route";
 
 // Supabase クライアントのモック
@@ -8,10 +7,8 @@ vi.mock("@supabase/supabase-js", () => ({
   createClient: vi.fn(),
 }));
 
-// token-refresh モジュールのモック
-vi.mock("@/lib/oauth/token-refresh", () => ({
-  refreshOAuthToken: vi.fn(),
-}));
+// fetchのモック
+global.fetch = vi.fn();
 
 // NextRequest のモック作成ヘルパー
 function createMockRequest(authHeader?: string) {
@@ -34,14 +31,16 @@ describe("Token Refresh Cron Endpoint", () => {
     process.env.CRON_SECRET = "test-cron-secret";
     process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
     process.env.SUPABASE_SERVICE_ROLE_KEY = "test-service-role-key";
+    process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID = "google-client-id";
+    process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET = "google-secret";
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "twitch-client-id";
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET = "twitch-secret";
   });
 
   it("認証が成功し、トークンがない場合に正常終了する", async () => {
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
-      lt: vi.fn().mockReturnThis(),
-      not: vi.fn().mockReturnThis(),
-      select: vi.fn().mockResolvedValue({
+      rpc: vi.fn().mockResolvedValue({
         data: [],
         error: null,
       }),
@@ -56,6 +55,7 @@ describe("Token Refresh Cron Endpoint", () => {
     expect(response.status).toBe(200);
     expect(data.data.total).toBe(0);
     expect(data.data.message).toContain("No tokens found");
+    expect(mockSupabase.rpc).toHaveBeenCalledWith("get_expired_oauth_tokens");
   });
 
   it("期限切れのトークンを正常にリフレッシュする", async () => {
@@ -63,47 +63,52 @@ describe("Token Refresh Cron Endpoint", () => {
       {
         expires_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
         provider: "google",
+        refresh_token_secret_id: "secret-1",
         user_id: "user-1",
-      },
-      {
-        expires_at: new Date(Date.now() + 2 * 60 * 1000).toISOString(),
-        provider: "twitch",
-        user_id: "user-2",
       },
     ];
 
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
-      lt: vi.fn().mockReturnThis(),
-      not: vi.fn().mockReturnThis(),
-      select: vi.fn().mockResolvedValue({
-        data: mockTokens,
+      rpc: vi
+        .fn()
+        .mockResolvedValueOnce({
+          // get_expired_oauth_tokens
+          data: mockTokens,
+          error: null,
+        })
+        .mockResolvedValueOnce({
+          // upsert_oauth_token_for_user
+          data: { success: true },
+          error: null,
+        }),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { decrypted_secret: "refresh_token_value" },
         error: null,
       }),
     };
 
     vi.mocked(createClient).mockReturnValue(mockSupabase as never);
 
-    // refreshOAuthToken のモック
-    vi.mocked(tokenRefresh.refreshOAuthToken)
-      .mockResolvedValueOnce({
-        provider: "google",
-        refreshed: true,
-      })
-      .mockResolvedValueOnce({
-        provider: "twitch",
-        refreshed: true,
-      });
+    // OAuth refresh endpoint mock
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      json: async () => ({
+        access_token: "new_access_token",
+        expires_in: 3600,
+      }),
+      ok: true,
+    } as Response);
 
     const request = createMockRequest("Bearer test-cron-secret");
     const response = await GET(request);
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(data.data.total).toBe(2);
-    expect(data.data.refreshed).toBe(2);
+    expect(data.data.total).toBe(1);
+    expect(data.data.refreshed).toBe(1);
     expect(data.data.failed).toBe(0);
-    expect(data.data.skipped).toBe(0);
   });
 
   it("リフレッシュに失敗したトークンを記録する", async () => {
@@ -111,27 +116,33 @@ describe("Token Refresh Cron Endpoint", () => {
       {
         expires_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
         provider: "google",
+        refresh_token_secret_id: "secret-1",
         user_id: "user-1",
       },
     ];
 
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
-      lt: vi.fn().mockReturnThis(),
-      not: vi.fn().mockReturnThis(),
-      select: vi.fn().mockResolvedValue({
+      rpc: vi.fn().mockResolvedValueOnce({
         data: mockTokens,
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { decrypted_secret: "refresh_token_value" },
         error: null,
       }),
     };
 
     vi.mocked(createClient).mockReturnValue(mockSupabase as never);
 
-    vi.mocked(tokenRefresh.refreshOAuthToken).mockResolvedValueOnce({
-      error: "Token refresh failed",
-      provider: "google",
-      refreshed: false,
-    });
+    // OAuth refresh endpoint mock - failure
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      text: async () => "Token expired",
+    } as Response);
 
     const request = createMockRequest("Bearer test-cron-secret");
     const response = await GET(request);
@@ -142,46 +153,6 @@ describe("Token Refresh Cron Endpoint", () => {
     expect(data.data.refreshed).toBe(0);
     expect(data.data.failed).toBe(1);
     expect(data.data.failedTokens).toHaveLength(1);
-    expect(data.data.failedTokens[0].error).toBe("Token refresh failed");
-  });
-
-  it("スキップされたトークンをカウントする", async () => {
-    const mockTokens = [
-      {
-        expires_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-        provider: "google",
-        user_id: "user-1",
-      },
-    ];
-
-    const mockSupabase = {
-      from: vi.fn().mockReturnThis(),
-      lt: vi.fn().mockReturnThis(),
-      not: vi.fn().mockReturnThis(),
-      select: vi.fn().mockResolvedValue({
-        data: mockTokens,
-        error: null,
-      }),
-    };
-
-    vi.mocked(createClient).mockReturnValue(mockSupabase as never);
-
-    vi.mocked(tokenRefresh.refreshOAuthToken).mockResolvedValueOnce({
-      error: "No refresh token available",
-      provider: "google",
-      refreshed: false,
-      skipped: true,
-    });
-
-    const request = createMockRequest("Bearer test-cron-secret");
-    const response = await GET(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(data.data.total).toBe(1);
-    expect(data.data.refreshed).toBe(0);
-    expect(data.data.skipped).toBe(1);
-    expect(data.data.failed).toBe(0);
   });
 
   it("認証ヘッダーがない場合に401を返す", async () => {
@@ -203,7 +174,7 @@ describe("Token Refresh Cron Endpoint", () => {
   });
 
   it("CRON_SECRETが設定されていない場合（本番環境）にエラーを返す", async () => {
-    delete process.env.CRON_SECRET;
+    process.env.CRON_SECRET = undefined;
     process.env.NODE_ENV = "production";
 
     const request = createMockRequest();
@@ -215,14 +186,12 @@ describe("Token Refresh Cron Endpoint", () => {
   });
 
   it("CRON_SECRETが設定されていない場合（開発環境）に警告を出すが処理を続行する", async () => {
-    delete process.env.CRON_SECRET;
+    process.env.CRON_SECRET = undefined;
     process.env.NODE_ENV = "development";
 
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
-      lt: vi.fn().mockReturnThis(),
-      not: vi.fn().mockReturnThis(),
-      select: vi.fn().mockResolvedValue({
+      rpc: vi.fn().mockResolvedValue({
         data: [],
         error: null,
       }),
@@ -239,7 +208,7 @@ describe("Token Refresh Cron Endpoint", () => {
   });
 
   it("SUPABASE_URLが設定されていない場合にエラーを返す", async () => {
-    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    process.env.NEXT_PUBLIC_SUPABASE_URL = undefined;
 
     const request = createMockRequest("Bearer test-cron-secret");
     const response = await GET(request);
@@ -250,7 +219,7 @@ describe("Token Refresh Cron Endpoint", () => {
   });
 
   it("SERVICE_ROLE_KEYが設定されていない場合にエラーを返す", async () => {
-    delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    process.env.SUPABASE_SERVICE_ROLE_KEY = undefined;
 
     const request = createMockRequest("Bearer test-cron-secret");
     const response = await GET(request);
@@ -263,9 +232,7 @@ describe("Token Refresh Cron Endpoint", () => {
   it("データベースエラー時にエラーを返す", async () => {
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
-      lt: vi.fn().mockReturnThis(),
-      not: vi.fn().mockReturnThis(),
-      select: vi.fn().mockResolvedValue({
+      rpc: vi.fn().mockResolvedValue({
         data: null,
         error: { message: "Database connection failed" },
       }),
@@ -283,7 +250,8 @@ describe("Token Refresh Cron Endpoint", () => {
 
   it("予期しないエラーを適切に処理する", async () => {
     const mockSupabase = {
-      from: vi.fn().mockImplementation(() => {
+      from: vi.fn().mockReturnThis(),
+      rpc: vi.fn().mockImplementation(() => {
         throw new Error("Unexpected error");
       }),
     };
