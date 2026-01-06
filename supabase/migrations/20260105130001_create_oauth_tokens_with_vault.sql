@@ -101,6 +101,8 @@ DECLARE
   v_refresh_secret_id UUID;
   v_existing_access_id UUID;
   v_existing_refresh_id UUID;
+  v_created_access BOOLEAN := FALSE;
+  v_created_refresh BOOLEAN := FALSE;
 BEGIN
   -- Check authentication
   v_user_id := auth.uid();
@@ -118,9 +120,11 @@ BEGIN
   IF v_existing_access_id IS NOT NULL THEN
     -- Update existing secret
     SELECT vault.update_secret(v_existing_access_id, p_access_token) INTO v_access_secret_id;
+    v_created_access := FALSE;
   ELSE
     -- Create new secret
     SELECT vault.create_secret(p_access_token) INTO v_access_secret_id;
+    v_created_access := TRUE;
   END IF;
 
   -- Update or create refresh token secret if provided
@@ -128,9 +132,11 @@ BEGIN
     IF v_existing_refresh_id IS NOT NULL THEN
       -- Update existing secret
       SELECT vault.update_secret(v_existing_refresh_id, p_refresh_token) INTO v_refresh_secret_id;
+      v_created_refresh := FALSE;
     ELSE
       -- Create new secret
       SELECT vault.create_secret(p_refresh_token) INTO v_refresh_secret_id;
+      v_created_refresh := TRUE;
     END IF;
   ELSIF v_existing_refresh_id IS NOT NULL THEN
     -- Refresh token was removed, delete the old secret
@@ -151,12 +157,12 @@ BEGIN
   RETURN jsonb_build_object('success', true);
 EXCEPTION
   WHEN OTHERS THEN
-    -- If anything fails, try to clean up the newly created secrets
+    -- If anything fails, clean up only newly created secrets (not updated ones)
     BEGIN
-      IF v_access_secret_id IS NOT NULL THEN
+      IF v_created_access AND v_access_secret_id IS NOT NULL THEN
         DELETE FROM vault.secrets WHERE id = v_access_secret_id;
       END IF;
-      IF v_refresh_secret_id IS NOT NULL THEN
+      IF v_created_refresh AND v_refresh_secret_id IS NOT NULL THEN
         DELETE FROM vault.secrets WHERE id = v_refresh_secret_id;
       END IF;
     EXCEPTION
