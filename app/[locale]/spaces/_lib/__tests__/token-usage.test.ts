@@ -18,24 +18,45 @@ vi.mock("@/lib/supabase/server", () => ({
 // OAuth token storage のモック
 vi.mock("@/lib/oauth/token-storage", () => ({
   getOAuthToken: vi.fn(),
+  getOAuthTokenForUser: vi.fn(),
+}));
+
+// Supabase admin のモック
+vi.mock("@/lib/supabase/admin", () => ({
+  createAdminClient: vi.fn(),
 }));
 
 // Twitch API のモック
 vi.mock("@/lib/twitch", () => ({
   checkFollowStatus: vi.fn(),
+  checkFollowWithAdminToken: vi.fn(),
   checkSubStatus: vi.fn(),
+  checkSubWithAdminToken: vi.fn(),
 }));
 
 // YouTube API のモック
 vi.mock("@/lib/youtube", () => ({
   checkMembershipStatus: vi.fn(),
+  checkMembershipWithAdminToken: vi.fn(),
   checkSubscriptionStatus: vi.fn(),
+  checkSubscriptionWithAdminToken: vi.fn(),
 }));
 
-import { getOAuthToken } from "@/lib/oauth/token-storage";
+import {
+  getOAuthToken,
+  getOAuthTokenForUser,
+} from "@/lib/oauth/token-storage";
 // テスト用にモック関数をインポート
-import { checkFollowStatus, checkSubStatus } from "@/lib/twitch";
-import { checkSubscriptionStatus } from "@/lib/youtube";
+import {
+  checkFollowStatus,
+  checkFollowWithAdminToken,
+  checkSubStatus,
+  checkSubWithAdminToken,
+} from "@/lib/twitch";
+import {
+  checkSubscriptionStatus,
+  checkSubscriptionWithAdminToken,
+} from "@/lib/youtube";
 import { joinSpace } from "../actions";
 
 describe("OAuth Token Usage in joinSpace", () => {
@@ -44,7 +65,7 @@ describe("OAuth Token Usage in joinSpace", () => {
   });
 
   describe("YouTube トークン取得と使用", () => {
-    test("保存されたGoogleトークンを使用してYouTube登録を確認する", async () => {
+    test("参加者と管理者のトークンを使用してYouTube登録を確認する", async () => {
       const mockSpace = {
         created_at: new Date().toISOString(),
         gatekeeper_rules: {
@@ -54,6 +75,7 @@ describe("OAuth Token Usage in joinSpace", () => {
           },
         },
         id: "123e4567-e89b-12d3-a456-426614174000",
+        owner_id: "owner123",
         status: "active",
       };
 
@@ -102,30 +124,45 @@ describe("OAuth Token Usage in joinSpace", () => {
         return {};
       });
 
-      // データベースから保存されたトークンを取得する動作をモック
+      // 参加者のトークンを取得する動作をモック
       vi.mocked(getOAuthToken).mockResolvedValue({
-        access_token: "stored_google_token",
+        access_token: "participant_google_token",
         created_at: "2025-01-01T00:00:00Z",
         expires_at: "2025-12-31T00:00:00Z",
         provider: "google",
-        refresh_token: "stored_refresh_token",
+        refresh_token: "participant_refresh_token",
+        success: true,
+        updated_at: "2025-01-01T00:00:00Z",
+      });
+
+      // 管理者のトークンを取得する動作をモック
+      vi.mocked(getOAuthTokenForUser).mockResolvedValue({
+        access_token: "owner_google_token",
+        created_at: "2025-01-01T00:00:00Z",
+        expires_at: "2025-12-31T00:00:00Z",
+        provider: "google",
+        refresh_token: "owner_refresh_token",
         success: true,
         updated_at: "2025-01-01T00:00:00Z",
       });
 
       // YouTube API が成功を返すようにモック
-      vi.mocked(checkSubscriptionStatus).mockResolvedValue({
+      vi.mocked(checkSubscriptionWithAdminToken).mockResolvedValue({
         isSubscribed: true,
       });
 
       const result = await joinSpace("123e4567-e89b-12d3-a456-426614174000");
 
-      // getOAuthToken が正しく呼ばれたことを確認
+      // 参加者のトークンが取得されたことを確認
       expect(getOAuthToken).toHaveBeenCalledWith(mockSupabase, "google");
 
-      // 取得したトークンが YouTube API に渡されたことを確認
-      expect(checkSubscriptionStatus).toHaveBeenCalledWith(
-        "stored_google_token",
+      // 管理者のトークンが取得されたことを確認
+      expect(getOAuthTokenForUser).toHaveBeenCalledWith("owner123", "google");
+
+      // 両方のトークンが YouTube API に渡されたことを確認
+      expect(checkSubscriptionWithAdminToken).toHaveBeenCalledWith(
+        "participant_google_token",
+        "owner_google_token",
         "UCtest123"
       );
 
@@ -142,6 +179,7 @@ describe("OAuth Token Usage in joinSpace", () => {
           },
         },
         id: "123e4567-e89b-12d3-a456-426614174000",
+        owner_id: "owner123",
         status: "active",
       };
 
@@ -197,7 +235,7 @@ describe("OAuth Token Usage in joinSpace", () => {
   });
 
   describe("Twitch トークン取得と使用", () => {
-    test("保存されたTwitchトークンを使用してフォロー状態を確認する", async () => {
+    test("参加者と管理者のトークンを使用してフォロー状態を確認する", async () => {
       const mockSpace = {
         created_at: new Date().toISOString(),
         gatekeeper_rules: {
@@ -207,6 +245,7 @@ describe("OAuth Token Usage in joinSpace", () => {
           },
         },
         id: "123e4567-e89b-12d3-a456-426614174000",
+        owner_id: "owner123",
         status: "active",
       };
 
@@ -215,21 +254,6 @@ describe("OAuth Token Usage in joinSpace", () => {
           user: {
             email: "test@example.com",
             id: "user123",
-          },
-        },
-      });
-
-      mockSupabase.auth.getSession.mockResolvedValue({
-        data: {
-          session: {
-            user: {
-              identities: [
-                {
-                  id: "twitch_user_id",
-                  provider: "twitch",
-                },
-              ],
-            },
           },
         },
       });
@@ -269,9 +293,20 @@ describe("OAuth Token Usage in joinSpace", () => {
         return {};
       });
 
-      // データベースから保存されたトークンを取得する動作をモック
+      // 参加者のトークンを取得する動作をモック
       vi.mocked(getOAuthToken).mockResolvedValue({
-        access_token: "stored_twitch_token",
+        access_token: "participant_twitch_token",
+        created_at: "2025-01-01T00:00:00Z",
+        expires_at: "2025-12-31T00:00:00Z",
+        provider: "twitch",
+        refresh_token: null,
+        success: true,
+        updated_at: "2025-01-01T00:00:00Z",
+      });
+
+      // 管理者のトークンを取得する動作をモック
+      vi.mocked(getOAuthTokenForUser).mockResolvedValue({
+        access_token: "owner_twitch_token",
         created_at: "2025-01-01T00:00:00Z",
         expires_at: "2025-12-31T00:00:00Z",
         provider: "twitch",
@@ -281,19 +316,22 @@ describe("OAuth Token Usage in joinSpace", () => {
       });
 
       // Twitch API が成功を返すようにモック
-      vi.mocked(checkFollowStatus).mockResolvedValue({
+      vi.mocked(checkFollowWithAdminToken).mockResolvedValue({
         isFollowing: true,
       });
 
       const result = await joinSpace("123e4567-e89b-12d3-a456-426614174000");
 
-      // getOAuthToken が正しく呼ばれたことを確認
+      // 参加者のトークンが取得されたことを確認
       expect(getOAuthToken).toHaveBeenCalledWith(mockSupabase, "twitch");
 
-      // 取得したトークンが Twitch API に渡されたことを確認
-      expect(checkFollowStatus).toHaveBeenCalledWith(
-        "stored_twitch_token",
-        "twitch_user_id",
+      // 管理者のトークンが取得されたことを確認
+      expect(getOAuthTokenForUser).toHaveBeenCalledWith("owner123", "twitch");
+
+      // 両方のトークンが Twitch API に渡されたことを確認
+      expect(checkFollowWithAdminToken).toHaveBeenCalledWith(
+        "participant_twitch_token",
+        "owner_twitch_token",
         "12345"
       );
 
@@ -310,6 +348,7 @@ describe("OAuth Token Usage in joinSpace", () => {
           },
         },
         id: "123e4567-e89b-12d3-a456-426614174000",
+        owner_id: "owner123",
         status: "active",
       };
 
@@ -378,7 +417,7 @@ describe("OAuth Token Usage in joinSpace", () => {
       expect(checkFollowStatus).not.toHaveBeenCalled();
     });
 
-    test("保存されたTwitchトークンを使用してサブスクリプション状態を確認する", async () => {
+    test("参加者と管理者のトークンを使用してサブスクリプション状態を確認する", async () => {
       const mockSpace = {
         created_at: new Date().toISOString(),
         gatekeeper_rules: {
@@ -388,6 +427,7 @@ describe("OAuth Token Usage in joinSpace", () => {
           },
         },
         id: "123e4567-e89b-12d3-a456-426614174000",
+        owner_id: "owner123",
         status: "active",
       };
 
@@ -396,21 +436,6 @@ describe("OAuth Token Usage in joinSpace", () => {
           user: {
             email: "test@example.com",
             id: "user123",
-          },
-        },
-      });
-
-      mockSupabase.auth.getSession.mockResolvedValue({
-        data: {
-          session: {
-            user: {
-              identities: [
-                {
-                  id: "twitch_user_id",
-                  provider: "twitch",
-                },
-              ],
-            },
           },
         },
       });
@@ -450,9 +475,20 @@ describe("OAuth Token Usage in joinSpace", () => {
         return {};
       });
 
-      // データベースから保存されたトークンを取得する動作をモック
+      // 参加者のトークンを取得する動作をモック
       vi.mocked(getOAuthToken).mockResolvedValue({
-        access_token: "stored_twitch_token",
+        access_token: "participant_twitch_token",
+        created_at: "2025-01-01T00:00:00Z",
+        expires_at: "2025-12-31T00:00:00Z",
+        provider: "twitch",
+        refresh_token: null,
+        success: true,
+        updated_at: "2025-01-01T00:00:00Z",
+      });
+
+      // 管理者のトークンを取得する動作をモック
+      vi.mocked(getOAuthTokenForUser).mockResolvedValue({
+        access_token: "owner_twitch_token",
         created_at: "2025-01-01T00:00:00Z",
         expires_at: "2025-12-31T00:00:00Z",
         provider: "twitch",
@@ -462,19 +498,22 @@ describe("OAuth Token Usage in joinSpace", () => {
       });
 
       // Twitch API が成功を返すようにモック
-      vi.mocked(checkSubStatus).mockResolvedValue({
+      vi.mocked(checkSubWithAdminToken).mockResolvedValue({
         isSubscribed: true,
       });
 
       const result = await joinSpace("123e4567-e89b-12d3-a456-426614174000");
 
-      // getOAuthToken が正しく呼ばれたことを確認
+      // 参加者のトークンが取得されたことを確認
       expect(getOAuthToken).toHaveBeenCalledWith(mockSupabase, "twitch");
 
-      // 取得したトークンが Twitch API に渡されたことを確認
-      expect(checkSubStatus).toHaveBeenCalledWith(
-        "stored_twitch_token",
-        "twitch_user_id",
+      // 管理者のトークンが取得されたことを確認
+      expect(getOAuthTokenForUser).toHaveBeenCalledWith("owner123", "twitch");
+
+      // 両方のトークンが Twitch API に渡されたことを確認
+      expect(checkSubWithAdminToken).toHaveBeenCalledWith(
+        "participant_twitch_token",
+        "owner_twitch_token",
         "12345"
       );
 
@@ -493,6 +532,7 @@ describe("OAuth Token Usage in joinSpace", () => {
           },
         },
         id: "123e4567-e89b-12d3-a456-426614174000",
+        owner_id: "owner123",
         status: "active",
       };
 
@@ -555,6 +595,7 @@ describe("OAuth Token Usage in joinSpace", () => {
           },
         },
         id: "123e4567-e89b-12d3-a456-426614174000",
+        owner_id: "owner123",
         status: "active",
       };
 

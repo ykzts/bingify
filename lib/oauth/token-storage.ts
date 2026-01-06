@@ -190,3 +190,51 @@ export function isTokenExpired(expiresAt: string | null | undefined): boolean {
     return false;
   }
 }
+
+/**
+ * 指定したユーザーのOAuth トークンを取得する（管理者権限）
+ * スペース所有者のトークンを取得する際に使用
+ *
+ * @param userId - 取得対象のユーザーID
+ * @param provider - OAuth プロバイダー名
+ * @returns トークン情報
+ */
+export async function getOAuthTokenForUser(
+  userId: string,
+  provider: OAuthProvider
+): Promise<GetTokenResult> {
+  try {
+    // 管理者クライアントを使用してトークンを取得
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const adminClient = createAdminClient();
+
+    const { data, error } = await adminClient.rpc("get_oauth_token_for_user", {
+      p_provider: provider,
+      p_user_id: userId,
+    });
+
+    if (error) {
+      console.error("Error getting OAuth token for user:", error);
+      return {
+        error: error.message,
+        success: false,
+      };
+    }
+
+    if (!data || typeof data !== "object") {
+      return {
+        error: "Invalid response from database",
+        success: false,
+      };
+    }
+
+    const result = data as unknown as GetTokenResult;
+    return result;
+  } catch (err) {
+    console.error("Exception getting OAuth token for user:", err);
+    return {
+      error: err instanceof Error ? err.message : "Unknown error",
+      success: false,
+    };
+  }
+}
