@@ -102,7 +102,7 @@ function parseYouTubeInput(input: string): {
  */
 function getYouTubeErrorCode(error: unknown): string {
   if (!error || typeof error !== "object") {
-    return "Unknown error";
+    return "ERROR_YOUTUBE_UNKNOWN";
   }
 
   // 構造化されたステータスコードチェック
@@ -136,7 +136,7 @@ function getYouTubeErrorCode(error: unknown): string {
     return error.message;
   }
 
-  return "Unknown error";
+  return "ERROR_YOUTUBE_UNKNOWN";
 }
 
 /**

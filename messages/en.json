@@ -482,6 +482,7 @@
     "errorYoutubeInsufficientPermissions": "Insufficient permissions. Please ensure your YouTube account has the required permissions.",
     "errorYoutubeChannelNotFound": "YouTube channel not found. Please ensure your YouTube account has a channel.",
     "errorYoutubeNotLinked": "YouTube account is not linked. Please link your YouTube account in account settings.",
+    "errorYoutubeUnknown": "An unknown error occurred. Please try again.",
     "errorTwitchNotLinked": "Twitch account is not linked. Please link your Twitch account in account settings.",
     "errorAuthRequired": "Authentication required",
     "errorTwitchTokenExpired": "Token has expired or is invalid. Please reconnect your Twitch account.",

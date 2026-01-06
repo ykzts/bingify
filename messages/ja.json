@@ -482,6 +482,7 @@
     "errorYoutubeInsufficientPermissions": "権限が不足しています。YouTubeアカウントに必要な権限があることを確認してください。",
     "errorYoutubeChannelNotFound": "YouTubeチャンネルが見つかりませんでした。YouTubeアカウントにチャンネルがあることを確認してください。",
     "errorYoutubeNotLinked": "YouTubeアカウントが連携されていません。アカウント設定からYouTubeアカウントを連携してください。",
+    "errorYoutubeUnknown": "不明なエラーが発生しました。もう一度お試しください。",
     "errorTwitchNotLinked": "Twitchアカウントが連携されていません。アカウント設定からTwitchアカウントを連携してください。",
     "errorAuthRequired": "認証が必要です",
     "errorTwitchTokenExpired": "トークンの有効期限が切れているか無効です。Twitchアカウントを再度連携してください。",

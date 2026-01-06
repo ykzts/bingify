@@ -58,6 +58,8 @@ export async function getOperatorYouTubeChannelId(): Promise<UserChannelResult> 
         channelResult.error === "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS"
       ) {
         errorKey = "errorYoutubeInsufficientPermissions";
+      } else if (channelResult.error === "ERROR_YOUTUBE_UNKNOWN") {
+        errorKey = "errorYoutubeUnknown";
       } else if (channelResult.error === "No channel found for this user") {
         errorKey = "errorYoutubeChannelNotFound";
       }
