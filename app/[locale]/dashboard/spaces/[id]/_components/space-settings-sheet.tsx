@@ -76,6 +76,7 @@ export function SpaceSettingsSheet({
           <SpaceSettingsForm
             currentParticipantCount={currentParticipantCount}
             features={features}
+            isOwner={isOwner}
             locale={locale}
             onSuccess={handleSuccess}
             space={space}
