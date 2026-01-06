@@ -1,0 +1,205 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/supabase";
+import type { OAuthProvider } from "./token-storage";
+import {
+  getOAuthToken,
+  isTokenExpired,
+  upsertOAuthToken,
+} from "./token-storage";
+
+/**
+ * リフレッシュトークンレスポンス
+ */
+export interface RefreshTokenResponse {
+  access_token: string;
+  expires_in?: number;
+  refresh_token?: string;
+  token_type?: string;
+}
+
+/**
+ * トークンリフレッシュ結果
+ */
+export interface RefreshResult {
+  error?: string;
+  provider: OAuthProvider;
+  refreshed: boolean;
+  skipped?: boolean;
+}
+
+/**
+ * Google OAuth のトークンをリフレッシュする
+ *
+ * google-auth-library を使用することも検討しましたが、
+ * テストの複雑さと一貫性のため、fetch APIを直接使用しています。
+ *
+ * @param refreshToken - リフレッシュトークン
+ * @returns 新しいアクセストークン情報
+ */
+export async function refreshGoogleToken(
+  refreshToken: string
+): Promise<RefreshTokenResponse> {
+  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET;
+
+  if (!(clientId && clientSecret)) {
+    throw new Error("Google OAuth credentials not configured");
+  }
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    client_secret: clientSecret,
+    grant_type: "refresh_token",
+    refresh_token: refreshToken,
+  });
+
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    body: params.toString(),
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      `Failed to refresh Google token: ${response.status} ${errorText}`
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * Twitch OAuth のトークンをリフレッシュする
+ *
+ * @param refreshToken - リフレッシュトークン
+ * @returns 新しいアクセストークン情報
+ */
+export async function refreshTwitchToken(
+  refreshToken: string
+): Promise<RefreshTokenResponse> {
+  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
+  const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET;
+
+  if (!(clientId && clientSecret)) {
+    throw new Error("Twitch OAuth credentials not configured");
+  }
+
+  // Use direct fetch API for token refresh
+  // @twurple/auth's RefreshingAuthProvider is designed for long-lived providers,
+  // not one-off token refresh operations
+  const response = await fetch("https://id.twitch.tv/oauth2/token", {
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+    }).toString(),
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      `Failed to refresh Twitch token: ${response.status} ${errorText}`
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * 単一ユーザーのトークンをリフレッシュする
+ *
+ * @param supabase - Supabase クライアント
+ * @param provider - OAuth プロバイダー
+ * @returns リフレッシュ結果
+ */
+export async function refreshOAuthToken(
+  supabase: SupabaseClient<Database>,
+  provider: OAuthProvider
+): Promise<RefreshResult> {
+  try {
+    // 現在のトークンを取得
+    const tokenResult = await getOAuthToken(supabase, provider);
+
+    if (!tokenResult.success) {
+      return {
+        error: tokenResult.error || "Failed to get token",
+        provider,
+        refreshed: false,
+      };
+    }
+
+    // トークンが期限切れかチェック
+    if (!isTokenExpired(tokenResult.expires_at)) {
+      return {
+        provider,
+        refreshed: false,
+        skipped: true,
+      };
+    }
+
+    // リフレッシュトークンがない場合はスキップ
+    if (!tokenResult.refresh_token) {
+      return {
+        error: "No refresh token available",
+        provider,
+        refreshed: false,
+        skipped: true,
+      };
+    }
+
+    // プロバイダーごとにリフレッシュ
+    let newTokenData: RefreshTokenResponse;
+    if (provider === "google") {
+      newTokenData = await refreshGoogleToken(tokenResult.refresh_token);
+    } else if (provider === "twitch") {
+      newTokenData = await refreshTwitchToken(tokenResult.refresh_token);
+    } else {
+      return {
+        error: `Unsupported provider: ${provider}`,
+        provider,
+        refreshed: false,
+      };
+    }
+
+    // 新しいトークンを保存
+    const expiresAt = newTokenData.expires_in
+      ? new Date(Date.now() + newTokenData.expires_in * 1000).toISOString()
+      : null;
+
+    const upsertResult = await upsertOAuthToken(supabase, {
+      access_token: newTokenData.access_token,
+      expires_at: expiresAt,
+      provider,
+      // 新しいリフレッシュトークンが返された場合は更新、なければ既存を保持
+      refresh_token: newTokenData.refresh_token || tokenResult.refresh_token,
+    });
+
+    if (!upsertResult.success) {
+      return {
+        error: upsertResult.error || "Failed to save refreshed token",
+        provider,
+        refreshed: false,
+      };
+    }
+
+    return {
+      provider,
+      refreshed: true,
+    };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    return {
+      error: errorMessage,
+      provider,
+      refreshed: false,
+    };
+  }
+}

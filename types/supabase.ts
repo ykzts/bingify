@@ -448,7 +448,21 @@ export type Database = {
         }[]
       }
       delete_oauth_token: { Args: { p_provider: string }; Returns: Json }
+      get_expired_oauth_tokens: {
+        Args: never
+        Returns: {
+          expires_at: string
+          lock_key: number
+          provider: string
+          refresh_token_secret_id: string
+          user_id: string
+        }[]
+      }
       get_oauth_token: { Args: { p_provider: string }; Returns: Json }
+      get_oauth_token_for_user: {
+        Args: { p_provider: string; p_user_id: string }
+        Returns: Json
+      }
       get_system_settings: {
         Args: never
         Returns: {
@@ -461,12 +475,26 @@ export type Database = {
         }[]
       }
       is_space_expired: { Args: { space_created_at: string }; Returns: boolean }
+      release_oauth_token_lock: {
+        Args: { p_lock_key: number }
+        Returns: boolean
+      }
       upsert_oauth_token: {
         Args: {
           p_access_token: string
           p_expires_at?: string
           p_provider: string
           p_refresh_token?: string
+        }
+        Returns: Json
+      }
+      upsert_oauth_token_for_user: {
+        Args: {
+          p_access_token: string
+          p_expires_at?: string
+          p_provider: string
+          p_refresh_token?: string
+          p_user_id: string
         }
         Returns: Json
       }
