@@ -176,7 +176,7 @@ export function DisplaySettingsDialog({
           <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
-        <Tabs className="w-full" defaultValue="url">
+        <Tabs aria-label={t("heading")} className="w-full" defaultValue="url">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="url">
               <ExternalLink className="h-4 w-4" />
