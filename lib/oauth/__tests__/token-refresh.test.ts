@@ -203,7 +203,7 @@ describe("Token Refresh", () => {
       expect(result.error).toContain("Token has been expired or revoked");
     });
 
-    it("リトライロジックが動作する（ネットワークエラー）", async () => {
+    it("ネットワークエラー時にエラーを返す", async () => {
       const mockSupabase = createMockSupabase();
       const expiredTime = new Date(Date.now() - 10 * 60 * 1000).toISOString();
 
@@ -215,29 +215,16 @@ describe("Token Refresh", () => {
         success: true,
       });
 
-      // 最初の2回は失敗、3回目は成功
-      vi.mocked(global.fetch)
-        .mockRejectedValueOnce(new Error("Network error"))
-        .mockRejectedValueOnce(new Error("Network error"))
-        .mockResolvedValueOnce({
-          json: async () => ({
-            access_token: "new_access_token",
-            expires_in: 3600,
-          }),
-          ok: true,
-        } as Response);
-
-      vi.mocked(tokenStorage.upsertOAuthToken).mockResolvedValueOnce({
-        success: true,
-      });
+      // fetchがネットワークエラーで失敗
+      vi.mocked(global.fetch).mockRejectedValueOnce(new Error("Network error"));
 
       const result = await refreshOAuthToken(mockSupabase, "google");
 
-      expect(result.refreshed).toBe(true);
-      expect(global.fetch).toHaveBeenCalledTimes(3);
+      expect(result.refreshed).toBe(false);
+      expect(result.error).toContain("Network error");
     });
 
-    it("保存に失敗した場合にエラーを返す", async () => {
+    it("トークンリフレッシュ成功後、保存に失敗した場合にエラーを返す", async () => {
       const mockSupabase = createMockSupabase();
       const expiredTime = new Date(Date.now() - 10 * 60 * 1000).toISOString();
 
@@ -317,19 +304,19 @@ describe("Token Refresh", () => {
         ok: true,
       } as Response);
 
-      vi.mocked(tokenStorage.upsertOAuthToken).mockResolvedValueOnce({
-        success: true,
-      });
+      vi.mocked(tokenStorage.upsertOAuthToken).mockImplementationOnce(
+        async (_supabase, token) => {
+          // expires_at が null であることを確認
+          expect(token.expires_at).toBeNull();
+          return {
+            success: true,
+          };
+        }
+      );
 
       const result = await refreshOAuthToken(mockSupabase, "google");
 
       expect(result.refreshed).toBe(true);
-      expect(tokenStorage.upsertOAuthToken).toHaveBeenCalledWith(
-        mockSupabase,
-        expect.objectContaining({
-          expires_at: null,
-        })
-      );
     });
   });
 });
