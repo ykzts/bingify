@@ -361,6 +361,13 @@
     "titleSpace": "Sign in to Join Space",
     "twitchButton": "Sign in with Twitch"
   },
+  "OAuth": {
+    "errorInsufficientPermissions": "Insufficient OAuth permissions. Please reconnect your account with the required permissions.",
+    "errorNetworkError": "Network error occurred while verifying your account. Please try again.",
+    "errorTokenDeleted": "Your OAuth token has been deleted due to invalid credentials. Please reconnect your account.",
+    "errorTokenExpired": "Your OAuth token has expired or been revoked. Please reconnect your account.",
+    "errorUnknown": "An unexpected error occurred during OAuth verification. Please try again."
+  },
   "Metadata": {
     "description": "Experience a new kind of bingo that brings everyone together in real-time. Sign in with OAuth and get started easily.",
     "ogSpaceSubtitle": "Join this bingo space",

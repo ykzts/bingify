@@ -1,6 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Database } from "@/types/supabase";
+// biome-ignore lint/performance/noNamespaceImport: Used in test mocks for clarity
+import * as errorHandler from "../token-error-handler";
 import { refreshOAuthToken } from "../token-refresh";
 // biome-ignore lint/performance/noNamespaceImport: Used in test mocks for clarity
 import * as tokenStorage from "../token-storage";
@@ -22,6 +24,15 @@ vi.mock("../token-storage", async () => {
   };
 });
 
+// token-error-handler モジュールのモック
+vi.mock("../token-error-handler", async () => {
+  const actual = await vi.importActual("../token-error-handler");
+  return {
+    ...actual,
+    handleOAuthError: vi.fn(),
+  };
+});
+
 // グローバルfetchのモック
 global.fetch = vi.fn();
 
@@ -33,6 +44,15 @@ describe("Token Refresh", () => {
     process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET = "google-client-secret";
     process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "twitch-client-id";
     process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET = "twitch-client-secret";
+
+    // handleOAuthError のデフォルトモック
+    vi.mocked(errorHandler.handleOAuthError).mockResolvedValue({
+      errorType: errorHandler.OAuthErrorType.UNKNOWN,
+      message: "Error",
+      provider: "google",
+      requiresReauth: false,
+      tokenDeleted: false,
+    });
   });
 
   describe("refreshOAuthToken", () => {
@@ -197,10 +217,26 @@ describe("Token Refresh", () => {
           }),
       } as Response);
 
+      // エラーハンドラーがトークンを削除する場合
+      vi.mocked(errorHandler.handleOAuthError).mockResolvedValueOnce({
+        errorType: errorHandler.OAuthErrorType.TOKEN_INVALID,
+        message: "Token has been expired or revoked",
+        provider: "google",
+        requiresReauth: true,
+        tokenDeleted: true,
+      });
+
       const result = await refreshOAuthToken(mockSupabase, "google");
 
       expect(result.refreshed).toBe(false);
       expect(result.error).toContain("Token has been expired or revoked");
+      expect(result.tokenDeleted).toBe(true);
+      expect(errorHandler.handleOAuthError).toHaveBeenCalledWith(
+        mockSupabase,
+        expect.any(Error),
+        "google",
+        "token refresh"
+      );
     });
 
     it("ネットワークエラー時にエラーを返す", async () => {
@@ -218,10 +254,20 @@ describe("Token Refresh", () => {
       // fetchがネットワークエラーで失敗
       vi.mocked(global.fetch).mockRejectedValueOnce(new Error("Network error"));
 
+      // エラーハンドラーがネットワークエラーを分類
+      vi.mocked(errorHandler.handleOAuthError).mockResolvedValueOnce({
+        errorType: errorHandler.OAuthErrorType.NETWORK_ERROR,
+        message: "Network error",
+        provider: "google",
+        requiresReauth: false,
+        tokenDeleted: false,
+      });
+
       const result = await refreshOAuthToken(mockSupabase, "google");
 
       expect(result.refreshed).toBe(false);
       expect(result.error).toContain("Network error");
+      expect(result.tokenDeleted).toBe(false);
     });
 
     it("トークンリフレッシュ成功後、保存に失敗した場合にエラーを返す", async () => {
