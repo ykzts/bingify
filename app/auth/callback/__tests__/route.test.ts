@@ -6,6 +6,12 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(),
 }));
 
+// Mock the OAuth token storage
+vi.mock("@/lib/oauth/token-storage", () => ({
+  upsertOAuthToken: vi.fn(),
+}));
+
+import { upsertOAuthToken } from "@/lib/oauth/token-storage";
 // Import after mocks
 import { createClient } from "@/lib/supabase/server";
 import { GET } from "../route";
@@ -105,6 +111,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -125,6 +135,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -145,6 +159,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -161,6 +179,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -181,6 +203,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -231,6 +257,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -254,6 +284,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -277,6 +311,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -300,6 +338,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -323,6 +365,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -346,6 +392,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -371,6 +421,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -396,6 +450,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -419,6 +477,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -442,6 +504,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -465,6 +531,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -488,6 +558,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -511,6 +585,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -536,6 +614,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -559,6 +641,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -582,6 +668,10 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: null,
+        }),
       },
     } as any);
 
@@ -598,5 +688,241 @@ describe("Auth Callback Route", () => {
 
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe(`${origin}/`);
+  });
+
+  describe("OAuth Token Storage", () => {
+    it("OAuthトークンが利用可能な場合保存する", async () => {
+      const mockUpsertOAuthToken = vi.mocked(upsertOAuthToken);
+      mockUpsertOAuthToken.mockResolvedValue({ success: true });
+
+      const mockCreateClient = vi.mocked(createClient);
+      const mockSupabase = {
+        auth: {
+          exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+          getSession: vi.fn().mockResolvedValue({
+            data: {
+              session: {
+                user: {
+                  id: "user-123",
+                  app_metadata: { provider: "google" },
+                },
+                provider_token: "mock-access-token",
+                provider_refresh_token: "mock-refresh-token",
+                expires_at: 1_234_567_890,
+              },
+            },
+            error: null,
+          }),
+        },
+      };
+      mockCreateClient.mockResolvedValue(mockSupabase as any);
+
+      const request = new NextRequest(
+        `${origin}/auth/callback?code=valid_code`,
+        {
+          headers: {
+            referer: `${origin}/login`,
+          },
+        }
+      );
+
+      const response = await GET(request);
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toBe(`${origin}/`);
+      expect(mockUpsertOAuthToken).toHaveBeenCalledWith(mockSupabase, {
+        provider: "google",
+        access_token: "mock-access-token",
+        refresh_token: "mock-refresh-token",
+        expires_at: expect.any(String),
+      });
+    });
+
+    it("provider_tokenが欠落している場合トークン保存をスキップする", async () => {
+      const mockUpsertOAuthToken = vi.mocked(upsertOAuthToken);
+      mockUpsertOAuthToken.mockClear();
+
+      const mockCreateClient = vi.mocked(createClient);
+      const mockSupabase = {
+        auth: {
+          exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+          getSession: vi.fn().mockResolvedValue({
+            data: {
+              session: {
+                user: {
+                  id: "user-123",
+                  app_metadata: { provider: "google" },
+                },
+                provider_token: null,
+                provider_refresh_token: null,
+                expires_at: 1_234_567_890,
+              },
+            },
+            error: null,
+          }),
+        },
+      };
+      mockCreateClient.mockResolvedValue(mockSupabase as any);
+
+      const request = new NextRequest(
+        `${origin}/auth/callback?code=valid_code`,
+        {
+          headers: {
+            referer: `${origin}/login`,
+          },
+        }
+      );
+
+      const response = await GET(request);
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toBe(`${origin}/`);
+      expect(mockUpsertOAuthToken).not.toHaveBeenCalled();
+    });
+
+    it("サポートされていないプロバイダーの場合トークン保存をスキップする", async () => {
+      const mockUpsertOAuthToken = vi.mocked(upsertOAuthToken);
+      mockUpsertOAuthToken.mockClear();
+
+      const mockCreateClient = vi.mocked(createClient);
+      const mockSupabase = {
+        auth: {
+          exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+          getSession: vi.fn().mockResolvedValue({
+            data: {
+              session: {
+                user: {
+                  id: "user-123",
+                  app_metadata: { provider: "github" },
+                },
+                provider_token: "mock-access-token",
+                provider_refresh_token: "mock-refresh-token",
+                expires_at: 1_234_567_890,
+              },
+            },
+            error: null,
+          }),
+        },
+      };
+      mockCreateClient.mockResolvedValue(mockSupabase as any);
+
+      const request = new NextRequest(
+        `${origin}/auth/callback?code=valid_code`,
+        {
+          headers: {
+            referer: `${origin}/login`,
+          },
+        }
+      );
+
+      const response = await GET(request);
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toBe(`${origin}/`);
+      expect(mockUpsertOAuthToken).not.toHaveBeenCalled();
+    });
+
+    it("トークン保存が失敗しても認証フローを継続する", async () => {
+      const mockUpsertOAuthToken = vi.mocked(upsertOAuthToken);
+      mockUpsertOAuthToken.mockResolvedValue({
+        success: false,
+        error: "Database error",
+      });
+
+      const consoleWarnSpy = vi
+        .spyOn(console, "warn")
+        // biome-ignore lint/suspicious/noEmptyBlockStatements: Mock implementation intentionally does nothing
+        .mockImplementation(() => {});
+
+      const mockCreateClient = vi.mocked(createClient);
+      const mockSupabase = {
+        auth: {
+          exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+          getSession: vi.fn().mockResolvedValue({
+            data: {
+              session: {
+                user: {
+                  id: "user-123",
+                  app_metadata: { provider: "twitch" },
+                },
+                provider_token: "mock-access-token",
+                provider_refresh_token: "mock-refresh-token",
+                expires_at: 1_234_567_890,
+              },
+            },
+            error: null,
+          }),
+        },
+      };
+      mockCreateClient.mockResolvedValue(mockSupabase as any);
+
+      const request = new NextRequest(
+        `${origin}/auth/callback?code=valid_code`,
+        {
+          headers: {
+            referer: `${origin}/login`,
+          },
+        }
+      );
+
+      const response = await GET(request);
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toBe(`${origin}/`);
+      expect(mockUpsertOAuthToken).toHaveBeenCalled();
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to store OAuth token"),
+        "Database error"
+      );
+
+      consoleWarnSpy.mockRestore();
+    });
+
+    it("refresh_tokenなしでもトークンを保存できる", async () => {
+      const mockUpsertOAuthToken = vi.mocked(upsertOAuthToken);
+      mockUpsertOAuthToken.mockResolvedValue({ success: true });
+
+      const mockCreateClient = vi.mocked(createClient);
+      const mockSupabase = {
+        auth: {
+          exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+          getSession: vi.fn().mockResolvedValue({
+            data: {
+              session: {
+                user: {
+                  id: "user-123",
+                  app_metadata: { provider: "google" },
+                },
+                provider_token: "mock-access-token",
+                provider_refresh_token: null,
+                expires_at: 1_234_567_890,
+              },
+            },
+            error: null,
+          }),
+        },
+      };
+      mockCreateClient.mockResolvedValue(mockSupabase as any);
+
+      const request = new NextRequest(
+        `${origin}/auth/callback?code=valid_code`,
+        {
+          headers: {
+            referer: `${origin}/login`,
+          },
+        }
+      );
+
+      const response = await GET(request);
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toBe(`${origin}/`);
+      expect(mockUpsertOAuthToken).toHaveBeenCalledWith(mockSupabase, {
+        provider: "google",
+        access_token: "mock-access-token",
+        refresh_token: null,
+        expires_at: expect.any(String),
+      });
+    });
   });
 });

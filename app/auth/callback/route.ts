@@ -1,6 +1,8 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { routing } from "@/i18n/routing";
+import { isValidOAuthProvider } from "@/lib/oauth/provider-validation";
+import { upsertOAuthToken } from "@/lib/oauth/token-storage";
 import { createClient } from "@/lib/supabase/server";
 
 const LOCALE_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/`);
@@ -205,6 +207,44 @@ export async function GET(request: NextRequest) {
     const locale = getLocaleFromReferer();
     const loginPath = buildPath("/login?error=auth_failed", locale);
     return NextResponse.redirect(`${origin}${loginPath}`);
+  }
+
+  // Get session to extract provider tokens
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (session) {
+    // Save OAuth tokens to database if available
+    const { provider_token, provider_refresh_token } = session;
+    const providerValue = session.user?.app_metadata?.provider;
+
+    // Validate provider is a supported OAuth provider
+    if (provider_token && isValidOAuthProvider(providerValue)) {
+      // Calculate token expiry if available from session
+      // Use session.expires_at which represents when the OAuth session expires
+      let expiresAt: string | null = null;
+      if (session.expires_at) {
+        // session.expires_at is a Unix timestamp (seconds)
+        expiresAt = new Date(session.expires_at * 1000).toISOString();
+      }
+
+      // Store token in encrypted database
+      const result = await upsertOAuthToken(supabase, {
+        provider: providerValue,
+        access_token: provider_token,
+        refresh_token: provider_refresh_token || null,
+        expires_at: expiresAt,
+      });
+
+      if (!result.success) {
+        console.warn(
+          `Failed to store OAuth token for provider ${providerValue}:`,
+          result.error
+        );
+        // Continue anyway - token storage failure shouldn't block authentication
+      }
+    }
   }
 
   // Successfully authenticated, redirect to specified path or default
