@@ -78,8 +78,11 @@ describe("Token Refresh Cron Endpoint", () => {
           error: null,
         })
         .mockResolvedValueOnce({
-          // decrypt_secret
-          data: "refresh_token_value",
+          // get_oauth_token_for_user
+          data: {
+            data: { refresh_token: "refresh_token_value" },
+            success: true,
+          },
           error: null,
         })
         .mockResolvedValueOnce({
@@ -130,8 +133,11 @@ describe("Token Refresh Cron Endpoint", () => {
           error: null,
         })
         .mockResolvedValueOnce({
-          // decrypt_secret
-          data: "refresh_token_value",
+          // get_oauth_token_for_user
+          data: {
+            data: { refresh_token: "refresh_token_value" },
+            success: true,
+          },
           error: null,
         }),
     };

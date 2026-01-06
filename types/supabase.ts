@@ -458,6 +458,10 @@ export type Database = {
         }[]
       }
       get_oauth_token: { Args: { p_provider: string }; Returns: Json }
+      get_oauth_token_for_user: {
+        Args: { p_provider: string; p_user_id: string }
+        Returns: Json
+      }
       get_system_settings: {
         Args: never
         Returns: {

@@ -148,3 +148,68 @@ GRANT EXECUTE ON FUNCTION public.upsert_oauth_token_for_user(UUID, TEXT, TEXT, T
 -- Add comment for documentation
 COMMENT ON FUNCTION public.upsert_oauth_token_for_user(UUID, TEXT, TEXT, TEXT, TIMESTAMPTZ) IS 'Upserts an OAuth token for a specific user. Only callable by service_role for cron jobs.';
 
+-- Create service_role-specific RPC function to get OAuth token for any user
+-- This version accepts user_id as a parameter instead of using auth.uid()
+CREATE OR REPLACE FUNCTION public.get_oauth_token_for_user(
+  p_user_id UUID,
+  p_provider TEXT
+) RETURNS JSONB
+SECURITY DEFINER
+SET search_path = public, private, vault, pg_temp
+AS $$
+DECLARE
+  v_token_record RECORD;
+  v_access_token TEXT;
+  v_refresh_token TEXT;
+BEGIN
+  -- Only allow service_role to call this function
+  IF current_setting('role', true) != 'service_role' THEN
+    RETURN jsonb_build_object('success', false, 'error', 'Access denied: only service_role can call this function');
+  END IF;
+
+  -- Validate user_id
+  IF p_user_id IS NULL THEN
+    RETURN jsonb_build_object('success', false, 'error', 'user_id is required');
+  END IF;
+
+  -- Get token record
+  SELECT * INTO v_token_record
+  FROM private.oauth_tokens
+  WHERE user_id = p_user_id AND provider = p_provider;
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('success', false, 'error', 'Token not found');
+  END IF;
+
+  -- Decrypt tokens from Vault
+  SELECT decrypted_secret INTO v_access_token
+  FROM vault.decrypted_secrets
+  WHERE id = v_token_record.access_token_secret_id;
+
+  IF v_token_record.refresh_token_secret_id IS NOT NULL THEN
+    SELECT decrypted_secret INTO v_refresh_token
+    FROM vault.decrypted_secrets
+    WHERE id = v_token_record.refresh_token_secret_id;
+  END IF;
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'data', jsonb_build_object(
+      'provider', v_token_record.provider,
+      'access_token', v_access_token,
+      'refresh_token', v_refresh_token,
+      'expires_at', v_token_record.expires_at
+    )
+  );
+EXCEPTION
+  WHEN OTHERS THEN
+    RETURN jsonb_build_object('success', false, 'error', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Grant execute permission to service_role only
+GRANT EXECUTE ON FUNCTION public.get_oauth_token_for_user(UUID, TEXT) TO service_role;
+
+-- Add comment for documentation
+COMMENT ON FUNCTION public.get_oauth_token_for_user(UUID, TEXT) IS 'Gets an OAuth token for a specific user with decrypted secrets. Only callable by service_role for cron jobs.';
+

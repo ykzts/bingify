@@ -116,24 +116,38 @@ export async function GET(request: NextRequest) {
 
     for (const token of tokens) {
       try {
-        // リフレッシュトークンを復号化（RPC関数を使用）
-        const { data: decryptedSecret, error: secretError } =
-          await supabase.rpc("decrypt_secret", {
-            p_secret_id: token.refresh_token_secret_id,
-          });
+        // Get OAuth token with decrypted refresh token
+        const { data: tokenData, error: tokenError } = await supabase.rpc(
+          "get_oauth_token_for_user",
+          {
+            p_provider: token.provider,
+            p_user_id: token.user_id,
+          }
+        );
 
-        if (secretError || !decryptedSecret) {
+        if (tokenError || !tokenData?.success) {
           throw new Error(
-            secretError?.message || "Failed to decrypt refresh token"
+            tokenError?.message ||
+              tokenData?.error ||
+              "Failed to get OAuth token"
           );
+        }
+
+        const refreshToken = tokenData.data.refresh_token;
+        if (!refreshToken) {
+          console.log(
+            `Skipping token refresh for user ${token.user_id} (${token.provider}): no refresh token`
+          );
+          summary.skipped++;
+          continue;
         }
 
         // プロバイダーごとにリフレッシュ
         let newTokenData: RefreshTokenResponse;
         if (token.provider === "google") {
-          newTokenData = await refreshGoogleToken(decryptedSecret);
+          newTokenData = await refreshGoogleToken(refreshToken);
         } else if (token.provider === "twitch") {
-          newTokenData = await refreshTwitchToken(decryptedSecret);
+          newTokenData = await refreshTwitchToken(refreshToken);
         } else {
           throw new Error(`Unsupported provider: ${token.provider}`);
         }
@@ -149,7 +163,7 @@ export async function GET(request: NextRequest) {
             p_access_token: newTokenData.access_token,
             p_expires_at: expiresAt,
             p_provider: token.provider,
-            p_refresh_token: newTokenData.refresh_token || decryptedSecret,
+            p_refresh_token: newTokenData.refresh_token || refreshToken,
             p_user_id: token.user_id,
           }
         );
