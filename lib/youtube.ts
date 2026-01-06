@@ -98,6 +98,48 @@ function parseYouTubeInput(input: string): {
 }
 
 /**
+ * エラーからYouTubeのエラーコードを取得するヘルパー関数
+ */
+function getYouTubeErrorCode(error: unknown): string {
+  if (!error || typeof error !== "object") {
+    return "Unknown error";
+  }
+
+  // 構造化されたステータスコードチェック
+  const errorObj = error as {
+    status?: number;
+    response?: { status?: number };
+    code?: number;
+  };
+  const status = errorObj.status || errorObj.response?.status || errorObj.code;
+
+  if (status === 401) {
+    return "ERROR_YOUTUBE_TOKEN_EXPIRED";
+  }
+  if (status === 403) {
+    return "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS";
+  }
+
+  // フォールバック: メッセージベースのチェック
+  if (error instanceof Error) {
+    const errorMessage = error.message.toLowerCase();
+    if (
+      errorMessage.includes("401") ||
+      errorMessage.includes("unauthorized") ||
+      errorMessage.includes("invalid credentials")
+    ) {
+      return "ERROR_YOUTUBE_TOKEN_EXPIRED";
+    }
+    if (errorMessage.includes("403") || errorMessage.includes("forbidden")) {
+      return "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS";
+    }
+    return error.message;
+  }
+
+  return "Unknown error";
+}
+
+/**
  * 参加者のYouTubeチャンネルIDを取得する
  * 参加者自身のアクセストークンを使用してチャンネルIDを取得
  *
@@ -135,55 +177,9 @@ export async function getUserYouTubeChannelId(
       error: "No channel found for this user",
     };
   } catch (error) {
-    // 構造化されたステータスコードチェックを使用
-    if (error && typeof error === "object") {
-      // GaxiosErrorの場合、statusまたはresponse.statusを確認
-      const errorObj = error as {
-        status?: number;
-        response?: { status?: number };
-        code?: number;
-      };
-      const status =
-        errorObj.status || errorObj.response?.status || errorObj.code;
-
-      if (status === 401) {
-        return {
-          error: "ERROR_YOUTUBE_TOKEN_EXPIRED",
-        };
-      }
-      if (status === 403) {
-        return {
-          error: "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS",
-        };
-      }
-
-      // ステータスが取得できない場合のフォールバック
-      if (error instanceof Error) {
-        const errorMessage = error.message.toLowerCase();
-        if (
-          errorMessage.includes("401") ||
-          errorMessage.includes("unauthorized") ||
-          errorMessage.includes("invalid credentials")
-        ) {
-          return {
-            error: "ERROR_YOUTUBE_TOKEN_EXPIRED",
-          };
-        }
-        if (
-          errorMessage.includes("403") ||
-          errorMessage.includes("forbidden")
-        ) {
-          return {
-            error: "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS",
-          };
-        }
-        return {
-          error: error.message,
-        };
-      }
-    }
+    const errorCode = getYouTubeErrorCode(error);
     return {
-      error: "Unknown error",
+      error: errorCode,
     };
   }
 }
@@ -218,60 +214,9 @@ export async function checkSubscriptionStatus(
       isSubscribed,
     };
   } catch (error) {
-    // 構造化されたステータスコードチェックを使用
-    if (error && typeof error === "object") {
-      // GaxiosErrorの場合、statusまたはresponse.statusを確認
-      const errorObj = error as {
-        status?: number;
-        response?: { status?: number };
-        code?: number;
-      };
-      const status =
-        errorObj.status || errorObj.response?.status || errorObj.code;
-
-      if (status === 401) {
-        return {
-          error: "ERROR_YOUTUBE_TOKEN_EXPIRED",
-          isSubscribed: false,
-        };
-      }
-      if (status === 403) {
-        return {
-          error: "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS",
-          isSubscribed: false,
-        };
-      }
-
-      // ステータスが取得できない場合のフォールバック
-      if (error instanceof Error) {
-        const errorMessage = error.message.toLowerCase();
-        if (
-          errorMessage.includes("401") ||
-          errorMessage.includes("unauthorized") ||
-          errorMessage.includes("invalid credentials")
-        ) {
-          return {
-            error: "ERROR_YOUTUBE_TOKEN_EXPIRED",
-            isSubscribed: false,
-          };
-        }
-        if (
-          errorMessage.includes("403") ||
-          errorMessage.includes("forbidden")
-        ) {
-          return {
-            error: "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS",
-            isSubscribed: false,
-          };
-        }
-        return {
-          error: error.message,
-          isSubscribed: false,
-        };
-      }
-    }
+    const errorCode = getYouTubeErrorCode(error);
     return {
-      error: "Unknown error",
+      error: errorCode,
       isSubscribed: false,
     };
   }
