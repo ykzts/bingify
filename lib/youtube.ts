@@ -135,27 +135,52 @@ export async function getUserYouTubeChannelId(
       error: "No channel found for this user",
     };
   } catch (error) {
-    // 401 Unauthorizedエラーの場合はトークンの有効期限切れを示唆
-    if (error instanceof Error) {
-      const errorMessage = error.message.toLowerCase();
-      if (
-        errorMessage.includes("401") ||
-        errorMessage.includes("unauthorized") ||
-        errorMessage.includes("invalid credentials")
-      ) {
+    // 構造化されたステータスコードチェックを使用
+    if (error && typeof error === "object") {
+      // GaxiosErrorの場合、statusまたはresponse.statusを確認
+      const errorObj = error as {
+        status?: number;
+        response?: { status?: number };
+        code?: number;
+      };
+      const status =
+        errorObj.status || errorObj.response?.status || errorObj.code;
+
+      if (status === 401) {
         return {
           error: "ERROR_YOUTUBE_TOKEN_EXPIRED",
         };
       }
-      // 403エラーの場合は権限不足
-      if (errorMessage.includes("403") || errorMessage.includes("forbidden")) {
+      if (status === 403) {
         return {
           error: "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS",
         };
       }
-      return {
-        error: error.message,
-      };
+
+      // ステータスが取得できない場合のフォールバック
+      if (error instanceof Error) {
+        const errorMessage = error.message.toLowerCase();
+        if (
+          errorMessage.includes("401") ||
+          errorMessage.includes("unauthorized") ||
+          errorMessage.includes("invalid credentials")
+        ) {
+          return {
+            error: "ERROR_YOUTUBE_TOKEN_EXPIRED",
+          };
+        }
+        if (
+          errorMessage.includes("403") ||
+          errorMessage.includes("forbidden")
+        ) {
+          return {
+            error: "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS",
+          };
+        }
+        return {
+          error: error.message,
+        };
+      }
     }
     return {
       error: "Unknown error",
@@ -193,30 +218,57 @@ export async function checkSubscriptionStatus(
       isSubscribed,
     };
   } catch (error) {
-    // 401 Unauthorizedエラーの場合はトークンの有効期限切れを示唆
-    if (error instanceof Error) {
-      const errorMessage = error.message.toLowerCase();
-      if (
-        errorMessage.includes("401") ||
-        errorMessage.includes("unauthorized") ||
-        errorMessage.includes("invalid credentials")
-      ) {
+    // 構造化されたステータスコードチェックを使用
+    if (error && typeof error === "object") {
+      // GaxiosErrorの場合、statusまたはresponse.statusを確認
+      const errorObj = error as {
+        status?: number;
+        response?: { status?: number };
+        code?: number;
+      };
+      const status =
+        errorObj.status || errorObj.response?.status || errorObj.code;
+
+      if (status === 401) {
         return {
           error: "ERROR_YOUTUBE_TOKEN_EXPIRED",
           isSubscribed: false,
         };
       }
-      // 403エラーの場合は権限不足
-      if (errorMessage.includes("403") || errorMessage.includes("forbidden")) {
+      if (status === 403) {
         return {
           error: "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS",
           isSubscribed: false,
         };
       }
-      return {
-        error: error.message,
-        isSubscribed: false,
-      };
+
+      // ステータスが取得できない場合のフォールバック
+      if (error instanceof Error) {
+        const errorMessage = error.message.toLowerCase();
+        if (
+          errorMessage.includes("401") ||
+          errorMessage.includes("unauthorized") ||
+          errorMessage.includes("invalid credentials")
+        ) {
+          return {
+            error: "ERROR_YOUTUBE_TOKEN_EXPIRED",
+            isSubscribed: false,
+          };
+        }
+        if (
+          errorMessage.includes("403") ||
+          errorMessage.includes("forbidden")
+        ) {
+          return {
+            error: "ERROR_YOUTUBE_INSUFFICIENT_PERMISSIONS",
+            isSubscribed: false,
+          };
+        }
+        return {
+          error: error.message,
+          isSubscribed: false,
+        };
+      }
     }
     return {
       error: "Unknown error",

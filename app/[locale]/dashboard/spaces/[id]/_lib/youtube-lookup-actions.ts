@@ -32,7 +32,7 @@ export async function lookupYouTubeChannelId(
     const errorTranslations: Record<string, string> = {
       "Input is required": "入力値が空です",
       "YouTube API key or OAuth token is not provided":
-        "YouTube APIキーが設定されていません",
+        "YouTube APIキーまたはOAuthトークンが設定されていません",
       "Invalid input format. Please provide a channel ID, handle (@username), or YouTube URL":
         "入力形式が不正です。チャンネルID、ハンドル（@username）、またはYouTube URLを入力してください",
     };
