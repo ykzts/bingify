@@ -199,10 +199,16 @@ export function DisplaySettingsDialog({
                   readOnly
                   value={viewingUrl}
                 />
-                <Button onClick={handleCopyUrl} size="icon" type="button">
+                <Button
+                  aria-label={t("copyUrlButton")}
+                  onClick={handleCopyUrl}
+                  size="icon"
+                  type="button"
+                >
                   <Copy className="h-4 w-4" />
                 </Button>
                 <Button
+                  aria-label={t("openUrlButton")}
                   onClick={handleOpenUrl}
                   size="icon"
                   type="button"

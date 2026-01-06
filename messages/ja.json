@@ -396,6 +396,7 @@
   "DisplaySettings": {
     "backgroundDescription": "スクリーン背景色を変更します。配信用に透過やクロマキー(緑/青)オプションが利用可能です。",
     "backgroundLabel": "背景",
+    "copyUrlButton": "URLをコピー",
     "copyUrlError": "URLのコピーに失敗しました",
     "copyUrlSuccess": "URLをクリップボードにコピーしました",
     "description": "表示用URLの管理とスクリーン表示設定を行います。",
@@ -405,6 +406,7 @@
     "heading": "表示設定",
     "localeDescription": "スクリーン表示の言語を選択します。",
     "localeLabel": "言語",
+    "openUrlButton": "新しいウィンドウで開く",
     "previewButton": "プレビュー",
     "regenerateConfirm": "古いURLは無効になります。続行してもよろしいですか？",
     "regenerateError": "URLの再生成に失敗しました",
