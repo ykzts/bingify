@@ -132,6 +132,13 @@ export function LoginForm({ providers }: Props) {
 
     const { error } = await supabase.auth.signInWithOAuth({
       options: {
+        queryParams:
+          typedProvider === "google"
+            ? {
+                access_type: "offline",
+                prompt: "consent",
+              }
+            : undefined,
         redirectTo: buildOAuthCallbackUrl(redirect ?? undefined),
         scopes: config.scopes,
       },
