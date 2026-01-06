@@ -4,7 +4,7 @@
 BEGIN;
 
 -- テストプランの設定
-SELECT plan(22);
+SELECT plan(23);
 
 -- ========================================
 -- private スキーマとテーブルの存在確認
@@ -90,6 +90,15 @@ SELECT fk_ok(
 SELECT col_is_unique(
   'private', 'oauth_tokens', ARRAY['user_id', 'provider'],
   'oauth_tokens テーブルは (user_id, provider) の組み合わせで UNIQUE 制約があること'
+);
+
+-- ========================================
+-- インデックスの検証
+-- ========================================
+
+SELECT has_index(
+  'private', 'oauth_tokens', 'idx_oauth_tokens_user_id',
+  'oauth_tokens テーブルに user_id インデックスが存在すること (RLS パフォーマンス最適化)'
 );
 
 -- テスト終了

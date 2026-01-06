@@ -23,6 +23,10 @@ CREATE TABLE IF NOT EXISTS private.oauth_tokens (
   UNIQUE (user_id, provider)
 );
 
+-- Create indexes for RLS and RPC performance optimization
+-- Index on user_id for efficient auth.uid() comparisons in RLS policies
+CREATE INDEX IF NOT EXISTS idx_oauth_tokens_user_id ON private.oauth_tokens(user_id);
+
 -- Enable Row Level Security
 ALTER TABLE private.oauth_tokens ENABLE ROW LEVEL SECURITY;
 
@@ -61,6 +65,25 @@ EXECUTE FUNCTION private.update_oauth_tokens_updated_at();
 
 -- Grant table permissions (RLS policies control actual access)
 GRANT SELECT, INSERT, UPDATE, DELETE ON private.oauth_tokens TO authenticated, service_role;
+
+-- ============================================================================
+-- SECURITY NOTE: Disabling PostgreSQL Statement Logging
+-- ============================================================================
+-- The RPC functions below handle plaintext OAuth tokens before encrypting them
+-- with Vault. To prevent these tokens from being logged in PostgreSQL logs,
+-- you MUST disable statement logging at the database role level.
+--
+-- Steps to secure your Supabase project:
+-- 1. Go to Supabase Dashboard → Project Settings → Database
+-- 2. Add this configuration to your database settings:
+--    ALTER ROLE postgres SET log_statement TO 'none';
+--    ALTER ROLE authenticator SET log_statement TO 'none';
+-- 3. Perform a "Fast database reboot" from the Dashboard to apply changes
+-- 4. Verify with: SHOW log_statement; (should return 'none')
+--
+-- Without this setting, plaintext tokens may be recorded in database logs,
+-- defeating the purpose of Vault encryption.
+-- ============================================================================
 
 -- Create RPC function to upsert OAuth token with Vault encryption
 CREATE OR REPLACE FUNCTION public.upsert_oauth_token(

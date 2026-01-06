@@ -11,9 +11,9 @@ vi.mock("@/lib/oauth/token-storage", () => ({
   upsertOAuthToken: vi.fn(),
 }));
 
+import { upsertOAuthToken } from "@/lib/oauth/token-storage";
 // Import after mocks
 import { createClient } from "@/lib/supabase/server";
-import { upsertOAuthToken } from "@/lib/oauth/token-storage";
 import { GET } from "../route";
 
 describe("Auth Callback Route", () => {
@@ -708,7 +708,7 @@ describe("Auth Callback Route", () => {
                 },
                 provider_token: "mock-access-token",
                 provider_refresh_token: "mock-refresh-token",
-                expires_at: 1234567890,
+                expires_at: 1_234_567_890,
               },
             },
             error: null,
@@ -755,7 +755,7 @@ describe("Auth Callback Route", () => {
                 },
                 provider_token: null,
                 provider_refresh_token: null,
-                expires_at: 1234567890,
+                expires_at: 1_234_567_890,
               },
             },
             error: null,
@@ -797,7 +797,7 @@ describe("Auth Callback Route", () => {
                 },
                 provider_token: "mock-access-token",
                 provider_refresh_token: "mock-refresh-token",
-                expires_at: 1234567890,
+                expires_at: 1_234_567_890,
               },
             },
             error: null,
@@ -844,7 +844,7 @@ describe("Auth Callback Route", () => {
                 },
                 provider_token: "mock-access-token",
                 provider_refresh_token: "mock-refresh-token",
-                expires_at: 1234567890,
+                expires_at: 1_234_567_890,
               },
             },
             error: null,
@@ -892,7 +892,7 @@ describe("Auth Callback Route", () => {
                 },
                 provider_token: "mock-access-token",
                 provider_refresh_token: null,
-                expires_at: 1234567890,
+                expires_at: 1_234_567_890,
               },
             },
             error: null,
