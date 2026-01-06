@@ -1,4 +1,0 @@
--- Enable Supabase Vault for secure key management
--- Vault is Supabase's recommended solution for storing secrets and encryption keys
--- It provides a secure, managed key storage that doesn't require direct pgsodium usage
--- Note: Vault is available in Supabase hosted environments (not in local dev by default)
