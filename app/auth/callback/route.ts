@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { routing } from "@/i18n/routing";
-import type { OAuthProvider } from "@/lib/oauth/token-storage";
+import { isValidOAuthProvider } from "@/lib/oauth/provider-validation";
 import { upsertOAuthToken } from "@/lib/oauth/token-storage";
 import { createClient } from "@/lib/supabase/server";
 
@@ -220,11 +220,7 @@ export async function GET(request: NextRequest) {
     const providerValue = session.user?.app_metadata?.provider;
 
     // Validate provider is a supported OAuth provider
-    const isValidProvider = (p: unknown): p is OAuthProvider => {
-      return p === "google" || p === "twitch";
-    };
-
-    if (provider_token && isValidProvider(providerValue)) {
+    if (provider_token && isValidOAuthProvider(providerValue)) {
       // Calculate token expiry if available from session
       // Use session.expires_at which represents when the OAuth session expires
       let expiresAt: string | null = null;

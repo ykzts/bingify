@@ -108,7 +108,7 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'Not authenticated');
   END IF;
 
-  -- Get existing secret IDs if token already exists (for cleanup)
+  -- Get existing secret IDs if token already exists (for cleanup after success)
   SELECT access_token_secret_id, refresh_token_secret_id
   INTO v_existing_access_id, v_existing_refresh_id
   FROM private.oauth_tokens
@@ -122,16 +122,7 @@ BEGIN
     SELECT vault.create_secret(p_refresh_token) INTO v_refresh_secret_id;
   END IF;
 
-  -- Clean up old Vault secrets BEFORE inserting new ones
-  -- This prevents secret leaks if the INSERT fails
-  IF v_existing_access_id IS NOT NULL AND v_existing_access_id != v_access_secret_id THEN
-    PERFORM vault.delete_secret(v_existing_access_id);
-  END IF;
-  IF v_existing_refresh_id IS NOT NULL AND v_existing_refresh_id != v_refresh_secret_id THEN
-    PERFORM vault.delete_secret(v_existing_refresh_id);
-  END IF;
-
-  -- Upsert the token record
+  -- Upsert the token record (must succeed before cleanup)
   INSERT INTO private.oauth_tokens (user_id, provider, access_token_secret_id, refresh_token_secret_id, expires_at)
   VALUES (v_user_id, p_provider, v_access_secret_id, v_refresh_secret_id, p_expires_at)
   ON CONFLICT (user_id, provider)
@@ -141,9 +132,31 @@ BEGIN
     expires_at = EXCLUDED.expires_at,
     updated_at = NOW();
 
+  -- Clean up old Vault secrets AFTER successful insert/update
+  -- Note: vault.delete_secret() doesn't exist, use DELETE FROM vault.secrets
+  IF v_existing_access_id IS NOT NULL AND v_existing_access_id != v_access_secret_id THEN
+    DELETE FROM vault.secrets WHERE id = v_existing_access_id;
+  END IF;
+  IF v_existing_refresh_id IS NOT NULL AND v_existing_refresh_id != v_refresh_secret_id THEN
+    DELETE FROM vault.secrets WHERE id = v_existing_refresh_id;
+  END IF;
+
   RETURN jsonb_build_object('success', true);
 EXCEPTION
   WHEN OTHERS THEN
+    -- If anything fails, try to clean up the newly created secrets
+    BEGIN
+      IF v_access_secret_id IS NOT NULL THEN
+        DELETE FROM vault.secrets WHERE id = v_access_secret_id;
+      END IF;
+      IF v_refresh_secret_id IS NOT NULL THEN
+        DELETE FROM vault.secrets WHERE id = v_refresh_secret_id;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        -- Ignore cleanup errors in exception handler
+        NULL;
+    END;
     RETURN jsonb_build_object('success', false, 'error', SQLERRM);
 END;
 $$ LANGUAGE plpgsql;
@@ -235,11 +248,12 @@ BEGIN
   WHERE user_id = v_user_id AND provider = p_provider;
 
   -- Clean up Vault secrets
+  -- Note: vault.delete_secret() doesn't exist, use DELETE FROM vault.secrets
   IF v_access_secret_id IS NOT NULL THEN
-    PERFORM vault.delete_secret(v_access_secret_id);
+    DELETE FROM vault.secrets WHERE id = v_access_secret_id;
   END IF;
   IF v_refresh_secret_id IS NOT NULL THEN
-    PERFORM vault.delete_secret(v_refresh_secret_id);
+    DELETE FROM vault.secrets WHERE id = v_refresh_secret_id;
   END IF;
 
   RETURN jsonb_build_object('success', true);
