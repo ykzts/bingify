@@ -40,6 +40,8 @@
     "errorInvalidUuid": "Invalid ID",
     "errorNoPermission": "Admin permission required",
     "fullName": "Name",
+    "metaDescription": "Manage spaces, users, authentication providers, and system settings",
+    "metaTitle": "Admin Dashboard",
     "navAuthProviders": "Authentication Providers",
     "navOverview": "Overview",
     "navSettings": "System Settings",

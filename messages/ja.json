@@ -40,6 +40,8 @@
     "errorInvalidUuid": "無効なIDです",
     "errorNoPermission": "管理者権限が必要です",
     "fullName": "名前",
+    "metaDescription": "スペース、ユーザー、認証プロバイダー、システム設定を管理",
+    "metaTitle": "管理ダッシュボード",
     "navAuthProviders": "認証プロバイダー",
     "navOverview": "概要",
     "navSettings": "システム設定",
