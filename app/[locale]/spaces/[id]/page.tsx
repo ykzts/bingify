@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { getSystemSettings } from "@/lib/data/system-settings";
+import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
 import {
   checkUserParticipation,
@@ -170,6 +172,11 @@ export default async function UserSpacePage({
   // Check if user is already a participant
   const isParticipant = await checkUserParticipation(id);
 
+  // Fetch system settings for OAuth scope configuration
+  const systemSettingsResult = await getSystemSettings();
+  const systemSettings =
+    systemSettingsResult.settings || DEFAULT_SYSTEM_SETTINGS;
+
   // For non-participants, fetch public info to show landing page
   if (!isParticipant) {
     const publicInfo = await getSpacePublicInfo(id);
@@ -206,7 +213,11 @@ export default async function UserSpacePage({
 
           {/* Participant Info Section */}
           <div className="mt-6">
-            <SpaceParticipation spaceId={id} spaceInfo={space} />
+            <SpaceParticipation
+              spaceId={id}
+              spaceInfo={space}
+              systemSettings={systemSettings}
+            />
           </div>
         </div>
       </div>
@@ -237,7 +248,11 @@ export default async function UserSpacePage({
 
         {/* Participant Info Section */}
         <div className="mt-6">
-          <SpaceParticipation spaceId={id} spaceInfo={space} />
+          <SpaceParticipation
+            spaceId={id}
+            spaceInfo={space}
+            systemSettings={systemSettings}
+          />
         </div>
       </div>
     </div>

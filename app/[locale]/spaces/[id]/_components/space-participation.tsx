@@ -7,9 +7,9 @@ import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   buildOAuthCallbackUrl,
-  GOOGLE_OAUTH_SCOPES,
-  TWITCH_OAUTH_SCOPES,
+  getScopesForProvider,
 } from "@/lib/auth/oauth-utils";
+import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/client";
 import type { JoinSpaceState, SpaceInfo } from "../../_lib/actions";
 import {
@@ -30,6 +30,7 @@ interface SpaceParticipationProps {
   compact?: boolean;
   spaceId: string;
   spaceInfo: SpaceInfo;
+  systemSettings: SystemSettings;
 }
 
 interface JoinButtonProps {
@@ -98,6 +99,7 @@ export function SpaceParticipation({
   compact = false,
   spaceId,
   spaceInfo,
+  systemSettings,
 }: SpaceParticipationProps) {
   const t = useTranslations("UserSpace");
   const router = useRouter();
@@ -287,7 +289,7 @@ export function SpaceParticipation({
             prompt: "consent",
           },
           redirectTo: buildOAuthCallbackUrl(window.location.pathname),
-          scopes: GOOGLE_OAUTH_SCOPES,
+          scopes: getScopesForProvider("google", systemSettings),
         },
         provider: "google",
       });
@@ -328,7 +330,7 @@ export function SpaceParticipation({
       const { error: oauthError } = await supabase.auth.linkIdentity({
         options: {
           redirectTo: buildOAuthCallbackUrl(window.location.pathname),
-          scopes: TWITCH_OAUTH_SCOPES,
+          scopes: getScopesForProvider("twitch", systemSettings),
         },
         provider: "twitch",
       });
