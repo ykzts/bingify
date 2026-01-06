@@ -3,7 +3,7 @@
 import { Loader2, Twitch, Users, Youtube } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   buildOAuthCallbackUrl,
@@ -12,7 +12,11 @@ import {
 } from "@/lib/auth/oauth-utils";
 import { createClient } from "@/lib/supabase/client";
 import type { JoinSpaceState, SpaceInfo } from "../../_lib/actions";
-import { joinSpace, leaveSpace } from "../../_lib/actions";
+import {
+  checkOAuthTokenAvailability,
+  joinSpace,
+  leaveSpace,
+} from "../../_lib/actions";
 import {
   useParticipantInfo,
   useUserParticipation,
@@ -167,84 +171,28 @@ export function SpaceParticipation({
     };
   }, [waitingForOAuth]);
 
-  // Helper function to check OAuth completion for a provider
-  const checkProviderOAuth = useCallback(
-    async (
-      storageKey: string,
-      setTokenFn: (value: boolean) => void,
-      providerName: string
-    ): Promise<boolean> => {
-      const oauthComplete = sessionStorage.getItem(storageKey);
-
-      if (!oauthComplete) {
-        setTokenFn(false);
-        return false;
+  // Use useEffectEvent to check existing OAuth tokens without including all dependencies
+  const checkExistingTokens = useEffectEvent(async () => {
+    // Check YouTube token if required
+    if (requiresYouTube && !hasYouTubeToken) {
+      const result = await checkOAuthTokenAvailability("google");
+      if (result.available) {
+        setHasYouTubeToken(true);
+        console.log("既存の有効なYouTubeトークンが見つかりました");
       }
+    }
 
-      // Verify that the session actually has a provider_token
-      // This prevents a race condition where the flag exists but session isn't ready yet
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (session?.provider_token) {
-        // Session is ready with provider_token, clear the flag and proceed
-        sessionStorage.removeItem(storageKey);
-        setTokenFn(true);
-        return true;
+    // Check Twitch token if required
+    if (requiresTwitch && !hasTwitchToken) {
+      const result = await checkOAuthTokenAvailability("twitch");
+      if (result.available) {
+        setHasTwitchToken(true);
+        console.log("既存の有効なTwitchトークンが見つかりました");
       }
+    }
+  });
 
-      // Session not ready yet, keep the flag and check again
-      console.warn(
-        `OAuth complete flag found for ${providerName} (key: ${storageKey}) but session not ready yet, will retry on next check`
-      );
-      return false;
-    },
-    []
-  );
-
-  // Check OAuth completion flags in sessionStorage for YouTube and Twitch
-  const checkOAuthTokens = useCallback(
-    async (joined: boolean) => {
-      if (joined) {
-        return;
-      }
-
-      let shouldTriggerJoin = false;
-
-      // Check for YouTube token if YouTube verification is required
-      if (requiresYouTube) {
-        const hasToken = await checkProviderOAuth(
-          YOUTUBE_OAUTH_COMPLETE_KEY,
-          setHasYouTubeToken,
-          "YouTube"
-        );
-        if (hasToken) {
-          shouldTriggerJoin = true;
-        }
-      }
-
-      // Check for Twitch token if Twitch verification is required
-      if (requiresTwitch) {
-        const hasToken = await checkProviderOAuth(
-          TWITCH_OAUTH_COMPLETE_KEY,
-          setHasTwitchToken,
-          "Twitch"
-        );
-        if (hasToken) {
-          shouldTriggerJoin = true;
-        }
-      }
-
-      if (shouldTriggerJoin) {
-        setShouldAutoJoin(true);
-      }
-    },
-    [requiresYouTube, requiresTwitch, checkProviderOAuth]
-  );
-
-  const handleJoin = useCallback(async () => {
+  const handleJoin = useEffectEvent(async () => {
     setIsJoining(true);
     setError(null);
 
@@ -260,12 +208,56 @@ export function SpaceParticipation({
     }
 
     setIsJoining(false);
-  }, [spaceId, refetchJoined, refetchInfo, router, t]);
+  });
 
-  // Check OAuth tokens when hasJoined changes
+  // Use useEffectEvent to handle OAuth completion check
+  const checkOAuthCompletion = useEffectEvent(async () => {
+    let shouldTriggerJoin = false;
+
+    // Check YouTube OAuth completion
+    if (sessionStorage.getItem(YOUTUBE_OAUTH_COMPLETE_KEY)) {
+      sessionStorage.removeItem(YOUTUBE_OAUTH_COMPLETE_KEY);
+      if (requiresYouTube) {
+        const result = await checkOAuthTokenAvailability("google");
+        if (result.available) {
+          setHasYouTubeToken(true);
+          shouldTriggerJoin = true;
+          console.log("YouTube OAuth完了: トークンを確認しました");
+        }
+      }
+    }
+
+    // Check Twitch OAuth completion
+    if (sessionStorage.getItem(TWITCH_OAUTH_COMPLETE_KEY)) {
+      sessionStorage.removeItem(TWITCH_OAUTH_COMPLETE_KEY);
+      if (requiresTwitch) {
+        const result = await checkOAuthTokenAvailability("twitch");
+        if (result.available) {
+          setHasTwitchToken(true);
+          shouldTriggerJoin = true;
+          console.log("Twitch OAuth完了: トークンを確認しました");
+        }
+      }
+    }
+
+    if (shouldTriggerJoin) {
+      setShouldAutoJoin(true);
+    }
+  });
+
+  // Check for existing OAuth tokens in database on mount
   useEffect(() => {
-    checkOAuthTokens(hasJoined);
-  }, [hasJoined, checkOAuthTokens]);
+    // Only check if user hasn't joined yet
+    if (hasJoined) {
+      return;
+    }
+
+    // First check for OAuth completion flags
+    checkOAuthCompletion();
+
+    // Then check for existing tokens
+    checkExistingTokens();
+  }, [hasJoined]);
 
   // Auto-join after OAuth completion
   useEffect(() => {
@@ -273,7 +265,7 @@ export function SpaceParticipation({
       setShouldAutoJoin(false);
       handleJoin();
     }
-  }, [shouldAutoJoin, hasJoined, isJoining, handleJoin]);
+  }, [shouldAutoJoin, hasJoined, isJoining]);
 
   const handleYouTubeVerify = async () => {
     setIsJoining(true);

@@ -1,5 +1,11 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { getSpacePublicInfo } from "../actions";
+import { checkOAuthTokenAvailability, getSpacePublicInfo } from "../actions";
+
+// Mock OAuth token storage functions using vi.hoisted
+const { mockGetOAuthToken, mockIsTokenExpired } = vi.hoisted(() => ({
+  mockGetOAuthToken: vi.fn(),
+  mockIsTokenExpired: vi.fn(),
+}));
 
 // Mock the Supabase client
 const mockSupabase = {
@@ -11,6 +17,11 @@ const mockSupabase = {
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(() => mockSupabase),
+}));
+
+vi.mock("@/lib/oauth/token-storage", () => ({
+  getOAuthToken: mockGetOAuthToken,
+  isTokenExpired: mockIsTokenExpired,
 }));
 
 // Mock privacy utilities
@@ -263,5 +274,96 @@ describe("getSpacePublicInfo", () => {
 
     expect(result).not.toBeNull();
     expect(result?.gatekeeper_rules?.twitch?.requirement).toBe("follower");
+  });
+});
+
+describe("checkOAuthTokenAvailability", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  test("ユーザーが認証されていない場合、available: false を返す", async () => {
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: null },
+      error: null,
+    });
+
+    const result = await checkOAuthTokenAvailability("google");
+
+    expect(result.available).toBe(false);
+    expect(result.error).toBe("User not authenticated");
+  });
+
+  test("有効なトークンが存在する場合、available: true を返す", async () => {
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: "user-123", email: "test@example.com" } },
+      error: null,
+    });
+
+    mockGetOAuthToken.mockResolvedValue({
+      success: true,
+      access_token: "valid_token",
+      expires_at: "2030-01-01T00:00:00Z",
+    });
+
+    mockIsTokenExpired.mockReturnValue(false);
+
+    const result = await checkOAuthTokenAvailability("google");
+
+    expect(result.available).toBe(true);
+    expect(result.error).toBeUndefined();
+  });
+
+  test("トークンが存在しない場合、available: false を返す", async () => {
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: "user-123", email: "test@example.com" } },
+      error: null,
+    });
+
+    mockGetOAuthToken.mockResolvedValue({
+      success: true,
+      access_token: null,
+    });
+
+    const result = await checkOAuthTokenAvailability("twitch");
+
+    expect(result.available).toBe(false);
+  });
+
+  test("トークンが期限切れの場合、available: false を返す", async () => {
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: "user-123", email: "test@example.com" } },
+      error: null,
+    });
+
+    mockGetOAuthToken.mockResolvedValue({
+      success: true,
+      access_token: "expired_token",
+      expires_at: "2020-01-01T00:00:00Z",
+    });
+
+    mockIsTokenExpired.mockReturnValue(true);
+
+    const result = await checkOAuthTokenAvailability("google");
+
+    expect(result.available).toBe(false);
+    expect(result.error).toBe("Token expired");
+  });
+
+  test("トークン取得に失敗した場合、available: false を返す", async () => {
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: "user-123", email: "test@example.com" } },
+      error: null,
+    });
+
+    mockGetOAuthToken.mockResolvedValue({
+      success: false,
+      error: "Database error",
+    });
+
+    const result = await checkOAuthTokenAvailability("google");
+
+    expect(result.available).toBe(false);
+    expect(result.error).toBe("Database error");
   });
 });
