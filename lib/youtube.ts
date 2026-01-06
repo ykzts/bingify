@@ -320,17 +320,32 @@ export async function checkMembershipWithAdminToken(
 
     // members.list APIを使用してメンバーを検索
     // このAPIはチャンネル所有者の権限が必要
-    const response = await youtube.members.list({
-      part: ["snippet"],
-    });
+    // ページネーションを処理して全メンバーを確認
+    let pageToken: string | undefined;
+    let isMember = false;
 
-    // メンバーリストから参加者のチャンネルIDを検索
-    const isMember = Boolean(
-      response.data.items?.some(
-        (item) =>
-          item.snippet?.memberDetails?.channelId === participantChannelId
-      )
-    );
+    do {
+      const response = await youtube.members.list({
+        pageToken,
+        part: ["snippet"],
+      });
+
+      // 現在のページでメンバーを検索
+      if (response.data.items) {
+        isMember = response.data.items.some(
+          (item) =>
+            item.snippet?.memberDetails?.channelId === participantChannelId
+        );
+
+        // メンバーが見つかったら早期終了
+        if (isMember) {
+          break;
+        }
+      }
+
+      // 次のページトークンを取得
+      pageToken = response.data.nextPageToken ?? undefined;
+    } while (pageToken);
 
     return {
       isMember,

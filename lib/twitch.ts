@@ -110,8 +110,7 @@ export async function getUserTwitchId(
     }
 
     const apiClient = createApiClient(userAccessToken);
-    // getAuthenticatedUser requires the access token to be passed
-    const user = await apiClient.users.getAuthenticatedUser(userAccessToken);
+    const user = await apiClient.users.getAuthenticatedUser();
 
     if (user) {
       return { userId: user.id };
