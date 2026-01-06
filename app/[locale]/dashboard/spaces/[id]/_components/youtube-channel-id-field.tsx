@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { YOUTUBE_CHANNEL_ID_REGEX } from "@/lib/youtube-constants";
 import { getOperatorYouTubeChannelId } from "../_lib/get-user-channel-actions";
-import { lookupYouTubeChannelId } from "../_lib/youtube-lookup-actions";
+import { lookupYouTubeChannelIdWithOperatorToken } from "../_lib/operator-lookup-actions";
 
 interface Props {
   // biome-ignore lint/suspicious/noExplicitAny: FieldApi type requires 23 generic parameters
@@ -63,11 +63,12 @@ export function YoutubeChannelIdField({
       setYoutubeIdError(null);
 
       try {
-        // Use Server Function instead of API route
-        const result = await lookupYouTubeChannelId(input.trim());
+        // Use operator's OAuth token for lookup
+        const result = await lookupYouTubeChannelIdWithOperatorToken(input.trim());
 
         if (result.error) {
-          setYoutubeIdError(result.error);
+          // Translate error key
+          setYoutubeIdError(t(result.error));
           setYoutubeIdConverting(false);
           return;
         }

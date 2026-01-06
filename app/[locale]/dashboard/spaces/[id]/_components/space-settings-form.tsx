@@ -363,6 +363,26 @@ export function SpaceSettingsForm({
   }, [isCurrentRequirementDisabled]);
 
   // 自動的に操作者のYouTubeチャンネルIDを取得（手動入力時の所有権チェック用）
+  const fetchYoutubeOperatorId = useEffectEvent(async (signal: AbortSignal) => {
+    setFetchingOperatorYoutubeId(true);
+    try {
+      const result = await getOperatorYouTubeChannelId();
+      
+      // AbortSignalをチェック（コンポーネントがアンマウントされた場合は更新しない）
+      if (signal.aborted) return;
+      
+      if (result.success && result.channelId) {
+        setOperatorYoutubeChannelId(result.channelId);
+      }
+    } catch (_error) {
+      // エラーは無視（所有権チェックができないだけ）
+    } finally {
+      if (!signal.aborted) {
+        setFetchingOperatorYoutubeId(false);
+      }
+    }
+  });
+
   useEffect(() => {
     // YouTubeチャンネルIDが入力されているが、操作者のIDがまだ取得されていない場合
     if (
@@ -372,21 +392,12 @@ export function SpaceSettingsForm({
       socialPlatform === "youtube" &&
       gatekeeperMode === "social"
     ) {
-      // バックグラウンドで操作者のIDを取得
-      const fetchOperatorId = async () => {
-        setFetchingOperatorYoutubeId(true);
-        try {
-          const result = await getOperatorYouTubeChannelId();
-          if (result.success && result.channelId) {
-            setOperatorYoutubeChannelId(result.channelId);
-          }
-        } catch (_error) {
-          // エラーは無視（所有権チェックができないだけ）
-        } finally {
-          setFetchingOperatorYoutubeId(false);
-        }
+      const controller = new AbortController();
+      fetchYoutubeOperatorId(controller.signal);
+      
+      return () => {
+        controller.abort();
       };
-      fetchOperatorId();
     }
   }, [
     enteredYoutubeChannelId,
@@ -394,9 +405,30 @@ export function SpaceSettingsForm({
     fetchingOperatorYoutubeId,
     socialPlatform,
     gatekeeperMode,
+    fetchYoutubeOperatorId,
   ]);
 
   // 自動的に操作者のTwitchブロードキャスターIDを取得（手動入力時の所有権チェック用）
+  const fetchTwitchOperatorId = useEffectEvent(async (signal: AbortSignal) => {
+    setFetchingOperatorTwitchId(true);
+    try {
+      const result = await getOperatorTwitchBroadcasterId();
+      
+      // AbortSignalをチェック（コンポーネントがアンマウントされた場合は更新しない）
+      if (signal.aborted) return;
+      
+      if (result.success && result.channelId) {
+        setOperatorTwitchBroadcasterId(result.channelId);
+      }
+    } catch (_error) {
+      // エラーは無視（所有権チェックができないだけ）
+    } finally {
+      if (!signal.aborted) {
+        setFetchingOperatorTwitchId(false);
+      }
+    }
+  });
+
   useEffect(() => {
     // TwitchブロードキャスターIDが入力されているが、操作者のIDがまだ取得されていない場合
     if (
@@ -406,21 +438,12 @@ export function SpaceSettingsForm({
       socialPlatform === "twitch" &&
       gatekeeperMode === "social"
     ) {
-      // バックグラウンドで操作者のIDを取得
-      const fetchOperatorId = async () => {
-        setFetchingOperatorTwitchId(true);
-        try {
-          const result = await getOperatorTwitchBroadcasterId();
-          if (result.success && result.channelId) {
-            setOperatorTwitchBroadcasterId(result.channelId);
-          }
-        } catch (_error) {
-          // エラーは無視（所有権チェックができないだけ）
-        } finally {
-          setFetchingOperatorTwitchId(false);
-        }
+      const controller = new AbortController();
+      fetchTwitchOperatorId(controller.signal);
+      
+      return () => {
+        controller.abort();
       };
-      fetchOperatorId();
     }
   }, [
     enteredTwitchBroadcasterId,
@@ -428,6 +451,7 @@ export function SpaceSettingsForm({
     fetchingOperatorTwitchId,
     socialPlatform,
     gatekeeperMode,
+    fetchTwitchOperatorId,
   ]);
 
   // Calculate effective gatekeeper mode (fallback to "none" if current mode is not available)

@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { TWITCH_ID_REGEX } from "@/lib/twitch";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { getOperatorTwitchBroadcasterId } from "../_lib/get-user-channel-actions";
-import { lookupTwitchBroadcasterId } from "../_lib/twitch-lookup-actions";
+import { lookupTwitchBroadcasterIdWithOperatorToken } from "../_lib/operator-lookup-actions";
 
 interface Props {
   // biome-ignore lint/suspicious/noExplicitAny: FieldApi type requires 23 generic parameters
@@ -63,11 +63,12 @@ export function TwitchBroadcasterIdField({
       setTwitchIdError(null);
 
       try {
-        // Use Server Function instead of API route
-        const result = await lookupTwitchBroadcasterId(input.trim());
+        // Use operator's OAuth token for lookup
+        const result = await lookupTwitchBroadcasterIdWithOperatorToken(input.trim());
 
         if (result.error) {
-          setTwitchIdError(result.error);
+          // Translate error key
+          setTwitchIdError(t(result.error));
           setTwitchIdConverting(false);
           return;
         }
