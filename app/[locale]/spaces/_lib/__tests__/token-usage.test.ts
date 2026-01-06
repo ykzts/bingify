@@ -42,21 +42,13 @@ vi.mock("@/lib/youtube", () => ({
   checkSubscriptionWithAdminToken: vi.fn(),
 }));
 
-import {
-  getOAuthToken,
-  getOAuthTokenForUser,
-} from "@/lib/oauth/token-storage";
+import { getOAuthToken, getOAuthTokenForUser } from "@/lib/oauth/token-storage";
 // テスト用にモック関数をインポート
 import {
-  checkFollowStatus,
   checkFollowWithAdminToken,
-  checkSubStatus,
   checkSubWithAdminToken,
 } from "@/lib/twitch";
-import {
-  checkSubscriptionStatus,
-  checkSubscriptionWithAdminToken,
-} from "@/lib/youtube";
+import { checkSubscriptionWithAdminToken } from "@/lib/youtube";
 import { joinSpace } from "../actions";
 
 describe("OAuth Token Usage in joinSpace", () => {
@@ -230,7 +222,7 @@ describe("OAuth Token Usage in joinSpace", () => {
 
       expect(result.success).toBe(false);
       expect(result.errorKey).toBe("errorYouTubeVerificationRequired");
-      expect(checkSubscriptionStatus).not.toHaveBeenCalled();
+      expect(checkSubscriptionWithAdminToken).not.toHaveBeenCalled();
     });
   });
 
@@ -414,7 +406,7 @@ describe("OAuth Token Usage in joinSpace", () => {
 
       expect(result.success).toBe(false);
       expect(result.errorKey).toBe("errorTwitchVerificationRequired");
-      expect(checkFollowStatus).not.toHaveBeenCalled();
+      expect(checkFollowWithAdminToken).not.toHaveBeenCalled();
     });
 
     test("参加者と管理者のトークンを使用してサブスクリプション状態を確認する", async () => {
