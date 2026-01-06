@@ -47,6 +47,10 @@ import {
   spaceSettingsFormOpts,
   spaceSettingsFormSchema,
 } from "../_lib/form-options";
+import {
+  getOperatorTwitchBroadcasterId,
+  getOperatorYouTubeChannelId,
+} from "../_lib/get-user-channel-actions";
 import type { PublishSpaceState } from "../_lib/settings-actions";
 import {
   updateAndPublishSpace,
@@ -130,6 +134,17 @@ export function SpaceSettingsForm({
   const [twitchIdError, setTwitchIdError] = useState<string | null>(null);
   const [youtubeIdConverting, setYoutubeIdConverting] = useState(false);
   const [youtubeIdError, setYoutubeIdError] = useState<string | null>(null);
+
+  // 操作者自身のチャンネルID（権限チェック用）
+  const [operatorYoutubeChannelId, setOperatorYoutubeChannelId] = useState<
+    string | null
+  >(null);
+  const [operatorTwitchBroadcasterId, setOperatorTwitchBroadcasterId] =
+    useState<string | null>(null);
+  const [fetchingOperatorYoutubeId, setFetchingOperatorYoutubeId] =
+    useState(false);
+  const [fetchingOperatorTwitchId, setFetchingOperatorTwitchId] =
+    useState(false);
 
   // Debounced function to convert YouTube handle/URL to channel ID
   const convertYoutubeInput = useDebouncedCallback(
@@ -217,6 +232,62 @@ export function SpaceSettingsForm({
     800
   );
 
+  // 操作者のYouTubeチャンネルIDを取得してフィールドに設定
+  const handleGetMyYoutubeId = async (fieldApi: {
+    setValue: (value: string) => void;
+  }) => {
+    setFetchingOperatorYoutubeId(true);
+    setYoutubeIdError(null);
+
+    try {
+      const result = await getOperatorYouTubeChannelId();
+
+      if (result.error || !result.channelId) {
+        setYoutubeIdError(result.error || t("youtubeChannelIdConvertError"));
+        return;
+      }
+
+      // 取得したチャンネルIDを保存（権限チェック用）
+      setOperatorYoutubeChannelId(result.channelId);
+
+      // フィールドの値を更新
+      fieldApi.setValue(result.channelId);
+      setYoutubeIdError(null);
+    } catch (_error) {
+      setYoutubeIdError(t("youtubeChannelIdConvertError"));
+    } finally {
+      setFetchingOperatorYoutubeId(false);
+    }
+  };
+
+  // 操作者のTwitchブロードキャスターIDを取得してフィールドに設定
+  const handleGetMyTwitchId = async (fieldApi: {
+    setValue: (value: string) => void;
+  }) => {
+    setFetchingOperatorTwitchId(true);
+    setTwitchIdError(null);
+
+    try {
+      const result = await getOperatorTwitchBroadcasterId();
+
+      if (result.error || !result.channelId) {
+        setTwitchIdError(result.error || t("twitchBroadcasterIdConvertError"));
+        return;
+      }
+
+      // 取得したブロードキャスターIDを保存（権限チェック用）
+      setOperatorTwitchBroadcasterId(result.channelId);
+
+      // フィールドの値を更新
+      fieldApi.setValue(result.channelId);
+      setTwitchIdError(null);
+    } catch (_error) {
+      setTwitchIdError(t("twitchBroadcasterIdConvertError"));
+    } finally {
+      setFetchingOperatorTwitchId(false);
+    }
+  };
+
   // Use TanStack Form with Next.js server actions for update
   const [updateState, updateAction] = useActionState(
     updateSpaceSettings.bind(null, space.id),
@@ -278,6 +349,28 @@ export function SpaceSettingsForm({
   const youtubeRequirement =
     (formValues.youtube_requirement as string) || "none";
   const twitchRequirement = (formValues.twitch_requirement as string) || "none";
+
+  // 入力されたチャンネルIDと操作者のチャンネルIDを取得
+  const enteredYoutubeChannelId =
+    (formValues.youtube_channel_id as string) || "";
+  const enteredTwitchBroadcasterId =
+    (formValues.twitch_broadcaster_id as string) || "";
+
+  // 入力されたIDが操作者自身のものかチェック
+  const isYoutubeOwnChannel =
+    operatorYoutubeChannelId &&
+    enteredYoutubeChannelId &&
+    operatorYoutubeChannelId === enteredYoutubeChannelId;
+  const isTwitchOwnChannel =
+    operatorTwitchBroadcasterId &&
+    enteredTwitchBroadcasterId &&
+    operatorTwitchBroadcasterId === enteredTwitchBroadcasterId;
+
+  // メンバーシップ/サブスクライバー限定の設定は自分のチャンネルのみ許可
+  const canUseYoutubeMemberSubscriber =
+    !enteredYoutubeChannelId || isYoutubeOwnChannel;
+  const canUseTwitchSubscriber =
+    !enteredTwitchBroadcasterId || isTwitchOwnChannel;
 
   // Use useEffectEvent to separate event logic from effect dependencies
   const handleUpdateSuccess = useEffectEvent(() => {
@@ -695,12 +788,22 @@ export function SpaceSettingsForm({
                                           {t("requirementNone")}
                                         </SelectItem>
                                         {showYoutubeMember && (
-                                          <SelectItem value="member">
+                                          <SelectItem
+                                            disabled={
+                                              !canUseYoutubeMemberSubscriber
+                                            }
+                                            value="member"
+                                          >
                                             {t("youtubeMember")}
                                           </SelectItem>
                                         )}
                                         {showYoutubeSubscriber && (
-                                          <SelectItem value="subscriber">
+                                          <SelectItem
+                                            disabled={
+                                              !canUseYoutubeMemberSubscriber
+                                            }
+                                            value="subscriber"
+                                          >
                                             {t("youtubeSubscriber")}
                                           </SelectItem>
                                         )}
@@ -719,34 +822,59 @@ export function SpaceSettingsForm({
                                       <FieldLabel>
                                         {t("youtubeChannelIdLabel")}
                                       </FieldLabel>
-                                      <div className="relative">
-                                        <Input
+                                      <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                          <Input
+                                            disabled={
+                                              isPending || youtubeIdConverting
+                                            }
+                                            name={field.name}
+                                            onChange={(e) => {
+                                              const value = e.target.value;
+                                              field.handleChange(value);
+                                              convertYoutubeInput(value, {
+                                                setValue: (newValue: string) =>
+                                                  field.handleChange(newValue),
+                                              });
+                                            }}
+                                            placeholder={t(
+                                              "youtubeChannelIdPlaceholder"
+                                            )}
+                                            required={
+                                              youtubeRequirement !== "none"
+                                            }
+                                            type="text"
+                                            value={field.state.value as string}
+                                          />
+                                          {youtubeIdConverting && (
+                                            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                              <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                                            </div>
+                                          )}
+                                        </div>
+                                        <Button
                                           disabled={
-                                            isPending || youtubeIdConverting
+                                            isPending ||
+                                            youtubeIdConverting ||
+                                            fetchingOperatorYoutubeId
                                           }
-                                          name={field.name}
-                                          onChange={(e) => {
-                                            const value = e.target.value;
-                                            field.handleChange(value);
-                                            convertYoutubeInput(value, {
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            handleGetMyYoutubeId({
                                               setValue: (newValue: string) =>
                                                 field.handleChange(newValue),
                                             });
                                           }}
-                                          placeholder={t(
-                                            "youtubeChannelIdPlaceholder"
+                                          type="button"
+                                          variant="outline"
+                                        >
+                                          {fetchingOperatorYoutubeId && (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
                                           )}
-                                          required={
-                                            youtubeRequirement !== "none"
-                                          }
-                                          type="text"
-                                          value={field.state.value as string}
-                                        />
-                                        {youtubeIdConverting && (
-                                          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                                          </div>
-                                        )}
+                                          {fetchingOperatorYoutubeId
+                                            ? t("fetchingMyId")
+                                            : t("getMyIdButton")}
+                                        </Button>
                                       </div>
                                       {field.state.meta.errors.length > 0 && (
                                         <FieldError>
@@ -760,6 +888,17 @@ export function SpaceSettingsForm({
                                           {youtubeIdError}
                                         </FieldError>
                                       )}
+                                      {!canUseYoutubeMemberSubscriber &&
+                                        enteredYoutubeChannelId && (
+                                          <Alert>
+                                            <AlertCircle className="h-4 w-4" />
+                                            <AlertDescription>
+                                              {t(
+                                                "memberSubscriberOnlyOwnChannel"
+                                              )}
+                                            </AlertDescription>
+                                          </Alert>
+                                        )}
                                       <FieldDescription>
                                         {t("youtubeChannelIdHelp")}
                                       </FieldDescription>
@@ -809,7 +948,10 @@ export function SpaceSettingsForm({
                                           </SelectItem>
                                         )}
                                         {showTwitchSubscriber && (
-                                          <SelectItem value="subscriber">
+                                          <SelectItem
+                                            disabled={!canUseTwitchSubscriber}
+                                            value="subscriber"
+                                          >
                                             {t("twitchSubscriber")}
                                           </SelectItem>
                                         )}
@@ -828,34 +970,59 @@ export function SpaceSettingsForm({
                                       <FieldLabel>
                                         {t("twitchBroadcasterIdLabel")}
                                       </FieldLabel>
-                                      <div className="relative">
-                                        <Input
+                                      <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                          <Input
+                                            disabled={
+                                              isPending || twitchIdConverting
+                                            }
+                                            name={field.name}
+                                            onChange={(e) => {
+                                              const value = e.target.value;
+                                              field.handleChange(value);
+                                              convertTwitchInput(value, {
+                                                setValue: (newValue: string) =>
+                                                  field.handleChange(newValue),
+                                              });
+                                            }}
+                                            placeholder={t(
+                                              "twitchBroadcasterIdPlaceholder"
+                                            )}
+                                            required={
+                                              twitchRequirement !== "none"
+                                            }
+                                            type="text"
+                                            value={field.state.value as string}
+                                          />
+                                          {twitchIdConverting && (
+                                            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                              <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                                            </div>
+                                          )}
+                                        </div>
+                                        <Button
                                           disabled={
-                                            isPending || twitchIdConverting
+                                            isPending ||
+                                            twitchIdConverting ||
+                                            fetchingOperatorTwitchId
                                           }
-                                          name={field.name}
-                                          onChange={(e) => {
-                                            const value = e.target.value;
-                                            field.handleChange(value);
-                                            convertTwitchInput(value, {
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            handleGetMyTwitchId({
                                               setValue: (newValue: string) =>
                                                 field.handleChange(newValue),
                                             });
                                           }}
-                                          placeholder={t(
-                                            "twitchBroadcasterIdPlaceholder"
+                                          type="button"
+                                          variant="outline"
+                                        >
+                                          {fetchingOperatorTwitchId && (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
                                           )}
-                                          required={
-                                            twitchRequirement !== "none"
-                                          }
-                                          type="text"
-                                          value={field.state.value as string}
-                                        />
-                                        {twitchIdConverting && (
-                                          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                                          </div>
-                                        )}
+                                          {fetchingOperatorTwitchId
+                                            ? t("fetchingMyId")
+                                            : t("getMyIdButton")}
+                                        </Button>
                                       </div>
                                       {field.state.meta.errors.length > 0 && (
                                         <FieldError>
@@ -867,6 +1034,17 @@ export function SpaceSettingsForm({
                                       {twitchIdError && (
                                         <FieldError>{twitchIdError}</FieldError>
                                       )}
+                                      {!canUseTwitchSubscriber &&
+                                        enteredTwitchBroadcasterId && (
+                                          <Alert>
+                                            <AlertCircle className="h-4 w-4" />
+                                            <AlertDescription>
+                                              {t(
+                                                "memberSubscriberOnlyOwnChannel"
+                                              )}
+                                            </AlertDescription>
+                                          </Alert>
+                                        )}
                                       <FieldDescription>
                                         {t("twitchBroadcasterIdHelp")}
                                       </FieldDescription>
