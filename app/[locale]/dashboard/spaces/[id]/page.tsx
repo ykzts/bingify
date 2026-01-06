@@ -104,14 +104,14 @@ export default async function AdminSpacePage({
   return (
     <div className="mx-auto min-h-screen max-w-3xl space-y-8 p-8">
       {/* Header with Action Buttons */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="font-bold text-3xl">{t("heading")}</h1>
           <p className="mt-1 text-gray-600">
             {t("spaceId")}: {space.share_key}
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <ViewingUrlDialog spaceId={space.id} viewToken={space.view_token} />
           <ScreenSettingsDialog
             initialBackground={initialBackground}
