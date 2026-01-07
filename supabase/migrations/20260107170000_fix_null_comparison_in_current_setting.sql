@@ -8,7 +8,8 @@ CREATE OR REPLACE FUNCTION prevent_role_change()
 RETURNS TRIGGER AS $$
 BEGIN
   -- Allow service_role to change anything
-  IF current_setting('request.jwt.claims', true)::json->>'role' = 'service_role' THEN
+  -- Use IS NOT DISTINCT FROM to handle NULL correctly (when JWT claim is missing or NULL)
+  IF (current_setting('request.jwt.claims', true)::json->>'role') IS NOT DISTINCT FROM 'service_role' THEN
     RETURN NEW;
   END IF;
   
