@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Button } from "@/components/ui/button";
 import type { Tables } from "@/types/supabase";
-import { forceDeleteSpace } from "../_lib/actions";
+import { forceDeleteSpace } from "../_actions/admin-operations";
 
 interface SpaceListProps {
   initialSpaces: Tables<"spaces">[];

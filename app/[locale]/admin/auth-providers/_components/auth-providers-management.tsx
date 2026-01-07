@@ -6,7 +6,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { type AuthProviderRow, updateAuthProvider } from "../_lib/actions";
+import {
+  type AuthProviderRow,
+  updateAuthProvider,
+} from "../_actions/auth-providers";
 
 interface Props {
   providers: AuthProviderRow[];

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { updateSpaceSettings } from "../settings-actions";
+import { updateSpaceSettings } from "../settings";
 
 // Mock dependencies
 vi.mock("@/lib/supabase/server", () => ({

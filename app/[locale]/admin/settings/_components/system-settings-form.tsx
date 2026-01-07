@@ -30,7 +30,7 @@ import {
   systemSettingsSchema,
 } from "@/lib/schemas/system-settings";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import { updateSystemSettingsAction } from "../_lib/actions";
+import { updateSystemSettingsAction } from "../_actions/system-settings";
 import { systemSettingsFormOpts } from "../_lib/form-options";
 
 interface Props {

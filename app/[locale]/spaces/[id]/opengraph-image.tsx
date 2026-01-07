@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getTranslations } from "next-intl/server";
-import { getSpacePublicInfo } from "../_lib/actions";
+import { getSpacePublicInfo } from "../_actions/space-join";
 
 export const alt = "Bingify Space";
 export const size = {

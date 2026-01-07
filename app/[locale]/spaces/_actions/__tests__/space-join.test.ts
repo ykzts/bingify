@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { checkOAuthTokenAvailability, getSpacePublicInfo } from "../actions";
+import { checkOAuthTokenAvailability, getSpacePublicInfo } from "../space-join";
 
 // Mock OAuth token storage functions using vi.hoisted
 const { mockGetOAuthToken, mockIsTokenExpired } = vi.hoisted(() => ({

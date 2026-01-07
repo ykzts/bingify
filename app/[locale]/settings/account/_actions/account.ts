@@ -6,7 +6,10 @@ import {
 } from "@tanstack/react-form-nextjs";
 import { usernameSchema } from "@/lib/schemas/user";
 import { createClient } from "@/lib/supabase/server";
-import { type UsernameFormValues, usernameFormOpts } from "./form-options";
+import {
+  type UsernameFormValues,
+  usernameFormOpts,
+} from "../_lib/form-options";
 
 export interface UnlinkIdentityState {
   error?: string;

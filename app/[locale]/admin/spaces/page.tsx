@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getAllSpaces } from "../_actions/admin-operations";
 import { SpaceList } from "../_components/space-list";
-import { getAllSpaces } from "../_lib/actions";
 
 export const dynamic = "force-dynamic";
 

@@ -7,7 +7,7 @@ vi.mock("@/lib/supabase/server", () => ({
 
 // Import after mocks
 import { createClient } from "@/lib/supabase/server";
-import { updateSystemSettingsAction } from "../actions";
+import { updateSystemSettingsAction } from "../system-settings";
 
 describe("Admin Settings Actions", () => {
   describe("updateSystemSettingsAction", () => {

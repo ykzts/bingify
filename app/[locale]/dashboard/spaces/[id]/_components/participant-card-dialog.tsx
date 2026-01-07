@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { checkBingoLines } from "@/lib/utils/bingo-checker";
-import { getParticipantCard } from "../_lib/actions";
+import { getParticipantCard } from "../_actions/space-operations";
 
 interface Props {
   participantName: string | null;

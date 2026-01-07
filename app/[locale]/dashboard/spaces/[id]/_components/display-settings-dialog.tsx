@@ -31,7 +31,7 @@ import type {
   ThemeType,
 } from "@/lib/types/screen-settings";
 import { getAbsoluteUrl } from "@/lib/utils/url";
-import { regenerateViewToken } from "../../../_lib/actions";
+import { regenerateViewToken } from "../../../_actions/space-management";
 
 interface Props {
   initialBackground: BackgroundType;

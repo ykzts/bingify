@@ -10,8 +10,8 @@ import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
 import { checkBingoLines } from "@/lib/utils/bingo-checker";
+import { updateBingoStatus } from "../_actions/bingo";
 import { useBingoCard } from "../_hooks/use-bingo-card";
-import { updateBingoStatus } from "../_lib/bingo-actions";
 
 interface Props {
   readOnly?: boolean;

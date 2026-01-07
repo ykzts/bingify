@@ -19,7 +19,7 @@ import {
 } from "@/lib/auth/oauth-utils";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/client";
-import { unlinkIdentity } from "../_lib/actions";
+import { unlinkIdentity } from "../_actions/account";
 
 interface AccountLinkingFormProps {
   systemSettings: SystemSettings;

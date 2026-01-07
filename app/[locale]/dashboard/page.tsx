@@ -4,10 +4,10 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SectionHeader } from "@/components/section-header";
 import { Link } from "@/i18n/navigation";
+import { getUserSpaces } from "./_actions/space-management";
 import { CreateSpaceForm } from "./_components/create-space-form";
 import { SpaceActionsDropdown } from "./_components/space-actions-dropdown";
 import { StatusBadge } from "./_components/status-badge";
-import { getUserSpaces } from "./_lib/actions";
 
 export const dynamic = "force-dynamic";
 

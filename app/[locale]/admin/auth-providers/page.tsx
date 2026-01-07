@@ -1,8 +1,8 @@
 import { AlertCircle } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { getAuthProviders } from "./_actions/auth-providers";
 import { AuthProvidersManagement } from "./_components/auth-providers-management";
-import { getAuthProviders } from "./_lib/actions";
 
 export const dynamic = "force-dynamic";
 

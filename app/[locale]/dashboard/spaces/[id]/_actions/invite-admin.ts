@@ -9,7 +9,7 @@ import { isValidUUID } from "@/lib/utils/uuid";
 import {
   type InviteAdminFormValues,
   inviteAdminFormOpts,
-} from "./form-options";
+} from "../_lib/form-options";
 
 async function checkUserAuthentication(
   supabase: Awaited<ReturnType<typeof createClient>>

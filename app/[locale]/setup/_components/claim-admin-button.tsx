@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
-import { claimAdmin } from "../../admin/_lib/actions";
+import { claimAdmin } from "../../admin/_actions/admin-operations";
 
 export function ClaimAdminButton() {
   const t = useTranslations("Setup");

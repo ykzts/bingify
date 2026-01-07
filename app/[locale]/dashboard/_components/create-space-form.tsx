@@ -37,7 +37,7 @@ import { getAbsoluteUrl } from "@/lib/utils/url";
 import {
   checkShareKeyAvailability,
   createSpaceAction,
-} from "../_lib/create-space-actions";
+} from "../_actions/create-space";
 import {
   createSpaceFormOpts,
   createSpaceFormSchema,

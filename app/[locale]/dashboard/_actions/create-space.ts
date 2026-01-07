@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   type CreateSpaceFormValues,
   createSpaceFormOpts,
-} from "./form-options";
+} from "../_lib/form-options";
 
 const MAX_SLUG_SUGGESTIONS = 10;
 

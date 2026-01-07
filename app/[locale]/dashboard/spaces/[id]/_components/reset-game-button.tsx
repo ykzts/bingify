@@ -17,8 +17,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
-import type { ResetGameState } from "../_lib/actions";
-import { resetGame } from "../_lib/actions";
+import type { ResetGameState } from "../_actions/space-operations";
+import { resetGame } from "../_actions/space-operations";
 
 interface ResetGameButtonProps {
   onSuccess?: () => void;

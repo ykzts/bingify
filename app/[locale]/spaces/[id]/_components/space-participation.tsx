@@ -11,12 +11,12 @@ import {
 } from "@/lib/auth/oauth-utils";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/client";
-import type { JoinSpaceState, SpaceInfo } from "../../_lib/actions";
+import type { JoinSpaceState, SpaceInfo } from "../../_actions/space-join";
 import {
   checkOAuthTokenAvailability,
   joinSpace,
   leaveSpace,
-} from "../../_lib/actions";
+} from "../../_actions/space-join";
 import {
   useParticipantInfo,
   useUserParticipation,

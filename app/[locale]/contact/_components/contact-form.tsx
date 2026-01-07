@@ -26,7 +26,7 @@ import {
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Textarea } from "@/components/ui/textarea";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import { submitContactFormAction } from "../_lib/actions";
+import { submitContactFormAction } from "../_actions/contact";
 import { contactFormOpts, contactFormSchema } from "../_lib/form-options";
 
 interface Props {

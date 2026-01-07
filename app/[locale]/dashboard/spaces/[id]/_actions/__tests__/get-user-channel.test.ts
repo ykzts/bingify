@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getOperatorTwitchBroadcasterId,
   getOperatorYouTubeChannelId,
-} from "../get-user-channel-actions";
+} from "../get-user-channel";
 
 // Mock dependencies
 vi.mock("@/lib/supabase/server", () => ({

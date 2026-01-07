@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getParticipants } from "../_lib/actions";
+import { getParticipants } from "../_actions/space-operations";
 
 export interface Participant {
   bingo_status: "none" | "reach" | "bingo";
