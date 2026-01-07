@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = pg_temp, pg_catalog, public, auth
+SET search_path = pg_temp, pg_catalog, public
 AS $$
 #variable_conflict use_column
 DECLARE default_role TEXT;
