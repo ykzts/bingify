@@ -155,6 +155,7 @@ async function exchangeCodeWithRetry(
   return { error: lastError };
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: OAuth callback handling requires multiple conditional checks for security and error handling
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
