@@ -24,7 +24,7 @@ vi.mock("@/lib/crypto", () => ({
 
 // Import after mocks
 import { createClient } from "@/lib/supabase/server";
-import { createSpace, getUserSpaces } from "../_lib/actions";
+import { createSpace, getUserSpaces } from "../_actions/space-management";
 
 describe("Dashboard Actions", () => {
   describe("getUserSpaces", () => {

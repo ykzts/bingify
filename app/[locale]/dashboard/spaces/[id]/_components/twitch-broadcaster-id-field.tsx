@@ -16,8 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { TWITCH_ID_REGEX } from "@/lib/twitch";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import { getOperatorTwitchBroadcasterId } from "../_lib/get-user-channel-actions";
-import { lookupTwitchBroadcasterIdWithOperatorToken } from "../_lib/operator-lookup-actions";
+import { getOperatorTwitchBroadcasterId } from "../_actions/get-user-channel";
+import { lookupTwitchBroadcasterIdWithOperatorToken } from "../_actions/operator-lookup";
 
 interface Props {
   // biome-ignore lint/suspicious/noExplicitAny: FieldApi type requires 23 generic parameters

@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getAllUsers } from "../_actions/admin-operations";
 import { UserList } from "../_components/user-list";
-import { getAllUsers } from "../_lib/actions";
 
 export const dynamic = "force-dynamic";
 

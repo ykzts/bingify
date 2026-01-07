@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   checkUserParticipation,
   getParticipantCount,
-} from "../../_lib/actions";
+} from "../../_actions/space-join";
 
 export function useParticipantInfo(spaceId: string) {
   return useQuery({

@@ -14,7 +14,7 @@ vi.mock("next-intl/server", () => ({
 }));
 
 // Mock the actions module
-vi.mock("../_lib/actions", () => ({
+vi.mock("../_actions/space-join", () => ({
   getSpacePublicInfo: vi.fn((id: string) => {
     if (id === "invalid-id") {
       return null;

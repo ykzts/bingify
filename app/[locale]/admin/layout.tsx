@@ -5,7 +5,7 @@ import { connection } from "next/server";
 import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { hasAdminUser } from "./_lib/actions";
+import { hasAdminUser } from "./_actions/admin-operations";
 
 export async function generateMetadata({
   params,

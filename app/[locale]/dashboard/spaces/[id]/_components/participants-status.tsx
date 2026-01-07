@@ -34,9 +34,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/client";
+import { kickParticipant } from "../_actions/space-operations";
 import type { Participant } from "../_hooks/use-participants";
 import { useParticipants } from "../_hooks/use-participants";
-import { kickParticipant } from "../_lib/actions";
 import { ParticipantCardDialog } from "./participant-card-dialog";
 
 interface Props {

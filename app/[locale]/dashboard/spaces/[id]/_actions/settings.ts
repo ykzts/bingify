@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { SpaceAdmin } from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";
-import { spaceSettingsFormOpts } from "./form-options";
+import { spaceSettingsFormOpts } from "../_lib/form-options";
 
 // Email validation regex at top level for performance
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

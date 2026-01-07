@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
-import { callNumber } from "../_lib/actions";
+import { callNumber } from "../_actions/space-operations";
 
 interface Props {
   spaceId: string;

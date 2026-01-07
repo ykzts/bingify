@@ -49,7 +49,7 @@ import {
   checkSubWithAdminToken,
 } from "@/lib/twitch";
 import { checkSubscriptionWithAdminToken } from "@/lib/youtube";
-import { joinSpace } from "../actions";
+import { joinSpace } from "../space-join";
 
 describe("OAuth Token Usage in joinSpace", () => {
   beforeEach(() => {

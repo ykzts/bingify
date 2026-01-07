@@ -41,18 +41,18 @@ import type { Space } from "@/lib/types/space";
 import { cn } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import {
-  spaceSettingsFormOpts,
-  spaceSettingsFormSchema,
-} from "../_lib/form-options";
-import {
   getOperatorTwitchBroadcasterId,
   getOperatorYouTubeChannelId,
-} from "../_lib/get-user-channel-actions";
-import type { PublishSpaceState } from "../_lib/settings-actions";
+} from "../_actions/get-user-channel";
+import type { PublishSpaceState } from "../_actions/settings";
 import {
   updateAndPublishSpace,
   updateSpaceSettings,
-} from "../_lib/settings-actions";
+} from "../_actions/settings";
+import {
+  spaceSettingsFormOpts,
+  spaceSettingsFormSchema,
+} from "../_lib/form-options";
 import { TwitchBroadcasterIdField } from "./twitch-broadcaster-id-field";
 import { YoutubeChannelIdField } from "./youtube-channel-id-field";
 

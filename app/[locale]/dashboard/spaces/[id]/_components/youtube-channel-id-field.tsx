@@ -16,8 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { YOUTUBE_CHANNEL_ID_REGEX } from "@/lib/youtube-constants";
-import { getOperatorYouTubeChannelId } from "../_lib/get-user-channel-actions";
-import { lookupYouTubeChannelIdWithOperatorToken } from "../_lib/operator-lookup-actions";
+import { getOperatorYouTubeChannelId } from "../_actions/get-user-channel";
+import { lookupYouTubeChannelIdWithOperatorToken } from "../_actions/operator-lookup";
 
 interface Props {
   // biome-ignore lint/suspicious/noExplicitAny: FieldApi type requires 23 generic parameters

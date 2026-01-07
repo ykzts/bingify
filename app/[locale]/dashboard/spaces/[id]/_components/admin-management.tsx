@@ -21,16 +21,16 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { SpaceAdmin } from "@/lib/types/space";
-import {
-  inviteAdminFormOpts,
-  inviteAdminFormSchema,
-} from "../_lib/form-options";
-import { inviteAdminAction } from "../_lib/invite-admin-actions";
+import { inviteAdminAction } from "../_actions/invite-admin";
 import {
   type GetSpaceAdminsResult,
   getSpaceAdmins,
   removeAdmin,
-} from "../_lib/settings-actions";
+} from "../_actions/settings";
+import {
+  inviteAdminFormOpts,
+  inviteAdminFormSchema,
+} from "../_lib/form-options";
 
 interface Props {
   spaceId: string;

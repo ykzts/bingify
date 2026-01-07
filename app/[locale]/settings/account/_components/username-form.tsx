@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { usernameSchema } from "@/lib/schemas/user";
-import { updateUsernameAction } from "../_lib/actions";
+import { updateUsernameAction } from "../_actions/account";
 import { usernameFormOpts } from "../_lib/form-options";
 
 interface UsernameFormProps {

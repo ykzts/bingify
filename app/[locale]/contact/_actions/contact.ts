@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-form-nextjs";
 import { getAdminEmails } from "@/lib/data/profiles";
 import { sendContactEmail } from "@/lib/mail";
-import { contactFormOpts, contactFormSchema } from "./form-options";
+import { contactFormOpts, contactFormSchema } from "../_lib/form-options";
 
 /**
  * Verify Cloudflare Turnstile token

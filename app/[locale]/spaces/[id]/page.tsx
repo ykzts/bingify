@@ -9,7 +9,7 @@ import {
   checkUserParticipation,
   getSpaceById,
   getSpacePublicInfo,
-} from "../_lib/actions";
+} from "../_actions/space-join";
 import { BingoCardDisplay } from "./_components/bingo-card-display";
 import { EventEndedView } from "./_components/event-ended-view";
 import { SpaceLandingPage } from "./_components/space-landing-page";
