@@ -59,6 +59,7 @@ import { YoutubeChannelIdField } from "./youtube-channel-id-field";
 interface Props {
   currentParticipantCount: number;
   features: SystemFeatures;
+  isOwner: boolean;
   locale: string;
   onSuccess?: (message: string) => void;
   space: Space;
@@ -119,6 +120,7 @@ function determineSocialPlatform(
 export function SpaceSettingsForm({
   currentParticipantCount,
   features,
+  isOwner,
   locale,
   onSuccess,
   space,
@@ -477,6 +479,7 @@ export function SpaceSettingsForm({
 
   const isDraft = space.status === "draft";
   const isPending = isSubmitting || isPublishing;
+  const isGatekeeperDisabled = isPending || !isOwner;
 
   // Calculate grid columns for tabs
   const visibleTabCount =
@@ -608,24 +611,32 @@ export function SpaceSettingsForm({
 
                 <Tabs
                   defaultValue={effectiveGatekeeperMode}
-                  onValueChange={(value) =>
-                    gatekeeperField.handleChange(
-                      value as "none" | "social" | "email"
-                    )
-                  }
+                  onValueChange={(value) => {
+                    if (!isGatekeeperDisabled) {
+                      gatekeeperField.handleChange(
+                        value as "none" | "social" | "email"
+                      );
+                    }
+                  }}
                   value={effectiveGatekeeperMode}
                 >
                   <TabsList className={cn("grid w-full", gridColsClass)}>
-                    <TabsTrigger value="none">
+                    <TabsTrigger disabled={isGatekeeperDisabled} value="none">
                       {t("gatekeeperModeNone")}
                     </TabsTrigger>
                     {showSocialOption && (
-                      <TabsTrigger value="social">
+                      <TabsTrigger
+                        disabled={isGatekeeperDisabled}
+                        value="social"
+                      >
                         {t("gatekeeperModeSocial")}
                       </TabsTrigger>
                     )}
                     {showEmailOption && (
-                      <TabsTrigger value="email">
+                      <TabsTrigger
+                        disabled={isGatekeeperDisabled}
+                        value="email"
+                      >
                         {t("gatekeeperModeEmail")}
                       </TabsTrigger>
                     )}
@@ -660,7 +671,7 @@ export function SpaceSettingsForm({
                                 {t("socialPlatformLabel")}
                               </Label>
                               <RadioGroup
-                                disabled={isPending}
+                                disabled={isGatekeeperDisabled}
                                 onValueChange={(value) =>
                                   platformField.handleChange(
                                     value as "youtube" | "twitch"
@@ -714,7 +725,7 @@ export function SpaceSettingsForm({
                                       {t("youtubeRequirementLabel")}
                                     </FieldLabel>
                                     <Select
-                                      disabled={isPending}
+                                      disabled={isGatekeeperDisabled}
                                       name={field.name}
                                       onValueChange={(value) => {
                                         field.handleChange(value);
@@ -769,7 +780,7 @@ export function SpaceSettingsForm({
                                   }
                                   enteredChannelId={enteredYoutubeChannelId}
                                   field={field}
-                                  isPending={isPending}
+                                  isPending={isGatekeeperDisabled}
                                   onOperatorIdFetched={
                                     setOperatorYoutubeChannelId
                                   }
@@ -792,7 +803,7 @@ export function SpaceSettingsForm({
                                       {t("twitchRequirementLabel")}
                                     </FieldLabel>
                                     <Select
-                                      disabled={isPending}
+                                      disabled={isGatekeeperDisabled}
                                       name={field.name}
                                       onValueChange={(value) => {
                                         field.handleChange(value);
@@ -840,7 +851,7 @@ export function SpaceSettingsForm({
                                     enteredTwitchBroadcasterId
                                   }
                                   field={field}
-                                  isPending={isPending}
+                                  isPending={isGatekeeperDisabled}
                                   onOperatorIdFetched={
                                     setOperatorTwitchBroadcasterId
                                   }
@@ -868,7 +879,7 @@ export function SpaceSettingsForm({
                                 {t("emailAllowlistLabel")}
                               </FieldLabel>
                               <Textarea
-                                disabled={isPending}
+                                disabled={isGatekeeperDisabled}
                                 name={field.name}
                                 onChange={(e) =>
                                   field.handleChange(e.target.value)
