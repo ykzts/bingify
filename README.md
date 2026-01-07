@@ -138,8 +138,20 @@ lib/
 - `pnpm local:stop` — Supabase ローカルインスタンス停止
 - `pnpm supabase:test` — データベーステスト実行（PgTAP）
 - `pnpm supabase:typegen` — Supabase の型定義を生成（DB 変更後に実行）
+- `pnpm labels:sync` — GitHub ラベルを同期（要 GitHub CLI 認証）
 - `pnpm lint` — ESLint 実行
 - `pnpm test` — フロントエンドテスト実行（Vitest）
+
+## GitHub ラベル管理
+
+このプロジェクトでは、GitHub Issue / Pull Request のラベルをコードとして管理しています。
+
+- ラベル定義: `.github/labels.json`
+- 自動同期: `main` ブランチへのマージ時に GitHub Actions が自動実行
+- 手動同期: `pnpm labels:sync` で手動実行可能（要 GitHub CLI）
+
+詳細は [docs/LABELS.md](docs/LABELS.md) を参照してください。
+
 
 ## データベーステスト
 
