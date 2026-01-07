@@ -448,6 +448,10 @@ export type Database = {
         }[]
       }
       delete_oauth_token: { Args: { p_provider: string }; Returns: Json }
+      delete_oauth_token_for_user: {
+        Args: { p_provider: string; p_user_id: string }
+        Returns: Json
+      }
       get_expired_oauth_tokens: {
         Args: never
         Returns: {

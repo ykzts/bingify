@@ -361,6 +361,13 @@
     "titleSpace": "スペースに参加",
     "twitchButton": "Twitchでログイン"
   },
+  "OAuth": {
+    "errorInsufficientPermissions": "OAuth権限が不足しています。必要な権限でアカウントを再接続してください。",
+    "errorNetworkError": "アカウント確認中にネットワークエラーが発生しました。もう一度お試しください。",
+    "errorTokenDeleted": "認証情報が無効なためOAuthトークンが削除されました。アカウントを再接続してください。",
+    "errorTokenExpired": "OAuthトークンの有効期限が切れているか、取り消されています。アカウントを再接続してください。",
+    "errorUnknown": "OAuth確認中に予期しないエラーが発生しました。もう一度お試しください。"
+  },
   "Metadata": {
     "description": "リアルタイムで盛り上がる、新しいビンゴ体験。OAuth ログインで簡単に始められます。",
     "ogSpaceSubtitle": "このビンゴスペースに参加",

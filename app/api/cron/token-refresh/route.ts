@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
+import { handleOAuthError } from "@/lib/oauth/token-error-handler";
 import {
   type RefreshTokenResponse,
   refreshGoogleToken,
@@ -11,10 +12,16 @@ import type { Database } from "@/types/supabase";
  * トークンリフレッシュの結果サマリー
  */
 interface RefreshSummary {
+  /** リフレッシュに失敗した数 */
   failed: number;
+  /** 正常にリフレッシュされた数 */
   refreshed: number;
+  /** スキップされた数 */
   skipped: number;
+  /** 合計処理数 */
   total: number;
+  /** 無効なトークンとして削除された数 */
+  tokensDeleted: number;
 }
 
 /**
@@ -127,12 +134,14 @@ export async function GET(request: NextRequest) {
       failed: 0,
       refreshed: 0,
       skipped: 0,
+      tokensDeleted: 0,
       total: tokens.length,
     };
 
     const failedTokens: Array<{
       error: string;
       provider: string;
+      tokenDeleted?: boolean;
       user_id: string;
     }> = [];
 
@@ -214,11 +223,46 @@ export async function GET(request: NextRequest) {
         console.error(
           `Failed to refresh token for user ${token.user_id} (${token.provider}): ${errorMsg}`
         );
-        failedTokens.push({
-          error: errorMsg,
-          provider: token.provider,
-          user_id: token.user_id,
-        });
+
+        // エラーハンドリング：無効なトークンの場合は削除
+        try {
+          const supabaseForUser = createClient<Database>(
+            supabaseUrl,
+            supabaseServiceKey
+          );
+          const errorResult = await handleOAuthError(
+            supabaseForUser,
+            err,
+            token.provider as "google" | "twitch",
+            `cron refresh for user ${token.user_id}`,
+            token.user_id // service roleコンテキストではuser_idを明示的に渡す
+          );
+
+          const tokenDeleted = errorResult.tokenDeleted;
+          if (tokenDeleted) {
+            summary.tokensDeleted++;
+            console.log(
+              `Deleted invalid token for user ${token.user_id} (${token.provider})`
+            );
+          }
+
+          failedTokens.push({
+            error: errorMsg,
+            provider: token.provider,
+            tokenDeleted,
+            user_id: token.user_id,
+          });
+        } catch (handleError) {
+          console.error(
+            `Failed to handle error for user ${token.user_id} (${token.provider}):`,
+            handleError
+          );
+          failedTokens.push({
+            error: errorMsg,
+            provider: token.provider,
+            user_id: token.user_id,
+          });
+        }
       } finally {
         // Release advisory lock after processing (success or failure)
         if (token.lock_key) {
@@ -237,14 +281,14 @@ export async function GET(request: NextRequest) {
     }
 
     console.log(
-      `Token refresh completed: ${summary.refreshed} refreshed, ${summary.skipped} skipped, ${summary.failed} failed`
+      `Token refresh completed: ${summary.refreshed} refreshed, ${summary.skipped} skipped, ${summary.failed} failed, ${summary.tokensDeleted} tokens deleted`
     );
 
     return NextResponse.json({
       data: {
         ...summary,
         failedTokens: failedTokens.length > 0 ? failedTokens : undefined,
-        message: `Token refresh completed: ${summary.refreshed} refreshed, ${summary.skipped} skipped, ${summary.failed} failed`,
+        message: `Token refresh completed: ${summary.refreshed} refreshed, ${summary.skipped} skipped, ${summary.failed} failed, ${summary.tokensDeleted} tokens deleted`,
       },
     });
   } catch (error) {

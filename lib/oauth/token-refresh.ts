@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/supabase";
+import { handleOAuthError } from "./token-error-handler";
 import type { OAuthProvider } from "./token-storage";
 import {
   getOAuthToken,
@@ -24,7 +25,10 @@ export interface RefreshResult {
   error?: string;
   provider: OAuthProvider;
   refreshed: boolean;
+  /** リフレッシュがスキップされた場合 */
   skipped?: boolean;
+  /** トークンが無効で削除された場合 */
+  tokenDeleted?: boolean;
 }
 
 /**
@@ -196,10 +200,20 @@ export async function refreshOAuthToken(
     };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);
+
+    // エラーハンドリング：無効なトークンの場合は削除
+    const errorResult = await handleOAuthError(
+      supabase,
+      err,
+      provider,
+      "token refresh"
+    );
+
     return {
       error: errorMessage,
       provider,
       refreshed: false,
+      tokenDeleted: errorResult.tokenDeleted,
     };
   }
 }
