@@ -277,29 +277,30 @@ export async function getOAuthTokenWithRefresh(
       return await existingRefresh;
     }
 
-    // トークンを取得
-    const tokenResult = await getOAuthToken(supabase, provider);
-
-    if (!tokenResult.success) {
-      return tokenResult;
-    }
-
-    // トークンが有効期限切れでない場合はそのまま返す
-    if (!isTokenExpired(tokenResult.expires_at)) {
-      return tokenResult;
-    }
-
-    // リフレッシュトークンがない場合はエラーを返す
-    if (!tokenResult.refresh_token) {
-      return {
-        error: "Token expired and no refresh token available",
-        success: false,
-      };
-    }
-
-    // リフレッシュ処理を開始（ロック）
+    // レースコンディションを防ぐため、即座にロックを設定
+    // Promise を作成し、トークン取得とリフレッシュ処理を内部で実行
     const refreshPromise = (async () => {
       try {
+        // トークンを取得
+        const tokenResult = await getOAuthToken(supabase, provider);
+
+        if (!tokenResult.success) {
+          return tokenResult;
+        }
+
+        // トークンが有効期限切れでない場合はそのまま返す
+        if (!isTokenExpired(tokenResult.expires_at)) {
+          return tokenResult;
+        }
+
+        // リフレッシュトークンがない場合はエラーを返す
+        if (!tokenResult.refresh_token) {
+          return {
+            error: "Token expired and no refresh token available",
+            success: false,
+          };
+        }
+
         // refreshOAuthToken を動的にインポート（循環依存回避）
         const { refreshOAuthToken } = await import("./token-refresh");
         const refreshResult = await refreshOAuthToken(supabase, provider);
@@ -319,7 +320,7 @@ export async function getOAuthTokenWithRefresh(
       }
     })();
 
-    // ロックに登録
+    // ロックに登録（レースコンディション回避のため、Promise作成直後に設定）
     refreshLocks.set(lockKey, refreshPromise);
 
     return await refreshPromise;
@@ -353,29 +354,30 @@ export async function getOAuthTokenForUserWithRefresh(
       return await existingRefresh;
     }
 
-    // トークンを取得
-    const tokenResult = await getOAuthTokenForUser(userId, provider);
-
-    if (!tokenResult.success) {
-      return tokenResult;
-    }
-
-    // トークンが有効期限切れでない場合はそのまま返す
-    if (!isTokenExpired(tokenResult.expires_at)) {
-      return tokenResult;
-    }
-
-    // リフレッシュトークンがない場合はエラーを返す
-    if (!tokenResult.refresh_token) {
-      return {
-        error: "Token expired and no refresh token available",
-        success: false,
-      };
-    }
-
-    // リフレッシュ処理を開始（ロック）
+    // レースコンディションを防ぐため、即座にロックを設定
+    // Promise を作成し、トークン取得とリフレッシュ処理を内部で実行
     const refreshPromise = (async () => {
       try {
+        // トークンを取得
+        const tokenResult = await getOAuthTokenForUser(userId, provider);
+
+        if (!tokenResult.success) {
+          return tokenResult;
+        }
+
+        // トークンが有効期限切れでない場合はそのまま返す
+        if (!isTokenExpired(tokenResult.expires_at)) {
+          return tokenResult;
+        }
+
+        // リフレッシュトークンがない場合はエラーを返す
+        if (!tokenResult.refresh_token) {
+          return {
+            error: "Token expired and no refresh token available",
+            success: false,
+          };
+        }
+
         // 管理者用のリフレッシュ処理を直接実装
         const { refreshGoogleToken, refreshTwitchToken } = await import(
           "./token-refresh"
@@ -435,7 +437,7 @@ export async function getOAuthTokenForUserWithRefresh(
       }
     })();
 
-    // ロックに登録
+    // ロックに登録（レースコンディション回避のため、Promise作成直後に設定）
     refreshLocks.set(lockKey, refreshPromise);
 
     return await refreshPromise;
