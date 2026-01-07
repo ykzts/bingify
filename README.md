@@ -41,7 +41,15 @@ pnpm install
 cp .env.local.example .env.local
 ```
 
-### 3. ローカル開発環境の起動
+### 3. Supabase メールテンプレートのシンボリックリンク作成
+
+Supabase CLI がメールテンプレートを見つけられるよう、シンボリックリンクを作成します。
+
+```bash
+ln -s supabase/templates templates
+```
+
+### 4. ローカル開発環境の起動
 
 ```bash
 # Supabase ローカルインスタンスを起動
@@ -53,7 +61,7 @@ pnpm dev
 
 アプリケーションは [http://localhost:3000](http://localhost:3000) で起動します。
 
-### 4. ローカルインスタンスの停止
+### 5. ローカルインスタンスの停止
 
 ```bash
 pnpm local:stop
