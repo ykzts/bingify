@@ -141,17 +141,6 @@ lib/
 - `pnpm lint` — ESLint 実行
 - `pnpm test` — フロントエンドテスト実行（Vitest）
 
-## GitHub ラベル管理
-
-このプロジェクトでは、GitHub Issue / Pull Request のラベルをコードとして管理しています。
-
-- ラベル定義: `.github/labels.yml`（YAML 形式）
-- 自動同期: `main` ブランチへのマージ時に GitHub Actions が自動実行
-- 使用ツール: [ghaction-github-labeler](https://github.com/crazy-max/ghaction-github-labeler)
-
-詳細は [docs/LABELS.md](docs/LABELS.md) を参照してください。
-
-
 ## データベーステスト
 
 Bingify では [PgTAP](https://pgtap.org/) を使用してデータベース層のテストを実施しています。これにより、RLS (Row Level Security) ポリシーやスキーマ定義が意図通りに動作することを検証できます。
