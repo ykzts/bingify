@@ -162,13 +162,16 @@ export function classifyProviderError(
  * @param error - 発生したエラー
  * @param provider - OAuthプロバイダー
  * @param context - エラー発生のコンテキスト（ログ用）
+ * @param userId - ユーザーID（service roleコンテキストで使用）
  * @returns エラーハンドリングの結果
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: エラーハンドリングには多くの条件分岐が必要
 export async function handleOAuthError(
   supabase: SupabaseClient<Database>,
   error: unknown,
   provider: OAuthProvider,
-  context: string
+  context: string,
+  userId?: string
 ): Promise<ErrorHandlingResult> {
   const errorType = classifyProviderError(error, provider);
 
@@ -203,13 +206,47 @@ export async function handleOAuthError(
     );
 
     try {
-      const deleteResult = await deleteOAuthToken(supabase, provider);
+      let deleteResult: {
+        deleted?: boolean;
+        error?: string;
+        provider?: string;
+        success: boolean;
+      };
+
+      // service roleコンテキスト（userId指定時）は delete_oauth_token_for_user を使用
+      if (userId) {
+        const { data, error: rpcError } = await supabase.rpc(
+          "delete_oauth_token_for_user",
+          {
+            p_provider: provider,
+            p_user_id: userId,
+          }
+        );
+
+        if (rpcError) {
+          deleteResult = {
+            error: rpcError.message,
+            success: false,
+          };
+        } else {
+          deleteResult = data as unknown as {
+            deleted?: boolean;
+            error?: string;
+            provider?: string;
+            success: boolean;
+          };
+        }
+      } else {
+        // 通常のユーザーコンテキストは既存の deleteOAuthToken を使用
+        deleteResult = await deleteOAuthToken(supabase, provider);
+      }
+
       result.tokenDeleted =
         deleteResult.success && (deleteResult.deleted ?? false);
 
       if (result.tokenDeleted) {
         console.log(
-          `[OAuth Error Handler] Successfully deleted invalid ${provider} token for user`
+          `[OAuth Error Handler] Successfully deleted invalid ${provider} token for user${userId ? ` ${userId}` : ""}`
         );
       } else {
         console.warn(

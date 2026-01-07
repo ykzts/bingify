@@ -234,7 +234,8 @@ export async function GET(request: NextRequest) {
             supabaseForUser,
             err,
             token.provider as "google" | "twitch",
-            `cron refresh for user ${token.user_id}`
+            `cron refresh for user ${token.user_id}`,
+            token.user_id // service roleコンテキストではuser_idを明示的に渡す
           );
 
           const tokenDeleted = errorResult.tokenDeleted;

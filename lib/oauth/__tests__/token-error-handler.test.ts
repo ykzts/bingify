@@ -434,5 +434,62 @@ describe("Token Error Handler", () => {
       expect(result.requiresReauth).toBe(true);
       expect(tokenStorage.deleteOAuthToken).toHaveBeenCalled();
     });
+
+    it("service roleコンテキスト（userId指定）でトークンを削除する", async () => {
+      const mockSupabase = createMockSupabase();
+      const error = { status: 401 };
+      const userId = "test-user-id";
+
+      // service role用のRPC呼び出しをモック
+      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
+        data: { deleted: true, provider: "google", success: true },
+        error: null,
+      } as never);
+
+      const result = await handleOAuthError(
+        mockSupabase,
+        error,
+        "google",
+        "cron refresh",
+        userId
+      );
+
+      expect(result.errorType).toBe(OAuthErrorType.TOKEN_INVALID);
+      expect(result.tokenDeleted).toBe(true);
+      expect(result.requiresReauth).toBe(true);
+      expect(mockSupabase.rpc).toHaveBeenCalledWith(
+        "delete_oauth_token_for_user",
+        {
+          p_provider: "google",
+          p_user_id: userId,
+        }
+      );
+      // 通常のdeleteOAuthTokenは呼ばれない
+      expect(tokenStorage.deleteOAuthToken).not.toHaveBeenCalled();
+    });
+
+    it("service roleコンテキストでRPCエラーが発生した場合", async () => {
+      const mockSupabase = createMockSupabase();
+      const error = { status: 401 };
+      const userId = "test-user-id";
+
+      // RPCエラーをモック
+      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
+        data: null,
+        error: { message: "RPC call failed" } as never,
+      } as never);
+
+      const result = await handleOAuthError(
+        mockSupabase,
+        error,
+        "google",
+        "cron refresh",
+        userId
+      );
+
+      expect(result.errorType).toBe(OAuthErrorType.TOKEN_INVALID);
+      expect(result.tokenDeleted).toBe(false);
+      expect(result.requiresReauth).toBe(true);
+    });
   });
 });
