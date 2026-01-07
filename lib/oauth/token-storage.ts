@@ -389,10 +389,7 @@ export async function getOAuthTokenForUserWithRefresh(
         };
 
         // ここではrefresh_tokenが必ず存在することは既にチェック済み
-        const refreshToken = tokenResult.refresh_token;
-        if (!refreshToken) {
-          throw new Error("Refresh token is missing");
-        }
+        const refreshToken = tokenResult.refresh_token as string;
 
         if (provider === "google") {
           newTokenData = await refreshGoogleToken(refreshToken);
@@ -414,12 +411,10 @@ export async function getOAuthTokenForUserWithRefresh(
           "upsert_oauth_token_for_user",
           {
             p_access_token: newTokenData.access_token,
-            p_expires_at: expiresAt ?? undefined,
+            p_expires_at: expiresAt,
             p_provider: provider,
             p_refresh_token:
-              newTokenData.refresh_token ||
-              tokenResult.refresh_token ||
-              undefined,
+              newTokenData.refresh_token ?? tokenResult.refresh_token,
             p_user_id: userId,
           }
         );
