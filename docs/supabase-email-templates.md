@@ -125,24 +125,24 @@ Supabaseはローカル環境でInbucketを使用してメールをキャプチ�
 ```toml
 [auth.email.template.confirmation]
 subject = "メールアドレスの確認 / Confirm Your Email"
-content_path = "./supabase/templates/confirmation.html"
+content_path = "./templates/confirmation.html"
 
 [auth.email.template.invite]
 subject = "Bingifyへの招待 / Invitation to Bingify"
-content_path = "./supabase/templates/invite.html"
+content_path = "./templates/invite.html"
 
 [auth.email.template.recovery]
 subject = "パスワードのリセット / Reset Your Password"
-content_path = "./supabase/templates/recovery.html"
+content_path = "./templates/recovery.html"
 
 [auth.email.template.email_change]
 subject = "メールアドレスの変更確認 / Confirm Email Change"
-content_path = "./supabase/templates/email_change.html"
+content_path = "./templates/email_change.html"
 
 [auth.email.notification.password_changed]
 enabled = true
 subject = "パスワードが変更されました / Password Changed"
-content_path = "./supabase/templates/password_changed_notification.html"
+content_path = "./templates/password_changed_notification.html"
 ```
 
 ## トラブルシューティング
