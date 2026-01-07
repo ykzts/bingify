@@ -1,11 +1,14 @@
 -- Fix search_path for handle_new_user so GoTrue resolves auth.users
 CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_temp, pg_catalog, public, auth
+AS $$
 #variable_conflict use_column
 DECLARE default_role TEXT;
 BEGIN
-  -- Ensure auth schema is on search_path for GoTrue
-  SET search_path = pg_catalog, public, auth;
+  -- search_path is enforced via function attribute above
 
   BEGIN
     SELECT default_user_role INTO default_role
@@ -43,7 +46,7 @@ BEGIN
 
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 REVOKE ALL ON FUNCTION handle_new_user() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION handle_new_user() TO service_role;
