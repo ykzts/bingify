@@ -405,7 +405,7 @@ export async function getOAuthTokenForUserWithRefresh(
 
         const expiresAt = newTokenData.expires_in
           ? new Date(Date.now() + newTokenData.expires_in * 1000).toISOString()
-          : null;
+          : undefined;
 
         const { data: upsertData, error: upsertError } = await adminClient.rpc(
           "upsert_oauth_token_for_user",
@@ -414,7 +414,9 @@ export async function getOAuthTokenForUserWithRefresh(
             p_expires_at: expiresAt,
             p_provider: provider,
             p_refresh_token:
-              newTokenData.refresh_token ?? tokenResult.refresh_token,
+              newTokenData.refresh_token ??
+              tokenResult.refresh_token ??
+              undefined,
             p_user_id: userId,
           }
         );
