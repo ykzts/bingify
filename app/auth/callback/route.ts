@@ -245,6 +245,25 @@ export async function GET(request: NextRequest) {
         // Continue anyway - token storage failure shouldn't block authentication
       }
     }
+
+    // Set language metadata if not already set (for OAuth users)
+    const userMetadata = session.user?.user_metadata;
+    if (!userMetadata?.language) {
+      const locale = getLocaleFromReferer();
+      if (locale) {
+        // Update user metadata with language preference
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: {
+            language: locale,
+          },
+        });
+
+        if (updateError) {
+          console.warn("Failed to set language metadata:", updateError);
+          // Continue anyway - metadata update failure shouldn't block authentication
+        }
+      }
+    }
   }
 
   // Successfully authenticated, redirect to specified path or default
