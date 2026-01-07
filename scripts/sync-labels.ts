@@ -5,13 +5,7 @@ import path from "node:path";
 interface Label {
   name: string;
   color: string;
-  description: string;
-}
-
-interface ExistingLabel {
-  name: string;
-  color: string;
-  description: string;
+  description?: string;
 }
 
 const LABELS_FILE = path.join(process.cwd(), ".github", "labels.json");
@@ -36,6 +30,13 @@ const execGhCommand = (command: string): string => {
 };
 
 /**
+ * シェル引数用にエスケープするヘルパー関数
+ */
+const escapeShellArg = (arg: string): string => {
+  return arg.replace(/"/g, '\\"');
+};
+
+/**
  * 定義ファイルからラベルを読み込む
  */
 const loadLabelsFromFile = (): Label[] => {
@@ -51,8 +52,13 @@ const loadLabelsFromFile = (): Label[] => {
   }
 
   for (const label of labels) {
-    if (!(label.name && label.color)) {
-      throw new Error("Each label must have 'name' and 'color' properties");
+    const hasValidName = label.name?.trim();
+    const hasValidColor = label.color?.trim();
+
+    if (!(hasValidName && hasValidColor)) {
+      throw new Error(
+        "Each label must have non-empty 'name' and 'color' properties"
+      );
     }
   }
 
@@ -62,7 +68,7 @@ const loadLabelsFromFile = (): Label[] => {
 /**
  * GitHub リポジトリから既存のラベルを取得
  */
-const getExistingLabels = (): ExistingLabel[] => {
+const getExistingLabels = (): Label[] => {
   console.log("📋 Fetching existing labels from GitHub...");
   const output = execGhCommand("gh label list --json name,color,description");
 
@@ -79,10 +85,10 @@ const getExistingLabels = (): ExistingLabel[] => {
 const createLabel = (label: Label): void => {
   console.log(`  ➕ Creating label: ${label.name}`);
   const descriptionArg = label.description
-    ? `--description "${label.description.replace(/"/g, '\\"')}"`
+    ? `--description "${escapeShellArg(label.description)}"`
     : "";
   execGhCommand(
-    `gh label create "${label.name}" --color "${label.color}" ${descriptionArg}`
+    `gh label create "${escapeShellArg(label.name)}" --color "${escapeShellArg(label.color)}" ${descriptionArg}`
   );
 };
 
@@ -92,10 +98,10 @@ const createLabel = (label: Label): void => {
 const updateLabel = (label: Label): void => {
   console.log(`  🔄 Updating label: ${label.name}`);
   const descriptionArg = label.description
-    ? `--description "${label.description.replace(/"/g, '\\"')}"`
+    ? `--description "${escapeShellArg(label.description)}"`
     : "";
   execGhCommand(
-    `gh label edit "${label.name}" --color "${label.color}" ${descriptionArg}`
+    `gh label edit "${escapeShellArg(label.name)}" --color "${escapeShellArg(label.color)}" ${descriptionArg}`
   );
 };
 
@@ -104,13 +110,13 @@ const updateLabel = (label: Label): void => {
  */
 const deleteLabel = (name: string): void => {
   console.log(`  ❌ Deleting label: ${name}`);
-  execGhCommand(`gh label delete "${name}" --yes`);
+  execGhCommand(`gh label delete "${escapeShellArg(name)}" --yes`);
 };
 
 /**
  * 2つのラベルが異なるかチェック
  */
-const labelsAreDifferent = (label1: Label, label2: ExistingLabel): boolean => {
+const labelsAreDifferent = (label1: Label, label2: Label): boolean => {
   return (
     label1.color.toLowerCase() !== label2.color.toLowerCase() ||
     (label1.description || "") !== (label2.description || "")
