@@ -112,11 +112,6 @@ export function LoginForm({ providers, systemSettings }: Props) {
     // システム設定に基づいてスコープを取得
     const scopes = getScopesForProvider(provider, systemSettings);
 
-    // Store locale in sessionStorage to retrieve after OAuth callback
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("auth_locale", locale);
-    }
-
     const { error } = await supabase.auth.signInWithOAuth({
       options: {
         queryParams:
