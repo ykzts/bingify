@@ -7,7 +7,7 @@
   ],
   "files": {
     "ignoreUnknown": true,
-    "includes": ["!components/ui", "!supabase/templates"]
+    "includes": ["!components/ui", "!templates"]
   },
   "overrides": [
     {
