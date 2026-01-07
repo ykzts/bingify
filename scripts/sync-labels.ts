@@ -30,13 +30,6 @@ const execGhCommand = (command: string): string => {
 };
 
 /**
- * シェル引数用にエスケープするヘルパー関数
- */
-const escapeShellArg = (arg: string): string => {
-  return arg.replace(/"/g, '\\"');
-};
-
-/**
  * 定義ファイルからラベルを読み込む
  */
 const loadLabelsFromFile = (): Label[] => {
@@ -84,11 +77,12 @@ const getExistingLabels = (): Label[] => {
  */
 const createLabel = (label: Label): void => {
   console.log(`  ➕ Creating label: ${label.name}`);
-  const descriptionArg = label.description
-    ? `--description "${escapeShellArg(label.description)}"`
-    : "";
+  const args = ["label", "create", label.name, "--color", label.color];
+  if (label.description) {
+    args.push("--description", label.description);
+  }
   execGhCommand(
-    `gh label create "${escapeShellArg(label.name)}" --color "${escapeShellArg(label.color)}" ${descriptionArg}`
+    `gh ${args.map((arg) => `"${arg.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`).join(" ")}`
   );
 };
 
@@ -97,11 +91,12 @@ const createLabel = (label: Label): void => {
  */
 const updateLabel = (label: Label): void => {
   console.log(`  🔄 Updating label: ${label.name}`);
-  const descriptionArg = label.description
-    ? `--description "${escapeShellArg(label.description)}"`
-    : "";
+  const args = ["label", "edit", label.name, "--color", label.color];
+  if (label.description) {
+    args.push("--description", label.description);
+  }
   execGhCommand(
-    `gh label edit "${escapeShellArg(label.name)}" --color "${escapeShellArg(label.color)}" ${descriptionArg}`
+    `gh ${args.map((arg) => `"${arg.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`).join(" ")}`
   );
 };
 
@@ -110,7 +105,10 @@ const updateLabel = (label: Label): void => {
  */
 const deleteLabel = (name: string): void => {
   console.log(`  ❌ Deleting label: ${name}`);
-  execGhCommand(`gh label delete "${escapeShellArg(name)}" --yes`);
+  const args = ["label", "delete", name, "--yes"];
+  execGhCommand(
+    `gh ${args.map((arg) => `"${arg.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`).join(" ")}`
+  );
 };
 
 /**
