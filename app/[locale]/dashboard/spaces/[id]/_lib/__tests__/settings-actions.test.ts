@@ -68,21 +68,15 @@ describe("updateSpaceSettings - ゲートキーパー設定の権限制御", () 
       },
       from: vi.fn((tableName: string) => {
         if (tableName === "spaces") {
-          // First call - get space
-          if (mockSupabase.from.mock.calls.length === 1) {
-            return {
-              select: vi.fn(() => ({
-                eq: vi.fn(() => ({
-                  single: vi.fn().mockResolvedValue({
-                    data: mockSpace,
-                    error: null,
-                  }),
-                })),
-              })),
-            };
-          }
-          // Third call - update
           return {
+            select: vi.fn(() => ({
+              eq: vi.fn(() => ({
+                single: vi.fn().mockResolvedValue({
+                  data: mockSpace,
+                  error: null,
+                }),
+              })),
+            })),
             update: vi.fn(() => ({
               eq: vi.fn().mockResolvedValue({
                 error: null,
