@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
-      - uses: crazy-max/ghaction-github-labeler@8bb4b27967e88c18e3ba8761b95400c1a9c333b0 # v5.1.0
+      - uses: crazy-max/ghaction-github-labeler@b54af0c25861143e7c8813d7cbbf46d2c341680c # v5.1.0
         with:
           github-token: ${{ github.token }}
           yaml-file: .github/labels.yml
