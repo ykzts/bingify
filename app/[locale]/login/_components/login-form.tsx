@@ -2,7 +2,7 @@
 
 import { AlertCircle, CheckCircle, Mail } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { z } from "zod";
 import { OAuthButton } from "@/components/oauth-button";
@@ -92,6 +92,7 @@ function EmailLoginForm({
 
 export function LoginForm({ providers, systemSettings }: Props) {
   const t = useTranslations("Login");
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
   const redirect = searchParams.get("redirect");
@@ -150,6 +151,9 @@ export function LoginForm({ providers, systemSettings }: Props) {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
+        data: {
+          language: locale,
+        },
         emailRedirectTo: buildOAuthCallbackUrl(redirect ?? undefined),
       },
     });

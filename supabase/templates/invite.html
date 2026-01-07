@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="{{if eq .Data.language "ja"}}ja{{else}}en{{end}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{if eq .Data.language "ja"}}Bingifyへの招待{{else}}Invitation to Bingify{{end}}</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+      padding: 40px 20px;
+      text-align: center;
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .content {
+      padding: 40px 30px;
+    }
+    .content p {
+      margin: 0 0 20px;
+      color: #333333;
+      font-size: 16px;
+    }
+    .button {
+      display: inline-block;
+      padding: 14px 40px;
+      background-color: #a78bfa;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      margin: 20px 0;
+      transition: background-color 0.2s;
+    }
+    .button:hover {
+      background-color: #8b5cf6;
+    }
+    .button-container {
+      text-align: center;
+      margin: 30px 0;
+    }
+    .info-box {
+      background-color: #ede9fe;
+      border-left: 4px solid #a78bfa;
+      padding: 15px 20px;
+      margin: 30px 0;
+      border-radius: 4px;
+    }
+    .info-box p {
+      margin: 0;
+      color: #5b21b6;
+      font-size: 14px;
+    }
+    .footer {
+      padding: 20px 30px;
+      background-color: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+    }
+    .footer a {
+      color: #a78bfa;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>{{if eq .Data.language "ja"}}Bingifyへようこそ{{else}}You're Invited to Bingify{{end}}</h1>
+    </div>
+    
+    <div class="content">
+      {{if eq .Data.language "ja"}}
+        <p>こんにちは！</p>
+        <p>Bingifyへ招待されました。ストリーマーやコミュニティ向けのリアルタイムビンゴアプリケーションに参加して、楽しい体験を始めましょう。</p>
+        <p>以下のボタンをクリックして、アカウントを作成してください。</p>
+      {{else}}
+        <p>Hello!</p>
+        <p>You've been invited to join Bingify, a real-time bingo application for streamers and communities. Click the button below to accept your invitation and create your account.</p>
+      {{end}}
+      
+      <div class="button-container">
+        <a href="{{ .ConfirmationURL }}" class="button">
+          {{if eq .Data.language "ja"}}招待を承諾{{else}}Accept Invitation{{end}}
+        </a>
+      </div>
+      
+      <div class="info-box">
+        {{if eq .Data.language "ja"}}
+          <p><strong>Bingifyでできること：</strong></p>
+          <p>• カスタムビンゴカードの作成<br>
+             • リアルタイムでのビンゴゲーム<br>
+             • ストリーマーとコミュニティの連携<br>
+             • 楽しいインタラクティブ体験</p>
+        {{else}}
+          <p><strong>What you can do with Bingify:</strong></p>
+          <p>• Create custom bingo cards<br>
+             • Play bingo games in real-time<br>
+             • Connect with streamers and communities<br>
+             • Enjoy interactive experiences</p>
+        {{end}}
+      </div>
+      
+      {{if eq .Data.language "ja"}}
+        <p style="color: #6b7280; font-size: 14px;">この招待に心当たりがない場合は、このメールを無視してください。アカウントは作成されません。</p>
+      {{else}}
+        <p style="color: #6b7280; font-size: 14px;">If you didn't expect this invitation, you can safely ignore this email. No account will be created.</p>
+      {{end}}
+    </div>
+    
+    <div class="footer">
+      <p>
+        {{if eq .Data.language "ja"}}
+          &copy; 2026 Bingify. すべての権利を保有します。<br>
+          リアルタイムビンゴアプリケーション
+        {{else}}
+          &copy; 2026 Bingify. All rights reserved.<br>
+          Real-time bingo application for streamers and communities
+        {{end}}
+      </p>
+    </div>
+  </div>
+</body>
+</html>

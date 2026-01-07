@@ -155,6 +155,7 @@ async function exchangeCodeWithRetry(
   return { error: lastError };
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: OAuth callback handling requires multiple conditional checks for security and error handling
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
@@ -243,6 +244,25 @@ export async function GET(request: NextRequest) {
           result.error
         );
         // Continue anyway - token storage failure shouldn't block authentication
+      }
+    }
+
+    // Set language metadata if not already set (for OAuth users)
+    const userMetadata = session.user?.user_metadata;
+    if (!userMetadata?.language) {
+      const locale = getLocaleFromReferer();
+      if (locale) {
+        // Update user metadata with language preference
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: {
+            language: locale,
+          },
+        });
+
+        if (updateError) {
+          console.warn("Failed to set language metadata:", updateError);
+          // Continue anyway - metadata update failure shouldn't block authentication
+        }
       }
     }
   }
