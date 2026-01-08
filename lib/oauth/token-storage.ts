@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { z } from "zod";
 import type { Database } from "@/types/supabase";
 
 export type OAuthProvider = "google" | "twitch";
@@ -32,6 +33,32 @@ export interface GetTokenResult extends TokenResult {
   refresh_token?: string | null;
   updated_at?: string;
 }
+
+/**
+ * Zodスキーマ: データベースから返されるトークンデータの構造
+ */
+const tokenDataSchema = z.object({
+  provider: z.string(),
+  access_token: z.string(),
+  refresh_token: z.string().nullable(),
+  expires_at: z.string().nullable(),
+});
+
+/**
+ * Zodスキーマ: データベースRPCレスポンスの構造
+ * 成功時: { success: true, data: { provider, access_token, ... } }
+ * エラー時: { success: false, error: string }
+ */
+const rpcResponseSchema = z.union([
+  z.object({
+    success: z.literal(true),
+    data: tokenDataSchema,
+  }),
+  z.object({
+    success: z.literal(false),
+    error: z.string().optional(),
+  }),
+]);
 
 export interface DeleteTokenResult extends TokenResult {
   deleted?: boolean;
@@ -85,6 +112,46 @@ export async function upsertOAuthToken(
 }
 
 /**
+ * データベースのRPCレスポンスからトークン情報を抽出するヘルパー関数
+ * Zodスキーマで型安全にバリデーションを実行
+ *
+ * @param data - データベースから返されたレスポンス
+ * @returns パース済みのトークン情報
+ */
+function parseTokenResponse(data: unknown): GetTokenResult {
+  // Zodでレスポンスをバリデーション
+  const parseResult = rpcResponseSchema.safeParse(data);
+
+  if (!parseResult.success) {
+    return {
+      error: `Invalid response structure: ${parseResult.error.message}`,
+      success: false,
+    };
+  }
+
+  const response = parseResult.data;
+
+  // エラーレスポンスの場合
+  if (!response.success) {
+    return {
+      error: response.error || "Unknown error",
+      success: false,
+    };
+  }
+
+  // 成功レスポンスの場合、トークンデータを返す
+  const tokenData = response.data;
+
+  return {
+    success: true,
+    provider: tokenData.provider,
+    access_token: tokenData.access_token,
+    refresh_token: tokenData.refresh_token,
+    expires_at: tokenData.expires_at,
+  };
+}
+
+/**
  * OAuth トークンを取得する
  * データベースから復号化されたトークンが返される
  *
@@ -109,15 +176,7 @@ export async function getOAuthToken(
       };
     }
 
-    if (!data || typeof data !== "object") {
-      return {
-        error: "Invalid response from database",
-        success: false,
-      };
-    }
-
-    const result = data as unknown as GetTokenResult;
-    return result;
+    return parseTokenResponse(data);
   } catch (err) {
     console.error("Exception getting OAuth token:", err);
     return {
@@ -221,15 +280,7 @@ export async function getOAuthTokenForUser(
       };
     }
 
-    if (!data || typeof data !== "object") {
-      return {
-        error: "Invalid response from database",
-        success: false,
-      };
-    }
-
-    const result = data as unknown as GetTokenResult;
-    return result;
+    return parseTokenResponse(data);
   } catch (err) {
     console.error("Exception getting OAuth token for user:", err);
     return {

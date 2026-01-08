@@ -81,18 +81,18 @@ describe("OAuth Token Storage", () => {
   describe("getOAuthToken", () => {
     it("成功時にトークン情報を返す", async () => {
       const mockSupabase = createMockSupabase();
-      const mockTokenData = {
-        access_token: "test_access_token",
-        created_at: "2025-01-05T00:00:00Z",
-        expires_at: "2025-01-10T00:00:00Z",
-        provider: "google",
-        refresh_token: "test_refresh_token",
+      const mockResponse = {
         success: true,
-        updated_at: "2025-01-05T00:00:00Z",
+        data: {
+          provider: "google",
+          access_token: "test_access_token",
+          refresh_token: "test_refresh_token",
+          expires_at: "2025-01-10T00:00:00Z",
+        },
       };
 
       vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
-        data: mockTokenData,
+        data: mockResponse,
         error: null,
       });
 
@@ -101,6 +101,8 @@ describe("OAuth Token Storage", () => {
       expect(result.success).toBe(true);
       expect(result.access_token).toBe("test_access_token");
       expect(result.refresh_token).toBe("test_refresh_token");
+      expect(result.provider).toBe("google");
+      expect(result.expires_at).toBe("2025-01-10T00:00:00Z");
       expect(mockSupabase.rpc).toHaveBeenCalledWith("get_oauth_token", {
         p_provider: "google",
       });
