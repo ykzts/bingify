@@ -106,12 +106,38 @@ describe("Auth Callback Route", () => {
     );
   });
 
+  it("セッションリフレッシュが失敗した場合エラー付きでログインにリダイレクトする", async () => {
+    const mockCreateClient = vi.mocked(createClient);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+        refreshSession: vi.fn().mockResolvedValue({
+          error: new Error("Failed to refresh session"),
+          data: { session: null },
+        }),
+      },
+    } as any);
+
+    const request = new NextRequest(`${origin}/auth/callback?code=valid_code`, {
+      headers: {
+        referer: `${origin}/login`,
+      },
+    });
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/login?error=auth_failed`
+    );
+  });
+
   it("認証成功時にダッシュボードにリダイレクトする", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -135,7 +161,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -159,7 +185,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -179,7 +205,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -203,7 +229,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -257,7 +283,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -284,7 +310,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -311,7 +337,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -338,7 +364,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -365,7 +391,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -392,7 +418,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -421,7 +447,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -450,7 +476,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -477,7 +503,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -504,7 +530,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -531,7 +557,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -558,7 +584,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -585,7 +611,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -614,7 +640,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -641,7 +667,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -668,7 +694,7 @@ describe("Auth Callback Route", () => {
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        getSession: vi.fn().mockResolvedValue({
+        refreshSession: vi.fn().mockResolvedValue({
           data: { session: null },
           error: null,
         }),
@@ -699,7 +725,7 @@ describe("Auth Callback Route", () => {
       const mockSupabase = {
         auth: {
           exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-          getSession: vi.fn().mockResolvedValue({
+          refreshSession: vi.fn().mockResolvedValue({
             data: {
               session: {
                 user: {
@@ -746,7 +772,7 @@ describe("Auth Callback Route", () => {
       const mockSupabase = {
         auth: {
           exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-          getSession: vi.fn().mockResolvedValue({
+          refreshSession: vi.fn().mockResolvedValue({
             data: {
               session: {
                 user: {
@@ -788,7 +814,7 @@ describe("Auth Callback Route", () => {
       const mockSupabase = {
         auth: {
           exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-          getSession: vi.fn().mockResolvedValue({
+          refreshSession: vi.fn().mockResolvedValue({
             data: {
               session: {
                 user: {
@@ -838,7 +864,7 @@ describe("Auth Callback Route", () => {
       const mockSupabase = {
         auth: {
           exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-          getSession: vi.fn().mockResolvedValue({
+          refreshSession: vi.fn().mockResolvedValue({
             data: {
               session: {
                 user: {
@@ -886,7 +912,7 @@ describe("Auth Callback Route", () => {
       const mockSupabase = {
         auth: {
           exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-          getSession: vi.fn().mockResolvedValue({
+          refreshSession: vi.fn().mockResolvedValue({
             data: {
               session: {
                 user: {
@@ -921,6 +947,54 @@ describe("Auth Callback Route", () => {
         provider: "google",
         access_token: "mock-access-token",
         refresh_token: null,
+        expires_at: expect.any(String),
+      });
+    });
+
+    it("refreshSessionから取得した最新のプロバイダー情報を正しく保存する", async () => {
+      const mockUpsertOAuthToken = vi.mocked(upsertOAuthToken);
+      mockUpsertOAuthToken.mockResolvedValue({ success: true });
+
+      const mockCreateClient = vi.mocked(createClient);
+      const mockSupabase = {
+        auth: {
+          exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+          refreshSession: vi.fn().mockResolvedValue({
+            data: {
+              session: {
+                user: {
+                  id: "user-123",
+                  app_metadata: { provider: "twitch" },
+                },
+                provider_token: "mock-twitch-token",
+                provider_refresh_token: "mock-twitch-refresh",
+                expires_at: 1_234_567_890,
+              },
+            },
+            error: null,
+          }),
+        },
+      };
+      mockCreateClient.mockResolvedValue(mockSupabase as any);
+
+      const request = new NextRequest(
+        `${origin}/auth/callback?code=valid_code`,
+        {
+          headers: {
+            referer: `${origin}/login`,
+          },
+        }
+      );
+
+      const response = await GET(request);
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toBe(`${origin}/`);
+      // refreshSessionから取得したproviderが正しく使用されることを確認
+      expect(mockUpsertOAuthToken).toHaveBeenCalledWith(mockSupabase, {
+        provider: "twitch",
+        access_token: "mock-twitch-token",
+        refresh_token: "mock-twitch-refresh",
         expires_at: expect.any(String),
       });
     });

@@ -210,10 +210,25 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}${loginPath}`);
   }
 
-  // Get session to extract provider tokens
+  // セッションをリフレッシュして最新のapp_metadataを取得する
+  // exchangeCodeForSessionの後、ブラウザストレージにキャッシュされた古いセッションデータではなく
+  // サーバーから最新のセッション情報（特にapp_metadata.provider）を取得するため
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { session: refreshedSession },
+    error: refreshError,
+  } = await supabase.auth.refreshSession();
+
+  if (refreshError) {
+    console.error(
+      "Error refreshing session after OAuth callback:",
+      refreshError
+    );
+    const locale = getLocaleFromReferer();
+    const loginPath = buildPath("/login?error=auth_failed", locale);
+    return NextResponse.redirect(`${origin}${loginPath}`);
+  }
+
+  const session = refreshedSession;
 
   if (session) {
     // Save OAuth tokens to database if available
