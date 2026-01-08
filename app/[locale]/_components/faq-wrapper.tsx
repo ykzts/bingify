@@ -20,38 +20,28 @@ async function FaqData() {
     console.error("Failed to fetch system settings:", error);
   }
 
+  const githubLink = (chunks: React.ReactNode) => (
+    <a
+      aria-label="View source code on GitHub (opens in a new window)"
+      className="text-primary underline hover:text-primary/80"
+      href="https://github.com/ykzts/bingify"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      {chunks}
+    </a>
+  );
+
   return (
     <Faq
       answer1={tFaq("answer1")}
       answer2={tFaq("answer2", { maxParticipants })}
       answer3={tFaq.rich("answer3", {
         expirationHours: spaceExpirationHours,
-        githubLink: (chunks) => (
-          <a
-            aria-label="View source code on GitHub (opens in a new window)"
-            className="text-primary underline hover:text-primary/80"
-            href="https://github.com/ykzts/bingify"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            {chunks}
-          </a>
-        ),
+        githubLink,
       })}
       answer4={tFaq("answer4")}
-      answer5={tFaq.rich("answer5", {
-        githubLink: (chunks) => (
-          <a
-            aria-label="View source code on GitHub (opens in a new window)"
-            className="text-primary underline hover:text-primary/80"
-            href="https://github.com/ykzts/bingify"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            {chunks}
-          </a>
-        ),
-      })}
+      answer5={tFaq.rich("answer5", { githubLink })}
       heading={tFaq("heading")}
       question1={tFaq("question1")}
       question2={tFaq("question2")}
