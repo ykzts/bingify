@@ -87,7 +87,10 @@ export async function lookupYouTubeChannelId(
     return result;
   } catch (error) {
     return {
-      error: error instanceof Error ? error.message : "Unknown error",
+      error:
+        error instanceof Error
+          ? `エラーが発生しました: ${error.message}`
+          : "不明なエラーが発生しました",
     };
   }
 }
