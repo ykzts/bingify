@@ -53,11 +53,13 @@ describe("Token Storage with Auto-Refresh", () => {
       // 有効なトークンを返すモック
       vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
         data: {
-          access_token: "valid_token",
-          expires_at: futureTime,
-          provider: "google",
-          refresh_token: "refresh_token",
           success: true,
+          data: {
+            provider: "google",
+            access_token: "valid_token",
+            refresh_token: "refresh_token",
+            expires_at: futureTime,
+          },
         },
         error: null,
       });
@@ -96,11 +98,13 @@ describe("Token Storage with Auto-Refresh", () => {
             // 1回目: 期限切れトークンを返す
             return Promise.resolve({
               data: {
-                access_token: "expired_token",
-                expires_at: expiredTime,
-                provider: "google",
-                refresh_token: "refresh_token",
                 success: true,
+                data: {
+                  provider: "google",
+                  access_token: "expired_token",
+                  refresh_token: "refresh_token",
+                  expires_at: expiredTime,
+                },
               },
               error: null,
             }) as never;
@@ -109,11 +113,13 @@ describe("Token Storage with Auto-Refresh", () => {
             // 2回目: refreshOAuthToken内のget_oauth_tokenの呼び出し
             return Promise.resolve({
               data: {
-                access_token: "expired_token",
-                expires_at: expiredTime,
-                provider: "google",
-                refresh_token: "refresh_token",
                 success: true,
+                data: {
+                  provider: "google",
+                  access_token: "expired_token",
+                  refresh_token: "refresh_token",
+                  expires_at: expiredTime,
+                },
               },
               error: null,
             }) as never;
@@ -131,11 +137,13 @@ describe("Token Storage with Auto-Refresh", () => {
             // 4回目: リフレッシュ後の新しいトークンを返す
             return Promise.resolve({
               data: {
-                access_token: "new_token",
-                expires_at: newExpiresAt,
-                provider: "google",
-                refresh_token: "refresh_token",
                 success: true,
+                data: {
+                  provider: "google",
+                  access_token: "new_token",
+                  refresh_token: "refresh_token",
+                  expires_at: newExpiresAt,
+                },
               },
               error: null,
             }) as never;
@@ -185,11 +193,13 @@ describe("Token Storage with Auto-Refresh", () => {
       // 期限切れでリフレッシュトークンがないトークンを返すモック
       vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
         data: {
-          access_token: "expired_token",
-          expires_at: expiredTime,
-          provider: "google",
-          refresh_token: null,
           success: true,
+          data: {
+            provider: "google",
+            access_token: "expired_token",
+            refresh_token: null,
+            expires_at: expiredTime,
+          },
         },
         error: null,
       });
@@ -250,11 +260,13 @@ describe("Token Storage with Auto-Refresh", () => {
       // 有効なトークンを返すモック
       vi.mocked(mockAdminClient.rpc).mockResolvedValueOnce({
         data: {
-          access_token: "valid_token",
-          expires_at: futureTime,
-          provider: "google",
-          refresh_token: "refresh_token",
           success: true,
+          data: {
+            provider: "google",
+            access_token: "valid_token",
+            refresh_token: "refresh_token",
+            expires_at: futureTime,
+          },
         },
         error: null,
       });
@@ -287,11 +299,13 @@ describe("Token Storage with Auto-Refresh", () => {
       vi.mocked(mockAdminClient.rpc)
         .mockResolvedValueOnce({
           data: {
-            access_token: "expired_token",
-            expires_at: expiredTime,
-            provider: "twitch",
-            refresh_token: "refresh_token",
             success: true,
+            data: {
+              provider: "twitch",
+              access_token: "expired_token",
+              refresh_token: "refresh_token",
+              expires_at: expiredTime,
+            },
           },
           error: null,
         })
@@ -303,11 +317,13 @@ describe("Token Storage with Auto-Refresh", () => {
         })
         .mockResolvedValueOnce({
           data: {
-            access_token: "new_token",
-            expires_at: newExpiresAt,
-            provider: "twitch",
-            refresh_token: "new_refresh_token",
             success: true,
+            data: {
+              provider: "twitch",
+              access_token: "new_token",
+              refresh_token: "new_refresh_token",
+              expires_at: newExpiresAt,
+            },
           },
           error: null,
         });
@@ -343,11 +359,13 @@ describe("Token Storage with Auto-Refresh", () => {
       // 期限切れでリフレッシュトークンがないトークンを返すモック
       vi.mocked(mockAdminClient.rpc).mockResolvedValueOnce({
         data: {
-          access_token: "expired_token",
-          expires_at: expiredTime,
-          provider: "google",
-          refresh_token: null,
           success: true,
+          data: {
+            provider: "google",
+            access_token: "expired_token",
+            refresh_token: null,
+            expires_at: expiredTime,
+          },
         },
         error: null,
       });
