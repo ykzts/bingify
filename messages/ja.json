@@ -192,6 +192,8 @@
     "viewCardButton": "カードを見る"
   },
   "Contact": {
+    "autoFillButton": "自分の情報を入力",
+    "autoFillLoginPrompt": "自分の情報を自動入力するには、ログインしてください",
     "backToHome": "ホームに戻る",
     "completeEmailNote": "以下のメールアドレス宛に返信します:",
     "completeMessage": "お問い合わせありがとうございます。内容を確認の上、担当者よりご連絡いたします。",

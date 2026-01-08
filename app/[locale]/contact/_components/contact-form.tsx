@@ -8,10 +8,11 @@ import {
   useStore,
   useTransform,
 } from "@tanstack/react-form-nextjs";
-import { Loader2, Mail, Send } from "lucide-react";
+import { Loader2, Mail, Send, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { FormErrors } from "@/components/form-errors";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Textarea } from "@/components/ui/textarea";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { submitContactFormAction } from "../_actions/contact";
+import { getUserProfile } from "../_actions/get-user-profile";
 import { contactFormOpts, contactFormSchema } from "../_lib/form-options";
 
 interface Props {
@@ -37,6 +39,7 @@ export function ContactForm({ locale }: Props) {
   const t = useTranslations("Contact");
   const router = useRouter();
   const [turnstileToken, setTurnstileToken] = useState<string>("");
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
   const hasTurnstile = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   const [state, action] = useActionState(
@@ -88,6 +91,33 @@ export function ContactForm({ locale }: Props) {
     }
   }, [state, router, locale]);
 
+  const handleAutoFill = async () => {
+    setIsAutoFilling(true);
+    try {
+      const result = await getUserProfile();
+
+      if (result.error || !result.data) {
+        toast.error(t("autoFillLoginPrompt"));
+        return;
+      }
+
+      const { full_name, email } = result.data;
+
+      if (full_name) {
+        form.setFieldValue("name", full_name);
+      }
+
+      if (email) {
+        form.setFieldValue("email", email);
+      }
+    } catch (error) {
+      console.error("Error auto-filling form:", error);
+      toast.error(t("autoFillLoginPrompt"));
+    } finally {
+      setIsAutoFilling(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-2xl rounded-lg border bg-white p-8 shadow-lg">
       <div className="mb-6 flex items-center gap-3">
@@ -98,6 +128,23 @@ export function ContactForm({ locale }: Props) {
       </div>
 
       <p className="mb-6 text-gray-600">{t("description")}</p>
+
+      <div className="mb-6 flex justify-end">
+        <Button
+          disabled={isAutoFilling}
+          onClick={handleAutoFill}
+          size="sm"
+          type="button"
+          variant="outline"
+        >
+          {isAutoFilling ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <User className="h-4 w-4" />
+          )}
+          {t("autoFillButton")}
+        </Button>
+      </div>
 
       <form action={action} noValidate onSubmit={() => form.handleSubmit()}>
         <FormErrors
