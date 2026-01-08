@@ -121,7 +121,7 @@ export function LoginForm({ providers, systemSettings }: Props) {
                 prompt: "consent",
               }
             : undefined,
-        redirectTo: buildOAuthCallbackUrl(redirect ?? undefined),
+        redirectTo: buildOAuthCallbackUrl(provider, redirect ?? undefined),
         scopes,
       },
       provider: provider as "google" | "twitch",
@@ -154,7 +154,8 @@ export function LoginForm({ providers, systemSettings }: Props) {
         data: {
           language: locale,
         },
-        emailRedirectTo: buildOAuthCallbackUrl(redirect ?? undefined),
+        // Email OTP uses the non-provider-specific callback route
+        emailRedirectTo: `${new URL(window.location.href).origin}/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`,
       },
     });
 

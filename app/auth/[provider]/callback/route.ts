@@ -1,6 +1,8 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { routing } from "@/i18n/routing";
+import { isValidOAuthProvider } from "@/lib/oauth/provider-validation";
+import { upsertOAuthToken } from "@/lib/oauth/token-storage";
 import { createClient } from "@/lib/supabase/server";
 
 const LOCALE_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/`);
@@ -153,11 +155,19 @@ async function exchangeCodeWithRetry(
   return { error: lastError };
 }
 
-export async function GET(request: NextRequest) {
+interface RouteContext {
+  params: Promise<{ provider: string }>;
+}
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: OAuth callback handling requires multiple conditional checks for security and error handling
+export async function GET(request: NextRequest, context: RouteContext) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const redirect = requestUrl.searchParams.get("redirect");
   const origin = requestUrl.origin;
+
+  // URLからプロバイダーを取得
+  const { provider } = await context.params;
 
   // Helper function to extract locale from referer
   const getLocaleFromReferer = (): string | null => {
@@ -187,6 +197,14 @@ export async function GET(request: NextRequest) {
   const buildPath = (path: string, locale: string | null): string => {
     return locale ? `/${locale}${path}` : path;
   };
+
+  // Validate provider parameter
+  if (!isValidOAuthProvider(provider)) {
+    console.error(`Invalid OAuth provider in callback URL: ${provider}`);
+    const locale = getLocaleFromReferer();
+    const loginPath = buildPath("/login?error=auth_failed", locale);
+    return NextResponse.redirect(`${origin}${loginPath}`);
+  }
 
   // Code parameter is required for authentication
   if (!code || code.trim() === "") {
@@ -228,7 +246,38 @@ export async function GET(request: NextRequest) {
   const session = refreshedSession;
 
   if (session) {
-    // Set language metadata if not already set (for email OTP users)
+    // Save OAuth tokens to database if available
+    const { provider_token, provider_refresh_token } = session;
+
+    // URLから取得したプロバイダーを使用してトークンを保存
+    // これにより、app_metadata.providerのキャッシュ問題を回避できる
+    if (provider_token) {
+      // Calculate token expiry if available from session
+      // Use session.expires_at which represents when the OAuth session expires
+      let expiresAt: string | null = null;
+      if (session.expires_at) {
+        // session.expires_at is a Unix timestamp (seconds)
+        expiresAt = new Date(session.expires_at * 1000).toISOString();
+      }
+
+      // Store token in encrypted database
+      const result = await upsertOAuthToken(supabase, {
+        access_token: provider_token,
+        expires_at: expiresAt,
+        provider,
+        refresh_token: provider_refresh_token || null,
+      });
+
+      if (!result.success) {
+        console.warn(
+          `Failed to store OAuth token for provider ${provider}:`,
+          result.error
+        );
+        // Continue anyway - token storage failure shouldn't block authentication
+      }
+    }
+
+    // Set language metadata if not already set (for OAuth users)
     const userMetadata = session.user?.user_metadata;
     if (!userMetadata?.language) {
       const locale = getLocaleFromReferer();

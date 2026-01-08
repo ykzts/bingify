@@ -288,7 +288,7 @@ export function SpaceParticipation({
             access_type: "offline",
             prompt: "consent",
           },
-          redirectTo: buildOAuthCallbackUrl(window.location.pathname),
+          redirectTo: buildOAuthCallbackUrl("google", window.location.pathname),
           scopes: getScopesForProvider("google", systemSettings),
         },
         provider: "google",
@@ -329,7 +329,7 @@ export function SpaceParticipation({
       // This adds Twitch scope to existing session for authenticated users
       const { error: oauthError } = await supabase.auth.linkIdentity({
         options: {
-          redirectTo: buildOAuthCallbackUrl(window.location.pathname),
+          redirectTo: buildOAuthCallbackUrl("twitch", window.location.pathname),
           scopes: getScopesForProvider("twitch", systemSettings),
         },
         provider: "twitch",

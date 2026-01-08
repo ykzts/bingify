@@ -104,7 +104,7 @@ export function AccountLinkingForm({
               prompt: "consent",
             },
           }),
-          redirectTo: buildOAuthCallbackUrl(),
+          redirectTo: buildOAuthCallbackUrl(provider),
           // Request scopes based on system settings for enabled gatekeeper features
           scopes: getScopesForProvider(provider, systemSettings),
         },

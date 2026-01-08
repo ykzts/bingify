@@ -42,14 +42,21 @@ function createTestSystemSettings(
 
 describe("buildOAuthCallbackUrl", () => {
   it("リダイレクトパスなしでコールバックURLを生成できる", () => {
-    const url = buildOAuthCallbackUrl();
-    expect(url).toContain("/auth/callback");
+    const url = buildOAuthCallbackUrl("google");
+    expect(url).toContain("/auth/google/callback");
   });
 
   it("リダイレクトパスありでコールバックURLを生成できる", () => {
-    const url = buildOAuthCallbackUrl("/spaces/123");
-    expect(url).toContain("/auth/callback");
+    const url = buildOAuthCallbackUrl("twitch", "/spaces/123");
+    expect(url).toContain("/auth/twitch/callback");
     expect(url).toContain("redirect=%2Fspaces%2F123");
+  });
+
+  it("異なるプロバイダーで正しいURLを生成できる", () => {
+    const googleUrl = buildOAuthCallbackUrl("google");
+    const twitchUrl = buildOAuthCallbackUrl("twitch");
+    expect(googleUrl).toContain("/auth/google/callback");
+    expect(twitchUrl).toContain("/auth/twitch/callback");
   });
 });
 
