@@ -15,14 +15,13 @@ export function buildOAuthCallbackUrl(
   provider: string,
   redirectPath?: string
 ): string {
-  const baseUrl = getAbsoluteUrl();
-  const callbackUrl = new URL(`/auth/${provider}/callback`, baseUrl);
+  let path = `/auth/${provider}/callback`;
 
   if (redirectPath) {
-    callbackUrl.searchParams.set("redirect", redirectPath);
+    path += `?redirect=${encodeURIComponent(redirectPath)}`;
   }
 
-  return callbackUrl.toString();
+  return getAbsoluteUrl(path);
 }
 
 /**
