@@ -1,4 +1,5 @@
 import { youtube_v3 } from "@googleapis/youtube";
+import { OAuth2Client } from "google-auth-library";
 import { YOUTUBE_CHANNEL_ID_REGEX } from "./youtube-constants";
 
 // 正規表現をトップレベルに定義（パフォーマンス向上）
@@ -6,6 +7,23 @@ const YOUTUBE_HANDLE_PATH_REGEX = /^\/@([^/]+)/;
 const YOUTUBE_CHANNEL_PATH_REGEX = /^\/channel\/(UC[a-zA-Z0-9_-]{22})/;
 const YOUTUBE_CUSTOM_PATH_REGEX = /^\/c\/([^/]+)/;
 const YOUTUBE_USER_PATH_REGEX = /^\/user\/([^/]+)/;
+
+/**
+ * OAuthアクセストークンからOAuth2Clientを作成する
+ *
+ * YouTube Data APIでOAuth認証を使用する場合、アクセストークン文字列を直接渡すのではなく、
+ * OAuth2Clientオブジェクトを作成して認証情報を設定する必要があります。
+ *
+ * @param accessToken - OAuthアクセストークン
+ * @returns 設定済みのOAuth2Clientインスタンス
+ */
+function createOAuth2ClientFromToken(accessToken: string): OAuth2Client {
+  const oauth2Client = new OAuth2Client();
+  oauth2Client.setCredentials({
+    access_token: accessToken,
+  });
+  return oauth2Client;
+}
 
 export interface YouTubeSubscriptionCheckResult {
   error?: string;
@@ -156,8 +174,11 @@ export async function getUserYouTubeChannelId(
       };
     }
 
+    // OAuth2Clientを作成してアクセストークンを設定
+    const oauth2Client = createOAuth2ClientFromToken(userAccessToken);
+
     const youtube = new youtube_v3.Youtube({
-      auth: userAccessToken,
+      auth: oauth2Client,
     });
 
     // 自分のチャンネル情報を取得
@@ -196,8 +217,11 @@ export async function checkSubscriptionStatus(
       };
     }
 
+    // OAuth2Clientを作成してアクセストークンを設定
+    const oauth2Client = createOAuth2ClientFromToken(userAccessToken);
+
     const youtube = new youtube_v3.Youtube({
-      auth: userAccessToken,
+      auth: oauth2Client,
     });
 
     const response = await youtube.subscriptions.list({
@@ -358,8 +382,11 @@ export async function checkMembershipWithAdminToken(
     const participantChannelId = participantChannelResult.channelId;
 
     // 2. 管理者（チャンネル所有者）のトークンでメンバーリストを取得
+    // OAuth2Clientを作成してアクセストークンを設定
+    const oauth2Client = createOAuth2ClientFromToken(adminAccessToken);
+
     const youtube = new youtube_v3.Youtube({
-      auth: adminAccessToken,
+      auth: oauth2Client,
     });
 
     // members.list APIを使用してメンバーを検索
@@ -425,7 +452,7 @@ export async function checkMembershipWithAdminToken(
  * - レガシーユーザーURL: https://www.youtube.com/user/username
  *
  * @param input - ユーザーが入力した値
- * @param apiKey - YouTube Data API v3のAPIキー（必須）
+ * @param auth - YouTube Data API v3のAPIキーまたはOAuthアクセストークン（必須）
  * @returns チャンネルIDまたはエラー情報
  */
 export async function resolveYouTubeChannelId(
@@ -457,8 +484,21 @@ export async function resolveYouTubeChannelId(
 
     // YouTube API クライアントを初期化
     // auth には API key または OAuth access token を渡すことができる
+    // OAuth2 access tokenの場合はOAuth2Clientを作成する
+    let authClient: string | OAuth2Client = auth;
+
+    // OAuth2トークンの可能性がある場合（"ya29."で始まるなど）はOAuth2Clientを作成
+    // ただし、APIキーとの区別が難しいため、まずは文字列として渡して試す
+    // エラーが発生した場合にOAuth2Clientを試すアプローチは複雑になるため、
+    // より確実な方法として、常にOAuth2Clientを作成する
+    // APIキーの場合はOAuth2Clientが適切に処理する
+    if (auth.startsWith("ya29.") || auth.length > 100) {
+      // OAuth2アクセストークンの可能性が高い（ya29.で始まる、または長い文字列）
+      authClient = createOAuth2ClientFromToken(auth);
+    }
+
     const youtube = new youtube_v3.Youtube({
-      auth,
+      auth: authClient,
     });
 
     // ハンドルから解決
