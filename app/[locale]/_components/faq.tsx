@@ -6,33 +6,51 @@ interface FaqProps {
   answer1: string;
   answer2: string;
   answer3: string;
+  answer4: string;
+  answer5: string;
   heading: string;
   maxParticipants: number;
   question1: string;
   question2: string;
   question3: string;
+  question4: string;
+  question5: string;
 }
 
 export function Faq({
   answer1,
   answer2,
   answer3,
+  answer4,
+  answer5,
   heading,
   maxParticipants: _maxParticipants,
   question1,
   question2,
   question3,
+  question4,
+  question5,
 }: FaqProps) {
   const faqs = [
     {
       answer: answer1,
-      id: "usage-limits",
+      id: "commercial-use",
       question: question1,
+    },
+    {
+      answer: answer2,
+      id: "cost",
+      question: question2,
+    },
+    {
+      answer: answer3,
+      id: "participant-limits",
+      question: question3,
     },
     {
       answer: (
         <>
-          {answer2.split("GitHub")[0]}
+          {answer4.split("GitHub")[0]}
           <a
             aria-label="View source code on GitHub (opens in a new window)"
             className="text-primary underline hover:text-primary/80"
@@ -42,13 +60,13 @@ export function Faq({
           >
             GitHub
           </a>
-          {answer2.split("GitHub")[1]}
+          {answer4.split("GitHub")[1]}
         </>
       ),
       id: "source-code",
-      question: question2,
+      question: question4,
     },
-    { answer: answer3, id: "funding", question: question3 },
+    { answer: answer5, id: "data-retention", question: question5 },
   ];
 
   return (

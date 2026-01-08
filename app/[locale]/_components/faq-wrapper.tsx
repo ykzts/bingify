@@ -21,14 +21,18 @@ async function FaqData() {
 
   return (
     <Faq
-      answer1={tFaq("answer1", { maxParticipants })}
+      answer1={tFaq("answer1")}
       answer2={tFaq("answer2")}
-      answer3={tFaq("answer3")}
+      answer3={tFaq("answer3", { maxParticipants })}
+      answer4={tFaq("answer4")}
+      answer5={tFaq("answer5")}
       heading={tFaq("heading")}
       maxParticipants={maxParticipants}
       question1={tFaq("question1")}
       question2={tFaq("question2")}
       question3={tFaq("question3")}
+      question4={tFaq("question4")}
+      question5={tFaq("question5")}
     />
   );
 }
@@ -41,7 +45,7 @@ function FaqSkeleton() {
           <div className="mx-auto mb-4 h-10 w-64 animate-pulse rounded bg-muted" />
         </div>
         <div className="space-y-6">
-          {[1, 2, 3].map((i) => (
+          {[1, 2, 3, 4, 5].map((i) => (
             <div
               className="overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm"
               key={i}
