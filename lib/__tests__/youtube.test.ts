@@ -169,7 +169,10 @@ describe("resolveYouTubeChannelId", () => {
   describe("チャンネルIDの直接入力", () => {
     it("有効なチャンネルIDをそのまま返す", async () => {
       const channelId = "UC1234567890123456789012";
-      const result = await resolveYouTubeChannelId(channelId, "test_api_key");
+      const result = await resolveYouTubeChannelId(
+        channelId,
+        "test_access_token"
+      );
 
       expect(result.channelId).toBe(channelId);
       expect(result.error).toBeUndefined();
@@ -178,7 +181,10 @@ describe("resolveYouTubeChannelId", () => {
 
     it("UCで始まる24文字のチャンネルIDを受け入れる", async () => {
       const channelId = "UCabcdefghijklmnopqrstuv";
-      const result = await resolveYouTubeChannelId(channelId, "test_api_key");
+      const result = await resolveYouTubeChannelId(
+        channelId,
+        "test_access_token"
+      );
 
       expect(result.channelId).toBe(channelId);
       expect(result.error).toBeUndefined();
@@ -195,7 +201,7 @@ describe("resolveYouTubeChannelId", () => {
 
       const result = await resolveYouTubeChannelId(
         "@GoogleDevelopers",
-        "test_api_key"
+        "test_access_token"
       );
 
       expect(result.channelId).toBe("UC1234567890123456789012");
@@ -215,7 +221,7 @@ describe("resolveYouTubeChannelId", () => {
 
       const result = await resolveYouTubeChannelId(
         "@NonExistentUser",
-        "test_api_key"
+        "test_access_token"
       );
 
       expect(result.channelId).toBeUndefined();
@@ -233,7 +239,7 @@ describe("resolveYouTubeChannelId", () => {
 
       const result = await resolveYouTubeChannelId(
         "https://www.youtube.com/@GoogleDevelopers",
-        "test_api_key"
+        "test_access_token"
       );
 
       expect(result.channelId).toBe("UC1234567890123456789012");
@@ -246,7 +252,7 @@ describe("resolveYouTubeChannelId", () => {
     it("チャンネルID形式のURLからチャンネルIDを抽出する", async () => {
       const result = await resolveYouTubeChannelId(
         "https://www.youtube.com/channel/UC1234567890123456789012",
-        "test_api_key"
+        "test_access_token"
       );
 
       expect(result.channelId).toBe("UC1234567890123456789012");
@@ -263,7 +269,7 @@ describe("resolveYouTubeChannelId", () => {
 
       const result = await resolveYouTubeChannelId(
         "https://www.youtube.com/c/GoogleDevelopers",
-        "test_api_key"
+        "test_access_token"
       );
 
       expect(result.channelId).toBe("UC1234567890123456789012");
@@ -282,7 +288,7 @@ describe("resolveYouTubeChannelId", () => {
 
       const result = await resolveYouTubeChannelId(
         "https://www.youtube.com/user/GoogleDevelopers",
-        "test_api_key"
+        "test_access_token"
       );
 
       expect(result.channelId).toBe("UC1234567890123456789012");
@@ -301,7 +307,7 @@ describe("resolveYouTubeChannelId", () => {
 
       const result = await resolveYouTubeChannelId(
         "https://youtube.com/@TestChannel",
-        "test_api_key"
+        "test_access_token"
       );
 
       expect(result.channelId).toBe("UC1234567890123456789012");
@@ -314,7 +320,7 @@ describe("resolveYouTubeChannelId", () => {
 
   describe("エラーハンドリング", () => {
     it("空の入力値に対してエラーを返す", async () => {
-      const result = await resolveYouTubeChannelId("", "test_api_key");
+      const result = await resolveYouTubeChannelId("", "test_access_token");
 
       expect(result.channelId).toBeUndefined();
       expect(result.error).toBe("Input is required");
@@ -322,7 +328,7 @@ describe("resolveYouTubeChannelId", () => {
     });
 
     it("空白のみの入力値に対してエラーを返す", async () => {
-      const result = await resolveYouTubeChannelId("   ", "test_api_key");
+      const result = await resolveYouTubeChannelId("   ", "test_access_token");
 
       expect(result.channelId).toBeUndefined();
       expect(result.error).toBe("Input is required");
@@ -341,7 +347,7 @@ describe("resolveYouTubeChannelId", () => {
     it("無効な入力形式に対してエラーを返す", async () => {
       const result = await resolveYouTubeChannelId(
         "invalid_input",
-        "test_api_key"
+        "test_access_token"
       );
 
       expect(result.channelId).toBeUndefined();
@@ -353,7 +359,7 @@ describe("resolveYouTubeChannelId", () => {
 
       const result = await resolveYouTubeChannelId(
         "@TestChannel",
-        "test_api_key"
+        "test_access_token"
       );
 
       expect(result.channelId).toBeUndefined();
@@ -366,7 +372,7 @@ describe("resolveYouTubeChannelId", () => {
 
       const result = await resolveYouTubeChannelId(
         "@TestChannel",
-        "test_api_key"
+        "test_access_token"
       );
 
       expect(result.channelId).toBeUndefined();
@@ -379,45 +385,11 @@ describe("resolveYouTubeChannelId", () => {
       const channelId = "UC1234567890123456789012";
       const result = await resolveYouTubeChannelId(
         `  ${channelId}  `,
-        "test_api_key"
+        "test_access_token"
       );
 
       expect(result.channelId).toBe(channelId);
       expect(result.error).toBeUndefined();
-    });
-  });
-
-  describe("OAuth2トークンの検出", () => {
-    it("ya29.で始まるトークンをOAuth2トークンとして認識する", async () => {
-      mockChannelsList.mockResolvedValue({
-        data: {
-          items: [{ id: "UC1234567890123456789012" }],
-        },
-      });
-
-      const result = await resolveYouTubeChannelId(
-        "@TestChannel",
-        "ya29.a0ARrdaM_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-      );
-
-      expect(result.channelId).toBe("UC1234567890123456789012");
-      expect(mockChannelsList).toHaveBeenCalled();
-    });
-
-    it("短い文字列（APIキー）は文字列として扱う", async () => {
-      mockChannelsList.mockResolvedValue({
-        data: {
-          items: [{ id: "UC1234567890123456789012" }],
-        },
-      });
-
-      const result = await resolveYouTubeChannelId(
-        "@TestChannel",
-        "AIzaSyDxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-      );
-
-      expect(result.channelId).toBe("UC1234567890123456789012");
-      expect(mockChannelsList).toHaveBeenCalled();
     });
   });
 });
