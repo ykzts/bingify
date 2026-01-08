@@ -3,6 +3,13 @@
 import { Globe } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTransition } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
@@ -34,37 +41,24 @@ export function LanguageSwitcher() {
       <div className="relative">
         <Globe
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-500"
+          className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-gray-500"
         />
-        <select
-          className="appearance-none rounded-md border border-gray-300 bg-white py-2 pr-8 pl-10 font-medium text-gray-700 text-sm transition-colors hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:focus:border-blue-400 dark:focus:ring-blue-400 dark:hover:border-gray-500"
+        <Select
           disabled={isPending}
-          id="language-select"
-          onChange={(e) => handleLocaleChange(e.target.value)}
+          onValueChange={handleLocaleChange}
           value={locale}
         >
-          {routing.locales.map((loc) => (
-            <option key={loc} value={loc}>
-              {localeNames[loc] || loc.toUpperCase()}
-            </option>
-          ))}
-        </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-          <svg
-            aria-hidden="true"
-            className="size-4 text-gray-500"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M19 9l-7 7-7-7"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-            />
-          </svg>
-        </div>
+          <SelectTrigger className="pl-10" id="language-select">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {routing.locales.map((loc) => (
+              <SelectItem key={loc} value={loc}>
+                {localeNames[loc] || loc.toUpperCase()}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

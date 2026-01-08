@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { InlineFieldError } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Field,
   FieldContent,
@@ -25,6 +26,13 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   type SystemSettings,
   systemSettingsSchema,
@@ -245,19 +253,24 @@ export function SystemSettingsForm({ initialSettings }: Props) {
               <Field>
                 <FieldContent>
                   <FieldLabel>{t("defaultUserRoleLabel")}</FieldLabel>
-                  <select
-                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  <Select
                     disabled={isSubmitting}
                     name={field.name}
-                    onChange={(e) =>
-                      field.handleChange(e.target.value as "organizer" | "user")
+                    onValueChange={(value) =>
+                      field.handleChange(value as "organizer" | "user")
                     }
-                    required
                     value={field.state.value as string}
                   >
-                    <option value="organizer">{t("roleOrganizer")}</option>
-                    <option value="user">{t("roleUser")}</option>
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="organizer">
+                        {t("roleOrganizer")}
+                      </SelectItem>
+                      <SelectItem value="user">{t("roleUser")}</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FieldDescription>
                     {t("defaultUserRoleHelp")}
                   </FieldDescription>
@@ -287,14 +300,14 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             <form.Field name="features.gatekeeper.youtube.enabled">
               {(field) => (
                 <div className="flex items-center space-x-2">
-                  <input
+                  <Checkbox
                     checked={field.state.value as boolean}
-                    className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                     disabled={isSubmitting}
                     id="features.gatekeeper.youtube.enabled"
                     name={field.name}
-                    onChange={(e) => field.handleChange(e.target.checked)}
-                    type="checkbox"
+                    onCheckedChange={(checked) =>
+                      field.handleChange(checked === true)
+                    }
                   />
                   <Label
                     className="cursor-pointer font-normal"
@@ -312,14 +325,14 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                 <form.Field name="features.gatekeeper.youtube.member.enabled">
                   {(field) => (
                     <div className="flex items-center space-x-2">
-                      <input
+                      <Checkbox
                         checked={field.state.value as boolean}
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                         disabled={isSubmitting}
                         id="features.gatekeeper.youtube.member.enabled"
                         name={field.name}
-                        onChange={(e) => field.handleChange(e.target.checked)}
-                        type="checkbox"
+                        onCheckedChange={(checked) =>
+                          field.handleChange(checked === true)
+                        }
                       />
                       <Label
                         className="cursor-pointer font-normal text-sm"
@@ -334,14 +347,14 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                 <form.Field name="features.gatekeeper.youtube.subscriber.enabled">
                   {(field) => (
                     <div className="flex items-center space-x-2">
-                      <input
+                      <Checkbox
                         checked={field.state.value as boolean}
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                         disabled={isSubmitting}
                         id="features.gatekeeper.youtube.subscriber.enabled"
                         name={field.name}
-                        onChange={(e) => field.handleChange(e.target.checked)}
-                        type="checkbox"
+                        onCheckedChange={(checked) =>
+                          field.handleChange(checked === true)
+                        }
                       />
                       <Label
                         className="cursor-pointer font-normal text-sm"
@@ -361,14 +374,14 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             <form.Field name="features.gatekeeper.twitch.enabled">
               {(field) => (
                 <div className="flex items-center space-x-2">
-                  <input
+                  <Checkbox
                     checked={field.state.value as boolean}
-                    className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                     disabled={isSubmitting}
                     id="features.gatekeeper.twitch.enabled"
                     name={field.name}
-                    onChange={(e) => field.handleChange(e.target.checked)}
-                    type="checkbox"
+                    onCheckedChange={(checked) =>
+                      field.handleChange(checked === true)
+                    }
                   />
                   <Label
                     className="cursor-pointer font-normal"
@@ -386,14 +399,14 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                 <form.Field name="features.gatekeeper.twitch.follower.enabled">
                   {(field) => (
                     <div className="flex items-center space-x-2">
-                      <input
+                      <Checkbox
                         checked={field.state.value as boolean}
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                         disabled={isSubmitting}
                         id="features.gatekeeper.twitch.follower.enabled"
                         name={field.name}
-                        onChange={(e) => field.handleChange(e.target.checked)}
-                        type="checkbox"
+                        onCheckedChange={(checked) =>
+                          field.handleChange(checked === true)
+                        }
                       />
                       <Label
                         className="cursor-pointer font-normal text-sm"
@@ -408,14 +421,14 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                 <form.Field name="features.gatekeeper.twitch.subscriber.enabled">
                   {(field) => (
                     <div className="flex items-center space-x-2">
-                      <input
+                      <Checkbox
                         checked={field.state.value as boolean}
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                         disabled={isSubmitting}
                         id="features.gatekeeper.twitch.subscriber.enabled"
                         name={field.name}
-                        onChange={(e) => field.handleChange(e.target.checked)}
-                        type="checkbox"
+                        onCheckedChange={(checked) =>
+                          field.handleChange(checked === true)
+                        }
                       />
                       <Label
                         className="cursor-pointer font-normal text-sm"
@@ -434,14 +447,14 @@ export function SystemSettingsForm({ initialSettings }: Props) {
           <form.Field name="features.gatekeeper.email.enabled">
             {(field) => (
               <div className="flex items-center space-x-2">
-                <input
+                <Checkbox
                   checked={field.state.value as boolean}
-                  className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                   disabled={isSubmitting}
                   id="features.gatekeeper.email.enabled"
                   name={field.name}
-                  onChange={(e) => field.handleChange(e.target.checked)}
-                  type="checkbox"
+                  onCheckedChange={(checked) =>
+                    field.handleChange(checked === true)
+                  }
                 />
                 <Label
                   className="cursor-pointer font-normal"
