@@ -61,13 +61,6 @@ export type Database = {
             foreignKeyName: "bingo_cards_space_id_fkey"
             columns: ["space_id"]
             isOneToOne: false
-            referencedRelation: "active_spaces"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "bingo_cards_space_id_fkey"
-            columns: ["space_id"]
-            isOneToOne: false
             referencedRelation: "spaces"
             referencedColumns: ["id"]
           },
@@ -93,13 +86,6 @@ export type Database = {
           value?: number
         }
         Relationships: [
-          {
-            foreignKeyName: "called_numbers_space_id_fkey"
-            columns: ["space_id"]
-            isOneToOne: false
-            referencedRelation: "active_spaces"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "called_numbers_space_id_fkey"
             columns: ["space_id"]
@@ -132,13 +118,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "participants_space_id_fkey"
-            columns: ["space_id"]
-            isOneToOne: false
-            referencedRelation: "active_spaces"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "participants_space_id_fkey"
             columns: ["space_id"]
@@ -214,13 +193,6 @@ export type Database = {
             foreignKeyName: "screen_settings_space_id_fkey"
             columns: ["space_id"]
             isOneToOne: true
-            referencedRelation: "active_spaces"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "screen_settings_space_id_fkey"
-            columns: ["space_id"]
-            isOneToOne: true
             referencedRelation: "spaces"
             referencedColumns: ["id"]
           },
@@ -249,13 +221,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "space_roles_space_id_fkey"
-            columns: ["space_id"]
-            isOneToOne: false
-            referencedRelation: "active_spaces"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "space_roles_space_id_fkey"
             columns: ["space_id"]
@@ -423,21 +388,7 @@ export type Database = {
       }
     }
     Views: {
-      active_spaces: {
-        Row: {
-          created_at: string | null
-          gatekeeper_rules: Json | null
-          id: string | null
-          max_participants: number | null
-          owner_id: string | null
-          settings: Json | null
-          share_key: string | null
-          status: string | null
-          updated_at: string | null
-          view_token: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       cleanup_expired_spaces: {
@@ -478,7 +429,6 @@ export type Database = {
           space_expiration_hours: number
         }[]
       }
-      is_space_expired: { Args: { space_created_at: string }; Returns: boolean }
       release_oauth_token_lock: {
         Args: { p_lock_key: number }
         Returns: boolean
