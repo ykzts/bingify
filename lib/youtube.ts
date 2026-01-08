@@ -469,7 +469,7 @@ export async function resolveYouTubeChannelId(
 
     if (!auth?.trim()) {
       return {
-        error: "YouTube API key or OAuth token is not provided",
+        error: "YouTube OAuth token is not provided",
       };
     }
 

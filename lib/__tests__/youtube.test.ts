@@ -338,9 +338,7 @@ describe("resolveYouTubeChannelId", () => {
       const result = await resolveYouTubeChannelId("@TestChannel", "");
 
       expect(result.channelId).toBeUndefined();
-      expect(result.error).toBe(
-        "YouTube API key or OAuth token is not provided"
-      );
+      expect(result.error).toBe("YouTube OAuth token is not provided");
       expect(mockChannelsList).not.toHaveBeenCalled();
     });
 

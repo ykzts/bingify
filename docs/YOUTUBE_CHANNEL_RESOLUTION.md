@@ -95,30 +95,25 @@ Channel ID
 
 ## セットアップ
 
-### 環境変数の設定
+### OAuth認証の設定
 
-`.env.local` に YouTube API キーを追加してください：
+YouTube チャンネル解決機能を使用するには、Google OAuth認証が必要です。
 
-```bash
-# YouTube API設定
-YOUTUBE_API_KEY=your_api_key_here
-```
+1. スペース管理者はGoogleアカウントでログイン
+2. YouTube Data API v3へのアクセス許可を承認
+3. システムが自動的にOAuthトークンを管理
 
-### API キーの取得方法
+### OAuth設定方法
 
-1. [Google Cloud Console](https://console.cloud.google.com/) にアクセス
-2. プロジェクトを選択または作成
-3. 「APIとサービス」→「認証情報」に移動
-4. 「認証情報を作成」→「APIキー」を選択
-5. YouTube Data API v3 を有効化
-6. 生成されたAPIキーを環境変数に設定
+詳細な設定手順については、`docs/OAUTH_SETUP.md` を参照してください。
 
-### APIキーの制限（推奨）
+- Google Cloud Console でOAuthクライアントIDを作成
+- Supabase の認証設定にクライアント情報を追加
+- YouTubeスコープを有効化
 
-セキュリティのため、以下の制限を設定することを推奨します：
+### 必要なスコープ
 
-- **アプリケーションの制限**: IPアドレスまたはHTTPリファラーで制限
-- **APIの制限**: YouTube Data API v3 のみを許可
+- `https://www.googleapis.com/auth/youtube.readonly` - チャンネル情報の読み取り
 
 ## テスト
 
