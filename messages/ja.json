@@ -75,7 +75,8 @@
     "usersTitle": "ユーザー管理",
     "paginationNext": "次へ",
     "paginationPrevious": "前へ",
-    "pageInfo": "{total}ページ中{current}ページ目"
+    "pageInfo": "{total}ページ中{current}ページ目",
+    "currentPage": "{current}ページ目"
   },
   "AdminAuthProviders": {
     "description": "ログインページで利用可能な認証プロバイダーを管理します",

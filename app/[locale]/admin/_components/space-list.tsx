@@ -162,9 +162,8 @@ export function SpaceList({
               )}
               <PaginationItem>
                 <span className="px-4 text-sm">
-                  {t("pageInfo", {
+                  {t("currentPage", {
                     current: currentPage,
-                    total: "...",
                   })}
                 </span>
               </PaginationItem>

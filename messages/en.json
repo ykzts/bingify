@@ -75,7 +75,8 @@
     "usersTitle": "User Management",
     "paginationNext": "Next",
     "paginationPrevious": "Previous",
-    "pageInfo": "Page {current} of {total}"
+    "pageInfo": "Page {current} of {total}",
+    "currentPage": "Page {current}"
   },
   "AdminAuthProviders": {
     "description": "Manage which authentication providers are available on the login page",
