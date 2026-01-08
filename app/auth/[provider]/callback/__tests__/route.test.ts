@@ -99,14 +99,14 @@ describe("Auth [Provider] Callback Route", () => {
     );
   });
 
-  it("セッションリフレッシュが失敗した場合エラー付きでログインにリダイレクトする", async () => {
+  it("セッション取得が失敗した場合エラー付きでログインにリダイレクトする", async () => {
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        refreshSession: vi.fn().mockResolvedValue({
+        getSession: vi.fn().mockResolvedValue({
           data: { session: null },
-          error: new Error("Failed to refresh session"),
+          error: new Error("Failed to get session"),
         }),
       },
     } as any);
@@ -129,12 +129,24 @@ describe("Auth [Provider] Callback Route", () => {
   });
 
   it("認証成功時にダッシュボードにリダイレクトする", async () => {
+    const mockUpsertOAuthToken = vi.mocked(upsertOAuthToken);
+    mockUpsertOAuthToken.mockResolvedValue({ success: true });
+
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        refreshSession: vi.fn().mockResolvedValue({
-          data: { session: null },
+        getSession: vi.fn().mockResolvedValue({
+          data: {
+            session: {
+              expires_at: 1_234_567_890,
+              provider_token: "mock-token",
+              user: {
+                app_metadata: { provider: "google" },
+                id: "user-123",
+              },
+            },
+          },
           error: null,
         }),
       },
@@ -156,12 +168,24 @@ describe("Auth [Provider] Callback Route", () => {
   });
 
   it("redirectパラメータが指定されている場合指定されたパスにリダイレクトする", async () => {
+    const mockUpsertOAuthToken = vi.mocked(upsertOAuthToken);
+    mockUpsertOAuthToken.mockResolvedValue({ success: true });
+
     const mockCreateClient = vi.mocked(createClient);
     mockCreateClient.mockResolvedValue({
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-        refreshSession: vi.fn().mockResolvedValue({
-          data: { session: null },
+        getSession: vi.fn().mockResolvedValue({
+          data: {
+            session: {
+              expires_at: 1_234_567_890,
+              provider_token: "mock-token",
+              user: {
+                app_metadata: { provider: "twitch" },
+                id: "user-123",
+              },
+            },
+          },
           error: null,
         }),
       },
@@ -191,7 +215,7 @@ describe("Auth [Provider] Callback Route", () => {
       const mockSupabase = {
         auth: {
           exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-          refreshSession: vi.fn().mockResolvedValue({
+          getSession: vi.fn().mockResolvedValue({
             data: {
               session: {
                 expires_at: 1_234_567_890,
@@ -240,7 +264,7 @@ describe("Auth [Provider] Callback Route", () => {
       const mockSupabase = {
         auth: {
           exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-          refreshSession: vi.fn().mockResolvedValue({
+          getSession: vi.fn().mockResolvedValue({
             data: {
               session: {
                 expires_at: 1_234_567_890,
@@ -289,7 +313,7 @@ describe("Auth [Provider] Callback Route", () => {
       const mockSupabase = {
         auth: {
           exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-          refreshSession: vi.fn().mockResolvedValue({
+          getSession: vi.fn().mockResolvedValue({
             data: {
               session: {
                 expires_at: 1_234_567_890,
@@ -339,7 +363,7 @@ describe("Auth [Provider] Callback Route", () => {
       const mockSupabase = {
         auth: {
           exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
-          refreshSession: vi.fn().mockResolvedValue({
+          getSession: vi.fn().mockResolvedValue({
             data: {
               session: {
                 expires_at: 1_234_567_890,

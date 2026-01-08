@@ -48,24 +48,17 @@ export async function GET(
     return NextResponse.redirect(`${origin}${loginPath}`);
   }
 
-  // セッションをリフレッシュして最新のapp_metadataを取得する
-  // exchangeCodeForSessionの後、ブラウザストレージにキャッシュされた古いセッションデータではなく
-  // サーバーから最新のセッション情報（特にapp_metadata.provider）を取得するため
+  // Get the current session after code exchange
   const {
-    data: { session: refreshedSession },
-    error: refreshError,
-  } = await supabase.auth.refreshSession();
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
 
-  if (refreshError) {
-    console.error(
-      "Error refreshing session after OAuth callback:",
-      refreshError
-    );
+  if (sessionError || !session) {
+    console.error("Error getting session after OAuth callback:", sessionError);
     const loginPath = buildPath("/login?error=auth_failed", locale);
     return NextResponse.redirect(`${origin}${loginPath}`);
   }
-
-  const session = refreshedSession;
 
   if (session) {
     // Save OAuth tokens to database if available
