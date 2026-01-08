@@ -201,12 +201,56 @@ export async function GET(request: NextRequest, context: RouteContext) {
     // URLから取得したプロバイダーを使用してトークンを保存
     // これにより、app_metadata.providerのキャッシュ問題を回避できる
     if (provider_token) {
-      // Calculate token expiry if available from session
-      // Use session.expires_at which represents when the OAuth session expires
+      // Extract OAuth token expiry from provider-specific fields
+      // Do NOT use session.expires_at as it's the Supabase session expiry, not OAuth token expiry
       let expiresAt: string | null = null;
-      if (session.expires_at) {
-        // session.expires_at is a Unix timestamp (seconds)
-        expiresAt = new Date(session.expires_at * 1000).toISOString();
+
+      // Try to get expiry from session metadata fields
+      // Some providers return expires_in (seconds) or provider_token_expires_at
+      const sessionAny = session as unknown as Record<string, unknown>;
+
+      // Check for provider-specific expiry fields
+      if (
+        typeof sessionAny.provider_token_expires_at === "number" &&
+        sessionAny.provider_token_expires_at > 0
+      ) {
+        // Some providers include explicit token expiry timestamp
+        expiresAt = new Date(
+          sessionAny.provider_token_expires_at * 1000
+        ).toISOString();
+      } else if (
+        typeof sessionAny.provider_token_expires_in === "number" &&
+        sessionAny.provider_token_expires_in > 0
+      ) {
+        // Calculate expiry from expires_in (seconds from now)
+        const expiryTime =
+          Date.now() + sessionAny.provider_token_expires_in * 1000;
+        expiresAt = new Date(expiryTime).toISOString();
+      } else if (
+        typeof sessionAny.expires_in === "number" &&
+        sessionAny.expires_in > 0
+      ) {
+        // Some providers use expires_in at session level
+        const expiryTime = Date.now() + sessionAny.expires_in * 1000;
+        expiresAt = new Date(expiryTime).toISOString();
+      } else {
+        // Try to decode JWT to get expiry if token is a JWT
+        try {
+          const tokenParts = provider_token.split(".");
+          if (tokenParts.length === 3) {
+            // Looks like a JWT, decode the payload
+            const payload = JSON.parse(
+              Buffer.from(tokenParts[1], "base64").toString("utf8")
+            );
+            if (typeof payload.exp === "number" && payload.exp > 0) {
+              // JWT exp claim is Unix timestamp in seconds
+              expiresAt = new Date(payload.exp * 1000).toISOString();
+            }
+          }
+        } catch {
+          // Not a JWT or failed to decode - leave expiresAt as null
+          // This is fine, some tokens don't have expiry (e.g., long-lived tokens)
+        }
       }
 
       // Store token in encrypted database

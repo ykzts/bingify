@@ -156,7 +156,9 @@ export function LoginForm({ providers, systemSettings }: Props) {
           language: locale,
         },
         // Email OTP uses the non-provider-specific callback route
-        emailRedirectTo: `${getAbsoluteUrl()}/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`,
+        emailRedirectTo: getAbsoluteUrl(
+          `/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`
+        ),
       },
     });
 

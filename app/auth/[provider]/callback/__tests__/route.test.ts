@@ -226,7 +226,7 @@ describe("Auth [Provider] Callback Route", () => {
       // app_metadata.provider(twitch)ではなく、URLのプロバイダーが優先される
       expect(mockUpsertOAuthToken).toHaveBeenCalledWith(mockSupabase, {
         access_token: "mock-access-token",
-        expires_at: expect.any(String),
+        expires_at: null, // No provider-specific expiry fields in mock
         provider: "google",
         refresh_token: "mock-refresh-token",
       });
@@ -275,7 +275,7 @@ describe("Auth [Provider] Callback Route", () => {
       // app_metadata.provider(google)の古いキャッシュ値ではなく、URLから取得
       expect(mockUpsertOAuthToken).toHaveBeenCalledWith(mockSupabase, {
         access_token: "mock-twitch-token",
-        expires_at: expect.any(String),
+        expires_at: null, // No provider-specific expiry fields in mock
         provider: "twitch",
         refresh_token: "mock-twitch-refresh",
       });
