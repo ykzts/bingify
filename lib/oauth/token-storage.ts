@@ -85,6 +85,59 @@ export async function upsertOAuthToken(
 }
 
 /**
+ * データベースのRPCレスポンスからトークン情報を抽出するヘルパー関数
+ * RPCレスポンスの構造: { success: true, data: { provider, access_token, ... } }
+ *
+ * @param data - データベースから返されたレスポンス
+ * @returns パース済みのトークン情報
+ */
+function parseTokenResponse(data: unknown): GetTokenResult {
+  if (!data || typeof data !== "object") {
+    return {
+      error: "Invalid response from database",
+      success: false,
+    };
+  }
+
+  const response = data as {
+    success: boolean;
+    data?: unknown;
+    error?: string;
+  };
+
+  // データベース関数がエラーを返した場合
+  if (!response.success) {
+    return {
+      error: response.error || "Unknown error",
+      success: false,
+    };
+  }
+
+  // ネストされた data フィールドを抽出
+  if (!response.data || typeof response.data !== "object") {
+    return {
+      error: "Invalid token data in response",
+      success: false,
+    };
+  }
+
+  const tokenData = response.data as {
+    provider: string;
+    access_token: string;
+    refresh_token?: string | null;
+    expires_at?: string | null;
+  };
+
+  return {
+    success: true,
+    provider: tokenData.provider,
+    access_token: tokenData.access_token,
+    refresh_token: tokenData.refresh_token || undefined,
+    expires_at: tokenData.expires_at || undefined,
+  };
+}
+
+/**
  * OAuth トークンを取得する
  * データベースから復号化されたトークンが返される
  *
@@ -109,49 +162,7 @@ export async function getOAuthToken(
       };
     }
 
-    if (!data || typeof data !== "object") {
-      return {
-        error: "Invalid response from database",
-        success: false,
-      };
-    }
-
-    const response = data as {
-      success: boolean;
-      data?: unknown;
-      error?: string;
-    };
-
-    // データベース関数がエラーを返した場合
-    if (!response.success) {
-      return {
-        error: response.error || "Unknown error",
-        success: false,
-      };
-    }
-
-    // ネストされた data フィールドを抽出
-    if (!response.data || typeof response.data !== "object") {
-      return {
-        error: "Invalid token data in response",
-        success: false,
-      };
-    }
-
-    const tokenData = response.data as {
-      provider: string;
-      access_token: string;
-      refresh_token?: string | null;
-      expires_at?: string | null;
-    };
-
-    return {
-      success: true,
-      provider: tokenData.provider,
-      access_token: tokenData.access_token,
-      refresh_token: tokenData.refresh_token || undefined,
-      expires_at: tokenData.expires_at || undefined,
-    };
+    return parseTokenResponse(data);
   } catch (err) {
     console.error("Exception getting OAuth token:", err);
     return {
@@ -255,49 +266,7 @@ export async function getOAuthTokenForUser(
       };
     }
 
-    if (!data || typeof data !== "object") {
-      return {
-        error: "Invalid response from database",
-        success: false,
-      };
-    }
-
-    const response = data as {
-      success: boolean;
-      data?: unknown;
-      error?: string;
-    };
-
-    // データベース関数がエラーを返した場合
-    if (!response.success) {
-      return {
-        error: response.error || "Unknown error",
-        success: false,
-      };
-    }
-
-    // ネストされた data フィールドを抽出
-    if (!response.data || typeof response.data !== "object") {
-      return {
-        error: "Invalid token data in response",
-        success: false,
-      };
-    }
-
-    const tokenData = response.data as {
-      provider: string;
-      access_token: string;
-      refresh_token?: string | null;
-      expires_at?: string | null;
-    };
-
-    return {
-      success: true,
-      provider: tokenData.provider,
-      access_token: tokenData.access_token,
-      refresh_token: tokenData.refresh_token || undefined,
-      expires_at: tokenData.expires_at || undefined,
-    };
+    return parseTokenResponse(data);
   } catch (err) {
     console.error("Exception getting OAuth token for user:", err);
     return {
