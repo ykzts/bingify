@@ -158,9 +158,10 @@ export async function GET(
 
   // If redirect path already includes locale, use it as-is
   // Otherwise, prepend locale if available
-  const finalPath = redirectPath.startsWith(`/${locale}/`)
-    ? redirectPath
-    : buildPath(redirectPath, locale);
+  const finalPath =
+    locale && redirectPath.startsWith(`/${locale}/`)
+      ? redirectPath
+      : buildPath(redirectPath, locale);
 
   return NextResponse.redirect(`${origin}${finalPath}`);
 }
