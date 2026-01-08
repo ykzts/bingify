@@ -38,7 +38,6 @@ async function FaqData() {
       answer2={tFaq("answer2", { maxParticipants })}
       answer3={tFaq.rich("answer3", {
         expirationHours: spaceExpirationHours,
-        githubLink,
       })}
       answer4={tFaq("answer4")}
       answer5={tFaq.rich("answer5", { githubLink })}
