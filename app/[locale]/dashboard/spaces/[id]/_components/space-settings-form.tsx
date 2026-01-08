@@ -14,6 +14,7 @@ import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useEffectEvent, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Field,
   FieldContent,
@@ -942,15 +943,15 @@ export function SpaceSettingsForm({
           <form.Field name="hide_metadata_before_join">
             {(field) => (
               <div className="flex items-start gap-3">
-                <input
+                <Checkbox
                   checked={field.state.value as boolean}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                  className="mt-1"
                   disabled={isPending}
                   id={field.name}
                   name={field.name}
-                  onChange={(e) => field.handleChange(e.target.checked)}
-                  type="checkbox"
-                  value="true"
+                  onCheckedChange={(checked) =>
+                    field.handleChange(checked === true)
+                  }
                 />
                 <div className="flex-1">
                   <Label className="cursor-pointer" htmlFor={field.name}>

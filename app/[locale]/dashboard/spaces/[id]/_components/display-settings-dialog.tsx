@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -193,8 +194,8 @@ export function DisplaySettingsDialog({
             <div className="space-y-3">
               <Label htmlFor="viewing-url">{t("viewingUrlLabel")}</Label>
               <div className="flex gap-2">
-                <input
-                  className="flex-1 rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 font-mono text-sm"
+                <Input
+                  className="flex-1 font-mono"
                   id="viewing-url"
                   readOnly
                   value={viewingUrl}
