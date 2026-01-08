@@ -1,13 +1,14 @@
 "use client";
 
 import { motion } from "motion/react";
+import type { ReactNode } from "react";
 
 interface FaqProps {
   answer1: string;
   answer2: string;
   answer3: string;
   answer4: string;
-  answer5: string;
+  answer5: ReactNode;
   heading: string;
   question1: string;
   question2: string;
@@ -51,21 +52,7 @@ export function Faq({
       question: question4,
     },
     {
-      answer: (
-        <>
-          {answer5.split("GitHub")[0]}
-          <a
-            aria-label="View source code on GitHub (opens in a new window)"
-            className="text-primary underline hover:text-primary/80"
-            href="https://github.com/ykzts/bingify"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            GitHub
-          </a>
-          {answer5.split("GitHub")[1]}
-        </>
-      ),
+      answer: answer5,
       id: "source-code",
       question: question5,
     },

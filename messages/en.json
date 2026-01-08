@@ -295,9 +295,9 @@
   "Faq": {
     "answer1": "No, it's completely free. Account registration is free, and you can use all features without any restrictions. There are no paid plans or hidden costs.",
     "answer2": "Each space can accommodate up to {maxParticipants} concurrent participants. This limit can be adjusted by the system administrator in the settings.",
-    "answer3": "Space expiration is managed through system settings. Data from completed spaces is retained as an archive for a certain period and then automatically deleted. Please contact your system administrator for specific details.",
+    "answer3": "Spaces expire {expirationHours, plural, =0 {indefinitely} other {after {expirationHours} hours from creation}}. Data from completed spaces is retained as an archive for a certain period and then automatically deleted.",
     "answer4": "Yes, absolutely! You can use Bingify freely for both personal and commercial purposes at no cost.",
-    "answer5": "Yes! Bingify is an open-source project under the MIT License. You can view, modify, and contribute to the source code on GitHub.",
+    "answer5": "Yes! Bingify is an open-source project under the MIT License. You can view, modify, and contribute to the source code on <githubLink>GitHub</githubLink>.",
     "heading": "Frequently Asked Questions",
     "question1": "Is there any cost to use it?",
     "question2": "Is there a limit on the number of participants?",
