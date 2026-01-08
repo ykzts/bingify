@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import type { ReactNode } from "react";
 import { Suspense } from "react";
 import { createPublicClient } from "@/lib/supabase/public-server";
 import { Faq } from "./faq";
@@ -20,7 +21,7 @@ async function FaqData() {
     console.error("Failed to fetch system settings:", error);
   }
 
-  const githubLink = (chunks: React.ReactNode) => (
+  const githubLink = (chunks: ReactNode) => (
     <a
       aria-label="View source code on GitHub (opens in a new window)"
       className="text-primary underline hover:text-primary/80"
