@@ -9,7 +9,6 @@ interface FaqProps {
   answer4: string;
   answer5: string;
   heading: string;
-  maxParticipants: number;
   question1: string;
   question2: string;
   question3: string;
@@ -24,7 +23,6 @@ export function Faq({
   answer4,
   answer5,
   heading,
-  maxParticipants: _maxParticipants,
   question1,
   question2,
   question3,
