@@ -203,6 +203,9 @@ DECLARE
   v_created_refresh BOOLEAN := FALSE;
   v_existing_record RECORD;
   v_delete_result UUID;
+  v_existing_access_token TEXT;
+  v_existing_refresh_token TEXT;
+  v_updated_at TIMESTAMPTZ;
 BEGIN
   -- Only allow service_role to call this function
   -- Use IS DISTINCT FROM to handle NULL correctly
@@ -215,22 +218,44 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'user_id is required');
   END IF;
 
-  -- Check for recent successful upsert to avoid duplicate processing (idempotency)
-  SELECT * INTO v_existing_record
-  FROM private.oauth_tokens
-  WHERE user_id = p_user_id AND provider = p_provider
-    AND updated_at > (NOW() - INTERVAL '60 seconds');
-  
-  IF FOUND THEN
-    -- Recent update detected, skip to avoid re-processing
-    RETURN jsonb_build_object('success', true, 'message', 'Recent update detected, skipping to avoid duplicate processing');
-  END IF;
-
-  -- Get existing secret IDs if token already exists
-  SELECT access_token_secret_id, refresh_token_secret_id
-  INTO v_existing_access_id, v_existing_refresh_id
+  -- Get existing secret IDs and updated_at timestamp
+  SELECT access_token_secret_id, refresh_token_secret_id, updated_at
+  INTO v_existing_access_id, v_existing_refresh_id, v_updated_at
   FROM private.oauth_tokens
   WHERE user_id = p_user_id AND provider = p_provider;
+
+  -- Idempotency check: if recently updated, compare tokens to avoid duplicate processing
+  IF FOUND AND v_updated_at > (NOW() - INTERVAL '60 seconds') THEN
+    -- Decrypt existing access token to compare
+    BEGIN
+      SELECT decrypted_secret INTO v_existing_access_token
+      FROM vault.decrypted_secrets
+      WHERE id = v_existing_access_id;
+      
+      -- If access tokens match, check refresh token before skipping
+      IF v_existing_access_token = p_access_token THEN
+        -- Check refresh token compatibility
+        IF p_refresh_token IS NULL AND v_existing_refresh_id IS NULL THEN
+          -- Both have no refresh token, tokens match completely
+          RETURN jsonb_build_object('success', true, 'message', 'Token already up to date, skipping duplicate processing');
+        ELSIF p_refresh_token IS NOT NULL AND v_existing_refresh_id IS NOT NULL THEN
+          -- Both have refresh tokens, compare them
+          SELECT decrypted_secret INTO v_existing_refresh_token
+          FROM vault.decrypted_secrets
+          WHERE id = v_existing_refresh_id;
+          
+          IF v_existing_refresh_token = p_refresh_token THEN
+            RETURN jsonb_build_object('success', true, 'message', 'Token already up to date, skipping duplicate processing');
+          END IF;
+        END IF;
+        -- Otherwise tokens differ (one has refresh, other doesn't), proceed with update
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        -- If decryption fails, proceed with update
+        NULL;
+    END;
+  END IF;
 
   -- Update or create access token secret
   IF v_existing_access_id IS NOT NULL THEN
