@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2, Twitch, Users, Youtube } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -103,6 +103,7 @@ export function SpaceParticipation({
 }: SpaceParticipationProps) {
   const t = useTranslations("UserSpace");
   const router = useRouter();
+  const pathname = usePathname();
   const [isJoining, setIsJoining] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -288,7 +289,7 @@ export function SpaceParticipation({
             access_type: "offline",
             prompt: "consent",
           },
-          redirectTo: buildOAuthCallbackUrl(window.location.pathname),
+          redirectTo: buildOAuthCallbackUrl("google", pathname),
           scopes: getScopesForProvider("google", systemSettings),
         },
         provider: "google",
@@ -329,7 +330,7 @@ export function SpaceParticipation({
       // This adds Twitch scope to existing session for authenticated users
       const { error: oauthError } = await supabase.auth.linkIdentity({
         options: {
-          redirectTo: buildOAuthCallbackUrl(window.location.pathname),
+          redirectTo: buildOAuthCallbackUrl("twitch", pathname),
           scopes: getScopesForProvider("twitch", systemSettings),
         },
         provider: "twitch",

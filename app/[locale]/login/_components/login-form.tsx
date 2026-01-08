@@ -23,6 +23,7 @@ import {
 import type { AuthProvider } from "@/lib/data/auth-providers";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/client";
+import { getAbsoluteUrl } from "@/lib/utils/url";
 
 const emailSchema = z.object({
   email: z.string().email(),
@@ -121,7 +122,7 @@ export function LoginForm({ providers, systemSettings }: Props) {
                 prompt: "consent",
               }
             : undefined,
-        redirectTo: buildOAuthCallbackUrl(redirect ?? undefined),
+        redirectTo: buildOAuthCallbackUrl(provider, redirect ?? undefined),
         scopes,
       },
       provider: provider as "google" | "twitch",
@@ -154,7 +155,10 @@ export function LoginForm({ providers, systemSettings }: Props) {
         data: {
           language: locale,
         },
-        emailRedirectTo: buildOAuthCallbackUrl(redirect ?? undefined),
+        // Email OTP uses the non-provider-specific callback route
+        emailRedirectTo: getAbsoluteUrl(
+          `/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`
+        ),
       },
     });
 

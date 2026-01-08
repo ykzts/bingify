@@ -7,18 +7,21 @@ import { getAbsoluteUrl } from "@/lib/utils/url";
 
 /**
  * Builds a callback URL for OAuth redirects
+ * @param provider - OAuth provider name (e.g., "google", "twitch")
  * @param redirectPath - Optional path to redirect to after authentication (e.g., "/spaces/123")
  * @returns The complete callback URL with redirect parameter if provided
  */
-export function buildOAuthCallbackUrl(redirectPath?: string): string {
-  const baseUrl = getAbsoluteUrl();
-  const callbackUrl = new URL("/auth/callback", baseUrl);
+export function buildOAuthCallbackUrl(
+  provider: string,
+  redirectPath?: string
+): string {
+  let path = `/auth/${provider}/callback`;
 
   if (redirectPath) {
-    callbackUrl.searchParams.set("redirect", redirectPath);
+    path += `?redirect=${encodeURIComponent(redirectPath)}`;
   }
 
-  return callbackUrl.toString();
+  return getAbsoluteUrl(path);
 }
 
 /**

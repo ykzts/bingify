@@ -1,67 +1,14 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { routing } from "@/i18n/routing";
-import { isValidOAuthProvider } from "@/lib/oauth/provider-validation";
-import { upsertOAuthToken } from "@/lib/oauth/token-storage";
 import { createClient } from "@/lib/supabase/server";
+import { validateRedirectPath } from "@/lib/utils/url";
 
 const LOCALE_PATTERN = new RegExp(`^/(${routing.locales.join("|")})/`);
-const PROTOCOL_PATTERN = /^[a-zA-Z][a-zA-Z0-9+.-]*:/;
-const DANGEROUS_PROTOCOLS = /(?:javascript|data|vbscript|file|about):/i;
 
 // Retry configuration for exchangeCodeForSession
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 1000;
-
-// Helper function to validate and sanitize redirect path
-function validateRedirectPath(redirect: string | null, origin: string): string {
-  let redirectPath = redirect && redirect.trim() !== "" ? redirect : "/";
-
-  // Decode URI component to handle encoded characters
-  try {
-    redirectPath = decodeURIComponent(redirectPath);
-  } catch {
-    return "/";
-  }
-
-  // Check for path traversal patterns before normalization
-  if (redirectPath.includes("..")) {
-    return "/";
-  }
-
-  // Validate redirect path to prevent open redirect vulnerabilities
-  if (!redirectPath.startsWith("/") || redirectPath.startsWith("//")) {
-    return "/";
-  }
-
-  // Check for protocol schemes at the start
-  if (PROTOCOL_PATTERN.test(redirectPath)) {
-    return "/";
-  }
-
-  // Check for dangerous protocol handlers anywhere in the path
-  if (DANGEROUS_PROTOCOLS.test(redirectPath)) {
-    return "/";
-  }
-
-  // Normalize and validate using URL constructor
-  try {
-    const testUrl = new URL(redirectPath, origin);
-
-    // Verify origin matches and protocol is safe
-    if (
-      testUrl.origin !== origin ||
-      (testUrl.protocol !== "http:" && testUrl.protocol !== "https:")
-    ) {
-      return "/";
-    }
-
-    // Use the normalized pathname from the URL object
-    return testUrl.pathname + testUrl.search + testUrl.hash;
-  } catch {
-    return "/";
-  }
-}
 
 // Helper function to retry exchangeCodeForSession with exponential backoff
 /**
@@ -155,7 +102,6 @@ async function exchangeCodeWithRetry(
   return { error: lastError };
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: OAuth callback handling requires multiple conditional checks for security and error handling
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
@@ -231,38 +177,7 @@ export async function GET(request: NextRequest) {
   const session = refreshedSession;
 
   if (session) {
-    // Save OAuth tokens to database if available
-    const { provider_token, provider_refresh_token } = session;
-    const providerValue = session.user?.app_metadata?.provider;
-
-    // Validate provider is a supported OAuth provider
-    if (provider_token && isValidOAuthProvider(providerValue)) {
-      // Calculate token expiry if available from session
-      // Use session.expires_at which represents when the OAuth session expires
-      let expiresAt: string | null = null;
-      if (session.expires_at) {
-        // session.expires_at is a Unix timestamp (seconds)
-        expiresAt = new Date(session.expires_at * 1000).toISOString();
-      }
-
-      // Store token in encrypted database
-      const result = await upsertOAuthToken(supabase, {
-        provider: providerValue,
-        access_token: provider_token,
-        refresh_token: provider_refresh_token || null,
-        expires_at: expiresAt,
-      });
-
-      if (!result.success) {
-        console.warn(
-          `Failed to store OAuth token for provider ${providerValue}:`,
-          result.error
-        );
-        // Continue anyway - token storage failure shouldn't block authentication
-      }
-    }
-
-    // Set language metadata if not already set (for OAuth users)
+    // Set language metadata if not already set (for email OTP users)
     const userMetadata = session.user?.user_metadata;
     if (!userMetadata?.language) {
       const locale = getLocaleFromReferer();
@@ -284,7 +199,7 @@ export async function GET(request: NextRequest) {
 
   // Successfully authenticated, redirect to specified path or default
   const locale = getLocaleFromReferer();
-  const redirectPath = validateRedirectPath(redirect, origin);
+  const redirectPath = validateRedirectPath(redirect);
 
   // If redirect path already includes locale, use it as-is
   // Otherwise, prepend locale if available
