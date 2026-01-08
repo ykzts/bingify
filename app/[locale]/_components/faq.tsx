@@ -32,23 +32,28 @@ export function Faq({
   const faqs = [
     {
       answer: answer1,
-      id: "commercial-use",
+      id: "cost",
       question: question1,
     },
     {
       answer: answer2,
-      id: "cost",
+      id: "participant-limits",
       question: question2,
     },
     {
       answer: answer3,
-      id: "participant-limits",
+      id: "data-retention",
       question: question3,
+    },
+    {
+      answer: answer4,
+      id: "commercial-use",
+      question: question4,
     },
     {
       answer: (
         <>
-          {answer4.split("GitHub")[0]}
+          {answer5.split("GitHub")[0]}
           <a
             aria-label="View source code on GitHub (opens in a new window)"
             className="text-primary underline hover:text-primary/80"
@@ -58,13 +63,12 @@ export function Faq({
           >
             GitHub
           </a>
-          {answer4.split("GitHub")[1]}
+          {answer5.split("GitHub")[1]}
         </>
       ),
       id: "source-code",
-      question: question4,
+      question: question5,
     },
-    { answer: answer5, id: "data-retention", question: question5 },
   ];
 
   return (

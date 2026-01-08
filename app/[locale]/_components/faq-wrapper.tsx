@@ -22,8 +22,8 @@ async function FaqData() {
   return (
     <Faq
       answer1={tFaq("answer1")}
-      answer2={tFaq("answer2")}
-      answer3={tFaq("answer3", { maxParticipants })}
+      answer2={tFaq("answer2", { maxParticipants })}
+      answer3={tFaq("answer3")}
       answer4={tFaq("answer4")}
       answer5={tFaq("answer5")}
       heading={tFaq("heading")}
