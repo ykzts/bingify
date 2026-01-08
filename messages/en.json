@@ -192,6 +192,8 @@
     "viewCardButton": "View Card"
   },
   "Contact": {
+    "autoFillButton": "Fill with My Info",
+    "autoFillLoginPrompt": "Please log in to auto-fill with your information",
     "backToHome": "Back to Home",
     "completeEmailNote": "We will reply to this email address:",
     "completeMessage": "Thank you for contacting us. We will review your message and get back to you soon.",
