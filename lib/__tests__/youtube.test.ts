@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   checkMembershipStatus,
   checkSubscriptionStatus,
+  getUserYouTubeChannelId,
   resolveYouTubeChannelId,
 } from "../youtube";
 
@@ -9,6 +10,16 @@ import {
 const mockList = vi.fn();
 const mockMembersList = vi.fn();
 const mockChannelsList = vi.fn();
+
+// Mock the google-auth-library module
+vi.mock("google-auth-library", () => ({
+  OAuth2Client: class {
+    credentials = {};
+    setCredentials(credentials: { access_token: string }) {
+      this.credentials = credentials;
+    }
+  },
+}));
 
 // Mock the YouTube API module
 vi.mock("@googleapis/youtube", () => ({
@@ -374,5 +385,83 @@ describe("resolveYouTubeChannelId", () => {
       expect(result.channelId).toBe(channelId);
       expect(result.error).toBeUndefined();
     });
+  });
+
+  describe("OAuth2トークンの検出", () => {
+    it("ya29.で始まるトークンをOAuth2トークンとして認識する", async () => {
+      mockChannelsList.mockResolvedValue({
+        data: {
+          items: [{ id: "UC1234567890123456789012" }],
+        },
+      });
+
+      const result = await resolveYouTubeChannelId(
+        "@TestChannel",
+        "ya29.a0ARrdaM_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      );
+
+      expect(result.channelId).toBe("UC1234567890123456789012");
+      expect(mockChannelsList).toHaveBeenCalled();
+    });
+
+    it("短い文字列（APIキー）は文字列として扱う", async () => {
+      mockChannelsList.mockResolvedValue({
+        data: {
+          items: [{ id: "UC1234567890123456789012" }],
+        },
+      });
+
+      const result = await resolveYouTubeChannelId(
+        "@TestChannel",
+        "AIzaSyDxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      );
+
+      expect(result.channelId).toBe("UC1234567890123456789012");
+      expect(mockChannelsList).toHaveBeenCalled();
+    });
+  });
+});
+
+describe("getUserYouTubeChannelId", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("アクセストークンを使用してユーザーのチャンネルIDを取得する", async () => {
+    mockChannelsList.mockResolvedValue({
+      data: {
+        items: [{ id: "UCtest_user_channel_id" }],
+      },
+    });
+
+    const result = await getUserYouTubeChannelId("test_access_token");
+
+    expect(result.channelId).toBe("UCtest_user_channel_id");
+    expect(result.error).toBeUndefined();
+    expect(mockChannelsList).toHaveBeenCalledWith({
+      mine: true,
+      part: ["id"],
+    });
+  });
+
+  it("チャンネルが見つからない場合にエラーを返す", async () => {
+    mockChannelsList.mockResolvedValue({
+      data: {
+        items: [],
+      },
+    });
+
+    const result = await getUserYouTubeChannelId("test_access_token");
+
+    expect(result.channelId).toBeUndefined();
+    expect(result.error).toBe("No channel found for this user");
+  });
+
+  it("アクセストークンが欠落している場合にエラーを返す", async () => {
+    const result = await getUserYouTubeChannelId("");
+
+    expect(result.channelId).toBeUndefined();
+    expect(result.error).toBe("Missing access token");
+    expect(mockChannelsList).not.toHaveBeenCalled();
   });
 });
