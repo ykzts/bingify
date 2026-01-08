@@ -72,7 +72,10 @@
     "subtitle": "サイト管理者用のコントロールパネル",
     "updateRoleError": "ロールの更新に失敗しました",
     "usersCount": "全{count}名のユーザー",
-    "usersTitle": "ユーザー管理"
+    "usersTitle": "ユーザー管理",
+    "paginationNext": "次へ",
+    "paginationPrevious": "前へ",
+    "pageInfo": "{total}ページ中{current}ページ目"
   },
   "AdminAuthProviders": {
     "description": "ログインページで利用可能な認証プロバイダーを管理します",

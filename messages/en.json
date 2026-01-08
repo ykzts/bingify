@@ -72,7 +72,10 @@
     "subtitle": "Site administrator control panel",
     "updateRoleError": "Failed to update role",
     "usersCount": "{count} users total",
-    "usersTitle": "User Management"
+    "usersTitle": "User Management",
+    "paginationNext": "Next",
+    "paginationPrevious": "Previous",
+    "pageInfo": "Page {current} of {total}"
   },
   "AdminAuthProviders": {
     "description": "Manage which authentication providers are available on the login page",

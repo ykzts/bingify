@@ -6,12 +6,17 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminUsersPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/admin/users">) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const query = await searchParams;
+  const currentPage = Number(query?.page) || 1;
+
   const t = await getTranslations("Admin");
-  const { currentUserId, error, users } = await getAllUsers();
+  const { currentUserId, error, hasMore, users } =
+    await getAllUsers(currentPage);
 
   if (error) {
     return (
@@ -30,7 +35,12 @@ export default async function AdminUsersPage({
         </p>
       </div>
 
-      <UserList currentUserId={currentUserId} initialUsers={users || []} />
+      <UserList
+        currentPage={currentPage}
+        currentUserId={currentUserId}
+        hasMore={hasMore}
+        initialUsers={users || []}
+      />
     </div>
   );
 }

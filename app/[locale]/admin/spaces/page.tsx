@@ -6,12 +6,16 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminSpacesPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/admin/spaces">) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const query = await searchParams;
+  const currentPage = Number(query?.page) || 1;
+
   const t = await getTranslations("Admin");
-  const { error, spaces } = await getAllSpaces();
+  const { error, hasMore, spaces } = await getAllSpaces(currentPage);
 
   if (error) {
     return (
@@ -30,7 +34,11 @@ export default async function AdminSpacesPage({
         </p>
       </div>
 
-      <SpaceList initialSpaces={spaces || []} />
+      <SpaceList
+        currentPage={currentPage}
+        hasMore={hasMore}
+        initialSpaces={spaces || []}
+      />
     </div>
   );
 }
