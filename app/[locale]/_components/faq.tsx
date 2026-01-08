@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 interface FaqProps {
   answer1: string;
   answer2: string;
-  answer3: string;
+  answer3: ReactNode;
   answer4: string;
   answer5: ReactNode;
   heading: string;
