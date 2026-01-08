@@ -293,13 +293,17 @@
     "unexpectedError": "An unexpected error occurred"
   },
   "Faq": {
-    "answer1": "The free version allows up to {maxParticipants} concurrent participants per space. For larger events or commercial use, please contact us.",
-    "answer2": "Yes! Bingify is open source under the MIT License. You can view, modify, and contribute to the source code on GitHub.",
-    "answer3": "This project is maintained by volunteers. You can support development through GitHub Sponsors, which helps cover hosting costs and development time.",
+    "answer1": "No, it's completely free. Account registration is free, and you can use all features without any restrictions. There are no paid plans or hidden costs.",
+    "answer2": "Each space can accommodate up to {maxParticipants} concurrent participants. This limit can be adjusted by the system administrator in the settings.",
+    "answer3": "Spaces expire {expirationHours, plural, =0 {indefinitely} other {after {expirationHours} hours from creation}}. Data from completed spaces is retained as an archive for a certain period and then automatically deleted.",
+    "answer4": "Yes, absolutely! You can use Bingify freely for both personal and commercial purposes at no cost.",
+    "answer5": "Yes! Bingify is an open-source project under the MIT License. You can view, modify, and contribute to the source code on <githubLink>GitHub</githubLink>.",
     "heading": "Frequently Asked Questions",
-    "question1": "What are the usage limits?",
-    "question2": "Is the source code available?",
-    "question3": "How is this project funded?"
+    "question1": "Is there any cost to use it?",
+    "question2": "Is there a limit on the number of participants?",
+    "question3": "How long is data retained?",
+    "question4": "Can I use it for commercial purposes?",
+    "question5": "Is the source code available?"
   },
   "Features": {
     "communityDescription": "Perfect for community events, streams, and parties. Easy to join with OAuth sign-in and enjoy together.",
