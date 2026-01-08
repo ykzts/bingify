@@ -40,8 +40,8 @@ export interface GetTokenResult extends TokenResult {
 const tokenDataSchema = z.object({
   provider: z.string(),
   access_token: z.string(),
-  refresh_token: z.string().nullable().optional(),
-  expires_at: z.string().nullable().optional(),
+  refresh_token: z.string().nullable(),
+  expires_at: z.string().nullable(),
 });
 
 /**
@@ -146,8 +146,8 @@ function parseTokenResponse(data: unknown): GetTokenResult {
     success: true,
     provider: tokenData.provider,
     access_token: tokenData.access_token,
-    refresh_token: tokenData.refresh_token ?? undefined,
-    expires_at: tokenData.expires_at ?? undefined,
+    refresh_token: tokenData.refresh_token,
+    expires_at: tokenData.expires_at,
   };
 }
 
