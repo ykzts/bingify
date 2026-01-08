@@ -96,7 +96,13 @@ export function ContactForm({ locale }: Props) {
     try {
       const result = await getUserProfile();
 
-      if (result.error || !result.data) {
+      if (result.error) {
+        // エラーメッセージをユーザーに表示
+        toast.error(t("autoFillLoginPrompt"));
+        return;
+      }
+
+      if (!result.data) {
         toast.error(t("autoFillLoginPrompt"));
         return;
       }
@@ -131,6 +137,7 @@ export function ContactForm({ locale }: Props) {
 
       <div className="mb-6 flex justify-end">
         <Button
+          aria-label={t("autoFillButton")}
           disabled={isAutoFilling}
           onClick={handleAutoFill}
           size="sm"
