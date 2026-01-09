@@ -62,12 +62,12 @@ export default async function AdminUserDetailPage({
     <div className="space-y-6">
       {/* ヘッダー */}
       <div>
-        <Link href="/admin/users">
-          <Button size="sm" variant="ghost">
+        <Button asChild size="sm" variant="ghost">
+          <Link href="/admin/users">
             <ChevronLeft className="mr-1 h-4 w-4" />
             {t("backToUserList")}
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         <h2 className="mt-4 font-bold text-2xl">{t("userDetailTitle")}</h2>
       </div>
 

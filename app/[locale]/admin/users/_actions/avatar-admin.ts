@@ -89,26 +89,48 @@ export async function deleteCustomAvatar(
 
     // Supabase Storage からファイルを削除
     if (profile.avatar_url) {
-      // URLからファイルパスを抽出
-      const storagePathPattern = "/storage/v1/object/public/avatars/";
-      let fileName = profile.avatar_url;
-      if (profile.avatar_url.includes(storagePathPattern)) {
-        const parts = profile.avatar_url.split(storagePathPattern);
-        fileName = parts[1] || profile.avatar_url;
-      }
+      try {
+        // URLからファイルパスを抽出
+        const url = new URL(profile.avatar_url);
+        const pathSegments = url.pathname.split("/");
+        const avatarsIndex = pathSegments.indexOf("avatars");
 
-      // ストレージから削除（管理者権限で実行）
-      const { error: deleteError } = await adminClient.storage
-        .from("avatars")
-        .remove([fileName]);
+        if (avatarsIndex === -1 || avatarsIndex === pathSegments.length - 1) {
+          console.error("Invalid avatar URL format:", profile.avatar_url);
+          return {
+            error: "errorInvalidAvatarUrl",
+            success: false,
+          };
+        }
 
-      if (deleteError) {
-        console.error("Failed to delete avatar from storage:", deleteError);
-        // ストレージ削除失敗はログのみ（処理は継続）
+        // avatars/ 以降のパスを取得してデコード
+        const fileName = pathSegments
+          .slice(avatarsIndex + 1)
+          .map((segment) => decodeURIComponent(segment))
+          .join("/");
+
+        // ストレージから削除（管理者権限で実行）
+        const { error: deleteError } = await adminClient.storage
+          .from("avatars")
+          .remove([fileName]);
+
+        if (deleteError) {
+          console.error("Failed to delete avatar from storage:", deleteError);
+          return {
+            error: "errorStorageDeleteFailed",
+            success: false,
+          };
+        }
+      } catch (urlError) {
+        console.error("Failed to parse avatar URL:", urlError);
+        return {
+          error: "errorInvalidAvatarUrl",
+          success: false,
+        };
       }
     }
 
-    // profiles テーブルを更新
+    // ストレージ削除成功後のみ profiles テーブルを更新
     const { error: updateError } = await adminClient
       .from("profiles")
       .update({
