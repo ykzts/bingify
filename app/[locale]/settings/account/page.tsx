@@ -7,6 +7,7 @@ import { getAvailableAvatars } from "@/lib/services/avatar-service";
 import { createClient } from "@/lib/supabase/server";
 import { AccountLinkingForm } from "./_components/account-linking-form";
 import { AvatarSelectionForm } from "./_components/avatar-selection-form";
+import { EmailChangeForm } from "./_components/email-change-form";
 import { UsernameForm } from "./_components/username-form";
 
 async function AccountSettingsContent({ locale }: { locale: string }) {
@@ -41,6 +42,7 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
   return (
     <div className="space-y-8">
       <UsernameForm currentUsername={profile?.full_name} />
+      <EmailChangeForm currentEmail={user.email} />
       <AccountLinkingForm systemSettings={systemSettings} user={user} />
       {availableAvatars && availableAvatars.length > 0 && (
         <AvatarSelectionForm
