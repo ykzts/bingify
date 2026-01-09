@@ -1,5 +1,4 @@
-import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SettingsTabs } from "./_components/settings-tabs";
 
 export default async function SettingsLayout({
@@ -9,7 +8,7 @@ export default async function SettingsLayout({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const t = useTranslations("AccountSettings");
+  const t = await getTranslations("AccountSettings");
 
   return (
     <div className="mx-auto max-w-4xl p-8">
