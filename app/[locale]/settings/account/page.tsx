@@ -5,6 +5,7 @@ import { getSystemSettings } from "@/lib/data/system-settings";
 import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
 import { AccountLinkingForm } from "./_components/account-linking-form";
+import { EmailChangeForm } from "./_components/email-change-form";
 import { UsernameForm } from "./_components/username-form";
 
 async function AccountSettingsContent({ locale }: { locale: string }) {
@@ -36,6 +37,7 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
   return (
     <div className="space-y-8">
       <UsernameForm currentUsername={profile?.full_name} />
+      <EmailChangeForm currentEmail={user.email} />
       <AccountLinkingForm systemSettings={systemSettings} user={user} />
     </div>
   );
