@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Link } from "@/i18n/navigation";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { cn } from "@/lib/utils";
@@ -130,6 +131,7 @@ export function SpaceSettingsForm({
   const router = useRouter();
   const t = useTranslations("SpaceSettings");
   const [serverError, setServerError] = useState<string | null>(null);
+  const [serverErrorKey, setServerErrorKey] = useState<string | null>(null);
 
   // 操作者自身のチャンネルID（権限チェック用）
   const [operatorYoutubeChannelId, setOperatorYoutubeChannelId] = useState<
@@ -232,26 +234,43 @@ export function SpaceSettingsForm({
   const handleUpdateSuccess = useEffectEvent(() => {
     onSuccess?.(t("updateSuccess"));
     setServerError(null);
+    setServerErrorKey(null);
   });
+
+  // Rich text error keys that need special rendering with links
+  const richTextErrorKeys = [
+    "errorOwnerTwitchAuthRequired",
+    "errorOwnerYoutubeAuthRequired",
+  ];
 
   // Common error translation logic
   const translateError = useEffectEvent((error: string): string => {
     // List of known error keys for translation
     const errorKeys = [
-      "errorYoutubeDisabled",
-      "errorYoutubeMemberDisabled",
-      "errorYoutubeSubscriberDisabled",
+      "errorEmailDisabled",
+      "errorGatekeeperOwnerOnly",
+      "errorOwnerTwitchAuthRequired",
+      "errorOwnerYoutubeAuthRequired",
       "errorTwitchDisabled",
       "errorTwitchFollowerDisabled",
       "errorTwitchSubscriberDisabled",
-      "errorEmailDisabled",
+      "errorYoutubeDisabled",
+      "errorYoutubeMemberDisabled",
+      "errorYoutubeSubscriberDisabled",
     ];
     // Translate error keys, otherwise use the error string as-is
     return errorKeys.includes(error) ? t(error) : error;
   });
 
   const handleUpdateError = useEffectEvent((error: string) => {
-    setServerError(translateError(error));
+    // Check if this is a rich text error key
+    if (richTextErrorKeys.includes(error)) {
+      setServerErrorKey(error);
+      setServerError(null);
+    } else {
+      setServerError(translateError(error));
+      setServerErrorKey(null);
+    }
   });
 
   const handlePublishSuccess = useEffectEvent(() => {
@@ -260,7 +279,14 @@ export function SpaceSettingsForm({
   });
 
   const handlePublishError = useEffectEvent((error: string) => {
-    setServerError(translateError(error));
+    // Check if this is a rich text error key
+    if (richTextErrorKeys.includes(error)) {
+      setServerErrorKey(error);
+      setServerError(null);
+    } else {
+      setServerError(translateError(error));
+      setServerErrorKey(null);
+    }
   });
 
   // Handle update success/error
@@ -983,6 +1009,26 @@ export function SpaceSettingsForm({
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>{t("updateError")}</AlertTitle>
             <AlertDescription>{serverError}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Server Error Display with Rich Text (for OAuth-related errors) */}
+        {serverErrorKey && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>{t("updateError")}</AlertTitle>
+            <AlertDescription>
+              {t.rich(serverErrorKey, {
+                accountLink: (chunks) => (
+                  <Link
+                    className="font-medium underline underline-offset-4 hover:text-destructive-foreground/80"
+                    href="/settings/account"
+                  >
+                    {chunks}
+                  </Link>
+                ),
+              })}
+            </AlertDescription>
           </Alert>
         )}
 
