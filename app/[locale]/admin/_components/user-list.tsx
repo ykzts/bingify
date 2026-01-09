@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Pagination,
@@ -23,6 +25,7 @@ import {
 import { banUser, updateUserRole } from "../_actions/admin-operations";
 
 interface User {
+  avatar_source: string | null;
   avatar_url: string | null;
   created_at: string | null;
   email: string | null;
@@ -109,6 +112,12 @@ export function UserList({
                 className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
                 scope="col"
               >
+                {t("avatar")}
+              </th>
+              <th
+                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+                scope="col"
+              >
                 {t("email")}
               </th>
               <th
@@ -140,15 +149,36 @@ export function UserList({
           <tbody className="divide-y divide-gray-200 bg-white">
             {users.length === 0 ? (
               <tr>
-                <td className="px-6 py-4 text-center text-gray-500" colSpan={5}>
+                <td className="px-6 py-4 text-center text-gray-500" colSpan={6}>
                   {t("noUsers")}
                 </td>
               </tr>
             ) : (
               users.map((user) => (
                 <tr key={user.id}>
+                  <td className="whitespace-nowrap px-6 py-4">
+                    <Link
+                      className="block transition-opacity hover:opacity-80"
+                      href={`${pathname}/${user.id}`}
+                    >
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage
+                          alt={user.full_name || user.email || "User"}
+                          src={user.avatar_url || undefined}
+                        />
+                        <AvatarFallback>
+                          <span className="text-lg">👤</span>
+                        </AvatarFallback>
+                      </Avatar>
+                    </Link>
+                  </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm">
-                    {user.email || "N/A"}
+                    <Link
+                      className="text-primary hover:underline"
+                      href={`${pathname}/${user.id}`}
+                    >
+                      {user.email || "N/A"}
+                    </Link>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm">
                     {user.full_name || "N/A"}
