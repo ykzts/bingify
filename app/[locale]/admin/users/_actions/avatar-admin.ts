@@ -164,6 +164,28 @@ export async function resetAvatarToDefault(
 
     const adminClient = createAdminClient();
 
+    // ユーザーの存在確認
+    const { data: userExists, error: checkError } = await adminClient
+      .from("profiles")
+      .select("id")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error("Failed to check user existence:", checkError);
+      return {
+        error: "errorGeneric",
+        success: false,
+      };
+    }
+
+    if (!userExists) {
+      return {
+        error: "errorUserNotFound",
+        success: false,
+      };
+    }
+
     // profiles テーブルを更新
     const { error: updateError } = await adminClient
       .from("profiles")

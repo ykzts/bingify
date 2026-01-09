@@ -100,7 +100,8 @@
     "errorUpdateFailed": "Failed to update",
     "errorUserNotFound": "User not found",
     "processing": "Processing...",
-    "userDetailTitle": "User Details"
+    "userDetailTitle": "User Details",
+    "notAvailable": "N/A"
   },
   "AdminAuthProviders": {
     "description": "Manage which authentication providers are available on the login page",

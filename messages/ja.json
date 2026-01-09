@@ -100,7 +100,8 @@
     "errorUpdateFailed": "更新に失敗しました",
     "errorUserNotFound": "ユーザーが見つかりません",
     "processing": "処理中...",
-    "userDetailTitle": "ユーザー詳細"
+    "userDetailTitle": "ユーザー詳細",
+    "notAvailable": "該当なし"
   },
   "AdminAuthProviders": {
     "description": "ログインページで利用可能な認証プロバイダーを管理します",

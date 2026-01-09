@@ -1,8 +1,8 @@
 import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
@@ -62,7 +62,7 @@ export default async function AdminUserDetailPage({
     <div className="space-y-6">
       {/* ヘッダー */}
       <div>
-        <Link href={`/${locale}/admin/users`}>
+        <Link href="/admin/users">
           <Button size="sm" variant="ghost">
             <ChevronLeft className="mr-1 h-4 w-4" />
             {t("backToUserList")}
@@ -77,13 +77,17 @@ export default async function AdminUserDetailPage({
         <dl className="space-y-3">
           <div>
             <dt className="font-medium text-gray-700 text-sm">{t("email")}</dt>
-            <dd className="mt-1 text-gray-900">{profile.email || "N/A"}</dd>
+            <dd className="mt-1 text-gray-900">
+              {profile.email || t("notAvailable")}
+            </dd>
           </div>
           <div>
             <dt className="font-medium text-gray-700 text-sm">
               {t("fullName")}
             </dt>
-            <dd className="mt-1 text-gray-900">{profile.full_name || "N/A"}</dd>
+            <dd className="mt-1 text-gray-900">
+              {profile.full_name || t("notAvailable")}
+            </dd>
           </div>
           <div>
             <dt className="font-medium text-gray-700 text-sm">{t("role")}</dt>
@@ -96,7 +100,7 @@ export default async function AdminUserDetailPage({
             <dd className="mt-1 text-gray-900">
               {profile.created_at
                 ? new Date(profile.created_at).toLocaleString()
-                : "N/A"}
+                : t("notAvailable")}
             </dd>
           </div>
         </dl>

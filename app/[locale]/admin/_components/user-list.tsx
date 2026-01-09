@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -22,18 +21,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Link, usePathname } from "@/i18n/navigation";
+import type { Tables } from "@/types/supabase";
 import { banUser, updateUserRole } from "../_actions/admin-operations";
 
-interface User {
-  avatar_source: string | null;
-  avatar_url: string | null;
-  created_at: string | null;
-  email: string | null;
-  full_name: string | null;
-  id: string;
-  role: string;
-  updated_at: string | null;
-}
+type User = Tables<"profiles">;
 
 interface UserListProps {
   currentPage: number;
@@ -162,10 +154,14 @@ export function UserList({
                       href={`${pathname}/${user.id}`}
                     >
                       <Avatar className="h-10 w-10">
-                        <AvatarImage
-                          alt={user.full_name || user.email || "User"}
-                          src={user.avatar_url || undefined}
-                        />
+                        <AvatarImage asChild>
+                          <Image
+                            alt={user.full_name || user.email || "User"}
+                            height={40}
+                            src={user.avatar_url || "/default-avatar.png"}
+                            width={40}
+                          />
+                        </AvatarImage>
                         <AvatarFallback>
                           <span className="text-lg">👤</span>
                         </AvatarFallback>
@@ -177,11 +173,11 @@ export function UserList({
                       className="text-primary hover:underline"
                       href={`${pathname}/${user.id}`}
                     >
-                      {user.email || "N/A"}
+                      {user.email || t("notAvailable")}
                     </Link>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm">
-                    {user.full_name || "N/A"}
+                    {user.full_name || t("notAvailable")}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <Select
@@ -211,7 +207,7 @@ export function UserList({
                   <td className="whitespace-nowrap px-6 py-4 text-gray-500 text-sm">
                     {user.created_at
                       ? new Date(user.created_at).toLocaleDateString()
-                      : "N/A"}
+                      : t("notAvailable")}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm">
                     <Button
