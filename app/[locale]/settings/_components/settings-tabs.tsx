@@ -3,9 +3,10 @@
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { routing } from "@/i18n/routing";
 
-// Move regex to top level for performance
-const LOCALE_PREFIX_REGEX = /^\/(en|ja)/;
+// ロケールプレフィックスを動的に構築
+const LOCALE_PREFIX_REGEX = new RegExp(`^/(${routing.locales.join("|")})`);
 
 export function SettingsTabs() {
   const t = useTranslations("AccountSettings");

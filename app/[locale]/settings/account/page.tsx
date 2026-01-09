@@ -9,4 +9,5 @@ export default async function AccountSettingsPage({
 
   // Redirect to the new profile page
   redirect({ href: "/settings/profile", locale });
+  return;
 }

@@ -52,9 +52,18 @@ export function AvatarSelectionForm({
       if (result.success) {
         toast.success(t("successAvatarUpdated"));
       } else {
-        const errorMessage = result.errorKey
-          ? t(result.errorKey as "errorGeneric")
-          : t("errorGeneric");
+        // Validate error key before using it as translation key
+        const validErrorKeys = new Set([
+          "errorGeneric",
+          "errorUnauthorized",
+          "errorInvalidAvatar",
+          "errorUpdateFailed",
+        ]);
+        const errorKey =
+          result.errorKey && validErrorKeys.has(result.errorKey)
+            ? result.errorKey
+            : "errorGeneric";
+        const errorMessage = t(errorKey as "errorGeneric");
         setError(errorMessage);
       }
     });
