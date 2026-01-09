@@ -23,7 +23,7 @@ Bingify は **Supabase Auth** を使用した認証システムを実装して�
 - **認証不要の機能**:
   - 表示専用画面 (`/screen/[token]`) - ストリーミング配信用
 
-OAuth プロバイダーの設定については [docs/OAUTH_SETUP.md](docs/OAUTH_SETUP.md) を参照してください。
+OAuth プロバイダーの設定は、Supabase Dashboard の Authentication > Providers から行います。
 
 ## セットアップ手順
 
