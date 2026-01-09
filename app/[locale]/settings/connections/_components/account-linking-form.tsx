@@ -9,7 +9,7 @@ import {
   Mail,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import {
@@ -17,6 +17,7 @@ import {
   ProviderIcon,
 } from "@/components/providers/provider-icon";
 import { Button } from "@/components/ui/button";
+import { getPathname } from "@/i18n/navigation";
 import {
   buildOAuthCallbackUrl,
   getScopesForProvider,
@@ -43,6 +44,7 @@ export function AccountLinkingForm({
   const t = useTranslations("AccountSettings");
   const router = useRouter();
   const confirm = useConfirm();
+  const locale = useLocale();
   const [loading, setLoading] = useState<OAuthProvider | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -79,7 +81,13 @@ export function AccountLinkingForm({
               prompt: "consent",
             },
           }),
-          redirectTo: buildOAuthCallbackUrl(provider),
+          redirectTo: buildOAuthCallbackUrl(
+            provider,
+            getPathname({
+              href: "/settings/connections",
+              locale,
+            })
+          ),
           // Request scopes based on system settings for enabled gatekeeper features
           scopes: getScopesForProvider(provider, systemSettings),
         },

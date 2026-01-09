@@ -8,16 +8,13 @@ import {
   useStore,
   useTransform,
 } from "@tanstack/react-form-nextjs";
-import { AlertCircle, Loader2, Mail } from "lucide-react";
+import { AlertCircle, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useEffectEvent } from "react";
 import { toast } from "sonner";
 import { FieldErrors } from "@/components/field-errors";
-import { FormErrors } from "@/components/form-errors";
-import { SectionHeader } from "@/components/section-header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldContent,
@@ -28,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { emailChangeSchema } from "@/lib/schemas/user";
 import { changeEmailAction } from "../_actions/account";
 import { emailChangeFormOpts } from "../_lib/form-options";
+import { ProfileSettingsFormCard } from "./profile-settings-form-card";
 
 interface EmailChangeFormProps {
   currentEmail?: string | null;
@@ -81,19 +79,8 @@ export function EmailChangeForm({ currentEmail }: EmailChangeFormProps) {
   }, [state]);
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <SectionHeader description={t("description")} icon={Mail}>
-        {t("title")}
-      </SectionHeader>
-
-      <form
-        action={action}
-        className="space-y-4"
-        noValidate
-        onSubmit={() => form.handleSubmit()}
-      >
-        <FormErrors errors={formErrors} variant="with-icon" />
-
+    <ProfileSettingsFormCard
+      aboveFields={
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
@@ -102,43 +89,39 @@ export function EmailChangeForm({ currentEmail }: EmailChangeFormProps) {
               : t("noEmailRegistered")}
           </AlertDescription>
         </Alert>
-
-        <form.Field name="email">
-          {(field) => (
-            <Field>
-              <FieldContent>
-                <FieldLabel>{t("emailLabel")}</FieldLabel>
-                <Input
-                  disabled={isSubmitting}
-                  maxLength={255}
-                  name={field.name}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder={t("emailPlaceholder")}
-                  required
-                  type="email"
-                  value={field.state.value as string}
-                />
-                <FieldDescription>{t("emailHelp")}</FieldDescription>
-                <FieldErrors
-                  className="mt-2"
-                  errors={field.state.meta.errors}
-                />
-              </FieldContent>
-            </Field>
-          )}
-        </form.Field>
-
-        <Button disabled={!canSubmit || isSubmitting} type="submit">
-          {isSubmitting ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              {t("changing")}
-            </>
-          ) : (
-            t("changeButton")
-          )}
-        </Button>
-      </form>
-    </div>
+      }
+      action={action}
+      canSubmit={canSubmit}
+      description={t("description")}
+      formErrors={formErrors}
+      icon={Mail}
+      idleLabel={t("changeButton")}
+      isSubmitting={isSubmitting}
+      onSubmit={() => form.handleSubmit()}
+      submittingLabel={t("changing")}
+      title={t("title")}
+    >
+      <form.Field name="email">
+        {(field) => (
+          <Field>
+            <FieldContent>
+              <FieldLabel>{t("emailLabel")}</FieldLabel>
+              <Input
+                disabled={isSubmitting}
+                maxLength={255}
+                name={field.name}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder={t("emailPlaceholder")}
+                required
+                type="email"
+                value={field.state.value as string}
+              />
+              <FieldDescription>{t("emailHelp")}</FieldDescription>
+              <FieldErrors className="mt-2" errors={field.state.meta.errors} />
+            </FieldContent>
+          </Field>
+        )}
+      </form.Field>
+    </ProfileSettingsFormCard>
   );
 }

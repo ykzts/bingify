@@ -1,5 +1,5 @@
 import { youtube_v3 } from "@googleapis/youtube";
-import { OAuth2Client } from "google-auth-library";
+import { createOAuth2ClientFromToken } from "@/lib/oauth/create-oauth-client";
 import { YOUTUBE_CHANNEL_ID_REGEX } from "./youtube-constants";
 
 // 正規表現をトップレベルに定義（パフォーマンス向上）
@@ -7,23 +7,6 @@ const YOUTUBE_HANDLE_PATH_REGEX = /^\/@([^/]+)/;
 const YOUTUBE_CHANNEL_PATH_REGEX = /^\/channel\/(UC[a-zA-Z0-9_-]{22})/;
 const YOUTUBE_CUSTOM_PATH_REGEX = /^\/c\/([^/]+)/;
 const YOUTUBE_USER_PATH_REGEX = /^\/user\/([^/]+)/;
-
-/**
- * OAuthアクセストークンからOAuth2Clientを作成する
- *
- * YouTube Data APIでOAuth認証を使用する場合、アクセストークン文字列を直接渡すのではなく、
- * OAuth2Clientオブジェクトを作成して認証情報を設定する必要があります。
- *
- * @param accessToken - OAuthアクセストークン
- * @returns 設定済みのOAuth2Clientインスタンス
- */
-function createOAuth2ClientFromToken(accessToken: string): OAuth2Client {
-  const oauth2Client = new OAuth2Client();
-  oauth2Client.setCredentials({
-    access_token: accessToken,
-  });
-  return oauth2Client;
-}
 
 export interface YouTubeSubscriptionCheckResult {
   error?: string;

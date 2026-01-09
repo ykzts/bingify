@@ -1,19 +1,8 @@
 import { youtube_v3 } from "@googleapis/youtube";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { OAuth2Client } from "google-auth-library";
+import { createOAuth2ClientFromToken } from "@/lib/oauth/create-oauth-client";
 import { shouldRefreshMetadata } from "@/lib/types/social-metadata";
 import type { Database, Tables, TablesInsert } from "@/types/supabase";
-
-/**
- * OAuthアクセストークンからOAuth2Clientを作成する
- */
-function createOAuth2ClientFromToken(accessToken: string): OAuth2Client {
-  const oauth2Client = new OAuth2Client();
-  oauth2Client.setCredentials({
-    access_token: accessToken,
-  });
-  return oauth2Client;
-}
 
 /**
  * YouTube Data API v3からチャンネルの詳細情報を取得
