@@ -58,21 +58,19 @@ export async function selectAvatar(
       };
     }
 
-    // プロバイダーアバターの場合、存在確認
+    // プロバイダーアバターの場合、identity が存在するか確認
     if (
       source === "google" ||
       source === "twitch" ||
       source === "github" ||
       source === "discord"
     ) {
-      const { data: providerAvatar } = await supabase
-        .from("user_provider_avatars")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("provider", source)
-        .single();
+      const identities = user.identities || [];
+      const hasIdentity = identities.some(
+        (identity) => identity.provider === source
+      );
 
-      if (!providerAvatar) {
+      if (!hasIdentity) {
         return {
           errorKey: "errorProviderNotLinked",
           success: false,

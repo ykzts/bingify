@@ -389,41 +389,6 @@ export type Database = {
         }
         Relationships: []
       }
-      user_provider_avatars: {
-        Row: {
-          avatar_url: string
-          created_at: string | null
-          id: string
-          provider: string
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          avatar_url: string
-          created_at?: string | null
-          id?: string
-          provider: string
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          avatar_url?: string
-          created_at?: string | null
-          id?: string
-          provider?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_provider_avatars_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never

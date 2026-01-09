@@ -1,74 +1,17 @@
-import { createAdminClient } from "@/lib/supabase/admin";
+import type { Provider } from "@/components/providers/provider-icon";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * アバターのソース種別
  */
-export type AvatarSource =
-  | "google"
-  | "twitch"
-  | "github"
-  | "discord"
-  | "upload"
-  | "default";
-
-/**
- * プロバイダーアバター情報
- */
-export interface ProviderAvatar {
-  avatar_url: string;
-  created_at: string;
-  id: string;
-  provider: AvatarSource;
-  updated_at: string;
-  user_id: string;
-}
+export type AvatarSource = Provider | "upload" | "default";
 
 /**
  * 利用可能なアバター情報
  */
 export interface AvailableAvatar {
   avatar_url: string;
-  provider: AvatarSource;
-}
-
-/**
- * プロバイダーアバターを更新または挿入
- * @param userId - ユーザーID
- * @param provider - プロバイダー名
- * @param avatarUrl - アバターURL
- */
-export async function updateProviderAvatar(
-  userId: string,
-  provider: AvatarSource,
-  avatarUrl: string
-): Promise<{ error: string | null; success: boolean }> {
-  try {
-    const adminClient = createAdminClient();
-
-    const { error } = await adminClient.from("user_provider_avatars").upsert(
-      {
-        avatar_url: avatarUrl,
-        provider,
-        user_id: userId,
-      },
-      {
-        onConflict: "user_id,provider",
-      }
-    );
-
-    if (error) {
-      console.error("Error updating provider avatar:", error);
-      return { error: error.message, success: false };
-    }
-
-    return { error: null, success: true };
-  } catch (error) {
-    console.error("Error in updateProviderAvatar:", error);
-    return {
-      error: error instanceof Error ? error.message : "Unknown error",
-      success: false,
-    };
-  }
+  provider: Provider;
 }
 
 /**
@@ -81,29 +24,35 @@ export async function setActiveAvatar(
   source: AvatarSource
 ): Promise<{ error: string | null; success: boolean }> {
   try {
-    const adminClient = createAdminClient();
+    const supabase = await createClient();
 
-    // 選択されたソースがプロバイダーの場合、対応するアバターURLを取得
+    // 選択されたソースがプロバイダーの場合、identityからアバターURLを取得
     let avatarUrl: string | null = null;
 
     if (source !== "default" && source !== "upload") {
-      const { data: providerAvatar, error: fetchError } = await adminClient
-        .from("user_provider_avatars")
-        .select("avatar_url")
-        .eq("user_id", userId)
-        .eq("provider", source)
-        .single();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      if (fetchError) {
-        console.error("Error fetching provider avatar:", fetchError);
-        return { error: "Provider avatar not found", success: false };
+      if (!user) {
+        return { error: "User not found", success: false };
       }
 
-      avatarUrl = providerAvatar.avatar_url;
+      const identity = user.identities?.find((id) => id.provider === source);
+
+      if (!identity) {
+        return { error: "Provider identity not found", success: false };
+      }
+
+      // identity_data から avatar_url を取得
+      avatarUrl =
+        (identity.identity_data?.avatar_url as string | undefined) ||
+        (identity.identity_data?.picture as string | undefined) ||
+        null;
     }
 
     // profiles テーブルを更新
-    const { error: updateError } = await adminClient
+    const { error: updateError } = await supabase
       .from("profiles")
       .update({
         avatar_source: source,
@@ -134,25 +83,41 @@ export async function getAvailableAvatars(
   userId: string
 ): Promise<{ data: AvailableAvatar[] | null; error: string | null }> {
   try {
-    const adminClient = createAdminClient();
+    const supabase = await createClient();
 
-    const { data, error } = await adminClient
-      .from("user_provider_avatars")
-      .select("provider, avatar_url")
-      .eq("user_id", userId);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (error) {
-      console.error("Error fetching available avatars:", error);
-      return { data: null, error: error.message };
+    if (!user || user.id !== userId) {
+      return { data: null, error: "Unauthorized" };
     }
 
-    // 型を明示的にキャスト
-    const typedData = (data || []).map((item) => ({
-      avatar_url: item.avatar_url,
-      provider: item.provider as AvatarSource,
-    }));
+    // identities から利用可能なアバターを取得
+    const availableAvatars: AvailableAvatar[] = [];
 
-    return { data: typedData, error: null };
+    for (const identity of user.identities || []) {
+      // プロバイダーが対応している場合のみ追加
+      if (
+        identity.provider === "google" ||
+        identity.provider === "twitch" ||
+        identity.provider === "github" ||
+        identity.provider === "discord"
+      ) {
+        const avatarUrl =
+          (identity.identity_data?.avatar_url as string | undefined) ||
+          (identity.identity_data?.picture as string | undefined);
+
+        if (avatarUrl) {
+          availableAvatars.push({
+            avatar_url: avatarUrl,
+            provider: identity.provider as Provider,
+          });
+        }
+      }
+    }
+
+    return { data: availableAvatars, error: null };
   } catch (error) {
     console.error("Error in getAvailableAvatars:", error);
     return {

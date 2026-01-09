@@ -1,4 +1,4 @@
--- handle_new_user 関数を更新してアバターソースとプロバイダーアバターを保存
+-- handle_new_user 関数を更新してアバターソースを保存
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -37,6 +37,7 @@ BEGIN
   BEGIN
     -- プロバイダーが oauth プロバイダーの場合、avatar_source を設定
     -- それ以外（email, magic link など）の場合は 'default' を使用
+    -- identities から avatar を取得するため、user_provider_avatars テーブルへの挿入は不要
     INSERT INTO public.profiles (id, email, full_name, avatar_url, role, avatar_source)
     VALUES (
       NEW.id,
@@ -54,15 +55,6 @@ BEGIN
           full_name = EXCLUDED.full_name,
           avatar_url = EXCLUDED.avatar_url,
           updated_at = NOW();
-
-    -- プロバイダーアバターが存在する場合、user_provider_avatars テーブルに保存
-    IF user_provider IN ('google', 'twitch', 'github', 'discord') AND user_avatar_url IS NOT NULL THEN
-      INSERT INTO public.user_provider_avatars (user_id, provider, avatar_url)
-      VALUES (NEW.id, user_provider, user_avatar_url)
-      ON CONFLICT (user_id, provider) DO UPDATE
-        SET avatar_url = EXCLUDED.avatar_url,
-            updated_at = NOW();
-    END IF;
 
     -- Clear recursion flag after successful insert
     PERFORM set_config('app.inserting_new_user', '', true);
