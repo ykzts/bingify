@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 
 /**
  * アバターのソース種別
+ * 注: Provider型にはgithubとdiscordも含まれていますが、
+ * 現在の実装ではgoogleとtwitchのみサポートしています
  */
 export type AvatarSource = Provider | "upload" | "default";
 
@@ -97,13 +99,8 @@ export async function getAvailableAvatars(
     const availableAvatars: AvailableAvatar[] = [];
 
     for (const identity of user.identities || []) {
-      // プロバイダーが対応している場合のみ追加
-      if (
-        identity.provider === "google" ||
-        identity.provider === "twitch" ||
-        identity.provider === "github" ||
-        identity.provider === "discord"
-      ) {
+      // 現在サポートしているプロバイダーのみ追加
+      if (identity.provider === "google" || identity.provider === "twitch") {
         const avatarUrl =
           (identity.identity_data?.avatar_url as string | undefined) ||
           (identity.identity_data?.picture as string | undefined);

@@ -1,3 +1,11 @@
+-- profiles テーブルに avatar_source カラムを追加
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_source TEXT 
+  CHECK (avatar_source IN ('google', 'twitch', 'upload', 'default')) 
+  DEFAULT 'default';
+
+-- インデックスの作成
+CREATE INDEX IF NOT EXISTS idx_profiles_avatar_source ON profiles(avatar_source);
+
 -- handle_new_user 関数を更新してアバターソースを保存
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER
@@ -10,6 +18,7 @@ DECLARE
   default_role TEXT;
   user_provider TEXT;
   user_avatar_url TEXT;
+  computed_avatar_source TEXT;
 BEGIN
   -- search_path is enforced via function attribute above
 
@@ -31,13 +40,19 @@ BEGIN
   user_provider := NEW.raw_app_meta_data->>'provider';
   user_avatar_url := NEW.raw_user_meta_data->>'avatar_url';
 
+  -- avatar_source を計算
+  computed_avatar_source := CASE 
+    WHEN user_provider IN ('google', 'twitch') THEN user_provider
+    ELSE 'default'
+  END;
+
   -- Prevent recursion from profile triggers touching auth.users
   PERFORM set_config('app.inserting_new_user', 'true', true);
 
   BEGIN
     -- プロバイダーが oauth プロバイダーの場合、avatar_source を設定
     -- それ以外（email, magic link など）の場合は 'default' を使用
-    -- identities から avatar を取得するため、user_provider_avatars テーブルへの挿入は不要
+    -- identities から avatar を取得するため、別テーブルへの挿入は不要
     INSERT INTO public.profiles (id, email, full_name, avatar_url, role, avatar_source)
     VALUES (
       NEW.id,
@@ -45,15 +60,13 @@ BEGIN
       NEW.raw_user_meta_data->>'full_name',
       user_avatar_url,
       default_role,
-      CASE 
-        WHEN user_provider IN ('google', 'twitch', 'github', 'discord') THEN user_provider
-        ELSE 'default'
-      END
+      computed_avatar_source
     )
     ON CONFLICT (id) DO UPDATE
       SET email = EXCLUDED.email,
           full_name = EXCLUDED.full_name,
           avatar_url = EXCLUDED.avatar_url,
+          avatar_source = EXCLUDED.avatar_source,
           updated_at = NOW();
 
     -- Clear recursion flag after successful insert

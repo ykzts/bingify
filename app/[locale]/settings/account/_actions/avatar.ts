@@ -46,8 +46,6 @@ export async function selectAvatar(
     const validSources: AvatarSource[] = [
       "google",
       "twitch",
-      "github",
-      "discord",
       "upload",
       "default",
     ];
@@ -59,12 +57,7 @@ export async function selectAvatar(
     }
 
     // プロバイダーアバターの場合、identity が存在するか確認
-    if (
-      source === "google" ||
-      source === "twitch" ||
-      source === "github" ||
-      source === "discord"
-    ) {
+    if (source === "google" || source === "twitch") {
       const identities = user.identities || [];
       const hasIdentity = identities.some(
         (identity) => identity.provider === source
