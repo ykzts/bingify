@@ -8,15 +8,12 @@ import {
   useStore,
   useTransform,
 } from "@tanstack/react-form-nextjs";
-import { Loader2, User } from "lucide-react";
+import { User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 import { FieldErrors } from "@/components/field-errors";
-import { FormErrors } from "@/components/form-errors";
-import { SectionHeader } from "@/components/section-header";
-import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldContent,
@@ -27,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { usernameSchema } from "@/lib/schemas/user";
 import { updateUsernameAction } from "../_actions/account";
 import { usernameFormOpts } from "../_lib/form-options";
+import { ProfileSettingsFormCard } from "./profile-settings-form-card";
 
 interface UsernameFormProps {
   currentUsername?: string | null;
@@ -77,55 +75,39 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
   }, [state, router, t]);
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <SectionHeader description={t("description")} icon={User}>
-        {t("title")}
-      </SectionHeader>
-
-      <form
-        action={action}
-        className="space-y-4"
-        noValidate
-        onSubmit={() => form.handleSubmit()}
-      >
-        <FormErrors errors={formErrors} variant="with-icon" />
-
-        <form.Field name="username">
-          {(field) => (
-            <Field>
-              <FieldContent>
-                <FieldLabel>{t("usernameLabel")}</FieldLabel>
-                <Input
-                  disabled={isSubmitting}
-                  maxLength={50}
-                  name={field.name}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder={t("usernamePlaceholder")}
-                  required
-                  type="text"
-                  value={field.state.value as string}
-                />
-                <FieldDescription>{t("usernameHelp")}</FieldDescription>
-                <FieldErrors
-                  className="mt-2"
-                  errors={field.state.meta.errors}
-                />
-              </FieldContent>
-            </Field>
-          )}
-        </form.Field>
-
-        <Button disabled={!canSubmit || isSubmitting} type="submit">
-          {isSubmitting ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              {t("saving")}
-            </>
-          ) : (
-            t("saveButton")
-          )}
-        </Button>
-      </form>
-    </div>
+    <ProfileSettingsFormCard
+      action={action}
+      canSubmit={canSubmit}
+      description={t("description")}
+      formErrors={formErrors}
+      icon={User}
+      idleLabel={t("saveButton")}
+      isSubmitting={isSubmitting}
+      onSubmit={() => form.handleSubmit()}
+      submittingLabel={t("saving")}
+      title={t("title")}
+    >
+      <form.Field name="username">
+        {(field) => (
+          <Field>
+            <FieldContent>
+              <FieldLabel>{t("usernameLabel")}</FieldLabel>
+              <Input
+                disabled={isSubmitting}
+                maxLength={50}
+                name={field.name}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder={t("usernamePlaceholder")}
+                required
+                type="text"
+                value={field.state.value as string}
+              />
+              <FieldDescription>{t("usernameHelp")}</FieldDescription>
+              <FieldErrors className="mt-2" errors={field.state.meta.errors} />
+            </FieldContent>
+          </Field>
+        )}
+      </form.Field>
+    </ProfileSettingsFormCard>
   );
 }

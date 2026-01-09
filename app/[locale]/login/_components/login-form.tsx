@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { buildAuthCallbackUrl } from "@/lib/auth/callback-url";
 import {
   buildOAuthCallbackUrl,
   getScopesForProvider,
@@ -23,7 +24,6 @@ import {
 import type { AuthProvider } from "@/lib/data/auth-providers";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/client";
-import { getAbsoluteUrl } from "@/lib/utils/url";
 
 const emailSchema = z.object({
   email: z.string().email(),
@@ -156,9 +156,7 @@ export function LoginForm({ providers, systemSettings }: Props) {
           language: locale,
         },
         // Email OTP uses the non-provider-specific callback route
-        emailRedirectTo: getAbsoluteUrl(
-          `/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`
-        ),
+        emailRedirectTo: buildAuthCallbackUrl(redirect ?? undefined),
       },
     });
 

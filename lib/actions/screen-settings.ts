@@ -15,35 +15,6 @@ export interface UpdateScreenSettingsResult {
 }
 
 /**
- * Get screen settings for a space
- */
-export async function getScreenSettings(spaceId: string): Promise<{
-  background: BackgroundType;
-  display_mode: DisplayMode;
-  locale?: LocaleType;
-  theme: ThemeType;
-} | null> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("screen_settings")
-    .select("background, display_mode, locale, theme")
-    .eq("space_id", spaceId)
-    .single();
-
-  if (error || !data) {
-    return null;
-  }
-
-  return {
-    background: data.background as BackgroundType,
-    display_mode: data.display_mode as DisplayMode,
-    locale: (data.locale as LocaleType) || undefined,
-    theme: (data.theme as ThemeType) || "dark",
-  };
-}
-
-/**
  * Update screen settings for a space (upsert)
  */
 export async function updateScreenSettings(
