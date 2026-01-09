@@ -642,6 +642,8 @@
     "errorSameEmail": "This is your current email address",
     "errorUnauthorized": "Authentication required",
     "errorUpdateFailed": "Failed to request email change",
-    "title": "Email Settings"
+    "title": "Email Settings",
+    "currentEmail": "Current email: {email}",
+    "noEmailRegistered": "No email address registered"
   }
 }

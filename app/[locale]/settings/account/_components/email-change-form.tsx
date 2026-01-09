@@ -11,7 +11,7 @@ import {
 import { AlertCircle, Loader2, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useEffectEvent } from "react";
 import { toast } from "sonner";
 import { FieldErrors } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
@@ -63,17 +63,22 @@ export function EmailChangeForm({ currentEmail }: EmailChangeFormProps) {
   );
   const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
+  // Use useEffectEvent to handle success without including functions in deps
+  const handleSuccess = useEffectEvent(() => {
+    toast.success(t("confirmationEmailSent"));
+    form.reset();
+    router.refresh();
+  });
+
   useEffect(() => {
     // Check for successful update
     const meta = (state as Record<string, unknown>)?.meta as
       | { success?: boolean }
       | undefined;
     if (meta?.success) {
-      toast.success(t("confirmationEmailSent"));
-      form.reset();
-      router.refresh();
+      handleSuccess();
     }
-  }, [state, router, t, form]);
+  }, [state]);
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
@@ -93,8 +98,8 @@ export function EmailChangeForm({ currentEmail }: EmailChangeFormProps) {
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             {currentEmail
-              ? `Current email: ${currentEmail}`
-              : "No email address registered"}
+              ? t("currentEmail", { email: currentEmail })
+              : t("noEmailRegistered")}
           </AlertDescription>
         </Alert>
 

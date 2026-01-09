@@ -642,6 +642,8 @@
     "errorSameEmail": "これは現在のメールアドレスです",
     "errorUnauthorized": "認証が必要です",
     "errorUpdateFailed": "メールアドレス変更のリクエストに失敗しました",
-    "title": "メールアドレス設定"
+    "title": "メールアドレス設定",
+    "currentEmail": "現在のメールアドレス: {email}",
+    "noEmailRegistered": "メールアドレスが登録されていません"
   }
 }

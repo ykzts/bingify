@@ -4,8 +4,11 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
+import { getLocale } from "next-intl/server";
+import { getPathname } from "@/i18n/navigation";
 import { emailChangeSchema, usernameSchema } from "@/lib/schemas/user";
 import { createClient } from "@/lib/supabase/server";
+import { getAbsoluteUrl } from "@/lib/utils/url";
 import {
   type EmailChangeFormValues,
   emailChangeFormOpts,
@@ -280,7 +283,7 @@ const emailChangeServerValidate = createServerValidate({
     if (!validation.success) {
       const issue = validation.error.issues[0];
       // Map Zod error codes to i18n keys
-      if (issue.code === "too_small" || issue.message.includes("required")) {
+      if (issue.code === "invalid_type" || issue.code === "too_small") {
         return { fields: { email: "errorEmailRequired" } };
       }
       if (issue.code === "too_big") {
@@ -291,7 +294,7 @@ const emailChangeServerValidate = createServerValidate({
     }
 
     // Check if the email is the same as the current email
-    if (user.email?.toLowerCase() === value.email.toLowerCase()) {
+    if (user.email?.toLowerCase() === validation.data.email.toLowerCase()) {
       return { fields: { email: "errorSameEmail" } };
     }
 
@@ -308,6 +311,7 @@ export async function changeEmailAction(
     const validatedData = await emailChangeServerValidate(formData);
 
     const supabase = await createClient();
+    const locale = await getLocale();
 
     // Double check authentication
     const {
@@ -327,7 +331,12 @@ export async function changeEmailAction(
         email: validatedData.email,
       },
       {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/settings/account`,
+        emailRedirectTo: getAbsoluteUrl(
+          getPathname({
+            href: "/settings/account",
+            locale,
+          })
+        ),
       }
     );
 
