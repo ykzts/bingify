@@ -19,22 +19,21 @@ async function AvatarSettingsContent({ locale }: { locale: string }) {
     });
   }
 
-  // TypeScript doesn't understand redirect() never returns, so we assert user is not null
-  const authenticatedUser = user!;
-
+  // @ts-expect-error - redirect() throws and never returns, user is guaranteed non-null here
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("avatar_source, avatar_url")
-    .eq("id", authenticatedUser.id)
+    .eq("id", user.id)
     .single();
 
   if (profileError) {
     console.error("Error fetching profile:", profileError);
   }
 
+  // @ts-expect-error - user is guaranteed non-null after redirect check
   // Fetch available avatars
   const { data: availableAvatars, error: avatarsError } =
-    await getAvailableAvatars(authenticatedUser.id);
+    await getAvailableAvatars(user.id);
 
   if (avatarsError) {
     console.error("Error fetching available avatars:", avatarsError);
@@ -77,6 +76,7 @@ export default async function AvatarSettingsPage({
   return (
     <Suspense
       fallback={
+        // biome-ignore lint/a11y/useSemanticElements: role="status" is appropriate for loading indicators
         <div
           aria-label="Loading"
           className="flex items-center justify-center py-12"

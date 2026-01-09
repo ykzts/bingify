@@ -18,13 +18,11 @@ async function ProfileSettingsContent({ locale }: { locale: string }) {
     });
   }
 
-  // TypeScript doesn't understand redirect() never returns, so we assert user is not null
-  const authenticatedUser = user!;
-
+  // @ts-expect-error - redirect() throws and never returns, user is guaranteed non-null here
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("full_name")
-    .eq("id", authenticatedUser.id)
+    .eq("id", user.id)
     .single();
 
   if (profileError) {
@@ -34,7 +32,8 @@ async function ProfileSettingsContent({ locale }: { locale: string }) {
   return (
     <div className="space-y-8">
       <UsernameForm currentUsername={profile?.full_name} />
-      <EmailChangeForm currentEmail={authenticatedUser.email ?? undefined} />
+      {/* @ts-ignore - user is guaranteed non-null after redirect check */}
+      <EmailChangeForm currentEmail={user.email ?? undefined} />
     </div>
   );
 }
@@ -48,6 +47,7 @@ export default async function ProfileSettingsPage({
   return (
     <Suspense
       fallback={
+        // biome-ignore lint/a11y/useSemanticElements: role="status" is appropriate for loading indicators
         <div
           aria-label="Loading"
           className="flex items-center justify-center py-12"

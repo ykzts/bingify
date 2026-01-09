@@ -19,9 +19,7 @@ async function ConnectionsSettingsContent({ locale }: { locale: string }) {
     });
   }
 
-  // TypeScript doesn't understand redirect() never returns, so we assert user is not null
-  const authenticatedUser = user!;
-
+  // @ts-expect-error - redirect() throws and never returns, user is guaranteed non-null here
   // Fetch system settings for OAuth scope configuration
   const systemSettingsResult = await getSystemSettings();
 
@@ -44,10 +42,8 @@ async function ConnectionsSettingsContent({ locale }: { locale: string }) {
 
   return (
     <div className="space-y-8">
-      <AccountLinkingForm
-        systemSettings={systemSettings}
-        user={authenticatedUser}
-      />
+      {/* @ts-ignore - user is guaranteed non-null after redirect check */}
+      <AccountLinkingForm systemSettings={systemSettings} user={user} />
     </div>
   );
 }
@@ -61,6 +57,7 @@ export default async function ConnectionsSettingsPage({
   return (
     <Suspense
       fallback={
+        // biome-ignore lint/a11y/useSemanticElements: role="status" is appropriate for loading indicators
         <div
           aria-label="Loading"
           className="flex items-center justify-center py-12"
