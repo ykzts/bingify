@@ -194,7 +194,11 @@ describe("Avatar Upload Schema", () => {
   it("空のファイルを拒否する", () => {
     const file = createMockFile(0, "image/jpeg");
     const result = avatarUploadSchema.safeParse({ file });
-    expect(result.success).toBe(true); // サイズは0でもOK（実際のアップロードで検証）
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const errorMessage = result.error.issues[0]?.message || "";
+      expect(errorMessage).toContain("empty");
+    }
   });
 
   it("非常に小さいファイルを受け入れる", () => {

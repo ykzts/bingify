@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   AVATAR_MAX_FILE_SIZE,
+  AVATAR_MIN_FILE_SIZE,
   isValidAvatarMimeType,
 } from "@/lib/constants/avatar";
 import { uploadAvatarAction } from "../_actions/avatar";
@@ -35,35 +36,39 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
     };
   }, [previewUrl]);
 
+  const clearFileSelection = () => {
+    setSelectedFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl(null);
+  };
+
+  const validateFile = (file: File): string | null => {
+    if (file.size < AVATAR_MIN_FILE_SIZE) {
+      return t("errorFileEmpty");
+    }
+    if (file.size > AVATAR_MAX_FILE_SIZE) {
+      return t("errorFileSizeExceeded");
+    }
+    if (!isValidAvatarMimeType(file.type)) {
+      return t("errorInvalidFileType");
+    }
+    return null;
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
-      setSelectedFile(null);
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-      setPreviewUrl(null);
+      clearFileSelection();
       return;
     }
 
     // クライアント側バリデーション
-    if (file.size > AVATAR_MAX_FILE_SIZE) {
-      setError(t("errorFileSizeExceeded"));
-      setSelectedFile(null);
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-      setPreviewUrl(null);
-      return;
-    }
-
-    if (!isValidAvatarMimeType(file.type)) {
-      setError(t("errorInvalidFileType"));
-      setSelectedFile(null);
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-      setPreviewUrl(null);
+    const validationError = validateFile(file);
+    if (validationError) {
+      setError(validationError);
+      clearFileSelection();
       return;
     }
 

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import {
   AVATAR_MAX_FILE_SIZE,
+  AVATAR_MIN_FILE_SIZE,
   isValidAvatarMimeType,
 } from "@/lib/constants/avatar";
 import { isValidOAuthProvider } from "@/lib/oauth/provider-validation";
@@ -144,6 +145,13 @@ export async function uploadAvatarAction(
     }
 
     // サーバー側バリデーション
+    if (file.size < AVATAR_MIN_FILE_SIZE) {
+      return {
+        errorKey: "errorFileEmpty",
+        success: false,
+      };
+    }
+
     if (file.size > AVATAR_MAX_FILE_SIZE) {
       return {
         errorKey: "errorFileSizeExceeded",

@@ -210,6 +210,7 @@
   },
   "AvatarUpload": {
     "description": "Upload JPEG, PNG, or WebP images (max 2MB)",
+    "errorFileEmpty": "Empty files cannot be uploaded",
     "errorFileSizeExceeded": "File size must be less than 2MB",
     "errorGeneric": "An unexpected error occurred",
     "errorInvalidFile": "Invalid file",

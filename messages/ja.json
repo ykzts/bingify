@@ -210,6 +210,7 @@
   },
   "AvatarUpload": {
     "description": "JPEG、PNG、WebP形式の画像をアップロードできます（最大2MB）",
+    "errorFileEmpty": "空のファイルはアップロードできません",
     "errorFileSizeExceeded": "ファイルサイズは2MB以下にしてください",
     "errorGeneric": "予期しないエラーが発生しました",
     "errorInvalidFile": "無効なファイルです",

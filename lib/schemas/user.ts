@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   AVATAR_MAX_FILE_SIZE,
+  AVATAR_MIN_FILE_SIZE,
   isValidAvatarMimeType,
 } from "@/lib/constants/avatar";
 
@@ -19,6 +20,9 @@ export type EmailChangeFormData = z.infer<typeof emailChangeSchema>;
 export const avatarUploadSchema = z.object({
   file: z
     .instanceof(File)
+    .refine((file) => file.size >= AVATAR_MIN_FILE_SIZE, {
+      message: "File must not be empty",
+    })
     .refine((file) => file.size <= AVATAR_MAX_FILE_SIZE, {
       message: "File size must be less than 2MB",
     })

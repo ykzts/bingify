@@ -1,6 +1,7 @@
 import {
   AVATAR_MAX_FILE_SIZE,
   AVATAR_MIME_TYPE_TO_EXT,
+  AVATAR_MIN_FILE_SIZE,
   isValidAvatarMimeType,
 } from "@/lib/constants/avatar";
 import { createClient } from "./server";
@@ -18,7 +19,15 @@ export async function uploadAvatar(
   file: File
 ): Promise<{ data: string | null; error: string | null }> {
   try {
-    // ファイルサイズチェック
+    // ファイルサイズチェック（最小）
+    if (file.size < AVATAR_MIN_FILE_SIZE) {
+      return {
+        data: null,
+        error: "File must not be empty",
+      };
+    }
+
+    // ファイルサイズチェック（最大）
     if (file.size > AVATAR_MAX_FILE_SIZE) {
       return {
         data: null,
