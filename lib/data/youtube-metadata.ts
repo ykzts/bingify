@@ -77,7 +77,7 @@ export async function getYouTubeChannelMetadata(
     return null;
   }
 
-  return data as unknown as YouTubeChannelMetadata;
+  return data;
 }
 
 /**
@@ -107,7 +107,7 @@ export async function upsertYouTubeChannelMetadata(
     );
   }
 
-  return data as unknown as YouTubeChannelMetadata;
+  return data;
 }
 
 /**

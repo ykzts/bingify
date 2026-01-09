@@ -1,46 +1,18 @@
+import type { Database } from "@/types/supabase";
+
 /**
  * YouTubeチャンネルのメタデータ型定義
+ * Supabaseの自動生成型を再エクスポート
  */
-export interface YouTubeChannelMetadata {
-  broadcaster_id?: never;
-  channel_id: string;
-  channel_title: string | null;
-  created_at: string;
-  created_by: string | null;
-  custom_url: string | null;
-  description: string | null;
-  display_name?: never;
-  fetch_error: string | null;
-  fetched_at: string;
-  handle: string | null;
-  id: string;
-  profile_image_url?: never;
-  thumbnail_url: string | null;
-  updated_at: string;
-  username?: never;
-}
+export type YouTubeChannelMetadata =
+  Database["public"]["Tables"]["youtube_channels"]["Row"];
 
 /**
  * Twitchブロードキャスターのメタデータ型定義
+ * Supabaseの自動生成型を再エクスポート
  */
-export interface TwitchBroadcasterMetadata {
-  broadcaster_id: string;
-  channel_id?: never;
-  channel_title?: never;
-  created_at: string;
-  created_by: string | null;
-  custom_url?: never;
-  description: string | null;
-  display_name: string | null;
-  fetch_error: string | null;
-  fetched_at: string;
-  handle?: never;
-  id: string;
-  profile_image_url: string | null;
-  thumbnail_url?: never;
-  updated_at: string;
-  username: string | null;
-}
+export type TwitchBroadcasterMetadata =
+  Database["public"]["Tables"]["twitch_broadcasters"]["Row"];
 
 /**
  * ソーシャルメタデータの統一型（YouTubeまたはTwitch）
@@ -48,33 +20,18 @@ export interface TwitchBroadcasterMetadata {
 export type SocialMetadata = YouTubeChannelMetadata | TwitchBroadcasterMetadata;
 
 /**
- * YouTubeチャンネルメタデータの挿入/更新用の型
+ * YouTubeチャンネルメタデータの挿入用の型
+ * Supabaseの自動生成型を再エクスポート
  */
-export interface YouTubeChannelInsert {
-  channel_id: string;
-  channel_title?: string | null;
-  created_by?: string | null;
-  custom_url?: string | null;
-  description?: string | null;
-  fetch_error?: string | null;
-  fetched_at?: string;
-  handle?: string | null;
-  thumbnail_url?: string | null;
-}
+export type YouTubeChannelInsert =
+  Database["public"]["Tables"]["youtube_channels"]["Insert"];
 
 /**
- * Twitchブロードキャスターメタデータの挿入/更新用の型
+ * Twitchブロードキャスターメタデータの挿入用の型
+ * Supabaseの自動生成型を再エクスポート
  */
-export interface TwitchBroadcasterInsert {
-  broadcaster_id: string;
-  created_by?: string | null;
-  description?: string | null;
-  display_name?: string | null;
-  fetch_error?: string | null;
-  fetched_at?: string;
-  profile_image_url?: string | null;
-  username?: string | null;
-}
+export type TwitchBroadcasterInsert =
+  Database["public"]["Tables"]["twitch_broadcasters"]["Insert"];
 
 /**
  * メタデータのキャッシュ有効期間（ミリ秒）

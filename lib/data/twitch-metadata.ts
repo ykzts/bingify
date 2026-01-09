@@ -62,7 +62,7 @@ export async function getTwitchBroadcasterMetadata(
     return null;
   }
 
-  return data as unknown as TwitchBroadcasterMetadata;
+  return data;
 }
 
 /**
@@ -92,7 +92,7 @@ export async function upsertTwitchBroadcasterMetadata(
     );
   }
 
-  return data as unknown as TwitchBroadcasterMetadata;
+  return data;
 }
 
 /**
