@@ -4,9 +4,11 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
-import { usernameSchema } from "@/lib/schemas/user";
+import { emailChangeSchema, usernameSchema } from "@/lib/schemas/user";
 import { createClient } from "@/lib/supabase/server";
 import {
+  type EmailChangeFormValues,
+  emailChangeFormOpts,
   type UsernameFormValues,
   usernameFormOpts,
 } from "../_lib/form-options";
@@ -254,6 +256,108 @@ export async function updateUsername(
     return {
       errorKey: "errorGeneric",
       success: false,
+    };
+  }
+}
+
+// Email change server validation
+const emailChangeServerValidate = createServerValidate({
+  ...emailChangeFormOpts,
+  onServerValidate: async ({ value }: { value: EmailChangeFormValues }) => {
+    const supabase = await createClient();
+
+    // Check authentication
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { form: "errorUnauthorized" };
+    }
+
+    // Validate email with Zod schema
+    const validation = emailChangeSchema.safeParse({ email: value.email });
+    if (!validation.success) {
+      const issue = validation.error.issues[0];
+      // Map Zod error codes to i18n keys
+      if (issue.code === "too_small" || issue.message.includes("required")) {
+        return { fields: { email: "errorEmailRequired" } };
+      }
+      if (issue.code === "too_big") {
+        return { fields: { email: "errorEmailTooLong" } };
+      }
+      // All other validation errors (including invalid email format)
+      return { fields: { email: "errorEmailInvalid" } };
+    }
+
+    // Check if the email is the same as the current email
+    if (user.email && user.email.toLowerCase() === value.email.toLowerCase()) {
+      return { fields: { email: "errorSameEmail" } };
+    }
+
+    return undefined;
+  },
+});
+
+export async function changeEmailAction(
+  _prevState: unknown,
+  formData: FormData
+) {
+  try {
+    // Validate the form data
+    const validatedData = await emailChangeServerValidate(formData);
+
+    const supabase = await createClient();
+
+    // Double check authentication
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        ...initialFormState,
+        errors: ["errorUnauthorized"],
+      };
+    }
+
+    // Request email change - Supabase will send confirmation emails
+    const { error } = await supabase.auth.updateUser(
+      {
+        email: validatedData.email,
+      },
+      {
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/settings/account`,
+      }
+    );
+
+    if (error) {
+      console.error("Email change error:", error);
+      return {
+        ...initialFormState,
+        errors: ["errorUpdateFailed"],
+      };
+    }
+
+    // Return success state
+    return {
+      ...initialFormState,
+      values: validatedData,
+      meta: {
+        success: true,
+      },
+    };
+  } catch (e) {
+    // Check if it's a ServerValidateError from TanStack Form
+    if (e && typeof e === "object" && "formState" in e) {
+      return (e as { formState: unknown }).formState;
+    }
+
+    // Some other error occurred
+    console.error("Error changing email:", e);
+    return {
+      ...initialFormState,
+      errors: ["errorGeneric"],
     };
   }
 }

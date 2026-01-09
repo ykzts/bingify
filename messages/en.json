@@ -626,5 +626,22 @@
     "usernameHelp": "Maximum 50 characters",
     "usernameLabel": "Username",
     "usernamePlaceholder": "Enter your name"
+  },
+  "EmailChangeSettings": {
+    "changeButton": "Request Email Change",
+    "changing": "Processing...",
+    "confirmationEmailSent": "Verification email has been sent to your new email address. Please click the link in the email to complete the change.",
+    "description": "Change the email address linked to your account. You will receive a confirmation link at your new email address.",
+    "emailHelp": "A verification link will be sent to this address",
+    "emailLabel": "New Email Address",
+    "emailPlaceholder": "your-new-email@example.com",
+    "errorEmailInvalid": "Please enter a valid email address",
+    "errorEmailRequired": "Email address is required",
+    "errorEmailTooLong": "Email address is too long",
+    "errorGeneric": "An unexpected error occurred",
+    "errorSameEmail": "This is your current email address",
+    "errorUnauthorized": "Authentication required",
+    "errorUpdateFailed": "Failed to request email change",
+    "title": "Email Settings"
   }
 }
