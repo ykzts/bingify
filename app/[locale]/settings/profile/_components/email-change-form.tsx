@@ -13,8 +13,6 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useEffectEvent } from "react";
 import { toast } from "sonner";
-import { changeEmailAction } from "@/app/[locale]/settings/_actions/account";
-import { emailChangeFormOpts } from "@/app/[locale]/settings/_lib/form-options";
 import { FieldErrors } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
 import { SectionHeader } from "@/components/section-header";
@@ -28,6 +26,8 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { emailChangeSchema } from "@/lib/schemas/user";
+import { changeEmailAction } from "../_actions/account";
+import { emailChangeFormOpts } from "../_lib/form-options";
 
 interface EmailChangeFormProps {
   currentEmail?: string | null;

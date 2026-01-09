@@ -11,7 +11,6 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { unlinkIdentity } from "@/app/[locale]/settings/_actions/account";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import {
   getProviderLabel,
@@ -25,6 +24,7 @@ import {
 import type { OAuthProvider } from "@/lib/oauth/token-storage";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/client";
+import { unlinkIdentity } from "../_actions/account";
 
 interface AccountLinkingFormProps {
   systemSettings: SystemSettings;
