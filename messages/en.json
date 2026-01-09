@@ -498,6 +498,7 @@
     "gatekeeperModeSocial": "Social Platform",
     "gatekeeperTitle": "Participation Requirements",
     "getMyIdButton": "Get My ID",
+    "helpOAuthRequired": "To use social integration, please complete OAuth authentication for Google (for YouTube) or Twitch from <accountLink>Account Settings</accountLink>.",
     "heading": "Space Settings",
     "hideMetadataHelp": "When enabled, non-participants will only see a 'Private Space' message without title or description",
     "hideMetadataLabel": "Hide title and description from non-participants",

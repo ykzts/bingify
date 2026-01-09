@@ -48,6 +48,15 @@ export default async function AdminSpacePage({
   // Check if current user is owner
   const isOwner = space.owner_id === user?.id;
 
+  // Get OAuth provider identities for the owner (to check available OAuth tokens)
+  const identities = user?.identities || [];
+  const hasGoogleAuth = identities.some(
+    (identity) => identity.provider === "google"
+  );
+  const hasTwitchAuth = identities.some(
+    (identity) => identity.provider === "twitch"
+  );
+
   // Get current participant count
   const { data: participantsData } = await supabase
     .from("participants")
@@ -127,6 +136,8 @@ export default async function AdminSpacePage({
           <SpaceSettingsSheet
             currentParticipantCount={participantCount}
             features={features}
+            hasGoogleAuth={hasGoogleAuth}
+            hasTwitchAuth={hasTwitchAuth}
             isOwner={isOwner}
             locale={locale}
             space={space}

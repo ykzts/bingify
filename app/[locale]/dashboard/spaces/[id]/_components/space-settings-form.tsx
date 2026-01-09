@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Link } from "@/i18n/navigation";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { cn } from "@/lib/utils";
@@ -60,6 +61,8 @@ import { YoutubeChannelIdField } from "./youtube-channel-id-field";
 interface Props {
   currentParticipantCount: number;
   features: SystemFeatures;
+  hasGoogleAuth: boolean;
+  hasTwitchAuth: boolean;
   isOwner: boolean;
   locale: string;
   onSuccess?: (message: string) => void;
@@ -121,6 +124,8 @@ function determineSocialPlatform(
 export function SpaceSettingsForm({
   currentParticipantCount,
   features,
+  hasGoogleAuth,
+  hasTwitchAuth,
   isOwner,
   locale,
   onSuccess,
@@ -311,9 +316,10 @@ export function SpaceSettingsForm({
   const showEmailOption =
     features.gatekeeper.email.enabled || isEmailConfigured;
   const showYoutubeOption =
-    features.gatekeeper.youtube.enabled || isYoutubeConfigured;
+    (features.gatekeeper.youtube.enabled || isYoutubeConfigured) &&
+    hasGoogleAuth; // Only show if OAuth is available
   const showTwitchOption =
-    features.gatekeeper.twitch.enabled || isTwitchConfigured;
+    (features.gatekeeper.twitch.enabled || isTwitchConfigured) && hasTwitchAuth; // Only show if OAuth is available
   const showSocialOption = showYoutubeOption || showTwitchOption;
 
   // Show requirement type options based on system settings
@@ -599,6 +605,28 @@ export function SpaceSettingsForm({
         {/* Gatekeeper Rules with Tabs */}
         <div className="space-y-4">
           <h2 className="font-semibold text-lg">{t("gatekeeperTitle")}</h2>
+
+          {/* OAuth Warning: Show if social gatekeeper features are enabled but OAuth not linked */}
+          {isOwner &&
+            !showSocialOption &&
+            (features.gatekeeper.youtube.enabled ||
+              features.gatekeeper.twitch.enabled) && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  {t.rich("helpOAuthRequired", {
+                    accountLink: (chunks) => (
+                      <Link
+                        className="font-medium underline underline-offset-4"
+                        href="/settings/account"
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                  })}
+                </AlertDescription>
+              </Alert>
+            )}
 
           <form.Field name="gatekeeper_mode">
             {(gatekeeperField) => (

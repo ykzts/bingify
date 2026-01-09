@@ -498,6 +498,7 @@
     "gatekeeperModeSocial": "ソーシャル連携",
     "gatekeeperTitle": "参加条件設定",
     "getMyIdButton": "自分のIDを取得",
+    "helpOAuthRequired": "ソーシャル連携を利用するには、<accountLink>アカウント設定</accountLink>でGoogle（YouTube用）またはTwitch のOAuth認証を完了してください。",
     "heading": "スペース設定",
     "hideMetadataHelp": "有効にすると、未参加者にはタイトルや説明が表示されず、「非公開スペース」メッセージのみが表示されます",
     "hideMetadataLabel": "未参加者にタイトルと説明を非表示にする",
