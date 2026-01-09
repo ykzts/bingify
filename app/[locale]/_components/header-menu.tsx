@@ -49,7 +49,8 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
   };
 
   const isActivePath = (path: string) => {
-    return pathname.startsWith(path);
+    // Exact match or starts with path followed by /
+    return pathname === path || pathname.startsWith(`${path}/`);
   };
 
   if (!user) {
