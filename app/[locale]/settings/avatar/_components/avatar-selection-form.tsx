@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Camera, Loader2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
@@ -121,7 +121,7 @@ export function AvatarSelectionForm({
             >
               <Avatar className="h-12 w-12">
                 <AvatarFallback>
-                  <span className="text-lg">👤</span>
+                  <User aria-hidden="true" className="size-5" />
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
@@ -144,7 +144,7 @@ export function AvatarSelectionForm({
                     src={uploadedAvatarUrl}
                   />
                   <AvatarFallback>
-                    <span className="text-lg">📷</span>
+                    <Camera aria-hidden="true" className="size-5" />
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">

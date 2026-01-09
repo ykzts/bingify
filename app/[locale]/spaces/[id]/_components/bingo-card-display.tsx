@@ -2,6 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import confetti from "canvas-confetti";
+import { PartyPopper, Zap } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useMemo, useRef } from "react";
@@ -258,15 +259,19 @@ export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
           {t("bingoCardTitle")}
         </h2>
 
-        {/* Status badges */}
+        {/* Status badges - using lucide-react icons for consistency */}
         {bingoCheckResult.hasBingo && (
-          <div className="mx-auto mb-4 max-w-md rounded-lg bg-yellow-500 px-4 py-2 text-center font-bold text-lg text-white">
-            🎉 {t("bingo")} 🎉
+          <div className="mx-auto mb-4 flex max-w-md items-center justify-center gap-2 rounded-lg bg-yellow-500 px-4 py-2 text-center font-bold text-lg text-white">
+            <PartyPopper aria-hidden="true" className="size-5" />
+            {t("bingo")}
+            <PartyPopper aria-hidden="true" className="size-5" />
           </div>
         )}
         {!bingoCheckResult.hasBingo && bingoCheckResult.hasReach && (
-          <div className="mx-auto mb-4 max-w-md rounded-lg bg-orange-500 px-4 py-2 text-center font-bold text-white">
-            ⚡ {t("reach")} ⚡
+          <div className="mx-auto mb-4 flex max-w-md items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-center font-bold text-white">
+            <Zap aria-hidden="true" className="size-5" />
+            {t("reach")}
+            <Zap aria-hidden="true" className="size-5" />
           </div>
         )}
 

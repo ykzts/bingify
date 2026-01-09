@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Loader2, RotateCcw, Trash2 } from "lucide-react";
+import { AlertCircle, Loader2, RotateCcw, Trash2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -134,7 +134,7 @@ export function AvatarManagement({
                   if (userProfile.avatar_source === "twitch") {
                     return <ProviderIcon provider="twitch" />;
                   }
-                  return <span className="text-2xl">👤</span>;
+                  return <User aria-hidden="true" className="size-5" />;
                 })()}
               </AvatarFallback>
             </Avatar>

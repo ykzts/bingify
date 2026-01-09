@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
+import { PartyPopper, Trash2, Zap } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -56,17 +56,17 @@ interface ParticipantUpdate {
 function showStatusNotification(
   participant: Participant,
   newStatus: "none" | "reach" | "bingo",
-  t: (key: string) => string
+  t: (key: string, values?: Record<string, string>) => string
 ): void {
   const displayName =
     participant?.profiles?.full_name || t("participantGuestName");
 
   if (newStatus === "bingo") {
-    toast.success(`🎉 ${displayName} got BINGO!`, {
+    toast.success(t("notificationBingo", { name: displayName }), {
       duration: 5000,
     });
   } else if (newStatus === "reach") {
-    toast.info(`⚡ ${displayName} has REACH!`, {
+    toast.info(t("notificationReach", { name: displayName }), {
       duration: 3000,
     });
   }
@@ -429,12 +429,17 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
                       <div className="flex gap-1">
                         {participant.bingo_status === "bingo" && (
                           <Badge className="bg-yellow-500 text-white hover:bg-yellow-600">
-                            🎉 BINGO
+                            <PartyPopper
+                              aria-hidden="true"
+                              className="mr-1 size-3"
+                            />
+                            BINGO
                           </Badge>
                         )}
                         {participant.bingo_status === "reach" && (
                           <Badge className="bg-orange-500 text-white hover:bg-orange-600">
-                            ⚡ REACH
+                            <Zap aria-hidden="true" className="mr-1 size-3" />
+                            REACH
                           </Badge>
                         )}
                       </div>

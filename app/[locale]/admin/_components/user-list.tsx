@@ -1,5 +1,6 @@
 "use client";
 
+import { User as UserIcon } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -163,7 +164,7 @@ export function UserList({
                           />
                         </AvatarImage>
                         <AvatarFallback>
-                          <span className="text-lg">👤</span>
+                          <UserIcon aria-hidden="true" className="size-4" />
                         </AvatarFallback>
                       </Avatar>
                     </Link>

@@ -88,7 +88,7 @@
     "overviewWarningNote1": "• スペースの削除は元に戻せません（アーカイブには保存されます）",
     "overviewWarningNote2": "• ユーザーのBANは完全にアカウントを削除します",
     "overviewWarningNote3": "• すべての操作は慎重に行ってください",
-    "overviewWarningTitle": "⚠️ 注意事項",
+    "overviewWarningTitle": "注意事項",
     "paginationNext": "次へ",
     "paginationPrevious": "前へ",
     "processing": "処理中...",
@@ -199,6 +199,8 @@
     "loadingCard": "カードを読み込み中...",
     "loadingParticipants": "参加者を読み込み中...",
     "noParticipants": "まだ参加者がいません",
+    "notificationBingo": "{name} さんがビンゴを達成しました！",
+    "notificationReach": "{name} さんがリーチになりました！",
     "numberCalledSuccess": "番号 {number} を呼びました",
     "participantCardTitle": "{name} さんのカード",
     "participantGuestName": "ゲストユーザー",
@@ -529,7 +531,7 @@
     "subtitle": "初回管理者セットアップ",
     "title": "Bingifyへようこそ",
     "warningMessage": "この操作は一度だけ実行できます。管理者権限を取得すると、このセットアップページにはアクセスできなくなります。",
-    "warningTitle": "⚠️ 重要",
+    "warningTitle": "重要",
     "welcomeMessage": "ようこそ！まだ管理者が設定されていません。下のボタンをクリックして、最初の管理者として登録してください。"
   },
   "SpaceLanding": {
