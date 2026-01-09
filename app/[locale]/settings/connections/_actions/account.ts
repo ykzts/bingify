@@ -69,7 +69,12 @@ export async function unlinkIdentity(
     }
 
     // Invalidate the connections settings page cache
-    revalidatePath("/settings/connections");
+    const locale = await getLocale();
+    const connectionsPath = getPathname({
+      href: "/settings/connections",
+      locale,
+    });
+    revalidatePath(connectionsPath);
 
     return {
       success: true,

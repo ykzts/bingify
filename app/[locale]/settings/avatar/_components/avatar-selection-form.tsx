@@ -38,6 +38,8 @@ export function AvatarSelectionForm({
   const [isPending, startTransition] = useTransition();
   const [selectedSource, setSelectedSource] =
     useState<AvatarSource>(currentAvatarSource);
+  const [currentSavedSource, setCurrentSavedSource] =
+    useState<AvatarSource>(currentAvatarSource);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -50,13 +52,18 @@ export function AvatarSelectionForm({
       const result = await selectAvatar(formData);
 
       if (result.success) {
+        // アバターソース変更後、保存済みソースを更新してボタンの無効化状態を反映
+        setCurrentSavedSource(selectedSource);
         toast.success(t("successAvatarUpdated"));
+        router.refresh();
       } else {
-        // Validate error key before using it as translation key
+        // selectAvatar が返す全てのエラーキーと同期したホワイトリストでバリデーション
         const validErrorKeys = new Set([
           "errorGeneric",
           "errorUnauthorized",
           "errorInvalidAvatar",
+          "errorInvalidSource",
+          "errorProviderNotLinked",
           "errorUpdateFailed",
         ]);
         const errorKey =
@@ -72,6 +79,7 @@ export function AvatarSelectionForm({
   const handleUploadSuccess = () => {
     // アップロード成功時、自動的に "upload" ソースを選択
     setSelectedSource("upload");
+    setCurrentSavedSource("upload");
     // ページをリフレッシュして最新のアバターを取得
     router.refresh();
   };
@@ -147,10 +155,10 @@ export function AvatarSelectionForm({
           )}
 
           {/* プロバイダーアバター */}
-          {availableAvatars.map((avatar) => (
+          {availableAvatars.map((avatar, index) => (
             <div
               className="flex items-center gap-4 rounded-lg border border-input p-4 transition-colors hover:border-primary"
-              key={avatar.provider}
+              key={`${avatar.provider}-${index}`}
             >
               <RadioGroupItem id={avatar.provider} value={avatar.provider} />
               <Label
@@ -177,7 +185,7 @@ export function AvatarSelectionForm({
         </RadioGroup>
 
         <Button
-          disabled={isPending || selectedSource === currentAvatarSource}
+          disabled={isPending || selectedSource === currentSavedSource}
           type="submit"
         >
           {isPending ? (
