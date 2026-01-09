@@ -84,7 +84,6 @@ export default async function Image({
             color: "#4b5563",
             fontSize: 28,
             lineHeight: 1.4,
-            maxWidth: "800px",
             textAlign: "center",
           }}
         >
