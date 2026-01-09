@@ -18,10 +18,13 @@ async function ProfileSettingsContent({ locale }: { locale: string }) {
     });
   }
 
+  // TypeScript doesn't understand redirect() never returns, so we assert user is not null
+  const authenticatedUser = user!;
+
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("full_name")
-    .eq("id", user.id)
+    .eq("id", authenticatedUser.id)
     .single();
 
   if (profileError) {
@@ -31,7 +34,7 @@ async function ProfileSettingsContent({ locale }: { locale: string }) {
   return (
     <div className="space-y-8">
       <UsernameForm currentUsername={profile?.full_name} />
-      <EmailChangeForm currentEmail={user.email ?? undefined} />
+      <EmailChangeForm currentEmail={authenticatedUser.email ?? undefined} />
     </div>
   );
 }

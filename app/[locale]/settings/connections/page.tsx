@@ -19,6 +19,9 @@ async function ConnectionsSettingsContent({ locale }: { locale: string }) {
     });
   }
 
+  // TypeScript doesn't understand redirect() never returns, so we assert user is not null
+  const authenticatedUser = user!;
+
   // Fetch system settings for OAuth scope configuration
   const systemSettingsResult = await getSystemSettings();
 
@@ -41,7 +44,10 @@ async function ConnectionsSettingsContent({ locale }: { locale: string }) {
 
   return (
     <div className="space-y-8">
-      <AccountLinkingForm systemSettings={systemSettings} user={user} />
+      <AccountLinkingForm
+        systemSettings={systemSettings}
+        user={authenticatedUser}
+      />
     </div>
   );
 }

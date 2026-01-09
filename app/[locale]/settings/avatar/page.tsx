@@ -19,10 +19,13 @@ async function AvatarSettingsContent({ locale }: { locale: string }) {
     });
   }
 
+  // TypeScript doesn't understand redirect() never returns, so we assert user is not null
+  const authenticatedUser = user!;
+
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("avatar_source, avatar_url")
-    .eq("id", user.id)
+    .eq("id", authenticatedUser.id)
     .single();
 
   if (profileError) {
@@ -31,7 +34,7 @@ async function AvatarSettingsContent({ locale }: { locale: string }) {
 
   // Fetch available avatars
   const { data: availableAvatars, error: avatarsError } =
-    await getAvailableAvatars(user.id);
+    await getAvailableAvatars(authenticatedUser.id);
 
   if (avatarsError) {
     console.error("Error fetching available avatars:", avatarsError);
