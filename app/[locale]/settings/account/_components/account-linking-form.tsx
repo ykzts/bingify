@@ -14,7 +14,6 @@ import { useState } from "react";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import {
   getProviderLabel,
-  type Provider,
   ProviderIcon,
 } from "@/components/providers/provider-icon";
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,7 @@ import {
   buildOAuthCallbackUrl,
   getScopesForProvider,
 } from "@/lib/auth/oauth-utils";
+import type { OAuthProvider } from "@/lib/oauth/token-storage";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/client";
 import { unlinkIdentity } from "../_actions/account";
@@ -33,7 +33,7 @@ interface AccountLinkingFormProps {
 
 interface ProviderConfig {
   label: string;
-  name: Provider;
+  name: OAuthProvider;
 }
 
 export function AccountLinkingForm({
@@ -43,7 +43,7 @@ export function AccountLinkingForm({
   const t = useTranslations("AccountSettings");
   const router = useRouter();
   const confirm = useConfirm();
-  const [loading, setLoading] = useState<Provider | null>(null);
+  const [loading, setLoading] = useState<OAuthProvider | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -60,11 +60,11 @@ export function AccountLinkingForm({
     },
   ];
 
-  const isLinked = (provider: Provider) => {
+  const isLinked = (provider: OAuthProvider) => {
     return identities.some((identity) => identity.provider === provider);
   };
 
-  const handleLink = async (provider: Provider) => {
+  const handleLink = async (provider: OAuthProvider) => {
     setError(null);
     setSuccess(null);
     setLoading(provider);
@@ -98,7 +98,7 @@ export function AccountLinkingForm({
     }
   };
 
-  const handleUnlink = async (provider: Provider) => {
+  const handleUnlink = async (provider: OAuthProvider) => {
     if (identities.length <= 1) {
       setError(t("errorMinimumIdentity"));
       return;

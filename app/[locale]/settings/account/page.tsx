@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "@/i18n/navigation";
 import { getSystemSettings } from "@/lib/data/system-settings";
 import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
+import type { AvatarSource } from "@/lib/services/avatar-service";
 import { getAvailableAvatars } from "@/lib/services/avatar-service";
 import { createClient } from "@/lib/supabase/server";
 import { AccountLinkingForm } from "./_components/account-linking-form";
@@ -45,18 +46,16 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
   }
 
   // Validate avatar_source and provide safe fallback
-  const allowedSources: Array<"google" | "twitch" | "upload" | "default"> = [
+  const allowedSources: AvatarSource[] = [
     "google",
     "twitch",
     "upload",
     "default",
   ];
-  const safeCurrentAvatarSource: "google" | "twitch" | "upload" | "default" =
+  const safeCurrentAvatarSource: AvatarSource =
     profile?.avatar_source &&
-    allowedSources.includes(
-      profile.avatar_source as "google" | "twitch" | "upload" | "default"
-    )
-      ? (profile.avatar_source as "google" | "twitch" | "upload" | "default")
+    allowedSources.includes(profile.avatar_source as AvatarSource)
+      ? (profile.avatar_source as AvatarSource)
       : "default";
 
   return (

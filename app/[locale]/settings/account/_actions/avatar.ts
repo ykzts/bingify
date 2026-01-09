@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { isValidOAuthProvider } from "@/lib/oauth/provider-validation";
 import type { AvatarSource } from "@/lib/services/avatar-service";
 import { setActiveAvatar } from "@/lib/services/avatar-service";
 import { createClient } from "@/lib/supabase/server";
@@ -57,7 +58,7 @@ export async function selectAvatar(
     }
 
     // プロバイダーアバターの場合、identity が存在するか確認
-    if (source === "google" || source === "twitch") {
+    if (isValidOAuthProvider(source)) {
       const identities = user.identities || [];
       const hasIdentity = identities.some(
         (identity) => identity.provider === source

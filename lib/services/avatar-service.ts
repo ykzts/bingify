@@ -1,21 +1,17 @@
+import type { OAuthProvider } from "@/lib/oauth/token-storage";
 import { createClient } from "@/lib/supabase/server";
-
-/**
- * サポートされているOAuthプロバイダー
- */
-export type SupportedProvider = "google" | "twitch";
 
 /**
  * アバターのソース種別
  */
-export type AvatarSource = SupportedProvider | "upload" | "default";
+export type AvatarSource = OAuthProvider | "upload" | "default";
 
 /**
  * 利用可能なアバター情報
  */
 export interface AvailableAvatar {
   avatar_url: string;
-  provider: SupportedProvider;
+  provider: OAuthProvider;
 }
 
 /**
@@ -115,7 +111,7 @@ export async function getAvailableAvatars(
         if (avatarUrl) {
           availableAvatars.push({
             avatar_url: avatarUrl,
-            provider: identity.provider as SupportedProvider,
+            provider: identity.provider as OAuthProvider,
           });
         }
       }
