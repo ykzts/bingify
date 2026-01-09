@@ -2,8 +2,8 @@ import { setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { EmailChangeForm } from "../account/_components/email-change-form";
-import { UsernameForm } from "../account/_components/username-form";
+import { EmailChangeForm } from "./_components/email-change-form";
+import { UsernameForm } from "./_components/username-form";
 
 async function ProfileSettingsContent({ locale }: { locale: string }) {
   const supabase = await createClient();
@@ -16,7 +16,6 @@ async function ProfileSettingsContent({ locale }: { locale: string }) {
       href: `/login?redirect=${encodeURIComponent("/settings/profile")}`,
       locale,
     });
-    return null;
   }
 
   const { data: profile, error: profileError } = await supabase
@@ -32,7 +31,7 @@ async function ProfileSettingsContent({ locale }: { locale: string }) {
   return (
     <div className="space-y-8">
       <UsernameForm currentUsername={profile?.full_name} />
-      <EmailChangeForm currentEmail={user.email} />
+      <EmailChangeForm currentEmail={user.email ?? undefined} />
     </div>
   );
 }
@@ -46,7 +45,11 @@ export default async function ProfileSettingsPage({
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center py-12">
+        <div
+          aria-label="Loading"
+          className="flex items-center justify-center py-12"
+          role="status"
+        >
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
         </div>
       }

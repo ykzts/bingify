@@ -4,7 +4,7 @@ import { redirect } from "@/i18n/navigation";
 import { getSystemSettings } from "@/lib/data/system-settings";
 import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
-import { AccountLinkingForm } from "../account/_components/account-linking-form";
+import { AccountLinkingForm } from "./_components/account-linking-form";
 
 async function ConnectionsSettingsContent({ locale }: { locale: string }) {
   const supabase = await createClient();
@@ -17,7 +17,6 @@ async function ConnectionsSettingsContent({ locale }: { locale: string }) {
       href: `/login?redirect=${encodeURIComponent("/settings/connections")}`,
       locale,
     });
-    return null;
   }
 
   // Fetch system settings for OAuth scope configuration
@@ -56,7 +55,11 @@ export default async function ConnectionsSettingsPage({
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center py-12">
+        <div
+          aria-label="Loading"
+          className="flex items-center justify-center py-12"
+          role="status"
+        >
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
         </div>
       }

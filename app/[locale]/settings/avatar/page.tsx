@@ -4,7 +4,7 @@ import { redirect } from "@/i18n/navigation";
 import type { AvatarSource } from "@/lib/services/avatar-service";
 import { getAvailableAvatars } from "@/lib/services/avatar-service";
 import { createClient } from "@/lib/supabase/server";
-import { AvatarSelectionForm } from "../account/_components/avatar-selection-form";
+import { AvatarSelectionForm } from "./_components/avatar-selection-form";
 
 async function AvatarSettingsContent({ locale }: { locale: string }) {
   const supabase = await createClient();
@@ -17,7 +17,6 @@ async function AvatarSettingsContent({ locale }: { locale: string }) {
       href: `/login?redirect=${encodeURIComponent("/settings/avatar")}`,
       locale,
     });
-    return null;
   }
 
   const { data: profile, error: profileError } = await supabase
@@ -75,7 +74,11 @@ export default async function AvatarSettingsPage({
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center py-12">
+        <div
+          aria-label="Loading"
+          className="flex items-center justify-center py-12"
+          role="status"
+        >
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
         </div>
       }
