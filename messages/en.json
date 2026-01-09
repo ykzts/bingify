@@ -500,6 +500,10 @@
     "errorTokenExpired": "Your OAuth token has expired or been revoked. Please reconnect your account.",
     "errorUnknown": "An unexpected error occurred during OAuth verification. Please try again."
   },
+  "Privacy": {
+    "metaDescription": "Read Bingify's Privacy Policy to understand how we collect, use, and protect your personal information.",
+    "metaTitle": "Privacy Policy"
+  },
   "ScreenView": {
     "background": "Background",
     "bgBlue": "Blue",
