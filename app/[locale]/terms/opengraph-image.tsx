@@ -8,6 +8,10 @@ export const size = {
 };
 export const contentType = "image/png";
 
+function getDefaultTitle(locale: string): string {
+  return locale === "ja" ? "利用規約" : "Terms of Service";
+}
+
 export default async function Image({
   params,
 }: {
@@ -15,9 +19,16 @@ export default async function Image({
 }) {
   const { locale } = await params;
 
-  // Load MDX metadata to get the title
-  const module = await loadMDXContent(locale, "terms");
-  const title = module.metadata?.title || "Terms of Service";
+  let title: string;
+  try {
+    const module = await loadMDXContent(locale, "terms");
+    title =
+      module.metadata?.title && module.metadata.title !== "Content Not Found"
+        ? module.metadata.title
+        : getDefaultTitle(locale);
+  } catch {
+    title = getDefaultTitle(locale);
+  }
 
   return new ImageResponse(
     <div
@@ -42,7 +53,6 @@ export default async function Image({
           padding: "80px 64px",
         }}
       >
-        {/* Logo and Bingify branding */}
         <div
           style={{
             alignItems: "center",
@@ -68,7 +78,6 @@ export default async function Image({
           <span style={{ color: "#1f2937" }}>Bingify</span>
         </div>
 
-        {/* Terms Title */}
         <div
           style={{
             color: "#1f2937",
