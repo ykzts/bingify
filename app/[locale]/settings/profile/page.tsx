@@ -16,9 +16,9 @@ async function ProfileSettingsContent({ locale }: { locale: string }) {
       href: `/login?redirect=${encodeURIComponent("/settings/profile")}`,
       locale,
     });
+    return;
   }
 
-  // @ts-expect-error - redirect() throws and never returns, user is guaranteed non-null here
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("full_name")
@@ -32,7 +32,6 @@ async function ProfileSettingsContent({ locale }: { locale: string }) {
   return (
     <div className="space-y-8">
       <UsernameForm currentUsername={profile?.full_name} />
-      {/* @ts-ignore - user is guaranteed non-null after redirect check */}
       <EmailChangeForm currentEmail={user.email ?? undefined} />
     </div>
   );

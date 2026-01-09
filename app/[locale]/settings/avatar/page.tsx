@@ -17,9 +17,9 @@ async function AvatarSettingsContent({ locale }: { locale: string }) {
       href: `/login?redirect=${encodeURIComponent("/settings/avatar")}`,
       locale,
     });
+    return;
   }
 
-  // @ts-expect-error - redirect() throws and never returns, user is guaranteed non-null here
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("avatar_source, avatar_url")
@@ -30,7 +30,6 @@ async function AvatarSettingsContent({ locale }: { locale: string }) {
     console.error("Error fetching profile:", profileError);
   }
 
-  // @ts-expect-error - user is guaranteed non-null after redirect check
   // Fetch available avatars
   const { data: availableAvatars, error: avatarsError } =
     await getAvailableAvatars(user.id);

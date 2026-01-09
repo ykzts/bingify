@@ -5,16 +5,16 @@ import {
   initialFormState,
 } from "@tanstack/react-form-nextjs";
 import { getLocale } from "next-intl/server";
-import { getPathname } from "@/i18n/navigation";
-import { emailChangeSchema, usernameSchema } from "@/lib/schemas/user";
-import { createClient } from "@/lib/supabase/server";
-import { getAbsoluteUrl } from "@/lib/utils/url";
 import {
   type EmailChangeFormValues,
   emailChangeFormOpts,
   type UsernameFormValues,
   usernameFormOpts,
-} from "../_lib/form-options";
+} from "@/app/[locale]/settings/_lib/form-options";
+import { getPathname } from "@/i18n/navigation";
+import { emailChangeSchema, usernameSchema } from "@/lib/schemas/user";
+import { createClient } from "@/lib/supabase/server";
+import { getAbsoluteUrl } from "@/lib/utils/url";
 
 export interface UnlinkIdentityState {
   error?: string;

@@ -17,9 +17,9 @@ async function ConnectionsSettingsContent({ locale }: { locale: string }) {
       href: `/login?redirect=${encodeURIComponent("/settings/connections")}`,
       locale,
     });
+    return;
   }
 
-  // @ts-expect-error - redirect() throws and never returns, user is guaranteed non-null here
   // Fetch system settings for OAuth scope configuration
   const systemSettingsResult = await getSystemSettings();
 
@@ -42,7 +42,6 @@ async function ConnectionsSettingsContent({ locale }: { locale: string }) {
 
   return (
     <div className="space-y-8">
-      {/* @ts-ignore - user is guaranteed non-null after redirect check */}
       <AccountLinkingForm systemSettings={systemSettings} user={user} />
     </div>
   );

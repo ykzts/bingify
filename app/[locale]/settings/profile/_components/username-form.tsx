@@ -13,6 +13,8 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
+import { updateUsernameAction } from "@/app/[locale]/settings/_actions/account";
+import { usernameFormOpts } from "@/app/[locale]/settings/_lib/form-options";
 import { FieldErrors } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
 import { SectionHeader } from "@/components/section-header";
@@ -25,8 +27,6 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { usernameSchema } from "@/lib/schemas/user";
-import { updateUsernameAction } from "../_actions/account";
-import { usernameFormOpts } from "../_lib/form-options";
 
 interface UsernameFormProps {
   currentUsername?: string | null;
