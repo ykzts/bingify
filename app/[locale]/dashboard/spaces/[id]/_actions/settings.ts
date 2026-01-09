@@ -4,7 +4,10 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
-import { getOAuthTokenForUser } from "@/lib/oauth/token-storage";
+import {
+  getOAuthTokenForUser,
+  type OAuthProvider,
+} from "@/lib/oauth/token-storage";
 import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
@@ -339,7 +342,7 @@ export async function updateSpaceSettings(
     // Validation: Check OAuth token availability for social gatekeeper
     if (gatekeeperMode === "social") {
       // Determine which OAuth provider is required based on platform
-      let requiredProvider: "google" | "twitch" | null = null;
+      let requiredProvider: OAuthProvider | null = null;
 
       if (
         socialPlatform === "youtube" &&
