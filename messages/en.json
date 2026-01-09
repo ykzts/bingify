@@ -205,7 +205,28 @@
     "processing": "Processing...",
     "saveButton": "Save Avatar",
     "successAvatarUpdated": "Avatar updated successfully",
-    "title": "Avatar Selection"
+    "title": "Avatar Selection",
+    "uploadedAvatar": "Uploaded Image"
+  },
+  "AvatarUpload": {
+    "description": "Upload JPEG, PNG, or WebP images (max 2MB)",
+    "errorFileEmpty": "Empty files cannot be uploaded",
+    "errorFileSizeExceeded": "File size must be less than 2MB",
+    "errorGeneric": "An unexpected error occurred",
+    "errorInvalidFile": "Invalid file",
+    "errorInvalidFileType": "Only JPEG, PNG, and WebP images are allowed",
+    "errorNoFileSelected": "No file selected",
+    "errorUnauthorized": "Authentication required",
+    "errorUploadFailed": "Upload failed",
+    "errorUpdateFailed": "Failed to update profile",
+    "fileHint": "Max 2MB, JPEG/PNG/WebP format",
+    "fileLabel": "Image File",
+    "previewAlt": "Preview of uploaded image",
+    "previewLabel": "Preview",
+    "successAvatarUploaded": "Avatar image uploaded successfully",
+    "title": "Upload Custom Image",
+    "uploadButton": "Upload",
+    "uploading": "Uploading..."
   },
   "Contact": {
     "autoFillButton": "Fill with My Info",

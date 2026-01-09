@@ -58,17 +58,20 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
       ? (profile.avatar_source as AvatarSource)
       : "default";
 
+  // Get uploaded avatar URL if available
+  const uploadedAvatarUrl =
+    profile?.avatar_source === "upload" ? profile.avatar_url : null;
+
   return (
     <div className="space-y-8">
       <UsernameForm currentUsername={profile?.full_name} />
       <EmailChangeForm currentEmail={user.email} />
       <AccountLinkingForm systemSettings={systemSettings} user={user} />
-      {availableAvatars && availableAvatars.length > 0 && (
-        <AvatarSelectionForm
-          availableAvatars={availableAvatars}
-          currentAvatarSource={safeCurrentAvatarSource}
-        />
-      )}
+      <AvatarSelectionForm
+        availableAvatars={availableAvatars || []}
+        currentAvatarSource={safeCurrentAvatarSource}
+        uploadedAvatarUrl={uploadedAvatarUrl}
+      />
     </div>
   );
 }

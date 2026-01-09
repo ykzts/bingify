@@ -205,7 +205,28 @@
     "processing": "処理中...",
     "saveButton": "アバターを保存",
     "successAvatarUpdated": "アバターが更新されました",
-    "title": "アバター選択"
+    "title": "アバター選択",
+    "uploadedAvatar": "アップロードした画像"
+  },
+  "AvatarUpload": {
+    "description": "JPEG、PNG、WebP形式の画像をアップロードできます（最大2MB）",
+    "errorFileEmpty": "空のファイルはアップロードできません",
+    "errorFileSizeExceeded": "ファイルサイズは2MB以下にしてください",
+    "errorGeneric": "予期しないエラーが発生しました",
+    "errorInvalidFile": "無効なファイルです",
+    "errorInvalidFileType": "JPEG、PNG、WebP形式の画像のみアップロード可能です",
+    "errorNoFileSelected": "ファイルが選択されていません",
+    "errorUnauthorized": "認証が必要です",
+    "errorUploadFailed": "アップロードに失敗しました",
+    "errorUpdateFailed": "プロフィールの更新に失敗しました",
+    "fileHint": "最大2MB、JPEG/PNG/WebP形式",
+    "fileLabel": "画像ファイル",
+    "previewAlt": "アップロード画像のプレビュー",
+    "previewLabel": "プレビュー",
+    "successAvatarUploaded": "アバター画像をアップロードしました",
+    "title": "カスタム画像をアップロード",
+    "uploadButton": "アップロード",
+    "uploading": "アップロード中..."
   },
   "Contact": {
     "autoFillButton": "自分の情報を入力",
