@@ -291,7 +291,7 @@ const emailChangeServerValidate = createServerValidate({
     }
 
     // Check if the email is the same as the current email
-    if (user.email && user.email.toLowerCase() === value.email.toLowerCase()) {
+    if (user.email?.toLowerCase() === value.email.toLowerCase()) {
       return { fields: { email: "errorSameEmail" } };
     }
 

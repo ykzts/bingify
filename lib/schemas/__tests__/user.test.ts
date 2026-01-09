@@ -74,7 +74,11 @@ describe("Email Change Schema", () => {
   });
 
   it("255文字を超えるメールアドレスを拒否する", () => {
-    const longEmail = `${"a".repeat(250)}@example.com`;
+    // Create an email that is exactly 256 characters (one over the limit)
+    const localPart = "a".repeat(244); // 244 + 1(@) + 11(example.com) = 256
+    const longEmail = `${localPart}@example.com`;
+    expect(longEmail.length).toBe(256);
+
     const result = emailChangeSchema.safeParse({ email: longEmail });
     expect(result.success).toBe(false);
   });
