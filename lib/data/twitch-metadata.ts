@@ -5,6 +5,7 @@ import type {
   TwitchBroadcasterInsert,
   TwitchBroadcasterMetadata,
 } from "@/lib/types/social-metadata";
+import { shouldRefreshMetadata } from "@/lib/types/social-metadata";
 import type { Database } from "@/types/supabase";
 
 /**
@@ -108,15 +109,13 @@ export async function fetchAndCacheTwitchBroadcasterMetadata(
   // まずDBをチェック
   const cached = await getTwitchBroadcasterMetadata(supabase, broadcasterId);
 
-  // キャッシュがあり、24時間以内のものであればそれを返す
-  if (cached && !cached.fetch_error) {
-    const fetchedAt = new Date(cached.fetched_at);
-    const now = new Date();
-    const ageInHours = (now.getTime() - fetchedAt.getTime()) / (1000 * 60 * 60);
-
-    if (ageInHours < 24) {
-      return cached;
-    }
+  // キャッシュがあり、エラーがなく、24時間以内のものであればそれを返す
+  if (
+    cached &&
+    !cached.fetch_error &&
+    !shouldRefreshMetadata(cached.fetched_at)
+  ) {
+    return cached;
   }
 
   // APIから取得

@@ -5,6 +5,7 @@ import type {
   YouTubeChannelInsert,
   YouTubeChannelMetadata,
 } from "@/lib/types/social-metadata";
+import { shouldRefreshMetadata } from "@/lib/types/social-metadata";
 import type { Database } from "@/types/supabase";
 
 /**
@@ -42,13 +43,19 @@ async function fetchYouTubeChannelDetails(
   const channel = response.data.items[0];
   const snippet = channel.snippet;
 
+  // カスタムURLからハンドルを生成
+  // Note: YouTubeのカスタムURLは通常ハンドル（@username）として使用される
+  // ただし、すべてのカスタムURLがこの形式とは限らないため、
+  // 実際の値を確認してから使用することを推奨
+  const handle = snippet?.customUrl ? `@${snippet.customUrl}` : null;
+
   return {
     channel_id: channelId,
     channel_title: snippet?.title || null,
     custom_url: snippet?.customUrl || null,
     description: snippet?.description || null,
     fetched_at: new Date().toISOString(),
-    handle: snippet?.customUrl ? `@${snippet.customUrl}` : null,
+    handle,
     thumbnail_url: snippet?.thumbnails?.default?.url || null,
   };
 }
@@ -117,15 +124,13 @@ export async function fetchAndCacheYouTubeChannelMetadata(
   // まずDBをチェック
   const cached = await getYouTubeChannelMetadata(supabase, channelId);
 
-  // キャッシュがあり、24時間以内のものであればそれを返す
-  if (cached && !cached.fetch_error) {
-    const fetchedAt = new Date(cached.fetched_at);
-    const now = new Date();
-    const ageInHours = (now.getTime() - fetchedAt.getTime()) / (1000 * 60 * 60);
-
-    if (ageInHours < 24) {
-      return cached;
-    }
+  // キャッシュがあり、エラーがなく、24時間以内のものであればそれを返す
+  if (
+    cached &&
+    !cached.fetch_error &&
+    !shouldRefreshMetadata(cached.fetched_at)
+  ) {
+    return cached;
   }
 
   // APIから取得

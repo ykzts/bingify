@@ -12,6 +12,9 @@ CREATE TABLE IF NOT EXISTS youtube_channels (
   created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  -- Note: YouTube チャンネルIDは現在 'UC' で始まる24文字の形式ですが、
+  -- 将来的にYouTubeがこの形式を変更する可能性があります。
+  -- その場合、このConstraintの更新が必要になります。
   CONSTRAINT valid_channel_id CHECK (char_length(channel_id) = 24 AND channel_id LIKE 'UC%')
 );
 
@@ -28,6 +31,9 @@ CREATE TABLE IF NOT EXISTS twitch_broadcasters (
   created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  -- Note: Twitch ブロードキャスターIDは現在数字のみの形式ですが、
+  -- 将来的にTwitchがこの形式を変更する可能性があります。
+  -- その場合、このConstraintの更新が必要になります。
   CONSTRAINT valid_broadcaster_id CHECK (broadcaster_id ~ '^\d+$')
 );
 
