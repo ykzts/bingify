@@ -37,7 +37,6 @@ export default async function Image({
           flexDirection: "column",
           gap: "32px",
           padding: "80px 64px",
-          maxWidth: "900px",
         }}
       >
         {/* Logo and Bingify branding */}
