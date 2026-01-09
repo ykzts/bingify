@@ -259,7 +259,7 @@ export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
           {t("bingoCardTitle")}
         </h2>
 
-        {/* Status badges */}
+        {/* Status badges - using lucide-react icons for consistency */}
         {bingoCheckResult.hasBingo && (
           <div className="mx-auto mb-4 flex max-w-md items-center justify-center gap-2 rounded-lg bg-yellow-500 px-4 py-2 text-center font-bold text-lg text-white">
             <PartyPopper aria-hidden="true" className="size-5" />
