@@ -1,8 +1,11 @@
+import {
+  AVATAR_MAX_FILE_SIZE,
+  AVATAR_MIME_TYPE_TO_EXT,
+  isValidAvatarMimeType,
+} from "@/lib/constants/avatar";
 import { createClient } from "./server";
 
 const AVATARS_BUCKET = "avatars";
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 /**
  * アバター画像をSupabase Storageにアップロード
@@ -16,7 +19,7 @@ export async function uploadAvatar(
 ): Promise<{ data: string | null; error: string | null }> {
   try {
     // ファイルサイズチェック
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > AVATAR_MAX_FILE_SIZE) {
       return {
         data: null,
         error: "File size exceeds 2MB limit",
@@ -24,7 +27,7 @@ export async function uploadAvatar(
     }
 
     // MIMEタイプチェック
-    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+    if (!isValidAvatarMimeType(file.type)) {
       return {
         data: null,
         error: "Invalid file type. Only JPEG, PNG, and WebP are allowed",
@@ -34,8 +37,9 @@ export async function uploadAvatar(
     const supabase = await createClient();
 
     // ファイル名を生成: {userId}/{timestamp}.{ext}
+    // セキュリティのため、MIMEタイプから拡張子を決定
     const timestamp = Date.now();
-    const ext = file.name.split(".").pop() || "jpg";
+    const ext = AVATAR_MIME_TYPE_TO_EXT[file.type] || "jpg";
     const fileName = `${userId}/${timestamp}.${ext}`;
 
     // ファイルをArrayBufferに変換
@@ -91,8 +95,10 @@ export async function deleteAvatar(
     // 公開URLの場合: https://.../storage/v1/object/public/avatars/{userId}/{timestamp}.{ext}
     // ストレージパスの場合: {userId}/{timestamp}.{ext}
     let fileName = path;
-    if (path.includes("/storage/v1/object/public/avatars/")) {
-      fileName = path.split("/storage/v1/object/public/avatars/")[1];
+    const storagePathPattern = "/storage/v1/object/public/avatars/";
+    if (path.includes(storagePathPattern)) {
+      const parts = path.split(storagePathPattern);
+      fileName = parts[1] || path;
     }
 
     // ユーザーIDで始まるパスかチェック（セキュリティ）

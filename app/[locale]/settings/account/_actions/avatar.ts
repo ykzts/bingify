@@ -1,6 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import {
+  AVATAR_MAX_FILE_SIZE,
+  isValidAvatarMimeType,
+} from "@/lib/constants/avatar";
 import { isValidOAuthProvider } from "@/lib/oauth/provider-validation";
 import type { AvatarSource } from "@/lib/services/avatar-service";
 import { setActiveAvatar } from "@/lib/services/avatar-service";
@@ -140,17 +144,14 @@ export async function uploadAvatarAction(
     }
 
     // サーバー側バリデーション
-    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-    const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
-
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > AVATAR_MAX_FILE_SIZE) {
       return {
         errorKey: "errorFileSizeExceeded",
         success: false,
       };
     }
 
-    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+    if (!isValidAvatarMimeType(file.type)) {
       return {
         errorKey: "errorInvalidFileType",
         success: false,
@@ -195,7 +196,10 @@ export async function uploadAvatarAction(
     if (updateError) {
       console.error("Failed to update profile:", updateError);
       // アップロードしたファイルをクリーンアップ
-      await deleteAvatar(user.id, publicUrl);
+      const cleanupResult = await deleteAvatar(user.id, publicUrl);
+      if (!cleanupResult.success) {
+        console.error("Failed to cleanup uploaded file:", cleanupResult.error);
+      }
       return {
         errorKey: "errorUpdateFailed",
         success: false,
@@ -204,7 +208,11 @@ export async function uploadAvatarAction(
 
     // 古いアップロード画像があれば削除
     if (oldAvatarUrl) {
-      await deleteAvatar(user.id, oldAvatarUrl);
+      const deleteResult = await deleteAvatar(user.id, oldAvatarUrl);
+      if (!deleteResult.success) {
+        // 古いファイルの削除失敗はログのみ（処理は継続）
+        console.error("Failed to delete old avatar:", deleteResult.error);
+      }
     }
 
     // キャッシュを再検証

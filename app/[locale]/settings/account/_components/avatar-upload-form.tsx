@@ -2,13 +2,17 @@
 
 import { AlertCircle, Loader2, Upload } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  AVATAR_MAX_FILE_SIZE,
+  isValidAvatarMimeType,
+} from "@/lib/constants/avatar";
 import { uploadAvatarAction } from "../_actions/avatar";
 
 interface AvatarUploadFormProps {
@@ -22,28 +26,43 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // プレビューURLのクリーンアップ
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       setSelectedFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
       setPreviewUrl(null);
       return;
     }
 
     // クライアント側バリデーション
-    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-    const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
-
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > AVATAR_MAX_FILE_SIZE) {
       setError(t("errorFileSizeExceeded"));
       setSelectedFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
       setPreviewUrl(null);
       return;
     }
 
-    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+    if (!isValidAvatarMimeType(file.type)) {
       setError(t("errorInvalidFileType"));
       setSelectedFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
       setPreviewUrl(null);
       return;
     }
@@ -51,7 +70,12 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
     setError(null);
     setSelectedFile(file);
 
-    // プレビュー画像を生成
+    // 古いプレビューURLをクリーンアップ
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    // 新しいプレビュー画像を生成
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
   };
@@ -73,6 +97,10 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
 
       if (result.success && result.data) {
         toast.success(t("successAvatarUploaded"));
+        // 古いプレビューURLをクリーンアップ
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+        }
         setSelectedFile(null);
         setPreviewUrl(null);
         // コールバックを呼び出し
