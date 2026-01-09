@@ -23,6 +23,8 @@ import { SpaceSettingsForm } from "./space-settings-form";
 interface Props {
   currentParticipantCount: number;
   features: SystemFeatures;
+  hasGoogleAuth: boolean;
+  hasTwitchAuth: boolean;
   isOwner: boolean;
   locale: string;
   space: Space;
@@ -32,6 +34,8 @@ interface Props {
 export function SpaceSettingsSheet({
   currentParticipantCount,
   features,
+  hasGoogleAuth,
+  hasTwitchAuth,
   isOwner,
   locale,
   space,
@@ -76,6 +80,8 @@ export function SpaceSettingsSheet({
           <SpaceSettingsForm
             currentParticipantCount={currentParticipantCount}
             features={features}
+            hasGoogleAuth={hasGoogleAuth}
+            hasTwitchAuth={hasTwitchAuth}
             isOwner={isOwner}
             locale={locale}
             onSuccess={handleSuccess}

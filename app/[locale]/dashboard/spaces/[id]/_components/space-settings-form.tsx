@@ -61,6 +61,8 @@ import { YoutubeChannelIdField } from "./youtube-channel-id-field";
 interface Props {
   currentParticipantCount: number;
   features: SystemFeatures;
+  hasGoogleAuth: boolean;
+  hasTwitchAuth: boolean;
   isOwner: boolean;
   locale: string;
   onSuccess?: (message: string) => void;
@@ -122,6 +124,8 @@ function determineSocialPlatform(
 export function SpaceSettingsForm({
   currentParticipantCount,
   features,
+  hasGoogleAuth,
+  hasTwitchAuth,
   isOwner,
   locale,
   onSuccess,
@@ -131,7 +135,6 @@ export function SpaceSettingsForm({
   const router = useRouter();
   const t = useTranslations("SpaceSettings");
   const [serverError, setServerError] = useState<string | null>(null);
-  const [serverErrorKey, setServerErrorKey] = useState<string | null>(null);
 
   // 操作者自身のチャンネルID（権限チェック用）
   const [operatorYoutubeChannelId, setOperatorYoutubeChannelId] = useState<
@@ -234,43 +237,26 @@ export function SpaceSettingsForm({
   const handleUpdateSuccess = useEffectEvent(() => {
     onSuccess?.(t("updateSuccess"));
     setServerError(null);
-    setServerErrorKey(null);
   });
-
-  // Rich text error keys that need special rendering with links
-  const richTextErrorKeys = [
-    "errorOwnerTwitchAuthRequired",
-    "errorOwnerYoutubeAuthRequired",
-  ];
 
   // Common error translation logic
   const translateError = useEffectEvent((error: string): string => {
     // List of known error keys for translation
     const errorKeys = [
-      "errorEmailDisabled",
-      "errorGatekeeperOwnerOnly",
-      "errorOwnerTwitchAuthRequired",
-      "errorOwnerYoutubeAuthRequired",
-      "errorTwitchDisabled",
-      "errorTwitchFollowerDisabled",
-      "errorTwitchSubscriberDisabled",
       "errorYoutubeDisabled",
       "errorYoutubeMemberDisabled",
       "errorYoutubeSubscriberDisabled",
+      "errorTwitchDisabled",
+      "errorTwitchFollowerDisabled",
+      "errorTwitchSubscriberDisabled",
+      "errorEmailDisabled",
     ];
     // Translate error keys, otherwise use the error string as-is
     return errorKeys.includes(error) ? t(error) : error;
   });
 
   const handleUpdateError = useEffectEvent((error: string) => {
-    // Check if this is a rich text error key
-    if (richTextErrorKeys.includes(error)) {
-      setServerErrorKey(error);
-      setServerError(null);
-    } else {
-      setServerError(translateError(error));
-      setServerErrorKey(null);
-    }
+    setServerError(translateError(error));
   });
 
   const handlePublishSuccess = useEffectEvent(() => {
@@ -279,14 +265,7 @@ export function SpaceSettingsForm({
   });
 
   const handlePublishError = useEffectEvent((error: string) => {
-    // Check if this is a rich text error key
-    if (richTextErrorKeys.includes(error)) {
-      setServerErrorKey(error);
-      setServerError(null);
-    } else {
-      setServerError(translateError(error));
-      setServerErrorKey(null);
-    }
+    setServerError(translateError(error));
   });
 
   // Handle update success/error
@@ -337,9 +316,10 @@ export function SpaceSettingsForm({
   const showEmailOption =
     features.gatekeeper.email.enabled || isEmailConfigured;
   const showYoutubeOption =
-    features.gatekeeper.youtube.enabled || isYoutubeConfigured;
+    (features.gatekeeper.youtube.enabled || isYoutubeConfigured) &&
+    hasGoogleAuth; // Only show if OAuth is available
   const showTwitchOption =
-    features.gatekeeper.twitch.enabled || isTwitchConfigured;
+    (features.gatekeeper.twitch.enabled || isTwitchConfigured) && hasTwitchAuth; // Only show if OAuth is available
   const showSocialOption = showYoutubeOption || showTwitchOption;
 
   // Show requirement type options based on system settings
@@ -625,6 +605,28 @@ export function SpaceSettingsForm({
         {/* Gatekeeper Rules with Tabs */}
         <div className="space-y-4">
           <h2 className="font-semibold text-lg">{t("gatekeeperTitle")}</h2>
+
+          {/* OAuth Warning: Show if social gatekeeper features are enabled but OAuth not linked */}
+          {isOwner &&
+            !showSocialOption &&
+            (features.gatekeeper.youtube.enabled ||
+              features.gatekeeper.twitch.enabled) && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  {t.rich("helpOAuthRequired", {
+                    accountLink: (chunks) => (
+                      <Link
+                        className="font-medium underline underline-offset-4"
+                        href="/settings/account"
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                  })}
+                </AlertDescription>
+              </Alert>
+            )}
 
           <form.Field name="gatekeeper_mode">
             {(gatekeeperField) => (
@@ -1009,26 +1011,6 @@ export function SpaceSettingsForm({
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>{t("updateError")}</AlertTitle>
             <AlertDescription>{serverError}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Server Error Display with Rich Text (for OAuth-related errors) */}
-        {serverErrorKey && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>{t("updateError")}</AlertTitle>
-            <AlertDescription>
-              {t.rich(serverErrorKey, {
-                accountLink: (chunks) => (
-                  <Link
-                    className="font-medium underline underline-offset-4 hover:text-destructive-foreground/80"
-                    href="/settings/account"
-                  >
-                    {chunks}
-                  </Link>
-                ),
-              })}
-            </AlertDescription>
           </Alert>
         )}
 

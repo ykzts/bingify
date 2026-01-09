@@ -4,10 +4,6 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
-import {
-  getOAuthTokenForUser,
-  type OAuthProvider,
-} from "@/lib/oauth/token-storage";
 import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
@@ -337,47 +333,6 @@ export async function updateSpaceSettings(
         ...initialFormState,
         errors: ["errorEmailDisabled"],
       };
-    }
-
-    // Validation: Check OAuth token availability for social gatekeeper
-    if (gatekeeperMode === "social") {
-      // Determine which OAuth provider is required based on platform
-      let requiredProvider: OAuthProvider | null = null;
-
-      if (
-        socialPlatform === "youtube" &&
-        youtubeRequirement !== "none" &&
-        youtubeChannelId
-      ) {
-        requiredProvider = "google";
-      } else if (
-        socialPlatform === "twitch" &&
-        twitchRequirement !== "none" &&
-        twitchBroadcasterId
-      ) {
-        requiredProvider = "twitch";
-      }
-
-      // If a provider is required, check if the space owner has authenticated
-      if (requiredProvider && space.owner_id) {
-        const tokenResult = await getOAuthTokenForUser(
-          space.owner_id,
-          requiredProvider
-        );
-
-        if (!(tokenResult.success && tokenResult.access_token)) {
-          // Return appropriate error message based on provider
-          const errorKey =
-            requiredProvider === "google"
-              ? "errorOwnerYoutubeAuthRequired"
-              : "errorOwnerTwitchAuthRequired";
-
-          return {
-            ...initialFormState,
-            errors: [errorKey],
-          };
-        }
-      }
     }
 
     // Validation 2: Check current participant count
