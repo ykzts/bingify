@@ -1,6 +1,6 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   TwitchBroadcasterInsert,
   TwitchBroadcasterMetadata,

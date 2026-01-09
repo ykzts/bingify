@@ -1,6 +1,6 @@
 import { youtube_v3 } from "@googleapis/youtube";
-import { OAuth2Client } from "google-auth-library";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { OAuth2Client } from "google-auth-library";
 import type {
   YouTubeChannelInsert,
   YouTubeChannelMetadata,
@@ -95,7 +95,9 @@ export async function upsertYouTubeChannelMetadata(
     .single();
 
   if (error) {
-    throw new Error(`Failed to upsert YouTube channel metadata: ${error.message}`);
+    throw new Error(
+      `Failed to upsert YouTube channel metadata: ${error.message}`
+    );
   }
 
   return data as unknown as YouTubeChannelMetadata;

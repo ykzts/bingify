@@ -45,23 +45,21 @@ export interface TwitchBroadcasterMetadata {
 /**
  * ソーシャルメタデータの統一型（YouTubeまたはTwitch）
  */
-export type SocialMetadata =
-  | YouTubeChannelMetadata
-  | TwitchBroadcasterMetadata;
+export type SocialMetadata = YouTubeChannelMetadata | TwitchBroadcasterMetadata;
 
 /**
  * YouTubeチャンネルメタデータの挿入/更新用の型
  */
 export interface YouTubeChannelInsert {
   channel_id: string;
-  channel_title?: string;
-  created_by?: string;
-  custom_url?: string;
-  description?: string;
-  fetch_error?: string;
+  channel_title?: string | null;
+  created_by?: string | null;
+  custom_url?: string | null;
+  description?: string | null;
+  fetch_error?: string | null;
   fetched_at?: string;
-  handle?: string;
-  thumbnail_url?: string;
+  handle?: string | null;
+  thumbnail_url?: string | null;
 }
 
 /**
@@ -69,13 +67,13 @@ export interface YouTubeChannelInsert {
  */
 export interface TwitchBroadcasterInsert {
   broadcaster_id: string;
-  created_by?: string;
-  description?: string;
-  display_name?: string;
-  fetch_error?: string;
+  created_by?: string | null;
+  description?: string | null;
+  display_name?: string | null;
+  fetch_error?: string | null;
   fetched_at?: string;
-  profile_image_url?: string;
-  username?: string;
+  profile_image_url?: string | null;
+  username?: string | null;
 }
 
 /**

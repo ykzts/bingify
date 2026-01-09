@@ -389,6 +389,93 @@ export type Database = {
         }
         Relationships: []
       }
+      twitch_broadcasters: {
+        Row: {
+          broadcaster_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          display_name: string | null
+          fetch_error: string | null
+          fetched_at: string
+          id: string
+          profile_image_url: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          broadcaster_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_name?: string | null
+          fetch_error?: string | null
+          fetched_at?: string
+          id?: string
+          profile_image_url?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          broadcaster_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_name?: string | null
+          fetch_error?: string | null
+          fetched_at?: string
+          id?: string
+          profile_image_url?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      youtube_channels: {
+        Row: {
+          channel_id: string
+          channel_title: string | null
+          created_at: string
+          created_by: string | null
+          custom_url: string | null
+          description: string | null
+          fetch_error: string | null
+          fetched_at: string
+          handle: string | null
+          id: string
+          thumbnail_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          channel_id: string
+          channel_title?: string | null
+          created_at?: string
+          created_by?: string | null
+          custom_url?: string | null
+          description?: string | null
+          fetch_error?: string | null
+          fetched_at?: string
+          handle?: string | null
+          id?: string
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          channel_id?: string
+          channel_title?: string | null
+          created_at?: string
+          created_by?: string | null
+          custom_url?: string | null
+          description?: string | null
+          fetch_error?: string | null
+          fetched_at?: string
+          handle?: string | null
+          id?: string
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
