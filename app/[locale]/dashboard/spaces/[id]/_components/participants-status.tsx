@@ -56,17 +56,17 @@ interface ParticipantUpdate {
 function showStatusNotification(
   participant: Participant,
   newStatus: "none" | "reach" | "bingo",
-  t: (key: string) => string
+  t: (key: string, values?: Record<string, string>) => string
 ): void {
   const displayName =
     participant?.profiles?.full_name || t("participantGuestName");
 
   if (newStatus === "bingo") {
-    toast.success(`${displayName} got BINGO!`, {
+    toast.success(t("notificationBingo", { name: displayName }), {
       duration: 5000,
     });
   } else if (newStatus === "reach") {
-    toast.info(`${displayName} has REACH!`, {
+    toast.info(t("notificationReach", { name: displayName }), {
       duration: 3000,
     });
   }

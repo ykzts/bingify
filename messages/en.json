@@ -199,6 +199,8 @@
     "loadingCard": "Loading card...",
     "loadingParticipants": "Loading participants...",
     "noParticipants": "No participants yet",
+    "notificationBingo": "{name} got BINGO!",
+    "notificationReach": "{name} has REACH!",
     "numberCalledSuccess": "Called number {number}",
     "participantCardTitle": "{name}'s Card",
     "participantGuestName": "Guest user",
