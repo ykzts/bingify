@@ -99,7 +99,7 @@ export async function selectAvatar(
     }
 
     // キャッシュを再検証
-    revalidatePath("/[locale]/settings/account", "page");
+    revalidatePath("/[locale]/settings/avatar", "page");
 
     return {
       success: true,
@@ -224,7 +224,7 @@ export async function uploadAvatarAction(
     }
 
     // キャッシュを再検証
-    revalidatePath("/[locale]/settings/account", "page");
+    revalidatePath("/[locale]/settings/avatar", "page");
 
     return {
       data: {

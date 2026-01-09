@@ -55,7 +55,7 @@ export function UserHeader({ user }: UserHeaderProps) {
       <Link
         aria-label={t("settings")}
         className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm transition hover:bg-gray-50"
-        href="/settings/account"
+        href="/settings/profile"
       >
         <Settings className="h-4 w-4" />
         {t("settings")}

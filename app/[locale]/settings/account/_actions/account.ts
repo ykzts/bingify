@@ -333,7 +333,7 @@ export async function changeEmailAction(
       {
         emailRedirectTo: getAbsoluteUrl(
           getPathname({
-            href: "/settings/account",
+            href: "/settings/profile",
             locale,
           })
         ),

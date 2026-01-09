@@ -618,7 +618,7 @@ export function SpaceSettingsForm({
                     accountLink: (chunks) => (
                       <Link
                         className="font-medium underline underline-offset-4"
-                        href="/settings/account"
+                        href="/settings/profile"
                       >
                         {chunks}
                       </Link>
