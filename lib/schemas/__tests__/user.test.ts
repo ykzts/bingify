@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { usernameSchema } from "../user";
+import { emailChangeSchema, usernameSchema } from "../user";
 
 describe("Username Schema", () => {
   it("有効なユーザー名を受け入れる", () => {
@@ -35,5 +35,80 @@ describe("Username Schema", () => {
   it("トリム後に空白のみのユーザー名を拒否する", () => {
     const result = usernameSchema.safeParse({ username: "   " });
     expect(result.success).toBe(false);
+  });
+});
+
+describe("Email Change Schema", () => {
+  it("有効なメールアドレスを受け入れる", () => {
+    const result = emailChangeSchema.safeParse({
+      email: "user@example.com",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("複雑なメールアドレスを受け入れる", () => {
+    const result = emailChangeSchema.safeParse({
+      email: "user.name+tag@subdomain.example.co.jp",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("空のメールアドレスを拒否する", () => {
+    const result = emailChangeSchema.safeParse({ email: "" });
+    expect(result.success).toBe(false);
+  });
+
+  it("無効な形式のメールアドレスを拒否する", () => {
+    const invalidEmails = [
+      "invalid",
+      "invalid@",
+      "@example.com",
+      "invalid@.com",
+      "invalid..email@example.com",
+    ];
+
+    for (const email of invalidEmails) {
+      const result = emailChangeSchema.safeParse({ email });
+      expect(result.success).toBe(false);
+    }
+  });
+
+  it("255文字を超えるメールアドレスを拒否する", () => {
+    const longEmail = `${"a".repeat(250)}@example.com`;
+    const result = emailChangeSchema.safeParse({ email: longEmail });
+    expect(result.success).toBe(false);
+  });
+
+  it("ちょうど255文字のメールアドレスを受け入れる", () => {
+    // Create an email that is exactly 255 characters
+    // Format: localpart@domain.com
+    const localPart = "a".repeat(243); // 243 + 1(@) + 11(example.com) = 255
+    const email = `${localPart}@example.com`;
+    expect(email.length).toBe(255);
+
+    const result = emailChangeSchema.safeParse({ email });
+    expect(result.success).toBe(true);
+  });
+
+  it("メールアドレスから空白をトリムする", () => {
+    const result = emailChangeSchema.safeParse({
+      email: "  user@example.com  ",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.email).toBe("user@example.com");
+    }
+  });
+
+  it("トリム後に空白のみのメールアドレスを拒否する", () => {
+    const result = emailChangeSchema.safeParse({ email: "   " });
+    expect(result.success).toBe(false);
+  });
+
+  it("大文字小文字を含むメールアドレスを受け入れる", () => {
+    const result = emailChangeSchema.safeParse({
+      email: "User.Name@Example.COM",
+    });
+    expect(result.success).toBe(true);
   });
 });
