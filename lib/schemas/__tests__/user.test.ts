@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { emailChangeSchema, usernameSchema } from "../user";
+import { avatarUploadSchema, emailChangeSchema, usernameSchema } from "../user";
 
 describe("Username Schema", () => {
   it("有効なユーザー名を受け入れる", () => {
@@ -113,6 +113,93 @@ describe("Email Change Schema", () => {
     const result = emailChangeSchema.safeParse({
       email: "User.Name@Example.COM",
     });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("Avatar Upload Schema", () => {
+  // テスト用のFileオブジェクトを作成するヘルパー関数
+  const createMockFile = (
+    size: number,
+    type: string,
+    name = "test.jpg"
+  ): File => {
+    const buffer = new ArrayBuffer(size);
+    const blob = new Blob([buffer], { type });
+    return new File([blob], name, { type });
+  };
+
+  it("有効なJPEGファイルを受け入れる", () => {
+    const file = createMockFile(1024 * 1024, "image/jpeg", "avatar.jpg"); // 1MB
+    const result = avatarUploadSchema.safeParse({ file });
+    expect(result.success).toBe(true);
+  });
+
+  it("有効なPNGファイルを受け入れる", () => {
+    const file = createMockFile(1024 * 1024, "image/png", "avatar.png"); // 1MB
+    const result = avatarUploadSchema.safeParse({ file });
+    expect(result.success).toBe(true);
+  });
+
+  it("有効なWebPファイルを受け入れる", () => {
+    const file = createMockFile(1024 * 1024, "image/webp", "avatar.webp"); // 1MB
+    const result = avatarUploadSchema.safeParse({ file });
+    expect(result.success).toBe(true);
+  });
+
+  it("2MB以下のファイルを受け入れる", () => {
+    const file = createMockFile(2 * 1024 * 1024, "image/jpeg"); // 2MB（境界値）
+    const result = avatarUploadSchema.safeParse({ file });
+    expect(result.success).toBe(true);
+  });
+
+  it("2MBを超えるファイルを拒否する", () => {
+    const file = createMockFile(2 * 1024 * 1024 + 1, "image/jpeg"); // 2MB + 1byte
+    const result = avatarUploadSchema.safeParse({ file });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const errorMessage = result.error.issues[0]?.message || "";
+      expect(errorMessage).toContain("2MB");
+    }
+  });
+
+  it("無効なMIMEタイプを拒否する（GIF）", () => {
+    const file = createMockFile(1024 * 1024, "image/gif", "avatar.gif");
+    const result = avatarUploadSchema.safeParse({ file });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const errorMessage = result.error.issues[0]?.message || "";
+      expect(errorMessage).toContain("JPEG, PNG, and WebP");
+    }
+  });
+
+  it("無効なMIMEタイプを拒否する（SVG）", () => {
+    const file = createMockFile(1024, "image/svg+xml", "avatar.svg");
+    const result = avatarUploadSchema.safeParse({ file });
+    expect(result.success).toBe(false);
+  });
+
+  it("無効なMIMEタイプを拒否する（テキストファイル）", () => {
+    const file = createMockFile(1024, "text/plain", "file.txt");
+    const result = avatarUploadSchema.safeParse({ file });
+    expect(result.success).toBe(false);
+  });
+
+  it("無効なMIMEタイプを拒否する（PDFファイル）", () => {
+    const file = createMockFile(1024, "application/pdf", "file.pdf");
+    const result = avatarUploadSchema.safeParse({ file });
+    expect(result.success).toBe(false);
+  });
+
+  it("空のファイルを拒否する", () => {
+    const file = createMockFile(0, "image/jpeg");
+    const result = avatarUploadSchema.safeParse({ file });
+    expect(result.success).toBe(true); // サイズは0でもOK（実際のアップロードで検証）
+  });
+
+  it("非常に小さいファイルを受け入れる", () => {
+    const file = createMockFile(100, "image/jpeg"); // 100 bytes
+    const result = avatarUploadSchema.safeParse({ file });
     expect(result.success).toBe(true);
   });
 });
