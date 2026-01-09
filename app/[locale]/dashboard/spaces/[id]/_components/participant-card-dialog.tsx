@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Eye } from "lucide-react";
+import { Eye, PartyPopper, Zap } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { BingoCard } from "@/components/bingo/bingo-card";
@@ -124,12 +124,14 @@ export function ParticipantCardDialog({
             <div className="flex items-center justify-center gap-2">
               {bingoCheckResult.hasBingo && (
                 <Badge className="bg-yellow-500 text-white hover:bg-yellow-600">
-                  🎉 {tUser("bingo")}
+                  <PartyPopper aria-hidden="true" className="mr-1 size-3" />
+                  {tUser("bingo")}
                 </Badge>
               )}
               {!bingoCheckResult.hasBingo && bingoCheckResult.hasReach && (
                 <Badge className="bg-orange-500 text-white hover:bg-orange-600">
-                  ⚡ {t("reachCount", { count: reachCount })}
+                  <Zap aria-hidden="true" className="mr-1 size-3" />
+                  {t("reachCount", { count: reachCount })}
                 </Badge>
               )}
             </div>
