@@ -1,6 +1,8 @@
 {
   "AccountSettings": {
+    "avatarTab": "Avatar",
     "connect": "Connect",
+    "connectionsTab": "Connected Accounts",
     "description": "Link multiple accounts to access your spaces from different providers.",
     "disconnect": "Disconnect",
     "errorGeneric": "An unexpected error occurred",
@@ -12,6 +14,7 @@
     "linkedEmail": "Linked Email",
     "note": "After linking accounts, you can sign in with any of them. You must keep at least one account linked.",
     "processing": "Processing...",
+    "profileTab": "Profile",
     "registeredEmail": "Registered Email Address",
     "statusLinked": "Linked",
     "statusNotLinked": "Not linked",

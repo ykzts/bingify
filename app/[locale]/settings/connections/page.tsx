@@ -1,0 +1,72 @@
+import { setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
+import { redirect } from "@/i18n/navigation";
+import { getSystemSettings } from "@/lib/data/system-settings";
+import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
+import { createClient } from "@/lib/supabase/server";
+import { AccountLinkingForm } from "./_components/account-linking-form";
+
+async function ConnectionsSettingsContent({ locale }: { locale: string }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect({
+      href: `/login?redirect=${encodeURIComponent("/settings/connections")}`,
+      locale,
+    });
+    return;
+  }
+
+  // Fetch system settings for OAuth scope configuration
+  const systemSettingsResult = await getSystemSettings();
+
+  if (systemSettingsResult.error) {
+    console.error(
+      "Error fetching system settings:",
+      systemSettingsResult.error
+    );
+  }
+
+  if (
+    systemSettingsResult.warnings &&
+    systemSettingsResult.warnings.length > 0
+  ) {
+    console.warn("System settings warnings:", systemSettingsResult.warnings);
+  }
+
+  const systemSettings =
+    systemSettingsResult.settings || DEFAULT_SYSTEM_SETTINGS;
+
+  return (
+    <div className="space-y-8">
+      <AccountLinkingForm systemSettings={systemSettings} user={user} />
+    </div>
+  );
+}
+
+export default async function ConnectionsSettingsPage({
+  params,
+}: PageProps<"/[locale]/settings/connections">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  return (
+    <Suspense
+      fallback={
+        // biome-ignore lint/a11y/useSemanticElements: role="status" is appropriate for loading indicators
+        <div
+          aria-label="Loading"
+          className="flex items-center justify-center py-12"
+          role="status"
+        >
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
+        </div>
+      }
+    >
+      <ConnectionsSettingsContent locale={locale} />
+    </Suspense>
+  );
+}

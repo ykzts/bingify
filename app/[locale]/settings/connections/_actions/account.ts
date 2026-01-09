@@ -4,6 +4,7 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
+import { revalidatePath } from "next/cache";
 import { getLocale } from "next-intl/server";
 import { getPathname } from "@/i18n/navigation";
 import { emailChangeSchema, usernameSchema } from "@/lib/schemas/user";
@@ -66,6 +67,14 @@ export async function unlinkIdentity(
         success: false,
       };
     }
+
+    // Invalidate the connections settings page cache
+    const locale = await getLocale();
+    const connectionsPath = getPathname({
+      href: "/settings/connections",
+      locale,
+    });
+    revalidatePath(connectionsPath);
 
     return {
       success: true,

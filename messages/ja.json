@@ -1,6 +1,8 @@
 {
   "AccountSettings": {
+    "avatarTab": "アバター",
     "connect": "連携する",
+    "connectionsTab": "連携アカウント",
     "description": "複数のアカウントを連携して、異なるプロバイダーからスペースにアクセスできます。",
     "disconnect": "連携解除",
     "errorGeneric": "予期しないエラーが発生しました",
@@ -12,6 +14,7 @@
     "linkedEmail": "連携されたメールアドレス",
     "note": "アカウントを連携すると、いずれかのアカウントでログインできます。最低1つのアカウントは連携したままにする必要があります。",
     "processing": "処理中...",
+    "profileTab": "プロフィール",
     "registeredEmail": "登録メールアドレス",
     "statusLinked": "連携済み",
     "statusNotLinked": "未連携",

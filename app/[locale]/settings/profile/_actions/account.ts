@@ -4,6 +4,7 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
+import { revalidatePath } from "next/cache";
 import { getLocale } from "next-intl/server";
 import { getPathname } from "@/i18n/navigation";
 import { emailChangeSchema, usernameSchema } from "@/lib/schemas/user";
@@ -149,6 +150,8 @@ export async function updateUsernameAction(
     }
 
     // Update the username in the database
+    // Note: Currently using full_name to store username as the schema
+    // lacks a dedicated username column. TODO: Add username column and migrate data.
     const { error } = await supabase
       .from("profiles")
       .update({
@@ -163,6 +166,9 @@ export async function updateUsernameAction(
         errors: ["errorUpdateFailed"],
       };
     }
+
+    // Invalidate the profile settings page cache
+    revalidatePath("/settings/profile");
 
     // Return success state
     return {
@@ -347,6 +353,9 @@ export async function changeEmailAction(
         errors: ["errorUpdateFailed"],
       };
     }
+
+    // Invalidate the profile settings page cache
+    await revalidatePath(getPathname({ href: "/settings/profile", locale }));
 
     // Return success state
     return {
