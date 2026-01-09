@@ -37,7 +37,27 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
     systemSettingsResult.settings || DEFAULT_SYSTEM_SETTINGS;
 
   // Fetch available avatars
-  const { data: availableAvatars } = await getAvailableAvatars(user.id);
+  const { data: availableAvatars, error: avatarsError } =
+    await getAvailableAvatars(user.id);
+
+  if (avatarsError) {
+    console.error("Error fetching available avatars:", avatarsError);
+  }
+
+  // Validate avatar_source and provide safe fallback
+  const allowedSources: Array<"google" | "twitch" | "upload" | "default"> = [
+    "google",
+    "twitch",
+    "upload",
+    "default",
+  ];
+  const safeCurrentAvatarSource: "google" | "twitch" | "upload" | "default" =
+    profile?.avatar_source &&
+    allowedSources.includes(
+      profile.avatar_source as "google" | "twitch" | "upload" | "default"
+    )
+      ? (profile.avatar_source as "google" | "twitch" | "upload" | "default")
+      : "default";
 
   return (
     <div className="space-y-8">
@@ -47,15 +67,7 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
       {availableAvatars && availableAvatars.length > 0 && (
         <AvatarSelectionForm
           availableAvatars={availableAvatars}
-          currentAvatarSource={
-            (profile?.avatar_source as
-              | "google"
-              | "twitch"
-              | "github"
-              | "discord"
-              | "upload"
-              | "default") || "default"
-          }
+          currentAvatarSource={safeCurrentAvatarSource}
         />
       )}
     </div>

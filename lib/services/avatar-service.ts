@@ -1,19 +1,21 @@
-import type { Provider } from "@/components/providers/provider-icon";
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * アバターのソース種別
- * 注: Provider型にはgithubとdiscordも含まれていますが、
- * 現在の実装ではgoogleとtwitchのみサポートしています
+ * サポートされているOAuthプロバイダー
  */
-export type AvatarSource = Provider | "upload" | "default";
+export type SupportedProvider = "google" | "twitch";
+
+/**
+ * アバターのソース種別
+ */
+export type AvatarSource = SupportedProvider | "upload" | "default";
 
 /**
  * 利用可能なアバター情報
  */
 export interface AvailableAvatar {
   avatar_url: string;
-  provider: Provider;
+  provider: SupportedProvider;
 }
 
 /**
@@ -28,18 +30,23 @@ export async function setActiveAvatar(
   try {
     const supabase = await createClient();
 
+    // 認証チェック: 呼び出し元が自分のアバターを変更しているか確認
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { error: "Unauthorized", success: false };
+    }
+
+    if (user.id !== userId) {
+      return { error: "Unauthorized", success: false };
+    }
+
     // 選択されたソースがプロバイダーの場合、identityからアバターURLを取得
     let avatarUrl: string | null = null;
 
     if (source !== "default" && source !== "upload") {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        return { error: "User not found", success: false };
-      }
-
       const identity = user.identities?.find((id) => id.provider === source);
 
       if (!identity) {
@@ -108,7 +115,7 @@ export async function getAvailableAvatars(
         if (avatarUrl) {
           availableAvatars.push({
             avatar_url: avatarUrl,
-            provider: identity.provider as Provider,
+            provider: identity.provider as SupportedProvider,
           });
         }
       }

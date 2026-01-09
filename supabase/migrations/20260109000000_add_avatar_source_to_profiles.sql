@@ -1,10 +1,10 @@
 -- profiles テーブルに avatar_source カラムを追加
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_source TEXT 
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_source TEXT 
   CHECK (avatar_source IN ('google', 'twitch', 'upload', 'default')) 
   DEFAULT 'default';
 
 -- インデックスの作成
-CREATE INDEX IF NOT EXISTS idx_profiles_avatar_source ON profiles(avatar_source);
+CREATE INDEX IF NOT EXISTS idx_profiles_avatar_source ON public.profiles(avatar_source);
 
 -- handle_new_user 関数を更新してアバターソースを保存
 CREATE OR REPLACE FUNCTION handle_new_user()
@@ -38,7 +38,10 @@ BEGIN
 
   -- プロバイダーとアバターURLを取得
   user_provider := NEW.raw_app_meta_data->>'provider';
-  user_avatar_url := NEW.raw_user_meta_data->>'avatar_url';
+  user_avatar_url := COALESCE(
+    NEW.raw_user_meta_data->>'avatar_url',
+    NEW.raw_user_meta_data->>'picture'
+  );
 
   -- avatar_source を計算
   computed_avatar_source := CASE 

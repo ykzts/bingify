@@ -6,23 +6,20 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
   getProviderLabel,
-  type Provider,
   ProviderIcon,
 } from "@/components/providers/provider-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import type { AvatarSource } from "@/lib/services/avatar-service";
+import type {
+  AvailableAvatar,
+  AvatarSource,
+} from "@/lib/services/avatar-service";
 import { selectAvatar } from "../_actions/avatar";
 
-interface ProviderAvatar {
-  avatar_url: string;
-  provider: Provider;
-}
-
 interface AvatarSelectionFormProps {
-  availableAvatars: ProviderAvatar[];
+  availableAvatars: AvailableAvatar[];
   currentAvatarSource: AvatarSource;
 }
 
