@@ -88,7 +88,7 @@
     "overviewWarningNote1": "• Space deletion is irreversible (but archived)",
     "overviewWarningNote2": "• User ban completely deletes the account",
     "overviewWarningNote3": "• Perform all operations with care",
-    "overviewWarningTitle": "⚠️ Warning",
+    "overviewWarningTitle": "Warning",
     "paginationNext": "Next",
     "paginationPrevious": "Previous",
     "processing": "Processing...",
@@ -529,7 +529,7 @@
     "subtitle": "Initial Administrator Setup",
     "title": "Welcome to Bingify",
     "warningMessage": "This action can only be performed once. After claiming admin role, this setup page will no longer be accessible.",
-    "warningTitle": "⚠️ Important",
+    "warningTitle": "Important",
     "welcomeMessage": "Welcome! No administrator has been set up yet. Click the button below to register yourself as the first administrator."
   },
   "SpaceLanding": {

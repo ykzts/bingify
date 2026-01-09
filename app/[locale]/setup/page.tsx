@@ -1,3 +1,4 @@
+import { AlertTriangle } from "lucide-react";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { useTranslations } from "next-intl";
@@ -60,7 +61,8 @@ function SetupContent() {
       <ClaimAdminButton />
 
       <div className="mt-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-        <p className="font-semibold text-sm text-yellow-800">
+        <p className="flex items-center gap-2 font-semibold text-sm text-yellow-800">
+          <AlertTriangle aria-hidden="true" className="size-4" />
           {t("warningTitle")}
         </p>
         <p className="mt-1 text-sm text-yellow-700">{t("warningMessage")}</p>

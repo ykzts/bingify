@@ -1,3 +1,4 @@
+import { AlertTriangle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
@@ -51,7 +52,8 @@ function WarningSection() {
 
   return (
     <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-      <h3 className="mb-2 font-semibold text-yellow-800">
+      <h3 className="mb-2 flex items-center gap-2 font-semibold text-yellow-800">
+        <AlertTriangle aria-hidden="true" className="size-5" />
         {t("overviewWarningTitle")}
       </h3>
       <ul className="space-y-1 text-sm text-yellow-700">
