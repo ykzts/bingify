@@ -1,12 +1,8 @@
 import { youtube_v3 } from "@googleapis/youtube";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { OAuth2Client } from "google-auth-library";
-import type {
-  YouTubeChannelInsert,
-  YouTubeChannelMetadata,
-} from "@/lib/types/social-metadata";
 import { shouldRefreshMetadata } from "@/lib/types/social-metadata";
-import type { Database } from "@/types/supabase";
+import type { Database, Tables, TablesInsert } from "@/types/supabase";
 
 /**
  * OAuthアクセストークンからOAuth2Clientを作成する
@@ -25,7 +21,7 @@ function createOAuth2ClientFromToken(accessToken: string): OAuth2Client {
 async function fetchYouTubeChannelDetails(
   channelId: string,
   accessToken: string
-): Promise<YouTubeChannelInsert> {
+): Promise<TablesInsert<"youtube_channels">> {
   const oauth2Client = createOAuth2ClientFromToken(accessToken);
   const youtube = new youtube_v3.Youtube({
     auth: oauth2Client,
@@ -66,7 +62,7 @@ async function fetchYouTubeChannelDetails(
 export async function getYouTubeChannelMetadata(
   supabase: SupabaseClient<Database>,
   channelId: string
-): Promise<YouTubeChannelMetadata | null> {
+): Promise<Tables<"youtube_channels"> | null> {
   const { data, error } = await supabase
     .from("youtube_channels")
     .select("*")
@@ -85,8 +81,8 @@ export async function getYouTubeChannelMetadata(
  */
 export async function upsertYouTubeChannelMetadata(
   supabase: SupabaseClient<Database>,
-  metadata: YouTubeChannelInsert
-): Promise<YouTubeChannelMetadata> {
+  metadata: TablesInsert<"youtube_channels">
+): Promise<Tables<"youtube_channels">> {
   const { data, error } = await supabase
     .from("youtube_channels")
     .upsert(
@@ -120,7 +116,7 @@ export async function fetchAndCacheYouTubeChannelMetadata(
   channelId: string,
   accessToken: string,
   userId?: string
-): Promise<YouTubeChannelMetadata> {
+): Promise<Tables<"youtube_channels">> {
   // まずDBをチェック
   const cached = await getYouTubeChannelMetadata(supabase, channelId);
 
@@ -146,7 +142,7 @@ export async function fetchAndCacheYouTubeChannelMetadata(
     return await upsertYouTubeChannelMetadata(supabase, metadata);
   } catch (error) {
     // エラーが発生した場合は、エラー情報を保存
-    const errorMetadata: YouTubeChannelInsert = {
+    const errorMetadata: TablesInsert<"youtube_channels"> = {
       channel_id: channelId,
       fetch_error: error instanceof Error ? error.message : "Unknown error",
       fetched_at: new Date().toISOString(),
@@ -171,7 +167,7 @@ export async function fetchAndCacheYouTubeChannelMetadata(
  * YouTubeチャンネルメタデータを表示用の文字列に変換
  */
 export function formatYouTubeChannelDisplay(
-  metadata: YouTubeChannelMetadata
+  metadata: Tables<"youtube_channels">
 ): string {
   const handle = metadata.handle || "";
   const channelId = metadata.channel_id;

@@ -1,12 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
-import type {
-  TwitchBroadcasterInsert,
-  TwitchBroadcasterMetadata,
-} from "@/lib/types/social-metadata";
 import { shouldRefreshMetadata } from "@/lib/types/social-metadata";
-import type { Database } from "@/types/supabase";
+import type { Database, Tables, TablesInsert } from "@/types/supabase";
 
 /**
  * Twurple API clientを作成
@@ -27,7 +23,7 @@ function createApiClient(appAccessToken: string): ApiClient {
 async function fetchTwitchBroadcasterDetails(
   broadcasterId: string,
   appAccessToken: string
-): Promise<TwitchBroadcasterInsert> {
+): Promise<TablesInsert<"twitch_broadcasters">> {
   const apiClient = createApiClient(appAccessToken);
   const user = await apiClient.users.getUserById(broadcasterId);
 
@@ -51,7 +47,7 @@ async function fetchTwitchBroadcasterDetails(
 export async function getTwitchBroadcasterMetadata(
   supabase: SupabaseClient<Database>,
   broadcasterId: string
-): Promise<TwitchBroadcasterMetadata | null> {
+): Promise<Tables<"twitch_broadcasters"> | null> {
   const { data, error } = await supabase
     .from("twitch_broadcasters")
     .select("*")
@@ -70,8 +66,8 @@ export async function getTwitchBroadcasterMetadata(
  */
 export async function upsertTwitchBroadcasterMetadata(
   supabase: SupabaseClient<Database>,
-  metadata: TwitchBroadcasterInsert
-): Promise<TwitchBroadcasterMetadata> {
+  metadata: TablesInsert<"twitch_broadcasters">
+): Promise<Tables<"twitch_broadcasters">> {
   const { data, error } = await supabase
     .from("twitch_broadcasters")
     .upsert(
@@ -105,7 +101,7 @@ export async function fetchAndCacheTwitchBroadcasterMetadata(
   broadcasterId: string,
   appAccessToken: string,
   userId?: string
-): Promise<TwitchBroadcasterMetadata> {
+): Promise<Tables<"twitch_broadcasters">> {
   // まずDBをチェック
   const cached = await getTwitchBroadcasterMetadata(supabase, broadcasterId);
 
@@ -134,7 +130,7 @@ export async function fetchAndCacheTwitchBroadcasterMetadata(
     return await upsertTwitchBroadcasterMetadata(supabase, metadata);
   } catch (error) {
     // エラーが発生した場合は、エラー情報を保存
-    const errorMetadata: TwitchBroadcasterInsert = {
+    const errorMetadata: TablesInsert<"twitch_broadcasters"> = {
       broadcaster_id: broadcasterId,
       fetch_error: error instanceof Error ? error.message : "Unknown error",
       fetched_at: new Date().toISOString(),
@@ -159,7 +155,7 @@ export async function fetchAndCacheTwitchBroadcasterMetadata(
  * Twitchブロードキャスターメタデータを表示用の文字列に変換
  */
 export function formatTwitchBroadcasterDisplay(
-  metadata: TwitchBroadcasterMetadata
+  metadata: Tables<"twitch_broadcasters">
 ): string {
   const username = metadata.username || "";
   const broadcasterId = metadata.broadcaster_id;

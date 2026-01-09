@@ -1,38 +1,3 @@
-import type { Database } from "@/types/supabase";
-
-/**
- * YouTubeチャンネルのメタデータ型定義
- * Supabaseの自動生成型を再エクスポート
- */
-export type YouTubeChannelMetadata =
-  Database["public"]["Tables"]["youtube_channels"]["Row"];
-
-/**
- * Twitchブロードキャスターのメタデータ型定義
- * Supabaseの自動生成型を再エクスポート
- */
-export type TwitchBroadcasterMetadata =
-  Database["public"]["Tables"]["twitch_broadcasters"]["Row"];
-
-/**
- * ソーシャルメタデータの統一型（YouTubeまたはTwitch）
- */
-export type SocialMetadata = YouTubeChannelMetadata | TwitchBroadcasterMetadata;
-
-/**
- * YouTubeチャンネルメタデータの挿入用の型
- * Supabaseの自動生成型を再エクスポート
- */
-export type YouTubeChannelInsert =
-  Database["public"]["Tables"]["youtube_channels"]["Insert"];
-
-/**
- * Twitchブロードキャスターメタデータの挿入用の型
- * Supabaseの自動生成型を再エクスポート
- */
-export type TwitchBroadcasterInsert =
-  Database["public"]["Tables"]["twitch_broadcasters"]["Insert"];
-
 /**
  * メタデータのキャッシュ有効期間（ミリ秒）
  * デフォルトは24時間
