@@ -42,7 +42,16 @@ export async function setActiveAvatar(
     // 選択されたソースがプロバイダーの場合、identityからアバターURLを取得
     let avatarUrl: string | null = null;
 
-    if (source !== "default" && source !== "upload") {
+    if (source === "upload") {
+      // アップロードソースの場合、既存の avatar_url を保持
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("avatar_url")
+        .eq("id", userId)
+        .single();
+
+      avatarUrl = profile?.avatar_url || null;
+    } else if (source !== "default") {
       const identity = user.identities?.find((id) => id.provider === source);
 
       if (!identity) {
@@ -120,6 +129,53 @@ export async function getAvailableAvatars(
     return { data: availableAvatars, error: null };
   } catch (error) {
     console.error("Error in getAvailableAvatars:", error);
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * アップロードされたアバターがあるか確認
+ * @param userId - ユーザーID
+ */
+export async function hasUploadedAvatar(
+  userId: string
+): Promise<{ data: { avatar_url: string } | null; error: string | null }> {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user || user.id !== userId) {
+      return { data: null, error: "Unauthorized" };
+    }
+
+    // profiles テーブルから avatar_source が 'upload' のレコードを取得
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("avatar_url, avatar_source")
+      .eq("id", userId)
+      .single();
+
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+      return { data: null, error: profileError.message };
+    }
+
+    if (profile?.avatar_source === "upload" && profile.avatar_url) {
+      return {
+        data: { avatar_url: profile.avatar_url },
+        error: null,
+      };
+    }
+
+    return { data: null, error: null };
+  } catch (error) {
+    console.error("Error in hasUploadedAvatar:", error);
     return {
       data: null,
       error: error instanceof Error ? error.message : "Unknown error",
