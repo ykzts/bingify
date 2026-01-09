@@ -543,13 +543,6 @@ const twitchMetadata = await fetchAndCacheTwitchBroadcasterMetadata(
 const displayText = formatTwitchBroadcasterDisplay(twitchMetadata);
 ```
 
-### 今後の拡張
-
-- UI でのタグ形式表示（`@handle (ID) ×` 形式）
-- 削除ボタン（×）の実装
-- スペース公開ページでのリッチな情報表示（チャンネル名、アイコンなど）
-- デフォルト要件値の変更（選択時に自動的に "subscriber" / "follower" を設定）
-
 ## 参考リンク
 
 - [Supabase CLI ドキュメント](https://supabase.com/docs/guides/cli)
