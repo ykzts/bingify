@@ -12,7 +12,10 @@ async function ProfileSettingsContent({ locale }: { locale: string }) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect({ href: "/login?redirect=/settings/profile", locale });
+    redirect({
+      href: `/login?redirect=${encodeURIComponent("/settings/profile")}`,
+      locale,
+    });
     return null;
   }
 
@@ -23,7 +26,7 @@ async function ProfileSettingsContent({ locale }: { locale: string }) {
     .single();
 
   if (profileError) {
-    console.error("Error fetching profile for user", user.id, profileError);
+    console.error("Error fetching profile:", profileError);
   }
 
   return (

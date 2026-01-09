@@ -13,12 +13,30 @@ async function ConnectionsSettingsContent({ locale }: { locale: string }) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect({ href: "/login?redirect=/settings/connections", locale });
+    redirect({
+      href: `/login?redirect=${encodeURIComponent("/settings/connections")}`,
+      locale,
+    });
     return null;
   }
 
   // Fetch system settings for OAuth scope configuration
   const systemSettingsResult = await getSystemSettings();
+
+  if (systemSettingsResult.error) {
+    console.error(
+      "Error fetching system settings:",
+      systemSettingsResult.error
+    );
+  }
+
+  if (
+    systemSettingsResult.warnings &&
+    systemSettingsResult.warnings.length > 0
+  ) {
+    console.warn("System settings warnings:", systemSettingsResult.warnings);
+  }
+
   const systemSettings =
     systemSettingsResult.settings || DEFAULT_SYSTEM_SETTINGS;
 

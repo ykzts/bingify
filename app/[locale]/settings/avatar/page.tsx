@@ -13,7 +13,10 @@ async function AvatarSettingsContent({ locale }: { locale: string }) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect({ href: "/login?redirect=/settings/avatar", locale });
+    redirect({
+      href: `/login?redirect=${encodeURIComponent("/settings/avatar")}`,
+      locale,
+    });
     return null;
   }
 
@@ -24,7 +27,7 @@ async function AvatarSettingsContent({ locale }: { locale: string }) {
     .single();
 
   if (profileError) {
-    console.error("Error fetching profile for user", user.id, profileError);
+    console.error("Error fetching profile:", profileError);
   }
 
   // Fetch available avatars
