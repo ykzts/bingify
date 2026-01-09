@@ -194,6 +194,19 @@
     "spaceId": "Space ID",
     "viewCardButton": "View Card"
   },
+  "AvatarSettings": {
+    "defaultAvatar": "Default Avatar",
+    "description": "Select which avatar to display from your linked accounts.",
+    "errorGeneric": "An unexpected error occurred",
+    "errorInvalidSource": "Invalid avatar source selected",
+    "errorProviderNotLinked": "This provider is not linked to your account",
+    "errorUnauthorized": "Authentication required",
+    "errorUpdateFailed": "Failed to update avatar",
+    "processing": "Processing...",
+    "saveButton": "Save Avatar",
+    "successAvatarUpdated": "Avatar updated successfully",
+    "title": "Avatar Selection"
+  },
   "Contact": {
     "autoFillButton": "Fill with My Info",
     "autoFillLoginPrompt": "Please log in to auto-fill with your information",
@@ -312,6 +325,25 @@
     "updateSuccess": "Screen settings updated successfully",
     "urlTab": "URL Management",
     "viewingUrlLabel": "Public Viewing URL"
+  },
+  "EmailChangeSettings": {
+    "changeButton": "Request Email Change",
+    "changing": "Processing...",
+    "confirmationEmailSent": "Verification email has been sent to your new email address. Please click the link in the email to complete the change.",
+    "description": "Change the email address linked to your account. You will receive a confirmation link at your new email address.",
+    "emailHelp": "A verification link will be sent to this address",
+    "emailLabel": "New Email Address",
+    "emailPlaceholder": "your-new-email@example.com",
+    "errorEmailInvalid": "Please enter a valid email address",
+    "errorEmailRequired": "Email address is required",
+    "errorEmailTooLong": "Email address is too long",
+    "errorGeneric": "An unexpected error occurred",
+    "errorSameEmail": "This is your current email address",
+    "errorUnauthorized": "Authentication required",
+    "errorUpdateFailed": "Failed to request email change",
+    "title": "Email Settings",
+    "currentEmail": "Current email: {email}",
+    "noEmailRegistered": "No email address registered"
   },
   "Errors": {
     "authRequired": "Authentication required",
@@ -627,24 +659,5 @@
     "usernameHelp": "Maximum 50 characters",
     "usernameLabel": "Username",
     "usernamePlaceholder": "Enter your name"
-  },
-  "EmailChangeSettings": {
-    "changeButton": "Request Email Change",
-    "changing": "Processing...",
-    "confirmationEmailSent": "Verification email has been sent to your new email address. Please click the link in the email to complete the change.",
-    "description": "Change the email address linked to your account. You will receive a confirmation link at your new email address.",
-    "emailHelp": "A verification link will be sent to this address",
-    "emailLabel": "New Email Address",
-    "emailPlaceholder": "your-new-email@example.com",
-    "errorEmailInvalid": "Please enter a valid email address",
-    "errorEmailRequired": "Email address is required",
-    "errorEmailTooLong": "Email address is too long",
-    "errorGeneric": "An unexpected error occurred",
-    "errorSameEmail": "This is your current email address",
-    "errorUnauthorized": "Authentication required",
-    "errorUpdateFailed": "Failed to request email change",
-    "title": "Email Settings",
-    "currentEmail": "Current email: {email}",
-    "noEmailRegistered": "No email address registered"
   }
 }
