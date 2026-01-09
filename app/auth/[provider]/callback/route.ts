@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { isValidOAuthProvider } from "@/lib/oauth/provider-validation";
 import { upsertOAuthToken } from "@/lib/oauth/token-storage";
+import { updateProviderAvatar } from "@/lib/services/avatar-service";
 import { createClient } from "@/lib/supabase/server";
 import { validateRedirectPath } from "@/lib/utils/url";
 import { buildPath, getLocaleFromReferer } from "./_lib/locale";
@@ -133,6 +134,30 @@ export async function GET(
           result.error
         );
         // Continue anyway - token storage failure shouldn't block authentication
+      }
+    }
+
+    // プロバイダーアバターを更新
+    const avatarUrl = session.user?.user_metadata?.avatar_url;
+    if (
+      avatarUrl &&
+      (provider === "google" ||
+        provider === "twitch" ||
+        provider === "github" ||
+        provider === "discord")
+    ) {
+      const avatarResult = await updateProviderAvatar(
+        session.user.id,
+        provider,
+        avatarUrl
+      );
+
+      if (!avatarResult.success) {
+        console.warn(
+          `Failed to update provider avatar for ${provider}:`,
+          avatarResult.error
+        );
+        // Continue anyway - avatar update failure shouldn't block authentication
       }
     }
 

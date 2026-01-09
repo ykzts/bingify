@@ -3,8 +3,10 @@ import { Suspense } from "react";
 import { redirect } from "@/i18n/navigation";
 import { getSystemSettings } from "@/lib/data/system-settings";
 import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
+import { getAvailableAvatars } from "@/lib/services/avatar-service";
 import { createClient } from "@/lib/supabase/server";
 import { AccountLinkingForm } from "./_components/account-linking-form";
+import { AvatarSelectionForm } from "./_components/avatar-selection-form";
 import { UsernameForm } from "./_components/username-form";
 
 async function AccountSettingsContent({ locale }: { locale: string }) {
@@ -20,7 +22,7 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("full_name")
+    .select("full_name, avatar_source, avatar_url")
     .eq("id", user.id)
     .single();
 
@@ -33,10 +35,27 @@ async function AccountSettingsContent({ locale }: { locale: string }) {
   const systemSettings =
     systemSettingsResult.settings || DEFAULT_SYSTEM_SETTINGS;
 
+  // Fetch available avatars
+  const { data: availableAvatars } = await getAvailableAvatars(user.id);
+
   return (
     <div className="space-y-8">
       <UsernameForm currentUsername={profile?.full_name} />
       <AccountLinkingForm systemSettings={systemSettings} user={user} />
+      {availableAvatars && availableAvatars.length > 0 && (
+        <AvatarSelectionForm
+          availableAvatars={availableAvatars}
+          currentAvatarSource={
+            (profile?.avatar_source as
+              | "google"
+              | "twitch"
+              | "github"
+              | "discord"
+              | "upload"
+              | "default") || "default"
+          }
+        />
+      )}
     </div>
   );
 }

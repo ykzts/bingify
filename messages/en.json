@@ -626,5 +626,18 @@
     "usernameHelp": "Maximum 50 characters",
     "usernameLabel": "Username",
     "usernamePlaceholder": "Enter your name"
+  },
+  "AvatarSettings": {
+    "defaultAvatar": "Default Avatar",
+    "description": "Select which avatar to display from your linked accounts.",
+    "errorGeneric": "An unexpected error occurred",
+    "errorInvalidSource": "Invalid avatar source selected",
+    "errorProviderNotLinked": "This provider is not linked to your account",
+    "errorUnauthorized": "Authentication required",
+    "errorUpdateFailed": "Failed to update avatar",
+    "processing": "Processing...",
+    "saveButton": "Save Avatar",
+    "successAvatarUpdated": "Avatar updated successfully",
+    "title": "Avatar Selection"
   }
 }

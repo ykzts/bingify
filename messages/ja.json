@@ -626,5 +626,18 @@
     "usernameHelp": "最大50文字まで入力できます",
     "usernameLabel": "ユーザー名",
     "usernamePlaceholder": "名前を入力してください"
+  },
+  "AvatarSettings": {
+    "defaultAvatar": "デフォルトアバター",
+    "description": "連携したアカウントから表示するアバターを選択できます。",
+    "errorGeneric": "予期しないエラーが発生しました",
+    "errorInvalidSource": "無効なアバターソースが選択されました",
+    "errorProviderNotLinked": "このプロバイダーはアカウントに連携されていません",
+    "errorUnauthorized": "認証が必要です",
+    "errorUpdateFailed": "アバターの更新に失敗しました",
+    "processing": "処理中...",
+    "saveButton": "アバターを保存",
+    "successAvatarUpdated": "アバターが更新されました",
+    "title": "アバター選択"
   }
 }
