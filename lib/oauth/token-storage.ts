@@ -38,10 +38,10 @@ export interface GetTokenResult extends TokenResult {
  * Zodスキーマ: データベースから返されるトークンデータの構造
  */
 const tokenDataSchema = z.object({
-  provider: z.string(),
   access_token: z.string(),
-  refresh_token: z.string().nullable(),
   expires_at: z.string().nullable(),
+  provider: z.string(),
+  refresh_token: z.string().nullable(),
 });
 
 /**
@@ -51,12 +51,12 @@ const tokenDataSchema = z.object({
  */
 const rpcResponseSchema = z.union([
   z.object({
-    success: z.literal(true),
     data: tokenDataSchema,
+    success: z.literal(true),
   }),
   z.object({
-    success: z.literal(false),
     error: z.string().optional(),
+    success: z.literal(false),
   }),
 ]);
 
@@ -143,11 +143,11 @@ function parseTokenResponse(data: unknown): GetTokenResult {
   const tokenData = response.data;
 
   return {
-    success: true,
-    provider: tokenData.provider,
     access_token: tokenData.access_token,
-    refresh_token: tokenData.refresh_token,
     expires_at: tokenData.expires_at,
+    provider: tokenData.provider,
+    refresh_token: tokenData.refresh_token,
+    success: true,
   };
 }
 

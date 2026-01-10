@@ -1,5 +1,12 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "assist": {
+    "actions": {
+      "source": {
+        "useSortedKeys": "on"
+      }
+    }
+  },
   "extends": [
     "ultracite/biome/core",
     "ultracite/biome/next",
@@ -9,13 +16,18 @@
     "ignoreUnknown": true,
     "includes": ["!components/ui", "!supabase/templates"]
   },
+  "json": {
+    "assist": {
+      "enabled": true
+    }
+  },
   "overrides": [
     {
-      "includes": ["types/supabase.ts"],
-      "linter": {
+      "formatter": {
         "enabled": false
       },
-      "formatter": {
+      "includes": ["types/supabase.ts"],
+      "linter": {
         "enabled": false
       }
     }

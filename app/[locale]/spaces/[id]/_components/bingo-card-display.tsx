@@ -49,7 +49,7 @@ export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
     }
     return bingoCard
       ? checkBingoLines(bingoCard.numbers, calledNumbers)
-      : { hasBingo: false, hasReach: false, bingoLines: [], reachLines: [] };
+      : { bingoLines: [], hasBingo: false, hasReach: false, reachLines: [] };
   }, [bingoCard, calledNumbers]);
 
   // Use frozen called numbers for display if bingo achieved
@@ -92,8 +92,8 @@ export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
     const duration = 3000;
     const animationEnd = Date.now() + duration;
     const defaults = {
-      startVelocity: 30,
       spread: 360,
+      startVelocity: 30,
       ticks: 60,
       zIndex: 0,
     };

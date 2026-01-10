@@ -94,8 +94,8 @@ describe("getOperatorYouTubeChannelId", () => {
 
     vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
     vi.mocked(getOAuthToken).mockResolvedValue({
-      success: false,
       error: "Token not found",
+      success: false,
     });
 
     const result = await getOperatorYouTubeChannelId();
@@ -269,8 +269,8 @@ describe("getOperatorTwitchBroadcasterId", () => {
 
     vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
     vi.mocked(getOAuthToken).mockResolvedValue({
-      success: false,
       error: "Token not found",
+      success: false,
     });
 
     const result = await getOperatorTwitchBroadcasterId();

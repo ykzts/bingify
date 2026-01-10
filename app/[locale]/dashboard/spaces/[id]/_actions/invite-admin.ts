@@ -209,10 +209,10 @@ export async function inviteAdminAction(
     // Return success state
     return {
       ...initialFormState,
-      values: { email: "" }, // Reset form
       meta: {
         success: true,
       },
+      values: { email: "" }, // Reset form
     };
   } catch (e) {
     // Check if it's a ServerValidateError from TanStack Form

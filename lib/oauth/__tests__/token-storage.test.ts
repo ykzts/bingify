@@ -25,10 +25,10 @@ describe("OAuth Token Storage", () => {
       });
 
       const result = await upsertOAuthToken(mockSupabase, {
-        provider: "google",
         access_token: "test_access_token",
-        refresh_token: "test_refresh_token",
         expires_at: "2025-01-10T00:00:00Z",
+        provider: "google",
+        refresh_token: "test_refresh_token",
       });
 
       expect(result.success).toBe(true);
@@ -48,8 +48,8 @@ describe("OAuth Token Storage", () => {
       });
 
       const result = await upsertOAuthToken(mockSupabase, {
-        provider: "twitch",
         access_token: "test_access_token",
+        provider: "twitch",
       });
 
       expect(result.success).toBe(false);
@@ -64,8 +64,8 @@ describe("OAuth Token Storage", () => {
       });
 
       const result = await upsertOAuthToken(mockSupabase, {
-        provider: "google",
         access_token: "test_access_token",
+        provider: "google",
       });
 
       expect(result.success).toBe(true);
@@ -82,13 +82,13 @@ describe("OAuth Token Storage", () => {
     it("成功時にトークン情報を返す", async () => {
       const mockSupabase = createMockSupabase();
       const mockResponse = {
-        success: true,
         data: {
-          provider: "google",
           access_token: "test_access_token",
-          refresh_token: "test_refresh_token",
           expires_at: "2025-01-10T00:00:00Z",
+          provider: "google",
+          refresh_token: "test_refresh_token",
         },
+        success: true,
       };
 
       vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({

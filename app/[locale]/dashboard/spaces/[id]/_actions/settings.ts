@@ -97,8 +97,8 @@ export async function updateSpaceSettings(
       }
       return {
         ...initialFormState,
-        errors: [validation.error.issues[0].message],
         errorMap,
+        errors: [validation.error.issues[0].message],
       };
     }
 
@@ -477,6 +477,7 @@ export async function updateSpaceSettings(
 
     return {
       ...initialFormState,
+      meta: { success: true },
       values: {
         description,
         email_allowlist: emailAllowlistRaw,
@@ -496,7 +497,6 @@ export async function updateSpaceSettings(
           | "member"
           | "subscriber",
       },
-      meta: { success: true },
     };
   } catch (e) {
     // Check if it's a ServerValidateError from TanStack Form

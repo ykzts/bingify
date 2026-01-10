@@ -99,6 +99,8 @@ export function CreateSpaceForm() {
 
   const form = useForm({
     ...createSpaceFormOpts,
+    // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
+    transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
     validationLogic: revalidateLogic({
       mode: "submit",
       modeAfterSubmission: "change",
@@ -106,8 +108,6 @@ export function CreateSpaceForm() {
     validators: {
       onChange: createSpaceFormSchema,
     },
-    // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
-    transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
   });
 
   const formErrors = useStore(form.store, (formState) => formState.errors);

@@ -110,10 +110,10 @@ export async function updateUsernameAction(
     // Return success state
     return {
       ...initialFormState,
-      values: validatedData,
       meta: {
         success: true,
       },
+      values: validatedData,
     };
   } catch (e) {
     // Check if it's a ServerValidateError from TanStack Form
@@ -218,10 +218,10 @@ export async function changeEmailAction(
     // Return success state
     return {
       ...initialFormState,
-      values: validatedData,
       meta: {
         success: true,
       },
+      values: validatedData,
     };
   } catch (e) {
     // Check if it's a ServerValidateError from TanStack Form

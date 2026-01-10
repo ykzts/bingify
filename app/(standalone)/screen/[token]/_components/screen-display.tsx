@@ -230,25 +230,25 @@ export function ScreenDisplay({
         <div className="flex h-screen w-full items-center justify-center">
           {displayNumber !== null ? (
             <motion.h1
-              animate={{ scale: 1, opacity: 1 }}
+              animate={{ opacity: 1, scale: 1 }}
               className={cn(
                 "font-black text-[clamp(8rem,20vw,16rem)] drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)]",
                 textColor
               )}
-              initial={{ scale: 0, opacity: 0 }}
+              initial={{ opacity: 0, scale: 0 }}
               key={displayNumber}
               style={{
-                WebkitTextStroke:
-                  theme === "light" ? "3px rgba(0,0,0,0.2)" : "3px black",
                 textShadow:
                   theme === "light"
                     ? "0 0 20px rgba(0,0,0,0.3), 2px 2px 0 rgba(0,0,0,0.2)"
                     : "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
+                WebkitTextStroke:
+                  theme === "light" ? "3px rgba(0,0,0,0.2)" : "3px black",
               }}
               transition={{
-                type: "spring",
-                stiffness: 260,
                 damping: 20,
+                stiffness: 260,
+                type: "spring",
               }}
             >
               {displayNumber}
@@ -279,25 +279,25 @@ export function ScreenDisplay({
             <div className="flex flex-1 items-center justify-center">
               {displayNumber !== null ? (
                 <motion.h1
-                  animate={{ scale: 1, opacity: 1 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   className={cn(
                     "font-black text-[clamp(6rem,15vw,12rem)] drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)] lg:text-[clamp(8rem,20vh,20rem)]",
                     textColor
                   )}
-                  initial={{ scale: 0, opacity: 0 }}
+                  initial={{ opacity: 0, scale: 0 }}
                   key={displayNumber}
                   style={{
-                    WebkitTextStroke:
-                      theme === "light" ? "3px rgba(0,0,0,0.2)" : "3px black",
                     textShadow:
                       theme === "light"
                         ? "0 0 20px rgba(0,0,0,0.3), 2px 2px 0 rgba(0,0,0,0.2)"
                         : "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
+                    WebkitTextStroke:
+                      theme === "light" ? "3px rgba(0,0,0,0.2)" : "3px black",
                   }}
                   transition={{
-                    type: "spring",
-                    stiffness: 260,
                     damping: 20,
+                    stiffness: 260,
+                    type: "spring",
                   }}
                 >
                   {displayNumber}

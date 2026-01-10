@@ -230,13 +230,13 @@ export async function createSpaceAction(
 
       return {
         ...initialFormState,
-        errors: ["この共有キーは既に使用されています"],
-        values: { share_key: validatedData.share_key },
         errorMap: {
           onChange: suggestion
             ? `この共有キーは既に使用されています。提案: ${suggestion}`
             : "この共有キーは既に使用されています",
         },
+        errors: ["この共有キーは既に使用されています"],
+        values: { share_key: validatedData.share_key },
       };
     }
 
@@ -271,12 +271,12 @@ export async function createSpaceAction(
     // Return success state with space ID for redirect
     return {
       ...initialFormState,
-      values: { share_key: validatedData.share_key },
       meta: {
-        success: true,
-        spaceId: uuid,
         shareKey: fullShareKey,
+        spaceId: uuid,
+        success: true,
       },
+      values: { share_key: validatedData.share_key },
     };
   } catch (e) {
     // Check if it's a ServerValidateError from TanStack Form

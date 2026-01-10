@@ -45,6 +45,8 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
     defaultValues: {
       username: currentUsername || "",
     },
+    // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
+    transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
     validationLogic: revalidateLogic({
       mode: "submit",
       modeAfterSubmission: "change",
@@ -52,8 +54,6 @@ export function UsernameForm({ currentUsername }: UsernameFormProps) {
     validators: {
       onChange: usernameSchema,
     },
-    // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
-    transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
   });
 
   const formErrors = useStore(form.store, (formState) => formState.errors);
