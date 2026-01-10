@@ -19,14 +19,14 @@ import { checkBingoLines } from "@/lib/utils/bingo-checker";
 import { getParticipantCard } from "../_actions/space-operations";
 
 interface Props {
+  participantId: string;
   participantName: string | null;
   spaceId: string;
-  userId: string;
 }
 
 export function ParticipantCardDialog({
   spaceId,
-  userId,
+  participantId,
   participantName,
 }: Props) {
   const t = useTranslations("AdminSpace");
@@ -42,13 +42,13 @@ export function ParticipantCardDialog({
   } = useQuery({
     enabled: open,
     queryFn: async () => {
-      const result = await getParticipantCard(spaceId, userId);
+      const result = await getParticipantCard(spaceId, participantId);
       if (!(result.success && result.data)) {
         throw new Error(result.error || "Failed to load card");
       }
       return result.data;
     },
-    queryKey: ["participant-card", spaceId, userId],
+    queryKey: ["participant-card", spaceId, participantId],
   });
 
   const { data: calledNumbersArray = [] } = useCalledNumbers(spaceId, {

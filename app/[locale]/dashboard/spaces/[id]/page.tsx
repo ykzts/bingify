@@ -11,6 +11,7 @@ import type {
   ThemeType,
 } from "@/lib/types/screen-settings";
 import { BingoGameManager } from "./_components/bingo-game-manager";
+import { ClosedSpaceParticipants } from "./_components/closed-space-participants";
 import { DisplaySettingsDialog } from "./_components/display-settings-dialog";
 import { DraftStatusView } from "./_components/draft-status-view";
 import { ParticipantsStatus } from "./_components/participants-status";
@@ -166,13 +167,22 @@ export default async function AdminSpacePage({
         </>
       )}
 
-      {space.status === "closed" && (
-        <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
-          <div className="text-center">
-            <h2 className="mb-2 font-bold text-2xl">{t("closeSpaceTitle")}</h2>
-            <p className="text-gray-600">{t("closeSpaceDescription")}</p>
+      {(space.status === "closed" || space.status === "expired") && (
+        <>
+          <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+            <div className="text-center">
+              <h2 className="mb-2 font-bold text-2xl">
+                {t("closeSpaceTitle")}
+              </h2>
+              <p className="text-gray-600">{t("closeSpaceDescription")}</p>
+            </div>
           </div>
-        </div>
+
+          <ClosedSpaceParticipants
+            maxParticipants={space.max_participants}
+            spaceId={space.id}
+          />
+        </>
       )}
 
       {/* Space URL Share - Always visible at the bottom */}
