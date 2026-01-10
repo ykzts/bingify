@@ -48,6 +48,9 @@ export function SpaceSettingsSheet({
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
 
+  // Generate space URL once
+  const spaceUrl = getAbsoluteUrl(`/@${space.share_key}`);
+
   // Open settings sheet if ?open=settings query parameter is present
   useEffect(() => {
     if (searchParams.get("open") === "settings") {
@@ -61,9 +64,8 @@ export function SpaceSettingsSheet({
   };
 
   const handleCopyUrl = async () => {
-    const url = getAbsoluteUrl(`/@${space.share_key}`);
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(spaceUrl);
       toast.success(t("spaceUrlCopySuccess"));
     } catch (error) {
       console.error("Failed to copy:", error);
@@ -97,12 +99,7 @@ export function SpaceSettingsSheet({
             <div className="space-y-2">
               <Label htmlFor="space-url">{t("spaceUrlLabel")}</Label>
               <div className="flex gap-2">
-                <Input
-                  id="space-url"
-                  readOnly
-                  type="text"
-                  value={getAbsoluteUrl(`/@${space.share_key}`)}
-                />
+                <Input id="space-url" readOnly type="text" value={spaceUrl} />
                 <Button
                   onClick={handleCopyUrl}
                   size="icon"
