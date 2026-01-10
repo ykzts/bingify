@@ -38,9 +38,9 @@ export function TwitchBroadcasterIdField({
   onOperatorIdFetched,
 }: Props) {
   const t = useTranslations("SpaceSettings");
-  const [twitchIdConverting, setYoutubeIdConverting] = useState(false);
-  const [twitchIdError, setYoutubeIdError] = useState<string | null>(null);
-  const [fetchingOperatorTwitchId, setFetchingOperatorYoutubeId] =
+  const [twitchIdConverting, setTwitchIdConverting] = useState(false);
+  const [twitchIdError, setTwitchIdError] = useState<string | null>(null);
+  const [fetchingOperatorTwitchId, setFetchingOperatorTwitchId] =
     useState(false);
   const [metadata, setMetadata] =
     useState<Tables<"twitch_broadcasters"> | null>(null);
@@ -81,20 +81,20 @@ export function TwitchBroadcasterIdField({
   // Convert YouTube handle/URL to channel ID
   const convertTwitchInput = async (input: string) => {
     if (!input || input.trim() === "") {
-      setYoutubeIdConverting(false);
-      setYoutubeIdError(null);
+      setTwitchIdConverting(false);
+      setTwitchIdError(null);
       return;
     }
 
     // すでにチャンネルIDの場合は変換不要
     if (TWITCH_ID_REGEX.test(input.trim())) {
-      setYoutubeIdConverting(false);
-      setYoutubeIdError(null);
+      setTwitchIdConverting(false);
+      setTwitchIdError(null);
       return;
     }
 
-    setYoutubeIdConverting(true);
-    setYoutubeIdError(null);
+    setTwitchIdConverting(true);
+    setTwitchIdError(null);
 
     try {
       // Use operator's OAuth token for lookup
@@ -104,15 +104,15 @@ export function TwitchBroadcasterIdField({
 
       if (result.error) {
         // Translate error key
-        setYoutubeIdError(t(result.error));
-        setYoutubeIdConverting(false);
+        setTwitchIdError(t(result.error));
+        setTwitchIdConverting(false);
         return;
       }
 
       if (result.broadcasterId) {
         // Update the field value with the converted ID
         field.handleChange(result.broadcasterId);
-        setYoutubeIdError(null);
+        setTwitchIdError(null);
 
         // Immediately fetch and display metadata
         setLoadingMetadata(true);
@@ -134,36 +134,36 @@ export function TwitchBroadcasterIdField({
           });
       }
     } catch (_error) {
-      setYoutubeIdError(t("twitchBroadcasterIdConvertError"));
+      setTwitchIdError(t("twitchBroadcasterIdConvertError"));
     } finally {
-      setYoutubeIdConverting(false);
+      setTwitchIdConverting(false);
     }
   };
 
   // 操作者のYouTubeチャンネルIDを取得してフィールドに設定
   const handleGetMyTwitchId = async () => {
-    setFetchingOperatorYoutubeId(true);
-    setYoutubeIdError(null);
+    setFetchingOperatorTwitchId(true);
+    setTwitchIdError(null);
 
     try {
       const result = await getOperatorTwitchBroadcasterId();
 
-      if (result.error || !result.broadcasterId) {
+      if (result.error || !result.channelId) {
         // エラーキーを翻訳
-        setYoutubeIdError(t(result.error || "twitchBroadcasterIdConvertError"));
+        setTwitchIdError(t(result.error || "twitchBroadcasterIdConvertError"));
         return;
       }
 
-      // 取得したチャンネルIDを保存（権限チェック用）
-      onOperatorIdFetched(result.broadcasterId);
+      // 取得したブロードキャスターIDを保存（権限チェック用）
+      onOperatorIdFetched(result.channelId);
 
       // フィールドの値を更新
-      field.handleChange(result.broadcasterId);
-      setYoutubeIdError(null);
+      field.handleChange(result.channelId);
+      setTwitchIdError(null);
     } catch (_error) {
-      setYoutubeIdError(t("twitchBroadcasterIdConvertError"));
+      setTwitchIdError(t("twitchBroadcasterIdConvertError"));
     } finally {
-      setFetchingOperatorYoutubeId(false);
+      setFetchingOperatorTwitchId(false);
     }
   };
 
@@ -209,7 +209,7 @@ export function TwitchBroadcasterIdField({
     field.handleChange("");
     setMetadata(null);
     setInputValue("");
-    setYoutubeIdError(null);
+    setTwitchIdError(null);
   };
 
   // Format display text for badge
@@ -251,7 +251,6 @@ export function TwitchBroadcasterIdField({
                       e.preventDefault();
                       handleDelete();
                     }}
-                    onKeyDown={handleKeyDown}
                     type="button"
                   >
                     <X className="h-3 w-3" />

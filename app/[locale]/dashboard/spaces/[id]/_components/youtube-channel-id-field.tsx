@@ -223,7 +223,8 @@ export function YoutubeChannelIdField({
     }
 
     const handle = metadata.handle || "";
-    // Remove @ if it exists at the start
+    // Handle should already be without @ from the database
+    // But clean it just in case for backward compatibility
     const cleanHandle = handle.replace(AT_PREFIX_REGEX, "");
 
     if (cleanHandle) {
@@ -260,7 +261,6 @@ export function YoutubeChannelIdField({
                       e.preventDefault();
                       handleDelete();
                     }}
-                    onKeyDown={handleKeyDown}
                     type="button"
                   >
                     <X className="h-3 w-3" />
