@@ -168,10 +168,21 @@ export default async function AdminSpacePage({
       )}
 
       {(space.status === "closed" || space.status === "expired") && (
-        <ClosedSpaceParticipants
-          maxParticipants={space.max_participants}
-          spaceId={space.id}
-        />
+        <>
+          <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+            <div className="text-center">
+              <h2 className="mb-2 font-bold text-2xl">
+                {t("closeSpaceTitle")}
+              </h2>
+              <p className="text-gray-600">{t("closeSpaceDescription")}</p>
+            </div>
+          </div>
+
+          <ClosedSpaceParticipants
+            maxParticipants={space.max_participants}
+            spaceId={space.id}
+          />
+        </>
       )}
 
       {/* Space URL Share - Always visible at the bottom */}
