@@ -87,12 +87,10 @@ export async function updateUsernameAction(
     }
 
     // Update the username in the database
-    // Note: Currently using full_name to store username as the schema
-    // lacks a dedicated username column. TODO: Add username column and migrate data.
     const { error } = await supabase
       .from("profiles")
       .update({
-        full_name: validatedData.username,
+        username: validatedData.username,
       })
       .eq("id", user.id);
 
