@@ -207,7 +207,7 @@ describe("resolveYouTubeChannelId", () => {
       expect(result.channelId).toBe("UC1234567890123456789012");
       expect(result.error).toBeUndefined();
       expect(mockChannelsList).toHaveBeenCalledWith({
-        forHandle: "@GoogleDevelopers",
+        forHandle: "GoogleDevelopers",
         part: ["id"],
       });
     });
@@ -225,7 +225,7 @@ describe("resolveYouTubeChannelId", () => {
       );
 
       expect(result.channelId).toBeUndefined();
-      expect(result.error).toContain("@NonExistentUser");
+      expect(result.error).toContain("NonExistentUser");
     });
   });
 
@@ -244,7 +244,7 @@ describe("resolveYouTubeChannelId", () => {
 
       expect(result.channelId).toBe("UC1234567890123456789012");
       expect(mockChannelsList).toHaveBeenCalledWith({
-        forHandle: "@GoogleDevelopers",
+        forHandle: "GoogleDevelopers",
         part: ["id"],
       });
     });
@@ -274,7 +274,7 @@ describe("resolveYouTubeChannelId", () => {
 
       expect(result.channelId).toBe("UC1234567890123456789012");
       expect(mockChannelsList).toHaveBeenCalledWith({
-        forHandle: "@GoogleDevelopers",
+        forHandle: "GoogleDevelopers",
         part: ["id"],
       });
     });
@@ -312,7 +312,7 @@ describe("resolveYouTubeChannelId", () => {
 
       expect(result.channelId).toBe("UC1234567890123456789012");
       expect(mockChannelsList).toHaveBeenCalledWith({
-        forHandle: "@TestChannel",
+        forHandle: "TestChannel",
         part: ["id"],
       });
     });

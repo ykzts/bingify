@@ -1,9 +1,10 @@
 "use client";
 
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -180,16 +181,23 @@ export function TwitchBroadcasterIdField({
     }
   };
 
-  // Handle key events
+  // Handle key events when input is focused
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // If metadata is shown and user presses any key except Tab, delete the metadata
-    if (metadata && e.key !== "Tab") {
-      e.preventDefault();
-      handleDelete();
-      // If it's a printable character, start typing with it
-      if (e.key.length === 1) {
+    // If metadata badge is shown, handle backspace/delete to remove entire badge
+    if (metadata) {
+      if (e.key === "Backspace" || e.key === "Delete") {
+        e.preventDefault();
+        handleDelete();
+        inputRef.current?.focus();
+        return;
+      }
+      // For other printable characters, delete badge and start typing
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        handleDelete();
         setInputValue(e.key);
         inputRef.current?.focus();
+        return;
       }
       return;
     }
@@ -212,7 +220,7 @@ export function TwitchBroadcasterIdField({
   };
 
   // Format display text for badge
-  const getDisplayText = () => {
+  const getBadgeText = () => {
     if (!metadata) {
       return "";
     }
@@ -232,33 +240,55 @@ export function TwitchBroadcasterIdField({
 
         <div className="flex gap-2">
           <div className="relative flex-1">
-            {metadata ? (
-              // Show formatted text with border (no badge - just simple border)
-              <Input
-                className="flex cursor-default items-center gap-2 text-sm"
+            {/* Input field container - always visible for text field appearance */}
+            {/* biome-ignore lint/a11y/useKeyWithClickEvents: Field container focuses hidden input on click */}
+            {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: Interactive field container */}
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: Field container delegates to input */}
+            <div
+              className="flex min-h-10 w-full items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              onClick={() => inputRef.current?.focus()}
+            >
+              {metadata ? (
+                // Show badge inside the field
+                <Badge className="flex items-center gap-1" variant="secondary">
+                  <span>{getBadgeText()}</span>
+                  <X
+                    className="h-3 w-3 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete();
+                    }}
+                  />
+                </Badge>
+              ) : (
+                // Show regular input
+                <Input
+                  className="h-auto border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  disabled={isPending || twitchIdConverting}
+                  name={field.name}
+                  onBlur={handleBlur}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  placeholder={t("twitchBroadcasterIdPlaceholder")}
+                  ref={inputRef}
+                  required={true}
+                  type="text"
+                  value={inputValue}
+                />
+              )}
+              {twitchIdConverting && !metadata && (
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin text-gray-400" />
+              )}
+            </div>
+            {/* Hidden input for accessibility */}
+            {metadata && (
+              <input
+                className="sr-only"
                 onKeyDown={handleKeyDown}
-                readOnly
-                value={getDisplayText()}
-              />
-            ) : (
-              // Show regular input
-              <Input
-                disabled={isPending || twitchIdConverting}
-                name={field.name}
-                onBlur={handleBlur}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                placeholder={t("twitchBroadcasterIdPlaceholder")}
                 ref={inputRef}
-                required={true}
+                tabIndex={0}
                 type="text"
-                value={inputValue}
               />
-            )}
-            {twitchIdConverting && !metadata && (
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-              </div>
             )}
           </div>
           <Button
