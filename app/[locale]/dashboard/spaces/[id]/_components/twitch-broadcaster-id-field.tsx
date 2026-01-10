@@ -49,13 +49,15 @@ export function TwitchBroadcasterIdField({
 
   // 入力値の更新
   useEffect(() => {
-    if (enteredBroadcasterId && !metadata && !loadingMetadata) {
-      // メタデータ未取得時は常にIDを表示
-      setInputValue(enteredBroadcasterId);
-    } else if (!enteredBroadcasterId) {
-      setInputValue("");
-    } else if (metadata) {
-      // メタデータ取得時にクリア
+    if (enteredBroadcasterId) {
+      if (!metadata || loadingMetadata) {
+        // メタデータ未取得時またはロード中は常にIDを表示
+        setInputValue(enteredBroadcasterId);
+      } else {
+        // メタデータ取得時にクリア
+        setInputValue("");
+      }
+    } else {
       setInputValue("");
     }
   }, [enteredBroadcasterId, metadata, loadingMetadata]);

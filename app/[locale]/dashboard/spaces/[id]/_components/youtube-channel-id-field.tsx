@@ -47,21 +47,20 @@ export function YoutubeChannelIdField({
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { data: metadata, isLoading: loadingMetadata } =
-    useYouTubeMetadata(enteredChannelId);
+  const { data: metadata } = useYouTubeMetadata(enteredChannelId);
 
   // 入力値の更新
   useEffect(() => {
-    if (enteredChannelId && !metadata && !loadingMetadata) {
-      if (!YOUTUBE_CHANNEL_ID_REGEX.test(enteredChannelId)) {
+    if (enteredChannelId) {
+      if (metadata) {
+        setInputValue("");
+      } else {
         setInputValue(enteredChannelId);
       }
-    } else if (!enteredChannelId) {
-      setInputValue("");
-    } else if (metadata) {
+    } else {
       setInputValue("");
     }
-  }, [enteredChannelId, metadata, loadingMetadata]);
+  }, [enteredChannelId, metadata]);
 
   // Convert YouTube handle/URL to channel ID
   const convertYoutubeInput = async (input: string) => {
@@ -71,8 +70,11 @@ export function YoutubeChannelIdField({
       return;
     }
 
+    const trimmedInput = input.trim();
+
     // すでにチャンネルIDの場合は変換不要
-    if (YOUTUBE_CHANNEL_ID_REGEX.test(input.trim())) {
+    if (YOUTUBE_CHANNEL_ID_REGEX.test(trimmedInput)) {
+      field.handleChange(trimmedInput);
       setYoutubeIdConverting(false);
       setYoutubeIdError(null);
       return;
@@ -83,9 +85,8 @@ export function YoutubeChannelIdField({
 
     try {
       // Use operator's OAuth token for lookup
-      const result = await lookupYouTubeChannelIdWithOperatorToken(
-        input.trim()
-      );
+      const result =
+        await lookupYouTubeChannelIdWithOperatorToken(trimmedInput);
 
       if (result.error) {
         // Translate error key
@@ -150,7 +151,9 @@ export function YoutubeChannelIdField({
       if (e.key === "Backspace" || e.key === "Delete") {
         e.preventDefault();
         handleDelete();
-        inputRef.current?.focus();
+        requestAnimationFrame(() => {
+          inputRef.current?.focus();
+        });
         return;
       }
       // For other printable characters, delete badge and start typing
@@ -158,7 +161,9 @@ export function YoutubeChannelIdField({
         e.preventDefault();
         handleDelete();
         setInputValue(e.key);
-        inputRef.current?.focus();
+        requestAnimationFrame(() => {
+          inputRef.current?.focus();
+        });
         return;
       }
       return;
