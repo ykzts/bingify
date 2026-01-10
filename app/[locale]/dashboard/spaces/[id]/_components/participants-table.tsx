@@ -37,7 +37,7 @@ interface Props {
 const NAME_SPLIT_REGEX = /\s+/;
 
 /**
- * Get initials from display name
+ * 表示名からイニシャルを取得する
  */
 function getInitials(name: string | null | undefined): string {
   const trimmed = name?.trim();
@@ -66,8 +66,7 @@ function getInitials(name: string | null | undefined): string {
 }
 
 /**
- * Shared participants table component used by both
- * ParticipantsStatus (active spaces) and ClosedSpaceParticipants (closed/expired spaces)
+ * ParticipantsStatus（アクティブスペース）と ClosedSpaceParticipants（クローズド/期限切れスペース）の両方で使用される共有の参加者テーブルコンポーネント
  */
 export function ParticipantsTable({
   actions,
