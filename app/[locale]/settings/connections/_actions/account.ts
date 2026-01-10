@@ -161,7 +161,7 @@ export async function updateUsernameAction(
     const { error } = await supabase
       .from("profiles")
       .update({
-        username: validatedData.username,
+        full_name: validatedData.username,
       })
       .eq("id", user.id);
 

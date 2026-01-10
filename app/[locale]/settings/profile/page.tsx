@@ -21,7 +21,7 @@ async function ProfileSettingsContent({ locale }: { locale: string }) {
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("username")
+    .select("full_name")
     .eq("id", user.id)
     .single();
 
@@ -31,7 +31,7 @@ async function ProfileSettingsContent({ locale }: { locale: string }) {
 
   return (
     <div className="space-y-8">
-      <UsernameForm currentUsername={profile?.username} />
+      <UsernameForm currentUsername={profile?.full_name} />
       <EmailChangeForm currentEmail={user.email ?? undefined} />
     </div>
   );
