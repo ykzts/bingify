@@ -56,8 +56,10 @@ export default async function LocaleLayout({
           <NextIntlClientProvider locale={locale} messages={messages}>
             <ConfirmProvider>
               <div className="flex min-h-screen flex-col">
-                <header className="fixed top-4 right-4 z-50">
-                  <HeaderMenuWrapper />
+                <header className="sticky top-0 z-50 border-gray-200 border-b bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/80">
+                  <div className="container mx-auto flex h-16 items-center justify-between px-4">
+                    <HeaderMenuWrapper />
+                  </div>
                 </header>
                 <main className="flex-1">{children}</main>
                 <Footer />

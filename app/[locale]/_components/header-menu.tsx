@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link, useRouter } from "@/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 interface HeaderMenuProps {
@@ -28,6 +28,7 @@ interface HeaderMenuProps {
 export function HeaderMenu({ user }: HeaderMenuProps) {
   const t = useTranslations("HeaderMenu");
   const router = useRouter();
+  const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -46,105 +47,119 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
     }
   };
 
+  const isActivePath = (path: string) => {
+    // ルートパスの特別処理
+    if (path === "/") {
+      return pathname === "/";
+    }
+    // 完全一致またはサブパスで始まる場合
+    return pathname === path || pathname.startsWith(`${path}/`);
+  };
+
   if (!user) {
     return (
-      <Link
-        className="rounded-md border border-gray-300 bg-white px-4 py-1.5 font-medium text-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
-        href="/login"
-      >
-        {t("login")}
-      </Link>
+      <>
+        <div />
+        <Link
+          className="rounded-md border border-gray-300 bg-white px-4 py-1.5 font-medium text-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
+          href="/login"
+        >
+          {t("login")}
+        </Link>
+      </>
     );
   }
 
   return (
-    <DropdownMenu onOpenChange={setOpen} open={open}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          aria-label={t("menu")}
-          className="rounded-full"
-          type="button"
-          variant="ghost"
+    <>
+      {/* ナビゲーションリンク */}
+      <nav className="flex items-center gap-2">
+        <Link
+          aria-current={isActivePath("/dashboard") ? "page" : undefined}
+          className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
+          href="/dashboard"
         >
-          {user.avatar_url ? (
-            <Image
-              alt={user.full_name || user.email || t("userAvatar")}
-              className="rounded-full object-cover"
-              height={32}
-              src={user.avatar_url}
-              width={32}
-            />
-          ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
-              <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-            </div>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
+          <LayoutDashboard className="h-4 w-4" />
+          <span className="sr-only sm:not-sr-only">{t("dashboard")}</span>
+        </Link>
 
-      <DropdownMenuPortal>
-        <DropdownMenuContent
-          align="end"
-          className="z-[100] min-w-[240px]"
-          sideOffset={8}
-        >
-          <div className="px-3 py-2">
-            <p className="font-medium text-sm">
-              {user.full_name || user.email}
-            </p>
-            {user.full_name && user.email && (
-              <p className="text-muted-foreground text-sm">{user.email}</p>
+        {user.role === "admin" && (
+          <Link
+            aria-current={isActivePath("/admin") ? "page" : undefined}
+            className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
+            href="/admin"
+          >
+            <Shield className="h-4 w-4" />
+            <span className="sr-only sm:not-sr-only">{t("admin")}</span>
+          </Link>
+        )}
+      </nav>
+
+      {/* ユーザーメニュー */}
+      <DropdownMenu onOpenChange={setOpen} open={open}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            aria-label={t("menu")}
+            className="rounded-full"
+            type="button"
+            variant="ghost"
+          >
+            {user.avatar_url ? (
+              <Image
+                alt={user.full_name || user.email || t("userAvatar")}
+                className="rounded-full object-cover"
+                height={32}
+                src={user.avatar_url}
+                width={32}
+              />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+              </div>
             )}
-          </div>
+          </Button>
+        </DropdownMenuTrigger>
 
-          <DropdownMenuSeparator />
+        <DropdownMenuPortal>
+          <DropdownMenuContent
+            align="end"
+            className="z-[100] min-w-[240px]"
+            sideOffset={8}
+          >
+            <div className="px-3 py-2">
+              <p className="font-medium text-sm">
+                {user.full_name || user.email}
+              </p>
+              {user.full_name && user.email && (
+                <p className="text-muted-foreground text-sm">{user.email}</p>
+              )}
+            </div>
 
-          <DropdownMenuItem asChild>
-            <Link
-              className="flex cursor-pointer items-center gap-2"
-              href="/dashboard"
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              {t("dashboard")}
-            </Link>
-          </DropdownMenuItem>
+            <DropdownMenuSeparator />
 
-          {user.role === "admin" && (
             <DropdownMenuItem asChild>
               <Link
                 className="flex cursor-pointer items-center gap-2"
-                href="/admin"
+                href="/settings/profile"
               >
-                <Shield className="h-4 w-4" />
-                {t("admin")}
+                <Settings className="h-4 w-4" />
+                {t("settings")}
               </Link>
             </DropdownMenuItem>
-          )}
 
-          <DropdownMenuSeparator />
+            <DropdownMenuSeparator />
 
-          <DropdownMenuItem asChild>
-            <Link
-              className="flex cursor-pointer items-center gap-2"
-              href="/settings/profile"
+            <DropdownMenuItem
+              className="disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={isLoggingOut}
+              onSelect={handleLogout}
             >
-              <Settings className="h-4 w-4" />
-              {t("settings")}
-            </Link>
-          </DropdownMenuItem>
-
-          <DropdownMenuSeparator />
-
-          <DropdownMenuItem
-            className="disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={isLoggingOut}
-            onSelect={handleLogout}
-          >
-            <LogOut className="h-4 w-4" />
-            {t("logout")}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenuPortal>
-    </DropdownMenu>
+              <LogOut className="h-4 w-4" />
+              {t("logout")}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenuPortal>
+      </DropdownMenu>
+    </>
   );
 }

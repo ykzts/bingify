@@ -77,10 +77,13 @@ export function HeaderMenuWrapper() {
   // Show loading state
   if (user === undefined) {
     return (
-      <div
-        aria-hidden="true"
-        className="flex h-8 w-8 animate-pulse items-center justify-center rounded-full bg-muted"
-      />
+      <>
+        <div />
+        <div
+          aria-hidden="true"
+          className="flex h-8 w-8 animate-pulse items-center justify-center rounded-full bg-muted"
+        />
+      </>
     );
   }
 
