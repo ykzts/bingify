@@ -170,9 +170,9 @@ export function ClosedSpaceParticipants({ spaceId, maxParticipants }: Props) {
                       </TableCell>
                       <TableCell className="text-right">
                         <ParticipantCardDialog
-                          userId={participant.user_id}
                           participantName={displayName}
                           spaceId={spaceId}
+                          userId={participant.user_id}
                         />
                       </TableCell>
                     </TableRow>
