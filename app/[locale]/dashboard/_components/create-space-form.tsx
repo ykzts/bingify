@@ -8,7 +8,6 @@ import {
   useStore,
   useTransform,
 } from "@tanstack/react-form-nextjs";
-import { format } from "date-fns";
 import {
   AlertCircle,
   AlertTriangle,
@@ -31,6 +30,7 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/input-group";
+import { formatDateSuffix } from "@/lib/utils/date-format";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { generateRandomKey } from "@/lib/utils/random-key";
 import { getAbsoluteUrl } from "@/lib/utils/url";
@@ -92,7 +92,7 @@ export function CreateSpaceForm() {
   const [available, setAvailable] = useState<boolean | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const dateSuffix = format(new Date(), "yyyyMMdd");
+  const dateSuffix = formatDateSuffix();
 
   // Use TanStack Form with Next.js server actions
   const [state, action] = useActionState(createSpaceAction, initialFormState);

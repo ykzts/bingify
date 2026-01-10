@@ -1,10 +1,10 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
-import { format } from "date-fns";
 import { z } from "zod";
 import { generateSecureToken } from "@/lib/crypto";
 import { createClient } from "@/lib/supabase/server";
+import { formatDateSuffix } from "@/lib/utils/date-format";
 
 const MAX_SLUG_SUGGESTIONS = 10;
 
@@ -30,7 +30,7 @@ const simpleCreateSpaceSchema = z.object({
 
 export async function checkShareKeyAvailability(shareKey: string) {
   try {
-    const dateSuffix = format(new Date(), "yyyyMMdd");
+    const dateSuffix = formatDateSuffix();
     const fullShareKey = `${shareKey}-${dateSuffix}`;
 
     const supabase = await createClient();
@@ -91,7 +91,7 @@ export async function createSpace(
     const { shareKey } = validation.data;
 
     // Generate full share key with date suffix
-    const dateSuffix = format(new Date(), "yyyyMMdd");
+    const dateSuffix = formatDateSuffix();
     const fullShareKey = `${shareKey}-${dateSuffix}`;
 
     // Check availability

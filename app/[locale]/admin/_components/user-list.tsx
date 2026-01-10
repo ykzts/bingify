@@ -2,7 +2,7 @@
 
 import { User as UserIcon } from "lucide-react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Link, usePathname } from "@/i18n/navigation";
+import { formatDate } from "@/lib/utils/date-format";
 import type { Tables } from "@/types/supabase";
 import { banUser, updateUserRole } from "../_actions/admin-operations";
 
@@ -42,6 +43,7 @@ export function UserList({
   initialUsers,
 }: UserListProps) {
   const t = useTranslations("Admin");
+  const locale = useLocale();
   const confirm = useConfirm();
   const pathname = usePathname();
   const [users, setUsers] = useState(initialUsers);
@@ -207,7 +209,7 @@ export function UserList({
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-gray-500 text-sm">
                     {user.created_at
-                      ? new Date(user.created_at).toLocaleDateString()
+                      ? formatDate(user.created_at, locale)
                       : t("notAvailable")}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm">

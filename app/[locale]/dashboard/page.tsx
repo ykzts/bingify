@@ -1,9 +1,9 @@
-import { format } from "date-fns";
 import { FileText, Users } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SectionHeader } from "@/components/section-header";
 import { Link } from "@/i18n/navigation";
+import { formatDateShort } from "@/lib/utils/date-format";
 import { getUserSpaces } from "./_actions/space-management";
 import { CreateSpaceForm } from "./_components/create-space-form";
 import { SpaceActionsDropdown } from "./_components/space-actions-dropdown";
@@ -39,9 +39,6 @@ export default async function DashboardPage({
 
   // Combine hosted and participated spaces for display
   const spaces = [...hostedSpaces, ...participatedSpaces];
-
-  // Locale-specific date format
-  const dateFormat = locale === "ja" ? "yyyy/MM/dd" : "MMM dd, yyyy";
 
   return (
     <div className="mx-auto max-w-4xl space-y-12 px-4 py-8">
@@ -187,12 +184,7 @@ export default async function DashboardPage({
                       />
                     </td>
                     <td className="px-4 py-3 text-gray-500">
-                      {(() => {
-                        const date = new Date(space.created_at || 0);
-                        return Number.isNaN(date.getTime())
-                          ? "-"
-                          : format(date, dateFormat);
-                      })()}
+                      {formatDateShort(space.created_at || 0, locale)}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <SpaceActionsDropdown space={space} />
