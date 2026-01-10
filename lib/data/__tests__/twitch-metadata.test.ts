@@ -29,6 +29,7 @@ const createMockSupabaseClient = () => {
   const mockEq = vi.fn();
   const mockSingle = vi.fn();
   const mockUpsert = vi.fn();
+  const mockUpdate = vi.fn();
 
   return {
     eq: mockEq,
@@ -36,10 +37,12 @@ const createMockSupabaseClient = () => {
       eq: mockEq,
       select: mockSelect,
       single: mockSingle,
+      update: mockUpdate,
       upsert: mockUpsert,
     })),
     select: mockSelect,
     single: mockSingle,
+    update: mockUpdate,
     upsert: mockUpsert,
   } as unknown as SupabaseClient<Database>;
 };
@@ -375,29 +378,20 @@ describe("fetchAndCacheTwitchBroadcasterMetadata", () => {
       eq: mockEq,
     });
 
-    // upsertTwitchBroadcasterMetadata のモック（エラー情報を保存するが良好なデータを保持）
-    const mockSingle = vi.fn().mockResolvedValue({
-      data: {
-        ...goodCachedData,
-        fetch_error: "API Error",
-        fetched_at: new Date().toISOString(),
-      },
+    // update のモック（エラー情報のみ更新）
+    const mockUpdateEq = vi.fn().mockResolvedValue({
       error: null,
     });
 
-    const mockSelectUpsert = vi.fn().mockReturnValue({
-      single: mockSingle,
-    });
-
-    const mockUpsert = vi.fn().mockReturnValue({
-      select: mockSelectUpsert,
+    const mockUpdate = vi.fn().mockReturnValue({
+      eq: mockUpdateEq,
     });
 
     mockSupabase.from = vi.fn().mockImplementation((table) => {
       if (table === "twitch_broadcasters") {
         return {
           select: mockSelectGet,
-          upsert: mockUpsert,
+          update: mockUpdate,
         };
       }
       return {};
@@ -418,18 +412,21 @@ describe("fetchAndCacheTwitchBroadcasterMetadata", () => {
     expect(result.description).toBe("良好なデータ");
     expect(result.profile_image_url).toBe("https://example.com/good.jpg");
 
-    // upsertが呼ばれ、エラー情報が記録されるが既存データは保持される
-    expect(mockUpsert).toHaveBeenCalledWith(
+    // updateが呼ばれ、エラー情報のみ更新される
+    expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        broadcaster_id: "123456789",
-        description: "良好なデータ",
-        display_name: "GoodStreamer",
         fetch_error: "API Error",
-        profile_image_url: "https://example.com/good.jpg",
-        username: "goodstreamer",
-      }),
-      expect.any(Object)
+        fetched_at: expect.any(String),
+        updated_at: expect.any(String),
+      })
     );
+
+    // broadcaster_idでフィルタリングされる
+    expect(mockUpdateEq).toHaveBeenCalledWith("broadcaster_id", "123456789");
+
+    // fetch_errorとfetched_atが更新されている
+    expect(result.fetch_error).toBe("API Error");
+    expect(result.fetched_at).not.toBe(goodCachedData.fetched_at);
   });
 
   it("APIエラー時にキャッシュがない場合はエラーをスローする", async () => {
