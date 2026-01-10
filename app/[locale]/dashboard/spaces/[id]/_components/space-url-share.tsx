@@ -18,6 +18,11 @@ export function SpaceUrlShare({ shareKey }: Props) {
 
   const handleCopyUrl = async () => {
     try {
+      // Check if clipboard API is available
+      if (!navigator.clipboard) {
+        toast.error(t("spaceUrlCopyError"));
+        return;
+      }
       await navigator.clipboard.writeText(spaceUrl);
       toast.success(t("spaceUrlCopySuccess"));
     } catch (error) {
@@ -30,11 +35,20 @@ export function SpaceUrlShare({ shareKey }: Props) {
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
       <div className="space-y-4">
         <h2 className="font-semibold text-lg">{t("spaceUrlSection")}</h2>
-        <p className="text-gray-600 text-sm">{t("spaceUrlDescription")}</p>
+        <p className="text-gray-600 text-sm" id="space-url-description">
+          {t("spaceUrlDescription")}
+        </p>
         <div className="space-y-2">
           <Label htmlFor="space-url">{t("spaceUrlLabel")}</Label>
           <div className="flex gap-2">
-            <Input id="space-url" readOnly type="text" value={spaceUrl} />
+            <Input
+              aria-describedby="space-url-description"
+              aria-label={t("spaceUrlLabel")}
+              id="space-url"
+              readOnly
+              type="text"
+              value={spaceUrl}
+            />
             <Button
               onClick={handleCopyUrl}
               size="icon"
