@@ -25,11 +25,14 @@ async function fetchTwitchBroadcasterDetails(
   appAccessToken: string
 ): Promise<TablesInsert<"twitch_broadcasters">> {
   const apiClient = createApiClient(appAccessToken);
-  const user = await apiClient.users.getUserById(broadcasterId);
+  // App access tokenで動作するようgetUsersByIdsを使用
+  const users = await apiClient.users.getUsersByIds([broadcasterId]);
 
-  if (!user) {
+  if (users.length === 0) {
     throw new Error("Broadcaster not found");
   }
+
+  const user = users[0];
 
   return {
     broadcaster_id: broadcasterId,

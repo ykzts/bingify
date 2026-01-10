@@ -9,12 +9,12 @@ import {
 } from "../twitch-metadata";
 
 // Twurple のモック
-const mockGetUserById = vi.fn();
+const mockGetUsersByIds = vi.fn();
 
 vi.mock("@twurple/api", () => ({
   ApiClient: class {
     users = {
-      getUserById: mockGetUserById,
+      getUsersByIds: mockGetUsersByIds,
     };
   },
 }));
@@ -258,7 +258,7 @@ describe("fetchAndCacheTwitchBroadcasterMetadata", () => {
 
     expect(result).toEqual(cachedData);
     // APIは呼ばれない
-    expect(mockGetUserById).not.toHaveBeenCalled();
+    expect(mockGetUsersByIds).not.toHaveBeenCalled();
   });
 
   it("キャッシュが古い場合はAPIから取得して保存する", async () => {
@@ -334,7 +334,7 @@ describe("fetchAndCacheTwitchBroadcasterMetadata", () => {
       return {};
     });
 
-    mockGetUserById.mockResolvedValue(apiResponse);
+    mockGetUsersByIds.mockResolvedValue([apiResponse]);
 
     const result = await fetchAndCacheTwitchBroadcasterMetadata(
       mockSupabase,
@@ -342,7 +342,7 @@ describe("fetchAndCacheTwitchBroadcasterMetadata", () => {
       "app_access_token"
     );
 
-    expect(mockGetUserById).toHaveBeenCalledWith("123456789");
+    expect(mockGetUsersByIds).toHaveBeenCalledWith(["123456789"]);
     expect(result.username).toBe("newstreamer");
     expect(result.display_name).toBe("NewStreamer");
     expect(result.description).toBe("新しい説明");
@@ -404,7 +404,7 @@ describe("fetchAndCacheTwitchBroadcasterMetadata", () => {
     });
 
     // APIがエラーをスロー
-    mockGetUserById.mockRejectedValue(new Error("API Error"));
+    mockGetUsersByIds.mockRejectedValue(new Error("API Error"));
 
     const result = await fetchAndCacheTwitchBroadcasterMetadata(
       mockSupabase,
@@ -467,7 +467,7 @@ describe("fetchAndCacheTwitchBroadcasterMetadata", () => {
       upsert: mockUpsert,
     }));
 
-    mockGetUserById.mockRejectedValue(new Error("API Error"));
+    mockGetUsersByIds.mockRejectedValue(new Error("API Error"));
 
     await expect(
       fetchAndCacheTwitchBroadcasterMetadata(
