@@ -1,9 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Tables } from "@/types/supabase";
-import {
-  getSpaceBingoCards,
-  getSpaceParticipants,
-} from "../participants";
+import { getSpaceBingoCards, getSpaceParticipants } from "../participants";
 
 // Mock Supabase client
 const mockSupabase = {
@@ -39,9 +36,9 @@ describe("getSpaceParticipants", () => {
     });
 
     // スペースのオーナーではない
-    let callCount = 0;
+    let _callCount = 0;
     mockSupabase.from.mockImplementation((table: string) => {
-      callCount++;
+      _callCount++;
       if (table === "spaces") {
         return {
           select: vi.fn().mockReturnValue({
