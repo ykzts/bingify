@@ -349,6 +349,7 @@ export function CreateSpaceForm() {
         disabled={
           !canSubmit ||
           isSubmitting ||
+          checking ||
           available === false ||
           shareKey.length < 3
         }
