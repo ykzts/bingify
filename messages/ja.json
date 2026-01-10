@@ -225,6 +225,12 @@
     "settingsStatusDraft": "準備中",
     "settingsTitle": "スペース設定",
     "spaceId": "スペースID",
+    "spaceUrlCopyButton": "URLをコピー",
+    "spaceUrlCopyError": "URLのコピーに失敗しました",
+    "spaceUrlCopySuccess": "URLをクリップボードにコピーしました",
+    "spaceUrlDescription": "このURLを参加者に共有して、スペースに参加してもらいましょう。",
+    "spaceUrlLabel": "参加用URL",
+    "spaceUrlSection": "スペース共有",
     "viewCardButton": "カードを見る"
   },
   "AvatarSettings": {

@@ -225,6 +225,12 @@
     "settingsStatusDraft": "Draft",
     "settingsTitle": "Space Settings",
     "spaceId": "Space ID",
+    "spaceUrlCopyButton": "Copy URL",
+    "spaceUrlCopyError": "Failed to copy URL",
+    "spaceUrlCopySuccess": "URL copied to clipboard",
+    "spaceUrlDescription": "Share this URL with participants to join the space.",
+    "spaceUrlLabel": "Participation URL",
+    "spaceUrlSection": "Space Sharing",
     "viewCardButton": "View Card"
   },
   "AvatarSettings": {

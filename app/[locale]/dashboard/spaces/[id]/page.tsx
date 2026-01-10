@@ -15,6 +15,7 @@ import { DisplaySettingsDialog } from "./_components/display-settings-dialog";
 import { DraftStatusView } from "./_components/draft-status-view";
 import { ParticipantsStatus } from "./_components/participants-status";
 import { SpaceSettingsSheet } from "./_components/space-settings-sheet";
+import { SpaceUrlShare } from "./_components/space-url-share";
 
 function isValidLocale(locale: string): locale is LocaleType {
   return locale === "en" || locale === "ja";
@@ -173,6 +174,9 @@ export default async function AdminSpacePage({
           </div>
         </div>
       )}
+
+      {/* Space URL Share - Always visible at the bottom */}
+      <SpaceUrlShare shareKey={space.share_key} />
     </div>
   );
 }
