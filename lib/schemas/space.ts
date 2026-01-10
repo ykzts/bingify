@@ -195,8 +195,7 @@ export const updateSpaceFormSchema = z
       // If social mode with YouTube, channel ID must be provided
       if (
         data.gatekeeper_mode === "social" &&
-        data.social_platform === "youtube" &&
-        data.youtube_requirement !== "none"
+        data.social_platform === "youtube"
       ) {
         return (
           data.youtube_channel_id &&
@@ -217,8 +216,7 @@ export const updateSpaceFormSchema = z
       // If social mode with Twitch, broadcaster ID must be provided
       if (
         data.gatekeeper_mode === "social" &&
-        data.social_platform === "twitch" &&
-        data.twitch_requirement !== "none"
+        data.social_platform === "twitch"
       ) {
         return (
           data.twitch_broadcaster_id &&
@@ -293,11 +291,11 @@ export const createSpaceFormSchema = z
     twitch_broadcaster_id: z.string().trim().optional(),
     twitch_requirement: z
       .enum(["none", "follower", "subscriber"])
-      .default("none"),
+      .default("follower"),
     youtube_channel_id: z.string().trim().optional(),
     youtube_requirement: z
       .enum(["none", "subscriber", "member"])
-      .default("none"),
+      .default("subscriber"),
   })
   .refine(
     (data) => {
@@ -318,8 +316,7 @@ export const createSpaceFormSchema = z
       // If social mode with YouTube, channel ID must be provided
       if (
         data.gatekeeper_mode === "social" &&
-        data.social_platform === "youtube" &&
-        data.youtube_requirement !== "none"
+        data.social_platform === "youtube"
       ) {
         return (
           data.youtube_channel_id &&
@@ -340,8 +337,7 @@ export const createSpaceFormSchema = z
       // If social mode with Twitch, broadcaster ID must be provided
       if (
         data.gatekeeper_mode === "social" &&
-        data.social_platform === "twitch" &&
-        data.twitch_requirement !== "none"
+        data.social_platform === "twitch"
       ) {
         return (
           data.twitch_broadcaster_id &&

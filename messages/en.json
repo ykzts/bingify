@@ -636,8 +636,12 @@
     "youtubeChannelIdLabel": "YouTube Channel ID",
     "youtubeChannelIdPlaceholder": "Channel ID, handle, or URL",
     "youtubeMember": "Members only",
+    "youtubeRegisterError": "Failed to register channel metadata",
     "youtubeRequirementLabel": "YouTube Requirement",
-    "youtubeSubscriber": "Subscribers only"
+    "youtubeSubscriber": "Subscribers only",
+    "loading": "Loading...",
+    "removeChannel": "Remove channel",
+    "removeBroadcaster": "Remove broadcaster"
   },
   "Support": {
     "description": "Bingify is an open-source project maintained by volunteers. Your support helps cover hosting costs and enables continued development.",

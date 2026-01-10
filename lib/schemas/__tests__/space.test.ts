@@ -43,7 +43,7 @@ describe("updateSpaceFormSchema - exclusive gatekeeper modes", () => {
       twitch_broadcaster_id: "",
       twitch_requirement: "none",
       youtube_channel_id: "",
-      youtube_requirement: "none",
+      youtube_requirement: "subscriber",
     });
     expect(result.success).toBe(true);
   });
@@ -94,7 +94,7 @@ describe("updateSpaceFormSchema - exclusive gatekeeper modes", () => {
       twitch_broadcaster_id: "123456789",
       twitch_requirement: "follower",
       youtube_channel_id: "",
-      youtube_requirement: "none",
+      youtube_requirement: "subscriber",
     });
     expect(result.success).toBe(true);
   });
@@ -110,7 +110,7 @@ describe("updateSpaceFormSchema - exclusive gatekeeper modes", () => {
       twitch_broadcaster_id: "notanumber",
       twitch_requirement: "follower",
       youtube_channel_id: "",
-      youtube_requirement: "none",
+      youtube_requirement: "subscriber",
     });
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -128,7 +128,7 @@ describe("updateSpaceFormSchema - exclusive gatekeeper modes", () => {
       twitch_broadcaster_id: "",
       twitch_requirement: "none",
       youtube_channel_id: "",
-      youtube_requirement: "none",
+      youtube_requirement: "subscriber",
     });
     expect(result.success).toBe(true);
   });
@@ -143,7 +143,7 @@ describe("updateSpaceFormSchema - exclusive gatekeeper modes", () => {
       twitch_broadcaster_id: "",
       twitch_requirement: "none",
       youtube_channel_id: "",
-      youtube_requirement: "none",
+      youtube_requirement: "subscriber",
     });
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -161,7 +161,7 @@ describe("updateSpaceFormSchema - exclusive gatekeeper modes", () => {
       twitch_broadcaster_id: "",
       twitch_requirement: "none",
       youtube_channel_id: "",
-      youtube_requirement: "none",
+      youtube_requirement: "subscriber",
     });
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -180,7 +180,7 @@ describe("createSpaceFormSchema - exclusive gatekeeper modes", () => {
       twitch_broadcaster_id: "",
       twitch_requirement: "none",
       youtube_channel_id: "",
-      youtube_requirement: "none",
+      youtube_requirement: "subscriber",
     });
     expect(result.success).toBe(true);
   });
@@ -194,7 +194,7 @@ describe("createSpaceFormSchema - exclusive gatekeeper modes", () => {
       twitch_broadcaster_id: "",
       twitch_requirement: "none",
       youtube_channel_id: "",
-      youtube_requirement: "none",
+      youtube_requirement: "subscriber",
     });
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -227,7 +227,7 @@ describe("createSpaceFormSchema - exclusive gatekeeper modes", () => {
       twitch_broadcaster_id: "123456789",
       twitch_requirement: "follower",
       youtube_channel_id: "",
-      youtube_requirement: "none",
+      youtube_requirement: "subscriber",
     });
     expect(result.success).toBe(true);
   });

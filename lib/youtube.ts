@@ -7,6 +7,7 @@ const YOUTUBE_HANDLE_PATH_REGEX = /^\/@([^/]+)/;
 const YOUTUBE_CHANNEL_PATH_REGEX = /^\/channel\/(UC[a-zA-Z0-9_-]{22})/;
 const YOUTUBE_CUSTOM_PATH_REGEX = /^\/c\/([^/]+)/;
 const YOUTUBE_USER_PATH_REGEX = /^\/user\/([^/]+)/;
+const AT_PREFIX_REGEX = /^@+/;
 
 export interface YouTubeSubscriptionCheckResult {
   error?: string;
@@ -55,8 +56,9 @@ function parseYouTubeInput(input: string): {
   }
 
   // 2. ハンドル形式（@から始まる）
+  // Note: handleは@を除いた状態で保存する（API呼び出し時に@を追加）
   if (trimmedInput.startsWith("@")) {
-    return { handle: trimmedInput };
+    return { handle: trimmedInput.substring(1) };
   }
 
   // 3. URL形式のパース
@@ -68,7 +70,8 @@ function parseYouTubeInput(input: string): {
       // ハンドル形式: /@username
       const handleMatch = pathname.match(YOUTUBE_HANDLE_PATH_REGEX);
       if (handleMatch) {
-        return { handle: `@${handleMatch[1]}` };
+        // handleMatch[1]は@を含まない部分なのでそのまま使用
+        return { handle: handleMatch[1] };
       }
 
       // チャンネルID形式: /channel/UCxxxxxxxxxxxxxxxxxxxxxx
@@ -81,7 +84,8 @@ function parseYouTubeInput(input: string): {
       // Note: カスタムURLは内部的にハンドルとして解決を試みます
       const customMatch = pathname.match(YOUTUBE_CUSTOM_PATH_REGEX);
       if (customMatch) {
-        return { handle: `@${customMatch[1]}` };
+        // customMatch[1]は@を含まない部分なのでそのまま使用
+        return { handle: customMatch[1] };
       }
 
       // レガシーユーザー形式: /user/username
@@ -503,13 +507,18 @@ export async function resolveYouTubeChannelId(
 
 /**
  * ハンドルからチャンネルIDを解決する
+ * Note: handleパラメータは@プレフィックスなしで渡される想定
  */
 async function resolveByHandle(
   youtube: youtube_v3.Youtube,
   handle: string
 ): Promise<YouTubeChannelResolveResult> {
+  // YouTube API は @ プレフィックスなしのハンドルを要求する
+  // 念のため @ を削除しておく
+  const cleanHandle = handle.replace(AT_PREFIX_REGEX, "");
+
   const response = await youtube.channels.list({
-    forHandle: handle,
+    forHandle: cleanHandle,
     part: ["id"],
   });
 
@@ -521,7 +530,7 @@ async function resolveByHandle(
   }
 
   return {
-    error: `Channel not found for handle '${handle}'`,
+    error: `Channel not found for handle: ${cleanHandle}`,
   };
 }
 

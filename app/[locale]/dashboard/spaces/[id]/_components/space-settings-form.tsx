@@ -174,10 +174,11 @@ export function SpaceSettingsForm({
       title: space.title || "",
       twitch_broadcaster_id:
         space.gatekeeper_rules?.twitch?.broadcasterId || "",
-      twitch_requirement: space.gatekeeper_rules?.twitch?.requirement || "none",
+      twitch_requirement:
+        space.gatekeeper_rules?.twitch?.requirement || "follower",
       youtube_channel_id: space.gatekeeper_rules?.youtube?.channelId || "",
       youtube_requirement:
-        space.gatekeeper_rules?.youtube?.requirement || "none",
+        space.gatekeeper_rules?.youtube?.requirement || "subscriber",
     },
     validationLogic: revalidateLogic({
       mode: "submit",
@@ -758,12 +759,6 @@ export function SpaceSettingsForm({
                                       name={field.name}
                                       onValueChange={(value) => {
                                         field.handleChange(value);
-                                        if (value === "none") {
-                                          form.setFieldValue(
-                                            "youtube_channel_id",
-                                            ""
-                                          );
-                                        }
                                       }}
                                       value={field.state.value as string}
                                     >
@@ -771,19 +766,6 @@ export function SpaceSettingsForm({
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
-                                        <SelectItem value="none">
-                                          {t("requirementNone")}
-                                        </SelectItem>
-                                        {showYoutubeMember && (
-                                          <SelectItem
-                                            disabled={
-                                              !canUseYoutubeMemberSubscriber
-                                            }
-                                            value="member"
-                                          >
-                                            {t("youtubeMember")}
-                                          </SelectItem>
-                                        )}
                                         {showYoutubeSubscriber && (
                                           <SelectItem
                                             disabled={
@@ -792,6 +774,16 @@ export function SpaceSettingsForm({
                                             value="subscriber"
                                           >
                                             {t("youtubeSubscriber")}
+                                          </SelectItem>
+                                        )}
+                                        {showYoutubeMember && (
+                                          <SelectItem
+                                            disabled={
+                                              !canUseYoutubeMemberSubscriber
+                                            }
+                                            value="member"
+                                          >
+                                            {t("youtubeMember")}
                                           </SelectItem>
                                         )}
                                       </SelectContent>
@@ -813,7 +805,6 @@ export function SpaceSettingsForm({
                                   onOperatorIdFetched={
                                     setOperatorYoutubeChannelId
                                   }
-                                  requirement={youtubeRequirement}
                                 />
                               )}
                             </form.Field>
@@ -836,12 +827,6 @@ export function SpaceSettingsForm({
                                       name={field.name}
                                       onValueChange={(value) => {
                                         field.handleChange(value);
-                                        if (value === "none") {
-                                          form.setFieldValue(
-                                            "twitch_broadcaster_id",
-                                            ""
-                                          );
-                                        }
                                       }}
                                       value={field.state.value as string}
                                     >
@@ -849,9 +834,6 @@ export function SpaceSettingsForm({
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
-                                        <SelectItem value="none">
-                                          {t("requirementNone")}
-                                        </SelectItem>
                                         {showTwitchFollower && (
                                           <SelectItem value="follower">
                                             {t("twitchFollower")}
@@ -884,7 +866,6 @@ export function SpaceSettingsForm({
                                   onOperatorIdFetched={
                                     setOperatorTwitchBroadcasterId
                                   }
-                                  requirement={twitchRequirement}
                                 />
                               )}
                             </form.Field>

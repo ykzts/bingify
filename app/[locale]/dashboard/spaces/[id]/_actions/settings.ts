@@ -4,6 +4,11 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
+import {
+  registerTwitchBroadcasterMetadata,
+  registerYouTubeChannelMetadata,
+} from "@/lib/data/social-metadata-helpers";
+import { getOAuthToken } from "@/lib/oauth/token-storage";
 import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
@@ -381,20 +386,12 @@ export async function updateSpaceSettings(
       gatekeeperRules = {};
 
       // Only add the selected platform's rules
-      if (
-        socialPlatform === "youtube" &&
-        youtubeRequirement !== "none" &&
-        youtubeChannelId
-      ) {
+      if (socialPlatform === "youtube" && youtubeChannelId) {
         gatekeeperRules.youtube = {
           channelId: youtubeChannelId,
           requirement: youtubeRequirement,
         };
-      } else if (
-        socialPlatform === "twitch" &&
-        twitchRequirement !== "none" &&
-        twitchBroadcasterId
-      ) {
+      } else if (socialPlatform === "twitch" && twitchBroadcasterId) {
         gatekeeperRules.twitch = {
           broadcasterId: twitchBroadcasterId,
           requirement: twitchRequirement,
@@ -436,6 +433,46 @@ export async function updateSpaceSettings(
         ...initialFormState,
         errors: ["設定の更新に失敗しました"],
       };
+    }
+
+    // Register social metadata after successful space update
+    // YouTube metadata registration
+    if (
+      gatekeeperMode === "social" &&
+      socialPlatform === "youtube" &&
+      youtubeChannelId
+    ) {
+      // Get user's Google OAuth token for YouTube API calls
+      const tokenResult = await getOAuthToken(supabase, "google");
+      if (tokenResult.success && tokenResult.access_token) {
+        // Register metadata (non-blocking - errors are logged but don't fail the update)
+        const result = await registerYouTubeChannelMetadata(
+          supabase,
+          youtubeChannelId,
+          tokenResult.access_token,
+          user.id
+        );
+        if (!result.success) {
+          console.error("Failed to register YouTube metadata:", result.error);
+        }
+      }
+    }
+
+    // Twitch metadata registration
+    if (
+      gatekeeperMode === "social" &&
+      socialPlatform === "twitch" &&
+      twitchBroadcasterId
+    ) {
+      // Register metadata (non-blocking - errors are logged but don't fail the update)
+      const result = await registerTwitchBroadcasterMetadata(
+        supabase,
+        twitchBroadcasterId,
+        user.id
+      );
+      if (!result.success) {
+        console.error("Failed to register Twitch metadata:", result.error);
+      }
     }
 
     return {
