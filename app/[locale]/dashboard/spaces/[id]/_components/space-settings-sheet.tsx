@@ -48,15 +48,23 @@ export function SpaceSettingsSheet({
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
 
-  // Open settings sheet if ?open=settings query parameter is present
+  // Sync sheet state with URL parameter (for external navigation)
   useEffect(() => {
-    if (searchParams.get("open") === "settings") {
-      setOpen(true);
+    const shouldOpen = searchParams.get("open") === "settings";
+    // Only update state if it differs from URL parameter
+    // This handles browser back/forward and direct URL changes
+    if (shouldOpen !== open) {
+      setOpen(shouldOpen);
     }
-  }, [searchParams]);
+  }, [searchParams, open]);
 
   // Handle opening/closing the sheet with URL parameter management
   const handleOpenChange = (newOpen: boolean) => {
+    // Only update if state is actually changing
+    if (newOpen === open) {
+      return;
+    }
+
     setOpen(newOpen);
 
     // Update URL parameters
