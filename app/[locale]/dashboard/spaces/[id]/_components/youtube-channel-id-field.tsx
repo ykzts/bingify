@@ -255,14 +255,17 @@ export function YoutubeChannelIdField({
                 <Loader2 className="h-4 w-4 shrink-0 animate-spin text-gray-400" />
               )}
             </div>
-            {/* Hidden input for accessibility */}
+            {/* Hidden input for form submission and accessibility */}
             {metadata && (
               <input
                 className="sr-only"
+                name={field.name}
                 onKeyDown={handleKeyDown}
+                readOnly
                 ref={inputRef}
                 tabIndex={0}
                 type="text"
+                value={enteredChannelId || ""}
               />
             )}
           </div>

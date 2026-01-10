@@ -446,15 +446,15 @@ export async function updateSpaceSettings(
       const tokenResult = await getOAuthToken(supabase, "google");
       if (tokenResult.success && tokenResult.access_token) {
         // Register metadata (non-blocking - errors are logged but don't fail the update)
-        await registerYouTubeChannelMetadata(
+        const result = await registerYouTubeChannelMetadata(
           supabase,
           youtubeChannelId,
           tokenResult.access_token,
           user.id
-        ).catch((error) => {
-          console.error("Failed to register YouTube metadata:", error);
-          // Don't fail the entire update if metadata registration fails
-        });
+        );
+        if (!result.success) {
+          console.error("Failed to register YouTube metadata:", result.error);
+        }
       }
     }
 
@@ -465,14 +465,14 @@ export async function updateSpaceSettings(
       twitchBroadcasterId
     ) {
       // Register metadata (non-blocking - errors are logged but don't fail the update)
-      await registerTwitchBroadcasterMetadata(
+      const result = await registerTwitchBroadcasterMetadata(
         supabase,
         twitchBroadcasterId,
         user.id
-      ).catch((error) => {
-        console.error("Failed to register Twitch metadata:", error);
-        // Don't fail the entire update if metadata registration fails
-      });
+      );
+      if (!result.success) {
+        console.error("Failed to register Twitch metadata:", result.error);
+      }
     }
 
     return {

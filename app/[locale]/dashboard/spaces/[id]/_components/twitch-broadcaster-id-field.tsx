@@ -62,7 +62,7 @@ export function TwitchBroadcasterIdField({
     }
   }, [enteredBroadcasterId, metadata, loadingMetadata]);
 
-  // Convert YouTube handle/URL to channel ID
+  // Convert Twitch username/URL to broadcaster ID
   const convertTwitchInput = async (input: string) => {
     if (!input || input.trim() === "") {
       setTwitchIdConverting(false);
@@ -106,7 +106,7 @@ export function TwitchBroadcasterIdField({
     }
   };
 
-  // 操作者のYouTubeチャンネルIDを取得してフィールドに設定
+  // 操作者のTwitchブロードキャスターIDを取得してフィールドに設定
   const handleGetMyTwitchId = async () => {
     setFetchingOperatorTwitchId(true);
     setTwitchIdError(null);
@@ -245,14 +245,17 @@ export function TwitchBroadcasterIdField({
                 <Loader2 className="h-4 w-4 shrink-0 animate-spin text-gray-400" />
               )}
             </div>
-            {/* Hidden input for accessibility */}
+            {/* Hidden input for form submission and accessibility */}
             {metadata && (
               <input
                 className="sr-only"
+                name={field.name}
                 onKeyDown={handleKeyDown}
+                readOnly
                 ref={inputRef}
                 tabIndex={0}
                 type="text"
+                value={enteredBroadcasterId || ""}
               />
             )}
           </div>
