@@ -575,6 +575,8 @@
   "SpaceSettings": {
     "basicInfoTitle": "基本情報",
     "capacityTitle": "参加人数制限",
+    "comboboxNoResults": "該当するオプションが見つかりません",
+    "comboboxSearchPlaceholder": "検索...",
     "descriptionHelp": "スペースの詳細や参加者へのメッセージを記入できます",
     "descriptionLabel": "説明（任意）",
     "descriptionPlaceholder": "このビンゴスペースについての説明を入力してください",
@@ -642,8 +644,10 @@
     "twitchBroadcasterIdPlaceholder": "ユーザー名、URL、またはID",
     "twitchBroadcasterIdUserNotFound": "ユーザーが見つかりませんでした",
     "twitchFollower": "フォロワーのみ",
+    "twitchFollowerDescription": "指定したTwitchチャンネルのフォロワーのみが参加できます",
     "twitchRequirementLabel": "Twitch要件",
     "twitchSubscriber": "サブスクライバーのみ",
+    "twitchSubscriberDescription": "指定したTwitchチャンネルのサブスクライバーのみが参加できます",
     "updateButton": "設定を更新",
     "updateError": "設定の更新に失敗しました",
     "updateSuccess": "設定を更新しました",
@@ -654,9 +658,11 @@
     "youtubeChannelIdLabel": "YouTubeチャンネルID",
     "youtubeChannelIdPlaceholder": "チャンネルID、ハンドル、またはURL",
     "youtubeMember": "メンバーのみ",
+    "youtubeMemberDescription": "指定したYouTubeチャンネルのメンバーシップ加入者のみが参加できます",
     "youtubeRegisterError": "チャンネルメタデータの登録に失敗しました",
     "youtubeRequirementLabel": "YouTube要件",
-    "youtubeSubscriber": "チャンネル登録者のみ"
+    "youtubeSubscriber": "チャンネル登録者のみ",
+    "youtubeSubscriberDescription": "指定したYouTubeチャンネルの登録者のみが参加できます"
   },
   "Support": {
     "description": "Bingifyはボランティアによって運営されているオープンソースプロジェクトです。あなたのサポートが、ホスティング費用や継続的な開発を支えます。",
