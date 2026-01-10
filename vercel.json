@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/token-refresh",
-      "schedule": "0 * * * *"
+      "schedule": "*/5 * * * *"
     }
   ]
 }
