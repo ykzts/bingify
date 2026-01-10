@@ -79,7 +79,8 @@ async function isUserParticipant(
 
 /**
  * スペースの参加者一覧を取得
- * オーナー、管理者、または参加者のみがアクセス可能
+ * オーナー/管理者: 全参加者を取得
+ * 一般参加者: 自分の情報のみ取得
  *
  * @param spaceId - スペースID
  * @returns 参加者一覧（プロフィール情報含む）、またはnull（権限なし）
@@ -98,17 +99,54 @@ export async function getSpaceParticipants(
     return null;
   }
 
-  // 権限チェック: オーナー、管理者、または参加者であること
+  // 権限チェック: オーナー、管理者かチェック
   const isOwnerOrAdmin = await isUserOwnerOrAdmin(spaceId, user.id);
-  const isParticipant = isOwnerOrAdmin
-    ? true
-    : await isUserParticipant(spaceId, user.id);
 
-  if (!isParticipant) {
-    return null;
+  // オーナー/管理者でない場合、参加者かチェック
+  if (!isOwnerOrAdmin) {
+    const isParticipant = await isUserParticipant(spaceId, user.id);
+    if (!isParticipant) {
+      return null;
+    }
+
+    // 一般参加者は自分の情報のみ取得
+    const { data: participantData, error: participantError } = await supabase
+      .from("participants")
+      .select("id, user_id, joined_at, bingo_status")
+      .eq("space_id", spaceId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (participantError || !participantData) {
+      console.error("Error fetching participant:", participantError);
+      return null;
+    }
+
+    // プロフィール情報を取得
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("id, full_name, avatar_url")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+      return null;
+    }
+
+    return [
+      {
+        avatar_url: profileData?.avatar_url || null,
+        bingo_status: participantData.bingo_status,
+        full_name: profileData?.full_name || null,
+        id: participantData.id,
+        joined_at: participantData.joined_at,
+        user_id: participantData.user_id,
+      },
+    ];
   }
 
-  // 参加者データを取得
+  // オーナー/管理者は全参加者データを取得
   const { data: participantsData, error: participantsError } = await supabase
     .from("participants")
     .select("id, user_id, joined_at, bingo_status")
@@ -119,6 +157,11 @@ export async function getSpaceParticipants(
   if (participantsError || !participantsData) {
     console.error("Error fetching participants:", participantsError);
     return null;
+  }
+
+  // 空の場合は早期リターン
+  if (participantsData.length === 0) {
+    return [];
   }
 
   // プロフィール情報を取得
@@ -151,8 +194,74 @@ export async function getSpaceParticipants(
 }
 
 /**
+ * 一般参加者の自分のビンゴカードを取得
+ */
+async function getOwnBingoCard(
+  spaceId: string,
+  userId: string
+): Promise<BingoCardWithParticipant[] | null> {
+  const supabase = await createClient();
+
+  // 自分のカードのみ取得
+  const { data: cardData, error: cardError } = await supabase
+    .from("bingo_cards")
+    .select("id, space_id, user_id, numbers, created_at")
+    .eq("space_id", spaceId)
+    .eq("user_id", userId)
+    .single();
+
+  if (cardError || !cardData) {
+    // カードが存在しない場合は空配列を返す
+    if (cardError?.code === "PGRST116") {
+      return [];
+    }
+    console.error("Error fetching bingo card:", cardError);
+    return null;
+  }
+
+  // 参加者情報を取得
+  const { data: participantData, error: participantError } = await supabase
+    .from("participants")
+    .select("user_id, bingo_status")
+    .eq("space_id", spaceId)
+    .eq("user_id", userId)
+    .single();
+
+  if (participantError) {
+    console.error("Error fetching participant:", participantError);
+    return null;
+  }
+
+  // プロフィール情報を取得
+  const { data: profileData, error: profileError } = await supabase
+    .from("profiles")
+    .select("id, full_name, avatar_url")
+    .eq("id", userId)
+    .single();
+
+  if (profileError) {
+    console.error("Error fetching profile:", profileError);
+    return null;
+  }
+
+  return [
+    {
+      avatar_url: profileData?.avatar_url || null,
+      bingo_status: participantData?.bingo_status || null,
+      created_at: cardData.created_at,
+      full_name: profileData?.full_name || null,
+      id: cardData.id,
+      numbers: cardData.numbers as number[][],
+      space_id: cardData.space_id,
+      user_id: cardData.user_id,
+    },
+  ];
+}
+
+/**
  * スペースの全ビンゴカードを取得
- * オーナー、管理者、または参加者のみがアクセス可能
+ * オーナー/管理者: 全カードを取得
+ * 一般参加者: 自分のカードのみ取得
  *
  * @param spaceId - スペースID
  * @returns ビンゴカード一覧（参加者情報含む）、またはnull（権限なし）
@@ -171,17 +280,21 @@ export async function getSpaceBingoCards(
     return null;
   }
 
-  // 権限チェック: オーナー、管理者、または参加者であること
+  // 権限チェック: オーナー、管理者かチェック
   const isOwnerOrAdmin = await isUserOwnerOrAdmin(spaceId, user.id);
-  const isParticipant = isOwnerOrAdmin
-    ? true
-    : await isUserParticipant(spaceId, user.id);
 
-  if (!isParticipant) {
-    return null;
+  // オーナー/管理者でない場合、参加者かチェック
+  if (!isOwnerOrAdmin) {
+    const isParticipant = await isUserParticipant(spaceId, user.id);
+    if (!isParticipant) {
+      return null;
+    }
+
+    // 一般参加者は自分のカードのみ取得
+    return getOwnBingoCard(spaceId, user.id);
   }
 
-  // ビンゴカードデータを取得
+  // オーナー/管理者は全ビンゴカードデータを取得
   const { data: cardsData, error: cardsError } = await supabase
     .from("bingo_cards")
     .select("id, space_id, user_id, numbers, created_at")
@@ -190,6 +303,11 @@ export async function getSpaceBingoCards(
   if (cardsError || !cardsData) {
     console.error("Error fetching bingo cards:", cardsError);
     return null;
+  }
+
+  // 空の場合は早期リターン
+  if (cardsData.length === 0) {
+    return [];
   }
 
   // 参加者情報を取得

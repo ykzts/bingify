@@ -87,51 +87,29 @@ describe("getSpaceParticipants", () => {
     expect(result).toBeNull();
   });
 
-  it("参加者の場合は参加者リストを返す", async () => {
-    // ユーザーは認証済みで参加者
+  it("一般参加者の場合は自分の情報のみ返す", async () => {
+    // ユーザーは認証済みで参加者（オーナー/管理者ではない）
     mockSupabase.auth.getUser.mockResolvedValue({
       data: { user: { id: "user-id" } },
     });
 
-    const mockParticipants = [
-      {
-        bingo_status: "bingo",
-        id: "participant-1",
-        joined_at: "2024-01-01T00:00:00Z",
-        user_id: "user-1",
-      },
-      {
-        bingo_status: "reach",
-        id: "participant-2",
-        joined_at: "2024-01-01T01:00:00Z",
-        user_id: "user-2",
-      },
-    ];
+    const mockParticipant = {
+      bingo_status: "reach",
+      id: "participant-1",
+      joined_at: "2024-01-01T00:00:00Z",
+      user_id: "user-id",
+    };
 
-    const mockProfiles: Tables<"profiles">[] = [
-      {
-        avatar_source: "upload",
-        avatar_url: "https://example.com/avatar1.jpg",
-        created_at: "2024-01-01T00:00:00Z",
-        email: "user1@example.com",
-        full_name: "User One",
-        id: "user-1",
-        role: "user",
-        updated_at: "2024-01-01T00:00:00Z",
-      },
-      {
-        avatar_source: "google",
-        avatar_url: "https://example.com/avatar2.jpg",
-        created_at: "2024-01-01T00:00:00Z",
-        email: "user2@example.com",
-        full_name: "User Two",
-        id: "user-2",
-        role: "user",
-        updated_at: "2024-01-01T00:00:00Z",
-      },
-    ];
-
-    let participantsCallCount = 0;
+    const mockProfile: Tables<"profiles"> = {
+      avatar_source: "upload",
+      avatar_url: "https://example.com/avatar1.jpg",
+      created_at: "2024-01-01T00:00:00Z",
+      email: "user@example.com",
+      full_name: "User One",
+      id: "user-id",
+      role: "user",
+      updated_at: "2024-01-01T00:00:00Z",
+    };
 
     mockSupabase.from.mockImplementation((table: string) => {
       if (table === "spaces") {
@@ -163,29 +141,12 @@ describe("getSpaceParticipants", () => {
         };
       }
       if (table === "participants") {
-        participantsCallCount++;
-        // 最初の呼び出し: isUserParticipant チェック
-        if (participantsCallCount === 1) {
-          return {
-            select: vi.fn().mockReturnValue({
-              eq: vi.fn().mockReturnValue({
-                eq: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({
-                    data: { id: "participant-id" },
-                    error: null,
-                  }),
-                }),
-              }),
-            }),
-          };
-        }
-        // 2回目以降の呼び出し: 実際のデータ取得
         return {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              order: vi.fn().mockReturnValue({
-                order: vi.fn().mockResolvedValue({
-                  data: mockParticipants,
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: mockParticipant,
                   error: null,
                 }),
               }),
@@ -196,9 +157,11 @@ describe("getSpaceParticipants", () => {
       if (table === "profiles") {
         return {
           select: vi.fn().mockReturnValue({
-            in: vi.fn().mockResolvedValue({
-              data: mockProfiles,
-              error: null,
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
+                data: mockProfile,
+                error: null,
+              }),
             }),
           }),
         };
@@ -209,12 +172,12 @@ describe("getSpaceParticipants", () => {
     const result = await getSpaceParticipants("test-space-id");
 
     expect(result).not.toBeNull();
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(1);
     expect(result?.[0]).toMatchObject({
       avatar_url: "https://example.com/avatar1.jpg",
-      bingo_status: "bingo",
+      bingo_status: "reach",
       full_name: "User One",
-      user_id: "user-1",
+      user_id: "user-id",
     });
   });
 });
@@ -234,43 +197,37 @@ describe("getSpaceBingoCards", () => {
     expect(result).toBeNull();
   });
 
-  it("参加者の場合はビンゴカードリストを返す", async () => {
+  it("一般参加者の場合は自分のカードのみ返す", async () => {
     mockSupabase.auth.getUser.mockResolvedValue({
       data: { user: { id: "user-id" } },
     });
 
-    const mockCards = [
-      {
-        created_at: "2024-01-01T00:00:00Z",
-        id: "card-1",
-        numbers: [
-          [1, 16, 31, 46, 61],
-          [2, 17, 32, 47, 62],
-          [3, 18, 0, 48, 63],
-          [4, 19, 33, 49, 64],
-          [5, 20, 34, 50, 65],
-        ],
-        space_id: "test-space-id",
-        user_id: "user-1",
-      },
-    ];
+    const mockCard = {
+      created_at: "2024-01-01T00:00:00Z",
+      id: "card-1",
+      numbers: [
+        [1, 16, 31, 46, 61],
+        [2, 17, 32, 47, 62],
+        [3, 18, 0, 48, 63],
+        [4, 19, 33, 49, 64],
+        [5, 20, 34, 50, 65],
+      ],
+      space_id: "test-space-id",
+      user_id: "user-id",
+    };
 
-    const mockParticipants = [{ bingo_status: "reach", user_id: "user-1" }];
+    const mockParticipant = { bingo_status: "reach", user_id: "user-id" };
 
-    const mockProfiles: Tables<"profiles">[] = [
-      {
-        avatar_source: "google",
-        avatar_url: "https://example.com/avatar1.jpg",
-        created_at: "2024-01-01T00:00:00Z",
-        email: "user1@example.com",
-        full_name: "User One",
-        id: "user-1",
-        role: "user",
-        updated_at: "2024-01-01T00:00:00Z",
-      },
-    ];
-
-    let participantsCallCount = 0;
+    const mockProfile: Tables<"profiles"> = {
+      avatar_source: "google",
+      avatar_url: "https://example.com/avatar1.jpg",
+      created_at: "2024-01-01T00:00:00Z",
+      email: "user@example.com",
+      full_name: "User One",
+      id: "user-id",
+      role: "user",
+      updated_at: "2024-01-01T00:00:00Z",
+    };
 
     mockSupabase.from.mockImplementation((table: string) => {
       if (table === "spaces") {
@@ -302,29 +259,14 @@ describe("getSpaceBingoCards", () => {
         };
       }
       if (table === "participants") {
-        participantsCallCount++;
-        // 最初の呼び出し: isUserParticipant チェック
-        if (participantsCallCount === 1) {
-          return {
-            select: vi.fn().mockReturnValue({
-              eq: vi.fn().mockReturnValue({
-                eq: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({
-                    data: { id: "participant-id" },
-                    error: null,
-                  }),
-                }),
-              }),
-            }),
-          };
-        }
-        // 2回目の呼び出し: 実際のデータ取得
         return {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              in: vi.fn().mockResolvedValue({
-                data: mockParticipants,
-                error: null,
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: mockParticipant,
+                  error: null,
+                }),
               }),
             }),
           }),
@@ -333,9 +275,13 @@ describe("getSpaceBingoCards", () => {
       if (table === "bingo_cards") {
         return {
           select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue({
-              data: mockCards,
-              error: null,
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: mockCard,
+                  error: null,
+                }),
+              }),
             }),
           }),
         };
@@ -343,9 +289,11 @@ describe("getSpaceBingoCards", () => {
       if (table === "profiles") {
         return {
           select: vi.fn().mockReturnValue({
-            in: vi.fn().mockResolvedValue({
-              data: mockProfiles,
-              error: null,
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
+                data: mockProfile,
+                error: null,
+              }),
             }),
           }),
         };
@@ -361,8 +309,8 @@ describe("getSpaceBingoCards", () => {
       avatar_url: "https://example.com/avatar1.jpg",
       bingo_status: "reach",
       full_name: "User One",
-      user_id: "user-1",
+      user_id: "user-id",
     });
-    expect(result?.[0].numbers).toEqual(mockCards[0].numbers);
+    expect(result?.[0].numbers).toEqual(mockCard.numbers);
   });
 });
