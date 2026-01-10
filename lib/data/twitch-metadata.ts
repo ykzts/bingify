@@ -129,7 +129,29 @@ export async function fetchAndCacheTwitchBroadcasterMetadata(
     // DBに保存
     return await upsertTwitchBroadcasterMetadata(supabase, metadata);
   } catch (error) {
-    // エラーが発生した場合は、エラー情報を保存
+    // エラーが発生した場合は、既存データを保持しつつエラー情報のみ更新
+    if (cached) {
+      // 既存レコードがある場合は、エラー情報のみ更新（他のフィールドは保持）
+      const errorMetadata: TablesInsert<"twitch_broadcasters"> = {
+        broadcaster_id: broadcasterId,
+        created_by: cached.created_by,
+        description: cached.description,
+        display_name: cached.display_name,
+        // エラー情報のみ更新
+        fetch_error: error instanceof Error ? error.message : "Unknown error",
+        fetched_at: new Date().toISOString(),
+        profile_image_url: cached.profile_image_url,
+        // 既存の良好なデータを保持
+        username: cached.username,
+      };
+
+      await upsertTwitchBroadcasterMetadata(supabase, errorMetadata);
+
+      // 既存の良好なデータを返す
+      return cached;
+    }
+
+    // 既存レコードがない場合のみ、新規にエラーレコードを作成
     const errorMetadata: TablesInsert<"twitch_broadcasters"> = {
       broadcaster_id: broadcasterId,
       fetch_error: error instanceof Error ? error.message : "Unknown error",
@@ -141,11 +163,6 @@ export async function fetchAndCacheTwitchBroadcasterMetadata(
     }
 
     await upsertTwitchBroadcasterMetadata(supabase, errorMetadata);
-
-    // キャッシュされたデータがあればそれを返す（古くてもエラーより良い）
-    if (cached) {
-      return cached;
-    }
 
     throw error;
   }
