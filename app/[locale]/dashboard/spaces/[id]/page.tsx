@@ -1,10 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
-import {
-  getSpaceBingoCards,
-  getSpaceParticipants,
-} from "@/lib/data/participants";
 import { getSpace } from "@/lib/data/spaces";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
@@ -14,7 +10,6 @@ import type {
   LocaleType,
   ThemeType,
 } from "@/lib/types/screen-settings";
-import { SpaceResults } from "../../../spaces/[id]/_components/space-results";
 import { BingoGameManager } from "./_components/bingo-game-manager";
 import { DisplaySettingsDialog } from "./_components/display-settings-dialog";
 import { DraftStatusView } from "./_components/draft-status-view";
@@ -119,36 +114,6 @@ export default async function AdminSpacePage({
     | LocaleType
     | undefined;
 
-  // Fetch results data for closed/expired spaces
-  let resultsData:
-    | {
-        bingoCards: Awaited<ReturnType<typeof getSpaceBingoCards>>;
-        calledNumbers: number[];
-        participants: Awaited<ReturnType<typeof getSpaceParticipants>>;
-      }
-    | undefined;
-
-  if (space.status === "closed" || space.status === "expired") {
-    const [participants, bingoCards, calledNumbersData] = await Promise.all([
-      getSpaceParticipants(id),
-      getSpaceBingoCards(id),
-      (async () => {
-        const { data } = await supabase
-          .from("called_numbers")
-          .select("value")
-          .eq("space_id", id)
-          .order("called_at", { ascending: true });
-        return data?.map((row) => row.value) || [];
-      })(),
-    ]);
-
-    resultsData = {
-      bingoCards,
-      calledNumbers: calledNumbersData,
-      participants,
-    };
-  }
-
   return (
     <div className="mx-auto min-h-screen max-w-3xl space-y-8 p-8">
       {/* Header with Action Buttons */}
@@ -189,35 +154,17 @@ export default async function AdminSpacePage({
       )}
 
       {space.status === "active" && (
-        <>
-          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <BingoGameManager spaceId={space.id} />
-          </div>
-
-          <ParticipantsStatus
-            maxParticipants={space.max_participants}
-            spaceId={space.id}
-          />
-        </>
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <BingoGameManager spaceId={space.id} />
+        </div>
       )}
 
-      {(space.status === "closed" || space.status === "expired") && (
-        <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
-          <h2 className="mb-6 text-center font-bold text-2xl">
-            {t("resultsTitle")}
-          </h2>
-          {resultsData?.participants && resultsData?.bingoCards ? (
-            <SpaceResults
-              bingoCards={resultsData.bingoCards}
-              calledNumbers={resultsData.calledNumbers}
-              participants={resultsData.participants}
-            />
-          ) : (
-            <div className="flex items-center justify-center py-12">
-              <p className="text-gray-500">{t("errorLoadingResults")}</p>
-            </div>
-          )}
-        </div>
+      {/* Participants List - Show for all statuses except draft */}
+      {space.status !== "draft" && (
+        <ParticipantsStatus
+          maxParticipants={space.max_participants}
+          spaceId={space.id}
+        />
       )}
 
       {/* Space URL Share - Always visible at the bottom */}
