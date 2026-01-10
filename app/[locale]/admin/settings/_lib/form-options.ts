@@ -2,6 +2,11 @@ import { formOptions } from "@tanstack/react-form-nextjs";
 import { z } from "zod";
 
 export const systemSettingsFormSchema = z.object({
+  archive_retention_days: z
+    .number()
+    .int("整数を入力してください")
+    .min(0, "0日以上を指定してください（0は即時削除）")
+    .max(365, "最大365日までです"),
   default_user_role: z.enum(["organizer", "user"]),
   features: z.object({
     gatekeeper: z.object({
@@ -54,6 +59,7 @@ export type SystemSettingsFormValues = z.infer<typeof systemSettingsFormSchema>;
 
 export const systemSettingsFormOpts = formOptions({
   defaultValues: {
+    archive_retention_days: 7,
     default_user_role: "organizer",
     features: {
       gatekeeper: {

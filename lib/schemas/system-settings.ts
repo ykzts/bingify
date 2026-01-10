@@ -32,6 +32,11 @@ export const systemFeaturesSchema = z.object({
 export const defaultUserRoleSchema = z.enum(["organizer", "user"]);
 
 export const systemSettingsSchema = z.object({
+  archive_retention_days: z
+    .number()
+    .int("整数を入力してください")
+    .min(0, "0日以上を指定してください（0は即時削除）")
+    .max(365, "最大365日までです"),
   default_user_role: defaultUserRoleSchema,
   features: systemFeaturesSchema,
   max_participants_per_space: z
@@ -62,6 +67,7 @@ export type SystemSettings = z.infer<typeof systemSettingsSchema>;
  * Default system settings used as fallback when database values are invalid
  */
 export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
+  archive_retention_days: 7,
   default_user_role: "organizer",
   features: {
     gatekeeper: {

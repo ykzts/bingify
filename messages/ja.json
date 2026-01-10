@@ -124,6 +124,8 @@
     "updateSuccess": "認証プロバイダーを更新しました"
   },
   "AdminSettings": {
+    "archiveRetentionHelp": "終了したスペースを何日間保持してからアーカイブに移動するか設定します（0は即時削除）",
+    "archiveRetentionLabel": "アーカイブ保持期間（日数）",
     "defaultUserRoleHelp": "新規登録ユーザーに自動的に付与される権限です。「主催者」はスペース作成が可能、「参加者」は作成不可となります。",
     "defaultUserRoleLabel": "新規ユーザーの初期権限",
     "description": "サーバーリソース管理とスペース制限の設定",

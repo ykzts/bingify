@@ -59,6 +59,7 @@ describe("Admin Settings Actions", () => {
 
       // FormDataを作成し、すべてのネストされたフィールドを含める
       const formData = new FormData();
+      formData.set("archive_retention_days", "7");
       formData.set("default_user_role", "organizer");
       formData.set("max_participants_per_space", "50");
       formData.set("max_spaces_per_user", "5");
@@ -155,6 +156,7 @@ describe("Admin Settings Actions", () => {
 
       // FormDataを作成 - チェックボックスはOFFの場合値が送信されない
       const formData = new FormData();
+      formData.set("archive_retention_days", "7");
       formData.set("default_user_role", "user");
       formData.set("max_participants_per_space", "100");
       formData.set("max_spaces_per_user", "10");
@@ -241,6 +243,7 @@ describe("Admin Settings Actions", () => {
 
       // FormDataを作成 - 一部のチェックボックスのみON
       const formData = new FormData();
+      formData.set("archive_retention_days", "14");
       formData.set("default_user_role", "organizer");
       formData.set("max_participants_per_space", "50");
       formData.set("max_spaces_per_user", "5");
@@ -354,6 +357,7 @@ describe("Admin Settings Actions", () => {
       vi.mocked(createClient).mockResolvedValue(mockClient as any);
 
       const formData = new FormData();
+      formData.set("archive_retention_days", "7");
       formData.set("default_user_role", "organizer");
       formData.set("max_participants_per_space", "50");
       formData.set("max_spaces_per_user", "5");

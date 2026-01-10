@@ -124,6 +124,8 @@
     "updateSuccess": "Authentication provider updated successfully"
   },
   "AdminSettings": {
+    "archiveRetentionHelp": "Set how many days to keep closed spaces before archiving (0 for immediate deletion)",
+    "archiveRetentionLabel": "Archive Retention (Days)",
     "defaultUserRoleHelp": "Default role automatically assigned to newly registered users. \"Organizer\" can create spaces, \"User\" can only participate.",
     "defaultUserRoleLabel": "Default Role for New Users",
     "description": "Configure server resource management and space limits",

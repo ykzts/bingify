@@ -1,8 +1,8 @@
 -- Unify 'expired' status to 'closed' for consistency
 -- This migration removes the distinction between manually closed and automatically expired spaces
 
--- Step 1: Update existing 'expired' spaces to 'closed'
-UPDATE spaces SET status = 'closed' WHERE status = 'expired';
+-- Step 1: Update existing 'expired' spaces to 'closed' and set updated_at
+UPDATE spaces SET status = 'closed', updated_at = NOW() WHERE status = 'expired';
 
 -- Step 2: Update the cleanup function to set status to 'closed' instead of 'expired'
 CREATE OR REPLACE FUNCTION cleanup_expired_spaces()
@@ -43,6 +43,9 @@ BEGIN
   RETURN QUERY SELECT COALESCE(result_count, 0), COALESCE(result_ids, ARRAY[]::UUID[]);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Set search_path for security to prevent search_path hijacking
+ALTER FUNCTION cleanup_expired_spaces() SET search_path = pg_catalog, public;
 
 -- Step 3: Update database comment to reflect unified status
 COMMENT ON COLUMN spaces.status IS 'Space status: draft (preparation, not public), active (in progress, public), closed (ended, view only - includes both manually and automatically closed spaces)';

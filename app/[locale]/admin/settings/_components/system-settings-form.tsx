@@ -56,6 +56,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
     ...systemSettingsFormOpts,
     defaultValues: initialSettings
       ? {
+          archive_retention_days: initialSettings.archive_retention_days,
           default_user_role: initialSettings.default_user_role,
           features: initialSettings.features,
           max_participants_per_space:
@@ -232,6 +233,37 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   />
                   <FieldDescription>
                     {t("spaceExpirationHelp")}
+                  </FieldDescription>
+                  {field.state.meta.errors.length > 0 && (
+                    <InlineFieldError>
+                      {getErrorMessage(field.state.meta.errors[0])}
+                    </InlineFieldError>
+                  )}
+                </FieldContent>
+              </Field>
+            )}
+          </form.Field>
+
+          <form.Field name="archive_retention_days">
+            {(field) => (
+              <Field>
+                <FieldContent>
+                  <FieldLabel>{t("archiveRetentionLabel")}</FieldLabel>
+                  <Input
+                    disabled={isSubmitting}
+                    max={365}
+                    min={0}
+                    name={field.name}
+                    onChange={(e) => {
+                      const parsed = Number.parseInt(e.target.value, 10);
+                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
+                    }}
+                    required
+                    type="number"
+                    value={field.state.value as number}
+                  />
+                  <FieldDescription>
+                    {t("archiveRetentionHelp")}
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
                     <InlineFieldError>
