@@ -486,8 +486,10 @@ export function SpaceSettingsForm({
   }
 
   const isDraft = space.status === "draft";
+  const isClosed = space.status === "closed";
   const isPending = isSubmitting || isPublishing;
-  const isGatekeeperDisabled = isPending || !isOwner;
+  const isGatekeeperDisabled = isPending || !isOwner || isClosed;
+  const isFormDisabled = isPending || isClosed;
 
   // Calculate grid columns for tabs
   const visibleTabCount =
@@ -501,6 +503,15 @@ export function SpaceSettingsForm({
 
   return (
     <div className="space-y-8">
+      {/* Closed Space Alert */}
+      {isClosed && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>{t("warning")}</AlertTitle>
+          <AlertDescription>{t("errorClosedSpace")}</AlertDescription>
+        </Alert>
+      )}
+
       <form
         action={updateAction}
         className="space-y-6"
@@ -517,7 +528,7 @@ export function SpaceSettingsForm({
                   <FieldContent>
                     <FieldLabel>{t("titleLabel")}</FieldLabel>
                     <Input
-                      disabled={isPending}
+                      disabled={isFormDisabled}
                       maxLength={100}
                       name={field.name}
                       onChange={(e) => field.handleChange(e.target.value)}
@@ -542,7 +553,7 @@ export function SpaceSettingsForm({
                   <FieldContent>
                     <FieldLabel>{t("descriptionLabel")}</FieldLabel>
                     <Textarea
-                      disabled={isPending}
+                      disabled={isFormDisabled}
                       maxLength={500}
                       name={field.name}
                       onChange={(e) => field.handleChange(e.target.value)}
@@ -573,7 +584,7 @@ export function SpaceSettingsForm({
                   <FieldContent>
                     <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
                     <Input
-                      disabled={isPending}
+                      disabled={isFormDisabled}
                       max={systemMaxParticipants}
                       min={Math.max(1, currentParticipantCount)}
                       name={field.name}
@@ -955,7 +966,7 @@ export function SpaceSettingsForm({
                 <Checkbox
                   checked={field.state.value as boolean}
                   className="mt-1"
-                  disabled={isPending}
+                  disabled={isFormDisabled}
                   id={field.name}
                   name={field.name}
                   onCheckedChange={(checked) =>
@@ -998,7 +1009,7 @@ export function SpaceSettingsForm({
         {/* Action Buttons */}
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
           <Button
-            disabled={!canSubmit || isPending}
+            disabled={!canSubmit || isPending || isClosed}
             type="submit"
             variant="outline"
           >
@@ -1008,7 +1019,7 @@ export function SpaceSettingsForm({
 
           {isDraft && (
             <Button
-              disabled={!canSubmit || isPending}
+              disabled={!canSubmit || isPending || isClosed}
               formAction={publishAction}
               type="submit"
             >

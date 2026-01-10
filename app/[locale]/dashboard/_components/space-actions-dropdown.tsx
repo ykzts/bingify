@@ -5,7 +5,6 @@ import {
   DoorClosed,
   ExternalLink,
   MoreHorizontal,
-  RefreshCw,
   Settings,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -82,11 +81,6 @@ export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
     }
   };
 
-  const handleReopen = () => {
-    // Navigate to the space settings page where user can change status from closed to draft/active
-    router.push(`/dashboard/spaces/${space.id}`);
-  };
-
   const isActive = space.status === "active";
   const isDraft = space.status === "draft";
   const isClosed = space.status === "closed";
@@ -94,7 +88,10 @@ export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-gray-100">
+        <DropdownMenuTrigger
+          className="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-gray-100 disabled:pointer-events-none disabled:opacity-50"
+          disabled={isClosed}
+        >
           <MoreHorizontal className="h-4 w-4" />
           <span className="sr-only">{t("spaceActions")}</span>
         </DropdownMenuTrigger>
@@ -117,25 +114,16 @@ export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
             </>
           )}
 
-          {isClosed && (
-            <DropdownMenuItem onClick={handleReopen}>
-              <RefreshCw className="mr-2 h-4 w-4" />
-              {t("reopenAction")}
-            </DropdownMenuItem>
-          )}
-
           <DropdownMenuSeparator />
 
           {/* Show close action for non-closed spaces */}
-          {!isClosed && (
-            <DropdownMenuItem
-              className="text-red-600 focus:text-red-600"
-              onClick={() => setShowCloseDialog(true)}
-            >
-              <DoorClosed className="mr-2 h-4 w-4" />
-              {t("closeAction")}
-            </DropdownMenuItem>
-          )}
+          <DropdownMenuItem
+            className="text-red-600 focus:text-red-600"
+            onClick={() => setShowCloseDialog(true)}
+          >
+            <DoorClosed className="mr-2 h-4 w-4" />
+            {t("closeAction")}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 

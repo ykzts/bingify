@@ -278,7 +278,8 @@ export function TwitchBroadcasterIdField({
                         <span>{getBadgeText()}</span>
                         <button
                           aria-label={t("removeBroadcaster")}
-                          className="inline-flex h-3 w-3 cursor-pointer items-center justify-center"
+                          className="inline-flex h-3 w-3 cursor-pointer items-center justify-center disabled:cursor-not-allowed disabled:opacity-50"
+                          disabled={isPending}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDelete();
