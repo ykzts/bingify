@@ -1,10 +1,9 @@
 "use client";
 
-import { AlertCircle, Loader2, X } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -48,7 +47,7 @@ export function YoutubeChannelIdField({
   const [metadata, setMetadata] = useState<Tables<"youtube_channels"> | null>(
     null
   );
-  const [loadingMetadata, setLoadingMetadata] = useState(false);
+  const [_loadingMetadata, setLoadingMetadata] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -244,29 +243,13 @@ export function YoutubeChannelIdField({
         <div className="flex gap-2">
           <div className="relative flex-1">
             {metadata ? (
-              // Show badge inside field-like container
-              <div className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 py-2">
-                <Badge
-                  className="flex items-center gap-1.5 text-sm"
-                  variant="secondary"
-                >
-                  {loadingMetadata && (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  )}
-                  <span>{getDisplayText()}</span>
-                  <button
-                    className="ml-1 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
-                    disabled={isPending}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleDelete();
-                    }}
-                    type="button"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              </div>
+              // Show formatted text with border (no badge - just simple border)
+              <Input
+                className="flex cursor-default items-center gap-2 text-sm"
+                onKeyDown={handleKeyDown}
+                readOnly
+                value={getDisplayText()}
+              />
             ) : (
               // Show regular input
               <Input
