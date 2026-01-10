@@ -15,6 +15,7 @@ import { useActionState, useEffect, useEffectEvent, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Combobox } from "@/components/ui/combobox";
 import {
   Field,
   FieldContent,
@@ -28,13 +29,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@/i18n/navigation";
@@ -707,49 +701,45 @@ export function SpaceSettingsForm({
                               value={effectiveSocialPlatform}
                             />
 
-                            <div>
-                              <Label className="mb-2">
-                                {t("socialPlatformLabel")}
-                              </Label>
-                              <RadioGroup
-                                disabled={isGatekeeperDisabled}
-                                onValueChange={(value) =>
-                                  platformField.handleChange(
-                                    value as "youtube" | "twitch"
-                                  )
-                                }
-                                value={effectiveSocialPlatform}
-                              >
-                                {showYoutubeOption && (
-                                  <div className="flex items-center space-x-2">
-                                    <RadioGroupItem
-                                      id="platform-youtube"
-                                      value="youtube"
-                                    />
-                                    <Label
-                                      className="cursor-pointer"
-                                      htmlFor="platform-youtube"
-                                    >
-                                      {t("platformYoutube")}
-                                    </Label>
-                                  </div>
-                                )}
-                                {showTwitchOption && (
-                                  <div className="flex items-center space-x-2">
-                                    <RadioGroupItem
-                                      id="platform-twitch"
-                                      value="twitch"
-                                    />
-                                    <Label
-                                      className="cursor-pointer"
-                                      htmlFor="platform-twitch"
-                                    >
-                                      {t("platformTwitch")}
-                                    </Label>
-                                  </div>
-                                )}
-                              </RadioGroup>
-                            </div>
+                            <Field>
+                              <FieldContent>
+                                <FieldLabel>
+                                  {t("socialPlatformLabel")}
+                                </FieldLabel>
+                                <Combobox
+                                  disabled={isGatekeeperDisabled}
+                                  emptyText={t("comboboxNoResults")}
+                                  onValueChange={(value) =>
+                                    platformField.handleChange(
+                                      value as "youtube" | "twitch"
+                                    )
+                                  }
+                                  options={[
+                                    ...(showYoutubeOption
+                                      ? [
+                                          {
+                                            label: t("platformYoutube"),
+                                            value: "youtube",
+                                          },
+                                        ]
+                                      : []),
+                                    ...(showTwitchOption
+                                      ? [
+                                          {
+                                            label: t("platformTwitch"),
+                                            value: "twitch",
+                                          },
+                                        ]
+                                      : []),
+                                  ]}
+                                  placeholder={t("socialPlatformLabel")}
+                                  searchPlaceholder={t(
+                                    "comboboxSearchPlaceholder"
+                                  )}
+                                  value={effectiveSocialPlatform}
+                                />
+                              </FieldContent>
+                            </Field>
                           </>
                         )}
                       </form.Field>
@@ -758,52 +748,6 @@ export function SpaceSettingsForm({
                       {effectiveSocialPlatform === "youtube" &&
                         showYoutubeOption && (
                           <>
-                            <form.Field name="youtube_requirement">
-                              {(field) => (
-                                <Field>
-                                  <FieldContent>
-                                    <FieldLabel>
-                                      {t("youtubeRequirementLabel")}
-                                    </FieldLabel>
-                                    <Select
-                                      disabled={isGatekeeperDisabled}
-                                      name={field.name}
-                                      onValueChange={(value) => {
-                                        field.handleChange(value);
-                                      }}
-                                      value={field.state.value as string}
-                                    >
-                                      <SelectTrigger>
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {showYoutubeSubscriber && (
-                                          <SelectItem
-                                            disabled={
-                                              !canUseYoutubeMemberSubscriber
-                                            }
-                                            value="subscriber"
-                                          >
-                                            {t("youtubeSubscriber")}
-                                          </SelectItem>
-                                        )}
-                                        {showYoutubeMember && (
-                                          <SelectItem
-                                            disabled={
-                                              !canUseYoutubeMemberSubscriber
-                                            }
-                                            value="member"
-                                          >
-                                            {t("youtubeMember")}
-                                          </SelectItem>
-                                        )}
-                                      </SelectContent>
-                                    </Select>
-                                  </FieldContent>
-                                </Field>
-                              )}
-                            </form.Field>
-
                             <form.Field name="youtube_channel_id">
                               {(field) => (
                                 <YoutubeChannelIdField
@@ -819,6 +763,74 @@ export function SpaceSettingsForm({
                                 />
                               )}
                             </form.Field>
+
+                            <form.Field name="youtube_requirement">
+                              {(field) => (
+                                <Field>
+                                  <FieldContent>
+                                    <FieldLabel>
+                                      {t("youtubeRequirementLabel")}
+                                    </FieldLabel>
+                                    <RadioGroup
+                                      disabled={isGatekeeperDisabled}
+                                      onValueChange={(value) => {
+                                        field.handleChange(value);
+                                      }}
+                                      value={field.state.value as string}
+                                    >
+                                      {showYoutubeSubscriber && (
+                                        <div className="flex items-start space-x-2">
+                                          <RadioGroupItem
+                                            className="mt-1"
+                                            disabled={
+                                              !canUseYoutubeMemberSubscriber
+                                            }
+                                            id="youtube-subscriber"
+                                            value="subscriber"
+                                          />
+                                          <div className="flex-1">
+                                            <Label
+                                              className="cursor-pointer"
+                                              htmlFor="youtube-subscriber"
+                                            >
+                                              {t("youtubeSubscriber")}
+                                            </Label>
+                                            <p className="mt-1 text-gray-500 text-sm">
+                                              {t(
+                                                "youtubeSubscriberDescription"
+                                              )}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      )}
+                                      {showYoutubeMember && (
+                                        <div className="flex items-start space-x-2">
+                                          <RadioGroupItem
+                                            className="mt-1"
+                                            disabled={
+                                              !canUseYoutubeMemberSubscriber
+                                            }
+                                            id="youtube-member"
+                                            value="member"
+                                          />
+                                          <div className="flex-1">
+                                            <Label
+                                              className="cursor-pointer"
+                                              htmlFor="youtube-member"
+                                            >
+                                              {t("youtubeMember")}
+                                            </Label>
+                                            <p className="mt-1 text-gray-500 text-sm">
+                                              {t("youtubeMemberDescription")}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </RadioGroup>
+                                  </FieldContent>
+                                </Field>
+                              )}
+                            </form.Field>
                           </>
                         )}
 
@@ -826,45 +838,6 @@ export function SpaceSettingsForm({
                       {effectiveSocialPlatform === "twitch" &&
                         showTwitchOption && (
                           <>
-                            <form.Field name="twitch_requirement">
-                              {(field) => (
-                                <Field>
-                                  <FieldContent>
-                                    <FieldLabel>
-                                      {t("twitchRequirementLabel")}
-                                    </FieldLabel>
-                                    <Select
-                                      disabled={isGatekeeperDisabled}
-                                      name={field.name}
-                                      onValueChange={(value) => {
-                                        field.handleChange(value);
-                                      }}
-                                      value={field.state.value as string}
-                                    >
-                                      <SelectTrigger>
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {showTwitchFollower && (
-                                          <SelectItem value="follower">
-                                            {t("twitchFollower")}
-                                          </SelectItem>
-                                        )}
-                                        {showTwitchSubscriber && (
-                                          <SelectItem
-                                            disabled={!canUseTwitchSubscriber}
-                                            value="subscriber"
-                                          >
-                                            {t("twitchSubscriber")}
-                                          </SelectItem>
-                                        )}
-                                      </SelectContent>
-                                    </Select>
-                                  </FieldContent>
-                                </Field>
-                              )}
-                            </form.Field>
-
                             <form.Field name="twitch_broadcaster_id">
                               {(field) => (
                                 <TwitchBroadcasterIdField
@@ -878,6 +851,67 @@ export function SpaceSettingsForm({
                                     setOperatorTwitchBroadcasterId
                                   }
                                 />
+                              )}
+                            </form.Field>
+
+                            <form.Field name="twitch_requirement">
+                              {(field) => (
+                                <Field>
+                                  <FieldContent>
+                                    <FieldLabel>
+                                      {t("twitchRequirementLabel")}
+                                    </FieldLabel>
+                                    <RadioGroup
+                                      disabled={isGatekeeperDisabled}
+                                      onValueChange={(value) => {
+                                        field.handleChange(value);
+                                      }}
+                                      value={field.state.value as string}
+                                    >
+                                      {showTwitchFollower && (
+                                        <div className="flex items-start space-x-2">
+                                          <RadioGroupItem
+                                            className="mt-1"
+                                            id="twitch-follower"
+                                            value="follower"
+                                          />
+                                          <div className="flex-1">
+                                            <Label
+                                              className="cursor-pointer"
+                                              htmlFor="twitch-follower"
+                                            >
+                                              {t("twitchFollower")}
+                                            </Label>
+                                            <p className="mt-1 text-gray-500 text-sm">
+                                              {t("twitchFollowerDescription")}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      )}
+                                      {showTwitchSubscriber && (
+                                        <div className="flex items-start space-x-2">
+                                          <RadioGroupItem
+                                            className="mt-1"
+                                            disabled={!canUseTwitchSubscriber}
+                                            id="twitch-subscriber"
+                                            value="subscriber"
+                                          />
+                                          <div className="flex-1">
+                                            <Label
+                                              className="cursor-pointer"
+                                              htmlFor="twitch-subscriber"
+                                            >
+                                              {t("twitchSubscriber")}
+                                            </Label>
+                                            <p className="mt-1 text-gray-500 text-sm">
+                                              {t("twitchSubscriberDescription")}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </RadioGroup>
+                                  </FieldContent>
+                                </Field>
                               )}
                             </form.Field>
                           </>

@@ -575,6 +575,8 @@
   "SpaceSettings": {
     "basicInfoTitle": "Basic Information",
     "capacityTitle": "Participant Limit",
+    "comboboxNoResults": "No option found",
+    "comboboxSearchPlaceholder": "Search...",
     "descriptionHelp": "Add details or messages for participants",
     "descriptionLabel": "Description (Optional)",
     "descriptionPlaceholder": "Enter a description for this bingo space",
@@ -641,8 +643,10 @@
     "twitchBroadcasterIdPlaceholder": "Username, URL, or ID",
     "twitchBroadcasterIdUserNotFound": "User not found",
     "twitchFollower": "Followers only",
+    "twitchFollowerDescription": "Only followers of the specified Twitch channel can join",
     "twitchRequirementLabel": "Twitch Requirement",
     "twitchSubscriber": "Subscribers only",
+    "twitchSubscriberDescription": "Only subscribers of the specified Twitch channel can join",
     "updateButton": "Update Settings",
     "updateError": "Failed to update settings",
     "updateSuccess": "Settings updated successfully",
@@ -653,9 +657,11 @@
     "youtubeChannelIdLabel": "YouTube Channel ID",
     "youtubeChannelIdPlaceholder": "Channel ID, handle, or URL",
     "youtubeMember": "Members only",
+    "youtubeMemberDescription": "Only members of the specified YouTube channel can join",
     "youtubeRegisterError": "Failed to register channel metadata",
     "youtubeRequirementLabel": "YouTube Requirement",
-    "youtubeSubscriber": "Subscribers only"
+    "youtubeSubscriber": "Subscribers only",
+    "youtubeSubscriberDescription": "Only subscribers of the specified YouTube channel can join"
   },
   "Support": {
     "description": "Bingify is an open-source project maintained by volunteers. Your support helps cover hosting costs and enables continued development.",
