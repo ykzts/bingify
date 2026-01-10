@@ -3,6 +3,7 @@ import {
   checkFollowStatus,
   checkSubStatus,
   getBroadcasterIdFromUsername,
+  getUserTwitchId,
   parseTwitchInput,
 } from "../twitch";
 
@@ -10,6 +11,7 @@ import {
 const mockGetChannelFollowers = vi.fn();
 const mockCheckUserSubscription = vi.fn();
 const mockGetUsersByNames = vi.fn();
+const mockGetAuthenticatedUser = vi.fn();
 
 vi.mock("@twurple/api", () => ({
   ApiClient: class {
@@ -20,6 +22,7 @@ vi.mock("@twurple/api", () => ({
       checkUserSubscription: mockCheckUserSubscription,
     };
     users = {
+      getAuthenticatedUser: mockGetAuthenticatedUser,
       getUsersByNames: mockGetUsersByNames,
     };
   },
@@ -28,6 +31,71 @@ vi.mock("@twurple/api", () => ({
 vi.mock("@twurple/auth", () => ({
   StaticAuthProvider: class {},
 }));
+
+describe("getUserTwitchId", () => {
+  const originalClientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "test_client_id";
+  });
+
+  afterEach(() => {
+    process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = originalClientId;
+  });
+
+  it("認証されたユーザーのIDを正常に取得する", async () => {
+    mockGetAuthenticatedUser.mockResolvedValue({
+      displayName: "TestUser",
+      id: "123456789",
+      login: "testuser",
+    });
+
+    const result = await getUserTwitchId("test_access_token");
+
+    expect(result.userId).toBe("123456789");
+    expect(result.error).toBeUndefined();
+    expect(mockGetAuthenticatedUser).toHaveBeenCalledTimes(1);
+    expect(mockGetAuthenticatedUser).toHaveBeenCalledWith("@me");
+  });
+
+  it("アクセストークンが欠落している場合にエラーを返す", async () => {
+    const result = await getUserTwitchId("");
+
+    expect(result.userId).toBeUndefined();
+    expect(result.error).toBe("Missing access token");
+    expect(mockGetAuthenticatedUser).not.toHaveBeenCalled();
+  });
+
+  it("getAuthenticatedUserがnullを返す場合にエラーを返す", async () => {
+    mockGetAuthenticatedUser.mockResolvedValue(null);
+
+    const result = await getUserTwitchId("test_access_token");
+
+    expect(result.userId).toBeUndefined();
+    expect(result.error).toBe("Failed to get user information");
+  });
+
+  it("APIリクエストが失敗した場合にエラーを返す", async () => {
+    mockGetAuthenticatedUser.mockRejectedValue(
+      new Error("API Error: Invalid token")
+    );
+
+    const result = await getUserTwitchId("invalid_token");
+
+    expect(result.userId).toBeUndefined();
+    expect(result.error).toBe("API Error: Invalid token");
+  });
+
+  it("ネットワークエラーを適切に処理する", async () => {
+    mockGetAuthenticatedUser.mockRejectedValue(new Error("Network error"));
+
+    const result = await getUserTwitchId("test_access_token");
+
+    expect(result.userId).toBeUndefined();
+    expect(result.error).toBe("Network error");
+  });
+});
 
 describe("checkFollowStatus", () => {
   const originalClientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;

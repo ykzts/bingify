@@ -110,11 +110,10 @@ export async function getUserTwitchId(
     }
 
     const apiClient = createApiClient(userAccessToken);
-    // getUsersByIds with empty array returns the authenticated user
-    const users = await apiClient.users.getUsersByIds([]);
+    const user = await apiClient.users.getAuthenticatedUser("@me");
 
-    if (users.length > 0) {
-      return { userId: users[0].id };
+    if (user) {
+      return { userId: user.id };
     }
 
     return {
