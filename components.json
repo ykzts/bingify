@@ -2,8 +2,8 @@
   "$schema": "https://ui.shadcn.com/schema.json",
   "aliases": {
     "components": "@/components",
-    "lib": "@/lib",
     "hooks": "@/hooks",
+    "lib": "@/lib",
     "ui": "@/components/ui",
     "utils": "@/lib/utils"
   },
