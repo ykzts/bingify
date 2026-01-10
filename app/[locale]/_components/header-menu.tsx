@@ -48,11 +48,11 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
   };
 
   const isActivePath = (path: string) => {
-    // Special case for root path
+    // ルートパスの特別処理
     if (path === "/") {
       return pathname === "/";
     }
-    // Exact match or starts with path followed by /
+    // 完全一致またはサブパスで始まる場合
     return pathname === path || pathname.startsWith(`${path}/`);
   };
 
@@ -80,7 +80,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
           href="/dashboard"
         >
           <LayoutDashboard className="h-4 w-4" />
-          <span className="hidden sm:inline">{t("dashboard")}</span>
+          <span className="sr-only sm:not-sr-only">{t("dashboard")}</span>
         </Link>
 
         {user.role === "admin" && (
@@ -90,7 +90,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
             href="/admin"
           >
             <Shield className="h-4 w-4" />
-            <span className="hidden sm:inline">{t("admin")}</span>
+            <span className="sr-only sm:not-sr-only">{t("admin")}</span>
           </Link>
         )}
       </nav>
