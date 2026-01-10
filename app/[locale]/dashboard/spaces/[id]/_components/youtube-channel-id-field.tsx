@@ -2,8 +2,9 @@
 
 import { AlertCircle, Loader2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -19,6 +20,9 @@ import type { Tables } from "@/types/supabase";
 import { getYouTubeMetadata } from "../_actions/get-metadata";
 import { getOperatorYouTubeChannelId } from "../_actions/get-user-channel";
 import { lookupYouTubeChannelIdWithOperatorToken } from "../_actions/operator-lookup";
+
+// Regex to remove @ prefix
+const AT_PREFIX_REGEX = /^@+/;
 
 interface Props {
   // biome-ignore lint/suspicious/noExplicitAny: FieldApi type requires 23 generic parameters
@@ -37,43 +41,26 @@ export function YoutubeChannelIdField({
   onOperatorIdFetched,
 }: Props) {
   const t = useTranslations("SpaceSettings");
-  const [youtubeIdConverting, setTwitchIdConverting] = useState(false);
-  const [youtubeIdError, setTwitchIdError] = useState<string | null>(null);
-  const [fetchingOperatorYoutubeId, setFetchingOperatorTwitchId] =
+  const [youtubeIdConverting, setYoutubeIdConverting] = useState(false);
+  const [youtubeIdError, setYoutubeIdError] = useState<string | null>(null);
+  const [fetchingOperatorYoutubeId, setFetchingOperatorYoutubeId] =
     useState(false);
   const [metadata, setMetadata] = useState<Tables<"youtube_channels"> | null>(
     null
   );
   const [loadingMetadata, setLoadingMetadata] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch metadata when broadcaster ID changes (from form state)
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Complex metadata fetch and formatting logic
+  // Fetch metadata when channel ID changes (from form state)
   useEffect(() => {
     if (enteredChannelId && YOUTUBE_CHANNEL_ID_REGEX.test(enteredChannelId)) {
       setLoadingMetadata(true);
       getYouTubeMetadata(enteredChannelId)
-        // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Complex but necessary metadata formatting logic
         .then((result) => {
           if (result.success && result.metadata) {
             setMetadata(result.metadata as Tables<"youtube_channels">);
-            // Update input to show formatted display
-            const meta = result.metadata as Tables<"youtube_channels">;
-            const handle = meta.handle || "";
-            // Remove @ prefix if present to avoid double @@
-            const displayHandle = handle.startsWith("@")
-              ? handle.substring(1)
-              : handle;
-
-            let displayText: string;
-            if (displayHandle) {
-              displayText = `@${displayHandle} (${enteredChannelId.substring(0, 8)}...)`;
-            } else if (meta.channel_title) {
-              displayText = `${meta.channel_title} (${enteredChannelId.substring(0, 8)}...)`;
-            } else {
-              displayText = enteredChannelId;
-            }
-            setInputValue(displayText);
+            setInputValue(""); // Clear input when metadata is shown
           } else {
             setMetadata(null);
             setInputValue(enteredChannelId);
@@ -95,23 +82,23 @@ export function YoutubeChannelIdField({
     }
   }, [enteredChannelId]);
 
-  // Convert Twitch username/URL to broadcaster ID
+  // Convert YouTube handle/URL to channel ID
   const convertYoutubeInput = async (input: string) => {
     if (!input || input.trim() === "") {
-      setTwitchIdConverting(false);
-      setTwitchIdError(null);
+      setYoutubeIdConverting(false);
+      setYoutubeIdError(null);
       return;
     }
 
-    // すでにIDの場合は変換不要
+    // すでにチャンネルIDの場合は変換不要
     if (YOUTUBE_CHANNEL_ID_REGEX.test(input.trim())) {
-      setTwitchIdConverting(false);
-      setTwitchIdError(null);
+      setYoutubeIdConverting(false);
+      setYoutubeIdError(null);
       return;
     }
 
-    setTwitchIdConverting(true);
-    setTwitchIdError(null);
+    setYoutubeIdConverting(true);
+    setYoutubeIdError(null);
 
     try {
       // Use operator's OAuth token for lookup
@@ -121,15 +108,15 @@ export function YoutubeChannelIdField({
 
       if (result.error) {
         // Translate error key
-        setTwitchIdError(t(result.error));
-        setTwitchIdConverting(false);
+        setYoutubeIdError(t(result.error));
+        setYoutubeIdConverting(false);
         return;
       }
 
       if (result.channelId) {
         // Update the field value with the converted ID
         field.handleChange(result.channelId);
-        setTwitchIdError(null);
+        setYoutubeIdError(null);
 
         // Immediately fetch and display metadata
         setLoadingMetadata(true);
@@ -139,6 +126,7 @@ export function YoutubeChannelIdField({
               setMetadata(
                 metadataResult.metadata as Tables<"youtube_channels">
               );
+              setInputValue(""); // Clear input when showing metadata badge
             }
           })
           .catch(() => {
@@ -150,36 +138,36 @@ export function YoutubeChannelIdField({
           });
       }
     } catch (_error) {
-      setTwitchIdError(t("youtubeChannelIdConvertError"));
+      setYoutubeIdError(t("youtubeChannelIdConvertError"));
     } finally {
-      setTwitchIdConverting(false);
+      setYoutubeIdConverting(false);
     }
   };
 
-  // 操作者のTwitchブロードキャスターIDを取得してフィールドに設定
+  // 操作者のYouTubeチャンネルIDを取得してフィールドに設定
   const handleGetMyYoutubeId = async () => {
-    setFetchingOperatorTwitchId(true);
-    setTwitchIdError(null);
+    setFetchingOperatorYoutubeId(true);
+    setYoutubeIdError(null);
 
     try {
       const result = await getOperatorYouTubeChannelId();
 
       if (result.error || !result.channelId) {
         // エラーキーを翻訳
-        setTwitchIdError(t(result.error || "youtubeChannelIdConvertError"));
+        setYoutubeIdError(t(result.error || "youtubeChannelIdConvertError"));
         return;
       }
 
-      // 取得したブロードキャスターIDを保存（権限チェック用）
+      // 取得したチャンネルIDを保存（権限チェック用）
       onOperatorIdFetched(result.channelId);
 
       // フィールドの値を更新
       field.handleChange(result.channelId);
-      setTwitchIdError(null);
+      setYoutubeIdError(null);
     } catch (_error) {
-      setTwitchIdError(t("youtubeChannelIdConvertError"));
+      setYoutubeIdError(t("youtubeChannelIdConvertError"));
     } finally {
-      setFetchingOperatorTwitchId(false);
+      setFetchingOperatorYoutubeId(false);
     }
   };
 
@@ -197,8 +185,21 @@ export function YoutubeChannelIdField({
     }
   };
 
-  // Handle Enter key - trigger conversion
+  // Handle key events
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // If metadata is shown and user presses any key except Tab, delete the metadata
+    if (metadata && e.key !== "Tab") {
+      e.preventDefault();
+      handleDelete();
+      // If it's a printable character, start typing with it
+      if (e.key.length === 1) {
+        setInputValue(e.key);
+        inputRef.current?.focus();
+      }
+      return;
+    }
+
+    // Trigger conversion on Enter
     if (e.key === "Enter" || e.key === "Return") {
       e.preventDefault();
       if (inputValue && !metadata) {
@@ -212,7 +213,26 @@ export function YoutubeChannelIdField({
     field.handleChange("");
     setMetadata(null);
     setInputValue("");
-    setTwitchIdError(null);
+    setYoutubeIdError(null);
+  };
+
+  // Format display text for badge
+  const getDisplayText = () => {
+    if (!metadata) {
+      return "";
+    }
+
+    const handle = metadata.handle || "";
+    // Remove @ if it exists at the start
+    const cleanHandle = handle.replace(AT_PREFIX_REGEX, "");
+
+    if (cleanHandle) {
+      return `@${cleanHandle} (${enteredChannelId.substring(0, 8)}...)`;
+    }
+    if (metadata.channel_title) {
+      return `${metadata.channel_title} (${enteredChannelId.substring(0, 8)}...)`;
+    }
+    return enteredChannelId;
   };
 
   return (
@@ -222,34 +242,50 @@ export function YoutubeChannelIdField({
 
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Input
-              disabled={isPending || youtubeIdConverting}
-              name={field.name}
-              onBlur={handleBlur}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder={t("youtubeChannelIdPlaceholder")}
-              required={true}
-              type="text"
-              value={inputValue}
-            />
-            {(youtubeIdConverting || loadingMetadata) && (
+            {metadata ? (
+              // Show badge inside field-like container
+              <div className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 py-2">
+                <Badge
+                  className="flex items-center gap-1.5 text-sm"
+                  variant="secondary"
+                >
+                  {loadingMetadata && (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  )}
+                  <span>{getDisplayText()}</span>
+                  <button
+                    className="ml-1 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+                    disabled={isPending}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleDelete();
+                    }}
+                    onKeyDown={handleKeyDown}
+                    type="button"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              </div>
+            ) : (
+              // Show regular input
+              <Input
+                disabled={isPending || youtubeIdConverting}
+                name={field.name}
+                onBlur={handleBlur}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                placeholder={t("youtubeChannelIdPlaceholder")}
+                ref={inputRef}
+                required={true}
+                type="text"
+                value={inputValue}
+              />
+            )}
+            {youtubeIdConverting && !metadata && (
               <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                 <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
               </div>
-            )}
-            {metadata && (
-              <button
-                className="absolute inset-y-0 right-0 flex items-center pr-3 hover:opacity-70"
-                disabled={isPending}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleDelete();
-                }}
-                type="button"
-              >
-                <X className="h-4 w-4 text-gray-500" />
-              </button>
             )}
           </div>
           <Button
