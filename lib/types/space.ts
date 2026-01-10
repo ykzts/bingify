@@ -14,9 +14,7 @@ const gatekeeperEmailSchema = z.object({
  */
 const gatekeeperTwitchSchema = z.object({
   broadcasterId: z.string(),
-  requireFollow: z.boolean().optional(), // Legacy format
   requirement: z.string().optional(), // "follower" or "subscriber"
-  requireSub: z.boolean().optional(), // Legacy format
 });
 
 /**
@@ -24,7 +22,6 @@ const gatekeeperTwitchSchema = z.object({
  */
 const gatekeeperYoutubeSchema = z.object({
   channelId: z.string(),
-  required: z.boolean().optional(), // Legacy format
   requirement: z.string().optional(), // "subscriber" or "member"
 });
 
