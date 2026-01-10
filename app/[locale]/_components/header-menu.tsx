@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
 
 interface HeaderMenuProps {
   user: {
@@ -69,12 +68,8 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
       {/* ナビゲーションリンク */}
       <nav className="flex items-center gap-2">
         <Link
-          className={cn(
-            "flex items-center gap-2 rounded-md px-3 py-2 font-medium text-sm transition-colors",
-            isActivePath("/dashboard")
-              ? "bg-purple-100 text-purple-900 dark:bg-purple-900/30 dark:text-purple-100"
-              : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-          )}
+          aria-current={isActivePath("/dashboard") ? "page" : undefined}
+          className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
           href="/dashboard"
         >
           <LayoutDashboard className="h-4 w-4" />
@@ -83,12 +78,8 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
 
         {user.role === "admin" && (
           <Link
-            className={cn(
-              "flex items-center gap-2 rounded-md px-3 py-2 font-medium text-sm transition-colors",
-              isActivePath("/admin")
-                ? "bg-purple-100 text-purple-900 dark:bg-purple-900/30 dark:text-purple-100"
-                : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-            )}
+            aria-current={isActivePath("/admin") ? "page" : undefined}
+            className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
             href="/admin"
           >
             <Shield className="h-4 w-4" />
