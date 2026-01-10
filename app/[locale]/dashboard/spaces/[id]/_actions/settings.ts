@@ -4,6 +4,11 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
+import {
+  registerTwitchBroadcasterMetadata,
+  registerYouTubeChannelMetadata,
+} from "@/lib/data/social-metadata-helpers";
+import { getOAuthToken } from "@/lib/oauth/token-storage";
 import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
@@ -436,6 +441,48 @@ export async function updateSpaceSettings(
         ...initialFormState,
         errors: ["設定の更新に失敗しました"],
       };
+    }
+
+    // Register social metadata after successful space update
+    // YouTube metadata registration
+    if (
+      gatekeeperMode === "social" &&
+      socialPlatform === "youtube" &&
+      youtubeRequirement !== "none" &&
+      youtubeChannelId
+    ) {
+      // Get user's Google OAuth token for YouTube API calls
+      const tokenResult = await getOAuthToken(supabase, "google");
+      if (tokenResult.success && tokenResult.access_token) {
+        // Register metadata (non-blocking - errors are logged but don't fail the update)
+        await registerYouTubeChannelMetadata(
+          supabase,
+          youtubeChannelId,
+          tokenResult.access_token,
+          user.id
+        ).catch((error) => {
+          console.error("Failed to register YouTube metadata:", error);
+          // Don't fail the entire update if metadata registration fails
+        });
+      }
+    }
+
+    // Twitch metadata registration
+    if (
+      gatekeeperMode === "social" &&
+      socialPlatform === "twitch" &&
+      twitchRequirement !== "none" &&
+      twitchBroadcasterId
+    ) {
+      // Register metadata (non-blocking - errors are logged but don't fail the update)
+      await registerTwitchBroadcasterMetadata(
+        supabase,
+        twitchBroadcasterId,
+        user.id
+      ).catch((error) => {
+        console.error("Failed to register Twitch metadata:", error);
+        // Don't fail the entire update if metadata registration fails
+      });
     }
 
     return {
