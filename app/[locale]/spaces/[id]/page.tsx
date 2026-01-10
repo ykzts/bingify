@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import {
+  getSpaceBingoCards,
+  getSpaceParticipants,
+} from "@/lib/data/participants";
 import { getSystemSettings } from "@/lib/data/system-settings";
 import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
@@ -14,6 +18,7 @@ import { BingoCardDisplay } from "./_components/bingo-card-display";
 import { EventEndedView } from "./_components/event-ended-view";
 import { SpaceLandingPage } from "./_components/space-landing-page";
 import { SpaceParticipation } from "./_components/space-participation";
+import { SpaceResults } from "./_components/space-results";
 
 export async function generateMetadata({
   params,
@@ -99,9 +104,9 @@ export default async function UserSpacePage({
     );
   }
 
-  // If space is closed, show event ended screen
-  if (space.status === "closed") {
-    // Check if user is a participant to show their final card
+  // If space is closed or expired, show results for participants
+  if (space.status === "closed" || space.status === "expired") {
+    // Check if user is a participant to show results
     const isParticipant = await checkUserParticipation(id);
 
     if (!isParticipant) {
@@ -130,7 +135,21 @@ export default async function UserSpacePage({
       );
     }
 
-    // Participants see their final card (read-only)
+    // Participants see full results including all participants and cards
+    const [participants, bingoCards, calledNumbersData] = await Promise.all([
+      getSpaceParticipants(id),
+      getSpaceBingoCards(id),
+      (async () => {
+        const supabase = await createClient();
+        const { data } = await supabase
+          .from("called_numbers")
+          .select("value")
+          .eq("space_id", id)
+          .order("called_at", { ascending: true });
+        return data?.map((row) => row.value) || [];
+      })(),
+    ]);
+
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="mx-auto max-w-4xl p-6">
@@ -152,12 +171,30 @@ export default async function UserSpacePage({
             <EventEndedView />
           </div>
 
-          {/* Participant's Final Result */}
-          <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+          {/* Your Card Section */}
+          <div className="mb-6 rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
             <h2 className="mb-6 text-center font-bold text-2xl">
-              {t("yourFinalResultTitle")}
+              {t("yourCard")}
             </h2>
             <BingoCardDisplay readOnly spaceId={id} />
+          </div>
+
+          {/* Results Section */}
+          <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+            <h2 className="mb-6 text-center font-bold text-2xl">
+              {t("resultsTitle")}
+            </h2>
+            {participants && bingoCards ? (
+              <SpaceResults
+                bingoCards={bingoCards}
+                calledNumbers={calledNumbersData}
+                participants={participants}
+              />
+            ) : (
+              <div className="flex items-center justify-center py-12">
+                <p className="text-gray-500">{t("errorLoadingResults")}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
