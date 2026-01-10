@@ -4,7 +4,7 @@
     "url": "https://github.com/ykzts/bingify/issues"
   },
   "dependencies": {
-    "@googleapis/youtube": "30.1.0",
+    "@googleapis/youtube": "30.2.0",
     "@marsidev/react-turnstile": "1.4.1",
     "@mdx-js/loader": "3.1.1",
     "@mdx-js/react": "3.1.1",
