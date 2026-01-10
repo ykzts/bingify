@@ -251,7 +251,7 @@ export function TwitchBroadcasterIdField({
                         variant="outline"
                       >
                         <Loader2 className="h-3 w-3 animate-spin" />
-                        <span>Loading...</span>
+                        <span>{t("loading")}</span>
                         <div className="inline-flex h-3 w-3 items-center justify-center opacity-50">
                           <X className="h-3 w-3" />
                         </div>
@@ -277,7 +277,7 @@ export function TwitchBroadcasterIdField({
                       >
                         <span>{getBadgeText()}</span>
                         <button
-                          aria-label="Remove broadcaster"
+                          aria-label={t("removeBroadcaster")}
                           className="inline-flex h-3 w-3 cursor-pointer items-center justify-center"
                           onClick={(e) => {
                             e.stopPropagation();

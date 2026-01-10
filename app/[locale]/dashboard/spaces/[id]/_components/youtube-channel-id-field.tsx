@@ -110,16 +110,18 @@ export function YoutubeChannelIdField({
         setInputValue(""); // Clear input, metadata will be fetched by useQuery
 
         // メタデータを即座に登録
-        registerYouTubeChannelMetadata(result.channelId)
-          .then(() => {
-            // キャッシュを無効化して再取得
-            queryClient.invalidateQueries({
-              queryKey: ["youtube-metadata", result.channelId],
-            });
-          })
-          .catch((error) => {
-            console.error("Failed to register YouTube metadata:", error);
-          });
+        const registerResult = await registerYouTubeChannelMetadata(
+          result.channelId
+        );
+        if (!registerResult.success) {
+          setYoutubeIdError(t(registerResult.error || "youtubeRegisterError"));
+          return;
+        }
+
+        // キャッシュを無効化して再取得
+        queryClient.invalidateQueries({
+          queryKey: ["youtube-metadata", result.channelId],
+        });
       }
     } catch (_error) {
       setYoutubeIdError(t("youtubeChannelIdConvertError"));
@@ -150,16 +152,18 @@ export function YoutubeChannelIdField({
       setYoutubeIdError(null);
 
       // メタデータを即座に登録
-      registerYouTubeChannelMetadata(result.channelId)
-        .then(() => {
-          // キャッシュを無効化して再取得
-          queryClient.invalidateQueries({
-            queryKey: ["youtube-metadata", result.channelId],
-          });
-        })
-        .catch((error) => {
-          console.error("Failed to register YouTube metadata:", error);
-        });
+      const registerResult = await registerYouTubeChannelMetadata(
+        result.channelId
+      );
+      if (!registerResult.success) {
+        setYoutubeIdError(t(registerResult.error || "youtubeRegisterError"));
+        return;
+      }
+
+      // キャッシュを無効化して再取得
+      queryClient.invalidateQueries({
+        queryKey: ["youtube-metadata", result.channelId],
+      });
     } catch (_error) {
       setYoutubeIdError(t("youtubeChannelIdConvertError"));
     } finally {
@@ -255,7 +259,7 @@ export function YoutubeChannelIdField({
                         variant="outline"
                       >
                         <Loader2 className="h-3 w-3 animate-spin" />
-                        <span>Loading...</span>
+                        <span>{t("loading")}</span>
                         <div className="inline-flex h-3 w-3 items-center justify-center opacity-50">
                           <X className="h-3 w-3" />
                         </div>
@@ -281,7 +285,7 @@ export function YoutubeChannelIdField({
                       >
                         <span>{getBadgeText()}</span>
                         <button
-                          aria-label="Remove channel"
+                          aria-label={t("removeChannel")}
                           className="inline-flex h-3 w-3 cursor-pointer items-center justify-center"
                           onClick={(e) => {
                             e.stopPropagation();
