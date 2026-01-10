@@ -3,11 +3,9 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SectionHeader } from "@/components/section-header";
 import { Link } from "@/i18n/navigation";
-import { formatDateShort } from "@/lib/utils/date-format";
 import { getUserSpaces } from "./_actions/space-management";
 import { CreateSpaceForm } from "./_components/create-space-form";
-import { SpaceActionsDropdown } from "./_components/space-actions-dropdown";
-import { StatusBadge } from "./_components/status-badge";
+import { SpaceTabs } from "./_components/space-tabs";
 
 export const dynamic = "force-dynamic";
 
@@ -36,9 +34,6 @@ export default async function DashboardPage({
   const t = await getTranslations("Dashboard");
   const { activeSpace, hostedSpaces, participatedSpaces, error } =
     await getUserSpaces();
-
-  // Combine hosted and participated spaces for display
-  const spaces = [...hostedSpaces, ...participatedSpaces];
 
   return (
     <div className="mx-auto max-w-4xl space-y-12 px-4 py-8">
@@ -118,83 +113,11 @@ export default async function DashboardPage({
       {/* --- SECTION 3: History --- */}
       <section>
         <SectionHeader icon={FileText}>{t("historyTitle")}</SectionHeader>
-        {spaces.length === 0 ? (
-          <div className="overflow-hidden rounded-lg border bg-white p-8 text-center shadow-sm">
-            <p className="text-gray-500 text-sm">{t("historyNoSpaces")}</p>
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b bg-gray-50 text-gray-500">
-                <tr>
-                  <th className="px-4 py-3 font-medium">
-                    {t("historySpaceName")}
-                  </th>
-                  <th className="px-4 py-3 font-medium">
-                    {t("historyStatus")}
-                  </th>
-                  <th className="px-4 py-3 font-medium">{t("historyDate")}</th>
-                  <th className="px-4 py-3 text-right font-medium">
-                    {t("spaceActions")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {spaces.map((space) => (
-                  <tr
-                    className="transition-colors hover:bg-gray-50"
-                    key={space.id}
-                  >
-                    <td className="px-4 py-3 font-medium text-gray-900">
-                      <Link
-                        className="flex flex-col gap-1 transition-colors hover:text-purple-600"
-                        href={`/dashboard/spaces/${space.id}`}
-                      >
-                        <div className="flex items-center gap-2">
-                          {space.share_key}
-                          {space.is_owner === false && (
-                            <span className="rounded bg-blue-100 px-2 py-0.5 text-blue-800 text-xs">
-                              {t("adminBadge")}
-                            </span>
-                          )}
-                        </div>
-                        {space.status === "active" &&
-                          space.participant_count !== undefined && (
-                            <p className="flex items-center gap-1 text-gray-500 text-xs">
-                              <Users className="h-3 w-3" />
-                              {t("activeSpaceParticipants", {
-                                count: space.participant_count || 0,
-                              })}
-                            </p>
-                          )}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge
-                        label={(() => {
-                          if (space.status === "active") {
-                            return t("statusActive");
-                          }
-                          if (space.status === "draft") {
-                            return t("statusDraft");
-                          }
-                          return t("statusClosed");
-                        })()}
-                        status={space.status || "closed"}
-                      />
-                    </td>
-                    <td className="px-4 py-3 text-gray-500">
-                      {formatDateShort(space.created_at || 0, locale)}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <SpaceActionsDropdown space={space} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <SpaceTabs
+          hostedSpaces={hostedSpaces}
+          locale={locale}
+          participatedSpaces={participatedSpaces}
+        />
       </section>
     </div>
   );
