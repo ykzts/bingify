@@ -222,8 +222,7 @@ async function verifyYouTubeSubscription(
 
 async function verifyTwitchRequirements(
   broadcasterId: string,
-  requireFollow: boolean,
-  requireSub: boolean,
+  requirement: "follower" | "subscriber",
   spaceOwnerId: string
 ): Promise<JoinSpaceState | null> {
   const supabase = await createClient();
@@ -256,7 +255,7 @@ async function verifyTwitchRequirements(
   const ownerAccessToken = ownerTokenResult.access_token;
 
   // Check follow requirement
-  if (requireFollow) {
+  if (requirement === "follower" || requirement === "subscriber") {
     const { checkFollowWithAdminToken } = await import("@/lib/twitch");
     const followResult = await checkFollowWithAdminToken(
       participantAccessToken,
@@ -280,7 +279,7 @@ async function verifyTwitchRequirements(
   }
 
   // Check subscription requirement
-  if (requireSub) {
+  if (requirement === "subscriber") {
     const { checkSubWithAdminToken } = await import("@/lib/twitch");
     const subResult = await checkSubWithAdminToken(
       participantAccessToken,
@@ -334,7 +333,6 @@ function verifyEmailAllowlist(
   return null;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Gatekeeper verification requires multiple conditional checks
 async function verifyGatekeeperRules(
   gatekeeperRules: GatekeeperRules | null,
   userEmail: string,
@@ -357,21 +355,12 @@ async function verifyGatekeeperRules(
 
   // Check YouTube subscription requirement if configured
   if (gatekeeperRules?.youtube?.channelId) {
-    // Support both new format (requirement) and legacy format (required)
     const requirement = gatekeeperRules.youtube.requirement;
-    const hasRequirement =
-      requirement === "subscriber" ||
-      requirement === "member" ||
-      gatekeeperRules.youtube.required;
 
-    if (hasRequirement) {
-      // Determine the actual requirement level
-      const requirementLevel: "subscriber" | "member" =
-        requirement === "member" ? "member" : "subscriber";
-
+    if (requirement === "subscriber" || requirement === "member") {
       const verificationResult = await verifyYouTubeSubscription(
         gatekeeperRules.youtube.channelId,
-        requirementLevel,
+        requirement,
         spaceOwnerId
       );
       if (verificationResult) {
@@ -382,20 +371,12 @@ async function verifyGatekeeperRules(
 
   // Check Twitch requirements if configured
   if (gatekeeperRules?.twitch?.broadcasterId) {
-    // Support both new format (requirement) and legacy format (requireFollow/requireSub)
     const requirement = gatekeeperRules.twitch.requirement;
-    const requireFollow =
-      requirement === "follower" ||
-      Boolean(gatekeeperRules.twitch.requireFollow);
-    const requireSub =
-      requirement === "subscriber" ||
-      Boolean(gatekeeperRules.twitch.requireSub);
 
-    if (requireFollow || requireSub) {
+    if (requirement === "follower" || requirement === "subscriber") {
       const verificationResult = await verifyTwitchRequirements(
         gatekeeperRules.twitch.broadcasterId,
-        requireFollow,
-        requireSub,
+        requirement,
         spaceOwnerId
       );
       if (verificationResult) {
@@ -693,11 +674,9 @@ function maskYoutubeRules(
     return undefined;
   }
 
-  const requirement =
-    gatekeeperRules.youtube.requirement ||
-    (gatekeeperRules.youtube.required ? "subscriber" : "none");
+  const requirement = gatekeeperRules.youtube.requirement;
 
-  if (requirement === "none") {
+  if (!requirement || requirement === "none") {
     return undefined;
   }
 
@@ -714,18 +693,9 @@ function maskTwitchRules(
     return undefined;
   }
 
-  let requirement = gatekeeperRules.twitch.requirement || "none";
+  const requirement = gatekeeperRules.twitch.requirement;
 
-  // Handle legacy format
-  if (requirement === "none") {
-    if (gatekeeperRules.twitch.requireSub) {
-      requirement = "subscriber";
-    } else if (gatekeeperRules.twitch.requireFollow) {
-      requirement = "follower";
-    }
-  }
-
-  if (requirement === "none") {
+  if (!requirement || requirement === "none") {
     return undefined;
   }
 

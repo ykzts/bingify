@@ -132,8 +132,7 @@ export function SpaceParticipation({
     () =>
       spaceInfo.gatekeeper_rules?.youtube?.channelId &&
       (spaceInfo.gatekeeper_rules.youtube.requirement === "subscriber" ||
-        spaceInfo.gatekeeper_rules.youtube.requirement === "member" ||
-        spaceInfo.gatekeeper_rules.youtube.required),
+        spaceInfo.gatekeeper_rules.youtube.requirement === "member"),
     [spaceInfo.gatekeeper_rules]
   );
 
@@ -143,9 +142,7 @@ export function SpaceParticipation({
     () =>
       spaceInfo.gatekeeper_rules?.twitch?.broadcasterId &&
       (spaceInfo.gatekeeper_rules.twitch.requirement === "follower" ||
-        spaceInfo.gatekeeper_rules.twitch.requirement === "subscriber" ||
-        spaceInfo.gatekeeper_rules.twitch.requireFollow ||
-        spaceInfo.gatekeeper_rules.twitch.requireSub),
+        spaceInfo.gatekeeper_rules.twitch.requirement === "subscriber"),
     [spaceInfo.gatekeeper_rules]
   );
 
