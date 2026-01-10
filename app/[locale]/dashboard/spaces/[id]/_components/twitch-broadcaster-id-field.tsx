@@ -44,21 +44,19 @@ export function TwitchBroadcasterIdField({
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch metadata using React Query
   const { data: metadata, isLoading: loadingMetadata } =
     useTwitchMetadata(enteredBroadcasterId);
 
-  // Update input value when broadcaster ID changes
+  // 入力値の更新
   useEffect(() => {
     if (enteredBroadcasterId && !metadata && !loadingMetadata) {
-      // Show broadcaster ID in input if no metadata yet
-      if (!TWITCH_ID_REGEX.test(enteredBroadcasterId)) {
-        setInputValue(enteredBroadcasterId);
-      }
+      // メタデータ未取得時は常にIDを表示
+      setInputValue(enteredBroadcasterId);
     } else if (!enteredBroadcasterId) {
       setInputValue("");
     } else if (metadata) {
-      setInputValue(""); // Clear input when metadata is available
+      // メタデータ取得時にクリア
+      setInputValue("");
     }
   }, [enteredBroadcasterId, metadata, loadingMetadata]);
 
@@ -72,6 +70,7 @@ export function TwitchBroadcasterIdField({
 
     // すでにチャンネルIDの場合は変換不要
     if (TWITCH_ID_REGEX.test(input.trim())) {
+      field.handleChange(input.trim());
       setTwitchIdConverting(false);
       setTwitchIdError(null);
       return;
@@ -205,7 +204,6 @@ export function TwitchBroadcasterIdField({
 
         <div className="flex gap-2">
           <div className="relative flex-1">
-            {/* Input field container - always visible for text field appearance */}
             {/* biome-ignore lint/a11y/useKeyWithClickEvents: Field container focuses hidden input on click */}
             {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: Interactive field container */}
             {/* biome-ignore lint/a11y/noStaticElementInteractions: Field container delegates to input */}
@@ -214,19 +212,33 @@ export function TwitchBroadcasterIdField({
               onClick={() => inputRef.current?.focus()}
             >
               {metadata ? (
-                // Show badge inside the field
-                <Badge className="flex items-center gap-1" variant="outline">
-                  <span>{getBadgeText()}</span>
-                  <X
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete();
-                    }}
+                <>
+                  <Badge className="flex items-center gap-1" variant="outline">
+                    <span>{getBadgeText()}</span>
+                    <button
+                      aria-label="Remove broadcaster"
+                      className="inline-flex h-3 w-3 cursor-pointer items-center justify-center"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete();
+                      }}
+                      type="button"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                  <input
+                    className="sr-only"
+                    name={field.name}
+                    onKeyDown={handleKeyDown}
+                    readOnly
+                    ref={inputRef}
+                    tabIndex={0}
+                    type="text"
+                    value={enteredBroadcasterId || ""}
                   />
-                </Badge>
+                </>
               ) : (
-                // Show regular input
                 <Input
                   className="h-auto border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                   disabled={isPending || twitchIdConverting}
@@ -245,19 +257,6 @@ export function TwitchBroadcasterIdField({
                 <Loader2 className="h-4 w-4 shrink-0 animate-spin text-gray-400" />
               )}
             </div>
-            {/* Hidden input for form submission and accessibility */}
-            {metadata && (
-              <input
-                className="sr-only"
-                name={field.name}
-                onKeyDown={handleKeyDown}
-                readOnly
-                ref={inputRef}
-                tabIndex={0}
-                type="text"
-                value={enteredBroadcasterId || ""}
-              />
-            )}
           </div>
           <Button
             disabled={

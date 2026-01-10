@@ -20,7 +20,7 @@ import { getOperatorYouTubeChannelId } from "../_actions/get-user-channel";
 import { lookupYouTubeChannelIdWithOperatorToken } from "../_actions/operator-lookup";
 import { useYouTubeMetadata } from "../_hooks/use-metadata";
 
-// Regex to remove @ prefix
+// @ プレフィックスを除去
 const AT_PREFIX_REGEX = /^@+/;
 
 interface Props {
@@ -47,21 +47,19 @@ export function YoutubeChannelIdField({
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch metadata using React Query
   const { data: metadata, isLoading: loadingMetadata } =
     useYouTubeMetadata(enteredChannelId);
 
-  // Update input value when channel ID changes
+  // 入力値の更新
   useEffect(() => {
     if (enteredChannelId && !metadata && !loadingMetadata) {
-      // Show channel ID in input if no metadata yet
       if (!YOUTUBE_CHANNEL_ID_REGEX.test(enteredChannelId)) {
         setInputValue(enteredChannelId);
       }
     } else if (!enteredChannelId) {
       setInputValue("");
     } else if (metadata) {
-      setInputValue(""); // Clear input when metadata is available
+      setInputValue("");
     }
   }, [enteredChannelId, metadata, loadingMetadata]);
 
@@ -136,23 +134,18 @@ export function YoutubeChannelIdField({
     }
   };
 
-  // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
-    // Don't trigger conversion while typing
   };
 
-  // Handle blur - trigger conversion
   const handleBlur = () => {
     if (inputValue && !metadata) {
       convertYoutubeInput(inputValue);
     }
   };
 
-  // Handle key events when input is focused
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // If metadata badge is shown, handle backspace/delete to remove entire badge
     if (metadata) {
       if (e.key === "Backspace" || e.key === "Delete") {
         e.preventDefault();
@@ -224,19 +217,33 @@ export function YoutubeChannelIdField({
               onClick={() => inputRef.current?.focus()}
             >
               {metadata ? (
-                // Show badge inside the field
-                <Badge className="flex items-center gap-1" variant="outline">
-                  <span>{getBadgeText()}</span>
-                  <X
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete();
-                    }}
+                <>
+                  <Badge className="flex items-center gap-1" variant="outline">
+                    <span>{getBadgeText()}</span>
+                    <button
+                      aria-label="Remove channel"
+                      className="inline-flex h-3 w-3 cursor-pointer items-center justify-center"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete();
+                      }}
+                      type="button"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                  <input
+                    className="sr-only"
+                    name={field.name}
+                    onKeyDown={handleKeyDown}
+                    readOnly
+                    ref={inputRef}
+                    tabIndex={0}
+                    type="text"
+                    value={enteredChannelId || ""}
                   />
-                </Badge>
+                </>
               ) : (
-                // Show regular input
                 <Input
                   className="h-auto border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                   disabled={isPending || youtubeIdConverting}
@@ -255,19 +262,6 @@ export function YoutubeChannelIdField({
                 <Loader2 className="h-4 w-4 shrink-0 animate-spin text-gray-400" />
               )}
             </div>
-            {/* Hidden input for form submission and accessibility */}
-            {metadata && (
-              <input
-                className="sr-only"
-                name={field.name}
-                onKeyDown={handleKeyDown}
-                readOnly
-                ref={inputRef}
-                tabIndex={0}
-                type="text"
-                value={enteredChannelId || ""}
-              />
-            )}
           </div>
           <Button
             disabled={
