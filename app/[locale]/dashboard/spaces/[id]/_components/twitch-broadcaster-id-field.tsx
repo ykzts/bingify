@@ -155,7 +155,9 @@ export function TwitchBroadcasterIdField({
       if (e.key === "Backspace" || e.key === "Delete") {
         e.preventDefault();
         handleDelete();
-        inputRef.current?.focus();
+        requestAnimationFrame(() => {
+          inputRef.current?.focus();
+        });
         return;
       }
       // For other printable characters, delete badge and start typing
@@ -163,7 +165,9 @@ export function TwitchBroadcasterIdField({
         e.preventDefault();
         handleDelete();
         setInputValue(e.key);
-        inputRef.current?.focus();
+        requestAnimationFrame(() => {
+          inputRef.current?.focus();
+        });
         return;
       }
       return;
