@@ -83,6 +83,10 @@ describe("Dashboard Actions", () => {
           if (table === "participants") {
             return {
               select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({
+                  data: [],
+                  error: null,
+                }),
                 in: vi.fn().mockResolvedValue({
                   data: [
                     { space_id: "space-1" },
@@ -105,7 +109,8 @@ describe("Dashboard Actions", () => {
       expect(result.activeSpace).toBeDefined();
       expect(result.activeSpace?.id).toBe("space-1");
       expect(result.activeSpace?.participant_count).toBe(5);
-      expect(result.spaces).toHaveLength(2);
+      expect(result.hostedSpaces).toHaveLength(2);
+      expect(result.participatedSpaces).toHaveLength(0);
       expect(result.error).toBeUndefined();
     });
 
@@ -122,7 +127,8 @@ describe("Dashboard Actions", () => {
 
       const result = await getUserSpaces();
       expect(result.activeSpace).toBeNull();
-      expect(result.spaces).toHaveLength(0);
+      expect(result.hostedSpaces).toHaveLength(0);
+      expect(result.participatedSpaces).toHaveLength(0);
       expect(result.error).toBe("Authentication required");
     });
 
@@ -151,7 +157,8 @@ describe("Dashboard Actions", () => {
 
       const result = await getUserSpaces();
       expect(result.activeSpace).toBeNull();
-      expect(result.spaces).toHaveLength(0);
+      expect(result.hostedSpaces).toHaveLength(0);
+      expect(result.participatedSpaces).toHaveLength(0);
       expect(result.error).toBe("Failed to fetch spaces");
     });
 
@@ -206,6 +213,10 @@ describe("Dashboard Actions", () => {
           if (table === "participants") {
             return {
               select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({
+                  data: [],
+                  error: null,
+                }),
                 in: vi.fn().mockResolvedValue({
                   data: [],
                   error: null,
@@ -220,7 +231,8 @@ describe("Dashboard Actions", () => {
 
       const result = await getUserSpaces();
       expect(result.activeSpace).toBeNull();
-      expect(result.spaces).toHaveLength(2);
+      expect(result.hostedSpaces).toHaveLength(2);
+      expect(result.participatedSpaces).toHaveLength(0);
       expect(result.error).toBeUndefined();
     });
 
@@ -280,6 +292,10 @@ describe("Dashboard Actions", () => {
           if (table === "participants") {
             return {
               select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({
+                  data: [],
+                  error: null,
+                }),
                 in: vi.fn().mockResolvedValue({
                   data: [
                     { space_id: "space-1" },
@@ -303,7 +319,8 @@ describe("Dashboard Actions", () => {
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         expect.stringContaining("Multiple active spaces found")
       );
-      expect(result.spaces).toHaveLength(2);
+      expect(result.hostedSpaces).toHaveLength(2);
+      expect(result.participatedSpaces).toHaveLength(0);
 
       consoleWarnSpy.mockRestore();
     });
@@ -342,6 +359,16 @@ describe("Dashboard Actions", () => {
               }),
             };
           }
+          if (table === "participants") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({
+                  data: [],
+                  error: null,
+                }),
+              }),
+            };
+          }
         }),
       };
 
@@ -349,7 +376,121 @@ describe("Dashboard Actions", () => {
 
       const result = await getUserSpaces();
       expect(result.activeSpace).toBeNull();
-      expect(result.spaces).toHaveLength(0);
+      expect(result.hostedSpaces).toHaveLength(0);
+      expect(result.participatedSpaces).toHaveLength(0);
+      expect(result.error).toBeUndefined();
+    });
+
+    it("参加スペースを取得し、主催スペースと重複しないようにする", async () => {
+      const userId = "test-user-id";
+      const mockOwnedSpaces = [
+        {
+          created_at: "2024-12-28T00:00:00Z",
+          id: "space-1",
+          share_key: "owned-space-20241228",
+          status: "active",
+        },
+      ];
+
+      const mockParticipatedSpaceIds = [
+        { space_id: "space-2" }, // Participated only
+        { space_id: "space-1" }, // Duplicate (owned)
+      ];
+
+      const mockParticipatedSpaces = [
+        {
+          created_at: "2024-12-27T00:00:00Z",
+          id: "space-2",
+          share_key: "participated-space-20241227",
+          status: "active",
+        },
+        {
+          created_at: "2024-12-28T00:00:00Z",
+          id: "space-1",
+          share_key: "owned-space-20241228",
+          status: "active",
+        },
+      ];
+
+      const mockClient = {
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: userId } },
+          }),
+        },
+        from: vi.fn().mockImplementation((table: string) => {
+          if (table === "spaces") {
+            const selectMock = vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                order: vi.fn().mockResolvedValue({
+                  data: mockOwnedSpaces,
+                  error: null,
+                }),
+              }),
+              in: vi.fn().mockResolvedValue({
+                data: mockParticipatedSpaces,
+                error: null,
+              }),
+            });
+            return { select: selectMock };
+          }
+          if (table === "space_roles") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockResolvedValue({
+                    data: [],
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          if (table === "participants") {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({
+                  data: mockParticipatedSpaceIds,
+                  error: null,
+                }),
+                in: vi.fn().mockResolvedValue({
+                  data: [
+                    { space_id: "space-1" },
+                    { space_id: "space-1" },
+                    { space_id: "space-2" },
+                    { space_id: "space-2" },
+                    { space_id: "space-2" },
+                  ],
+                  error: null,
+                }),
+              }),
+            };
+          }
+        }),
+      };
+
+      vi.mocked(createClient).mockResolvedValue(mockClient as any);
+
+      const result = await getUserSpaces();
+
+      // Verify hosted spaces
+      expect(result.hostedSpaces).toHaveLength(1);
+      expect(result.hostedSpaces[0].id).toBe("space-1");
+      expect(result.hostedSpaces[0].is_owner).toBe(true);
+
+      // Verify participated spaces (should not include space-1)
+      expect(result.participatedSpaces).toHaveLength(1);
+      expect(result.participatedSpaces[0].id).toBe("space-2");
+      expect(result.participatedSpaces[0].is_owner).toBe(false);
+
+      // Verify participant counts
+      expect(result.hostedSpaces[0].participant_count).toBe(2);
+      expect(result.participatedSpaces[0].participant_count).toBe(3);
+
+      // Active space should come from hosted spaces
+      expect(result.activeSpace).toBeDefined();
+      expect(result.activeSpace?.id).toBe("space-1");
+
       expect(result.error).toBeUndefined();
     });
   });
