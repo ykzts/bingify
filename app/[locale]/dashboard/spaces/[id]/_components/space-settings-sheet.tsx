@@ -96,10 +96,12 @@ export function SpaceSettingsSheet({
     toast.success(message);
   };
 
+  const isClosed = space.status === "closed";
+
   return (
     <Sheet onOpenChange={handleOpenChange} open={open}>
       <SheetTrigger asChild>
-        <Button size="sm" variant="outline">
+        <Button disabled={isClosed} size="sm" variant="outline">
           <Settings className="h-4 w-4" />
           {t("settingsButton")}
         </Button>

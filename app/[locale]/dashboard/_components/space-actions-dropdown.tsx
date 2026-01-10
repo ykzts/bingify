@@ -99,10 +99,12 @@ export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
           <span className="sr-only">{t("spaceActions")}</span>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleManage}>
-            <Settings className="mr-2 h-4 w-4" />
-            {t("manageAction")}
-          </DropdownMenuItem>
+          {!isClosed && (
+            <DropdownMenuItem onClick={handleManage}>
+              <Settings className="mr-2 h-4 w-4" />
+              {t("manageAction")}
+            </DropdownMenuItem>
+          )}
 
           {(isActive || isDraft) && (
             <>
