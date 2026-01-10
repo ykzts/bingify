@@ -167,7 +167,7 @@ export default async function AdminSpacePage({
         </>
       )}
 
-      {(space.status === "closed" || space.status === "expired") && (
+      {space.status === "closed" && (
         <>
           <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
             <div className="text-center">

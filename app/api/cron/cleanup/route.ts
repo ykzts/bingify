@@ -1,8 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 
-// Retention period in days (90 days)
-const RETENTION_DAYS = 90;
+// Default retention periods
+const ARCHIVE_RETENTION_DAYS = Number.parseInt(
+  process.env.ARCHIVE_RETENTION_DAYS || "7",
+  10
+);
+const SPACES_ARCHIVE_RETENTION_DAYS = 90; // Keep archived spaces for 90 days in spaces_archive table
 
 export async function GET(request: NextRequest) {
   try {
@@ -60,40 +64,81 @@ export async function GET(request: NextRequest) {
     const expiredCount = expirationResult?.[0]?.expired_count || 0;
 
     console.log(
-      `Marked ${expiredCount} space(s) as expired based on system settings`
+      `Marked ${expiredCount} space(s) as closed based on system settings`
     );
 
-    // Step 2: Calculate cutoff date for archived spaces
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - RETENTION_DAYS);
+    // Step 2: Archive and delete closed spaces older than ARCHIVE_RETENTION_DAYS
+    const closedCutoffDate = new Date();
+    closedCutoffDate.setDate(
+      closedCutoffDate.getDate() - ARCHIVE_RETENTION_DAYS
+    );
 
-    // Delete old archived spaces
-    const { data: deletedSpaces, error: spacesError } = await supabase
+    // Get closed spaces that need to be archived and deleted
+    const { data: spacesToArchive, error: fetchError } = await supabase
+      .from("spaces")
+      .select("id")
+      .eq("status", "closed")
+      .lt("updated_at", closedCutoffDate.toISOString());
+
+    if (fetchError) {
+      console.error("Error fetching closed spaces:", fetchError);
+    }
+
+    const archivedCount = spacesToArchive?.length || 0;
+
+    // Delete closed spaces (trigger will automatically move them to spaces_archive)
+    if (spacesToArchive && spacesToArchive.length > 0) {
+      const spaceIds = spacesToArchive.map((s) => s.id);
+      const { error: deleteError } = await supabase
+        .from("spaces")
+        .delete()
+        .in("id", spaceIds);
+
+      if (deleteError) {
+        console.error("Error deleting closed spaces:", deleteError);
+      } else {
+        console.log(
+          `Archived and deleted ${archivedCount} closed space(s) older than ${ARCHIVE_RETENTION_DAYS} days (cutoff: ${closedCutoffDate.toISOString()})`
+        );
+      }
+    }
+
+    // Step 3: Delete old archived spaces from spaces_archive table
+    const archiveCutoffDate = new Date();
+    archiveCutoffDate.setDate(
+      archiveCutoffDate.getDate() - SPACES_ARCHIVE_RETENTION_DAYS
+    );
+
+    const { data: deletedArchives, error: archiveError } = await supabase
       .from("spaces_archive")
       .delete()
-      .lt("archived_at", cutoffDate.toISOString())
+      .lt("archived_at", archiveCutoffDate.toISOString())
       .select("id");
 
-    if (spacesError) {
-      console.error("Error deleting archived spaces:", spacesError);
+    if (archiveError) {
+      console.error("Error deleting old archives:", archiveError);
       return NextResponse.json(
-        { error: "Failed to delete archived spaces" },
+        { error: "Failed to delete old archives" },
         { status: 500 }
       );
     }
 
-    const deletedCount = deletedSpaces?.length || 0;
+    const deletedArchiveCount = deletedArchives?.length || 0;
 
     console.log(
-      `Cleanup completed: deleted ${deletedCount} archived record(s) older than ${RETENTION_DAYS} days (cutoff: ${cutoffDate.toISOString()})`
+      `Cleanup completed: deleted ${deletedArchiveCount} archived record(s) older than ${SPACES_ARCHIVE_RETENTION_DAYS} days (cutoff: ${archiveCutoffDate.toISOString()})`
     );
 
     return NextResponse.json({
       data: {
-        deletedCount,
+        archivedCount,
+        deletedArchiveCount,
         expiredCount,
-        message: `Successfully marked ${expiredCount} space(s) as expired and deleted ${deletedCount} archived record(s) older than ${RETENTION_DAYS} days`,
-        retentionDays: RETENTION_DAYS,
+        message: `Successfully marked ${expiredCount} space(s) as closed, archived ${archivedCount} closed space(s) older than ${ARCHIVE_RETENTION_DAYS} days, and deleted ${deletedArchiveCount} archived record(s) older than ${SPACES_ARCHIVE_RETENTION_DAYS} days`,
+        retentionDays: {
+          archive: ARCHIVE_RETENTION_DAYS,
+          spacesArchive: SPACES_ARCHIVE_RETENTION_DAYS,
+        },
       },
     });
   } catch (error) {

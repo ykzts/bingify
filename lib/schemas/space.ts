@@ -133,12 +133,7 @@ export const twitchRequirementSchema = z.enum([
 export type SpaceFormData = z.infer<typeof spaceSchema>;
 
 // Space status enum
-export const spaceStatusSchema = z.enum([
-  "draft",
-  "active",
-  "closed",
-  "expired",
-]);
+export const spaceStatusSchema = z.enum(["draft", "active", "closed"]);
 
 export type SpaceStatus = z.infer<typeof spaceStatusSchema>;
 
