@@ -34,7 +34,11 @@ export default async function DashboardPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("Dashboard");
-  const { activeSpace, spaces, error } = await getUserSpaces();
+  const { activeSpace, hostedSpaces, participatedSpaces, error } =
+    await getUserSpaces();
+
+  // Combine hosted and participated spaces for display
+  const spaces = [...hostedSpaces, ...participatedSpaces];
 
   // Locale-specific date format
   const dateFormat = locale === "ja" ? "yyyy/MM/dd" : "MMM dd, yyyy";

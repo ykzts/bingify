@@ -347,7 +347,8 @@ export interface UserSpace {
 export interface UserSpacesResult {
   activeSpace: UserSpace | null;
   error?: string;
-  spaces: UserSpace[];
+  hostedSpaces: UserSpace[];
+  participatedSpaces: UserSpace[];
 }
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Function handles multiple space sources and deduplication logic
@@ -364,7 +365,8 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       return {
         activeSpace: null,
         error: "Authentication required",
-        spaces: [],
+        hostedSpaces: [],
+        participatedSpaces: [],
       };
     }
 
@@ -380,7 +382,8 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       return {
         activeSpace: null,
         error: "Failed to fetch spaces",
-        spaces: [],
+        hostedSpaces: [],
+        participatedSpaces: [],
       };
     }
 
@@ -397,7 +400,7 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
     }
 
     // Step 2: Fetch the actual space records
-    const spaceIds = (adminRoles || []).map((role) => role.space_id);
+    const adminSpaceIds = (adminRoles || []).map((role) => role.space_id);
     let adminSpacesData: Array<{
       created_at: string | null;
       id: string;
@@ -405,11 +408,11 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       status: string | null;
     }> = [];
 
-    if (spaceIds.length > 0) {
+    if (adminSpaceIds.length > 0) {
       const { data: fetchedSpaces, error: spacesError } = await supabase
         .from("spaces")
         .select("id, share_key, status, created_at")
-        .in("id", spaceIds);
+        .in("id", adminSpaceIds);
 
       if (spacesError) {
         console.error("Error fetching admin spaces:", spacesError);
@@ -418,7 +421,42 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       }
     }
 
-    // Combine owned and admin spaces
+    // Fetch spaces where user is participant - split into two queries
+    // Step 1: Get space_ids where user is participant
+    const { data: participantRoles, error: participantError } = await supabase
+      .from("participants")
+      .select("space_id")
+      .eq("user_id", user.id);
+
+    if (participantError) {
+      console.error("Error fetching participant roles:", participantError);
+    }
+
+    // Step 2: Fetch the actual space records
+    const participantSpaceIds = (participantRoles || []).map(
+      (role) => role.space_id
+    );
+    let participantSpacesData: Array<{
+      created_at: string | null;
+      id: string;
+      share_key: string;
+      status: string | null;
+    }> = [];
+
+    if (participantSpaceIds.length > 0) {
+      const { data: fetchedSpaces, error: spacesError } = await supabase
+        .from("spaces")
+        .select("id, share_key, status, created_at")
+        .in("id", participantSpaceIds);
+
+      if (spacesError) {
+        console.error("Error fetching participant spaces:", spacesError);
+      } else {
+        participantSpacesData = fetchedSpaces || [];
+      }
+    }
+
+    // Combine owned and admin spaces (hosted spaces)
     const ownedSpacesWithFlag: UserSpace[] = (ownedSpaces || []).map((s) => ({
       ...s,
       is_owner: true,
@@ -432,29 +470,49 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       status: space.status,
     }));
 
-    // Combine and deduplicate (in case user is both owner and admin somehow)
-    const spaceMap = new Map<string, UserSpace>();
+    // Combine and deduplicate hosted spaces (in case user is both owner and admin)
+    const hostedSpaceMap = new Map<string, UserSpace>();
     for (const space of [...ownedSpacesWithFlag, ...adminSpaces]) {
-      if (spaceMap.has(space.id)) {
+      if (hostedSpaceMap.has(space.id)) {
         // If space exists, prefer owner flag
-        const existing = spaceMap.get(space.id);
+        const existing = hostedSpaceMap.get(space.id);
         if (existing && space.is_owner) {
-          spaceMap.set(space.id, space);
+          hostedSpaceMap.set(space.id, space);
         }
       } else {
-        spaceMap.set(space.id, space);
+        hostedSpaceMap.set(space.id, space);
       }
     }
 
-    const allSpaces = Array.from(spaceMap.values()).sort(
+    const hostedSpaces = Array.from(hostedSpaceMap.values()).sort(
       (a, b) =>
         new Date(b.created_at || 0).getTime() -
         new Date(a.created_at || 0).getTime()
     );
 
+    // Filter participated spaces to exclude hosted spaces (avoid duplicates)
+    const hostedSpaceIds = new Set(hostedSpaces.map((s) => s.id));
+    const participatedSpaces = participantSpacesData
+      .filter((space) => !hostedSpaceIds.has(space.id))
+      .map((space) => ({
+        created_at: space.created_at,
+        id: space.id,
+        is_owner: false,
+        share_key: space.share_key,
+        status: space.status,
+      }))
+      .sort(
+        (a, b) =>
+          new Date(b.created_at || 0).getTime() -
+          new Date(a.created_at || 0).getTime()
+      );
+
     // Get participant counts for all spaces in a single query
     // Note: Fetching actual data instead of using count to avoid RLS recursion issues
-    const allSpaceIds = allSpaces.map((space) => space.id);
+    const allSpaceIds = [
+      ...hostedSpaces.map((space) => space.id),
+      ...participatedSpaces.map((space) => space.id),
+    ];
     let participantCounts: Record<string, number> = {};
 
     if (allSpaceIds.length > 0) {
@@ -475,15 +533,21 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       }
     }
 
-    // Add participant counts to spaces
-    const spacesWithCounts = allSpaces.map((space) => ({
+    // Add participant counts to hosted spaces
+    const hostedSpacesWithCounts = hostedSpaces.map((space) => ({
       ...space,
       participant_count: participantCounts[space.id] ?? 0,
     }));
 
-    // Find active space (excluding draft)
+    // Add participant counts to participated spaces
+    const participatedSpacesWithCounts = participatedSpaces.map((space) => ({
+      ...space,
+      participant_count: participantCounts[space.id] ?? 0,
+    }));
+
+    // Find active space (excluding draft) - only from hosted spaces
     let activeSpace: UserSpace | null = null;
-    const allActiveSpaces = spacesWithCounts.filter(
+    const allActiveSpaces = hostedSpacesWithCounts.filter(
       (s) => s.status === "active"
     );
     const activeSpaceData = allActiveSpaces[0] ?? null;
@@ -501,14 +565,16 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
 
     return {
       activeSpace,
-      spaces: spacesWithCounts,
+      hostedSpaces: hostedSpacesWithCounts,
+      participatedSpaces: participatedSpacesWithCounts,
     };
   } catch (error) {
     console.error("Error in getUserSpaces:", error);
     return {
       activeSpace: null,
       error: "An unexpected error occurred",
-      spaces: [],
+      hostedSpaces: [],
+      participatedSpaces: [],
     };
   }
 }
