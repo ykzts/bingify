@@ -3,7 +3,7 @@
 import { Settings } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { AdminManagement } from "./admin-management";
@@ -42,23 +43,61 @@ export function SpaceSettingsSheet({
   systemMaxParticipants,
 }: Props) {
   const t = useTranslations("AdminSpace");
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
 
-  // Open settings sheet if ?open=settings query parameter is present
-  useEffect(() => {
-    if (searchParams.get("open") === "settings") {
-      setOpen(true);
+  // URLパラメータを更新する処理（useEffectEventで依存配列から分離）
+  const updateUrl = useEffectEvent((shouldOpen: boolean) => {
+    const currentOpenValue = searchParams.get("open");
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (shouldOpen) {
+      // 開く場合：既に"settings"でなければ設定
+      if (currentOpenValue !== "settings") {
+        params.set("open", "settings");
+      } else {
+        return; // 既に設定済みの場合は何もしない
+      }
+    } else if (currentOpenValue === "settings") {
+      // 閉じる場合：現在の値が"settings"の場合のみ削除
+      params.delete("open");
+    } else {
+      return; // "settings"でない場合は他のコンポーネントの値なので削除しない
     }
+
+    // 同じパスに更新されたクエリパラメータで遷移（履歴とスクロール位置を維持）
+    const newUrl = params.toString() ? `${pathname}?${params}` : pathname;
+    router.replace(newUrl, { scroll: false });
+  });
+
+  // URLパラメータとシート状態を同期（外部ナビゲーション対応）
+  useEffect(() => {
+    const shouldOpen = searchParams.get("open") === "settings";
+    // 関数型更新を使用してレースコンディションを回避
+    // 現在の状態と異なる場合のみ更新（ブラウザの戻る/進むや直接URLアクセスに対応）
+    setOpen((prev) => (prev === shouldOpen ? prev : shouldOpen));
   }, [searchParams]);
 
+  // シートの開閉とURLパラメータ管理を行うハンドラ
+  const handleOpenChange = (newOpen: boolean) => {
+    // 状態が実際に変わる場合のみ更新
+    if (newOpen === open) {
+      return;
+    }
+
+    setOpen(newOpen);
+    updateUrl(newOpen);
+  };
+
   const handleSuccess = (message: string) => {
-    setOpen(false);
+    handleOpenChange(false);
     toast.success(message);
   };
 
   return (
-    <Sheet onOpenChange={setOpen} open={open}>
+    <Sheet onOpenChange={handleOpenChange} open={open}>
       <SheetTrigger asChild>
         <Button size="sm" variant="outline">
           <Settings className="h-4 w-4" />
@@ -99,7 +138,7 @@ export function SpaceSettingsSheet({
           {/* Danger Zone - Always visible for destructive actions */}
           <div className="border-red-200 border-t pt-8">
             <DangerZone
-              onResetSuccess={() => setOpen(false)}
+              onResetSuccess={() => handleOpenChange(false)}
               spaceId={space.id}
             />
           </div>
