@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { formatDateTime } from "@/lib/utils/date-format";
 import { isValidUUID } from "@/lib/utils/uuid";
 import { AvatarManagement } from "../_components/avatar-management";
 
@@ -99,7 +100,7 @@ export default async function AdminUserDetailPage({
             </dt>
             <dd className="mt-1 text-gray-900">
               {profile.created_at
-                ? new Date(profile.created_at).toLocaleString()
+                ? formatDateTime(profile.created_at, locale)
                 : t("notAvailable")}
             </dd>
           </div>

@@ -4,9 +4,9 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
-import { format } from "date-fns";
 import { generateSecureToken } from "@/lib/crypto";
 import { createClient } from "@/lib/supabase/server";
+import { formatDateSuffix } from "@/lib/utils/date-format";
 import {
   type CreateSpaceFormValues,
   createSpaceFormOpts,
@@ -141,7 +141,7 @@ const serverValidate = createServerValidate({
   ...createSpaceFormOpts,
   onServerValidate: async ({ value }: { value: CreateSpaceFormValues }) => {
     const supabase = await createClient();
-    const dateSuffix = format(new Date(), "yyyyMMdd");
+    const dateSuffix = formatDateSuffix();
     const fullShareKey = `${value.share_key}-${dateSuffix}`;
 
     // Check authentication
@@ -210,7 +210,7 @@ export async function createSpaceAction(
       };
     }
 
-    const dateSuffix = format(new Date(), "yyyyMMdd");
+    const dateSuffix = formatDateSuffix();
     const fullShareKey = `${validatedData.share_key}-${dateSuffix}`;
 
     // Double check if the share key is still available (race condition)
@@ -296,7 +296,7 @@ export async function createSpaceAction(
 // Keep the existing checkShareKeyAvailability function
 export async function checkShareKeyAvailability(shareKey: string) {
   try {
-    const dateSuffix = format(new Date(), "yyyyMMdd");
+    const dateSuffix = formatDateSuffix();
     const fullShareKey = `${shareKey}-${dateSuffix}`;
 
     const supabase = await createClient();

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
@@ -13,6 +13,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { formatDate } from "@/lib/utils/date-format";
 import type { Tables } from "@/types/supabase";
 import { forceDeleteSpace } from "../_actions/admin-operations";
 
@@ -28,6 +29,7 @@ export function SpaceList({
   initialSpaces,
 }: SpaceListProps) {
   const t = useTranslations("Admin");
+  const locale = useLocale();
   const confirm = useConfirm();
   const pathname = usePathname();
   const [spaces, setSpaces] = useState(initialSpaces);
@@ -124,7 +126,7 @@ export function SpaceList({
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-gray-500 text-sm">
                     {space.created_at
-                      ? new Date(space.created_at).toLocaleDateString()
+                      ? formatDate(space.created_at, locale)
                       : "N/A"}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm">

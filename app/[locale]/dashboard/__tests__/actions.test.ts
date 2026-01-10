@@ -14,8 +14,8 @@ vi.mock("node:crypto", async (importOriginal) => {
   };
 });
 
-vi.mock("date-fns", () => ({
-  format: vi.fn(() => "20241231"),
+vi.mock("@/lib/utils/date-format", () => ({
+  formatDateSuffix: vi.fn(() => "20241231"),
 }));
 
 vi.mock("@/lib/crypto", () => ({
