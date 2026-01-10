@@ -154,13 +154,19 @@ export default async function AdminSpacePage({
       )}
 
       {space.status === "active" && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <BingoGameManager spaceId={space.id} />
-        </div>
+        <>
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <BingoGameManager spaceId={space.id} />
+          </div>
+
+          <ParticipantsStatus
+            maxParticipants={space.max_participants}
+            spaceId={space.id}
+          />
+        </>
       )}
 
-      {/* Participants List - Show for all statuses except draft */}
-      {space.status !== "draft" && (
+      {(space.status === "closed" || space.status === "expired") && (
         <ParticipantsStatus
           maxParticipants={space.max_participants}
           spaceId={space.id}
