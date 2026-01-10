@@ -101,8 +101,6 @@ function updateParticipantList(
   return newList;
 }
 
-const _NAME_SPLIT_REGEX = /\s+/;
-
 export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
   const t = useTranslations("AdminSpace");
   const queryClient = useQueryClient();
