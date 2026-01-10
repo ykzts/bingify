@@ -157,7 +157,7 @@ export async function updateUsernameAction(
       };
     }
 
-    // Update the username in the database
+    // Update the name in the database
     const { error } = await supabase
       .from("profiles")
       .update({
