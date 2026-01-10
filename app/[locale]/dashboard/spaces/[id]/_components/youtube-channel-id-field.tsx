@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Loader2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
@@ -18,6 +19,7 @@ import { getErrorMessage } from "@/lib/utils/error-message";
 import { YOUTUBE_CHANNEL_ID_REGEX } from "@/lib/youtube-constants";
 import { getOperatorYouTubeChannelId } from "../_actions/get-user-channel";
 import { lookupYouTubeChannelIdWithOperatorToken } from "../_actions/operator-lookup";
+import { registerYouTubeChannelMetadata } from "../_actions/register-metadata";
 import { useYouTubeMetadata } from "../_hooks/use-metadata";
 
 // @ プレフィックスを除去
@@ -40,6 +42,7 @@ export function YoutubeChannelIdField({
   onOperatorIdFetched,
 }: Props) {
   const t = useTranslations("SpaceSettings");
+  const queryClient = useQueryClient();
   const [youtubeIdConverting, setYoutubeIdConverting] = useState(false);
   const [youtubeIdError, setYoutubeIdError] = useState<string | null>(null);
   const [fetchingOperatorYoutubeId, setFetchingOperatorYoutubeId] =
@@ -100,6 +103,18 @@ export function YoutubeChannelIdField({
         field.handleChange(result.channelId);
         setYoutubeIdError(null);
         setInputValue(""); // Clear input, metadata will be fetched by useQuery
+
+        // メタデータを即座に登録
+        registerYouTubeChannelMetadata(result.channelId)
+          .then(() => {
+            // キャッシュを無効化して再取得
+            queryClient.invalidateQueries({
+              queryKey: ["youtube-metadata", result.channelId],
+            });
+          })
+          .catch((error) => {
+            console.error("Failed to register YouTube metadata:", error);
+          });
       }
     } catch (_error) {
       setYoutubeIdError(t("youtubeChannelIdConvertError"));
@@ -128,6 +143,18 @@ export function YoutubeChannelIdField({
       // フィールドの値を更新
       field.handleChange(result.channelId);
       setYoutubeIdError(null);
+
+      // メタデータを即座に登録
+      registerYouTubeChannelMetadata(result.channelId)
+        .then(() => {
+          // キャッシュを無効化して再取得
+          queryClient.invalidateQueries({
+            queryKey: ["youtube-metadata", result.channelId],
+          });
+        })
+        .catch((error) => {
+          console.error("Failed to register YouTube metadata:", error);
+        });
     } catch (_error) {
       setYoutubeIdError(t("youtubeChannelIdConvertError"));
     } finally {

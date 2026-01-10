@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Loader2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
@@ -18,6 +19,7 @@ import { TWITCH_ID_REGEX } from "@/lib/twitch";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { getOperatorTwitchBroadcasterId } from "../_actions/get-user-channel";
 import { lookupTwitchBroadcasterIdWithOperatorToken } from "../_actions/operator-lookup";
+import { registerTwitchBroadcasterMetadata } from "../_actions/register-metadata";
 import { useTwitchMetadata } from "../_hooks/use-metadata";
 
 interface Props {
@@ -37,6 +39,7 @@ export function TwitchBroadcasterIdField({
   onOperatorIdFetched,
 }: Props) {
   const t = useTranslations("SpaceSettings");
+  const queryClient = useQueryClient();
   const [twitchIdConverting, setTwitchIdConverting] = useState(false);
   const [twitchIdError, setTwitchIdError] = useState<string | null>(null);
   const [fetchingOperatorTwitchId, setFetchingOperatorTwitchId] =
@@ -99,6 +102,18 @@ export function TwitchBroadcasterIdField({
         field.handleChange(result.broadcasterId);
         setTwitchIdError(null);
         setInputValue(""); // Clear input, metadata will be fetched by useQuery
+
+        // メタデータを即座に登録
+        registerTwitchBroadcasterMetadata(result.broadcasterId)
+          .then(() => {
+            // キャッシュを無効化して再取得
+            queryClient.invalidateQueries({
+              queryKey: ["twitch-metadata", result.broadcasterId],
+            });
+          })
+          .catch((error) => {
+            console.error("Failed to register Twitch metadata:", error);
+          });
       }
     } catch (_error) {
       setTwitchIdError(t("twitchBroadcasterIdConvertError"));
@@ -127,6 +142,18 @@ export function TwitchBroadcasterIdField({
       // フィールドの値を更新
       field.handleChange(result.channelId);
       setTwitchIdError(null);
+
+      // メタデータを即座に登録
+      registerTwitchBroadcasterMetadata(result.channelId)
+        .then(() => {
+          // キャッシュを無効化して再取得
+          queryClient.invalidateQueries({
+            queryKey: ["twitch-metadata", result.channelId],
+          });
+        })
+        .catch((error) => {
+          console.error("Failed to register Twitch metadata:", error);
+        });
     } catch (_error) {
       setTwitchIdError(t("twitchBroadcasterIdConvertError"));
     } finally {
