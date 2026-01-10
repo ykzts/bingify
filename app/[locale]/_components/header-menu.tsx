@@ -54,17 +54,20 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
 
   if (!user) {
     return (
-      <Link
-        className="rounded-md border border-gray-300 bg-white px-4 py-1.5 font-medium text-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
-        href="/login"
-      >
-        {t("login")}
-      </Link>
+      <>
+        <div />
+        <Link
+          className="rounded-md border border-gray-300 bg-white px-4 py-1.5 font-medium text-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
+          href="/login"
+        >
+          {t("login")}
+        </Link>
+      </>
     );
   }
 
   return (
-    <div className="flex items-center gap-4">
+    <>
       {/* ナビゲーションリンク */}
       <nav className="flex items-center gap-2">
         <Link
@@ -153,6 +156,6 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
           </DropdownMenuContent>
         </DropdownMenuPortal>
       </DropdownMenu>
-    </div>
+    </>
   );
 }
