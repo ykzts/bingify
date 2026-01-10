@@ -3,7 +3,7 @@
 import { Settings } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,36 +48,39 @@ export function SpaceSettingsSheet({
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
 
-  // Sync sheet state with URL parameter (for external navigation)
-  useEffect(() => {
-    const shouldOpen = searchParams.get("open") === "settings";
-    // Only update state if it differs from URL parameter
-    // This handles browser back/forward and direct URL changes
-    if (shouldOpen !== open) {
-      setOpen(shouldOpen);
-    }
-  }, [searchParams, open]);
-
-  // Handle opening/closing the sheet with URL parameter management
-  const handleOpenChange = (newOpen: boolean) => {
-    // Only update if state is actually changing
-    if (newOpen === open) {
-      return;
-    }
-
-    setOpen(newOpen);
-
-    // Update URL parameters
+  // URLパラメータを更新する処理（useEffectEventで依存配列から分離）
+  const updateUrl = useEffectEvent((shouldOpen: boolean) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (newOpen) {
+    if (shouldOpen) {
       params.set("open", "settings");
     } else {
       params.delete("open");
     }
 
-    // Navigate to the same path with updated query params
+    // 同じパスに更新されたクエリパラメータで遷移（履歴を汚さない）
     const newUrl = params.toString() ? `${pathname}?${params}` : pathname;
     router.replace(newUrl);
+  });
+
+  // URLパラメータとシート状態を同期（外部ナビゲーション対応）
+  useEffect(() => {
+    const shouldOpen = searchParams.get("open") === "settings";
+    // URLパラメータと状態が異なる場合のみ更新
+    // ブラウザの戻る/進むや直接URLアクセスに対応
+    if (shouldOpen !== open) {
+      setOpen(shouldOpen);
+    }
+  }, [searchParams, open]);
+
+  // シートの開閉とURLパラメータ管理を行うハンドラ
+  const handleOpenChange = (newOpen: boolean) => {
+    // 状態が実際に変わる場合のみ更新
+    if (newOpen === open) {
+      return;
+    }
+
+    setOpen(newOpen);
+    updateUrl(newOpen);
   };
 
   const handleSuccess = (message: string) => {
