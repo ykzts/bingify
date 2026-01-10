@@ -14,7 +14,11 @@ import {
   FieldError,
   FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { TWITCH_ID_REGEX } from "@/lib/twitch";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { getOperatorTwitchBroadcasterId } from "../_actions/get-user-channel";
@@ -237,59 +241,87 @@ export function TwitchBroadcasterIdField({
 
         <div className="flex gap-2">
           <div className="relative flex-1">
-            {/* biome-ignore lint/a11y/useKeyWithClickEvents: Field container focuses hidden input on click */}
-            {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: Interactive field container */}
-            {/* biome-ignore lint/a11y/noStaticElementInteractions: Field container delegates to input */}
-            <div
-              className="flex min-h-10 w-full items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-              onClick={() => inputRef.current?.focus()}
-            >
-              {metadata ? (
-                <>
-                  <Badge className="flex items-center gap-1" variant="outline">
-                    <span>{getBadgeText()}</span>
-                    <button
-                      aria-label="Remove broadcaster"
-                      className="inline-flex h-3 w-3 cursor-pointer items-center justify-center"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete();
-                      }}
-                      type="button"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                  <input
-                    className="sr-only"
+            <InputGroup>
+              {(() => {
+                if (loadingMetadata && enteredBroadcasterId) {
+                  return (
+                    <InputGroupAddon>
+                      <Badge
+                        className="flex items-center gap-1"
+                        variant="outline"
+                      >
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <span>Loading...</span>
+                        <div className="inline-flex h-3 w-3 items-center justify-center opacity-50">
+                          <X className="h-3 w-3" />
+                        </div>
+                      </Badge>
+                      <input
+                        className="sr-only"
+                        name={field.name}
+                        readOnly
+                        ref={inputRef}
+                        tabIndex={0}
+                        type="text"
+                        value={enteredBroadcasterId || ""}
+                      />
+                    </InputGroupAddon>
+                  );
+                }
+                if (metadata) {
+                  return (
+                    <InputGroupAddon>
+                      <Badge
+                        className="flex items-center gap-1"
+                        variant="outline"
+                      >
+                        <span>{getBadgeText()}</span>
+                        <button
+                          aria-label="Remove broadcaster"
+                          className="inline-flex h-3 w-3 cursor-pointer items-center justify-center"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete();
+                          }}
+                          type="button"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                      <input
+                        className="sr-only"
+                        name={field.name}
+                        onKeyDown={handleKeyDown}
+                        readOnly
+                        ref={inputRef}
+                        tabIndex={0}
+                        type="text"
+                        value={enteredBroadcasterId || ""}
+                      />
+                    </InputGroupAddon>
+                  );
+                }
+                return (
+                  <InputGroupInput
+                    disabled={isPending || twitchIdConverting}
                     name={field.name}
+                    onBlur={handleBlur}
+                    onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
-                    readOnly
+                    placeholder={t("twitchBroadcasterIdPlaceholder")}
                     ref={inputRef}
-                    tabIndex={0}
+                    required={true}
                     type="text"
-                    value={enteredBroadcasterId || ""}
+                    value={inputValue}
                   />
-                </>
-              ) : (
-                <Input
-                  className="h-auto border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                  disabled={isPending || twitchIdConverting}
-                  name={field.name}
-                  onBlur={handleBlur}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder={t("twitchBroadcasterIdPlaceholder")}
-                  ref={inputRef}
-                  required={true}
-                  type="text"
-                  value={inputValue}
-                />
+                );
+              })()}
+              {twitchIdConverting && !loadingMetadata && !metadata && (
+                <InputGroupAddon align="inline-end">
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin text-gray-400" />
+                </InputGroupAddon>
               )}
-              {twitchIdConverting && !metadata && (
-                <Loader2 className="h-4 w-4 shrink-0 animate-spin text-gray-400" />
-              )}
-            </div>
+            </InputGroup>
           </div>
           <Button
             disabled={
