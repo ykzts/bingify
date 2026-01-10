@@ -472,14 +472,19 @@ export async function updateSpaceSettings(
       socialPlatform === "twitch" &&
       twitchBroadcasterId
     ) {
-      // Register metadata (non-blocking - errors are logged but don't fail the update)
-      const result = await registerTwitchBroadcasterMetadata(
-        supabase,
-        twitchBroadcasterId,
-        user.id
-      );
-      if (!result.success) {
-        console.error("Failed to register Twitch metadata:", result.error);
+      // Get user's Twitch OAuth token
+      const tokenResult = await getOAuthToken(supabase, "twitch");
+      if (tokenResult.success && tokenResult.access_token) {
+        // Register metadata (non-blocking - errors are logged but don't fail the update)
+        const result = await registerTwitchBroadcasterMetadata(
+          supabase,
+          twitchBroadcasterId,
+          tokenResult.access_token,
+          user.id
+        );
+        if (!result.success) {
+          console.error("Failed to register Twitch metadata:", result.error);
+        }
       }
     }
 

@@ -7,13 +7,13 @@ import type { Database, Tables, TablesInsert } from "@/types/supabase";
 /**
  * Twurple API clientを作成
  */
-function createApiClient(appAccessToken: string): ApiClient {
+function createApiClient(userAccessToken: string): ApiClient {
   const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
   if (!clientId) {
     throw new Error("Twitch client ID not configured");
   }
 
-  const authProvider = new StaticAuthProvider(clientId, appAccessToken);
+  const authProvider = new StaticAuthProvider(clientId, userAccessToken);
   return new ApiClient({ authProvider });
 }
 
@@ -22,10 +22,10 @@ function createApiClient(appAccessToken: string): ApiClient {
  */
 async function fetchTwitchBroadcasterDetails(
   broadcasterId: string,
-  appAccessToken: string
+  userAccessToken: string
 ): Promise<TablesInsert<"twitch_broadcasters">> {
-  const apiClient = createApiClient(appAccessToken);
-  // App access tokenで動作するようgetUsersByIdsを使用
+  const apiClient = createApiClient(userAccessToken);
+  // ユーザーアクセストークンで動作するようgetUsersByIdsを使用
   const users = await apiClient.users.getUsersByIds([broadcasterId]);
 
   if (users.length === 0) {
@@ -102,7 +102,7 @@ export async function upsertTwitchBroadcasterMetadata(
 export async function fetchAndCacheTwitchBroadcasterMetadata(
   supabase: SupabaseClient<Database>,
   broadcasterId: string,
-  appAccessToken: string,
+  userAccessToken: string,
   userId?: string
 ): Promise<Tables<"twitch_broadcasters">> {
   // まずDBをチェック
@@ -121,7 +121,7 @@ export async function fetchAndCacheTwitchBroadcasterMetadata(
   try {
     const metadata = await fetchTwitchBroadcasterDetails(
       broadcasterId,
-      appAccessToken
+      userAccessToken
     );
 
     // created_byを設定

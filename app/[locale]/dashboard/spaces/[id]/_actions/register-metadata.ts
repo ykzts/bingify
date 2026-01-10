@@ -62,9 +62,20 @@ export async function registerTwitchBroadcasterMetadata(broadcasterId: string) {
       return { error: "Unauthorized", success: false };
     }
 
+    // Get operator's Twitch OAuth token
+    const tokenResult = await getOAuthToken(supabase, "twitch");
+
+    if (!(tokenResult.success && tokenResult.access_token)) {
+      return {
+        error: "Twitch OAuth token not found",
+        success: false,
+      };
+    }
+
     const result = await registerTwitchMetadata(
       supabase,
       broadcasterId,
+      tokenResult.access_token,
       user.id
     );
 
