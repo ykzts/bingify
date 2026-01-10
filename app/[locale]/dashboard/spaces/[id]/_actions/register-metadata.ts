@@ -4,6 +4,7 @@ import {
   registerTwitchBroadcasterMetadata as registerTwitchMetadata,
   registerYouTubeChannelMetadata as registerYouTubeMetadata,
 } from "@/lib/data/social-metadata-helpers";
+import { getOAuthToken } from "@/lib/oauth/token-storage";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -20,11 +21,10 @@ export async function registerYouTubeChannelMetadata(channelId: string) {
       return { error: "Unauthorized", success: false };
     }
 
-    // Get OAuth token for YouTube API
-    const { data: tokenData } = await supabase.auth.getSession();
-    const youtubeToken = tokenData.session?.provider_token;
+    // Get operator's YouTube OAuth token using the proper token storage function
+    const tokenResult = await getOAuthToken(supabase, "google");
 
-    if (!youtubeToken) {
+    if (!(tokenResult.success && tokenResult.access_token)) {
       return {
         error: "YouTube OAuth token not found",
         success: false,
@@ -34,7 +34,7 @@ export async function registerYouTubeChannelMetadata(channelId: string) {
     const result = await registerYouTubeMetadata(
       supabase,
       channelId,
-      youtubeToken,
+      tokenResult.access_token,
       user.id
     );
 
