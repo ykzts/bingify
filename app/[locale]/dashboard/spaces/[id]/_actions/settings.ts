@@ -121,7 +121,7 @@ export async function updateSpaceSettings(
     // Get current space data
     const { data: space, error: spaceError } = await supabase
       .from("spaces")
-      .select("owner_id, max_participants, settings, gatekeeper_rules")
+      .select("owner_id, max_participants, settings, gatekeeper_rules, status")
       .eq("id", spaceId)
       .single();
 
@@ -129,6 +129,14 @@ export async function updateSpaceSettings(
       return {
         ...initialFormState,
         errors: ["スペースが見つかりませんでした"],
+      };
+    }
+
+    // Check if space is closed
+    if (space.status === "closed") {
+      return {
+        ...initialFormState,
+        errors: ["errorClosedSpace"],
       };
     }
 
@@ -711,13 +719,21 @@ export async function inviteAdmin(
     // Check if current user is the owner
     const { data: space, error: spaceError } = await supabase
       .from("spaces")
-      .select("owner_id")
+      .select("owner_id, status")
       .eq("id", spaceId)
       .single();
 
     if (spaceError || !space) {
       return {
         error: "スペースが見つかりませんでした",
+        success: false,
+      };
+    }
+
+    // Check if space is closed
+    if (space.status === "closed") {
+      return {
+        error: "閉鎖されたスペースの設定は変更できません",
         success: false,
       };
     }
@@ -827,13 +843,21 @@ export async function removeAdmin(
     // Check if current user is the owner
     const { data: space, error: spaceError } = await supabase
       .from("spaces")
-      .select("owner_id")
+      .select("owner_id, status")
       .eq("id", spaceId)
       .single();
 
     if (spaceError || !space) {
       return {
         error: "スペースが見つかりませんでした",
+        success: false,
+      };
+    }
+
+    // Check if space is closed
+    if (space.status === "closed") {
+      return {
+        error: "閉鎖されたスペースの設定は変更できません",
         success: false,
       };
     }
