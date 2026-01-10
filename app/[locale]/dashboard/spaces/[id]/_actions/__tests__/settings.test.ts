@@ -478,12 +478,12 @@ describe("updateSpaceSettings - ゲートキーパー設定の権限制御", () 
   });
 });
 
-describe("updateSpaceSettings - 閉鎖されたスペースの設定変更制限", () => {
+describe("updateSpaceSettings - 終了したスペースの設定変更制限", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("閉鎖されたスペースの設定は変更できない", async () => {
+  it("終了したスペースの設定は変更できない", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     const { isValidUUID } = await import("@/lib/utils/uuid");
 
@@ -542,7 +542,7 @@ describe("updateSpaceSettings - 閉鎖されたスペースの設定変更制限
     );
   });
 
-  it("管理者も閉鎖されたスペースの設定は変更できない", async () => {
+  it("管理者も終了したスペースの設定は変更できない", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     const { isValidUUID } = await import("@/lib/utils/uuid");
 
