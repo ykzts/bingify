@@ -48,6 +48,10 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
   };
 
   const isActivePath = (path: string) => {
+    // Special case for root path
+    if (path === "/") {
+      return pathname === "/";
+    }
     // Exact match or starts with path followed by /
     return pathname === path || pathname.startsWith(`${path}/`);
   };
