@@ -32,16 +32,16 @@ describe("Dashboard Actions", () => {
       const userId = "test-user-id";
       const mockSpaces = [
         {
+          created_at: "2024-12-28T00:00:00Z",
           id: "space-1",
           share_key: "active-space-20241228",
           status: "active",
-          created_at: "2024-12-28T00:00:00Z",
         },
         {
+          created_at: "2024-12-27T00:00:00Z",
           id: "space-2",
           share_key: "closed-space-20241227",
           status: "closed",
-          created_at: "2024-12-27T00:00:00Z",
         },
       ];
 
@@ -159,16 +159,16 @@ describe("Dashboard Actions", () => {
       const userId = "test-user-id";
       const mockSpaces = [
         {
+          created_at: "2024-12-28T00:00:00Z",
           id: "space-1",
           share_key: "closed-space-20241228",
           status: "closed",
-          created_at: "2024-12-28T00:00:00Z",
         },
         {
+          created_at: "2024-12-27T00:00:00Z",
           id: "space-2",
           share_key: "closed-space-20241227",
           status: "closed",
-          created_at: "2024-12-27T00:00:00Z",
         },
       ];
 
@@ -233,16 +233,16 @@ describe("Dashboard Actions", () => {
         });
       const mockSpaces = [
         {
+          created_at: "2024-12-28T00:00:00Z",
           id: "space-1",
           share_key: "active-space-1-20241228",
           status: "active",
-          created_at: "2024-12-28T00:00:00Z",
         },
         {
+          created_at: "2024-12-27T00:00:00Z",
           id: "space-2",
           share_key: "active-space-2-20241227",
           status: "active",
-          created_at: "2024-12-27T00:00:00Z",
         },
       ];
 

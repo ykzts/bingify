@@ -180,6 +180,11 @@ export function SpaceSettingsForm({
       youtube_requirement:
         space.gatekeeper_rules?.youtube?.requirement || "subscriber",
     },
+    transform: useTransform(
+      // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
+      (baseForm) => mergeForm(baseForm, updateState!),
+      [updateState]
+    ),
     validationLogic: revalidateLogic({
       mode: "submit",
       modeAfterSubmission: "change",
@@ -187,11 +192,6 @@ export function SpaceSettingsForm({
     validators: {
       onChange: spaceSettingsFormSchema,
     },
-    transform: useTransform(
-      // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
-      (baseForm) => mergeForm(baseForm, updateState!),
-      [updateState]
-    ),
   });
 
   const isSubmitting = useStore(

@@ -51,10 +51,10 @@ export async function lookupYouTubeChannelId(
     if (result.error) {
       const errorTranslations: Record<string, string> = {
         "Input is required": "入力値が空です",
-        "YouTube OAuth token is not provided":
-          "YouTube OAuthトークンが設定されていません",
         "Invalid input format. Please provide a channel ID, handle (@username), or YouTube URL":
           "入力形式が不正です。チャンネルID、ハンドル（@username）、またはYouTube URLを入力してください",
+        "YouTube OAuth token is not provided":
+          "YouTube OAuthトークンが設定されていません",
       };
 
       // チャンネルが見つからない場合のエラーメッセージを変換

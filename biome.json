@@ -5,6 +5,13 @@
     "ultracite/biome/next",
     "ultracite/biome/react"
   ],
+  "assist": {
+    "actions": {
+      "source": {
+        "useSortedKeys": "on"
+      }
+    }
+  },
   "files": {
     "ignoreUnknown": true,
     "includes": ["!components/ui", "!supabase/templates"]

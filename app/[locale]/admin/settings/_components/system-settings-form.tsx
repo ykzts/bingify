@@ -65,6 +65,8 @@ export function SystemSettingsForm({ initialSettings }: Props) {
           space_expiration_hours: initialSettings.space_expiration_hours,
         }
       : systemSettingsFormOpts.defaultValues,
+    // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
+    transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
     validationLogic: revalidateLogic({
       mode: "submit",
       modeAfterSubmission: "change",
@@ -72,8 +74,6 @@ export function SystemSettingsForm({ initialSettings }: Props) {
     validators: {
       onDynamic: systemSettingsSchema,
     },
-    // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
-    transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
   });
 
   const formErrors = useStore(form.store, (formState) => formState.errors);

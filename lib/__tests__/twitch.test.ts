@@ -335,9 +335,9 @@ describe("getBroadcasterIdFromUsername", () => {
   it("有効なユーザー名に対して配信者IDを返す", async () => {
     mockGetUsersByNames.mockResolvedValue([
       {
+        displayName: "Ninja",
         id: "19571641",
         login: "ninja",
-        displayName: "Ninja",
       },
     ]);
 

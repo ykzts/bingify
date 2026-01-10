@@ -381,8 +381,8 @@ export async function getParticipants(
     // Sort by bingo status priority (bingo > reach > none) then by joined_at
     const statusPriority: Record<"bingo" | "reach" | "none", number> = {
       bingo: 0,
-      reach: 1,
       none: 2,
+      reach: 1,
     };
     const sortedParticipants = participants.sort((a, b) => {
       const priorityDiff =

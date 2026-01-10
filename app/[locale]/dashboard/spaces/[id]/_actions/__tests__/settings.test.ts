@@ -16,8 +16,8 @@ vi.mock("@tanstack/react-form-nextjs", async (importOriginal) => {
     ...actual,
     createServerValidate: vi.fn(() => vi.fn()),
     initialFormState: {
-      errors: [],
       errorMap: {},
+      errors: [],
       values: {},
     },
   };

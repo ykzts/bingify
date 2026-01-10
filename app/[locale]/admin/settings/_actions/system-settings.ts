@@ -74,16 +74,8 @@ function parseSystemSettingsFormData(
   // Checkboxes send their value (or nothing) when checked, nothing when unchecked
   data.features = {
     gatekeeper: {
-      youtube: {
-        enabled: formData.has("features.gatekeeper.youtube.enabled"),
-        member: {
-          enabled: formData.has("features.gatekeeper.youtube.member.enabled"),
-        },
-        subscriber: {
-          enabled: formData.has(
-            "features.gatekeeper.youtube.subscriber.enabled"
-          ),
-        },
+      email: {
+        enabled: formData.has("features.gatekeeper.email.enabled"),
       },
       twitch: {
         enabled: formData.has("features.gatekeeper.twitch.enabled"),
@@ -96,8 +88,16 @@ function parseSystemSettingsFormData(
           ),
         },
       },
-      email: {
-        enabled: formData.has("features.gatekeeper.email.enabled"),
+      youtube: {
+        enabled: formData.has("features.gatekeeper.youtube.enabled"),
+        member: {
+          enabled: formData.has("features.gatekeeper.youtube.member.enabled"),
+        },
+        subscriber: {
+          enabled: formData.has(
+            "features.gatekeeper.youtube.subscriber.enabled"
+          ),
+        },
       },
     },
   };
@@ -158,10 +158,10 @@ export async function updateSystemSettingsAction(
     // Return success state with consistent shape
     return {
       ...initialFormState,
-      values: validatedData,
       meta: {
         success: true,
       },
+      values: validatedData,
     };
   } catch (e) {
     console.error("Error in updateSystemSettingsAction:", e);

@@ -52,8 +52,8 @@ describe("locale-detection", () => {
     it("Accept-Languageヘッダーよりクッキーを優先する", () => {
       const request = new NextRequest("http://localhost:3000/@test", {
         headers: {
-          cookie: "NEXT_LOCALE=en",
           "accept-language": "ja,en-US;q=0.9",
+          cookie: "NEXT_LOCALE=en",
         },
       });
 
@@ -89,8 +89,8 @@ describe("locale-detection", () => {
     it("無効なクッキー値を適切に処理する", () => {
       const request = new NextRequest("http://localhost:3000/@test", {
         headers: {
-          cookie: "NEXT_LOCALE=invalid",
           "accept-language": "ja",
+          cookie: "NEXT_LOCALE=invalid",
         },
       });
 

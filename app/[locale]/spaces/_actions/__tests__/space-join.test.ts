@@ -296,14 +296,14 @@ describe("checkOAuthTokenAvailability", () => {
 
   test("有効なトークンが存在する場合、available: true を返す", async () => {
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: "user-123", email: "test@example.com" } },
+      data: { user: { email: "test@example.com", id: "user-123" } },
       error: null,
     });
 
     mockGetOAuthToken.mockResolvedValue({
-      success: true,
       access_token: "valid_token",
       expires_at: "2030-01-01T00:00:00Z",
+      success: true,
     });
 
     mockIsTokenExpired.mockReturnValue(false);
@@ -316,13 +316,13 @@ describe("checkOAuthTokenAvailability", () => {
 
   test("トークンが存在しない場合、available: false を返す", async () => {
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: "user-123", email: "test@example.com" } },
+      data: { user: { email: "test@example.com", id: "user-123" } },
       error: null,
     });
 
     mockGetOAuthToken.mockResolvedValue({
-      success: true,
       access_token: null,
+      success: true,
     });
 
     const result = await checkOAuthTokenAvailability("twitch");
@@ -332,14 +332,14 @@ describe("checkOAuthTokenAvailability", () => {
 
   test("トークンが期限切れの場合、available: false を返す", async () => {
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: "user-123", email: "test@example.com" } },
+      data: { user: { email: "test@example.com", id: "user-123" } },
       error: null,
     });
 
     mockGetOAuthToken.mockResolvedValue({
-      success: true,
       access_token: "expired_token",
       expires_at: "2020-01-01T00:00:00Z",
+      success: true,
     });
 
     mockIsTokenExpired.mockReturnValue(true);
@@ -352,13 +352,13 @@ describe("checkOAuthTokenAvailability", () => {
 
   test("トークン取得に失敗した場合、available: false を返す", async () => {
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: "user-123", email: "test@example.com" } },
+      data: { user: { email: "test@example.com", id: "user-123" } },
       error: null,
     });
 
     mockGetOAuthToken.mockResolvedValue({
-      success: false,
       error: "Database error",
+      success: false,
     });
 
     const result = await checkOAuthTokenAvailability("google");

@@ -49,6 +49,10 @@ export function ContactForm({ locale }: Props) {
 
   const form = useForm({
     ...contactFormOpts,
+    transform: useTransform(
+      (baseForm) => (state ? mergeForm(baseForm, state) : baseForm),
+      [state]
+    ),
     validationLogic: revalidateLogic({
       mode: "submit",
       modeAfterSubmission: "change",
@@ -56,10 +60,6 @@ export function ContactForm({ locale }: Props) {
     validators: {
       onChange: contactFormSchema,
     },
-    transform: useTransform(
-      (baseForm) => (state ? mergeForm(baseForm, state) : baseForm),
-      [state]
-    ),
   });
 
   const formErrors = useStore(form.store, (formState) => formState.errors);

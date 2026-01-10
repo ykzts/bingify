@@ -120,7 +120,7 @@ describe("getErrorMessage", () => {
 
   describe("フォールバック動作", () => {
     it("プレーンオブジェクトを文字列に変換する", () => {
-      const obj = { foo: "bar", baz: 123 };
+      const obj = { baz: 123, foo: "bar" };
       expect(getErrorMessage(obj)).toBe("[object Object]");
     });
 

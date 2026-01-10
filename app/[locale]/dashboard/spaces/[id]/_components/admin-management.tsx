@@ -53,6 +53,8 @@ export function AdminManagement({ spaceId }: Props) {
 
   const form = useForm({
     ...inviteAdminFormOpts,
+    // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
+    transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
     validationLogic: revalidateLogic({
       mode: "submit",
       modeAfterSubmission: "change",
@@ -60,8 +62,6 @@ export function AdminManagement({ spaceId }: Props) {
     validators: {
       onDynamic: inviteAdminFormSchema,
     },
-    // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
-    transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
   });
 
   const formErrors = useStore(form.store, (formState) => formState.errors);

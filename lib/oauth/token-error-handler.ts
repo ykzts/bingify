@@ -6,14 +6,14 @@ import { deleteOAuthToken, type OAuthProvider } from "./token-storage";
  * OAuthエラーの種類
  */
 export const OAuthErrorType = {
-  /** トークンが無効化された（401エラー） */
-  TOKEN_INVALID: "TOKEN_INVALID",
   /** トークンの権限が不足している（403エラー） */
   INSUFFICIENT_PERMISSIONS: "INSUFFICIENT_PERMISSIONS",
-  /** リフレッシュトークンが無効 */
-  REFRESH_TOKEN_INVALID: "REFRESH_TOKEN_INVALID",
   /** ネットワークエラー */
   NETWORK_ERROR: "NETWORK_ERROR",
+  /** リフレッシュトークンが無効 */
+  REFRESH_TOKEN_INVALID: "REFRESH_TOKEN_INVALID",
+  /** トークンが無効化された（401エラー） */
+  TOKEN_INVALID: "TOKEN_INVALID",
   /** その他のエラー */
   UNKNOWN: "UNKNOWN",
 } as const;

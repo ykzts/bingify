@@ -106,8 +106,8 @@ describe("Auth Callback Route", () => {
       auth: {
         exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
         refreshSession: vi.fn().mockResolvedValue({
-          error: new Error("Failed to refresh session"),
           data: { session: null },
+          error: new Error("Failed to refresh session"),
         }),
       },
     } as any);

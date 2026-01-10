@@ -83,27 +83,27 @@ describe("Admin Settings Actions", () => {
       // キャプチャされた設定が正しい構造を持つことを確認
       expect(capturedSettings).toMatchObject({
         default_user_role: "organizer",
-        max_participants_per_space: 50,
-        max_spaces_per_user: 5,
-        max_total_spaces: 1000,
-        space_expiration_hours: 48,
         features: {
           gatekeeper: {
-            youtube: {
+            email: {
               enabled: true,
-              member: { enabled: true },
-              subscriber: { enabled: true },
             },
             twitch: {
               enabled: true,
               follower: { enabled: true },
               subscriber: { enabled: true },
             },
-            email: {
+            youtube: {
               enabled: true,
+              member: { enabled: true },
+              subscriber: { enabled: true },
             },
           },
         },
+        max_participants_per_space: 50,
+        max_spaces_per_user: 5,
+        max_total_spaces: 1000,
+        space_expiration_hours: 48,
       });
     });
 
@@ -175,18 +175,18 @@ describe("Admin Settings Actions", () => {
         default_user_role: "user",
         features: {
           gatekeeper: {
-            youtube: {
+            email: {
               enabled: false,
-              member: { enabled: false },
-              subscriber: { enabled: false },
             },
             twitch: {
               enabled: false,
               follower: { enabled: false },
               subscriber: { enabled: false },
             },
-            email: {
+            youtube: {
               enabled: false,
+              member: { enabled: false },
+              subscriber: { enabled: false },
             },
           },
         },
@@ -267,18 +267,18 @@ describe("Admin Settings Actions", () => {
       expect(capturedSettings).toMatchObject({
         features: {
           gatekeeper: {
-            youtube: {
+            email: {
               enabled: true,
-              member: { enabled: true },
-              subscriber: { enabled: false },
             },
             twitch: {
               enabled: false,
               follower: { enabled: false },
               subscriber: { enabled: false },
             },
-            email: {
+            youtube: {
               enabled: true,
+              member: { enabled: true },
+              subscriber: { enabled: false },
             },
           },
         },

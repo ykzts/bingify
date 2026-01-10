@@ -107,7 +107,7 @@ function generateRowPositions(
 ): Array<{ row: number; col: number }> {
   const positions: Array<{ row: number; col: number }> = [];
   for (let col = 0; col < CARD_SIZE; col++) {
-    positions.push({ row, col });
+    positions.push({ col, row });
   }
   return positions;
 }
@@ -120,7 +120,7 @@ function generateColPositions(
 ): Array<{ row: number; col: number }> {
   const positions: Array<{ row: number; col: number }> = [];
   for (let row = 0; row < CARD_SIZE; row++) {
-    positions.push({ row, col });
+    positions.push({ col, row });
   }
   return positions;
 }
@@ -136,7 +136,7 @@ function generateDiagonalPositions(
   for (let i = 0; i < CARD_SIZE; i++) {
     const row = i;
     const col = index === 0 ? i : CARD_SIZE - 1 - i;
-    positions.push({ row, col });
+    positions.push({ col, row });
   }
   return positions;
 }
