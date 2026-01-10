@@ -738,7 +738,7 @@ export async function inviteAdmin(
     // Check if space is closed
     if (space.status === "closed") {
       return {
-        error: "閉鎖されたスペースの設定は変更できません",
+        error: "終了したスペースの設定は変更できません",
         success: false,
       };
     }
@@ -862,7 +862,7 @@ export async function removeAdmin(
     // Check if space is closed
     if (space.status === "closed") {
       return {
-        error: "閉鎖されたスペースの設定は変更できません",
+        error: "終了したスペースの設定は変更できません",
         success: false,
       };
     }
