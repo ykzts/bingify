@@ -32,7 +32,8 @@ async function fetchYouTubeChannelDetails(
   // Note: YouTubeのカスタムURLは通常ハンドル（@username）として使用される
   // ただし、すべてのカスタムURLがこの形式とは限らないため、
   // 実際の値を確認してから使用することを推奨
-  const handle = snippet?.customUrl ? `@${snippet.customUrl}` : null;
+  // handleはデータベースに@なしで保存する（表示時に@を付与）
+  const handle = snippet?.customUrl || null;
 
   return {
     channel_id: channelId,
@@ -162,7 +163,7 @@ export function formatYouTubeChannelDisplay(
   const channelId = metadata.channel_id;
 
   if (handle) {
-    return `${handle} (${channelId})`;
+    return `@${handle} (${channelId})`;
   }
 
   const title = metadata.channel_title || "";

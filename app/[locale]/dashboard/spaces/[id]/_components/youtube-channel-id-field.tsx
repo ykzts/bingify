@@ -26,9 +26,6 @@ import { lookupYouTubeChannelIdWithOperatorToken } from "../_actions/operator-lo
 import { registerYouTubeChannelMetadata } from "../_actions/register-metadata";
 import { useYouTubeMetadata } from "../_hooks/use-metadata";
 
-// @ プレフィックスを除去
-const AT_PREFIX_REGEX = /^@+/;
-
 interface Props {
   // biome-ignore lint/suspicious/noExplicitAny: FieldApi type requires 23 generic parameters
   field: any;
@@ -228,13 +225,10 @@ export function YoutubeChannelIdField({
     }
 
     const handle = metadata.handle || "";
-    // Handle should already be without @ from the database
-    // But clean it just in case for backward compatibility
-    const cleanHandle = handle.replace(AT_PREFIX_REGEX, "");
     const shortId = enteredChannelId.substring(0, 8);
 
-    if (cleanHandle) {
-      return `@${cleanHandle} (${shortId}...)`;
+    if (handle) {
+      return `@${handle} (${shortId}...)`;
     }
     if (metadata.channel_title) {
       return `${metadata.channel_title} (${shortId}...)`;
