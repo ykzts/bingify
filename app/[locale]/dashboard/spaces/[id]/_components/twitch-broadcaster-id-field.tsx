@@ -26,7 +26,6 @@ interface Props {
   // biome-ignore lint/suspicious/noExplicitAny: FieldApi type requires 23 generic parameters
   field: any;
   isPending: boolean;
-  requirement: string;
   canUseSubscriber: boolean;
   enteredBroadcasterId: string;
   onOperatorIdFetched: (broadcasterId: string) => void;
@@ -35,7 +34,6 @@ interface Props {
 export function TwitchBroadcasterIdField({
   field,
   isPending,
-  requirement,
   canUseSubscriber,
   enteredBroadcasterId,
   onOperatorIdFetched,
@@ -113,6 +111,25 @@ export function TwitchBroadcasterIdField({
           // Update the field value with the converted ID
           fieldApi.setValue(result.broadcasterId);
           setTwitchIdError(null);
+
+          // Immediately fetch and display metadata
+          setLoadingMetadata(true);
+          getTwitchMetadata(result.broadcasterId)
+            .then((metadataResult) => {
+              if (metadataResult.success && metadataResult.metadata) {
+                setMetadata(
+                  metadataResult.metadata as Tables<"twitch_broadcasters">
+                );
+                setShowInput(false);
+              }
+            })
+            .catch(() => {
+              // If metadata fetch fails, keep showing input
+              setShowInput(true);
+            })
+            .finally(() => {
+              setLoadingMetadata(false);
+            });
         }
       } catch (_error) {
         setTwitchIdError(t("twitchBroadcasterIdConvertError"));
@@ -156,10 +173,6 @@ export function TwitchBroadcasterIdField({
     setMetadata(null);
     setShowInput(true);
   };
-
-  if (requirement === "none") {
-    return null;
-  }
 
   return (
     <Field>
@@ -224,7 +237,7 @@ export function TwitchBroadcasterIdField({
                   });
                 }}
                 placeholder={t("twitchBroadcasterIdPlaceholder")}
-                required={requirement !== "none"}
+                required={true}
                 type="text"
                 value={field.state.value as string}
               />

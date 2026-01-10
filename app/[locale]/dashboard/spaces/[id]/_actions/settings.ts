@@ -386,20 +386,12 @@ export async function updateSpaceSettings(
       gatekeeperRules = {};
 
       // Only add the selected platform's rules
-      if (
-        socialPlatform === "youtube" &&
-        youtubeRequirement !== "none" &&
-        youtubeChannelId
-      ) {
+      if (socialPlatform === "youtube" && youtubeChannelId) {
         gatekeeperRules.youtube = {
           channelId: youtubeChannelId,
           requirement: youtubeRequirement,
         };
-      } else if (
-        socialPlatform === "twitch" &&
-        twitchRequirement !== "none" &&
-        twitchBroadcasterId
-      ) {
+      } else if (socialPlatform === "twitch" && twitchBroadcasterId) {
         gatekeeperRules.twitch = {
           broadcasterId: twitchBroadcasterId,
           requirement: twitchRequirement,
@@ -448,7 +440,6 @@ export async function updateSpaceSettings(
     if (
       gatekeeperMode === "social" &&
       socialPlatform === "youtube" &&
-      youtubeRequirement !== "none" &&
       youtubeChannelId
     ) {
       // Get user's Google OAuth token for YouTube API calls
@@ -471,7 +462,6 @@ export async function updateSpaceSettings(
     if (
       gatekeeperMode === "social" &&
       socialPlatform === "twitch" &&
-      twitchRequirement !== "none" &&
       twitchBroadcasterId
     ) {
       // Register metadata (non-blocking - errors are logged but don't fail the update)

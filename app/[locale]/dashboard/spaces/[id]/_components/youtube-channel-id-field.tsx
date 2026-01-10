@@ -26,7 +26,6 @@ interface Props {
   // biome-ignore lint/suspicious/noExplicitAny: FieldApi type requires 23 generic parameters
   field: any;
   isPending: boolean;
-  requirement: string;
   canUseMemberSubscriber: boolean;
   enteredChannelId: string;
   onOperatorIdFetched: (channelId: string) => void;
@@ -35,7 +34,6 @@ interface Props {
 export function YoutubeChannelIdField({
   field,
   isPending,
-  requirement,
   canUseMemberSubscriber,
   enteredChannelId,
   onOperatorIdFetched,
@@ -114,6 +112,25 @@ export function YoutubeChannelIdField({
           // Update the field value with the converted ID
           fieldApi.setValue(result.channelId);
           setYoutubeIdError(null);
+
+          // Immediately fetch and display metadata
+          setLoadingMetadata(true);
+          getYouTubeMetadata(result.channelId)
+            .then((metadataResult) => {
+              if (metadataResult.success && metadataResult.metadata) {
+                setMetadata(
+                  metadataResult.metadata as Tables<"youtube_channels">
+                );
+                setShowInput(false);
+              }
+            })
+            .catch(() => {
+              // If metadata fetch fails, keep showing input
+              setShowInput(true);
+            })
+            .finally(() => {
+              setLoadingMetadata(false);
+            });
         }
       } catch (_error) {
         setYoutubeIdError(t("youtubeChannelIdConvertError"));
@@ -157,10 +174,6 @@ export function YoutubeChannelIdField({
     setMetadata(null);
     setShowInput(true);
   };
-
-  if (requirement === "none") {
-    return null;
-  }
 
   return (
     <Field>
@@ -223,7 +236,7 @@ export function YoutubeChannelIdField({
                   });
                 }}
                 placeholder={t("youtubeChannelIdPlaceholder")}
-                required={requirement !== "none"}
+                required={true}
                 type="text"
                 value={field.state.value as string}
               />

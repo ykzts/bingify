@@ -29,7 +29,7 @@ export const spaceSettingsFormSchema = z.object({
   twitch_broadcaster_id: z.string(),
   twitch_requirement: z.enum(["none", "follower", "subscriber"]),
   youtube_channel_id: z.string(),
-  youtube_requirement: z.enum(["none", "subscriber"]),
+  youtube_requirement: z.enum(["none", "subscriber", "member"]),
 });
 
 export type SpaceSettingsFormValues = z.infer<typeof spaceSettingsFormSchema>;
@@ -44,8 +44,8 @@ export const spaceSettingsFormOpts = formOptions({
     social_platform: "youtube",
     title: "",
     twitch_broadcaster_id: "",
-    twitch_requirement: "none",
+    twitch_requirement: "follower",
     youtube_channel_id: "",
-    youtube_requirement: "none",
+    youtube_requirement: "subscriber",
   } as SpaceSettingsFormValues,
 });

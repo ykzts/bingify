@@ -135,9 +135,9 @@ describe("updateSpaceSettings - ゲートキーパー設定の権限制御", () 
     formData.set("gatekeeper_mode", "email");
     formData.set("email_allowlist", "user@example.com");
     formData.set("social_platform", "youtube");
-    formData.set("youtube_requirement", "none");
+    formData.set("youtube_requirement", "subscriber");
     formData.set("youtube_channel_id", "");
-    formData.set("twitch_requirement", "none");
+    formData.set("twitch_requirement", "follower");
     formData.set("twitch_broadcaster_id", "");
 
     const result = await updateSpaceSettings("space-123", undefined, formData);
@@ -213,9 +213,9 @@ describe("updateSpaceSettings - ゲートキーパー設定の権限制御", () 
     formData.set("gatekeeper_mode", "email");
     formData.set("email_allowlist", "user@example.com");
     formData.set("social_platform", "youtube");
-    formData.set("youtube_requirement", "none");
+    formData.set("youtube_requirement", "subscriber");
     formData.set("youtube_channel_id", "");
-    formData.set("twitch_requirement", "none");
+    formData.set("twitch_requirement", "follower");
     formData.set("twitch_broadcaster_id", "");
 
     const result = await updateSpaceSettings("space-123", undefined, formData);
@@ -336,9 +336,9 @@ describe("updateSpaceSettings - ゲートキーパー設定の権限制御", () 
     formData.set("gatekeeper_mode", "none"); // Not changing (was null, will be null)
     formData.set("email_allowlist", "");
     formData.set("social_platform", "youtube");
-    formData.set("youtube_requirement", "none");
+    formData.set("youtube_requirement", "subscriber");
     formData.set("youtube_channel_id", "");
-    formData.set("twitch_requirement", "none");
+    formData.set("twitch_requirement", "follower");
     formData.set("twitch_broadcaster_id", "");
 
     const result = await updateSpaceSettings("space-123", undefined, formData);
@@ -464,9 +464,9 @@ describe("updateSpaceSettings - ゲートキーパー設定の権限制御", () 
     formData.set("gatekeeper_mode", "email"); // Keep the same
     formData.set("email_allowlist", "user@example.com"); // Keep the same
     formData.set("social_platform", "youtube");
-    formData.set("youtube_requirement", "none");
+    formData.set("youtube_requirement", "subscriber");
     formData.set("youtube_channel_id", "");
-    formData.set("twitch_requirement", "none");
+    formData.set("twitch_requirement", "follower");
     formData.set("twitch_broadcaster_id", "");
 
     const result = await updateSpaceSettings("space-123", undefined, formData);
