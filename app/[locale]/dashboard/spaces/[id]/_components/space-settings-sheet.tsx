@@ -14,6 +14,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
 import { AdminManagement } from "./admin-management";
@@ -42,6 +43,8 @@ export function SpaceSettingsSheet({
   systemMaxParticipants,
 }: Props) {
   const t = useTranslations("AdminSpace");
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
 
@@ -52,13 +55,30 @@ export function SpaceSettingsSheet({
     }
   }, [searchParams]);
 
+  // Handle opening/closing the sheet with URL parameter management
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+
+    // Update URL parameters
+    const params = new URLSearchParams(searchParams.toString());
+    if (newOpen) {
+      params.set("open", "settings");
+    } else {
+      params.delete("open");
+    }
+
+    // Navigate to the same path with updated query params
+    const newUrl = params.toString() ? `${pathname}?${params}` : pathname;
+    router.replace(newUrl);
+  };
+
   const handleSuccess = (message: string) => {
-    setOpen(false);
+    handleOpenChange(false);
     toast.success(message);
   };
 
   return (
-    <Sheet onOpenChange={setOpen} open={open}>
+    <Sheet onOpenChange={handleOpenChange} open={open}>
       <SheetTrigger asChild>
         <Button size="sm" variant="outline">
           <Settings className="h-4 w-4" />
@@ -99,7 +119,7 @@ export function SpaceSettingsSheet({
           {/* Danger Zone - Always visible for destructive actions */}
           <div className="border-red-200 border-t pt-8">
             <DangerZone
-              onResetSuccess={() => setOpen(false)}
+              onResetSuccess={() => handleOpenChange(false)}
               spaceId={space.id}
             />
           </div>
