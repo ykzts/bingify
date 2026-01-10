@@ -85,15 +85,13 @@ export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
   const isDraft = space.status === "draft";
   const isClosed = space.status === "closed";
 
-  // Don't render dropdown menu for closed spaces
-  if (isClosed) {
-    return null;
-  }
-
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-gray-100">
+        <DropdownMenuTrigger
+          className="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-gray-100 disabled:pointer-events-none disabled:opacity-50"
+          disabled={isClosed}
+        >
           <MoreHorizontal className="h-4 w-4" />
           <span className="sr-only">{t("spaceActions")}</span>
         </DropdownMenuTrigger>
