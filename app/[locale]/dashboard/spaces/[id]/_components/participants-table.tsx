@@ -25,11 +25,11 @@ import { ParticipantCardDialog } from "./participant-card-dialog";
 
 interface Props {
   actions?: (participant: Participant) => ReactNode;
-  bingoCount: number;
-  emptyMessage: string;
-  maxParticipants: number;
+  bingoCount?: number;
+  emptyMessage?: string;
+  maxParticipants?: number;
   participants: Participant[];
-  reachCount: number;
+  reachCount?: number;
   spaceId: string;
 }
 
@@ -70,24 +70,38 @@ function getInitials(name: string | null | undefined): string {
  */
 export function ParticipantsTable({
   actions,
-  bingoCount,
-  emptyMessage,
+  bingoCount: providedBingoCount,
+  emptyMessage: providedEmptyMessage,
   maxParticipants,
   participants,
-  reachCount,
+  reachCount: providedReachCount,
   spaceId,
 }: Props) {
   const t = useTranslations("AdminSpace");
 
+  // Compute counts if not provided
+  const bingoCount = providedBingoCount ?? participants.filter((p) => p.bingo_status === "bingo").length;
+  const reachCount = providedReachCount ?? participants.filter((p) => p.bingo_status === "reach").length;
+  const emptyMessage = providedEmptyMessage ?? t("noParticipants");
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("participantsTitle")}</CardTitle>
+        <CardTitle>
+          {maxParticipants !== undefined
+            ? t("participantsListTitle", {
+                count: participants.length,
+                max: maxParticipants,
+              })
+            : t("participantsTitle")}
+        </CardTitle>
         <CardDescription>
-          {t("participantsDescription", {
-            count: participants.length,
-            max: maxParticipants,
-          })}
+          {maxParticipants !== undefined
+            ? t("participantsDescription", {
+                count: participants.length,
+                max: maxParticipants,
+              })
+            : `${participants.length} ${participants.length === 1 ? "participant" : "participants"}`}
           {bingoCount > 0 && (
             <span className="ml-2">
               <PartyPopper className="mr-1 inline size-4" />

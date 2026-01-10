@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { PartyPopper, Trash2, Zap } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -15,8 +15,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,19 +23,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/client";
 import { kickParticipant } from "../_actions/space-operations";
 import type { Participant } from "../_hooks/use-participants";
 import { useParticipants } from "../_hooks/use-participants";
-import { ParticipantCardDialog } from "./participant-card-dialog";
+import { ParticipantsTable } from "./participants-table";
 
 interface Props {
   maxParticipants: number;
@@ -103,42 +93,15 @@ function updateParticipantList(
     if (statusDiff !== 0) {
       return statusDiff;
     }
-    return new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime();
+    const aTime = a.joined_at ? new Date(a.joined_at).getTime() : 0;
+    const bTime = b.joined_at ? new Date(b.joined_at).getTime() : 0;
+    return aTime - bTime;
   });
 
   return newList;
 }
 
 const NAME_SPLIT_REGEX = /\s+/;
-
-/**
- * Get initials from display name
- */
-function getInitials(name: string | null | undefined): string {
-  const trimmed = name?.trim();
-  if (!trimmed) {
-    return "G";
-  }
-
-  const parts = trimmed
-    .split(NAME_SPLIT_REGEX)
-    .filter((part) => part.length > 0);
-
-  if (parts.length === 0 || !parts[0]) {
-    return "G";
-  }
-
-  if (parts.length === 1) {
-    return parts[0].substring(0, 2).toUpperCase();
-  }
-
-  const lastPart = parts.at(-1);
-  if (!lastPart || lastPart.length === 0) {
-    return parts[0].substring(0, 2).toUpperCase();
-  }
-
-  return (parts[0][0] + lastPart[0]).toUpperCase();
-}
 
 export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
   const t = useTranslations("AdminSpace");
@@ -372,112 +335,29 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {t("participantsListTitle", {
-              count: participants.length,
-              max: maxParticipants,
-            })}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("participantsTableUser")}</TableHead>
-                <TableHead>{t("participantsTableStatus")}</TableHead>
-                <TableHead className="text-right">
-                  {t("participantsTableActions")}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {participants.map((participant) => {
-                const displayName =
-                  participant.profiles?.full_name || t("participantGuestName");
-                const initials = getInitials(participant.profiles?.full_name);
-
-                return (
-                  <TableRow key={participant.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          {participant.profiles?.avatar_url && (
-                            <AvatarImage
-                              alt={displayName}
-                              src={participant.profiles.avatar_url}
-                            />
-                          )}
-                          <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                            {initials}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col">
-                          <span className="font-medium text-sm">
-                            {displayName}
-                          </span>
-                          {!participant.profiles?.full_name && (
-                            <span className="text-muted-foreground text-xs">
-                              {participant.user_id.substring(0, 8)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        {participant.bingo_status === "bingo" && (
-                          <Badge className="bg-yellow-500 text-white hover:bg-yellow-600">
-                            <PartyPopper
-                              aria-hidden="true"
-                              className="mr-1 size-3"
-                            />
-                            BINGO
-                          </Badge>
-                        )}
-                        {participant.bingo_status === "reach" && (
-                          <Badge className="bg-orange-500 text-white hover:bg-orange-600">
-                            <Zap aria-hidden="true" className="mr-1 size-3" />
-                            REACH
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <ParticipantCardDialog
-                          participantName={
-                            participant.profiles?.full_name || null
-                          }
-                          spaceId={spaceId}
-                          userId={participant.user_id}
-                        />
-                        <Button
-                          disabled={
-                            kickingId === participant.id || isPendingKick
-                          }
-                          onClick={() =>
-                            handleKickClick(
-                              participant.id,
-                              participant.profiles?.full_name || null
-                            )
-                          }
-                          size="sm"
-                          variant="ghost"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">{t("kickButton")}</span>
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <ParticipantsTable
+        actions={(participant) => (
+          <Button
+            disabled={
+              kickingId === participant.id || isPendingKick
+            }
+            onClick={() =>
+              handleKickClick(
+                participant.id,
+                participant.profiles?.full_name || null
+              )
+            }
+            size="sm"
+            variant="ghost"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span className="sr-only">{t("kickButton")}</span>
+          </Button>
+        )}
+        maxParticipants={maxParticipants}
+        participants={participants}
+        spaceId={spaceId}
+      />
     </>
   );
 }

@@ -4,7 +4,7 @@ import { getParticipants } from "../_actions/space-operations";
 export interface Participant {
   bingo_status: "none" | "reach" | "bingo";
   id: string;
-  joined_at: string;
+  joined_at: string | null;
   profiles?: {
     avatar_url: string | null;
     full_name: string | null;
