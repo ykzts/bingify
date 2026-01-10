@@ -4,7 +4,7 @@
 BEGIN;
 
 -- テストプランの設定（実行するテスト数を宣言）
-SELECT plan(47);
+SELECT plan(52);
 
 -- ========================================
 -- テーブル存在確認
@@ -28,6 +28,8 @@ SELECT has_column('public', 'profiles', 'full_name', 'profiles.full_name カラ�
 SELECT has_column('public', 'profiles', 'username', 'profiles.username カラムが存在すること');
 SELECT col_type_is('public', 'profiles', 'username', 'text', 'profiles.username は text 型であること');
 SELECT col_is_unique('public', 'profiles', 'username', 'profiles.username は UNIQUE 制約があること');
+SELECT has_index('public', 'profiles', 'idx_profiles_username', 'profiles.username に idx_profiles_username インデックスが存在すること');
+SELECT col_has_check('public', 'profiles', 'username', 'profiles.username に CHECK 制約があること');
 SELECT has_column('public', 'profiles', 'avatar_url', 'profiles.avatar_url カラムが存在すること');
 SELECT has_column('public', 'profiles', 'created_at', 'profiles.created_at カラムが存在すること');
 SELECT has_column('public', 'profiles', 'updated_at', 'profiles.updated_at カラムが存在すること');
