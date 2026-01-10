@@ -11,6 +11,7 @@ import type {
   ThemeType,
 } from "@/lib/types/screen-settings";
 import { BingoGameManager } from "./_components/bingo-game-manager";
+import { ClosedSpaceParticipants } from "./_components/closed-space-participants";
 import { DisplaySettingsDialog } from "./_components/display-settings-dialog";
 import { DraftStatusView } from "./_components/draft-status-view";
 import { ParticipantsStatus } from "./_components/participants-status";
@@ -167,7 +168,7 @@ export default async function AdminSpacePage({
       )}
 
       {(space.status === "closed" || space.status === "expired") && (
-        <ParticipantsStatus
+        <ClosedSpaceParticipants
           maxParticipants={space.max_participants}
           spaceId={space.id}
         />
