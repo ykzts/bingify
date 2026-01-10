@@ -3,9 +3,7 @@
 import { AlertCircle, Loader2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -46,9 +44,9 @@ export function TwitchBroadcasterIdField({
   const [metadata, setMetadata] =
     useState<Tables<"twitch_broadcasters"> | null>(null);
   const [loadingMetadata, setLoadingMetadata] = useState(false);
-  const [showInput, setShowInput] = useState(!enteredBroadcasterId);
+  const [inputValue, setInputValue] = useState("");
 
-  // Fetch metadata when broadcaster ID changes
+  // Fetch metadata when broadcaster ID changes (from form state)
   useEffect(() => {
     if (enteredBroadcasterId && TWITCH_ID_REGEX.test(enteredBroadcasterId)) {
       setLoadingMetadata(true);
@@ -56,89 +54,94 @@ export function TwitchBroadcasterIdField({
         .then((result) => {
           if (result.success && result.metadata) {
             setMetadata(result.metadata as Tables<"twitch_broadcasters">);
-            setShowInput(false);
+            // Update input to show formatted display
+            const meta = result.metadata as Tables<"twitch_broadcasters">;
+            const username = meta.username || meta.display_name || "";
+            const displayText = username
+              ? `${username} (${enteredBroadcasterId})`
+              : enteredBroadcasterId;
+            setInputValue(displayText);
           } else {
             setMetadata(null);
-            setShowInput(true);
+            setInputValue(enteredBroadcasterId);
           }
         })
         .catch(() => {
           setMetadata(null);
-          setShowInput(true);
+          setInputValue(enteredBroadcasterId);
         })
         .finally(() => {
           setLoadingMetadata(false);
         });
-    } else {
+    } else if (enteredBroadcasterId) {
+      setInputValue(enteredBroadcasterId);
       setMetadata(null);
-      setShowInput(true);
+    } else {
+      setInputValue("");
+      setMetadata(null);
     }
   }, [enteredBroadcasterId]);
 
-  // Debounced function to convert Twitch username/URL to ID
-  const convertTwitchInput = useDebouncedCallback(
-    async (input: string, fieldApi: { setValue: (value: string) => void }) => {
-      if (!input || input.trim() === "") {
-        setTwitchIdConverting(false);
-        setTwitchIdError(null);
-        return;
-      }
-
-      // すでにIDの場合は変換不要
-      if (TWITCH_ID_REGEX.test(input.trim())) {
-        setTwitchIdConverting(false);
-        setTwitchIdError(null);
-        return;
-      }
-
-      setTwitchIdConverting(true);
+  // Convert Twitch username/URL to broadcaster ID
+  const convertTwitchInput = async (input: string) => {
+    if (!input || input.trim() === "") {
+      setTwitchIdConverting(false);
       setTwitchIdError(null);
+      return;
+    }
 
-      try {
-        // Use operator's OAuth token for lookup
-        const result = await lookupTwitchBroadcasterIdWithOperatorToken(
-          input.trim()
-        );
+    // すでにIDの場合は変換不要
+    if (TWITCH_ID_REGEX.test(input.trim())) {
+      setTwitchIdConverting(false);
+      setTwitchIdError(null);
+      return;
+    }
 
-        if (result.error) {
-          // Translate error key
-          setTwitchIdError(t(result.error));
-          setTwitchIdConverting(false);
-          return;
-        }
+    setTwitchIdConverting(true);
+    setTwitchIdError(null);
 
-        if (result.broadcasterId) {
-          // Update the field value with the converted ID
-          fieldApi.setValue(result.broadcasterId);
-          setTwitchIdError(null);
+    try {
+      // Use operator's OAuth token for lookup
+      const result = await lookupTwitchBroadcasterIdWithOperatorToken(
+        input.trim()
+      );
 
-          // Immediately fetch and display metadata
-          setLoadingMetadata(true);
-          getTwitchMetadata(result.broadcasterId)
-            .then((metadataResult) => {
-              if (metadataResult.success && metadataResult.metadata) {
-                setMetadata(
-                  metadataResult.metadata as Tables<"twitch_broadcasters">
-                );
-                setShowInput(false);
-              }
-            })
-            .catch(() => {
-              // If metadata fetch fails, keep showing input
-              setShowInput(true);
-            })
-            .finally(() => {
-              setLoadingMetadata(false);
-            });
-        }
-      } catch (_error) {
-        setTwitchIdError(t("twitchBroadcasterIdConvertError"));
-      } finally {
+      if (result.error) {
+        // Translate error key
+        setTwitchIdError(t(result.error));
         setTwitchIdConverting(false);
+        return;
       }
-    },
-    800
-  );
+
+      if (result.broadcasterId) {
+        // Update the field value with the converted ID
+        field.handleChange(result.broadcasterId);
+        setTwitchIdError(null);
+
+        // Immediately fetch and display metadata
+        setLoadingMetadata(true);
+        getTwitchMetadata(result.broadcasterId)
+          .then((metadataResult) => {
+            if (metadataResult.success && metadataResult.metadata) {
+              setMetadata(
+                metadataResult.metadata as Tables<"twitch_broadcasters">
+              );
+            }
+          })
+          .catch(() => {
+            // If metadata fetch fails, show ID
+            setMetadata(null);
+          })
+          .finally(() => {
+            setLoadingMetadata(false);
+          });
+      }
+    } catch (_error) {
+      setTwitchIdError(t("twitchBroadcasterIdConvertError"));
+    } finally {
+      setTwitchIdConverting(false);
+    }
+  };
 
   // 操作者のTwitchブロードキャスターIDを取得してフィールドに設定
   const handleGetMyTwitchId = async () => {
@@ -167,11 +170,36 @@ export function TwitchBroadcasterIdField({
     }
   };
 
-  // Handle delete button click
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+    // Don't trigger conversion while typing
+  };
+
+  // Handle blur - trigger conversion
+  const handleBlur = () => {
+    if (inputValue && !metadata) {
+      convertTwitchInput(inputValue);
+    }
+  };
+
+  // Handle Enter key - trigger conversion
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === "Return") {
+      e.preventDefault();
+      if (inputValue && !metadata) {
+        convertTwitchInput(inputValue);
+      }
+    }
+  };
+
+  // Handle delete
   const handleDelete = () => {
     field.handleChange("");
     setMetadata(null);
-    setShowInput(true);
+    setInputValue("");
+    setTwitchIdError(null);
   };
 
   return (
@@ -179,94 +207,55 @@ export function TwitchBroadcasterIdField({
       <FieldContent>
         <FieldLabel>{t("twitchBroadcasterIdLabel")}</FieldLabel>
 
-        {/* Display metadata as badge when available */}
-        {metadata && !showInput && (
-          <div className="flex items-center gap-2">
-            <Badge
-              className="flex items-center gap-2 px-3 py-2 text-sm"
-              variant="secondary"
-            >
-              {loadingMetadata && <Loader2 className="h-3 w-3 animate-spin" />}
-              <span>
-                {metadata.username ||
-                  metadata.display_name ||
-                  enteredBroadcasterId}{" "}
-                ({enteredBroadcasterId})
-              </span>
-              <Button
-                className="h-4 w-4 p-0 hover:bg-transparent"
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Input
+              disabled={isPending || twitchIdConverting}
+              name={field.name}
+              onBlur={handleBlur}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              placeholder={t("twitchBroadcasterIdPlaceholder")}
+              required={true}
+              type="text"
+              value={inputValue}
+            />
+            {(twitchIdConverting || loadingMetadata) && (
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+              </div>
+            )}
+            {metadata && (
+              <button
+                className="absolute inset-y-0 right-0 flex items-center pr-3 hover:opacity-70"
                 disabled={isPending}
                 onClick={(e) => {
                   e.preventDefault();
                   handleDelete();
                 }}
-                size="sm"
                 type="button"
-                variant="ghost"
               >
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-            <Button
-              onClick={(e) => {
-                e.preventDefault();
-                setShowInput(true);
-              }}
-              size="sm"
-              type="button"
-              variant="outline"
-            >
-              {t("changeButton", { default: "Change" })}
-            </Button>
+                <X className="h-4 w-4 text-gray-500" />
+              </button>
+            )}
           </div>
-        )}
-
-        {/* Input field for entering/editing broadcaster ID */}
-        {showInput && (
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Input
-                disabled={isPending || twitchIdConverting}
-                name={field.name}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  field.handleChange(value);
-                  convertTwitchInput(value, {
-                    setValue: (newValue: string) =>
-                      field.handleChange(newValue),
-                  });
-                }}
-                placeholder={t("twitchBroadcasterIdPlaceholder")}
-                required={true}
-                type="text"
-                value={field.state.value as string}
-              />
-              {twitchIdConverting && (
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                  <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                </div>
-              )}
-            </div>
-            <Button
-              disabled={
-                isPending || twitchIdConverting || fetchingOperatorTwitchId
-              }
-              onClick={(e) => {
-                e.preventDefault();
-                handleGetMyTwitchId();
-              }}
-              type="button"
-              variant="outline"
-            >
-              {fetchingOperatorTwitchId && (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              )}
-              {fetchingOperatorTwitchId
-                ? t("fetchingMyId")
-                : t("getMyIdButton")}
-            </Button>
-          </div>
-        )}
+          <Button
+            disabled={
+              isPending || twitchIdConverting || fetchingOperatorTwitchId
+            }
+            onClick={(e) => {
+              e.preventDefault();
+              handleGetMyTwitchId();
+            }}
+            type="button"
+            variant="outline"
+          >
+            {fetchingOperatorTwitchId && (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            )}
+            {fetchingOperatorTwitchId ? t("fetchingMyId") : t("getMyIdButton")}
+          </Button>
+        </div>
 
         {field.state.meta.errors.length > 0 && (
           <FieldError>{getErrorMessage(field.state.meta.errors[0])}</FieldError>
