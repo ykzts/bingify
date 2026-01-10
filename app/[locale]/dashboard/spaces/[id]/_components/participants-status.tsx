@@ -101,7 +101,7 @@ function updateParticipantList(
   return newList;
 }
 
-const NAME_SPLIT_REGEX = /\s+/;
+const _NAME_SPLIT_REGEX = /\s+/;
 
 export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
   const t = useTranslations("AdminSpace");
@@ -338,9 +338,7 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
       <ParticipantsTable
         actions={(participant) => (
           <Button
-            disabled={
-              kickingId === participant.id || isPendingKick
-            }
+            disabled={kickingId === participant.id || isPendingKick}
             onClick={() =>
               handleKickClick(
                 participant.id,

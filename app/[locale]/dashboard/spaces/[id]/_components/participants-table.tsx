@@ -1,7 +1,7 @@
 "use client";
 
 import { PartyPopper, Zap } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatDate } from "@/lib/utils/date-format";
 import type { Participant } from "../_hooks/use-participants";
 import { ParticipantCardDialog } from "./participant-card-dialog";
 
@@ -77,11 +78,16 @@ export function ParticipantsTable({
   reachCount: providedReachCount,
   spaceId,
 }: Props) {
+  const locale = useLocale();
   const t = useTranslations("AdminSpace");
 
   // Compute counts if not provided
-  const bingoCount = providedBingoCount ?? participants.filter((p) => p.bingo_status === "bingo").length;
-  const reachCount = providedReachCount ?? participants.filter((p) => p.bingo_status === "reach").length;
+  const bingoCount =
+    providedBingoCount ??
+    participants.filter((p) => p.bingo_status === "bingo").length;
+  const reachCount =
+    providedReachCount ??
+    participants.filter((p) => p.bingo_status === "reach").length;
   const emptyMessage = providedEmptyMessage ?? t("noParticipants");
 
   return (
@@ -175,7 +181,9 @@ export function ParticipantsTable({
                         )}
                       </TableCell>
                       <TableCell className="text-gray-600 text-sm">
-                        {new Date(participant.joined_at).toLocaleString()}
+                        {participant.joined_at
+                          ? formatDate(participant.joined_at, locale)
+                          : "-"}
                       </TableCell>
                       <TableCell>
                         <ParticipantCardDialog
