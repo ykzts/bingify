@@ -211,6 +211,7 @@
     "participantNameColumn": "名前",
     "participantStatusColumn": "ステータス",
     "participantsCount": "{count} / {max} 人の参加者",
+    "participantsDescription": "{count} 人の参加者",
     "participantsErrorFetch": "参加者の読み込みに失敗しました。ページを再読み込みしてください。",
     "participantsListTitle": "参加者 ({count}/{max})",
     "participantsStatus": "参加者の状態",

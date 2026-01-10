@@ -494,10 +494,10 @@ export interface GetParticipantCardResult {
 
 export async function getParticipantCard(
   spaceId: string,
-  userId: string
+  participantId: string
 ): Promise<GetParticipantCardResult> {
   try {
-    if (!(isValidUUID(spaceId) && isValidUUID(userId))) {
+    if (!(isValidUUID(spaceId) && isValidUUID(participantId))) {
       return {
         error: "Invalid ID",
         success: false,
@@ -534,7 +534,7 @@ export async function getParticipantCard(
       .from("participants")
       .select("bingo_status, user_id")
       .eq("space_id", spaceId)
-      .eq("user_id", userId)
+      .eq("id", participantId)
       .single();
 
     if (!participant) {
@@ -548,7 +548,7 @@ export async function getParticipantCard(
       .from("bingo_cards")
       .select("id, space_id, user_id, numbers, created_at")
       .eq("space_id", spaceId)
-      .eq("user_id", userId)
+      .eq("user_id", participant.user_id)
       .single();
 
     if (!card) {
@@ -561,7 +561,7 @@ export async function getParticipantCard(
     const { data: profile } = await supabase
       .from("profiles")
       .select("full_name")
-      .eq("id", userId)
+      .eq("id", participant.user_id)
       .single();
 
     return {

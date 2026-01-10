@@ -211,6 +211,7 @@
     "participantNameColumn": "Name",
     "participantStatusColumn": "Status",
     "participantsCount": "{count} / {max} participants",
+    "participantsDescription": "{count} participant",
     "participantsErrorFetch": "Failed to load participants. Please try refreshing the page.",
     "participantsListTitle": "Participants ({count}/{max})",
     "participantsStatus": "Participants Status",

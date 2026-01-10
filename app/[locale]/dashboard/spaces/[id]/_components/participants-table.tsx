@@ -107,7 +107,9 @@ export function ParticipantsTable({
                 count: participants.length,
                 max: maxParticipants,
               })
-            : `${participants.length} ${participants.length === 1 ? "participant" : "participants"}`}
+            : t("participantsDescription", {
+                count: participants.length,
+              })}
           {bingoCount > 0 && (
             <span className="ml-2">
               <PartyPopper className="mr-1 inline size-4" />
