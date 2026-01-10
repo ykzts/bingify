@@ -1,5 +1,5 @@
 import { ApiClient } from "@twurple/api";
-import { getAppToken, StaticAuthProvider } from "@twurple/auth";
+import { getAppToken, getTokenInfo, StaticAuthProvider } from "@twurple/auth";
 
 // Regex patterns for parsing Twitch input
 export const TWITCH_ID_REGEX = /^\d+$/;
@@ -109,11 +109,17 @@ export async function getUserTwitchId(
       };
     }
 
-    const apiClient = createApiClient(userAccessToken);
-    const user = await apiClient.users.getAuthenticatedUser("@me");
+    const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
+    if (!clientId) {
+      return {
+        error: "Twitch client ID not configured",
+      };
+    }
 
-    if (user) {
-      return { userId: user.id };
+    const tokenInfo = await getTokenInfo(userAccessToken, clientId);
+
+    if (tokenInfo.userId) {
+      return { userId: tokenInfo.userId };
     }
 
     return {
