@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getAppAccessToken } from "@/lib/twitch";
 import type { Database } from "@/types/supabase";
 import { fetchAndCacheTwitchBroadcasterMetadata } from "./twitch-metadata";
 import { fetchAndCacheYouTubeChannelMetadata } from "./youtube-metadata";
@@ -45,28 +44,21 @@ export async function registerYouTubeChannelMetadata(
  *
  * @param supabase - Supabaseクライアント
  * @param broadcasterId - Twitchブロードキャスター ID
+ * @param userAccessToken - ユーザーのTwitch OAuthアクセストークン
  * @param userId - ユーザーID（created_by用）
  * @returns 成功時はtrue、失敗時はfalse
  */
 export async function registerTwitchBroadcasterMetadata(
   supabase: SupabaseClient<Database>,
   broadcasterId: string,
+  userAccessToken: string,
   userId: string
 ): Promise<{ error?: string; success: boolean }> {
   try {
-    // Twitch APIはApp Access Tokenを使用してメタデータを取得
-    const appAccessToken = await getAppAccessToken();
-    if (!appAccessToken) {
-      return {
-        error: "Failed to get Twitch app access token",
-        success: false,
-      };
-    }
-
     await fetchAndCacheTwitchBroadcasterMetadata(
       supabase,
       broadcasterId,
-      appAccessToken,
+      userAccessToken,
       userId
     );
     return { success: true };

@@ -7,13 +7,13 @@ import type { Database, Tables, TablesInsert } from "@/types/supabase";
 /**
  * Twurple API clientを作成
  */
-function createApiClient(appAccessToken: string): ApiClient {
+function createApiClient(userAccessToken: string): ApiClient {
   const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
   if (!clientId) {
     throw new Error("Twitch client ID not configured");
   }
 
-  const authProvider = new StaticAuthProvider(clientId, appAccessToken);
+  const authProvider = new StaticAuthProvider(clientId, userAccessToken);
   return new ApiClient({ authProvider });
 }
 
@@ -22,14 +22,17 @@ function createApiClient(appAccessToken: string): ApiClient {
  */
 async function fetchTwitchBroadcasterDetails(
   broadcasterId: string,
-  appAccessToken: string
+  userAccessToken: string
 ): Promise<TablesInsert<"twitch_broadcasters">> {
-  const apiClient = createApiClient(appAccessToken);
-  const user = await apiClient.users.getUserById(broadcasterId);
+  const apiClient = createApiClient(userAccessToken);
+  // ユーザーアクセストークンで動作するようgetUsersByIdsを使用
+  const users = await apiClient.users.getUsersByIds([broadcasterId]);
 
-  if (!user) {
+  if (users.length === 0) {
     throw new Error("Broadcaster not found");
   }
+
+  const user = users[0];
 
   return {
     broadcaster_id: broadcasterId,
@@ -99,7 +102,7 @@ export async function upsertTwitchBroadcasterMetadata(
 export async function fetchAndCacheTwitchBroadcasterMetadata(
   supabase: SupabaseClient<Database>,
   broadcasterId: string,
-  appAccessToken: string,
+  userAccessToken: string,
   userId?: string
 ): Promise<Tables<"twitch_broadcasters">> {
   // まずDBをチェック
@@ -118,7 +121,7 @@ export async function fetchAndCacheTwitchBroadcasterMetadata(
   try {
     const metadata = await fetchTwitchBroadcasterDetails(
       broadcasterId,
-      appAccessToken
+      userAccessToken
     );
 
     // created_byを設定
@@ -129,7 +132,35 @@ export async function fetchAndCacheTwitchBroadcasterMetadata(
     // DBに保存
     return await upsertTwitchBroadcasterMetadata(supabase, metadata);
   } catch (error) {
-    // エラーが発生した場合は、エラー情報を保存
+    // エラーが発生した場合は、fetch_errorとfetched_atのみ更新
+    if (cached) {
+      const fetch_error =
+        error instanceof Error ? error.message : "Unknown error";
+      const fetched_at = new Date().toISOString();
+
+      // TOCTOU回避: fetch_errorとfetched_atのみ更新
+      const { error: updateError } = await supabase
+        .from("twitch_broadcasters")
+        .update({
+          fetch_error,
+          fetched_at,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("broadcaster_id", broadcasterId);
+
+      if (updateError) {
+        console.error("Failed to update error metadata:", updateError);
+      }
+
+      // cachedにエラー情報を反映して返す
+      return {
+        ...cached,
+        fetch_error,
+        fetched_at,
+      };
+    }
+
+    // 既存レコードがない場合のみ、新規にエラーレコードを作成
     const errorMetadata: TablesInsert<"twitch_broadcasters"> = {
       broadcaster_id: broadcasterId,
       fetch_error: error instanceof Error ? error.message : "Unknown error",
@@ -141,11 +172,6 @@ export async function fetchAndCacheTwitchBroadcasterMetadata(
     }
 
     await upsertTwitchBroadcasterMetadata(supabase, errorMetadata);
-
-    // キャッシュされたデータがあればそれを返す（古くてもエラーより良い）
-    if (cached) {
-      return cached;
-    }
 
     throw error;
   }
