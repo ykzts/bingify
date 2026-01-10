@@ -16,10 +16,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { YOUTUBE_CHANNEL_ID_REGEX } from "@/lib/youtube-constants";
-import type { Tables } from "@/types/supabase";
-import { getYouTubeMetadata } from "../_actions/get-metadata";
 import { getOperatorYouTubeChannelId } from "../_actions/get-user-channel";
 import { lookupYouTubeChannelIdWithOperatorToken } from "../_actions/operator-lookup";
+import { useYouTubeMetadata } from "../_hooks/use-metadata";
 
 // Regex to remove @ prefix
 const AT_PREFIX_REGEX = /^@+/;
@@ -45,42 +44,26 @@ export function YoutubeChannelIdField({
   const [youtubeIdError, setYoutubeIdError] = useState<string | null>(null);
   const [fetchingOperatorYoutubeId, setFetchingOperatorYoutubeId] =
     useState(false);
-  const [metadata, setMetadata] = useState<Tables<"youtube_channels"> | null>(
-    null
-  );
-  const [_loadingMetadata, setLoadingMetadata] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch metadata when channel ID changes (from form state)
+  // Fetch metadata using React Query
+  const { data: metadata, isLoading: loadingMetadata } =
+    useYouTubeMetadata(enteredChannelId);
+
+  // Update input value when channel ID changes
   useEffect(() => {
-    if (enteredChannelId && YOUTUBE_CHANNEL_ID_REGEX.test(enteredChannelId)) {
-      setLoadingMetadata(true);
-      getYouTubeMetadata(enteredChannelId)
-        .then((result) => {
-          if (result.success && result.metadata) {
-            setMetadata(result.metadata as Tables<"youtube_channels">);
-            setInputValue(""); // Clear input when metadata is shown
-          } else {
-            setMetadata(null);
-            setInputValue(enteredChannelId);
-          }
-        })
-        .catch(() => {
-          setMetadata(null);
-          setInputValue(enteredChannelId);
-        })
-        .finally(() => {
-          setLoadingMetadata(false);
-        });
-    } else if (enteredChannelId) {
-      setInputValue(enteredChannelId);
-      setMetadata(null);
-    } else {
+    if (enteredChannelId && !metadata && !loadingMetadata) {
+      // Show channel ID in input if no metadata yet
+      if (!YOUTUBE_CHANNEL_ID_REGEX.test(enteredChannelId)) {
+        setInputValue(enteredChannelId);
+      }
+    } else if (!enteredChannelId) {
       setInputValue("");
-      setMetadata(null);
+    } else if (metadata) {
+      setInputValue(""); // Clear input when metadata is available
     }
-  }, [enteredChannelId]);
+  }, [enteredChannelId, metadata, loadingMetadata]);
 
   // Convert YouTube handle/URL to channel ID
   const convertYoutubeInput = async (input: string) => {
@@ -117,25 +100,7 @@ export function YoutubeChannelIdField({
         // Update the field value with the converted ID
         field.handleChange(result.channelId);
         setYoutubeIdError(null);
-
-        // Immediately fetch and display metadata
-        setLoadingMetadata(true);
-        getYouTubeMetadata(result.channelId)
-          .then((metadataResult) => {
-            if (metadataResult.success && metadataResult.metadata) {
-              setMetadata(
-                metadataResult.metadata as Tables<"youtube_channels">
-              );
-              setInputValue(""); // Clear input when showing metadata badge
-            }
-          })
-          .catch(() => {
-            // If metadata fetch fails, show ID
-            setMetadata(null);
-          })
-          .finally(() => {
-            setLoadingMetadata(false);
-          });
+        setInputValue(""); // Clear input, metadata will be fetched by useQuery
       }
     } catch (_error) {
       setYoutubeIdError(t("youtubeChannelIdConvertError"));
@@ -218,7 +183,6 @@ export function YoutubeChannelIdField({
   // Handle delete
   const handleDelete = () => {
     field.handleChange("");
-    setMetadata(null);
     setInputValue("");
     setYoutubeIdError(null);
   };
@@ -261,7 +225,7 @@ export function YoutubeChannelIdField({
             >
               {metadata ? (
                 // Show badge inside the field
-                <Badge className="flex items-center gap-1" variant="secondary">
+                <Badge className="flex items-center gap-1" variant="outline">
                   <span>{getBadgeText()}</span>
                   <X
                     className="h-3 w-3 cursor-pointer"

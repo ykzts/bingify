@@ -766,16 +766,6 @@ export function SpaceSettingsForm({
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
-                                        {showYoutubeMember && (
-                                          <SelectItem
-                                            disabled={
-                                              !canUseYoutubeMemberSubscriber
-                                            }
-                                            value="member"
-                                          >
-                                            {t("youtubeMember")}
-                                          </SelectItem>
-                                        )}
                                         {showYoutubeSubscriber && (
                                           <SelectItem
                                             disabled={
@@ -784,6 +774,16 @@ export function SpaceSettingsForm({
                                             value="subscriber"
                                           >
                                             {t("youtubeSubscriber")}
+                                          </SelectItem>
+                                        )}
+                                        {showYoutubeMember && (
+                                          <SelectItem
+                                            disabled={
+                                              !canUseYoutubeMemberSubscriber
+                                            }
+                                            value="member"
+                                          >
+                                            {t("youtubeMember")}
                                           </SelectItem>
                                         )}
                                       </SelectContent>

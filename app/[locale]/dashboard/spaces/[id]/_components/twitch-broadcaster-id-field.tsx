@@ -16,10 +16,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { TWITCH_ID_REGEX } from "@/lib/twitch";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import type { Tables } from "@/types/supabase";
-import { getTwitchMetadata } from "../_actions/get-metadata";
 import { getOperatorTwitchBroadcasterId } from "../_actions/get-user-channel";
 import { lookupTwitchBroadcasterIdWithOperatorToken } from "../_actions/operator-lookup";
+import { useTwitchMetadata } from "../_hooks/use-metadata";
 
 interface Props {
   // biome-ignore lint/suspicious/noExplicitAny: FieldApi type requires 23 generic parameters
@@ -42,41 +41,26 @@ export function TwitchBroadcasterIdField({
   const [twitchIdError, setTwitchIdError] = useState<string | null>(null);
   const [fetchingOperatorTwitchId, setFetchingOperatorTwitchId] =
     useState(false);
-  const [metadata, setMetadata] =
-    useState<Tables<"twitch_broadcasters"> | null>(null);
-  const [_loadingMetadata, setLoadingMetadata] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch metadata when channel ID changes (from form state)
+  // Fetch metadata using React Query
+  const { data: metadata, isLoading: loadingMetadata } =
+    useTwitchMetadata(enteredBroadcasterId);
+
+  // Update input value when broadcaster ID changes
   useEffect(() => {
-    if (enteredBroadcasterId && TWITCH_ID_REGEX.test(enteredBroadcasterId)) {
-      setLoadingMetadata(true);
-      getTwitchMetadata(enteredBroadcasterId)
-        .then((result) => {
-          if (result.success && result.metadata) {
-            setMetadata(result.metadata as Tables<"twitch_broadcasters">);
-            setInputValue(""); // Clear input when metadata is shown
-          } else {
-            setMetadata(null);
-            setInputValue(enteredBroadcasterId);
-          }
-        })
-        .catch(() => {
-          setMetadata(null);
-          setInputValue(enteredBroadcasterId);
-        })
-        .finally(() => {
-          setLoadingMetadata(false);
-        });
-    } else if (enteredBroadcasterId) {
-      setInputValue(enteredBroadcasterId);
-      setMetadata(null);
-    } else {
+    if (enteredBroadcasterId && !metadata && !loadingMetadata) {
+      // Show broadcaster ID in input if no metadata yet
+      if (!TWITCH_ID_REGEX.test(enteredBroadcasterId)) {
+        setInputValue(enteredBroadcasterId);
+      }
+    } else if (!enteredBroadcasterId) {
       setInputValue("");
-      setMetadata(null);
+    } else if (metadata) {
+      setInputValue(""); // Clear input when metadata is available
     }
-  }, [enteredBroadcasterId]);
+  }, [enteredBroadcasterId, metadata, loadingMetadata]);
 
   // Convert YouTube handle/URL to channel ID
   const convertTwitchInput = async (input: string) => {
@@ -113,25 +97,7 @@ export function TwitchBroadcasterIdField({
         // Update the field value with the converted ID
         field.handleChange(result.broadcasterId);
         setTwitchIdError(null);
-
-        // Immediately fetch and display metadata
-        setLoadingMetadata(true);
-        getTwitchMetadata(result.broadcasterId)
-          .then((metadataResult) => {
-            if (metadataResult.success && metadataResult.metadata) {
-              setMetadata(
-                metadataResult.metadata as Tables<"twitch_broadcasters">
-              );
-              setInputValue(""); // Clear input when showing metadata badge
-            }
-          })
-          .catch(() => {
-            // If metadata fetch fails, show ID
-            setMetadata(null);
-          })
-          .finally(() => {
-            setLoadingMetadata(false);
-          });
+        setInputValue(""); // Clear input, metadata will be fetched by useQuery
       }
     } catch (_error) {
       setTwitchIdError(t("twitchBroadcasterIdConvertError"));
@@ -214,7 +180,6 @@ export function TwitchBroadcasterIdField({
   // Handle delete
   const handleDelete = () => {
     field.handleChange("");
-    setMetadata(null);
     setInputValue("");
     setTwitchIdError(null);
   };
@@ -250,7 +215,7 @@ export function TwitchBroadcasterIdField({
             >
               {metadata ? (
                 // Show badge inside the field
-                <Badge className="flex items-center gap-1" variant="secondary">
+                <Badge className="flex items-center gap-1" variant="outline">
                   <span>{getBadgeText()}</span>
                   <X
                     className="h-3 w-3 cursor-pointer"
