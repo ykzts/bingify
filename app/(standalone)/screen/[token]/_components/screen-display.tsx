@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useScreen } from "@/components/providers/screen-provider";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
@@ -61,6 +61,7 @@ export function ScreenDisplay({
   const [notification, setNotification] = useState<NotificationState | null>(
     null
   );
+  const notificationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const {
     currentNumber: drumRollNumber,
     isAnimating,
@@ -227,8 +228,12 @@ export function ScreenDisplay({
     (payload: { new: ParticipantUpdate }) => {
       const updated = payload.new;
 
-      // Validate payload structure
-      if (!(updated?.id && updated.user_id && updated.bingo_status)) {
+      // Validate payload structure (check for null/undefined, not falsy values)
+      if (
+        updated?.id == null ||
+        updated.user_id == null ||
+        updated.bingo_status == null
+      ) {
         console.error("Invalid participant update payload:", payload);
         return;
       }
@@ -244,6 +249,11 @@ export function ScreenDisplay({
         updated.bingo_status === "bingo" ||
         updated.bingo_status === "reach"
       ) {
+        // Clear any existing timeout
+        if (notificationTimeoutRef.current) {
+          clearTimeout(notificationTimeoutRef.current);
+        }
+
         const displayName = updated.profiles?.full_name || t("guestName");
         const messageKey =
           updated.bingo_status === "bingo"
@@ -260,8 +270,9 @@ export function ScreenDisplay({
 
         // Auto-hide notification after duration
         const duration = updated.bingo_status === "bingo" ? 5000 : 3000;
-        setTimeout(() => {
+        notificationTimeoutRef.current = setTimeout(() => {
           setNotification(null);
+          notificationTimeoutRef.current = null;
         }, duration);
       }
     }
@@ -303,6 +314,15 @@ export function ScreenDisplay({
       supabase.removeChannel(channel);
     };
   }, [spaceId]);
+
+  // Cleanup notification timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (notificationTimeoutRef.current) {
+        clearTimeout(notificationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const currentNumber =
     calledNumbers.length > 0 ? (calledNumbers.at(-1)?.value ?? null) : null;

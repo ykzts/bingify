@@ -55,7 +55,7 @@ export function NotificationBanner({ message, type }: NotificationBannerProps) {
         }}
       >
         <p
-          className="whitespace-nowrap font-black text-2xl text-white drop-shadow-lg md:text-4xl lg:text-5xl"
+          className="whitespace-nowrap font-black text-2xl text-white md:text-4xl lg:text-5xl"
           style={{
             textShadow: "0 0 20px rgba(0,0,0,0.8), 2px 2px 4px rgba(0,0,0,0.5)",
           }}
