@@ -338,6 +338,7 @@ export async function regenerateViewToken(
 export interface UserSpace {
   created_at: string | null;
   id: string;
+  is_also_participant?: boolean;
   is_owner?: boolean;
   participant_count?: number;
   share_key: string;
@@ -499,6 +500,11 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
         new Date(a.created_at || 0).getTime()
     );
 
+    // Create a set of participant space IDs for quick lookup
+    const participantSpaceIdsSet = new Set(
+      participantSpacesData.map((space) => space.id)
+    );
+
     // Filter participated spaces to exclude hosted spaces (avoid duplicates)
     const hostedSpaceIds = new Set(hostedSpaces.map((s) => s.id));
     const participatedSpaces = participantSpacesData
@@ -542,9 +548,10 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       }
     }
 
-    // Add participant counts to hosted spaces
+    // Add participant counts and is_also_participant flag to hosted spaces
     const hostedSpacesWithCounts = hostedSpaces.map((space) => ({
       ...space,
+      is_also_participant: participantSpaceIdsSet.has(space.id),
       participant_count: participantCounts[space.id] ?? 0,
     }));
 

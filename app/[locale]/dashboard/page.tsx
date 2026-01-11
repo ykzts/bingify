@@ -115,12 +115,22 @@ export default async function DashboardPage({
                   </p>
                 </div>
               </div>
-              <Link
-                className="w-full rounded border border-green-200 bg-white px-4 py-2 font-bold text-green-700 text-sm shadow-sm transition hover:bg-green-100 sm:w-auto"
-                href={`/dashboard/spaces/${space.id}`}
-              >
-                {t("activeSpaceBackToAdmin")}
-              </Link>
+              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                <Link
+                  className="w-full rounded border border-green-200 bg-white px-4 py-2 font-bold text-green-700 text-sm shadow-sm transition hover:bg-green-100 sm:w-auto"
+                  href={`/dashboard/spaces/${space.id}`}
+                >
+                  {t("activeSpaceBackToAdmin")}
+                </Link>
+                {space.is_also_participant && (
+                  <Link
+                    className="w-full rounded border border-green-200 bg-white px-4 py-2 font-bold text-green-700 text-sm shadow-sm transition hover:bg-green-100 sm:w-auto"
+                    href={`/spaces/${space.id}`}
+                  >
+                    {t("viewSpaceAction")}
+                  </Link>
+                )}
+              </div>
             </div>
           ))}
           {/* Participated active spaces */}
