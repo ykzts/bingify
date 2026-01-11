@@ -355,6 +355,7 @@ export type Database = {
       }
       system_settings: {
         Row: {
+          archive_retention_hours: number
           created_at: string | null
           default_user_role: string
           features: Json
@@ -363,9 +364,11 @@ export type Database = {
           max_spaces_per_user: number
           max_total_spaces: number
           space_expiration_hours: number
+          spaces_archive_retention_hours: number
           updated_at: string | null
         }
         Insert: {
+          archive_retention_hours?: number
           created_at?: string | null
           default_user_role?: string
           features?: Json
@@ -374,9 +377,11 @@ export type Database = {
           max_spaces_per_user?: number
           max_total_spaces?: number
           space_expiration_hours?: number
+          spaces_archive_retention_hours?: number
           updated_at?: string | null
         }
         Update: {
+          archive_retention_hours?: number
           created_at?: string | null
           default_user_role?: string
           features?: Json
@@ -385,6 +390,7 @@ export type Database = {
           max_spaces_per_user?: number
           max_total_spaces?: number
           space_expiration_hours?: number
+          spaces_archive_retention_hours?: number
           updated_at?: string | null
         }
         Relationships: []
@@ -511,12 +517,14 @@ export type Database = {
       get_system_settings: {
         Args: never
         Returns: {
+          archive_retention_hours: number
           default_user_role: string
           features: Json
           max_participants_per_space: number
           max_spaces_per_user: number
           max_total_spaces: number
           space_expiration_hours: number
+          spaces_archive_retention_hours: number
         }[]
       }
       release_oauth_token_lock: {
