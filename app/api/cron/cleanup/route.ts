@@ -1,12 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 
-// Retention period in days (90 days)
-const RETENTION_DAYS = 90;
-
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: クリーンアップ処理は複数のステップを含むため複雑度が高い
 export async function GET(request: NextRequest) {
   try {
-    // Verify cron secret for authentication
+    // Cron秘密鍵による認証を検証
     const authHeader = request.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
 
@@ -28,7 +26,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Create Supabase client with service role key for admin operations
+    // 管理操作用にサービスロールキーでSupabaseクライアントを作成
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -48,52 +46,118 @@ export async function GET(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Step 1: Mark expired spaces based on system settings
-    const { data: expirationResult, error: expirationError } =
-      await supabase.rpc("cleanup_expired_spaces");
+    // システム設定から archive_retention_hours と spaces_archive_retention_hours を取得
+    const { data: systemSettings, error: settingsError } = await supabase
+      .from("system_settings")
+      .select("archive_retention_hours, spaces_archive_retention_hours")
+      .eq("id", 1)
+      .maybeSingle();
 
-    if (expirationError) {
-      console.error("Error marking expired spaces:", expirationError);
-      // Continue with archive cleanup even if expiration marking fails
-    }
-
-    const expiredCount = expirationResult?.[0]?.expired_count || 0;
-
-    console.log(
-      `Marked ${expiredCount} space(s) as expired based on system settings`
-    );
-
-    // Step 2: Calculate cutoff date for archived spaces
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - RETENTION_DAYS);
-
-    // Delete old archived spaces
-    const { data: deletedSpaces, error: spacesError } = await supabase
-      .from("spaces_archive")
-      .delete()
-      .lt("archived_at", cutoffDate.toISOString())
-      .select("id");
-
-    if (spacesError) {
-      console.error("Error deleting archived spaces:", spacesError);
+    if (settingsError) {
+      console.error("Error fetching system settings:", settingsError);
       return NextResponse.json(
-        { error: "Failed to delete archived spaces" },
+        { error: "Failed to fetch system settings" },
         { status: 500 }
       );
     }
 
-    const deletedCount = deletedSpaces?.length || 0;
+    // archive_retention_hours の検証（有限の非負整数であることを確認）
+    let archiveRetentionHours = systemSettings?.archive_retention_hours ?? 168; // 7 days default
+    if (
+      !Number.isFinite(archiveRetentionHours) ||
+      archiveRetentionHours < 0 ||
+      !Number.isInteger(archiveRetentionHours)
+    ) {
+      console.error(
+        `Invalid archive_retention_hours value: ${archiveRetentionHours}. Using default: 168 (7 days)`
+      );
+      archiveRetentionHours = 168; // デフォルト値を使用
+    }
+
+    // spaces_archive_retention_hours の検証（有限の非負整数であることを確認）
+    let spacesArchiveRetentionHours =
+      systemSettings?.spaces_archive_retention_hours ?? 2160; // 90 days default
+    if (
+      !Number.isFinite(spacesArchiveRetentionHours) ||
+      spacesArchiveRetentionHours < 0 ||
+      !Number.isInteger(spacesArchiveRetentionHours)
+    ) {
+      console.error(
+        `Invalid spaces_archive_retention_hours value: ${spacesArchiveRetentionHours}. Using default: 2160 (90 days)`
+      );
+      spacesArchiveRetentionHours = 2160; // デフォルト値を使用
+    }
+
+    // Step 1: システム設定に基づいて有効期限切れスペースを closed としてマーク
+    const { data: closedResult, error: closedError } = await supabase.rpc(
+      "cleanup_expired_spaces"
+    );
+
+    if (closedError) {
+      console.error("Error marking spaces as closed:", closedError);
+      // closed マーキングが失敗してもアーカイブクリーンアップは継続
+    }
+
+    const markedClosedCount = closedResult?.[0]?.expired_count || 0;
 
     console.log(
-      `Cleanup completed: deleted ${deletedCount} archived record(s) older than ${RETENTION_DAYS} days (cutoff: ${cutoffDate.toISOString()})`
+      `Marked ${markedClosedCount} space(s) as closed based on system settings`
+    );
+
+    // Step 2: archive_retention_hours より古い closed スペースをアーカイブして削除
+    const closedCutoffMs = Date.now() - archiveRetentionHours * 3_600_000;
+    const closedCutoffDate = new Date(closedCutoffMs);
+
+    // 条件付き削除を1回のクエリで実行（スケーラビリティ向上、count:'exact'のみでminimal返却）
+    const { error: deleteError, count: archivedCount } = await supabase
+      .from("spaces")
+      .delete({ count: "exact" })
+      .eq("status", "closed")
+      .lt("updated_at", closedCutoffDate.toISOString());
+
+    if (deleteError) {
+      console.error("Error deleting closed spaces:", deleteError);
+      // アーカイブ失敗してもStep 3のクリーンアップは継続（既存アーカイブの削除は独立した処理）
+    }
+
+    if (archivedCount && archivedCount > 0) {
+      console.log(
+        `Archived and deleted ${archivedCount} closed space(s) older than ${archiveRetentionHours} hours (${Math.round(archiveRetentionHours / 24)} days) (cutoff: ${closedCutoffDate.toISOString()})`
+      );
+    }
+
+    // Step 3: spaces_archive テーブルから古いアーカイブレコードを削除
+    const archiveCutoffMs =
+      Date.now() - spacesArchiveRetentionHours * 3_600_000;
+    const archiveCutoffDate = new Date(archiveCutoffMs);
+
+    const { error: archiveError, count: deletedArchiveCount } = await supabase
+      .from("spaces_archive")
+      .delete({ count: "exact" })
+      .lt("archived_at", archiveCutoffDate.toISOString());
+
+    if (archiveError) {
+      console.error("Error deleting old archives:", archiveError);
+      return NextResponse.json(
+        { error: "Failed to delete old archives" },
+        { status: 500 }
+      );
+    }
+
+    console.log(
+      `Cleanup completed: deleted ${deletedArchiveCount || 0} archived record(s) older than ${spacesArchiveRetentionHours} hours (${Math.round(spacesArchiveRetentionHours / 24)} days) (cutoff: ${archiveCutoffDate.toISOString()})`
     );
 
     return NextResponse.json({
       data: {
-        deletedCount,
-        expiredCount,
-        message: `Successfully marked ${expiredCount} space(s) as expired and deleted ${deletedCount} archived record(s) older than ${RETENTION_DAYS} days`,
-        retentionDays: RETENTION_DAYS,
+        archivedCount: archivedCount || 0,
+        deletedArchiveCount: deletedArchiveCount || 0,
+        markedClosedCount,
+        message: `Successfully marked ${markedClosedCount} space(s) as closed, archived ${archivedCount || 0} closed space(s) older than ${Math.round(archiveRetentionHours / 24)} days, and deleted ${deletedArchiveCount || 0} archived record(s) older than ${Math.round(spacesArchiveRetentionHours / 24)} days`,
+        retentionHours: {
+          archive: archiveRetentionHours,
+          spacesArchive: spacesArchiveRetentionHours,
+        },
       },
     });
   } catch (error) {

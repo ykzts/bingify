@@ -273,8 +273,15 @@ Bingify は**Supabase Auth を利用したユーザー認証・ロール管理�
 - **フィールド**:
   - `share_key` (TEXT, UNIQUE): 共有キー
   - `settings` (JSONB): スペース設定
-  - `status` (TEXT): ステータス（`active` など）
+  - `status` (TEXT): ステータス
+    - `draft`: 準備中（非公開）
+    - `active`: 進行中（公開）
+    - `closed`: 終了（閲覧のみ）- 手動終了と自動終了（48時間経過）の両方を含む
   - `created_at`, `updated_at` (TIMESTAMP)
+
+**備考**: 
+- `closed` スペースは一定期間（デフォルト168時間 = 7日、システム設定画面の `archive_retention_hours` で設定可能）経過後、自動的に削除され `spaces_archive` テーブルに移動します
+- `spaces_archive` テーブル内のレコードは一定期間（デフォルト2160時間 = 90日、システム設定画面の `spaces_archive_retention_hours` で設定可能）後にさらに削除されます
 
 ### 5.2 bingo_cards テーブル
 
@@ -312,6 +319,16 @@ Bingify は**Supabase Auth を利用したユーザー認証・ロール管理�
 - `ENABLE_BASIC_AUTH`: Basic認証の有効化フラグ（`true` / `false`）
 - `BASIC_AUTH_USER`: Basic認証のユーザー名
 - `BASIC_AUTH_PASSWORD`: Basic認証のパスワード
+
+### 6.4 定期ジョブ
+
+- `CRON_SECRET`: Vercel Cronジョブの認証用シークレット（必須）
+  - 定期的なクリーンアップジョブの実行を認証するために使用されます
+
+**アーカイブ保持期間の設定:**
+- `archive_retention_hours` と `spaces_archive_retention_hours` は `system_settings` テーブルに保存され、管理画面から設定可能です
+- `archive_retention_hours` (デフォルト: 168時間 = 7日): `closed` ステータスのスペースがこの期間経過後に自動削除され `spaces_archive` テーブルに移動します
+- `spaces_archive_retention_hours` (デフォルト: 2160時間 = 90日): `spaces_archive` テーブル内のレコードがこの期間経過後に完全削除されます
 
 ---
 

@@ -33,13 +33,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  type SystemSettings,
-  systemSettingsSchema,
-} from "@/lib/schemas/system-settings";
+import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { updateSystemSettingsAction } from "../_actions/system-settings";
-import { systemSettingsFormOpts } from "../_lib/form-options";
+import {
+  systemSettingsFormOpts,
+  systemSettingsFormSchema,
+} from "../_lib/form-options";
 
 interface Props {
   initialSettings?: SystemSettings;
@@ -56,6 +56,9 @@ export function SystemSettingsForm({ initialSettings }: Props) {
     ...systemSettingsFormOpts,
     defaultValues: initialSettings
       ? {
+          archive_retention_days: Math.round(
+            initialSettings.archive_retention_hours / 24
+          ), // Convert hours to days for display
           default_user_role: initialSettings.default_user_role,
           features: initialSettings.features,
           max_participants_per_space:
@@ -63,6 +66,9 @@ export function SystemSettingsForm({ initialSettings }: Props) {
           max_spaces_per_user: initialSettings.max_spaces_per_user,
           max_total_spaces: initialSettings.max_total_spaces,
           space_expiration_hours: initialSettings.space_expiration_hours,
+          spaces_archive_retention_days: Math.round(
+            initialSettings.spaces_archive_retention_hours / 24
+          ), // Convert hours to days for display
         }
       : systemSettingsFormOpts.defaultValues,
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
@@ -72,7 +78,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
       modeAfterSubmission: "change",
     }),
     validators: {
-      onDynamic: systemSettingsSchema,
+      onDynamic: systemSettingsFormSchema,
     },
   });
 
@@ -232,6 +238,68 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                   />
                   <FieldDescription>
                     {t("spaceExpirationHelp")}
+                  </FieldDescription>
+                  {field.state.meta.errors.length > 0 && (
+                    <InlineFieldError>
+                      {getErrorMessage(field.state.meta.errors[0])}
+                    </InlineFieldError>
+                  )}
+                </FieldContent>
+              </Field>
+            )}
+          </form.Field>
+
+          <form.Field name="archive_retention_days">
+            {(field) => (
+              <Field>
+                <FieldContent>
+                  <FieldLabel>{t("archiveRetentionLabel")}</FieldLabel>
+                  <Input
+                    disabled={isSubmitting}
+                    max={365}
+                    min={0}
+                    name={field.name}
+                    onChange={(e) => {
+                      const parsed = Number.parseInt(e.target.value, 10);
+                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
+                    }}
+                    required
+                    type="number"
+                    value={field.state.value as number}
+                  />
+                  <FieldDescription>
+                    {t("archiveRetentionHelp")}
+                  </FieldDescription>
+                  {field.state.meta.errors.length > 0 && (
+                    <InlineFieldError>
+                      {getErrorMessage(field.state.meta.errors[0])}
+                    </InlineFieldError>
+                  )}
+                </FieldContent>
+              </Field>
+            )}
+          </form.Field>
+
+          <form.Field name="spaces_archive_retention_days">
+            {(field) => (
+              <Field>
+                <FieldContent>
+                  <FieldLabel>{t("spacesArchiveRetentionLabel")}</FieldLabel>
+                  <Input
+                    disabled={isSubmitting}
+                    max={3650}
+                    min={0}
+                    name={field.name}
+                    onChange={(e) => {
+                      const parsed = Number.parseInt(e.target.value, 10);
+                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
+                    }}
+                    required
+                    type="number"
+                    value={field.state.value as number}
+                  />
+                  <FieldDescription>
+                    {t("spacesArchiveRetentionHelp")}
                   </FieldDescription>
                   {field.state.meta.errors.length > 0 && (
                     <InlineFieldError>

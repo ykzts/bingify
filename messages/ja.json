@@ -124,6 +124,8 @@
     "updateSuccess": "認証プロバイダーを更新しました"
   },
   "AdminSettings": {
+    "archiveRetentionHelp": "終了したスペースを何日間保持してからアーカイブに移動するか設定します（0は即時削除）",
+    "archiveRetentionLabel": "アーカイブ保持期間（日数）",
     "defaultUserRoleHelp": "新規登録ユーザーに自動的に付与される権限です。「主催者」はスペース作成が可能、「参加者」は作成不可となります。",
     "defaultUserRoleLabel": "新規ユーザーの初期権限",
     "description": "サーバーリソース管理とスペース制限の設定",
@@ -155,6 +157,8 @@
     "saving": "保存中...",
     "spaceExpirationHelp": "スペース作成から何時間で有効期限切れとするか設定します（0は無期限）",
     "spaceExpirationLabel": "スペース有効期限（時間）",
+    "spacesArchiveRetentionHelp": "アーカイブテーブルに保存されたスペースを何日間保持してから完全に削除するか設定します（0は即時削除）",
+    "spacesArchiveRetentionLabel": "アーカイブ最終保持期間（日数）",
     "title": "システム設定",
     "twitchFollowerLabel": "Twitchフォロワー要件",
     "twitchSubscriberLabel": "Twitchサブスクライバー要件",

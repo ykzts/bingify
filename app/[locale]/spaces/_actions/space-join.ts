@@ -452,6 +452,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
     }
 
     // Check if space has expired based on system settings
+    // This provides race condition protection between cleanup cron runs
     const { data: systemSettings } = await supabase
       .from("system_settings")
       .select("space_expiration_hours")
@@ -475,7 +476,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
       );
       if (new Date() > expirationDate) {
         return {
-          errorKey: "errorSpaceExpired",
+          errorKey: "errorSpaceClosed",
           success: false,
         };
       }

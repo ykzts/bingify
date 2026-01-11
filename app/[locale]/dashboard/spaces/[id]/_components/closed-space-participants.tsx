@@ -10,7 +10,7 @@ interface Props {
 }
 
 /**
- * Static participant list for closed/expired spaces.
+ * Static participant list for closed spaces.
  * No real-time updates, no kick functionality.
  */
 export function ClosedSpaceParticipants({ maxParticipants, spaceId }: Props) {
