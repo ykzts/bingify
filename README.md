@@ -13,17 +13,17 @@
 
 ## 認証について
 
-Bingify は **Supabase Auth** を使用した認証システムを実装しています。
+Bingifyは **Supabase Auth** を使用した認証システムを実装しています。
 
-- **認証方法**: OAuth（Google、Twitch）
+- **認証方法**: OAuth (Google、Twitch)
 - **認証が必須の機能**:
-  - スペースの作成・管理 (`/dashboard/*`)
-  - ビンゴカードの表示・参加 (`/spaces/*`, `/@<share_key>`)
-  - 管理者機能 (`/admin/*`)
+ - スペースの作成・管理 (`/dashboard/*`)
+ - ビンゴカードの表示・参加 (`/spaces/*`, `/@<share_key>`)
+ - 管理者機能 (`/admin/*`)
 - **認証不要の機能**:
-  - 表示専用画面 (`/screen/[token]`) - ストリーミング配信用
+ - 表示専用画面 (`/screen/[token]`) - ストリーミング配信用
 
-OAuth プロバイダーの設定は、Supabase Dashboard の Authentication > Providers から行います。
+OAuthプロバイダーの設定は、Supabase Dashboardの Authentication > Providersから行います。
 
 ## セットアップ手順
 
@@ -35,7 +35,7 @@ pnpm install
 
 ### 2. 環境変数の設定
 
-`.env.local.example` をコピーして、Supabase の接続情報を設定します。
+`.env.local.example` をコピーして、Supabaseの接続情報を設定します。
 
 ```bash
 cp .env.local.example .env.local
@@ -44,14 +44,14 @@ cp .env.local.example .env.local
 ### 3. ローカル開発環境の起動
 
 ```bash
-# Supabase ローカルインスタンスを起動
+# Supabaseローカルインスタンスを起動
 pnpm local:setup
 
 # 開発サーバーを起動
 pnpm dev
 ```
 
-アプリケーションは [http://localhost:3000](http://localhost:3000) で起動します。
+アプリケーションは [http://localhost:3000] (http://localhost:3000) で起動します。
 
 ### 4. ローカルインスタンスの停止
 
@@ -64,16 +64,16 @@ pnpm local:stop
 ### 1. スペース作成
 
 - 管理画面 (`/dashboard`) でビンゴスペースを作成
-- **認証必須**: OAuth（Google、Twitch）によるログインが必要
-- 共有キー形式: `[ユーザー入力]-[日付YYYYMMDD]`（例: `my-party-20251224`）
+- **認証必須**: OAuth (Google、Twitch)によるログインが必要
+- 共有キー形式: `[ユーザー入力]-[日付YYYYMMDD]` (例: `my-party-20251224`)
 - リアルタイムで重複チェック
 
-### 2. URL解決（Middleware）
+### 2. URL解決 (Middleware)
 
 - 公開URL: `/@<share_key>`
 - **認証必須**: アクセスには認証が必要
-- Supabase の `share_key` で UUID を検索
-- `/spaces/<uuid>` に内部 rewrite（URLは `/@<share_key>` のまま表示）
+- Supabaseの `share_key` で UUIDを検索
+- `/spaces/<uuid>` に内部 rewrite (URLは `/@<share_key>` のまま表示)
 
 ### 3. 管理画面
 
@@ -85,9 +85,9 @@ pnpm local:stop
 
 - `/spaces/<uuid>` または `/@<share_key>`: ビンゴカード表示
 - **認証必須**: 認証されたユーザーのみアクセス可能
-- Supabase Realtime でリアルタイム同期
+- Supabase Realtimeでリアルタイム同期
 
-### 5. 表示専用画面（認証不要）
+### 5. 表示専用画面 (認証不要)
 
 - `/screen/[token]`: `view_token` を使用した公開表示画面
 - **認証不要**: ストリーミング配信などで使用する表示専用画面
@@ -100,13 +100,13 @@ pnpm local:stop
 動的ルートのパラメータは必ず `await` してください。
 
 ```typescript
-export default async function Page({
-  params,
+export default async function Page ({
+ params,
 }: {
-  params: Promise<{ id: string }>;
+ params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  // ...
+ const { id } = await params;
+ // ...
 }
 ```
 
@@ -115,18 +115,18 @@ export default async function Page({
 ```
 app/
 ├── dashboard/
-│   ├── spaces/[id]/page.tsx
-│   ├── actions.ts
-│   └── page.tsx
+│ ├── spaces/[id]/page.tsx
+│ ├── actions.ts
+│ └── page.tsx
 ├── spaces/[id]/page.tsx
 ├── globals.css
 └── layout.tsx
 lib/
 ├── supabase/
-│   ├── server.ts
-│   └── client.ts
+│ ├── server.ts
+│ └── client.ts
 ├── schemas/
-│   └── space.ts
+│ └── space.ts
 └── utils.ts
 ```
 
@@ -134,21 +134,21 @@ lib/
 
 - `pnpm dev` — 開発サーバー起動
 - `pnpm build` — 本番ビルド
-- `pnpm local:setup` — Supabase ローカルインスタンス起動
-- `pnpm local:stop` — Supabase ローカルインスタンス停止
-- `pnpm supabase:test` — データベーステスト実行（PgTAP）
-- `pnpm supabase:typegen` — Supabase の型定義を生成（DB 変更後に実行）
+- `pnpm local:setup` — Supabaseローカルインスタンス起動
+- `pnpm local:stop` — Supabaseローカルインスタンス停止
+- `pnpm supabase:test` — データベーステスト実行 (PgTAP)
+- `pnpm supabase:typegen` — Supabaseの型定義を生成 (DB 変更後に実行)
 - `pnpm lint` — ESLint 実行
-- `pnpm test` — フロントエンドテスト実行（Vitest）
+- `pnpm test` — フロントエンドテスト実行 (Vitest)
 
 ## データベーステスト
 
-Bingify では [PgTAP](https://pgtap.org/) を使用してデータベース層のテストを実施しています。これにより、RLS (Row Level Security) ポリシーやスキーマ定義が意図通りに動作することを検証できます。
+Bingifyでは [PgTAP] (https://pgtap.org/) を使用してデータベース層のテストを実施しています。これにより、RLS (Row Level Security) ポリシーやスキーマ定義が意図通りに動作することを検証できます。
 
 ### テストの実行
 
 ```bash
-# Supabase ローカルインスタンスを起動
+# Supabaseローカルインスタンスを起動
 pnpm local:setup
 
 # データベーステストを実行
@@ -159,56 +159,56 @@ pnpm supabase:test
 
 テストファイルは `supabase/tests/database/` ディレクトリに配置されています：
 
-- `01_schema.sql` — スキーマ定義のテスト（テーブル、カラム、外部キー制約）
-- `02_rls_security.sql` — RLS ポリシーのテスト（権限とセキュリティ）
+- `01_schema.sql` — スキーマ定義のテスト (テーブル、カラム、外部キー制約)
+- `02_rls_security.sql` — RLSポリシーのテスト (権限とセキュリティ)
 
 ### 新しいテストの追加
 
-新しいデータベーステストを追加する場合は、`supabase/tests/database/` ディレクトリに `.sql` ファイルを作成してください。PgTAP の関数を使用してテストを記述します。詳細は [PgTAP ドキュメント](https://pgtap.org/documentation.html)を参照してください。
+新しいデータベーステストを追加する場合は、`supabase/tests/database/` ディレクトリに `.sql` ファイルを作成してください。PgTAPの関数を使用してテストを記述します。詳細は [PgTAPドキュメント] (https://pgtap.org/documentation.html)を参照してください。
 
 ## 環境変数
 
-ローカル開発時は `.env.local.example` に記載されている値を参照してください。本番環境では Supabase Cloud を使用します。
+ローカル開発時は `.env.local.example` に記載されている値を参照してください。本番環境では Supabase Cloudを使用します。
 
 ## データベースマイグレーション
 
 ### 自動デプロイ
 
-`supabase/migrations` ディレクトリ配下の `.sql` マイグレーションファイルは、`main` ブランチへのマージ時に自動的に Cloud Supabase へデプロイされます。
+`supabase/migrations` ディレクトリ配下の `.sql` マイグレーションファイルは、`main` ブランチへのマージ時に自動的に Cloud Supabaseへデプロイされます。
 
 **⚠️ 重要な運用ルール:**
 
-- **既に適用済みのマイグレーションファイル（main ブランチに存在するファイル）は絶対に編集しないでください**
-- Supabase は一度適用されたマイグレーションを再実行しないため、既存ファイルの編集は新規環境にのみ反映され、環境間の不整合を引き起こします
-- 変更が必要な場合は、必ず新しいマイグレーションファイルを作成してください（詳細は [docs/MIGRATIONS.md](docs/MIGRATIONS.md) を参照）
-- マイグレーションファイルをリポジトリから削除しても、Cloud Supabase に適用済みのマイグレーションは削除されません
-- ロールバックが必要な場合は、新しいマイグレーションファイルで明示的にロールバック SQL を記述してください
+- **既に適用済みのマイグレーションファイル (mainブランチに存在するファイル)は絶対に編集しないでください**
+- Supabaseは一度適用されたマイグレーションを再実行しないため、既存ファイルの編集は新規環境にのみ反映され、環境間の不整合を引き起こします
+- 変更が必要な場合は、必ず新しいマイグレーションファイルを作成してください (詳細は [docs/MIGRATIONS.md] (docs/MIGRATIONS.md) を参照)
+- マイグレーションファイルをリポジトリから削除しても、Cloud Supabaseに適用済みのマイグレーションは削除されません
+- ロールバックが必要な場合は、新しいマイグレーションファイルで明示的にロールバックSQLを記述してください
 
 **動作フロー:**
 
-1. `supabase/migrations/**/*.sql` に変更を含む PR を作成
-2. PR がレビュー・承認される
+1. `supabase/migrations/**/*.sql` に変更を含む PRを作成
+2. PRがレビュー・承認される
 3. `main` ブランチへマージ
-4. GitHub Actions が自動的にマイグレーションを Cloud Supabase に適用
+4. GitHub Actionsが自動的にマイグレーションを Cloud Supabaseに適用
 5. デプロイ前後の検証ステップで安全性を確保
 
 **必要な GitHub Secrets:**
 
-- `SUPABASE_ACCESS_TOKEN` — Supabase の Personal Access Token（[Settings > Access Tokens](https://supabase.com/dashboard/account/tokens) から取得）
-- `SUPABASE_PROJECT_ID` — Supabase プロジェクトの Project Reference ID（プロジェクト設定から確認可能）
+- `SUPABASE_ACCESS_TOKEN` — Supabaseの Personal Access Token ([Settings > Access Tokens] (https://supabase.com/dashboard/account/tokens) から取得)
+- `SUPABASE_PROJECT_ID` — Supabaseプロジェクトの Project Reference ID (プロジェクト設定から確認可能)
 
 ### 手動デプロイ
 
-緊急時や特定の環境へのデプロイが必要な場合は、GitHub Actions の `workflow_dispatch` から手動実行できます。
+緊急時や特定の環境へのデプロイが必要な場合は、GitHub Actionsの `workflow_dispatch` から手動実行できます。
 
-1. GitHub リポジトリの **Actions** タブを開く
+1. GitHubリポジトリの **Actions** タブを開く
 2. **Deploy Migrations** ワークフローを選択
 3. **Run workflow** をクリックし、デプロイ先の環境を選択
 
 ### ローカルでのマイグレーション
 
 ```bash
-# ローカル Supabase インスタンスにマイグレーションを適用
+# ローカルSupabaseインスタンスにマイグレーションを適用
 pnpm local:setup
 
 # 新しいマイグレーションファイルを作成
@@ -219,22 +219,22 @@ supabase migration new <migration_name>
 
 **マイグレーションが失敗した場合:**
 
-1. GitHub Actions のログで詳細なエラーメッセージを確認
+1. GitHub Actionsのログで詳細なエラーメッセージを確認
 2. マイグレーションファイルの SQL 構文を確認
-3. Supabase Dashboard で現在のデータベーススキーマを確認
-4. 必要に応じて、手動でロールバック SQL を実行
+3. Supabase Dashboardで現在のデータベーススキーマを確認
+4. 必要に応じて、手動でロールバックSQLを実行
 
 **ロールバックが必要な場合:**
 
 マイグレーションの自動ロールバックは実装されていません。問題が発生した場合は、以下の手順で手動対応してください：
 
-1. Supabase Dashboard の SQL Editor を開く
-2. 問題のあるマイグレーションを元に戻す SQL を実行
-3. 修正内容を**新しい**マイグレーションファイルとして作成し、PR を作成（⚠️ 既存ファイルは編集しない）
+1. Supabase Dashboardの SQL Editorを開く
+2. 問題のあるマイグレーションを元に戻す SQLを実行
+3. 修正内容を**新しい**マイグレーションファイルとして作成し、PRを作成 (⚠️ 既存ファイルは編集しない)
 
 ## 型定義の生成
 
-Supabase のデータベーススキーマから TypeScript の型定義を自動生成できます。
+Supabaseのデータベーススキーマから TypeScriptの型定義を自動生成できます。
 
 ### 型定義の更新手順
 
@@ -248,9 +248,9 @@ pnpm supabase:typegen
 
 **重要:**
 
-- ローカルの Supabase インスタンスが起動している必要があります（`pnpm local:setup`）
+- ローカルの Supabaseインスタンスが起動している必要があります (`pnpm local:setup`)
 - 生成された型定義ファイルは Git 管理対象となります
-- DB スキーマ変更後は必ず型定義を更新し、コミットに含めてください
+- DBスキーマ変更後は必ず型定義を更新し、コミットに含めてください
 
 ### 型定義の使用例
 
@@ -261,7 +261,7 @@ import type { Database, Tables } from "@/types/supabase";
 type Space = Tables<"spaces">;
 type BingoCard = Tables<"bingo_cards">;
 
-// Database 型を使用して Supabase クライアントを型付け
+// Database 型を使用して Supabaseクライアントを型付け
 import { createClient } from "@supabase/supabase-js";
-const supabase = createClient<Database>(url, key);
+const supabase = createClient<Database> (url, key);
 ```
