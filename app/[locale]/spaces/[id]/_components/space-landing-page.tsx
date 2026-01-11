@@ -1,6 +1,7 @@
 "use client";
 
 import { Lock, Mail, Twitch, Youtube } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { FormattedText } from "@/components/formatted-text";
 import type { PublicSpaceInfo } from "@/lib/types/space";
@@ -77,10 +78,44 @@ export function SpaceLandingPage({ publicInfo }: Props) {
             {publicInfo.gatekeeper_rules.youtube && (
               <div className="flex gap-3">
                 <Youtube className="mt-1 h-5 w-5 shrink-0 text-gray-500" />
-                <div className="space-y-1">
+                <div className="flex-1 space-y-2">
                   <p className="font-medium text-sm">
                     {t("youtubeRequirement")}
                   </p>
+                  {/* Channel Info */}
+                  {(publicInfo.gatekeeper_rules.youtube.channel_title ||
+                    publicInfo.gatekeeper_rules.youtube.thumbnail_url) && (
+                    <div className="flex items-center gap-3">
+                      {publicInfo.gatekeeper_rules.youtube.thumbnail_url && (
+                        <Image
+                          alt=""
+                          className="h-12 w-12 rounded-full"
+                          height={48}
+                          src={
+                            publicInfo.gatekeeper_rules.youtube.thumbnail_url
+                          }
+                          width={48}
+                        />
+                      )}
+                      <div className="flex-1">
+                        {publicInfo.gatekeeper_rules.youtube.channel_title && (
+                          <a
+                            className="font-medium text-sm hover:underline"
+                            href={`https://www.youtube.com/channel/${publicInfo.gatekeeper_rules.youtube.channelId}`}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                          >
+                            {publicInfo.gatekeeper_rules.youtube.channel_title}
+                          </a>
+                        )}
+                        {publicInfo.gatekeeper_rules.youtube.handle && (
+                          <p className="text-gray-500 text-xs">
+                            @{publicInfo.gatekeeper_rules.youtube.handle}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   <p className="text-gray-600 text-sm">
                     {publicInfo.gatekeeper_rules.youtube.requirement ===
                     "subscriber"
@@ -95,10 +130,44 @@ export function SpaceLandingPage({ publicInfo }: Props) {
             {publicInfo.gatekeeper_rules.twitch && (
               <div className="flex gap-3">
                 <Twitch className="mt-1 h-5 w-5 shrink-0 text-gray-500" />
-                <div className="space-y-1">
+                <div className="flex-1 space-y-2">
                   <p className="font-medium text-sm">
                     {t("twitchRequirement")}
                   </p>
+                  {/* Broadcaster Info */}
+                  {(publicInfo.gatekeeper_rules.twitch.display_name ||
+                    publicInfo.gatekeeper_rules.twitch.profile_image_url) && (
+                    <div className="flex items-center gap-3">
+                      {publicInfo.gatekeeper_rules.twitch.profile_image_url && (
+                        <Image
+                          alt=""
+                          className="h-12 w-12 rounded-full"
+                          height={48}
+                          src={
+                            publicInfo.gatekeeper_rules.twitch.profile_image_url
+                          }
+                          width={48}
+                        />
+                      )}
+                      <div className="flex-1">
+                        {publicInfo.gatekeeper_rules.twitch.display_name && (
+                          <a
+                            className="font-medium text-sm hover:underline"
+                            href={`https://www.twitch.tv/${publicInfo.gatekeeper_rules.twitch.username || publicInfo.gatekeeper_rules.twitch.display_name}`}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                          >
+                            {publicInfo.gatekeeper_rules.twitch.display_name}
+                          </a>
+                        )}
+                        {publicInfo.gatekeeper_rules.twitch.username && (
+                          <p className="text-gray-500 text-xs">
+                            @{publicInfo.gatekeeper_rules.twitch.username}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   <p className="text-gray-600 text-sm">
                     {publicInfo.gatekeeper_rules.twitch.requirement ===
                     "subscriber"

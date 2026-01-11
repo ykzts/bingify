@@ -23,6 +23,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
       },
       {
+        hostname: "yt3.ggpht.com",
+        protocol: "https",
+      },
+      {
         hostname: "static-cdn.jtvnw.net",
         protocol: "https",
       },
