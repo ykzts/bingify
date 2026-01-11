@@ -1,9 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 
-// spaces_archive テーブルで保持するアーカイブレコードの保持期間（日数）
-const SPACES_ARCHIVE_RETENTION_DAYS = 90;
-
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: クリーンアップ処理は複数のステップを含むため複雑度が高い
 export async function GET(request: NextRequest) {
   try {
     // Cron秘密鍵による認証を検証
@@ -48,10 +46,10 @@ export async function GET(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // システム設定から archive_retention_days を取得
+    // システム設定から archive_retention_days と spaces_archive_retention_days を取得
     const { data: systemSettings, error: settingsError } = await supabase
       .from("system_settings")
-      .select("archive_retention_days")
+      .select("archive_retention_days, spaces_archive_retention_days")
       .eq("id", 1)
       .single();
 
@@ -72,6 +70,20 @@ export async function GET(request: NextRequest) {
     ) {
       console.error(
         `Invalid archive_retention_days value: ${archiveRetentionDays}. Using default: 7`
+      );
+      // デフォルト値を使用して継続
+    }
+
+    // spaces_archive_retention_days の検証（有限の非負整数であることを確認）
+    const spacesArchiveRetentionDays =
+      systemSettings?.spaces_archive_retention_days ?? 90;
+    if (
+      !Number.isFinite(spacesArchiveRetentionDays) ||
+      spacesArchiveRetentionDays < 0 ||
+      !Number.isInteger(spacesArchiveRetentionDays)
+    ) {
+      console.error(
+        `Invalid spaces_archive_retention_days value: ${spacesArchiveRetentionDays}. Using default: 90`
       );
       // デフォルト値を使用して継続
     }
@@ -122,9 +134,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Step 3: spaces_archive テーブルから古いアーカイブレコードを削除
+    const validSpacesArchiveRetentionDays =
+      Number.isFinite(spacesArchiveRetentionDays) &&
+      spacesArchiveRetentionDays >= 0
+        ? spacesArchiveRetentionDays
+        : 90;
     const archiveCutoffDate = new Date();
     archiveCutoffDate.setDate(
-      archiveCutoffDate.getDate() - SPACES_ARCHIVE_RETENTION_DAYS
+      archiveCutoffDate.getDate() - validSpacesArchiveRetentionDays
     );
 
     const { data: deletedArchives, error: archiveError } = await supabase
@@ -144,7 +161,7 @@ export async function GET(request: NextRequest) {
     const deletedArchiveCount = deletedArchives?.length || 0;
 
     console.log(
-      `Cleanup completed: deleted ${deletedArchiveCount} archived record(s) older than ${SPACES_ARCHIVE_RETENTION_DAYS} days (cutoff: ${archiveCutoffDate.toISOString()})`
+      `Cleanup completed: deleted ${deletedArchiveCount} archived record(s) older than ${validSpacesArchiveRetentionDays} days (cutoff: ${archiveCutoffDate.toISOString()})`
     );
 
     return NextResponse.json({
@@ -152,10 +169,10 @@ export async function GET(request: NextRequest) {
         archivedCount,
         deletedArchiveCount,
         expiredCount,
-        message: `Successfully marked ${expiredCount} space(s) as closed, archived ${archivedCount} closed space(s) older than ${validArchiveRetentionDays} days, and deleted ${deletedArchiveCount} archived record(s) older than ${SPACES_ARCHIVE_RETENTION_DAYS} days`,
+        message: `Successfully marked ${expiredCount} space(s) as closed, archived ${archivedCount} closed space(s) older than ${validArchiveRetentionDays} days, and deleted ${deletedArchiveCount} archived record(s) older than ${validSpacesArchiveRetentionDays} days`,
         retentionDays: {
           archive: validArchiveRetentionDays,
-          spacesArchive: SPACES_ARCHIVE_RETENTION_DAYS,
+          spacesArchive: validSpacesArchiveRetentionDays,
         },
       },
     });

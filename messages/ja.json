@@ -157,6 +157,8 @@
     "saving": "保存中...",
     "spaceExpirationHelp": "スペース作成から何時間で有効期限切れとするか設定します（0は無期限）",
     "spaceExpirationLabel": "スペース有効期限（時間）",
+    "spacesArchiveRetentionHelp": "アーカイブテーブルに保存されたスペースを何日間保持してから完全に削除するか設定します（0は即時削除）",
+    "spacesArchiveRetentionLabel": "アーカイブ最終保持期間（日数）",
     "title": "システム設定",
     "twitchFollowerLabel": "Twitchフォロワー要件",
     "twitchSubscriberLabel": "Twitchサブスクライバー要件",

@@ -280,9 +280,8 @@ Bingify は**Supabase Auth を利用したユーザー認証・ロール管理�
   - `created_at`, `updated_at` (TIMESTAMP)
 
 **備考**: 
-- `expired` ステータスは廃止され、`closed` に統一されました
-- 手動で終了したスペースも、48時間経過で自動終了したスペースも、すべて `status = 'closed'` として扱われます
-- `closed` スペースは一定期間（デフォルト7日、`ARCHIVE_RETENTION_DAYS` 環境変数で設定可能）経過後、自動的に削除され `spaces_archive` テーブルに移動します
+- `closed` スペースは一定期間（デフォルト7日、システム設定画面の `archive_retention_days` で設定可能）経過後、自動的に削除され `spaces_archive` テーブルに移動します
+- `spaces_archive` テーブル内のレコードは一定期間（デフォルト90日、システム設定画面の `spaces_archive_retention_days` で設定可能）後にさらに削除されます
 
 ### 5.2 bingo_cards テーブル
 

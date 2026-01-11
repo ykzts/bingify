@@ -78,6 +78,16 @@ function parseSystemSettingsFormData(
     );
   }
 
+  const spacesArchiveRetentionDays = formData.get(
+    "spaces_archive_retention_days"
+  );
+  if (spacesArchiveRetentionDays) {
+    data.spaces_archive_retention_days = Number.parseInt(
+      spacesArchiveRetentionDays as string,
+      10
+    );
+  }
+
   // Parse nested features object with proper boolean handling
   // Checkboxes send their value (or nothing) when checked, nothing when unchecked
   data.features = {

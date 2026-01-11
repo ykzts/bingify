@@ -183,6 +183,7 @@ describe("systemSettingsSchema", () => {
   it("機能を含む有効なシステム設定を受け入れる", () => {
     const result = systemSettingsSchema.safeParse({
       archive_retention_days: 7,
+      spaces_archive_retention_days: 90,
       default_user_role: "organizer",
       features: {
         gatekeeper: {
@@ -272,6 +273,7 @@ describe("systemSettingsSchema", () => {
   it("space_expiration_hoursが0（無制限）の場合は受け入れる", () => {
     const result = systemSettingsSchema.safeParse({
       archive_retention_days: 7,
+      spaces_archive_retention_days: 90,
       default_user_role: "organizer",
       features: {
         gatekeeper: {
@@ -399,6 +401,7 @@ describe("systemSettingsSchema", () => {
   it("max_total_spacesが0（無制限）の場合は受け入れる", () => {
     const result = systemSettingsSchema.safeParse({
       archive_retention_days: 7,
+      spaces_archive_retention_days: 90,
       default_user_role: "organizer",
       features: {
         gatekeeper: {

@@ -59,6 +59,11 @@ export const systemSettingsSchema = z.object({
     .int("整数を入力してください")
     .min(0, "0時間以上を指定してください（0は無期限）")
     .max(8760, "最大8760時間（365日）までです"),
+  spaces_archive_retention_days: z
+    .number()
+    .int("整数を入力してください")
+    .min(0, "0日以上を指定してください（0は即時削除）")
+    .max(3650, "最大3650日（10年）までです"),
 });
 
 export type SystemSettings = z.infer<typeof systemSettingsSchema>;
@@ -88,4 +93,5 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
   max_spaces_per_user: 5,
   max_total_spaces: 1000,
   space_expiration_hours: 48,
+  spaces_archive_retention_days: 90,
 } as const satisfies SystemSettings;
