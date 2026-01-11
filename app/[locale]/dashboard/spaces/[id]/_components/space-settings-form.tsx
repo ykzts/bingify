@@ -510,10 +510,7 @@ export function SpaceSettingsForm({
         action={updateAction}
         className="space-y-6"
         noValidate
-        onSubmit={(e) => {
-          e.preventDefault();
-          form.handleSubmit();
-        }}
+        onSubmit={() => form.handleSubmit()}
       >
         {/* Basic Information */}
         <FieldSet>
