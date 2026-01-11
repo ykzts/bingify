@@ -100,7 +100,7 @@ pnpm local:stop
 動的ルートのパラメータは必ず `await` してください。
 
 ```typescript
-export default async function Page ({
+export default async function Page({
   params,
 }: {
   params: Promise<{ id: string }>;
