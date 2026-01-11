@@ -65,7 +65,8 @@ describe("Admin Settings Actions", () => {
       formData.set("max_participants_per_space", "50");
       formData.set("max_spaces_per_user", "5");
       formData.set("max_total_spaces", "1000");
-      formData.set("space_expiration_hours", "48");
+      formData.set("space_expiration_days", "2");
+      formData.set("space_expiration_hours", "0");
 
       // フィーチャーフラグ - すべてのネストされたフィールドを含める
       formData.set("features.gatekeeper.youtube.enabled", "on");
@@ -163,7 +164,8 @@ describe("Admin Settings Actions", () => {
       formData.set("max_participants_per_space", "100");
       formData.set("max_spaces_per_user", "10");
       formData.set("max_total_spaces", "2000");
-      formData.set("space_expiration_hours", "24");
+      formData.set("space_expiration_days", "1");
+      formData.set("space_expiration_hours", "0");
 
       // すべてのチェックボックスがOFFの場合
       // FormDataには何も設定されない
@@ -251,7 +253,8 @@ describe("Admin Settings Actions", () => {
       formData.set("max_participants_per_space", "50");
       formData.set("max_spaces_per_user", "5");
       formData.set("max_total_spaces", "1000");
-      formData.set("space_expiration_hours", "48");
+      formData.set("space_expiration_days", "2");
+      formData.set("space_expiration_hours", "0");
 
       // YouTube: 有効、member: 有効、subscriber: 無効
       formData.set("features.gatekeeper.youtube.enabled", "on");
@@ -366,7 +369,8 @@ describe("Admin Settings Actions", () => {
       formData.set("max_participants_per_space", "50");
       formData.set("max_spaces_per_user", "5");
       formData.set("max_total_spaces", "1000");
-      formData.set("space_expiration_hours", "48");
+      formData.set("space_expiration_days", "2");
+      formData.set("space_expiration_hours", "0");
 
       const result = await updateSystemSettingsAction(undefined, formData);
 

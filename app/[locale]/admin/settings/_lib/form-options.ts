@@ -48,11 +48,22 @@ export const systemSettingsFormSchema = z.object({
     .int("整数を入力してください")
     .min(0, "0以上を指定してください（0は無制限）")
     .max(100_000, "最大100000スペースまでです"),
-  space_expiration_hours: z
-    .number()
-    .int("整数を入力してください")
-    .min(0, "0時間以上を指定してください（0は無期限）")
-    .max(8760, "最大8760時間（365日）までです"),
+  space_expiration: z
+    .object({
+      days: z
+        .number()
+        .int("整数を入力してください")
+        .min(0, "0日以上を指定してください")
+        .max(365, "最大365日までです"),
+      hours: z
+        .number()
+        .int("整数を入力してください")
+        .min(0, "0時間以上を指定してください")
+        .max(23, "最大23時間までです"),
+    })
+    .refine((data) => data.days > 0 || data.hours > 0, {
+      message: "1時間以上を指定してください",
+    }),
   spaces_archive_retention_days: z
     .number()
     .int("整数を入力してください")
@@ -84,7 +95,10 @@ export const systemSettingsFormOpts = formOptions({
     max_participants_per_space: 50,
     max_spaces_per_user: 5,
     max_total_spaces: 1000,
-    space_expiration_hours: 48,
+    space_expiration: {
+      days: 2,
+      hours: 0,
+    },
     spaces_archive_retention_days: 90,
   } as SystemSettingsFormValues,
 });

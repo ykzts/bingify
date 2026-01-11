@@ -23,6 +23,11 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { updateSystemSettingsAction } from "../_actions/system-settings";
@@ -54,7 +59,10 @@ export function ExpirationArchiveForm({ initialSettings }: Props) {
             initialSettings.max_participants_per_space,
           max_spaces_per_user: initialSettings.max_spaces_per_user,
           max_total_spaces: initialSettings.max_total_spaces,
-          space_expiration_hours: initialSettings.space_expiration_hours,
+          space_expiration: {
+            days: Math.floor(initialSettings.space_expiration_hours / 24),
+            hours: initialSettings.space_expiration_hours % 24,
+          },
           spaces_archive_retention_days: Math.round(
             initialSettings.spaces_archive_retention_hours / 24
           ),
@@ -105,25 +113,52 @@ export function ExpirationArchiveForm({ initialSettings }: Props) {
 
       <FieldSet>
         <FieldGroup>
-          <form.Field name="space_expiration_hours">
+          <form.Field name="space_expiration">
             {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
             {(field: any) => (
               <Field>
                 <FieldContent>
                   <FieldLabel>{t("spaceExpirationLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={8760}
-                    min={0}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
+                  <InputGroup>
+                    <InputGroupInput
+                      className="w-20"
+                      disabled={isSubmitting}
+                      max={365}
+                      min={0}
+                      name="space_expiration_days"
+                      onChange={(e) => {
+                        const parsed = Number.parseInt(e.target.value, 10);
+                        const days = Number.isNaN(parsed) ? 0 : parsed;
+                        field.handleChange({
+                          ...field.state.value,
+                          days,
+                        });
+                      }}
+                      required
+                      type="number"
+                      value={field.state.value?.days ?? 0}
+                    />
+                    <InputGroupText>日</InputGroupText>
+                    <InputGroupInput
+                      className="w-20"
+                      disabled={isSubmitting}
+                      max={23}
+                      min={0}
+                      name="space_expiration_hours"
+                      onChange={(e) => {
+                        const parsed = Number.parseInt(e.target.value, 10);
+                        const hours = Number.isNaN(parsed) ? 0 : parsed;
+                        field.handleChange({
+                          ...field.state.value,
+                          hours,
+                        });
+                      }}
+                      required
+                      type="number"
+                      value={field.state.value?.hours ?? 0}
+                    />
+                    <InputGroupText>時間</InputGroupText>
+                  </InputGroup>
                   <FieldDescription>
                     {t("spaceExpirationHelp")}
                   </FieldDescription>
