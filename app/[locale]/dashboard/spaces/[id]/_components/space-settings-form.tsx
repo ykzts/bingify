@@ -39,6 +39,7 @@ import { getErrorMessage } from "@/lib/utils/error-message";
 import {
   getOperatorTwitchBroadcasterId,
   getOperatorYouTubeChannelId,
+  getVerifiedSocialChannels,
 } from "../_actions/get-user-channel";
 import type { PublishSpaceState } from "../_actions/settings";
 import {
@@ -365,6 +366,29 @@ export function SpaceSettingsForm({
       resetRequirementToNone();
     }
   }, [isCurrentRequirementDisabled]);
+
+  // マウント時に検証済みチャンネルIDを取得
+  useEffect(() => {
+    const fetchVerifiedChannels = async () => {
+      try {
+        const verified = await getVerifiedSocialChannels();
+
+        // 検証済みYouTubeチャンネルIDがある場合、設定
+        if (verified.youtube) {
+          setOperatorYoutubeChannelId(verified.youtube);
+        }
+
+        // 検証済みTwitchブロードキャスターIDがある場合、設定
+        if (verified.twitch) {
+          setOperatorTwitchBroadcasterId(verified.twitch);
+        }
+      } catch (error) {
+        console.error("Error fetching verified channels:", error);
+      }
+    };
+
+    fetchVerifiedChannels();
+  }, []);
 
   // 自動的に操作者のYouTubeチャンネルIDを取得（手動入力時の所有権チェック用）
   const fetchYoutubeOperatorId = useEffectEvent(async (signal: AbortSignal) => {
