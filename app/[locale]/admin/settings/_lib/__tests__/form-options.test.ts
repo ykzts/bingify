@@ -96,7 +96,7 @@ describe("systemSettingsFormSchema", () => {
       expect(result.success).toBe(true);
     });
 
-    it("日数と時間が両方0の場合は拒否する", () => {
+    it("日数と時間が両方0の場合を受け入れる（無期限）", () => {
       const result = systemSettingsFormSchema.safeParse({
         archive_retention_days: 7,
         default_user_role: "organizer",
@@ -124,12 +124,7 @@ describe("systemSettingsFormSchema", () => {
         },
         spaces_archive_retention_days: 90,
       });
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toContain(
-          "無期限にする場合を除き"
-        );
-      }
+      expect(result.success).toBe(true);
     });
 
     it("負の日数を拒否する", () => {
