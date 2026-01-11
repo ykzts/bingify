@@ -325,7 +325,7 @@ INSERT INTO bingo_cards (
 ) VALUES (
 	'11111111-aaaa-aaaa-aaaa-111111111111'::uuid,
 	'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid,
-	'00000000-0000-0000-0000-000000000001'::text,
+	'00000000-0000-0000-0000-000000000001'::uuid,
 	'[
 		[5, 12, 23, 34, 45],
 		[7, 18, 25, 38, 52],
@@ -348,7 +348,7 @@ INSERT INTO bingo_cards (
 ) VALUES (
 	'22222222-aaaa-aaaa-aaaa-222222222222'::uuid,
 	'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid,
-	'00000000-0000-0000-0000-000000000002'::text,
+	'00000000-0000-0000-0000-000000000002'::uuid,
 	'[
 		[3, 16, 24, 37, 48],
 		[6, 19, 28, 39, 51],
