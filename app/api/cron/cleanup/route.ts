@@ -105,11 +105,7 @@ export async function GET(request: NextRequest) {
     );
 
     // Step 2: archive_retention_hours より古い closed スペースをアーカイブして削除
-    const validArchiveRetentionHours =
-      Number.isFinite(archiveRetentionHours) && archiveRetentionHours >= 0
-        ? archiveRetentionHours
-        : 168; // 7 days default
-    const closedCutoffMs = Date.now() - validArchiveRetentionHours * 3_600_000;
+    const closedCutoffMs = Date.now() - archiveRetentionHours * 3_600_000;
     const closedCutoffDate = new Date(closedCutoffMs);
 
     // 条件付き削除を1回のクエリで実行（スケーラビリティ向上、count:'exact'のみでminimal返却）
@@ -121,22 +117,18 @@ export async function GET(request: NextRequest) {
 
     if (deleteError) {
       console.error("Error deleting closed spaces:", deleteError);
+      // アーカイブ失敗してもStep 3のクリーンアップは継続（既存アーカイブの削除は独立した処理）
     }
 
     if (archivedCount && archivedCount > 0) {
       console.log(
-        `Archived and deleted ${archivedCount} closed space(s) older than ${validArchiveRetentionHours} hours (${Math.round(validArchiveRetentionHours / 24)} days) (cutoff: ${closedCutoffDate.toISOString()})`
+        `Archived and deleted ${archivedCount} closed space(s) older than ${archiveRetentionHours} hours (${Math.round(archiveRetentionHours / 24)} days) (cutoff: ${closedCutoffDate.toISOString()})`
       );
     }
 
     // Step 3: spaces_archive テーブルから古いアーカイブレコードを削除
-    const validSpacesArchiveRetentionHours =
-      Number.isFinite(spacesArchiveRetentionHours) &&
-      spacesArchiveRetentionHours >= 0
-        ? spacesArchiveRetentionHours
-        : 2160; // 90 days default
     const archiveCutoffMs =
-      Date.now() - validSpacesArchiveRetentionHours * 3_600_000;
+      Date.now() - spacesArchiveRetentionHours * 3_600_000;
     const archiveCutoffDate = new Date(archiveCutoffMs);
 
     const { error: archiveError, count: deletedArchiveCount } = await supabase
@@ -153,7 +145,7 @@ export async function GET(request: NextRequest) {
     }
 
     console.log(
-      `Cleanup completed: deleted ${deletedArchiveCount || 0} archived record(s) older than ${validSpacesArchiveRetentionHours} hours (${Math.round(validSpacesArchiveRetentionHours / 24)} days) (cutoff: ${archiveCutoffDate.toISOString()})`
+      `Cleanup completed: deleted ${deletedArchiveCount || 0} archived record(s) older than ${spacesArchiveRetentionHours} hours (${Math.round(spacesArchiveRetentionHours / 24)} days) (cutoff: ${archiveCutoffDate.toISOString()})`
     );
 
     return NextResponse.json({
@@ -161,10 +153,10 @@ export async function GET(request: NextRequest) {
         archivedCount: archivedCount || 0,
         deletedArchiveCount: deletedArchiveCount || 0,
         markedClosedCount,
-        message: `Successfully marked ${markedClosedCount} space(s) as closed, archived ${archivedCount || 0} closed space(s) older than ${Math.round(validArchiveRetentionHours / 24)} days, and deleted ${deletedArchiveCount || 0} archived record(s) older than ${Math.round(validSpacesArchiveRetentionHours / 24)} days`,
+        message: `Successfully marked ${markedClosedCount} space(s) as closed, archived ${archivedCount || 0} closed space(s) older than ${Math.round(archiveRetentionHours / 24)} days, and deleted ${deletedArchiveCount || 0} archived record(s) older than ${Math.round(spacesArchiveRetentionHours / 24)} days`,
         retentionHours: {
-          archive: validArchiveRetentionHours,
-          spacesArchive: validSpacesArchiveRetentionHours,
+          archive: archiveRetentionHours,
+          spacesArchive: spacesArchiveRetentionHours,
         },
       },
     });
