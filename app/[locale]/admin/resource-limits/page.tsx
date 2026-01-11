@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSystemSettings } from "@/lib/data/system-settings";
-import { ResourceLimitsForm } from "../settings/_components/resource-limits-form";
+import { ResourceLimitsForm } from "./_components/resource-limits-form";
 
 export const dynamic = "force-dynamic";
 

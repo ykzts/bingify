@@ -29,11 +29,11 @@ import {
 } from "@/components/ui/input-group";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import { updateSystemSettingsAction } from "../_actions/system-settings";
+import { updateSystemSettingsAction } from "../../_actions/system-settings";
 import {
   systemSettingsFormOpts,
   systemSettingsFormSchema,
-} from "../_lib/form-options";
+} from "../../_lib/form-options";
 
 interface Props {
   initialSettings?: SystemSettings;

@@ -16,11 +16,11 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
-import { updateSystemSettingsAction } from "../_actions/system-settings";
+import { updateSystemSettingsAction } from "../../_actions/system-settings";
 import {
   systemSettingsFormOpts,
   systemSettingsFormSchema,
-} from "../_lib/form-options";
+} from "../../_lib/form-options";
 
 interface Props {
   initialSettings?: SystemSettings;
