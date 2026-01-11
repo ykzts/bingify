@@ -345,8 +345,8 @@ describe("getVerifiedSocialChannels", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockResolvedValue({
             data: [
-              { provider: "youtube", channel_id: "UC123456789" },
-              { provider: "twitch", channel_id: "987654321" },
+              { channel_id: "UC123456789", provider: "youtube" },
+              { channel_id: "987654321", provider: "twitch" },
             ],
             error: null,
           }),
@@ -421,7 +421,7 @@ describe("getVerifiedSocialChannels", () => {
       from: vi.fn().mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockResolvedValue({
-            data: [{ provider: "youtube", channel_id: "UC123456789" }],
+            data: [{ channel_id: "UC123456789", provider: "youtube" }],
             error: null,
           }),
         }),
