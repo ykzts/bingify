@@ -22,7 +22,6 @@ import {
   FieldLabel,
   FieldSet,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupInput,
@@ -50,9 +49,10 @@ export function ExpirationArchiveForm({ initialSettings }: Props) {
     ...systemSettingsFormOpts,
     defaultValues: initialSettings
       ? {
-          archive_retention_days: Math.round(
-            initialSettings.archive_retention_hours / 24
-          ),
+          archive_retention: {
+            days: Math.floor(initialSettings.archive_retention_hours / 24),
+            hours: initialSettings.archive_retention_hours % 24,
+          },
           default_user_role: initialSettings.default_user_role,
           features: initialSettings.features,
           max_participants_per_space:
@@ -63,9 +63,12 @@ export function ExpirationArchiveForm({ initialSettings }: Props) {
             days: Math.floor(initialSettings.space_expiration_hours / 24),
             hours: initialSettings.space_expiration_hours % 24,
           },
-          spaces_archive_retention_days: Math.round(
-            initialSettings.spaces_archive_retention_hours / 24
-          ),
+          spaces_archive_retention: {
+            days: Math.floor(
+              initialSettings.spaces_archive_retention_hours / 24
+            ),
+            hours: initialSettings.spaces_archive_retention_hours % 24,
+          },
         }
       : systemSettingsFormOpts.defaultValues,
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
@@ -121,9 +124,9 @@ export function ExpirationArchiveForm({ initialSettings }: Props) {
                   <FieldLabel>{t("spaceExpirationLabel")}</FieldLabel>
                   <InputGroup>
                     <InputGroupInput
-                      className="w-20"
+                      className="w-[4.5rem]"
                       disabled={isSubmitting}
-                      max={365}
+                      max={9999}
                       min={0}
                       name="space_expiration_days"
                       onChange={(e) => {
@@ -140,9 +143,9 @@ export function ExpirationArchiveForm({ initialSettings }: Props) {
                     />
                     <InputGroupText>{t("spaceExpirationDays")}</InputGroupText>
                     <InputGroupInput
-                      className="w-20"
+                      className="w-[4.5rem]"
                       disabled={isSubmitting}
-                      max={23}
+                      max={9999}
                       min={0}
                       name="space_expiration_hours"
                       onChange={(e) => {
@@ -172,25 +175,54 @@ export function ExpirationArchiveForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          <form.Field name="archive_retention_days">
+          <form.Field name="archive_retention">
             {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
             {(field: any) => (
               <Field>
                 <FieldContent>
                   <FieldLabel>{t("archiveRetentionLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={365}
-                    min={0}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
+                  <InputGroup>
+                    <InputGroupInput
+                      className="w-[4.5rem]"
+                      disabled={isSubmitting}
+                      max={9999}
+                      min={0}
+                      name="archive_retention_days"
+                      onChange={(e) => {
+                        const parsed = Number.parseInt(e.target.value, 10);
+                        const days = Number.isNaN(parsed) ? 0 : parsed;
+                        field.handleChange({
+                          ...field.state.value,
+                          days,
+                        });
+                      }}
+                      required
+                      type="number"
+                      value={field.state.value?.days ?? 0}
+                    />
+                    <InputGroupText>{t("archiveRetentionDays")}</InputGroupText>
+                    <InputGroupInput
+                      className="w-[4.5rem]"
+                      disabled={isSubmitting}
+                      max={9999}
+                      min={0}
+                      name="archive_retention_hours"
+                      onChange={(e) => {
+                        const parsed = Number.parseInt(e.target.value, 10);
+                        const hours = Number.isNaN(parsed) ? 0 : parsed;
+                        field.handleChange({
+                          ...field.state.value,
+                          hours,
+                        });
+                      }}
+                      required
+                      type="number"
+                      value={field.state.value?.hours ?? 0}
+                    />
+                    <InputGroupText>
+                      {t("archiveRetentionHours")}
+                    </InputGroupText>
+                  </InputGroup>
                   <FieldDescription>
                     {t("archiveRetentionHelp")}
                   </FieldDescription>
@@ -204,25 +236,56 @@ export function ExpirationArchiveForm({ initialSettings }: Props) {
             )}
           </form.Field>
 
-          <form.Field name="spaces_archive_retention_days">
+          <form.Field name="spaces_archive_retention">
             {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
             {(field: any) => (
               <Field>
                 <FieldContent>
                   <FieldLabel>{t("spacesArchiveRetentionLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={3650}
-                    min={0}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
+                  <InputGroup>
+                    <InputGroupInput
+                      className="w-[4.5rem]"
+                      disabled={isSubmitting}
+                      max={9999}
+                      min={0}
+                      name="spaces_archive_retention_days"
+                      onChange={(e) => {
+                        const parsed = Number.parseInt(e.target.value, 10);
+                        const days = Number.isNaN(parsed) ? 0 : parsed;
+                        field.handleChange({
+                          ...field.state.value,
+                          days,
+                        });
+                      }}
+                      required
+                      type="number"
+                      value={field.state.value?.days ?? 0}
+                    />
+                    <InputGroupText>
+                      {t("spacesArchiveRetentionDays")}
+                    </InputGroupText>
+                    <InputGroupInput
+                      className="w-[4.5rem]"
+                      disabled={isSubmitting}
+                      max={9999}
+                      min={0}
+                      name="spaces_archive_retention_hours"
+                      onChange={(e) => {
+                        const parsed = Number.parseInt(e.target.value, 10);
+                        const hours = Number.isNaN(parsed) ? 0 : parsed;
+                        field.handleChange({
+                          ...field.state.value,
+                          hours,
+                        });
+                      }}
+                      required
+                      type="number"
+                      value={field.state.value?.hours ?? 0}
+                    />
+                    <InputGroupText>
+                      {t("spacesArchiveRetentionHours")}
+                    </InputGroupText>
+                  </InputGroup>
                   <FieldDescription>
                     {t("spacesArchiveRetentionHelp")}
                   </FieldDescription>

@@ -5,7 +5,7 @@ describe("systemSettingsFormSchema", () => {
   describe("space_expiration フィールド", () => {
     it("有効な日数+時間の組み合わせを受け入れる", () => {
       const result = systemSettingsFormSchema.safeParse({
-        archive_retention_days: 7,
+        archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
         features: {
           gatekeeper: {
@@ -29,14 +29,14 @@ describe("systemSettingsFormSchema", () => {
           days: 2,
           hours: 12,
         },
-        spaces_archive_retention_days: 90,
+        spaces_archive_retention: { days: 90, hours: 0 },
       });
       expect(result.success).toBe(true);
     });
 
     it("日数のみの指定を受け入れる", () => {
       const result = systemSettingsFormSchema.safeParse({
-        archive_retention_days: 7,
+        archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
         features: {
           gatekeeper: {
@@ -60,14 +60,14 @@ describe("systemSettingsFormSchema", () => {
           days: 7,
           hours: 0,
         },
-        spaces_archive_retention_days: 90,
+        spaces_archive_retention: { days: 90, hours: 0 },
       });
       expect(result.success).toBe(true);
     });
 
     it("時間のみの指定を受け入れる", () => {
       const result = systemSettingsFormSchema.safeParse({
-        archive_retention_days: 7,
+        archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
         features: {
           gatekeeper: {
@@ -91,14 +91,14 @@ describe("systemSettingsFormSchema", () => {
           days: 0,
           hours: 12,
         },
-        spaces_archive_retention_days: 90,
+        spaces_archive_retention: { days: 90, hours: 0 },
       });
       expect(result.success).toBe(true);
     });
 
     it("日数と時間が両方0の場合を受け入れる（無期限）", () => {
       const result = systemSettingsFormSchema.safeParse({
-        archive_retention_days: 7,
+        archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
         features: {
           gatekeeper: {
@@ -122,14 +122,14 @@ describe("systemSettingsFormSchema", () => {
           days: 0,
           hours: 0,
         },
-        spaces_archive_retention_days: 90,
+        spaces_archive_retention: { days: 90, hours: 0 },
       });
       expect(result.success).toBe(true);
     });
 
     it("負の日数を拒否する", () => {
       const result = systemSettingsFormSchema.safeParse({
-        archive_retention_days: 7,
+        archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
         features: {
           gatekeeper: {
@@ -153,14 +153,14 @@ describe("systemSettingsFormSchema", () => {
           days: -1,
           hours: 12,
         },
-        spaces_archive_retention_days: 90,
+        spaces_archive_retention: { days: 90, hours: 0 },
       });
       expect(result.success).toBe(false);
     });
 
     it("負の時間を拒否する", () => {
       const result = systemSettingsFormSchema.safeParse({
-        archive_retention_days: 7,
+        archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
         features: {
           gatekeeper: {
@@ -184,14 +184,14 @@ describe("systemSettingsFormSchema", () => {
           days: 2,
           hours: -1,
         },
-        spaces_archive_retention_days: 90,
+        spaces_archive_retention: { days: 90, hours: 0 },
       });
       expect(result.success).toBe(false);
     });
 
-    it("365日を超える日数を拒否する", () => {
+    it("9999日を超える日数を拒否する", () => {
       const result = systemSettingsFormSchema.safeParse({
-        archive_retention_days: 7,
+        archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
         features: {
           gatekeeper: {
@@ -212,17 +212,17 @@ describe("systemSettingsFormSchema", () => {
         max_spaces_per_user: 5,
         max_total_spaces: 1000,
         space_expiration: {
-          days: 366,
+          days: 10_000,
           hours: 0,
         },
-        spaces_archive_retention_days: 90,
+        spaces_archive_retention: { days: 90, hours: 0 },
       });
       expect(result.success).toBe(false);
     });
 
-    it("23時間を超える時間を拒否する", () => {
+    it("9999時間を超える時間を拒否する", () => {
       const result = systemSettingsFormSchema.safeParse({
-        archive_retention_days: 7,
+        archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
         features: {
           gatekeeper: {
@@ -244,16 +244,16 @@ describe("systemSettingsFormSchema", () => {
         max_total_spaces: 1000,
         space_expiration: {
           days: 2,
-          hours: 24,
+          hours: 10_000,
         },
-        spaces_archive_retention_days: 90,
+        spaces_archive_retention: { days: 90, hours: 0 },
       });
       expect(result.success).toBe(false);
     });
 
-    it("最大値 (365日23時間) を受け入れる", () => {
+    it("最大値 (9999日9999時間) を受け入れる", () => {
       const result = systemSettingsFormSchema.safeParse({
-        archive_retention_days: 7,
+        archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
         features: {
           gatekeeper: {
@@ -274,17 +274,17 @@ describe("systemSettingsFormSchema", () => {
         max_spaces_per_user: 5,
         max_total_spaces: 1000,
         space_expiration: {
-          days: 365,
-          hours: 23,
+          days: 9999,
+          hours: 9999,
         },
-        spaces_archive_retention_days: 90,
+        spaces_archive_retention: { days: 90, hours: 0 },
       });
       expect(result.success).toBe(true);
     });
 
     it("小数を拒否する (日数)", () => {
       const result = systemSettingsFormSchema.safeParse({
-        archive_retention_days: 7,
+        archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
         features: {
           gatekeeper: {
@@ -308,14 +308,14 @@ describe("systemSettingsFormSchema", () => {
           days: 2.5,
           hours: 0,
         },
-        spaces_archive_retention_days: 90,
+        spaces_archive_retention: { days: 90, hours: 0 },
       });
       expect(result.success).toBe(false);
     });
 
     it("小数を拒否する (時間)", () => {
       const result = systemSettingsFormSchema.safeParse({
-        archive_retention_days: 7,
+        archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
         features: {
           gatekeeper: {
@@ -339,7 +339,7 @@ describe("systemSettingsFormSchema", () => {
           days: 2,
           hours: 12.5,
         },
-        spaces_archive_retention_days: 90,
+        spaces_archive_retention: { days: 90, hours: 0 },
       });
       expect(result.success).toBe(false);
     });
