@@ -11,30 +11,11 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useEffectEvent } from "react";
 import { toast } from "sonner";
-import { InlineFieldError } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
-import { getErrorMessage } from "@/lib/utils/error-message";
 import { updateSystemSettingsAction } from "../_actions/system-settings";
 import {
   systemSettingsFormOpts,
@@ -45,11 +26,10 @@ interface Props {
   initialSettings?: SystemSettings;
 }
 
-export function SystemSettingsForm({ initialSettings }: Props) {
+export function AuthProvidersForm({ initialSettings }: Props) {
   const router = useRouter();
   const t = useTranslations("AdminSettings");
 
-  // Use TanStack Form with Next.js server actions
   const [state, action] = useActionState(updateSystemSettingsAction, undefined);
 
   const form = useForm({
@@ -58,7 +38,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
       ? {
           archive_retention_days: Math.round(
             initialSettings.archive_retention_hours / 24
-          ), // Convert hours to days for display
+          ),
           default_user_role: initialSettings.default_user_role,
           features: initialSettings.features,
           max_participants_per_space:
@@ -68,7 +48,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
           space_expiration_hours: initialSettings.space_expiration_hours,
           spaces_archive_retention_days: Math.round(
             initialSettings.spaces_archive_retention_hours / 24
-          ), // Convert hours to days for display
+          ),
         }
       : systemSettingsFormOpts.defaultValues,
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
@@ -89,24 +69,21 @@ export function SystemSettingsForm({ initialSettings }: Props) {
   );
   const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
-  // Get platform-level enabled states from nested form values
-  const formValues = useStore(form.store, (state) => state.values);
+  // biome-ignore lint/suspicious/noExplicitAny: TanStack Form store state type
+  const formValues = useStore(form.store, (state: any) => state.values);
   const youtubeEnabled =
     formValues.features?.gatekeeper?.youtube?.enabled ?? true;
   const twitchEnabled =
     formValues.features?.gatekeeper?.twitch?.enabled ?? true;
 
-  // Use useEffectEvent to separate event logic from effect dependencies
   const handleUpdateSuccess = useEffectEvent(() => {
     toast.success(t("updateSuccess"));
-    // Show success message briefly, then refresh
     setTimeout(() => {
       router.refresh();
     }, 1500);
   });
 
   useEffect(() => {
-    // Check for successful update
     const meta = (state as Record<string, unknown>)?.meta as
       | { success?: boolean }
       | undefined;
@@ -124,237 +101,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
     >
       <FormErrors errors={formErrors} variant="with-icon" />
 
-      <FieldSet>
-        <FieldLegend>リソース制限</FieldLegend>
-        <FieldGroup>
-          <form.Field name="max_participants_per_space">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={10_000}
-                    min={1}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
-                  <FieldDescription>
-                    {t("maxParticipantsHelp")}
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <InlineFieldError>
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </InlineFieldError>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
-
-          <form.Field name="max_spaces_per_user">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("maxSpacesPerUserLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={100}
-                    min={1}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
-                  <FieldDescription>
-                    {t("maxSpacesPerUserHelp")}
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <InlineFieldError>
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </InlineFieldError>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
-
-          <form.Field name="max_total_spaces">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("maxTotalSpacesLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={100_000}
-                    min={0}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
-                  <FieldDescription>{t("maxTotalSpacesHelp")}</FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <InlineFieldError>
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </InlineFieldError>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
-
-          <form.Field name="space_expiration_hours">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("spaceExpirationLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={8760}
-                    min={0}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
-                  <FieldDescription>
-                    {t("spaceExpirationHelp")}
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <InlineFieldError>
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </InlineFieldError>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
-
-          <form.Field name="archive_retention_days">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("archiveRetentionLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={365}
-                    min={0}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
-                  <FieldDescription>
-                    {t("archiveRetentionHelp")}
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <InlineFieldError>
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </InlineFieldError>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
-
-          <form.Field name="spaces_archive_retention_days">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("spacesArchiveRetentionLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={3650}
-                    min={0}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
-                  <FieldDescription>
-                    {t("spacesArchiveRetentionHelp")}
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <InlineFieldError>
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </InlineFieldError>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
-        </FieldGroup>
-      </FieldSet>
-
-      <FieldSet className="border-t pt-6">
-        <FieldLegend>{t("userSettingsTitle")}</FieldLegend>
-        <FieldGroup>
-          <form.Field name="default_user_role">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("defaultUserRoleLabel")}</FieldLabel>
-                  <Select
-                    disabled={isSubmitting}
-                    name={field.name}
-                    onValueChange={(value) =>
-                      field.handleChange(value as "organizer" | "user")
-                    }
-                    value={field.state.value as string}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="organizer">
-                        {t("roleOrganizer")}
-                      </SelectItem>
-                      <SelectItem value="user">{t("roleUser")}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FieldDescription>
-                    {t("defaultUserRoleHelp")}
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <p className="text-red-600 text-sm">
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </p>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
-        </FieldGroup>
-      </FieldSet>
-
-      <div className="space-y-4 border-t pt-6">
+      <div className="space-y-4">
         <h4 className="font-semibold text-base">{t("featureFlagsTitle")}</h4>
         <p className="text-gray-600 text-sm">{t("featureFlagsDescription")}</p>
 
@@ -366,7 +113,8 @@ export function SystemSettingsForm({ initialSettings }: Props) {
           {/* YouTube Platform */}
           <div className="space-y-2">
             <form.Field name="features.gatekeeper.youtube.enabled">
-              {(field) => (
+              {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+              {(field: any) => (
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     checked={field.state.value as boolean}
@@ -391,7 +139,8 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             {youtubeEnabled && (
               <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4">
                 <form.Field name="features.gatekeeper.youtube.member.enabled">
-                  {(field) => (
+                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                  {(field: any) => (
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         checked={field.state.value as boolean}
@@ -413,7 +162,8 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                 </form.Field>
 
                 <form.Field name="features.gatekeeper.youtube.subscriber.enabled">
-                  {(field) => (
+                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                  {(field: any) => (
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         checked={field.state.value as boolean}
@@ -440,7 +190,8 @@ export function SystemSettingsForm({ initialSettings }: Props) {
           {/* Twitch Platform */}
           <div className="space-y-2">
             <form.Field name="features.gatekeeper.twitch.enabled">
-              {(field) => (
+              {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+              {(field: any) => (
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     checked={field.state.value as boolean}
@@ -465,7 +216,8 @@ export function SystemSettingsForm({ initialSettings }: Props) {
             {twitchEnabled && (
               <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4">
                 <form.Field name="features.gatekeeper.twitch.follower.enabled">
-                  {(field) => (
+                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                  {(field: any) => (
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         checked={field.state.value as boolean}
@@ -487,7 +239,8 @@ export function SystemSettingsForm({ initialSettings }: Props) {
                 </form.Field>
 
                 <form.Field name="features.gatekeeper.twitch.subscriber.enabled">
-                  {(field) => (
+                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                  {(field: any) => (
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         checked={field.state.value as boolean}
@@ -513,7 +266,8 @@ export function SystemSettingsForm({ initialSettings }: Props) {
 
           {/* Email */}
           <form.Field name="features.gatekeeper.email.enabled">
-            {(field) => (
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
               <div className="flex items-center space-x-2">
                 <Checkbox
                   checked={field.state.value as boolean}
@@ -536,7 +290,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end border-t pt-6">
         <Button disabled={!canSubmit || isSubmitting} type="submit">
           {isSubmitting ? t("saving") : t("saveButton")}
         </Button>

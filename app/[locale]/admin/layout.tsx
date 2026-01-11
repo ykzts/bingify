@@ -119,9 +119,33 @@ function AdminNav({ locale }: { locale: string }) {
         <li>
           <Link
             className="inline-block border-transparent border-b-2 pb-4 hover:border-blue-500"
-            href={`/${locale}/admin/settings`}
+            href={`/${locale}/admin/general`}
           >
-            {t("navSettings")}
+            {t("navGeneral")}
+          </Link>
+        </li>
+        <li>
+          <Link
+            className="inline-block border-transparent border-b-2 pb-4 hover:border-blue-500"
+            href={`/${locale}/admin/resource-limits`}
+          >
+            {t("navResourceLimits")}
+          </Link>
+        </li>
+        <li>
+          <Link
+            className="inline-block border-transparent border-b-2 pb-4 hover:border-blue-500"
+            href={`/${locale}/admin/expiration-archive`}
+          >
+            {t("navExpirationArchive")}
+          </Link>
+        </li>
+        <li>
+          <Link
+            className="inline-block border-transparent border-b-2 pb-4 hover:border-blue-500"
+            href={`/${locale}/admin/gatekeeper`}
+          >
+            {t("navGatekeeper")}
           </Link>
         </li>
       </ul>
