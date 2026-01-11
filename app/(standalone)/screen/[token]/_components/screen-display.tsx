@@ -225,7 +225,7 @@ export function ScreenDisplay({
 
   // Use useEffectEvent for participants update handling
   const onParticipantUpdate = useEffectEvent(
-    (payload: { new: ParticipantUpdate }) => {
+    async (payload: { new: ParticipantUpdate }) => {
       const updated = payload.new;
 
       // Validate payload structure (check for null/undefined, not falsy values)
@@ -254,7 +254,15 @@ export function ScreenDisplay({
           clearTimeout(notificationTimeoutRef.current);
         }
 
-        const displayName = updated.profiles?.full_name || t("guestName");
+        // Fetch profile information from profiles table
+        const supabase = createClient();
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", updated.user_id)
+          .single();
+
+        const displayName = profile?.full_name || t("guestName");
         const messageKey =
           updated.bingo_status === "bingo"
             ? "notificationBingo"
