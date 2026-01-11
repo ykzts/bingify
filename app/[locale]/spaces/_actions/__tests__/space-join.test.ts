@@ -242,9 +242,7 @@ describe("getSpacePublicInfo", () => {
     expect(result).not.toBeNull();
     expect(result?.gatekeeper_rules?.twitch?.requirement).toBe("follower");
     expect(result?.gatekeeper_rules?.twitch?.broadcasterId).toBe("12345678");
-    expect(result?.gatekeeper_rules?.twitch?.display_name).toBe(
-      "TestStreamer"
-    );
+    expect(result?.gatekeeper_rules?.twitch?.display_name).toBe("TestStreamer");
     expect(result?.gatekeeper_rules?.twitch?.username).toBe("teststreamer");
     expect(result?.gatekeeper_rules?.twitch?.profile_image_url).toBe(
       "https://static-cdn.jtvnw.net/test.jpg"
