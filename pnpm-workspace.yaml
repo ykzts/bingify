@@ -1,8 +1,9 @@
-ignoredBuiltDependencies:
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - '@swc/core'
+  - esbuild
   - sharp
+  - supabase
   - unrs-resolver
 
-onlyBuiltDependencies:
-  - supabase
-
-savePrefix: ""
+savePrefix: ''

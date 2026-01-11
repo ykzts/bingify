@@ -114,5 +114,6 @@
     "type-check": "tsc --noEmit",
     "typegen": "next typegen"
   },
+  "type": "module",
   "version": "0.1.0"
 }
