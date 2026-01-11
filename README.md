@@ -138,7 +138,7 @@ lib/
 - `pnpm local:stop` — Supabaseローカルインスタンス停止
 - `pnpm supabase:test` — データベーステスト実行 (PgTAP)
 - `pnpm supabase:typegen` — Supabaseの型定義を生成 (DB 変更後に実行)
-- `pnpm lint` — ESLint 実行
+- `pnpm lint` — コードチェック (Ultracite)
 - `pnpm test` — フロントエンドテスト実行 (Vitest)
 
 ## データベーステスト

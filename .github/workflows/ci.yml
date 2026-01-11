@@ -31,7 +31,7 @@ jobs:
       - name: Generate types
         run: pnpm typegen
 
-      - name: Run Biome checks
+      - name: Run Ultracite checks
         run: pnpm check:ci --reporter=github
 
       - name: Type check
