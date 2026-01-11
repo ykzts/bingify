@@ -511,6 +511,7 @@ export function SpaceSettingsForm({
         className="space-y-6"
         noValidate
         onSubmit={(e) => {
+          e.preventDefault();
           // TODO: Remove debug logging after verification
           const formData = new FormData(e.currentTarget);
           console.log("=== FormData Debug ===");
