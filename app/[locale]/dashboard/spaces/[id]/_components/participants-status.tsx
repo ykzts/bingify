@@ -63,12 +63,34 @@ function showStatusNotification(
 }
 
 /**
+ * Fetch participant profile from profiles table
+ */
+async function fetchParticipantProfile(
+  userId: string
+): Promise<{ avatar_url: string | null; full_name: string | null } | null> {
+  const supabase = createClient();
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("full_name, avatar_url")
+    .eq("id", userId)
+    .single();
+
+  if (profileError) {
+    console.warn(`Failed to fetch profile for user ${userId}:`, profileError);
+    return null;
+  }
+
+  return profile;
+}
+
+/**
  * Update and sort participant list
  */
 function updateParticipantList(
   participants: Participant[],
   updatedId: string,
-  newStatus: "none" | "reach" | "bingo"
+  newStatus: "none" | "reach" | "bingo",
+  profiles?: { avatar_url: string | null; full_name: string | null } | null
 ): Participant[] {
   const index = participants.findIndex((p) => p.id === updatedId);
   if (index === -1) {
@@ -79,6 +101,8 @@ function updateParticipantList(
   newList[index] = {
     ...newList[index],
     bingo_status: newStatus,
+    // Update profiles if provided
+    ...(profiles !== undefined && { profiles }),
   };
 
   // Sort by bingo status (bingo > reach > none) then by joined_at
@@ -118,36 +142,55 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
   } | null>(null);
 
   // Use useEffectEvent to separate event logic from effect dependencies
-  const onUpdate = useEffectEvent((payload: { new: ParticipantUpdate }) => {
-    const updated = payload.new;
+  const onUpdate = useEffectEvent(
+    async (payload: { new: ParticipantUpdate }) => {
+      const updated = payload.new;
 
-    // Validate payload structure
-    if (!(updated?.id && updated.user_id && updated.bingo_status)) {
-      console.error("Invalid participant update payload:", payload);
-      return;
-    }
-
-    // Validate bingo_status value
-    if (!["none", "reach", "bingo"].includes(updated.bingo_status)) {
-      console.error("Invalid bingo_status value:", updated.bingo_status);
-      return;
-    }
-
-    // Update the participant in the list
-    queryClient.setQueryData<Participant[]>(
-      ["participants", spaceId],
-      (prev) => {
-        if (!prev) {
-          return [];
-        }
-        const currentParticipant = prev.find((p) => p.id === updated.id);
-        if (currentParticipant) {
-          showStatusNotification(currentParticipant, updated.bingo_status, t);
-        }
-        return updateParticipantList(prev, updated.id, updated.bingo_status);
+      // Validate payload structure
+      if (!(updated?.id && updated.user_id && updated.bingo_status)) {
+        console.error("Invalid participant update payload:", payload);
+        return;
       }
-    );
-  });
+
+      // Validate bingo_status value
+      if (!["none", "reach", "bingo"].includes(updated.bingo_status)) {
+        console.error("Invalid bingo_status value:", updated.bingo_status);
+        return;
+      }
+
+      // Fetch updated profile information from profiles table
+      const profile = await fetchParticipantProfile(updated.user_id);
+
+      // Update the participant in the list
+      queryClient.setQueryData<Participant[]>(
+        ["participants", spaceId],
+        (prev) => {
+          if (!prev) {
+            return [];
+          }
+          const currentParticipant = prev.find((p) => p.id === updated.id);
+          if (currentParticipant) {
+            // Create updated participant with fresh profile data for notification
+            const participantWithProfile = {
+              ...currentParticipant,
+              profiles: profile,
+            };
+            showStatusNotification(
+              participantWithProfile,
+              updated.bingo_status,
+              t
+            );
+          }
+          return updateParticipantList(
+            prev,
+            updated.id,
+            updated.bingo_status,
+            profile
+          );
+        }
+      );
+    }
+  );
 
   const onInsert = useEffectEvent(() => {
     // Refetch participants when a new one joins
