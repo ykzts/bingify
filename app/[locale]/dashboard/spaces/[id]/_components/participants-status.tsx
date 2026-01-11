@@ -149,8 +149,12 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
     async (payload: { new: ParticipantUpdate }) => {
       const updated = payload.new;
 
-      // Validate payload structure
-      if (!(updated?.id && updated.user_id && updated.bingo_status)) {
+      // Validate payload structure (check for null/undefined, not falsy values)
+      if (
+        updated?.id == null ||
+        updated.user_id == null ||
+        updated.bingo_status == null
+      ) {
         console.error("Invalid participant update payload:", payload);
         return;
       }
