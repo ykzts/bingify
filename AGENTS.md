@@ -96,6 +96,43 @@ pnpm dev
 - コメントは最小限、必要な箇所のみ。
 - JSON および JS のオブジェクトキーは原則アルファベット順に並べること（設定ファイルや `package.json` の `dependencies`/`devDependencies` など）。必要に応じて ESLint の `sort-keys` で警告運用。
 
+## サンプルドメインの使用
+
+コード例やドキュメント内でサンプルURLやメールアドレスを使用する際は、**RFC 2606** で定義された予約済みドメイン名を使用すること。
+
+**使用すべきドメイン:**
+
+- `example.com`
+- `example.org`
+- `example.net`
+
+**適用箇所:**
+
+- コード例 (テスト、ドキュメント内のコードブロック)
+- メールアドレスの例示
+- URLの例示
+- API リクエスト/レスポンスの例
+
+**例:**
+
+```typescript
+// ✅ 正しい
+const email = "user@example.com";
+const url = "https://example.com/callback";
+
+// ❌ 誤り (実在するドメインを使用しない)
+const email = "user@mysite.com";
+const url = "https://mycompany.com/callback";
+```
+
+**目的:**
+
+- 実在するドメインの誤使用を防ぐ
+- 標準的なサンプルドメインを統一して使用
+- ドキュメントの品質と安全性を向上
+
+**参考:** [RFC 2606 - Reserved Top Level DNS Names](https://www.rfc-editor.org/rfc/rfc2606.html)
+
 ## 重要なパス
 
 - Pages: `app/[locale]/dashboard/`, `app/[locale]/spaces/`
