@@ -751,9 +751,6 @@ export function SpaceSettingsForm({
                             <form.Field name="youtube_channel_id">
                               {(field) => (
                                 <YoutubeChannelIdField
-                                  canUseMemberSubscriber={
-                                    canUseYoutubeMemberSubscriber
-                                  }
                                   enteredChannelId={enteredYoutubeChannelId}
                                   field={field}
                                   isPending={isGatekeeperDisabled}
