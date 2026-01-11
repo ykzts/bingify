@@ -240,9 +240,11 @@ export function ScreenDisplay({
       }
 
       // Show notification for bingo or reach
-      if (updated.bingo_status === "bingo" || updated.bingo_status === "reach") {
-        const displayName =
-          updated.profiles?.full_name || t("guestName");
+      if (
+        updated.bingo_status === "bingo" ||
+        updated.bingo_status === "reach"
+      ) {
+        const displayName = updated.profiles?.full_name || t("guestName");
         const messageKey =
           updated.bingo_status === "bingo"
             ? "notificationBingo"

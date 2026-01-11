@@ -12,10 +12,7 @@ interface NotificationBannerProps {
  * アニメーション付き通知バナーコンポーネント
  * ビンゴまたはリーチ達成時に画面上部に表示される
  */
-export function NotificationBanner({
-  message,
-  type,
-}: NotificationBannerProps) {
+export function NotificationBanner({ message, type }: NotificationBannerProps) {
   // ビンゴとリーチで異なるスタイルを適用
   const isBingo = type === "bingo";
 
@@ -27,7 +24,7 @@ export function NotificationBanner({
         y: 0,
       }}
       className={cn(
-        "fixed left-1/2 top-8 z-50 -translate-x-1/2 rounded-2xl px-8 py-6 shadow-2xl backdrop-blur-md",
+        "fixed top-8 left-1/2 z-50 -translate-x-1/2 rounded-2xl px-8 py-6 shadow-2xl backdrop-blur-md",
         isBingo
           ? "bg-gradient-to-r from-yellow-400 to-orange-500"
           : "bg-gradient-to-r from-blue-400 to-purple-500"
