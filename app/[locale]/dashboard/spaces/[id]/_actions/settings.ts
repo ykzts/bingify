@@ -12,9 +12,11 @@ import { getOAuthToken } from "@/lib/oauth/token-storage";
 import { updateSpaceFormSchema } from "@/lib/schemas/space";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
+import { getUserTwitchId } from "@/lib/twitch";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { SpaceAdmin } from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";
+import { getUserYouTubeChannelId } from "@/lib/youtube";
 import { spaceSettingsFormOpts } from "../_lib/form-options";
 
 // Email validation regex at top level for performance
@@ -375,6 +377,85 @@ export async function updateSpaceSettings(
           `現在の参加者数（${currentParticipantCount}人）より少ない人数には設定できません。`,
         ],
       };
+    }
+
+    // Validation 3: Verify channel ownership for YouTube and Twitch
+    // YouTube channel ownership verification
+    if (
+      gatekeeperMode === "social" &&
+      socialPlatform === "youtube" &&
+      youtubeChannelId &&
+      youtubeRequirement !== "none"
+    ) {
+      // Get user's YouTube OAuth token
+      const tokenResult = await getOAuthToken(supabase, "google");
+      if (tokenResult.success && tokenResult.access_token) {
+        // Get the authenticated user's YouTube channel ID
+        const channelResult = await getUserYouTubeChannelId(
+          tokenResult.access_token
+        );
+
+        // Verify the submitted channel ID matches the authenticated user's channel
+        if (
+          channelResult.error ||
+          !channelResult.channelId ||
+          channelResult.channelId !== youtubeChannelId
+        ) {
+          return {
+            ...initialFormState,
+            errorMap: {
+              youtube_channel_id:
+                "YouTubeチャンネルIDは、認証されたアカウントのチャンネルIDと一致する必要があります。「自分のIDを取得」ボタンを使用してください。",
+            },
+            errors: [
+              "YouTubeチャンネルIDは、認証されたアカウントのチャンネルIDと一致する必要があります。",
+            ],
+          };
+        }
+      } else {
+        return {
+          ...initialFormState,
+          errors: ["errorYoutubeNotLinked"],
+        };
+      }
+    }
+
+    // Twitch broadcaster ownership verification
+    if (
+      gatekeeperMode === "social" &&
+      socialPlatform === "twitch" &&
+      twitchBroadcasterId &&
+      twitchRequirement !== "none"
+    ) {
+      // Get user's Twitch OAuth token
+      const tokenResult = await getOAuthToken(supabase, "twitch");
+      if (tokenResult.success && tokenResult.access_token) {
+        // Get the authenticated user's Twitch user ID
+        const userIdResult = await getUserTwitchId(tokenResult.access_token);
+
+        // Verify the submitted broadcaster ID matches the authenticated user's ID
+        if (
+          userIdResult.error ||
+          !userIdResult.userId ||
+          userIdResult.userId !== twitchBroadcasterId
+        ) {
+          return {
+            ...initialFormState,
+            errorMap: {
+              twitch_broadcaster_id:
+                "Twitch配信者IDは、認証されたアカウントのIDと一致する必要があります。「自分のIDを取得」ボタンを使用してください。",
+            },
+            errors: [
+              "Twitch配信者IDは、認証されたアカウントのIDと一致する必要があります。",
+            ],
+          };
+        }
+      } else {
+        return {
+          ...initialFormState,
+          errors: ["errorTwitchNotLinked"],
+        };
+      }
     }
 
     // Build exclusive gatekeeper_rules based on selected mode
