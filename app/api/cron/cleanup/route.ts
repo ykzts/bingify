@@ -46,12 +46,12 @@ export async function GET(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // システム設定から archive_retention_days と spaces_archive_retention_days を取得
+    // システム設定から archive_retention_hours と spaces_archive_retention_hours を取得
     const { data: systemSettings, error: settingsError } = await supabase
       .from("system_settings")
       .select("archive_retention_hours, spaces_archive_retention_hours")
       .eq("id", 1)
-      .single();
+      .maybeSingle();
 
     if (settingsError) {
       console.error("Error fetching system settings:", settingsError);
@@ -89,18 +89,19 @@ export async function GET(request: NextRequest) {
     }
 
     // Step 1: システム設定に基づいて有効期限切れスペースを closed としてマーク
-    const { data: expirationResult, error: expirationError } =
-      await supabase.rpc("cleanup_expired_spaces");
+    const { data: closedResult, error: closedError } = await supabase.rpc(
+      "cleanup_expired_spaces"
+    );
 
-    if (expirationError) {
-      console.error("Error marking expired spaces:", expirationError);
-      // 有効期限マーキングが失敗してもアーカイブクリーンアップは継続
+    if (closedError) {
+      console.error("Error marking spaces as closed:", closedError);
+      // closed マーキングが失敗してもアーカイブクリーンアップは継続
     }
 
-    const expiredCount = expirationResult?.[0]?.expired_count || 0;
+    const markedClosedCount = closedResult?.[0]?.expired_count || 0;
 
     console.log(
-      `Marked ${expiredCount} space(s) as closed based on system settings`
+      `Marked ${markedClosedCount} space(s) as closed based on system settings`
     );
 
     // Step 2: archive_retention_hours より古い closed スペースをアーカイブして削除
@@ -168,8 +169,8 @@ export async function GET(request: NextRequest) {
       data: {
         archivedCount,
         deletedArchiveCount,
-        expiredCount,
-        message: `Successfully marked ${expiredCount} space(s) as closed, archived ${archivedCount} closed space(s) older than ${Math.round(validArchiveRetentionHours / 24)} days, and deleted ${deletedArchiveCount} archived record(s) older than ${Math.round(validSpacesArchiveRetentionHours / 24)} days`,
+        markedClosedCount,
+        message: `Successfully marked ${markedClosedCount} space(s) as closed, archived ${archivedCount} closed space(s) older than ${Math.round(validArchiveRetentionHours / 24)} days, and deleted ${deletedArchiveCount} archived record(s) older than ${Math.round(validSpacesArchiveRetentionHours / 24)} days`,
         retentionHours: {
           archive: validArchiveRetentionHours,
           spacesArchive: validSpacesArchiveRetentionHours,
