@@ -190,7 +190,7 @@ const url = "https://mycompany.com/callback";
 コミット前に必ず以下のスクリプトを実行し、すべてが成功することを確認してください：
 
 ```bash
-# Biome による Lint & Format チェック
+# Ultracite による Lint & Format チェック
 pnpm check
 
 # TypeScript 型チェック
