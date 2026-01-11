@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSystemSettings } from "@/lib/data/system-settings";
-import { ExpirationArchiveForm } from "../settings/_components/expiration-archive-form";
+import { ExpirationArchiveForm } from "./_components/expiration-archive-form";
 
 export const dynamic = "force-dynamic";
 

@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSystemSettings } from "@/lib/data/system-settings";
-import { AuthProvidersForm } from "../settings/_components/auth-providers-form";
+import { AuthProvidersForm } from "./_components/auth-providers-form";
 
 export const dynamic = "force-dynamic";
 
