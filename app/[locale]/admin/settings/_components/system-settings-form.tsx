@@ -11,35 +11,19 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useEffectEvent } from "react";
 import { toast } from "sonner";
-import { InlineFieldError } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
-import { getErrorMessage } from "@/lib/utils/error-message";
 import { updateSystemSettingsAction } from "../_actions/system-settings";
 import {
   systemSettingsFormOpts,
   systemSettingsFormSchema,
 } from "../_lib/form-options";
+import { AuthProvidersTab } from "./auth-providers-tab";
+import { ExpirationArchiveTab } from "./expiration-archive-tab";
+import { GeneralSettingsTab } from "./general-settings-tab";
+import { ResourceLimitsTab } from "./resource-limits-tab";
 
 interface Props {
   initialSettings?: SystemSettings;
@@ -89,13 +73,6 @@ export function SystemSettingsForm({ initialSettings }: Props) {
   );
   const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
-  // Get platform-level enabled states from nested form values
-  const formValues = useStore(form.store, (state) => state.values);
-  const youtubeEnabled =
-    formValues.features?.gatekeeper?.youtube?.enabled ?? true;
-  const twitchEnabled =
-    formValues.features?.gatekeeper?.twitch?.enabled ?? true;
-
   // Use useEffectEvent to separate event logic from effect dependencies
   const handleUpdateSuccess = useEffectEvent(() => {
     toast.success(t("updateSuccess"));
@@ -124,419 +101,38 @@ export function SystemSettingsForm({ initialSettings }: Props) {
     >
       <FormErrors errors={formErrors} variant="with-icon" />
 
-      <FieldSet>
-        <FieldLegend>リソース制限</FieldLegend>
-        <FieldGroup>
-          <form.Field name="max_participants_per_space">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={10_000}
-                    min={1}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
-                  <FieldDescription>
-                    {t("maxParticipantsHelp")}
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <InlineFieldError>
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </InlineFieldError>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
+      <Tabs defaultValue="general">
+        <TabsList>
+          <TabsTrigger value="general">{t("generalTitle")}</TabsTrigger>
+          <TabsTrigger value="resource-limits">
+            {t("resourceLimitsTitle")}
+          </TabsTrigger>
+          <TabsTrigger value="expiration-archive">
+            {t("expirationArchiveTitle")}
+          </TabsTrigger>
+          <TabsTrigger value="auth-providers">
+            {t("authProvidersTitle")}
+          </TabsTrigger>
+        </TabsList>
 
-          <form.Field name="max_spaces_per_user">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("maxSpacesPerUserLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={100}
-                    min={1}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
-                  <FieldDescription>
-                    {t("maxSpacesPerUserHelp")}
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <InlineFieldError>
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </InlineFieldError>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
+        <TabsContent value="general">
+          <GeneralSettingsTab form={form} isSubmitting={isSubmitting} />
+        </TabsContent>
 
-          <form.Field name="max_total_spaces">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("maxTotalSpacesLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={100_000}
-                    min={0}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
-                  <FieldDescription>{t("maxTotalSpacesHelp")}</FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <InlineFieldError>
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </InlineFieldError>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
+        <TabsContent value="resource-limits">
+          <ResourceLimitsTab form={form} isSubmitting={isSubmitting} />
+        </TabsContent>
 
-          <form.Field name="space_expiration_hours">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("spaceExpirationLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={8760}
-                    min={0}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
-                  <FieldDescription>
-                    {t("spaceExpirationHelp")}
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <InlineFieldError>
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </InlineFieldError>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
+        <TabsContent value="expiration-archive">
+          <ExpirationArchiveTab form={form} isSubmitting={isSubmitting} />
+        </TabsContent>
 
-          <form.Field name="archive_retention_days">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("archiveRetentionLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={365}
-                    min={0}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
-                  <FieldDescription>
-                    {t("archiveRetentionHelp")}
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <InlineFieldError>
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </InlineFieldError>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
+        <TabsContent value="auth-providers">
+          <AuthProvidersTab form={form} isSubmitting={isSubmitting} />
+        </TabsContent>
+      </Tabs>
 
-          <form.Field name="spaces_archive_retention_days">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("spacesArchiveRetentionLabel")}</FieldLabel>
-                  <Input
-                    disabled={isSubmitting}
-                    max={3650}
-                    min={0}
-                    name={field.name}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      field.handleChange(Number.isNaN(parsed) ? 0 : parsed);
-                    }}
-                    required
-                    type="number"
-                    value={field.state.value as number}
-                  />
-                  <FieldDescription>
-                    {t("spacesArchiveRetentionHelp")}
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <InlineFieldError>
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </InlineFieldError>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
-        </FieldGroup>
-      </FieldSet>
-
-      <FieldSet className="border-t pt-6">
-        <FieldLegend>{t("userSettingsTitle")}</FieldLegend>
-        <FieldGroup>
-          <form.Field name="default_user_role">
-            {(field) => (
-              <Field>
-                <FieldContent>
-                  <FieldLabel>{t("defaultUserRoleLabel")}</FieldLabel>
-                  <Select
-                    disabled={isSubmitting}
-                    name={field.name}
-                    onValueChange={(value) =>
-                      field.handleChange(value as "organizer" | "user")
-                    }
-                    value={field.state.value as string}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="organizer">
-                        {t("roleOrganizer")}
-                      </SelectItem>
-                      <SelectItem value="user">{t("roleUser")}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FieldDescription>
-                    {t("defaultUserRoleHelp")}
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <p className="text-red-600 text-sm">
-                      {getErrorMessage(field.state.meta.errors[0])}
-                    </p>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
-        </FieldGroup>
-      </FieldSet>
-
-      <div className="space-y-4 border-t pt-6">
-        <h4 className="font-semibold text-base">{t("featureFlagsTitle")}</h4>
-        <p className="text-gray-600 text-sm">{t("featureFlagsDescription")}</p>
-
-        <div className="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <h5 className="font-medium text-sm">
-            {t("gatekeeperFeaturesTitle")}
-          </h5>
-
-          {/* YouTube Platform */}
-          <div className="space-y-2">
-            <form.Field name="features.gatekeeper.youtube.enabled">
-              {(field) => (
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={field.state.value as boolean}
-                    disabled={isSubmitting}
-                    id="features.gatekeeper.youtube.enabled"
-                    name={field.name}
-                    onCheckedChange={(checked) =>
-                      field.handleChange(checked === true)
-                    }
-                  />
-                  <Label
-                    className="cursor-pointer font-normal"
-                    htmlFor="features.gatekeeper.youtube.enabled"
-                  >
-                    {t("gatekeeperYoutubeLabel")}
-                  </Label>
-                </div>
-              )}
-            </form.Field>
-
-            {/* YouTube Requirement Types */}
-            {youtubeEnabled && (
-              <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4">
-                <form.Field name="features.gatekeeper.youtube.member.enabled">
-                  {(field) => (
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={field.state.value as boolean}
-                        disabled={isSubmitting}
-                        id="features.gatekeeper.youtube.member.enabled"
-                        name={field.name}
-                        onCheckedChange={(checked) =>
-                          field.handleChange(checked === true)
-                        }
-                      />
-                      <Label
-                        className="cursor-pointer font-normal text-sm"
-                        htmlFor="features.gatekeeper.youtube.member.enabled"
-                      >
-                        {t("youtubeMemberLabel")}
-                      </Label>
-                    </div>
-                  )}
-                </form.Field>
-
-                <form.Field name="features.gatekeeper.youtube.subscriber.enabled">
-                  {(field) => (
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={field.state.value as boolean}
-                        disabled={isSubmitting}
-                        id="features.gatekeeper.youtube.subscriber.enabled"
-                        name={field.name}
-                        onCheckedChange={(checked) =>
-                          field.handleChange(checked === true)
-                        }
-                      />
-                      <Label
-                        className="cursor-pointer font-normal text-sm"
-                        htmlFor="features.gatekeeper.youtube.subscriber.enabled"
-                      >
-                        {t("youtubeSubscriberLabel")}
-                      </Label>
-                    </div>
-                  )}
-                </form.Field>
-              </div>
-            )}
-          </div>
-
-          {/* Twitch Platform */}
-          <div className="space-y-2">
-            <form.Field name="features.gatekeeper.twitch.enabled">
-              {(field) => (
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={field.state.value as boolean}
-                    disabled={isSubmitting}
-                    id="features.gatekeeper.twitch.enabled"
-                    name={field.name}
-                    onCheckedChange={(checked) =>
-                      field.handleChange(checked === true)
-                    }
-                  />
-                  <Label
-                    className="cursor-pointer font-normal"
-                    htmlFor="features.gatekeeper.twitch.enabled"
-                  >
-                    {t("gatekeeperTwitchLabel")}
-                  </Label>
-                </div>
-              )}
-            </form.Field>
-
-            {/* Twitch Requirement Types */}
-            {twitchEnabled && (
-              <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4">
-                <form.Field name="features.gatekeeper.twitch.follower.enabled">
-                  {(field) => (
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={field.state.value as boolean}
-                        disabled={isSubmitting}
-                        id="features.gatekeeper.twitch.follower.enabled"
-                        name={field.name}
-                        onCheckedChange={(checked) =>
-                          field.handleChange(checked === true)
-                        }
-                      />
-                      <Label
-                        className="cursor-pointer font-normal text-sm"
-                        htmlFor="features.gatekeeper.twitch.follower.enabled"
-                      >
-                        {t("twitchFollowerLabel")}
-                      </Label>
-                    </div>
-                  )}
-                </form.Field>
-
-                <form.Field name="features.gatekeeper.twitch.subscriber.enabled">
-                  {(field) => (
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={field.state.value as boolean}
-                        disabled={isSubmitting}
-                        id="features.gatekeeper.twitch.subscriber.enabled"
-                        name={field.name}
-                        onCheckedChange={(checked) =>
-                          field.handleChange(checked === true)
-                        }
-                      />
-                      <Label
-                        className="cursor-pointer font-normal text-sm"
-                        htmlFor="features.gatekeeper.twitch.subscriber.enabled"
-                      >
-                        {t("twitchSubscriberLabel")}
-                      </Label>
-                    </div>
-                  )}
-                </form.Field>
-              </div>
-            )}
-          </div>
-
-          {/* Email */}
-          <form.Field name="features.gatekeeper.email.enabled">
-            {(field) => (
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  checked={field.state.value as boolean}
-                  disabled={isSubmitting}
-                  id="features.gatekeeper.email.enabled"
-                  name={field.name}
-                  onCheckedChange={(checked) =>
-                    field.handleChange(checked === true)
-                  }
-                />
-                <Label
-                  className="cursor-pointer font-normal"
-                  htmlFor="features.gatekeeper.email.enabled"
-                >
-                  {t("gatekeeperEmailLabel")}
-                </Label>
-              </div>
-            )}
-          </form.Field>
-        </div>
-      </div>
-
-      <div className="flex justify-end">
+      <div className="flex justify-end border-t pt-6">
         <Button disabled={!canSubmit || isSubmitting} type="submit">
           {isSubmitting ? t("saving") : t("saveButton")}
         </Button>

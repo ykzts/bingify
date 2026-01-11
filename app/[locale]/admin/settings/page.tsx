@@ -45,9 +45,6 @@ export default async function AdminSettingsPage({
       )}
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h3 className="mb-4 font-semibold text-lg">
-          {t("resourceLimitsTitle")}
-        </h3>
         <SystemSettingsForm initialSettings={settings} />
       </div>
     </div>
