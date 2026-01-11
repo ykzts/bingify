@@ -29,7 +29,7 @@ Supabaseの Personal Access Tokenです。
 
 **取得方法:**
 
-1. [Supabase Dashboard] (https://supabase.com/dashboard) にログイン
+1. [Supabase Dashboard](https://supabase.com/dashboard) にログイン
 2. 右上のアカウントメニューから **Account Settings** を開く
 3. **Access Tokens** タブを選択
 4. **Generate new token** をクリック
@@ -48,7 +48,7 @@ Supabaseプロジェクトの Project Reference IDです。
 
 **取得方法:**
 
-1. [Supabase Dashboard] (https://supabase.com/dashboard) でプロジェクトを開く
+1. [Supabase Dashboard](https://supabase.com/dashboard) でプロジェクトを開く
 2. Settings > Generalを選択
 3. **Reference ID** をコピー (例: `abcdefghijklmnop`)
 4. GitHubリポジトリの Secretsに `SUPABASE_PROJECT_ID` として保存
@@ -430,6 +430,6 @@ ALTER TABLE spaces DROP COLUMN IF EXISTS new_column;
 
 ## 参考リンク
 
-- [Supabase CLIドキュメント] (https://supabase.com/docs/guides/cli)
-- [Supabaseマイグレーションガイド] (https://supabase.com/docs/guides/cli/local-development#database-migrations)
-- [GitHub Actionsドキュメント] (https://docs.github.com/actions)
+- [Supabase CLIドキュメント](https://supabase.com/docs/guides/cli)
+- [Supabaseマイグレーションガイド](https://supabase.com/docs/guides/cli/local-development#database-migrations)
+- [GitHub Actionsドキュメント](https://docs.github.com/actions)

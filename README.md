@@ -51,7 +51,7 @@ pnpm local:setup
 pnpm dev
 ```
 
-アプリケーションは [http://localhost:3000] (http://localhost:3000) で起動します。
+アプリケーションは [http://localhost:3000](http://localhost:3000) で起動します。
 
 ### 4. ローカルインスタンスの停止
 
@@ -143,7 +143,7 @@ lib/
 
 ## データベーステスト
 
-Bingifyでは [PgTAP] (https://pgtap.org/) を使用してデータベース層のテストを実施しています。これにより、RLS (Row Level Security) ポリシーやスキーマ定義が意図通りに動作することを検証できます。
+Bingifyでは [PgTAP](https://pgtap.org/) を使用してデータベース層のテストを実施しています。これにより、RLS (Row Level Security) ポリシーやスキーマ定義が意図通りに動作することを検証できます。
 
 ### テストの実行
 
@@ -164,7 +164,7 @@ pnpm supabase:test
 
 ### 新しいテストの追加
 
-新しいデータベーステストを追加する場合は、`supabase/tests/database/` ディレクトリに `.sql` ファイルを作成してください。PgTAPの関数を使用してテストを記述します。詳細は [PgTAPドキュメント] (https://pgtap.org/documentation.html) を参照してください。
+新しいデータベーステストを追加する場合は、`supabase/tests/database/` ディレクトリに `.sql` ファイルを作成してください。PgTAPの関数を使用してテストを記述します。詳細は [PgTAPドキュメント](https://pgtap.org/documentation.html) を参照してください。
 
 ## 環境変数
 
@@ -180,7 +180,7 @@ pnpm supabase:test
 
 - **既に適用済みのマイグレーションファイル (mainブランチに存在するファイル) は絶対に編集しないでください**
 - Supabaseは一度適用されたマイグレーションを再実行しないため、既存ファイルの編集は新規環境にのみ反映され、環境間の不整合を引き起こします
-- 変更が必要な場合は、必ず新しいマイグレーションファイルを作成してください (詳細は [docs/MIGRATIONS.md] (docs/MIGRATIONS.md) を参照)
+- 変更が必要な場合は、必ず新しいマイグレーションファイルを作成してください (詳細は [docs/MIGRATIONS.md](docs/MIGRATIONS.md) を参照)
 - マイグレーションファイルをリポジトリから削除しても、Cloud Supabaseに適用済みのマイグレーションは削除されません
 - ロールバックが必要な場合は、新しいマイグレーションファイルで明示的にロールバックSQLを記述してください
 
@@ -194,7 +194,7 @@ pnpm supabase:test
 
 **必要な GitHub Secrets:**
 
-- `SUPABASE_ACCESS_TOKEN` — Supabaseの Personal Access Token ([Settings > Access Tokens] (https://supabase.com/dashboard/account/tokens) から取得)
+- `SUPABASE_ACCESS_TOKEN` — Supabaseの Personal Access Token ([Settings > Access Tokens](https://supabase.com/dashboard/account/tokens) から取得)
 - `SUPABASE_PROJECT_ID` — Supabaseプロジェクトの Project Reference ID (プロジェクト設定から確認可能)
 
 ### 手動デプロイ
@@ -263,5 +263,5 @@ type BingoCard = Tables<"bingo_cards">;
 
 // Database 型を使用して Supabaseクライアントを型付け
 import { createClient } from "@supabase/supabase-js";
-const supabase = createClient<Database> (url, key);
+const supabase = createClient<Database>(url, key);
 ```

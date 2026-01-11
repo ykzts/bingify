@@ -7,7 +7,7 @@
 - AI (Cursor/Copilot) にコードを書かせる際は、可能な限りこのファイルをコンテキスト (`@docs/GLOSSARY.md`) に含めるか、参照させるようにしてください。
 - 新しい概念が登場した際は、随時このファイルを更新してください。
 - 用語の定義は、コード上の命名と一致させることを心がけてください。
-- **日本語・英語の表記ルールについては [STYLE_GUIDE.md] (STYLE_GUIDE.md) を参照してください。**
+- **日本語・英語の表記ルールについては [STYLE_GUIDE.md](STYLE_GUIDE.md) を参照してください。**
 
 ## UI表示における用語統一ルール
 
@@ -213,7 +213,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 ### 3.6 Proxy (プロキシ)
 
-- **定義**: Next.jsの Proxy (旧 Middleware) 。リクエストを処理し、URL書き換えやアクセス制御を行う
+- **定義**: Next.jsの Proxy (旧 Middleware)。リクエストを処理し、URL書き換えやアクセス制御を行う
 - **英語**: Proxy
 - **日本語**: プロキシ
 - **コード上の命名**:
@@ -356,7 +356,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 ### 7.4 Supabase
 
 - **定義**: オープンソースのFirebase代替サービス
-- **用途**: データベース (PostgreSQL) 、リアルタイム同期、認証 (将来実装予定)
+- **用途**: データベース (PostgreSQL)、リアルタイム同期、認証 (将来実装予定)
 
 ### 7.5 Conventional Commits
 
@@ -378,7 +378,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 ## 9. 参考資料
 
-- [README.md] (../README.md): プロジェクト概要、セットアップ手順
-- [AGENTS.md] (../AGENTS.md): AI開発者向けガイドライン
-- [CONTRIBUTING.md] (../CONTRIBUTING.md): コーディング指針、PR作成ルール
-- [STYLE_GUIDE.md] (STYLE_GUIDE.md): 日本語・英語表記の統一ルール
+- [README.md](../README.md): プロジェクト概要、セットアップ手順
+- [AGENTS.md](../AGENTS.md): AI開発者向けガイドライン
+- [CONTRIBUTING.md](../CONTRIBUTING.md): コーディング指針、PR作成ルール
+- [STYLE_GUIDE.md](STYLE_GUIDE.md): 日本語・英語表記の統一ルール
