@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Participant } from "../_hooks/use-participants";
+import type { Participant } from "../../_hooks/use-participants";
 import { updateParticipantList } from "../participants-status";
 
 describe("ParticipantsStatus - updateParticipantList", () => {
