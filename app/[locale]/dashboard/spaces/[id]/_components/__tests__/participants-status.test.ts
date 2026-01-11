@@ -110,7 +110,11 @@ describe("ParticipantsStatus - updateParticipantList", () => {
       },
     ];
 
-    const result = updateParticipantList(participants, "participant-1", "reach");
+    const result = updateParticipantList(
+      participants,
+      "participant-1",
+      "reach"
+    );
 
     expect(result[0].profiles?.full_name).toBe("参加者1");
     expect(result[0].bingo_status).toBe("reach");

@@ -62,12 +62,14 @@ function showStatusNotification(
   }
 }
 
+type ParticipantProfile = NonNullable<Participant["profiles"]>;
+
 /**
  * Fetch participant profile from profiles table
  */
 async function fetchParticipantProfile(
   userId: string
-): Promise<{ avatar_url: string | null; full_name: string | null } | null> {
+): Promise<ParticipantProfile | null> {
   const supabase = createClient();
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
@@ -90,7 +92,7 @@ function updateParticipantList(
   participants: Participant[],
   updatedId: string,
   newStatus: "none" | "reach" | "bingo",
-  profiles?: { avatar_url: string | null; full_name: string | null } | null
+  profiles?: ParticipantProfile | null
 ): Participant[] {
   const index = participants.findIndex((p) => p.id === updatedId);
   if (index === -1) {
@@ -101,7 +103,8 @@ function updateParticipantList(
   newList[index] = {
     ...newList[index],
     bingo_status: newStatus,
-    // Update profiles if provided
+    // Update profiles if provided. When undefined, existing profiles are preserved.
+    // When null, profiles are explicitly set to null. When an object, profiles are updated.
     ...(profiles !== undefined && { profiles }),
   };
 
@@ -170,13 +173,14 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
           }
           const currentParticipant = prev.find((p) => p.id === updated.id);
           if (currentParticipant) {
-            // Create updated participant with fresh profile data for notification
-            const participantWithProfile = {
+            // Create participant with refreshed profile data for notification display
+            // Note: profile may be null if fetch failed, which is acceptable
+            const participantForNotification = {
               ...currentParticipant,
               profiles: profile,
             };
             showStatusNotification(
-              participantWithProfile,
+              participantForNotification,
               updated.bingo_status,
               t
             );
