@@ -668,9 +668,16 @@ export async function checkUserParticipation(
 /**
  * Helper to mask YouTube gatekeeper rules
  */
-function maskYoutubeRules(
-  gatekeeperRules: GatekeeperRules
-): { requirement: string } | undefined {
+async function maskYoutubeRules(gatekeeperRules: GatekeeperRules): Promise<
+  | {
+      channel_title: string | null;
+      channelId: string;
+      handle: string | null;
+      requirement: string;
+      thumbnail_url: string | null;
+    }
+  | undefined
+> {
   if (!gatekeeperRules?.youtube?.channelId) {
     return undefined;
   }
@@ -681,15 +688,38 @@ function maskYoutubeRules(
     return undefined;
   }
 
-  return { requirement };
+  // Fetch YouTube channel metadata
+  const supabase = await createClient();
+  const { getYouTubeChannelMetadata } = await import(
+    "@/lib/data/youtube-metadata"
+  );
+  const metadata = await getYouTubeChannelMetadata(
+    supabase,
+    gatekeeperRules.youtube.channelId
+  );
+
+  return {
+    channel_title: metadata?.channel_title || null,
+    channelId: gatekeeperRules.youtube.channelId,
+    handle: metadata?.handle || null,
+    requirement,
+    thumbnail_url: metadata?.thumbnail_url || null,
+  };
 }
 
 /**
  * Helper to mask Twitch gatekeeper rules
  */
-function maskTwitchRules(
-  gatekeeperRules: GatekeeperRules
-): { requirement: string } | undefined {
+async function maskTwitchRules(gatekeeperRules: GatekeeperRules): Promise<
+  | {
+      broadcasterId: string;
+      display_name: string | null;
+      profile_image_url: string | null;
+      requirement: string;
+      username: string | null;
+    }
+  | undefined
+> {
   if (!gatekeeperRules?.twitch?.broadcasterId) {
     return undefined;
   }
@@ -700,7 +730,23 @@ function maskTwitchRules(
     return undefined;
   }
 
-  return { requirement };
+  // Fetch Twitch broadcaster metadata
+  const supabase = await createClient();
+  const { getTwitchBroadcasterMetadata } = await import(
+    "@/lib/data/twitch-metadata"
+  );
+  const metadata = await getTwitchBroadcasterMetadata(
+    supabase,
+    gatekeeperRules.twitch.broadcasterId
+  );
+
+  return {
+    broadcasterId: gatekeeperRules.twitch.broadcasterId,
+    display_name: metadata?.display_name || null,
+    profile_image_url: metadata?.profile_image_url || null,
+    requirement,
+    username: metadata?.username || null,
+  };
 }
 
 /**
@@ -774,14 +820,14 @@ export async function getSpacePublicInfo(
         maskedGatekeeperRules.email = maskedEmail;
       }
 
-      // Include YouTube requirement (no masking needed)
-      const maskedYoutube = maskYoutubeRules(gatekeeperRules);
+      // Include YouTube requirement with metadata
+      const maskedYoutube = await maskYoutubeRules(gatekeeperRules);
       if (maskedYoutube) {
         maskedGatekeeperRules.youtube = maskedYoutube;
       }
 
-      // Include Twitch requirement (no masking needed)
-      const maskedTwitch = maskTwitchRules(gatekeeperRules);
+      // Include Twitch requirement with metadata
+      const maskedTwitch = await maskTwitchRules(gatekeeperRules);
       if (maskedTwitch) {
         maskedGatekeeperRules.twitch = maskedTwitch;
       }

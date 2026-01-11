@@ -7,6 +7,13 @@ const { mockGetOAuthToken, mockIsTokenExpired } = vi.hoisted(() => ({
   mockIsTokenExpired: vi.fn(),
 }));
 
+// Mock YouTube and Twitch metadata functions using vi.hoisted
+const { mockGetYouTubeChannelMetadata, mockGetTwitchBroadcasterMetadata } =
+  vi.hoisted(() => ({
+    mockGetTwitchBroadcasterMetadata: vi.fn(),
+    mockGetYouTubeChannelMetadata: vi.fn(),
+  }));
+
 // Mock the Supabase client
 const mockSupabase = {
   auth: {
@@ -22,6 +29,14 @@ vi.mock("@/lib/supabase/server", () => ({
 vi.mock("@/lib/oauth/token-storage", () => ({
   getOAuthToken: mockGetOAuthToken,
   isTokenExpired: mockIsTokenExpired,
+}));
+
+vi.mock("@/lib/data/youtube-metadata", () => ({
+  getYouTubeChannelMetadata: mockGetYouTubeChannelMetadata,
+}));
+
+vi.mock("@/lib/data/twitch-metadata", () => ({
+  getTwitchBroadcasterMetadata: mockGetTwitchBroadcasterMetadata,
 }));
 
 // Mock privacy utilities
@@ -93,6 +108,13 @@ describe("getSpacePublicInfo", () => {
       }),
     });
 
+    mockGetYouTubeChannelMetadata.mockResolvedValue({
+      channel_id: "UCtest123",
+      channel_title: "Test Channel",
+      handle: "testchannel",
+      thumbnail_url: "https://yt3.ggpht.com/test.jpg",
+    });
+
     const result = await getSpacePublicInfo(
       "123e4567-e89b-12d3-a456-426614174000"
     );
@@ -106,6 +128,14 @@ describe("getSpacePublicInfo", () => {
       "@company.com",
     ]);
     expect(result?.gatekeeper_rules?.youtube?.requirement).toBe("subscriber");
+    expect(result?.gatekeeper_rules?.youtube?.channelId).toBe("UCtest123");
+    expect(result?.gatekeeper_rules?.youtube?.channel_title).toBe(
+      "Test Channel"
+    );
+    expect(result?.gatekeeper_rules?.youtube?.handle).toBe("testchannel");
+    expect(result?.gatekeeper_rules?.youtube?.thumbnail_url).toBe(
+      "https://yt3.ggpht.com/test.jpg"
+    );
   });
 
   test("ドラフトスペースに対してステータス付きのスペース情報を返す", async () => {
@@ -169,6 +199,54 @@ describe("getSpacePublicInfo", () => {
 
     expect(result).not.toBeNull();
     expect(result?.hideMetadata).toBe(true);
+  });
+
+  test("Twitchゲートキーパールールを持つスペース情報にメタデータを含めて返す", async () => {
+    const mockSpace = {
+      description: "Twitch-gated space",
+      gatekeeper_rules: {
+        twitch: {
+          broadcasterId: "12345678",
+          requirement: "follower",
+        },
+      },
+      id: "123e4567-e89b-12d3-a456-426614174000",
+      settings: {},
+      share_key: "twitch-space",
+      status: "active",
+      title: "Twitch Space",
+    };
+
+    mockSupabase.from.mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
+            data: mockSpace,
+            error: null,
+          }),
+        }),
+      }),
+    });
+
+    mockGetTwitchBroadcasterMetadata.mockResolvedValue({
+      broadcaster_id: "12345678",
+      display_name: "TestStreamer",
+      profile_image_url: "https://static-cdn.jtvnw.net/test.jpg",
+      username: "teststreamer",
+    });
+
+    const result = await getSpacePublicInfo(
+      "123e4567-e89b-12d3-a456-426614174000"
+    );
+
+    expect(result).not.toBeNull();
+    expect(result?.gatekeeper_rules?.twitch?.requirement).toBe("follower");
+    expect(result?.gatekeeper_rules?.twitch?.broadcasterId).toBe("12345678");
+    expect(result?.gatekeeper_rules?.twitch?.display_name).toBe("TestStreamer");
+    expect(result?.gatekeeper_rules?.twitch?.username).toBe("teststreamer");
+    expect(result?.gatekeeper_rules?.twitch?.profile_image_url).toBe(
+      "https://static-cdn.jtvnw.net/test.jpg"
+    );
   });
 
   test("すべてのルールがnoneの場合nullのgatekeeper_rulesを返す", async () => {

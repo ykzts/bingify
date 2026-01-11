@@ -1,12 +1,124 @@
 "use client";
 
 import { Lock, Mail, Twitch, Youtube } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { FormattedText } from "@/components/formatted-text";
 import type { PublicSpaceInfo } from "@/lib/types/space";
 
 interface Props {
   publicInfo: PublicSpaceInfo;
+}
+
+interface YoutubeRequirementProps {
+  youtube: NonNullable<
+    NonNullable<PublicSpaceInfo["gatekeeper_rules"]>["youtube"]
+  >;
+}
+
+function YoutubeRequirement({ youtube }: YoutubeRequirementProps) {
+  const t = useTranslations("SpaceLanding");
+
+  return (
+    <div className="flex gap-3">
+      <Youtube className="mt-1 h-5 w-5 shrink-0 text-gray-500" />
+      <div className="flex-1 space-y-2">
+        <p className="font-medium text-sm">{t("youtubeRequirement")}</p>
+        {/* Channel Info */}
+        {(youtube.channel_title || youtube.thumbnail_url) && (
+          <div className="flex items-center gap-3">
+            {youtube.thumbnail_url && (
+              <Image
+                alt={youtube.channel_title || "YouTube channel avatar"}
+                className="h-12 w-12 rounded-full"
+                height={48}
+                src={youtube.thumbnail_url}
+                width={48}
+              />
+            )}
+            <div className="flex-1">
+              {youtube.channel_title && (
+                <a
+                  className="font-medium text-sm hover:underline"
+                  href={`https://www.youtube.com/channel/${youtube.channelId}`}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {youtube.channel_title}
+                </a>
+              )}
+              {youtube.handle && (
+                <p className="text-gray-500 text-xs">@{youtube.handle}</p>
+              )}
+            </div>
+          </div>
+        )}
+        <p className="text-gray-600 text-sm">
+          {youtube.requirement === "subscriber"
+            ? t("youtubeSubscriberRequired")
+            : t("youtubeMemberRequired")}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+interface TwitchRequirementProps {
+  twitch: NonNullable<
+    NonNullable<PublicSpaceInfo["gatekeeper_rules"]>["twitch"]
+  >;
+}
+
+function TwitchRequirement({ twitch }: TwitchRequirementProps) {
+  const t = useTranslations("SpaceLanding");
+
+  return (
+    <div className="flex gap-3">
+      <Twitch className="mt-1 h-5 w-5 shrink-0 text-gray-500" />
+      <div className="flex-1 space-y-2">
+        <p className="font-medium text-sm">{t("twitchRequirement")}</p>
+        {/* Broadcaster Info */}
+        {(twitch.display_name || twitch.profile_image_url) && (
+          <div className="flex items-center gap-3">
+            {twitch.profile_image_url && (
+              <Image
+                alt={twitch.display_name || "Twitch profile avatar"}
+                className="h-12 w-12 rounded-full"
+                height={48}
+                src={twitch.profile_image_url}
+                width={48}
+              />
+            )}
+            <div className="flex-1">
+              {twitch.display_name && twitch.username && (
+                <a
+                  className="font-medium text-sm hover:underline"
+                  href={`https://www.twitch.tv/${twitch.username}`}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {twitch.display_name}
+                </a>
+              )}
+              {twitch.display_name && !twitch.username && (
+                <span className="font-medium text-sm">
+                  {twitch.display_name}
+                </span>
+              )}
+              {twitch.username && (
+                <p className="text-gray-500 text-xs">@{twitch.username}</p>
+              )}
+            </div>
+          </div>
+        )}
+        <p className="text-gray-600 text-sm">
+          {twitch.requirement === "subscriber"
+            ? t("twitchSubscriberRequired")
+            : t("twitchFollowerRequired")}
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export function SpaceLandingPage({ publicInfo }: Props) {
@@ -75,38 +187,14 @@ export function SpaceLandingPage({ publicInfo }: Props) {
 
             {/* YouTube Requirements */}
             {publicInfo.gatekeeper_rules.youtube && (
-              <div className="flex gap-3">
-                <Youtube className="mt-1 h-5 w-5 shrink-0 text-gray-500" />
-                <div className="space-y-1">
-                  <p className="font-medium text-sm">
-                    {t("youtubeRequirement")}
-                  </p>
-                  <p className="text-gray-600 text-sm">
-                    {publicInfo.gatekeeper_rules.youtube.requirement ===
-                    "subscriber"
-                      ? t("youtubeSubscriberRequired")
-                      : t("youtubeMemberRequired")}
-                  </p>
-                </div>
-              </div>
+              <YoutubeRequirement
+                youtube={publicInfo.gatekeeper_rules.youtube}
+              />
             )}
 
             {/* Twitch Requirements */}
             {publicInfo.gatekeeper_rules.twitch && (
-              <div className="flex gap-3">
-                <Twitch className="mt-1 h-5 w-5 shrink-0 text-gray-500" />
-                <div className="space-y-1">
-                  <p className="font-medium text-sm">
-                    {t("twitchRequirement")}
-                  </p>
-                  <p className="text-gray-600 text-sm">
-                    {publicInfo.gatekeeper_rules.twitch.requirement ===
-                    "subscriber"
-                      ? t("twitchSubscriberRequired")
-                      : t("twitchFollowerRequired")}
-                  </p>
-                </div>
-              </div>
+              <TwitchRequirement twitch={publicInfo.gatekeeper_rules.twitch} />
             )}
           </div>
         </div>

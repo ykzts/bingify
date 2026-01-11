@@ -75,10 +75,18 @@ export interface PublicSpaceInfo {
       allowed: string[]; // Masked email patterns
     };
     twitch?: {
+      broadcasterId: string;
+      display_name: string | null;
+      profile_image_url: string | null;
       requirement: string;
+      username: string | null;
     };
     youtube?: {
+      channel_title: string | null;
+      channelId: string;
+      handle: string | null;
       requirement: string;
+      thumbnail_url: string | null;
     };
   } | null;
   hideMetadata: boolean;
