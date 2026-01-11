@@ -115,18 +115,18 @@ export default async function Page ({
 ```
 app/
 ├── dashboard/
-│ ├── spaces/[id]/page.tsx
-│ ├── actions.ts
-│ └── page.tsx
+│   ├── spaces/[id]/page.tsx
+│   ├── actions.ts
+│   └── page.tsx
 ├── spaces/[id]/page.tsx
 ├── globals.css
 └── layout.tsx
 lib/
 ├── supabase/
-│ ├── server.ts
-│ └── client.ts
+│   ├── server.ts
+│   └── client.ts
 ├── schemas/
-│ └── space.ts
+│   └── space.ts
 └── utils.ts
 ```
 
