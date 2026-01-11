@@ -70,22 +70,20 @@ function parseSystemSettingsFormData(
     );
   }
 
+  // Parse archive retention days and convert to hours for database storage
   const archiveRetentionDays = formData.get("archive_retention_days");
   if (archiveRetentionDays) {
-    data.archive_retention_days = Number.parseInt(
-      archiveRetentionDays as string,
-      10
-    );
+    const days = Number.parseInt(archiveRetentionDays as string, 10);
+    data.archive_retention_hours = days * 24; // Convert days to hours
   }
 
+  // Parse spaces archive retention days and convert to hours for database storage
   const spacesArchiveRetentionDays = formData.get(
     "spaces_archive_retention_days"
   );
   if (spacesArchiveRetentionDays) {
-    data.spaces_archive_retention_days = Number.parseInt(
-      spacesArchiveRetentionDays as string,
-      10
-    );
+    const days = Number.parseInt(spacesArchiveRetentionDays as string, 10);
+    data.spaces_archive_retention_hours = days * 24; // Convert days to hours
   }
 
   // Parse nested features object with proper boolean handling

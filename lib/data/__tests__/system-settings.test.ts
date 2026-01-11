@@ -20,8 +20,7 @@ describe("getSystemSettings", () => {
 
   it("検証されたシステム設定を返す", async () => {
     const mockData = {
-      archive_retention_days: 7,
-      spaces_archive_retention_days: 90,
+      archive_retention_hours: 168,
       default_user_role: "organizer",
       features: {
         gatekeeper: {
@@ -42,6 +41,7 @@ describe("getSystemSettings", () => {
       max_spaces_per_user: 10,
       max_total_spaces: 100,
       space_expiration_hours: 72,
+      spaces_archive_retention_hours: 2160,
     };
 
     mockSupabase.from.mockReturnValue({
@@ -59,8 +59,7 @@ describe("getSystemSettings", () => {
 
     expect(result.error).toBeUndefined();
     expect(result.settings).toEqual({
-      archive_retention_days: 7,
-      spaces_archive_retention_days: 90,
+      archive_retention_hours: 168,
       default_user_role: "organizer",
       features: {
         gatekeeper: {
@@ -81,6 +80,7 @@ describe("getSystemSettings", () => {
       max_spaces_per_user: 10,
       max_total_spaces: 100,
       space_expiration_hours: 72,
+      spaces_archive_retention_hours: 2160,
     });
   });
 
@@ -104,14 +104,14 @@ describe("getSystemSettings", () => {
 
   it("無効な機能に対してデフォルトを使用し警告を返す", async () => {
     const mockData = {
-      archive_retention_days: 7,
-      spaces_archive_retention_days: 90,
+      archive_retention_hours: 168,
       default_user_role: "organizer",
       features: { invalid: "structure" }, // Invalid features structure
       max_participants_per_space: 1000,
       max_spaces_per_user: 10,
       max_total_spaces: 100,
       space_expiration_hours: 72,
+      spaces_archive_retention_hours: 2160,
     };
 
     mockSupabase.from.mockReturnValue({

@@ -32,11 +32,11 @@ export const systemFeaturesSchema = z.object({
 export const defaultUserRoleSchema = z.enum(["organizer", "user"]);
 
 export const systemSettingsSchema = z.object({
-  archive_retention_days: z
+  archive_retention_hours: z
     .number()
     .int("整数を入力してください")
-    .min(0, "0日以上を指定してください（0は即時削除）")
-    .max(365, "最大365日までです"),
+    .min(0, "0時間以上を指定してください（0は即時削除）")
+    .max(8760, "最大8760時間（365日）までです"),
   default_user_role: defaultUserRoleSchema,
   features: systemFeaturesSchema,
   max_participants_per_space: z
@@ -59,11 +59,11 @@ export const systemSettingsSchema = z.object({
     .int("整数を入力してください")
     .min(0, "0時間以上を指定してください（0は無期限）")
     .max(8760, "最大8760時間（365日）までです"),
-  spaces_archive_retention_days: z
+  spaces_archive_retention_hours: z
     .number()
     .int("整数を入力してください")
-    .min(0, "0日以上を指定してください（0は即時削除）")
-    .max(3650, "最大3650日（10年）までです"),
+    .min(0, "0時間以上を指定してください（0は即時削除）")
+    .max(87_600, "最大87600時間（10年）までです"),
 });
 
 export type SystemSettings = z.infer<typeof systemSettingsSchema>;
@@ -72,7 +72,7 @@ export type SystemSettings = z.infer<typeof systemSettingsSchema>;
  * Default system settings used as fallback when database values are invalid
  */
 export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
-  archive_retention_days: 7,
+  archive_retention_hours: 168, // 7 days
   default_user_role: "organizer",
   features: {
     gatekeeper: {
@@ -93,5 +93,5 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
   max_spaces_per_user: 5,
   max_total_spaces: 1000,
   space_expiration_hours: 48,
-  spaces_archive_retention_days: 90,
+  spaces_archive_retention_hours: 2160, // 90 days
 } as const satisfies SystemSettings;

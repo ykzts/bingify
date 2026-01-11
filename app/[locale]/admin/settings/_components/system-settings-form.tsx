@@ -56,7 +56,9 @@ export function SystemSettingsForm({ initialSettings }: Props) {
     ...systemSettingsFormOpts,
     defaultValues: initialSettings
       ? {
-          archive_retention_days: initialSettings.archive_retention_days,
+          archive_retention_days: Math.round(
+            initialSettings.archive_retention_hours / 24
+          ), // Convert hours to days for display
           default_user_role: initialSettings.default_user_role,
           features: initialSettings.features,
           max_participants_per_space:
@@ -64,8 +66,9 @@ export function SystemSettingsForm({ initialSettings }: Props) {
           max_spaces_per_user: initialSettings.max_spaces_per_user,
           max_total_spaces: initialSettings.max_total_spaces,
           space_expiration_hours: initialSettings.space_expiration_hours,
-          spaces_archive_retention_days:
-            initialSettings.spaces_archive_retention_days,
+          spaces_archive_retention_days: Math.round(
+            initialSettings.spaces_archive_retention_hours / 24
+          ), // Convert hours to days for display
         }
       : systemSettingsFormOpts.defaultValues,
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm

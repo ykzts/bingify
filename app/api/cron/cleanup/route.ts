@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     // システム設定から archive_retention_days と spaces_archive_retention_days を取得
     const { data: systemSettings, error: settingsError } = await supabase
       .from("system_settings")
-      .select("archive_retention_days, spaces_archive_retention_days")
+      .select("archive_retention_hours, spaces_archive_retention_hours")
       .eq("id", 1)
       .single();
 
@@ -61,29 +61,30 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // archive_retention_days の検証（有限の非負整数であることを確認）
-    const archiveRetentionDays = systemSettings?.archive_retention_days ?? 7;
+    // archive_retention_hours の検証（有限の非負整数であることを確認）
+    const archiveRetentionHours =
+      systemSettings?.archive_retention_hours ?? 168; // 7 days default
     if (
-      !Number.isFinite(archiveRetentionDays) ||
-      archiveRetentionDays < 0 ||
-      !Number.isInteger(archiveRetentionDays)
+      !Number.isFinite(archiveRetentionHours) ||
+      archiveRetentionHours < 0 ||
+      !Number.isInteger(archiveRetentionHours)
     ) {
       console.error(
-        `Invalid archive_retention_days value: ${archiveRetentionDays}. Using default: 7`
+        `Invalid archive_retention_hours value: ${archiveRetentionHours}. Using default: 168 (7 days)`
       );
       // デフォルト値を使用して継続
     }
 
-    // spaces_archive_retention_days の検証（有限の非負整数であることを確認）
-    const spacesArchiveRetentionDays =
-      systemSettings?.spaces_archive_retention_days ?? 90;
+    // spaces_archive_retention_hours の検証（有限の非負整数であることを確認）
+    const spacesArchiveRetentionHours =
+      systemSettings?.spaces_archive_retention_hours ?? 2160; // 90 days default
     if (
-      !Number.isFinite(spacesArchiveRetentionDays) ||
-      spacesArchiveRetentionDays < 0 ||
-      !Number.isInteger(spacesArchiveRetentionDays)
+      !Number.isFinite(spacesArchiveRetentionHours) ||
+      spacesArchiveRetentionHours < 0 ||
+      !Number.isInteger(spacesArchiveRetentionHours)
     ) {
       console.error(
-        `Invalid spaces_archive_retention_days value: ${spacesArchiveRetentionDays}. Using default: 90`
+        `Invalid spaces_archive_retention_hours value: ${spacesArchiveRetentionHours}. Using default: 2160 (90 days)`
       );
       // デフォルト値を使用して継続
     }
@@ -103,14 +104,14 @@ export async function GET(request: NextRequest) {
       `Marked ${expiredCount} space(s) as closed based on system settings`
     );
 
-    // Step 2: archive_retention_days より古い closed スペースをアーカイブして削除
+    // Step 2: archive_retention_hours より古い closed スペースをアーカイブして削除
     const closedCutoffDate = new Date();
-    const validArchiveRetentionDays =
-      Number.isFinite(archiveRetentionDays) && archiveRetentionDays >= 0
-        ? archiveRetentionDays
-        : 7;
-    closedCutoffDate.setDate(
-      closedCutoffDate.getDate() - validArchiveRetentionDays
+    const validArchiveRetentionHours =
+      Number.isFinite(archiveRetentionHours) && archiveRetentionHours >= 0
+        ? archiveRetentionHours
+        : 168; // 7 days default
+    closedCutoffDate.setHours(
+      closedCutoffDate.getHours() - validArchiveRetentionHours
     );
 
     // 条件付き削除を1回のクエリで実行（スケーラビリティ向上）
@@ -129,19 +130,19 @@ export async function GET(request: NextRequest) {
 
     if (archivedCount > 0) {
       console.log(
-        `Archived and deleted ${archivedCount} closed space(s) older than ${validArchiveRetentionDays} days (cutoff: ${closedCutoffDate.toISOString()})`
+        `Archived and deleted ${archivedCount} closed space(s) older than ${validArchiveRetentionHours} hours (${Math.round(validArchiveRetentionHours / 24)} days) (cutoff: ${closedCutoffDate.toISOString()})`
       );
     }
 
     // Step 3: spaces_archive テーブルから古いアーカイブレコードを削除
-    const validSpacesArchiveRetentionDays =
-      Number.isFinite(spacesArchiveRetentionDays) &&
-      spacesArchiveRetentionDays >= 0
-        ? spacesArchiveRetentionDays
-        : 90;
+    const validSpacesArchiveRetentionHours =
+      Number.isFinite(spacesArchiveRetentionHours) &&
+      spacesArchiveRetentionHours >= 0
+        ? spacesArchiveRetentionHours
+        : 2160; // 90 days default
     const archiveCutoffDate = new Date();
-    archiveCutoffDate.setDate(
-      archiveCutoffDate.getDate() - validSpacesArchiveRetentionDays
+    archiveCutoffDate.setHours(
+      archiveCutoffDate.getHours() - validSpacesArchiveRetentionHours
     );
 
     const { data: deletedArchives, error: archiveError } = await supabase
@@ -161,7 +162,7 @@ export async function GET(request: NextRequest) {
     const deletedArchiveCount = deletedArchives?.length || 0;
 
     console.log(
-      `Cleanup completed: deleted ${deletedArchiveCount} archived record(s) older than ${validSpacesArchiveRetentionDays} days (cutoff: ${archiveCutoffDate.toISOString()})`
+      `Cleanup completed: deleted ${deletedArchiveCount} archived record(s) older than ${validSpacesArchiveRetentionHours} hours (${Math.round(validSpacesArchiveRetentionHours / 24)} days) (cutoff: ${archiveCutoffDate.toISOString()})`
     );
 
     return NextResponse.json({
@@ -169,10 +170,10 @@ export async function GET(request: NextRequest) {
         archivedCount,
         deletedArchiveCount,
         expiredCount,
-        message: `Successfully marked ${expiredCount} space(s) as closed, archived ${archivedCount} closed space(s) older than ${validArchiveRetentionDays} days, and deleted ${deletedArchiveCount} archived record(s) older than ${validSpacesArchiveRetentionDays} days`,
-        retentionDays: {
-          archive: validArchiveRetentionDays,
-          spacesArchive: validSpacesArchiveRetentionDays,
+        message: `Successfully marked ${expiredCount} space(s) as closed, archived ${archivedCount} closed space(s) older than ${Math.round(validArchiveRetentionHours / 24)} days, and deleted ${deletedArchiveCount} archived record(s) older than ${Math.round(validSpacesArchiveRetentionHours / 24)} days`,
+        retentionHours: {
+          archive: validArchiveRetentionHours,
+          spacesArchive: validSpacesArchiveRetentionHours,
         },
       },
     });
