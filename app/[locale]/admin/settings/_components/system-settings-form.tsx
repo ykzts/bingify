@@ -33,13 +33,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  type SystemSettings,
-  systemSettingsSchema,
-} from "@/lib/schemas/system-settings";
+import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { updateSystemSettingsAction } from "../_actions/system-settings";
-import { systemSettingsFormOpts } from "../_lib/form-options";
+import {
+  systemSettingsFormOpts,
+  systemSettingsFormSchema,
+} from "../_lib/form-options";
 
 interface Props {
   initialSettings?: SystemSettings;
@@ -78,7 +78,7 @@ export function SystemSettingsForm({ initialSettings }: Props) {
       modeAfterSubmission: "change",
     }),
     validators: {
-      onDynamic: systemSettingsSchema,
+      onDynamic: systemSettingsFormSchema,
     },
   });
 

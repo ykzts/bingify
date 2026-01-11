@@ -16,6 +16,7 @@ function createTestSystemSettings(
   overrides?: Partial<SystemSettings>
 ): SystemSettings {
   return {
+    archive_retention_hours: 168,
     default_user_role: "organizer",
     features: {
       gatekeeper: {
@@ -36,6 +37,7 @@ function createTestSystemSettings(
     max_spaces_per_user: 5,
     max_total_spaces: 1000,
     space_expiration_hours: 48,
+    spaces_archive_retention_hours: 2160,
     ...overrides,
   };
 }

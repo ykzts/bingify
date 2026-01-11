@@ -62,8 +62,7 @@ export async function GET(request: NextRequest) {
     }
 
     // archive_retention_hours の検証（有限の非負整数であることを確認）
-    const archiveRetentionHours =
-      systemSettings?.archive_retention_hours ?? 168; // 7 days default
+    let archiveRetentionHours = systemSettings?.archive_retention_hours ?? 168; // 7 days default
     if (
       !Number.isFinite(archiveRetentionHours) ||
       archiveRetentionHours < 0 ||
@@ -72,11 +71,11 @@ export async function GET(request: NextRequest) {
       console.error(
         `Invalid archive_retention_hours value: ${archiveRetentionHours}. Using default: 168 (7 days)`
       );
-      // デフォルト値を使用して継続
+      archiveRetentionHours = 168; // デフォルト値を使用
     }
 
     // spaces_archive_retention_hours の検証（有限の非負整数であることを確認）
-    const spacesArchiveRetentionHours =
+    let spacesArchiveRetentionHours =
       systemSettings?.spaces_archive_retention_hours ?? 2160; // 90 days default
     if (
       !Number.isFinite(spacesArchiveRetentionHours) ||
@@ -86,7 +85,7 @@ export async function GET(request: NextRequest) {
       console.error(
         `Invalid spaces_archive_retention_hours value: ${spacesArchiveRetentionHours}. Using default: 2160 (90 days)`
       );
-      // デフォルト値を使用して継続
+      spacesArchiveRetentionHours = 2160; // デフォルト値を使用
     }
 
     // Step 1: システム設定に基づいて有効期限切れスペースを closed としてマーク
