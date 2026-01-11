@@ -345,10 +345,13 @@ export interface UserSpace {
 }
 
 export interface UserSpacesResult {
+  activeHostedSpaces: UserSpace[];
+  activeParticipatedSpaces: UserSpace[];
   activeSpace: UserSpace | null;
+  closedHostedSpaces: UserSpace[];
+  closedParticipatedSpaces: UserSpace[];
+  draftHostedSpaces: UserSpace[];
   error?: string;
-  hostedSpaces: UserSpace[];
-  participatedSpaces: UserSpace[];
 }
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Function handles multiple space sources and deduplication logic
@@ -363,10 +366,13 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
 
     if (!user) {
       return {
+        activeHostedSpaces: [],
+        activeParticipatedSpaces: [],
         activeSpace: null,
+        closedHostedSpaces: [],
+        closedParticipatedSpaces: [],
+        draftHostedSpaces: [],
         error: "Authentication required",
-        hostedSpaces: [],
-        participatedSpaces: [],
       };
     }
 
@@ -380,10 +386,13 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
     if (ownedError) {
       console.error("Error fetching owned spaces:", ownedError);
       return {
+        activeHostedSpaces: [],
+        activeParticipatedSpaces: [],
         activeSpace: null,
+        closedHostedSpaces: [],
+        closedParticipatedSpaces: [],
+        draftHostedSpaces: [],
         error: "Failed to fetch spaces",
-        hostedSpaces: [],
-        participatedSpaces: [],
       };
     }
 
@@ -545,14 +554,30 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       participant_count: participantCounts[space.id] ?? 0,
     }));
 
-    // Find active space (excluding draft) - only from hosted spaces
-    let activeSpace: UserSpace | null = null;
-    const allActiveSpaces = hostedSpacesWithCounts.filter(
+    // Filter spaces by status for hosted spaces
+    const activeHostedSpaces = hostedSpacesWithCounts.filter(
       (s) => s.status === "active"
     );
-    const activeSpaceData = allActiveSpaces[0] ?? null;
+    const draftHostedSpaces = hostedSpacesWithCounts.filter(
+      (s) => s.status === "draft"
+    );
+    const closedHostedSpaces = hostedSpacesWithCounts.filter(
+      (s) => s.status === "closed"
+    );
 
-    if (allActiveSpaces.length > 1) {
+    // Filter spaces by status for participated spaces
+    const activeParticipatedSpaces = participatedSpacesWithCounts.filter(
+      (s) => s.status === "active"
+    );
+    const closedParticipatedSpaces = participatedSpacesWithCounts.filter(
+      (s) => s.status === "closed"
+    );
+
+    // Find active space (excluding draft) - only from hosted spaces
+    let activeSpace: UserSpace | null = null;
+    const activeSpaceData = activeHostedSpaces[0] ?? null;
+
+    if (activeHostedSpaces.length > 1) {
       // Multiple active spaces found; using the most recently created (first in list)
       console.warn(
         `Multiple active spaces found for user ${user.id}; using the most recently created one.`
@@ -564,17 +589,23 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
     }
 
     return {
+      activeHostedSpaces,
+      activeParticipatedSpaces,
       activeSpace,
-      hostedSpaces: hostedSpacesWithCounts,
-      participatedSpaces: participatedSpacesWithCounts,
+      closedHostedSpaces,
+      closedParticipatedSpaces,
+      draftHostedSpaces,
     };
   } catch (error) {
     console.error("Error in getUserSpaces:", error);
     return {
+      activeHostedSpaces: [],
+      activeParticipatedSpaces: [],
       activeSpace: null,
+      closedHostedSpaces: [],
+      closedParticipatedSpaces: [],
+      draftHostedSpaces: [],
       error: "An unexpected error occurred",
-      hostedSpaces: [],
-      participatedSpaces: [],
     };
   }
 }

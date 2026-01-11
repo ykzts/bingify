@@ -109,8 +109,10 @@ describe("Dashboard Actions", () => {
       expect(result.activeSpace).toBeDefined();
       expect(result.activeSpace?.id).toBe("space-1");
       expect(result.activeSpace?.participant_count).toBe(5);
-      expect(result.hostedSpaces).toHaveLength(2);
-      expect(result.participatedSpaces).toHaveLength(0);
+      expect(result.activeHostedSpaces).toHaveLength(1);
+      expect(result.closedHostedSpaces).toHaveLength(1);
+      expect(result.activeParticipatedSpaces).toHaveLength(0);
+      expect(result.closedParticipatedSpaces).toHaveLength(0);
       expect(result.error).toBeUndefined();
     });
 
@@ -127,8 +129,11 @@ describe("Dashboard Actions", () => {
 
       const result = await getUserSpaces();
       expect(result.activeSpace).toBeNull();
-      expect(result.hostedSpaces).toHaveLength(0);
-      expect(result.participatedSpaces).toHaveLength(0);
+      expect(result.activeHostedSpaces).toHaveLength(0);
+      expect(result.activeParticipatedSpaces).toHaveLength(0);
+      expect(result.closedHostedSpaces).toHaveLength(0);
+      expect(result.closedParticipatedSpaces).toHaveLength(0);
+      expect(result.draftHostedSpaces).toHaveLength(0);
       expect(result.error).toBe("Authentication required");
     });
 
@@ -157,8 +162,11 @@ describe("Dashboard Actions", () => {
 
       const result = await getUserSpaces();
       expect(result.activeSpace).toBeNull();
-      expect(result.hostedSpaces).toHaveLength(0);
-      expect(result.participatedSpaces).toHaveLength(0);
+      expect(result.activeHostedSpaces).toHaveLength(0);
+      expect(result.activeParticipatedSpaces).toHaveLength(0);
+      expect(result.closedHostedSpaces).toHaveLength(0);
+      expect(result.closedParticipatedSpaces).toHaveLength(0);
+      expect(result.draftHostedSpaces).toHaveLength(0);
       expect(result.error).toBe("Failed to fetch spaces");
     });
 
@@ -231,8 +239,10 @@ describe("Dashboard Actions", () => {
 
       const result = await getUserSpaces();
       expect(result.activeSpace).toBeNull();
-      expect(result.hostedSpaces).toHaveLength(2);
-      expect(result.participatedSpaces).toHaveLength(0);
+      expect(result.activeHostedSpaces).toHaveLength(0);
+      expect(result.closedHostedSpaces).toHaveLength(2);
+      expect(result.activeParticipatedSpaces).toHaveLength(0);
+      expect(result.closedParticipatedSpaces).toHaveLength(0);
       expect(result.error).toBeUndefined();
     });
 
@@ -319,8 +329,10 @@ describe("Dashboard Actions", () => {
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         expect.stringContaining("Multiple active spaces found")
       );
-      expect(result.hostedSpaces).toHaveLength(2);
-      expect(result.participatedSpaces).toHaveLength(0);
+      expect(result.activeHostedSpaces).toHaveLength(2);
+      expect(result.closedHostedSpaces).toHaveLength(0);
+      expect(result.activeParticipatedSpaces).toHaveLength(0);
+      expect(result.closedParticipatedSpaces).toHaveLength(0);
 
       consoleWarnSpy.mockRestore();
     });
@@ -376,8 +388,11 @@ describe("Dashboard Actions", () => {
 
       const result = await getUserSpaces();
       expect(result.activeSpace).toBeNull();
-      expect(result.hostedSpaces).toHaveLength(0);
-      expect(result.participatedSpaces).toHaveLength(0);
+      expect(result.activeHostedSpaces).toHaveLength(0);
+      expect(result.closedHostedSpaces).toHaveLength(0);
+      expect(result.activeParticipatedSpaces).toHaveLength(0);
+      expect(result.closedParticipatedSpaces).toHaveLength(0);
+      expect(result.draftHostedSpaces).toHaveLength(0);
       expect(result.error).toBeUndefined();
     });
 
@@ -473,19 +488,19 @@ describe("Dashboard Actions", () => {
 
       const result = await getUserSpaces();
 
-      // Verify hosted spaces
-      expect(result.hostedSpaces).toHaveLength(1);
-      expect(result.hostedSpaces[0].id).toBe("space-1");
-      expect(result.hostedSpaces[0].is_owner).toBe(true);
+      // Verify hosted spaces (active)
+      expect(result.activeHostedSpaces).toHaveLength(1);
+      expect(result.activeHostedSpaces[0].id).toBe("space-1");
+      expect(result.activeHostedSpaces[0].is_owner).toBe(true);
 
       // Verify participated spaces (should not include space-1)
-      expect(result.participatedSpaces).toHaveLength(1);
-      expect(result.participatedSpaces[0].id).toBe("space-2");
-      expect(result.participatedSpaces[0].is_owner).toBe(false);
+      expect(result.activeParticipatedSpaces).toHaveLength(1);
+      expect(result.activeParticipatedSpaces[0].id).toBe("space-2");
+      expect(result.activeParticipatedSpaces[0].is_owner).toBe(false);
 
       // Verify participant counts
-      expect(result.hostedSpaces[0].participant_count).toBe(2);
-      expect(result.participatedSpaces[0].participant_count).toBe(3);
+      expect(result.activeHostedSpaces[0].participant_count).toBe(2);
+      expect(result.activeParticipatedSpaces[0].participant_count).toBe(3);
 
       // Active space should come from hosted spaces
       expect(result.activeSpace).toBeDefined();

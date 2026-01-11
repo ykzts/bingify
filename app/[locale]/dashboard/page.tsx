@@ -32,8 +32,15 @@ export default async function DashboardPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("Dashboard");
-  const { activeSpace, hostedSpaces, participatedSpaces, error } =
-    await getUserSpaces();
+  const {
+    activeHostedSpaces,
+    activeParticipatedSpaces,
+    activeSpace,
+    closedHostedSpaces,
+    closedParticipatedSpaces,
+    draftHostedSpaces,
+    error,
+  } = await getUserSpaces();
 
   return (
     <div className="mx-auto max-w-4xl space-y-12 px-4 py-8">
@@ -110,15 +117,101 @@ export default async function DashboardPage({
         </section>
       )}
 
-      {/* --- SECTION 3: History --- */}
-      <section>
-        <SectionHeader icon={FileText}>{t("historyTitle")}</SectionHeader>
-        <SpaceTabs
-          hostedSpaces={hostedSpaces}
-          locale={locale}
-          participatedSpaces={participatedSpaces}
-        />
-      </section>
+      {/* --- SECTION 3: Active Spaces --- */}
+      {(activeHostedSpaces.length > 0 ||
+        activeParticipatedSpaces.length > 0) && (
+        <section>
+          <SectionHeader icon={FileText}>
+            {t("activeSectionTitle")}
+          </SectionHeader>
+          <SpaceTabs
+            hostedSpaces={activeHostedSpaces}
+            hostedTabLabel={t("hostedSpacesTab")}
+            locale={locale}
+            participatedSpaces={activeParticipatedSpaces}
+            participatedTabLabel={t("participatedSpacesTab")}
+          />
+        </section>
+      )}
+
+      {/* --- SECTION 4: Draft Spaces --- */}
+      {draftHostedSpaces.length > 0 && (
+        <section>
+          <SectionHeader icon={FileText}>
+            {t("draftSectionTitle")}
+          </SectionHeader>
+          <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b bg-gray-50 text-gray-500">
+                <tr>
+                  <th className="px-4 py-3 font-medium">
+                    {t("historySpaceName")}
+                  </th>
+                  <th className="px-4 py-3 font-medium">
+                    {t("historyStatus")}
+                  </th>
+                  <th className="px-4 py-3 font-medium">{t("historyDate")}</th>
+                  <th className="px-4 py-3 text-right font-medium">
+                    {t("spaceActions")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {draftHostedSpaces.map((space) => (
+                  <tr
+                    className="transition-colors hover:bg-gray-50"
+                    key={space.id}
+                  >
+                    <td className="px-4 py-3 font-medium text-gray-900">
+                      <Link
+                        className="transition-colors hover:text-purple-600"
+                        href={`/dashboard/spaces/${space.id}`}
+                      >
+                        {space.share_key}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 font-medium text-xs text-yellow-800">
+                        {t("statusDraft")}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-500">
+                      {space.created_at
+                        ? new Date(space.created_at).toLocaleDateString(locale)
+                        : ""}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Link
+                        className="rounded border border-gray-200 bg-white px-3 py-1.5 text-gray-700 text-sm shadow-sm transition hover:bg-gray-50"
+                        href={`/dashboard/spaces/${space.id}`}
+                      >
+                        {t("manageAction")}
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* --- SECTION 5: Past History (Closed) --- */}
+      {(closedHostedSpaces.length > 0 ||
+        closedParticipatedSpaces.length > 0) && (
+        <section>
+          <SectionHeader icon={FileText}>
+            {t("closedSectionTitle")}
+          </SectionHeader>
+          <SpaceTabs
+            hostedSpaces={closedHostedSpaces}
+            hostedTabLabel={t("hostedSpacesPastTab")}
+            locale={locale}
+            participatedSpaces={closedParticipatedSpaces}
+            participatedTabLabel={t("participatedSpacesPastTab")}
+          />
+        </section>
+      )}
     </div>
   );
 }
