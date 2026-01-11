@@ -60,12 +60,15 @@ describe("Admin Settings Actions", () => {
       // FormDataを作成し、すべてのネストされたフィールドを含める
       const formData = new FormData();
       formData.set("archive_retention_days", "7");
+      formData.set("archive_retention_hours", "0");
       formData.set("spaces_archive_retention_days", "90");
+      formData.set("spaces_archive_retention_hours", "0");
       formData.set("default_user_role", "organizer");
       formData.set("max_participants_per_space", "50");
       formData.set("max_spaces_per_user", "5");
       formData.set("max_total_spaces", "1000");
-      formData.set("space_expiration_hours", "48");
+      formData.set("space_expiration_days", "2");
+      formData.set("space_expiration_hours", "0");
 
       // フィーチャーフラグ - すべてのネストされたフィールドを含める
       formData.set("features.gatekeeper.youtube.enabled", "on");
@@ -158,12 +161,15 @@ describe("Admin Settings Actions", () => {
       // FormDataを作成 - チェックボックスはOFFの場合値が送信されない
       const formData = new FormData();
       formData.set("archive_retention_days", "7");
+      formData.set("archive_retention_hours", "0");
       formData.set("spaces_archive_retention_days", "90");
+      formData.set("spaces_archive_retention_hours", "0");
       formData.set("default_user_role", "user");
       formData.set("max_participants_per_space", "100");
       formData.set("max_spaces_per_user", "10");
       formData.set("max_total_spaces", "2000");
-      formData.set("space_expiration_hours", "24");
+      formData.set("space_expiration_days", "1");
+      formData.set("space_expiration_hours", "0");
 
       // すべてのチェックボックスがOFFの場合
       // FormDataには何も設定されない
@@ -246,12 +252,15 @@ describe("Admin Settings Actions", () => {
       // FormDataを作成 - 一部のチェックボックスのみON
       const formData = new FormData();
       formData.set("archive_retention_days", "14");
+      formData.set("archive_retention_hours", "0");
       formData.set("spaces_archive_retention_days", "90");
+      formData.set("spaces_archive_retention_hours", "0");
       formData.set("default_user_role", "organizer");
       formData.set("max_participants_per_space", "50");
       formData.set("max_spaces_per_user", "5");
       formData.set("max_total_spaces", "1000");
-      formData.set("space_expiration_hours", "48");
+      formData.set("space_expiration_days", "2");
+      formData.set("space_expiration_hours", "0");
 
       // YouTube: 有効、member: 有効、subscriber: 無効
       formData.set("features.gatekeeper.youtube.enabled", "on");
@@ -361,12 +370,15 @@ describe("Admin Settings Actions", () => {
 
       const formData = new FormData();
       formData.set("archive_retention_days", "7");
+      formData.set("archive_retention_hours", "0");
       formData.set("spaces_archive_retention_days", "90");
+      formData.set("spaces_archive_retention_hours", "0");
       formData.set("default_user_role", "organizer");
       formData.set("max_participants_per_space", "50");
       formData.set("max_spaces_per_user", "5");
       formData.set("max_total_spaces", "1000");
-      formData.set("space_expiration_hours", "48");
+      formData.set("space_expiration_days", "2");
+      formData.set("space_expiration_hours", "0");
 
       const result = await updateSystemSettingsAction(undefined, formData);
 

@@ -62,28 +62,56 @@ function parseSystemSettingsFormData(
     data.max_total_spaces = Number.parseInt(maxTotalSpaces as string, 10);
   }
 
-  const expirationHours = formData.get("space_expiration_hours");
-  if (expirationHours) {
-    data.space_expiration_hours = Number.parseInt(
-      expirationHours as string,
-      10
-    );
+  // Parse space expiration days and hours and convert to hours for database storage
+  const spaceExpirationDays = formData.get("space_expiration_days");
+  const spaceExpirationHours = formData.get("space_expiration_hours");
+  if (
+    spaceExpirationDays !== null &&
+    spaceExpirationHours !== null &&
+    spaceExpirationDays !== "" &&
+    spaceExpirationHours !== ""
+  ) {
+    const days = Number.parseInt(spaceExpirationDays as string, 10);
+    const hours = Number.parseInt(spaceExpirationHours as string, 10);
+    if (!(Number.isNaN(days) || Number.isNaN(hours))) {
+      data.space_expiration_hours = days * 24 + hours;
+    }
   }
 
-  // Parse archive retention days and convert to hours for database storage
+  // Parse archive retention days and hours and convert to hours for database storage
   const archiveRetentionDays = formData.get("archive_retention_days");
-  if (archiveRetentionDays) {
+  const archiveRetentionHours = formData.get("archive_retention_hours");
+  if (
+    archiveRetentionDays !== null &&
+    archiveRetentionHours !== null &&
+    archiveRetentionDays !== "" &&
+    archiveRetentionHours !== ""
+  ) {
     const days = Number.parseInt(archiveRetentionDays as string, 10);
-    data.archive_retention_hours = days * 24; // Convert days to hours
+    const hours = Number.parseInt(archiveRetentionHours as string, 10);
+    if (!(Number.isNaN(days) || Number.isNaN(hours))) {
+      data.archive_retention_hours = days * 24 + hours;
+    }
   }
 
-  // Parse spaces archive retention days and convert to hours for database storage
+  // Parse spaces archive retention days and hours and convert to hours for database storage
   const spacesArchiveRetentionDays = formData.get(
     "spaces_archive_retention_days"
   );
-  if (spacesArchiveRetentionDays) {
+  const spacesArchiveRetentionHours = formData.get(
+    "spaces_archive_retention_hours"
+  );
+  if (
+    spacesArchiveRetentionDays !== null &&
+    spacesArchiveRetentionHours !== null &&
+    spacesArchiveRetentionDays !== "" &&
+    spacesArchiveRetentionHours !== ""
+  ) {
     const days = Number.parseInt(spacesArchiveRetentionDays as string, 10);
-    data.spaces_archive_retention_hours = days * 24; // Convert days to hours
+    const hours = Number.parseInt(spacesArchiveRetentionHours as string, 10);
+    if (!(Number.isNaN(days) || Number.isNaN(hours))) {
+      data.spaces_archive_retention_hours = days * 24 + hours;
+    }
   }
 
   // Parse nested features object with proper boolean handling
