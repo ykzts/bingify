@@ -1,6 +1,3 @@
-// Component uses TanStack Form's render props which have complex types
-// biome-ignore lint: Complex TanStack Form types
-// @ts-nocheck
 "use client";
 
 import { useTranslations } from "next-intl";
@@ -15,15 +12,11 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { getErrorMessage } from "@/lib/utils/error-message";
+import { useSettingsForm } from "./settings-form-context";
 
-interface Props {
-  // biome-ignore lint/suspicious/noExplicitAny: TanStack Form types are complex and internal
-  form: any;
-  isSubmitting: boolean;
-}
-
-export function ResourceLimitsTab({ form, isSubmitting }: Props) {
+export function ResourceLimitsTab() {
   const t = useTranslations("AdminSettings");
+  const { form, isSubmitting } = useSettingsForm();
 
   return (
     <div className="space-y-6">
@@ -36,7 +29,8 @@ export function ResourceLimitsTab({ form, isSubmitting }: Props) {
       <FieldSet>
         <FieldGroup>
           <form.Field name="max_participants_per_space">
-            {(field) => (
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
               <Field>
                 <FieldContent>
                   <FieldLabel>{t("maxParticipantsLabel")}</FieldLabel>
@@ -67,7 +61,8 @@ export function ResourceLimitsTab({ form, isSubmitting }: Props) {
           </form.Field>
 
           <form.Field name="max_spaces_per_user">
-            {(field) => (
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
               <Field>
                 <FieldContent>
                   <FieldLabel>{t("maxSpacesPerUserLabel")}</FieldLabel>
@@ -98,7 +93,8 @@ export function ResourceLimitsTab({ form, isSubmitting }: Props) {
           </form.Field>
 
           <form.Field name="max_total_spaces">
-            {(field) => (
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
               <Field>
                 <FieldContent>
                   <FieldLabel>{t("maxTotalSpacesLabel")}</FieldLabel>

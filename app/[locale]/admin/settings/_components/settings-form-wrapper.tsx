@@ -13,23 +13,20 @@ import { useActionState, useEffect, useEffectEvent } from "react";
 import { toast } from "sonner";
 import { FormErrors } from "@/components/form-errors";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { updateSystemSettingsAction } from "../_actions/system-settings";
 import {
   systemSettingsFormOpts,
   systemSettingsFormSchema,
 } from "../_lib/form-options";
-import { AuthProvidersTab } from "./auth-providers-tab";
-import { ExpirationArchiveTab } from "./expiration-archive-tab";
-import { GeneralSettingsTab } from "./general-settings-tab";
-import { ResourceLimitsTab } from "./resource-limits-tab";
+import { SettingsFormContext } from "./settings-form-context";
 
 interface Props {
+  children: React.ReactNode;
   initialSettings?: SystemSettings;
 }
 
-export function SystemSettingsForm({ initialSettings }: Props) {
+export function SettingsFormWrapper({ children, initialSettings }: Props) {
   const router = useRouter();
   const t = useTranslations("AdminSettings");
 
@@ -93,50 +90,23 @@ export function SystemSettingsForm({ initialSettings }: Props) {
   }, [state]);
 
   return (
-    <form
-      action={action}
-      className="space-y-6"
-      noValidate
-      onSubmit={() => form.handleSubmit()}
-    >
-      <FormErrors errors={formErrors} variant="with-icon" />
+    <SettingsFormContext.Provider value={{ form, isSubmitting }}>
+      <form
+        action={action}
+        className="space-y-6"
+        noValidate
+        onSubmit={() => form.handleSubmit()}
+      >
+        <FormErrors errors={formErrors} variant="with-icon" />
 
-      <Tabs defaultValue="general">
-        <TabsList>
-          <TabsTrigger value="general">{t("generalTitle")}</TabsTrigger>
-          <TabsTrigger value="resource-limits">
-            {t("resourceLimitsTitle")}
-          </TabsTrigger>
-          <TabsTrigger value="expiration-archive">
-            {t("expirationArchiveTitle")}
-          </TabsTrigger>
-          <TabsTrigger value="auth-providers">
-            {t("authProvidersTitle")}
-          </TabsTrigger>
-        </TabsList>
+        {children}
 
-        <TabsContent value="general">
-          <GeneralSettingsTab form={form} isSubmitting={isSubmitting} />
-        </TabsContent>
-
-        <TabsContent value="resource-limits">
-          <ResourceLimitsTab form={form} isSubmitting={isSubmitting} />
-        </TabsContent>
-
-        <TabsContent value="expiration-archive">
-          <ExpirationArchiveTab form={form} isSubmitting={isSubmitting} />
-        </TabsContent>
-
-        <TabsContent value="auth-providers">
-          <AuthProvidersTab form={form} isSubmitting={isSubmitting} />
-        </TabsContent>
-      </Tabs>
-
-      <div className="flex justify-end border-t pt-6">
-        <Button disabled={!canSubmit || isSubmitting} type="submit">
-          {isSubmitting ? t("saving") : t("saveButton")}
-        </Button>
-      </div>
-    </form>
+        <div className="flex justify-end border-t pt-6">
+          <Button disabled={!canSubmit || isSubmitting} type="submit">
+            {isSubmitting ? t("saving") : t("saveButton")}
+          </Button>
+        </div>
+      </form>
+    </SettingsFormContext.Provider>
   );
 }

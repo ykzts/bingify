@@ -1,6 +1,3 @@
-// Component uses TanStack Form's render props which have complex types
-// biome-ignore lint: Complex TanStack Form types
-// @ts-nocheck
 "use client";
 
 import { useTranslations } from "next-intl";
@@ -15,15 +12,11 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { getErrorMessage } from "@/lib/utils/error-message";
+import { useSettingsForm } from "./settings-form-context";
 
-interface Props {
-  // biome-ignore lint/suspicious/noExplicitAny: TanStack Form types are complex and internal
-  form: any;
-  isSubmitting: boolean;
-}
-
-export function ExpirationArchiveTab({ form, isSubmitting }: Props) {
+export function ExpirationArchiveTab() {
   const t = useTranslations("AdminSettings");
+  const { form, isSubmitting } = useSettingsForm();
 
   return (
     <div className="space-y-6">
@@ -36,7 +29,8 @@ export function ExpirationArchiveTab({ form, isSubmitting }: Props) {
       <FieldSet>
         <FieldGroup>
           <form.Field name="space_expiration_hours">
-            {(field) => (
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
               <Field>
                 <FieldContent>
                   <FieldLabel>{t("spaceExpirationLabel")}</FieldLabel>
@@ -67,7 +61,8 @@ export function ExpirationArchiveTab({ form, isSubmitting }: Props) {
           </form.Field>
 
           <form.Field name="archive_retention_days">
-            {(field) => (
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
               <Field>
                 <FieldContent>
                   <FieldLabel>{t("archiveRetentionLabel")}</FieldLabel>
@@ -98,7 +93,8 @@ export function ExpirationArchiveTab({ form, isSubmitting }: Props) {
           </form.Field>
 
           <form.Field name="spaces_archive_retention_days">
-            {(field) => (
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
               <Field>
                 <FieldContent>
                   <FieldLabel>{t("spacesArchiveRetentionLabel")}</FieldLabel>

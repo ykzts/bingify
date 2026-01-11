@@ -1,6 +1,3 @@
-// Component uses TanStack Form's render props which have complex types
-// biome-ignore lint: Complex TanStack Form types
-// @ts-nocheck
 "use client";
 
 import { useTranslations } from "next-intl";
@@ -22,27 +19,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getErrorMessage } from "@/lib/utils/error-message";
+import { useSettingsForm } from "./settings-form-context";
 
-interface Props {
-  // biome-ignore lint/suspicious/noExplicitAny: TanStack Form types are complex and internal
-  form: any;
-  isSubmitting: boolean;
-}
-
-export function GeneralSettingsTab({ form, isSubmitting }: Props) {
+export function GeneralSettingsTab() {
   const t = useTranslations("AdminSettings");
+  const { form, isSubmitting } = useSettingsForm();
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-gray-600 text-sm">{t("generalDescription")}</p>
-      </div>
-
       <FieldSet>
         <FieldLegend>{t("userSettingsTitle")}</FieldLegend>
         <FieldGroup>
           <form.Field name="default_user_role">
-            {(field) => (
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
               <Field>
                 <FieldContent>
                   <FieldLabel>{t("defaultUserRoleLabel")}</FieldLabel>

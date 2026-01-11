@@ -1,24 +1,18 @@
-// Component uses TanStack Form's render props which have complex types
-// biome-ignore lint: Complex TanStack Form types
-// @ts-nocheck
 "use client";
 
 import { useStore } from "@tanstack/react-form";
 import { useTranslations } from "next-intl";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { useSettingsForm } from "./settings-form-context";
 
-interface Props {
-  // biome-ignore lint/suspicious/noExplicitAny: TanStack Form types are complex and internal
-  form: any;
-  isSubmitting: boolean;
-}
-
-export function AuthProvidersTab({ form, isSubmitting }: Props) {
+export function AuthProvidersTab() {
   const t = useTranslations("AdminSettings");
+  const { form, isSubmitting } = useSettingsForm();
 
   // Get platform-level enabled states from nested form values
-  const formValues = useStore(form.store, (state) => state.values);
+  // biome-ignore lint/suspicious/noExplicitAny: TanStack Form store state type
+  const formValues = useStore(form.store, (state: any) => state.values);
   const youtubeEnabled =
     formValues.features?.gatekeeper?.youtube?.enabled ?? true;
   const twitchEnabled =
@@ -42,7 +36,8 @@ export function AuthProvidersTab({ form, isSubmitting }: Props) {
           {/* YouTube Platform */}
           <div className="space-y-2">
             <form.Field name="features.gatekeeper.youtube.enabled">
-              {(field) => (
+              {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+              {(field: any) => (
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     checked={field.state.value as boolean}
@@ -67,7 +62,8 @@ export function AuthProvidersTab({ form, isSubmitting }: Props) {
             {youtubeEnabled && (
               <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4">
                 <form.Field name="features.gatekeeper.youtube.member.enabled">
-                  {(field) => (
+                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                  {(field: any) => (
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         checked={field.state.value as boolean}
@@ -89,7 +85,8 @@ export function AuthProvidersTab({ form, isSubmitting }: Props) {
                 </form.Field>
 
                 <form.Field name="features.gatekeeper.youtube.subscriber.enabled">
-                  {(field) => (
+                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                  {(field: any) => (
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         checked={field.state.value as boolean}
@@ -116,7 +113,8 @@ export function AuthProvidersTab({ form, isSubmitting }: Props) {
           {/* Twitch Platform */}
           <div className="space-y-2">
             <form.Field name="features.gatekeeper.twitch.enabled">
-              {(field) => (
+              {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+              {(field: any) => (
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     checked={field.state.value as boolean}
@@ -141,7 +139,8 @@ export function AuthProvidersTab({ form, isSubmitting }: Props) {
             {twitchEnabled && (
               <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4">
                 <form.Field name="features.gatekeeper.twitch.follower.enabled">
-                  {(field) => (
+                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                  {(field: any) => (
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         checked={field.state.value as boolean}
@@ -163,7 +162,8 @@ export function AuthProvidersTab({ form, isSubmitting }: Props) {
                 </form.Field>
 
                 <form.Field name="features.gatekeeper.twitch.subscriber.enabled">
-                  {(field) => (
+                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                  {(field: any) => (
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         checked={field.state.value as boolean}
@@ -189,7 +189,8 @@ export function AuthProvidersTab({ form, isSubmitting }: Props) {
 
           {/* Email */}
           <form.Field name="features.gatekeeper.email.enabled">
-            {(field) => (
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
               <div className="flex items-center space-x-2">
                 <Checkbox
                   checked={field.state.value as boolean}
