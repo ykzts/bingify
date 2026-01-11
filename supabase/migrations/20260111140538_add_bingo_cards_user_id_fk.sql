@@ -8,7 +8,6 @@ WHERE user_id::uuid NOT IN (SELECT id FROM auth.users);
 
 -- Step 2: RLS ポリシーを一時的に削除（型変更のため）
 DROP POLICY IF EXISTS "Users can read their own bingo cards" ON bingo_cards;
-DROP POLICY IF EXISTS "Users can read bingo cards in spaces they've joined" ON bingo_cards;
 DROP POLICY IF EXISTS "Users can insert their own bingo cards" ON bingo_cards;
 DROP POLICY IF EXISTS "Users can delete their own bingo cards" ON bingo_cards;
 
