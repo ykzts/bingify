@@ -7,24 +7,24 @@
 - AI (Cursor/Copilot)にコードを書かせる際は、可能な限りこのファイルをコンテキスト (`@docs/GLOSSARY.md`)に含めるか、参照させるようにしてください。
 - 新しい概念が登場した際は、随時このファイルを更新してください。
 - 用語の定義は、コード上の命名と一致させることを心がけてください。
-- **日本語・英語の表記ルールについては [STYLE_GUIDE.md] (STYLE_GUIDE.md)を参照してください。**
+- **日本語・英語の表記ルールについては [STYLE_GUIDE.md](STYLE_GUIDE.md)を参照してください。**
 
 ## UI表示における用語統一ルール
 
 アプリケーション全体で一貫した用語を使用するため、以下の対訳表に従ってください。
 
-| 英語 (Code/Key) | 日本語 (UI Display) | 備考 |
-| :--------------------- | :----------------------------------------- | :-------------------------------------------------------------------------------------------------- |
-| **Share Key** | **共有キー** | ❌ シェアキー, ❌ スラッグ, ❌ Share key (日本語環境下)<br>内部実装: `shareKey` / `share_key` |
-| **Space** | **スペース** | ❌ ルーム, ❌ 会場 |
-| **Dashboard** | **ダッシュボード** | ❌ 管理画面 (ダッシュボードの文脈で)<br>例外: AdminSpace.headingなど一部で「ダッシュボード」を使用 |
-| **Host / Owner** | **ホスト** または **所有者** | スペースの文脈では「ホスト」、技術的な文脈では「所有者」 |
-| **Participant** | **参加者** | ❌ ゲスト, ❌ ユーザー (参加者の文脈で) |
-| **Join** | **参加する** | ❌ 入室する |
-| **Sign in / Sign out** | **ログイン / ログアウト** | ❌ サインイン, ❌ サインアウト<br>英語は "Sign in/Sign out" (動詞形)を使用 |
-| **View Token** | **閲覧トークン** | 画面表示用の認証トークン |
-| **Gatekeeper** | **ゲートキーパー** または **アクセス制御** | 参加条件設定機能 |
-| **Admin** | **管理者** | サイト管理者を指す場合 |
+| 英語 (Code/Key)        | 日本語 (UI Display)                        | 備考                                                                                               |
+| :--------------------- | :----------------------------------------- | :------------------------------------------------------------------------------------------------- |
+| **Share Key**          | **共有キー**                               | ❌ シェアキー, ❌ スラッグ, ❌ Share key (日本語環境下)<br>内部実装: `shareKey` / `share_key`      |
+| **Space**              | **スペース**                               | ❌ ルーム, ❌ 会場                                                                                 |
+| **Dashboard**          | **ダッシュボード**                         | ❌ 管理画面 (ダッシュボードの文脈で)<br>例外: AdminSpace.headingなど一部で「ダッシュボード」を使用 |
+| **Host / Owner**       | **ホスト** または **所有者**               | スペースの文脈では「ホスト」、技術的な文脈では「所有者」                                           |
+| **Participant**        | **参加者**                                 | ❌ ゲスト, ❌ ユーザー (参加者の文脈で)                                                            |
+| **Join**               | **参加する**                               | ❌ 入室する                                                                                        |
+| **Sign in / Sign out** | **ログイン / ログアウト**                  | ❌ サインイン, ❌ サインアウト<br>英語は "Sign in/Sign out" (動詞形)を使用                         |
+| **View Token**         | **閲覧トークン**                           | 画面表示用の認証トークン                                                                           |
+| **Gatekeeper**         | **ゲートキーパー** または **アクセス制御** | 参加条件設定機能                                                                                   |
+| **Admin**              | **管理者**                                 | サイト管理者を指す場合                                                                             |
 
 **重要**:
 
@@ -84,9 +84,9 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **英語**: Space
 - **日本語**: スペース
 - **コード上の命名**:
- - データベーステーブル: `spaces`
- - 型定義: `Space` (未明示的定義)
- - ルートパラメータ: `[id]`
+- データベーステーブル: `spaces`
+- 型定義: `Space` (未明示的定義)
+- ルートパラメータ: `[id]`
 - **関連用語**: Share Key, Space ID
 
 ### 2.2 Share Key (共有キー)
@@ -95,18 +95,18 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **英語**: Share Key
 - **日本語**: 共有キー
 - **コード上の命名**:
- - データベースカラム: `spaces.share_key`
- - フォームフィールド: `shareKey`
- - Zodスキーマ: `spaceSchema.shareKey`
- - 変数名: `shareKey`
- - 関数名: `checkShareKeyAvailability ()`, `findAvailableShareKey ()`
+- データベースカラム: `spaces.share_key`
+- フォームフィールド: `shareKey`
+- Zodスキーマ: `spaceSchema.shareKey`
+- 変数名: `shareKey`
+- 関数名: `checkShareKeyAvailability ()`, `findAvailableShareKey ()`
 - **形式**: `<user-input>-<YYYYMMDD>` (例: `my-party-20251224`)
 - **制約**: 小文字の英数字とハイフンのみ、3〜30文字
 - **UI表示ルール**:
- - ✅ 正しい表記: 「共有キー」
- - ❌ 使用禁止: 「シェアキー」「スラッグ」「slug」「Share key」 (日本語環境下)
- - コード内部 (変数名、関数名、DBカラム名、スキーマ)では `shareKey` または `share_key` を使用
- - ユーザーの目に触れる翻訳ファイルやUIラベルでは必ず「共有キー」を使用すること
+- ✅ 正しい表記: 「共有キー」
+- ❌ 使用禁止: 「シェアキー」「スラッグ」「slug」「Share key」 (日本語環境下)
+- コード内部 (変数名、関数名、DBカラム名、スキーマ)では `shareKey` または `share_key` を使用
+- ユーザーの目に触れる翻訳ファイルやUIラベルでは必ず「共有キー」を使用すること
 - **備考**: 将来的に日付サフィックスは有料オプションなどで省略可能となる可能性がある
 
 ### 2.3 Space ID
@@ -115,8 +115,8 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **英語**: Space ID
 - **日本語**: スペースID
 - **コード上の命名**:
- - データベースカラム: `spaces.id`
- - ルートパラメータ: `[id]`
+- データベースカラム: `spaces.id`
+- ルートパラメータ: `[id]`
 - **形式**: UUID v4
 - **例**: `550e8400-e29b-41d4-a716-446655440000`
 
@@ -126,8 +126,8 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **英語**: Bingo Card
 - **日本語**: ビンゴカード
 - **コード上の命名**:
- - データベーステーブル: `bingo_cards`
- - 型定義: `BingoCard` (未明示的定義)
+- データベーステーブル: `bingo_cards`
+- 型定義: `BingoCard` (未明示的定義)
 - **関連フィールド**: `space_id`, `user_id`, `numbers`
 
 ### 2.5 Called Numbers (抽選済み番号)
@@ -136,8 +136,8 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **英語**: Called Numbers
 - **日本語**: 抽選済み番号 / コール済み番号
 - **コード上の命名**:
- - データベーステーブル: `called_numbers`
- - 型定義: `CalledNumber` (未明示的定義)
+- データベーステーブル: `called_numbers`
+- 型定義: `CalledNumber` (未明示的定義)
 - **関連フィールド**: `space_id`, `value`, `called_at`
 
 ### 2.6 View Token (閲覧トークン)
@@ -166,8 +166,8 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **英語**: Realtime Sync / Real-time Synchronization
 - **日本語**: リアルタイム同期
 - **コード上の命名**:
- - Supabase 機能: `supabase_realtime` publication
- - 対象テーブル: `spaces`, `bingo_cards`, `called_numbers`
+- Supabase 機能: `supabase_realtime` publication
+- 対象テーブル: `spaces`, `bingo_cards`, `called_numbers`
 - **用途**: 抽選番号の同期、カードの更新など
 
 ### 3.2 Magic Link (マジックリンク)
@@ -184,9 +184,9 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **英語**: Identity Linking
 - **日本語**: アイデンティティ連携
 - **コード上の命名**:
- - ファイルパス: `app/[locale]/settings/account/_components/account-linking-form.tsx`
- - サーバーアクション: `unlinkIdentity` in `app/[locale]/settings/account/actions.ts`
- - Supabase 関数: `supabase.auth.linkIdentity ()`, `supabase.auth.unlinkIdentity ()`
+- ファイルパス: `app/[locale]/settings/account/_components/account-linking-form.tsx`
+- サーバーアクション: `unlinkIdentity` in `app/[locale]/settings/account/actions.ts`
+- Supabase 関数: `supabase.auth.linkIdentity ()`, `supabase.auth.unlinkIdentity ()`
 - **関連技術**: Supabase Auth
 
 ### 3.4 Server Functions / Server Actions
@@ -195,9 +195,9 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **英語**: Server Functions / Server Actions
 - **日本語**: サーバー関数 / サーバーアクション
 - **コード上の命名**:
- - ファイルパス: `app/[locale]/dashboard/actions.ts`
- - マーカー: `"use server"`
- - 主要関数: `createSpace`, `checkSlugAvailability`
+- ファイルパス: `app/[locale]/dashboard/actions.ts`
+- マーカー: `"use server"`
+- 主要関数: `createSpace`, `checkSlugAvailability`
 - **関連技術**: Zod, `useActionState`
 
 ### 3.5 Basic Auth (ベーシック認証)
@@ -206,9 +206,9 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **英語**: Basic Auth / Basic Authentication
 - **日本語**: ベーシック認証
 - **コード上の命名**:
- - ファイルパス: `lib/auth/basic-auth.ts`
- - 関数: `checkBasicAuth`
- - 環境変数: `ENABLE_BASIC_AUTH`, `BASIC_AUTH_USER`, `BASIC_AUTH_PASSWORD`
+- ファイルパス: `lib/auth/basic-auth.ts`
+- 関数: `checkBasicAuth`
+- 環境変数: `ENABLE_BASIC_AUTH`, `BASIC_AUTH_USER`, `BASIC_AUTH_PASSWORD`
 - **用途**: 公開前の制限、ステージング環境保護
 
 ### 3.6 Proxy (プロキシ)
@@ -217,11 +217,11 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **英語**: Proxy
 - **日本語**: プロキシ
 - **コード上の命名**:
- - ファイルパス: `lib/middleware/share-key.ts`
- - 関数: `handleShareKeyRewrite`, `validateShareKey`
+- ファイルパス: `lib/middleware/share-key.ts`
+- 関数: `handleShareKeyRewrite`, `validateShareKey`
 - **主要機能**:
- - `/@<share_key>` → `/[locale]/spaces/[id]` への内部書き換え
- - Share Keyのバリデーション
+- `/@<share_key>` → `/[locale]/spaces/[id]` への内部書き換え
+- Share Keyのバリデーション
 - **参考**: https://nextjs.org/docs/app/api-reference/file-conventions/proxy
 
 ### 3.7 Zod Schema (Zodスキーマ)
@@ -230,9 +230,9 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **英語**: Zod Schema
 - **日本語**: Zodスキーマ
 - **コード上の命名**:
- - ファイルパス: `lib/schemas/space.ts`
- - スキーマ: `spaceSchema`
- - 型推論: `z.infer<typeof spaceSchema>`
+- ファイルパス: `lib/schemas/space.ts`
+- スキーマ: `spaceSchema`
+- 型推論: `z.infer<typeof spaceSchema>`
 - **関連技術**: Server Functions, `useActionState`
 
 ---
@@ -272,15 +272,16 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 - **主キー**: `id` (UUID)
 - **フィールド**:
- - `share_key` (TEXT, UNIQUE): 共有キー
- - `settings` (JSONB): スペース設定
- - `status` (TEXT): ステータス
- - `draft`: 準備中 (非公開)
- - `active`: 進行中 (公開)
- - `closed`: 終了 (閲覧のみ)- 手動終了と自動終了 (48時間経過)の両方を含む
- - `created_at`, `updated_at` (TIMESTAMP)
+- `share_key` (TEXT, UNIQUE): 共有キー
+- `settings` (JSONB): スペース設定
+- `status` (TEXT): ステータス
+- `draft`: 準備中 (非公開)
+- `active`: 進行中 (公開)
+- `closed`: 終了 (閲覧のみ)- 手動終了と自動終了 (48時間経過)の両方を含む
+- `created_at`, `updated_at` (TIMESTAMP)
 
-**備考**: 
+**備考**:
+
 - `closed` スペースは一定期間 (デフォルト168時間 = 7日、システム設定画面の `archive_retention_hours` で設定可能)経過後、自動的に削除され `spaces_archive` テーブルに移動します
 - `spaces_archive` テーブル内のレコードは一定期間 (デフォルト2160時間 = 90日、システム設定画面の `spaces_archive_retention_hours` で設定可能)後にさらに削除されます
 
@@ -289,17 +290,17 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **主キー**: `id` (UUID)
 - **外部キー**: `space_id` → `spaces.id`
 - **フィールド**:
- - `user_id` (TEXT): ユーザー識別子
- - `numbers` (JSONB): ビンゴカードの数字配列
- - `created_at` (TIMESTAMP)
+- `user_id` (TEXT): ユーザー識別子
+- `numbers` (JSONB): ビンゴカードの数字配列
+- `created_at` (TIMESTAMP)
 
 ### 5.3 called_numbersテーブル
 
 - **主キー**: `id` (UUID)
 - **外部キー**: `space_id` → `spaces.id`
 - **フィールド**:
- - `value` (INTEGER): 抽選された番号
- - `called_at` (TIMESTAMP): 抽選日時
+- `value` (INTEGER): 抽選された番号
+- `called_at` (TIMESTAMP): 抽選日時
 
 ---
 
@@ -324,9 +325,10 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 ### 6.4 定期ジョブ
 
 - `CRON_SECRET`: Vercel Cronジョブの認証用シークレット (必須)
- - 定期的なクリーンアップジョブの実行を認証するために使用されます
+- 定期的なクリーンアップジョブの実行を認証するために使用されます
 
 **アーカイブ保持期間の設定:**
+
 - `archive_retention_hours` と `spaces_archive_retention_hours` は `system_settings` テーブルに保存され、管理画面から設定可能です
 - `archive_retention_hours` (デフォルト: 168時間 = 7日): `closed` ステータスのスペースがこの期間経過後に自動削除され `spaces_archive` テーブルに移動します
 - `spaces_archive_retention_hours` (デフォルト: 2160時間 = 90日): `spaces_archive` テーブル内のレコードがこの期間経過後に完全削除されます
@@ -366,17 +368,17 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 ## 8. 更新履歴
 
-| 日付 | 変更内容 | 変更者 |
+| 日付       | 変更内容                                                                  | 変更者         |
 | ---------- | ------------------------------------------------------------------------- | -------------- |
 | 2025-12-30 | 内部実装を `slug` から `shareKey` に統一、Dashboard表記を統一、用語を追加 | GitHub Copilot |
-| 2025-12-30 | UI表示における用語統一ルールを追加、Share Keyの定義を明確化 | GitHub Copilot |
-| 2025-12-26 | 初版作成 | GitHub Copilot |
+| 2025-12-30 | UI表示における用語統一ルールを追加、Share Keyの定義を明確化               | GitHub Copilot |
+| 2025-12-26 | 初版作成                                                                  | GitHub Copilot |
 
 ---
 
 ## 9. 参考資料
 
-- [README.md] (../README.md): プロジェクト概要、セットアップ手順
-- [AGENTS.md] (../AGENTS.md): AI開発者向けガイドライン
-- [CONTRIBUTING.md] (../CONTRIBUTING.md): コーディング指針、PR作成ルール
-- [STYLE_GUIDE.md] (STYLE_GUIDE.md): 日本語・英語表記の統一ルール
+- [README.md](../README.md): プロジェクト概要、セットアップ手順
+- [AGENTS.md](../AGENTS.md): AI開発者向けガイドライン
+- [CONTRIBUTING.md](../CONTRIBUTING.md): コーディング指針、PR作成ルール
+- [STYLE_GUIDE.md](STYLE_GUIDE.md): 日本語・英語表記の統一ルール

@@ -10,9 +10,9 @@
 
 - ワークフローは `.sql` ファイルの追加・変更時に自動実行されます
 - **⚠️ 既に適用済みのマイグレーションファイルは絶対に編集しないでください**
- - Supabaseは一度適用されたマイグレーションを再実行しません
- - 既存のマイグレーションファイルを編集すると、新規環境構築時のみ変更が反映され、既存環境との間で不整合が発生します
- - 変更が必要な場合は、必ず新しいマイグレーションファイルを作成してください
+- Supabaseは一度適用されたマイグレーションを再実行しません
+- 既存のマイグレーションファイルを編集すると、新規環境構築時のみ変更が反映され、既存環境との間で不整合が発生します
+- 変更が必要な場合は、必ず新しいマイグレーションファイルを作成してください
 - **マイグレーションファイルの削除はデータベースからのロールバックを行いません**
 - リポジトリからファイルを削除しても、Cloud Supabaseに適用済みのマイグレーションは残ります
 - マイグレーションを元に戻す必要がある場合は、新しいマイグレーションファイルで明示的にロールバックSQLを記述してください
@@ -29,7 +29,7 @@ Supabaseの Personal Access Tokenです。
 
 **取得方法:**
 
-1. [Supabase Dashboard] (https://supabase.com/dashboard) にログイン
+1. [Supabase Dashboard](https://supabase.com/dashboard) にログイン
 2. 右上のアカウントメニューから **Account Settings** を開く
 3. **Access Tokens** タブを選択
 4. **Generate new token** をクリック
@@ -48,7 +48,7 @@ Supabaseプロジェクトの Project Reference IDです。
 
 **取得方法:**
 
-1. [Supabase Dashboard] (https://supabase.com/dashboard) でプロジェクトを開く
+1. [Supabase Dashboard](https://supabase.com/dashboard) でプロジェクトを開く
 2. Settings > Generalを選択
 3. **Reference ID** をコピー (例: `abcdefghijklmnop`)
 4. GitHubリポジトリの Secretsに `SUPABASE_PROJECT_ID` として保存
@@ -63,8 +63,10 @@ Supabaseプロジェクトの Project Reference IDです。
 2. **New environment** をクリック
 3. 環境名を入力 (`production` または `staging`)
 4. 必要に応じて Protection rulesを設定
- - Required reviewers: 本番環境へのデプロイ前に承認を必須にする
- - Wait timer: デプロイ前に待機時間を設定する
+
+- Required reviewers: 本番環境へのデプロイ前に承認を必須にする
+- Wait timer: デプロイ前に待機時間を設定する
+
 5. Environment secretsに環境固有の `SUPABASE_PROJECT_ID` を設定
 
 ## 運用フロー
@@ -428,6 +430,6 @@ ALTER TABLE spaces DROP COLUMN IF EXISTS new_column;
 
 ## 参考リンク
 
-- [Supabase CLIドキュメント] (https://supabase.com/docs/guides/cli)
-- [Supabaseマイグレーションガイド] (https://supabase.com/docs/guides/cli/local-development#database-migrations)
-- [GitHub Actionsドキュメント] (https://docs.github.com/actions)
+- [Supabase CLIドキュメント](https://supabase.com/docs/guides/cli)
+- [Supabaseマイグレーションガイド](https://supabase.com/docs/guides/cli/local-development#database-migrations)
+- [GitHub Actionsドキュメント](https://docs.github.com/actions)
