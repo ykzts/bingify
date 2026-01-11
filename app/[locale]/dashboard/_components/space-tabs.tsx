@@ -48,7 +48,7 @@ function SpaceTable({
                   href={`/dashboard/spaces/${space.id}`}
                 >
                   <div className="flex items-center gap-2">
-                    {space.share_key}
+                    {space.title || space.share_key}
                     {space.is_owner === false && (
                       <span className="rounded bg-blue-100 px-2 py-0.5 text-blue-800 text-xs">
                         {t("adminBadge")}

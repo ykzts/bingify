@@ -102,7 +102,7 @@ export default async function DashboardPage({
                 </span>
                 <div>
                   <p className="font-bold text-green-900">
-                    {space.share_key}{" "}
+                    {space.title || space.share_key}{" "}
                     <span className="text-green-700 text-xs">
                       ({t("activeSpaceLabel")})
                     </span>
@@ -151,7 +151,7 @@ export default async function DashboardPage({
                 </span>
                 <div>
                   <p className="font-bold text-green-900">
-                    {space.share_key}{" "}
+                    {space.title || space.share_key}{" "}
                     <span className="text-green-700 text-xs">
                       ({t("activeSpaceLabel")})
                     </span>
@@ -210,7 +210,7 @@ export default async function DashboardPage({
                         className="transition-colors hover:text-purple-600"
                         href={`/dashboard/spaces/${space.id}`}
                       >
-                        {space.share_key}
+                        {space.title || space.share_key}
                       </Link>
                     </td>
                     <td className="px-4 py-3">
