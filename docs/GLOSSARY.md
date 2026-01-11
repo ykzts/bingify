@@ -7,6 +7,7 @@
 - AI (Cursor/Copilot)にコードを書かせる際は、可能な限りこのファイルをコンテキスト (`@docs/GLOSSARY.md`)に含めるか、参照させるようにしてください。
 - 新しい概念が登場した際は、随時このファイルを更新してください。
 - 用語の定義は、コード上の命名と一致させることを心がけてください。
+- **日本語・英語の表記ルールについては [STYLE_GUIDE.md] (STYLE_GUIDE.md)を参照してください。**
 
 ## UI表示における用語統一ルール
 
@@ -378,3 +379,4 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - [README.md] (../README.md): プロジェクト概要、セットアップ手順
 - [AGENTS.md] (../AGENTS.md): AI開発者向けガイドライン
 - [CONTRIBUTING.md] (../CONTRIBUTING.md): コーディング指針、PR作成ルール
+- [STYLE_GUIDE.md] (STYLE_GUIDE.md): 日本語・英語表記の統一ルール
