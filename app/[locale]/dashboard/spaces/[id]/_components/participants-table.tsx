@@ -1,6 +1,7 @@
 "use client";
 
 import { PartyPopper, Zap } from "lucide-react";
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -153,7 +154,15 @@ export function ParticipantsTable({
                         <div className="flex items-center gap-3">
                           <Avatar className="size-8">
                             {avatarUrl ? (
-                              <AvatarImage alt={displayName} src={avatarUrl} />
+                              <AvatarImage asChild>
+                                <Image
+                                  alt={displayName}
+                                  className="object-cover"
+                                  fill
+                                  sizes="32px"
+                                  src={avatarUrl}
+                                />
+                              </AvatarImage>
                             ) : null}
                             <AvatarFallback>
                               {getInitials(displayName)}

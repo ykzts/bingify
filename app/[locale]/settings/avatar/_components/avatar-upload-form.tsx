@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertCircle, Loader2, Upload } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -149,7 +150,20 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
         {previewUrl && (
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
-              <AvatarImage alt={t("previewAlt")} src={previewUrl} />
+              {/* ブロブURLの場合は通常のimgタグを使用 */}
+              {previewUrl.startsWith("blob:") ? (
+                <AvatarImage alt={t("previewAlt")} src={previewUrl} />
+              ) : (
+                <AvatarImage asChild>
+                  <Image
+                    alt={t("previewAlt")}
+                    className="object-cover"
+                    fill
+                    sizes="64px"
+                    src={previewUrl}
+                  />
+                </AvatarImage>
+              )}
               <AvatarFallback>
                 <Upload className="h-8 w-8" />
               </AvatarFallback>

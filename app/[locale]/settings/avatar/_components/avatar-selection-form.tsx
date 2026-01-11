@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertCircle, Camera, Loader2, User } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
@@ -139,10 +140,15 @@ export function AvatarSelectionForm({
                 htmlFor="upload"
               >
                 <Avatar className="h-12 w-12">
-                  <AvatarImage
-                    alt={t("uploadedAvatar")}
-                    src={uploadedAvatarUrl}
-                  />
+                  <AvatarImage asChild>
+                    <Image
+                      alt={t("uploadedAvatar")}
+                      className="object-cover"
+                      fill
+                      sizes="48px"
+                      src={uploadedAvatarUrl}
+                    />
+                  </AvatarImage>
                   <AvatarFallback>
                     <Camera aria-hidden="true" className="size-5" />
                   </AvatarFallback>
@@ -166,10 +172,15 @@ export function AvatarSelectionForm({
                 htmlFor={avatar.provider}
               >
                 <Avatar className="h-12 w-12">
-                  <AvatarImage
-                    alt={getProviderLabel(avatar.provider)}
-                    src={avatar.avatar_url}
-                  />
+                  <AvatarImage asChild>
+                    <Image
+                      alt={getProviderLabel(avatar.provider)}
+                      className="object-cover"
+                      fill
+                      sizes="48px"
+                      src={avatar.avatar_url}
+                    />
+                  </AvatarImage>
                   <AvatarFallback>
                     <ProviderIcon provider={avatar.provider} />
                   </AvatarFallback>
