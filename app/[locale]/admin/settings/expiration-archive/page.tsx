@@ -1,7 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSystemSettings } from "@/lib/data/system-settings";
-import { ExpirationArchiveTab } from "../_components/expiration-archive-tab";
-import { SettingsFormWrapper } from "../_components/settings-form-wrapper";
+import { ExpirationArchiveForm } from "../_components/expiration-archive-form";
 
 export const dynamic = "force-dynamic";
 
@@ -48,9 +47,7 @@ export default async function ExpirationArchivePage({
       )}
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <SettingsFormWrapper initialSettings={settings}>
-          <ExpirationArchiveTab />
-        </SettingsFormWrapper>
+        <ExpirationArchiveForm initialSettings={settings} />
       </div>
     </div>
   );

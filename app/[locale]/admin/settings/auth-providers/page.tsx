@@ -1,7 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSystemSettings } from "@/lib/data/system-settings";
-import { AuthProvidersTab } from "../_components/auth-providers-tab";
-import { SettingsFormWrapper } from "../_components/settings-form-wrapper";
+import { AuthProvidersForm } from "../_components/auth-providers-form";
 
 export const dynamic = "force-dynamic";
 
@@ -46,9 +45,7 @@ export default async function AuthProvidersPage({
       )}
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <SettingsFormWrapper initialSettings={settings}>
-          <AuthProvidersTab />
-        </SettingsFormWrapper>
+        <AuthProvidersForm initialSettings={settings} />
       </div>
     </div>
   );
