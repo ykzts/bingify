@@ -126,7 +126,9 @@ describe("systemSettingsFormSchema", () => {
       });
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain("1時間以上");
+        expect(result.error.issues[0].message).toContain(
+          "無期限にする場合を除き"
+        );
       }
     });
 

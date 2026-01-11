@@ -65,14 +65,17 @@ function parseSystemSettingsFormData(
   // Parse space expiration days and hours and convert to hours for database storage
   const spaceExpirationDays = formData.get("space_expiration_days");
   const spaceExpirationHours = formData.get("space_expiration_hours");
-  if (spaceExpirationDays !== null || spaceExpirationHours !== null) {
-    const days = spaceExpirationDays
-      ? Number.parseInt(spaceExpirationDays as string, 10)
-      : 0;
-    const hours = spaceExpirationHours
-      ? Number.parseInt(spaceExpirationHours as string, 10)
-      : 0;
-    data.space_expiration_hours = days * 24 + hours;
+  if (
+    spaceExpirationDays !== null &&
+    spaceExpirationHours !== null &&
+    spaceExpirationDays !== "" &&
+    spaceExpirationHours !== ""
+  ) {
+    const days = Number.parseInt(spaceExpirationDays as string, 10);
+    const hours = Number.parseInt(spaceExpirationHours as string, 10);
+    if (!(Number.isNaN(days) || Number.isNaN(hours))) {
+      data.space_expiration_hours = days * 24 + hours;
+    }
   }
 
   // Parse archive retention days and convert to hours for database storage

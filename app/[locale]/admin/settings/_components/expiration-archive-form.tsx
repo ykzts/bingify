@@ -138,7 +138,7 @@ export function ExpirationArchiveForm({ initialSettings }: Props) {
                       type="number"
                       value={field.state.value?.days ?? 0}
                     />
-                    <InputGroupText>日</InputGroupText>
+                    <InputGroupText>{t("spaceExpirationDays")}</InputGroupText>
                     <InputGroupInput
                       className="w-20"
                       disabled={isSubmitting}
@@ -157,7 +157,7 @@ export function ExpirationArchiveForm({ initialSettings }: Props) {
                       type="number"
                       value={field.state.value?.hours ?? 0}
                     />
-                    <InputGroupText>時間</InputGroupText>
+                    <InputGroupText>{t("spaceExpirationHours")}</InputGroupText>
                   </InputGroup>
                   <FieldDescription>
                     {t("spaceExpirationHelp")}

@@ -62,7 +62,7 @@ export const systemSettingsFormSchema = z.object({
         .max(23, "最大23時間までです"),
     })
     .refine((data) => data.days > 0 || data.hours > 0, {
-      message: "1時間以上を指定してください",
+      message: "無期限にする場合を除き、1時間以上を指定してください",
     }),
   spaces_archive_retention_days: z
     .number()
