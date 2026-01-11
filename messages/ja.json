@@ -372,7 +372,8 @@
     "spaceActions": "操作",
     "statusActive": "開催中",
     "statusClosed": "終了",
-    "statusDraft": "準備中"
+    "statusDraft": "準備中",
+    "viewSpaceAction": "スペースを見る"
   },
   "DisplaySettings": {
     "backgroundDescription": "スクリーン背景色を変更します。配信用に透過やクロマキー(緑/青)オプションが利用可能です。",

@@ -4,6 +4,7 @@ import {
   Copy,
   DoorClosed,
   ExternalLink,
+  Eye,
   MoreHorizontal,
   Settings,
 } from "lucide-react";
@@ -41,6 +42,13 @@ export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
   const router = useRouter();
   const [isClosing, setIsClosing] = useState(false);
   const [showCloseDialog, setShowCloseDialog] = useState(false);
+
+  // 参加スペース（主催者ではない）かどうかを判定
+  const isParticipatedSpace = space.is_owner === false;
+
+  const handleViewSpace = () => {
+    router.push(`/spaces/${space.id}`);
+  };
 
   const handleManage = () => {
     router.push(`/dashboard/spaces/${space.id}?open=settings`);
@@ -96,34 +104,45 @@ export function SpaceActionsDropdown({ space }: SpaceActionsDropdownProps) {
           <span className="sr-only">{t("spaceActions")}</span>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleManage}>
-            <Settings className="mr-2 h-4 w-4" />
-            {t("manageAction")}
-          </DropdownMenuItem>
-
-          {(isActive || isDraft) && (
+          {/* 参加スペースの場合は「View Space」アクションのみを表示 */}
+          {isParticipatedSpace ? (
+            <DropdownMenuItem onClick={handleViewSpace}>
+              <Eye className="mr-2 h-4 w-4" />
+              {t("viewSpaceAction")}
+            </DropdownMenuItem>
+          ) : (
             <>
-              <DropdownMenuItem onClick={handleCopyLink}>
-                <Copy className="mr-2 h-4 w-4" />
-                {t("copyLinkAction")}
+              {/* 主催スペースの場合は既存のすべてのアクションを表示 */}
+              <DropdownMenuItem onClick={handleManage}>
+                <Settings className="mr-2 h-4 w-4" />
+                {t("manageAction")}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleOpenPublicView}>
-                <ExternalLink className="mr-2 h-4 w-4" />
-                {t("openPublicViewAction")}
+
+              {(isActive || isDraft) && (
+                <>
+                  <DropdownMenuItem onClick={handleCopyLink}>
+                    <Copy className="mr-2 h-4 w-4" />
+                    {t("copyLinkAction")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleOpenPublicView}>
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    {t("openPublicViewAction")}
+                  </DropdownMenuItem>
+                </>
+              )}
+
+              <DropdownMenuSeparator />
+
+              {/* Show close action for non-closed spaces */}
+              <DropdownMenuItem
+                className="text-red-600 focus:text-red-600"
+                onClick={() => setShowCloseDialog(true)}
+              >
+                <DoorClosed className="mr-2 h-4 w-4" />
+                {t("closeAction")}
               </DropdownMenuItem>
             </>
           )}
-
-          <DropdownMenuSeparator />
-
-          {/* Show close action for non-closed spaces */}
-          <DropdownMenuItem
-            className="text-red-600 focus:text-red-600"
-            onClick={() => setShowCloseDialog(true)}
-          >
-            <DoorClosed className="mr-2 h-4 w-4" />
-            {t("closeAction")}
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
