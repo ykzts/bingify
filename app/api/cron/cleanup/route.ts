@@ -105,30 +105,25 @@ export async function GET(request: NextRequest) {
     );
 
     // Step 2: archive_retention_hours より古い closed スペースをアーカイブして削除
-    const closedCutoffDate = new Date();
     const validArchiveRetentionHours =
       Number.isFinite(archiveRetentionHours) && archiveRetentionHours >= 0
         ? archiveRetentionHours
         : 168; // 7 days default
-    closedCutoffDate.setHours(
-      closedCutoffDate.getHours() - validArchiveRetentionHours
-    );
+    const closedCutoffMs = Date.now() - validArchiveRetentionHours * 3_600_000;
+    const closedCutoffDate = new Date(closedCutoffMs);
 
-    // 条件付き削除を1回のクエリで実行（スケーラビリティ向上）
-    const { data: deletedSpaces, error: deleteError } = await supabase
+    // 条件付き削除を1回のクエリで実行（スケーラビリティ向上、count:'exact'のみでminimal返却）
+    const { error: deleteError, count: archivedCount } = await supabase
       .from("spaces")
-      .delete()
+      .delete({ count: "exact" })
       .eq("status", "closed")
-      .lt("updated_at", closedCutoffDate.toISOString())
-      .select("id");
+      .lt("updated_at", closedCutoffDate.toISOString());
 
     if (deleteError) {
       console.error("Error deleting closed spaces:", deleteError);
     }
 
-    const archivedCount = deletedSpaces?.length || 0;
-
-    if (archivedCount > 0) {
+    if (archivedCount && archivedCount > 0) {
       console.log(
         `Archived and deleted ${archivedCount} closed space(s) older than ${validArchiveRetentionHours} hours (${Math.round(validArchiveRetentionHours / 24)} days) (cutoff: ${closedCutoffDate.toISOString()})`
       );
@@ -140,16 +135,14 @@ export async function GET(request: NextRequest) {
       spacesArchiveRetentionHours >= 0
         ? spacesArchiveRetentionHours
         : 2160; // 90 days default
-    const archiveCutoffDate = new Date();
-    archiveCutoffDate.setHours(
-      archiveCutoffDate.getHours() - validSpacesArchiveRetentionHours
-    );
+    const archiveCutoffMs =
+      Date.now() - validSpacesArchiveRetentionHours * 3_600_000;
+    const archiveCutoffDate = new Date(archiveCutoffMs);
 
-    const { data: deletedArchives, error: archiveError } = await supabase
+    const { error: archiveError, count: deletedArchiveCount } = await supabase
       .from("spaces_archive")
-      .delete()
-      .lt("archived_at", archiveCutoffDate.toISOString())
-      .select("id");
+      .delete({ count: "exact" })
+      .lt("archived_at", archiveCutoffDate.toISOString());
 
     if (archiveError) {
       console.error("Error deleting old archives:", archiveError);
@@ -159,18 +152,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const deletedArchiveCount = deletedArchives?.length || 0;
-
     console.log(
-      `Cleanup completed: deleted ${deletedArchiveCount} archived record(s) older than ${validSpacesArchiveRetentionHours} hours (${Math.round(validSpacesArchiveRetentionHours / 24)} days) (cutoff: ${archiveCutoffDate.toISOString()})`
+      `Cleanup completed: deleted ${deletedArchiveCount || 0} archived record(s) older than ${validSpacesArchiveRetentionHours} hours (${Math.round(validSpacesArchiveRetentionHours / 24)} days) (cutoff: ${archiveCutoffDate.toISOString()})`
     );
 
     return NextResponse.json({
       data: {
-        archivedCount,
-        deletedArchiveCount,
+        archivedCount: archivedCount || 0,
+        deletedArchiveCount: deletedArchiveCount || 0,
         markedClosedCount,
-        message: `Successfully marked ${markedClosedCount} space(s) as closed, archived ${archivedCount} closed space(s) older than ${Math.round(validArchiveRetentionHours / 24)} days, and deleted ${deletedArchiveCount} archived record(s) older than ${Math.round(validSpacesArchiveRetentionHours / 24)} days`,
+        message: `Successfully marked ${markedClosedCount} space(s) as closed, archived ${archivedCount || 0} closed space(s) older than ${Math.round(validArchiveRetentionHours / 24)} days, and deleted ${deletedArchiveCount || 0} archived record(s) older than ${Math.round(validSpacesArchiveRetentionHours / 24)} days`,
         retentionHours: {
           archive: validArchiveRetentionHours,
           spacesArchive: validSpacesArchiveRetentionHours,
