@@ -90,20 +90,11 @@ END $$;
 DO $$
 DECLARE
   test_space_id UUID := '00000000-0000-0000-0000-000000000110';
-  test_non_owner_id UUID := '00000000-0000-0000-0000-000000000012';
-  update_succeeded BOOLEAN := FALSE;
 BEGIN
   -- status を更新（gatekeeper_rules は変更しない）
   UPDATE spaces
   SET status = 'paused'
   WHERE id = test_space_id;
-  
-  update_succeeded := TRUE;
-  
-  -- テスト結果を記録
-  IF NOT update_succeeded THEN
-    RAISE EXCEPTION 'gatekeeper_rules が変更されない場合の更新が失敗しました';
-  END IF;
 END $$;
 
 SELECT ok(
@@ -121,7 +112,6 @@ DO $$
 DECLARE
   test_space_id UUID := '00000000-0000-0000-0000-000000000110';
   test_owner_id UUID := '00000000-0000-0000-0000-000000000011';
-  update_succeeded BOOLEAN := FALSE;
 BEGIN
   -- auth.uid() がオーナー ID を返すように設定
   PERFORM set_config('request.jwt.claims', json_build_object('sub', test_owner_id::text)::text, true);
@@ -131,15 +121,8 @@ BEGIN
   SET gatekeeper_rules = '{"enabled": true}'::jsonb
   WHERE id = test_space_id;
   
-  update_succeeded := TRUE;
-  
   -- JWT claims をクリア
   PERFORM set_config('request.jwt.claims', '', true);
-  
-  -- テスト結果を記録
-  IF NOT update_succeeded THEN
-    RAISE EXCEPTION 'オーナーによる gatekeeper_rules 更新が失敗しました';
-  END IF;
 END $$;
 
 SELECT ok(
@@ -260,6 +243,7 @@ SELECT ok(
 DO $$
 DECLARE
   test_space_id UUID := '00000000-0000-0000-0000-000000000110';
+  test_owner_id UUID := '00000000-0000-0000-0000-000000000011';
   test_non_owner_id UUID := '00000000-0000-0000-0000-000000000012';
   current_rules JSONB;
 BEGIN
@@ -275,10 +259,20 @@ BEGIN
     owner_id = test_non_owner_id,
     gatekeeper_rules = current_rules
   WHERE id = test_space_id;
+  
+  -- テスト結果の確認
+  IF (SELECT owner_id FROM spaces WHERE id = test_space_id) != test_non_owner_id THEN
+    RAISE EXCEPTION 'owner_id の更新が失敗しました';
+  END IF;
+  
+  -- owner_id を元に戻す（テストの独立性を保つため）
+  UPDATE spaces
+  SET owner_id = test_owner_id
+  WHERE id = test_space_id;
 END $$;
 
 SELECT ok(
-  (SELECT owner_id FROM spaces WHERE id = '00000000-0000-0000-0000-000000000110') = '00000000-0000-0000-0000-000000000012',
+  TRUE,  -- DO ブロック内でテストが完了している
   'gatekeeper_rules が変更されない場合、オーナーシップに関係なく更新が成功すること'
 );
 
