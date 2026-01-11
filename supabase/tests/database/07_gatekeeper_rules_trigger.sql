@@ -35,9 +35,13 @@ SELECT ok(
 -- check_gatekeeper_rules_owner 関数が SECURITY DEFINER ではないことを確認
 -- SECURITY DEFINER が設定されていると auth.uid() が正しく動作しないため
 SELECT ok(
-  NOT (
-    SELECT prosecdef FROM pg_proc
-    WHERE proname = 'check_gatekeeper_rules_owner'
+  NOT COALESCE(
+    (
+      SELECT prosecdef FROM pg_proc
+      WHERE proname = 'check_gatekeeper_rules_owner'
+        AND pronamespace = 'public'::regnamespace
+    ),
+    TRUE  -- 関数が存在しない場合はテスト失敗（TRUE を NOT すると FALSE になる）
   ),
   'check_gatekeeper_rules_owner 関数が SECURITY DEFINER ではないこと（auth.uid() の正常動作のため）'
 );
