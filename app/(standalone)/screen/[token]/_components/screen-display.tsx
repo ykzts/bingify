@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useEffectEvent, useState } from "react";
@@ -16,6 +16,7 @@ import type {
   ThemeType,
 } from "@/lib/types/screen-settings";
 import { cn } from "@/lib/utils";
+import { NotificationBanner } from "./notification-banner";
 
 interface Props {
   baseUrl: string;
@@ -25,6 +26,21 @@ interface Props {
   locale: string;
   shareKey: string;
   spaceId: string;
+}
+
+interface ParticipantUpdate {
+  bingo_status: "none" | "reach" | "bingo";
+  id: string;
+  profiles?: {
+    full_name: string | null;
+  } | null;
+  user_id: string;
+}
+
+interface NotificationState {
+  id: string;
+  message: string;
+  type: "bingo" | "reach";
 }
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Complex UI component with multiple state management and realtime subscriptions
@@ -42,6 +58,9 @@ export function ScreenDisplay({
   const { data: calledNumbers = [] } = useCalledNumbers(spaceId, { retry: 3 });
   const [mode, setMode] = useState<DisplayMode>(initialMode);
   const [theme, setTheme] = useState<ThemeType>(initialTheme);
+  const [notification, setNotification] = useState<NotificationState | null>(
+    null
+  );
   const {
     currentNumber: drumRollNumber,
     isAnimating,
@@ -203,6 +222,86 @@ export function ScreenDisplay({
     };
   }, [spaceId]);
 
+  // Use useEffectEvent for participants update handling
+  const onParticipantUpdate = useEffectEvent(
+    (payload: { new: ParticipantUpdate }) => {
+      const updated = payload.new;
+
+      // Validate payload structure
+      if (!(updated?.id && updated.user_id && updated.bingo_status)) {
+        console.error("Invalid participant update payload:", payload);
+        return;
+      }
+
+      // Validate bingo_status value
+      if (!["none", "reach", "bingo"].includes(updated.bingo_status)) {
+        console.error("Invalid bingo_status value:", updated.bingo_status);
+        return;
+      }
+
+      // Show notification for bingo or reach
+      if (updated.bingo_status === "bingo" || updated.bingo_status === "reach") {
+        const displayName =
+          updated.profiles?.full_name || t("guestName");
+        const messageKey =
+          updated.bingo_status === "bingo"
+            ? "notificationBingo"
+            : "notificationReach";
+        const message = t(messageKey, { name: displayName });
+
+        // Set notification with unique ID to trigger re-render
+        setNotification({
+          id: `${updated.id}-${updated.bingo_status}-${Date.now()}`,
+          message,
+          type: updated.bingo_status,
+        });
+
+        // Auto-hide notification after duration
+        const duration = updated.bingo_status === "bingo" ? 5000 : 3000;
+        setTimeout(() => {
+          setNotification(null);
+        }, duration);
+      }
+    }
+  );
+
+  // Subscribe to participants updates for bingo/reach notifications
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`screen-${spaceId}-participants`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          filter: `space_id=eq.${spaceId}`,
+          schema: "public",
+          table: "participants",
+        },
+        (payload) => {
+          const updated = payload.new as ParticipantUpdate;
+          onParticipantUpdate({ new: updated });
+        }
+      )
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          console.error(
+            `Participants subscription error for screen-${spaceId}:`,
+            status
+          );
+        } else if (status === "SUBSCRIBED") {
+          console.info(
+            `Participants subscription established for screen-${spaceId}`
+          );
+        }
+      });
+
+    return () => {
+      channel.unsubscribe();
+      supabase.removeChannel(channel);
+    };
+  }, [spaceId]);
+
   const currentNumber =
     calledNumbers.length > 0 ? (calledNumbers.at(-1)?.value ?? null) : null;
 
@@ -225,6 +324,17 @@ export function ScreenDisplay({
         theme === "light" ? "bg-white" : ""
       )}
     >
+      {/* Notification Banner */}
+      <AnimatePresence>
+        {notification && (
+          <NotificationBanner
+            key={notification.id}
+            message={notification.message}
+            type={notification.type}
+          />
+        )}
+      </AnimatePresence>
+
       {isMinimal ? (
         /* Minimal Mode: Current Number Only */
         <div className="flex h-screen w-full items-center justify-center">
