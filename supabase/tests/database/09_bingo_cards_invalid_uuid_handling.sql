@@ -1,16 +1,16 @@
 -- ビンゴカード無効UUID処理のテスト
 -- マイグレーションが無効なUUID形式のuser_idを安全に処理することを検証
+-- 外部キー制約が正しく機能することを検証
 
 BEGIN;
 
 -- テストプランの設定
-SELECT plan(3);
+SELECT plan(4);
 
 -- ========================================
--- 無効なUUID処理のテスト
+-- テスト用データの準備
 -- ========================================
 
--- テスト用のスペースとユーザーを準備
 DO $$
 DECLARE
   test_space_id UUID;
@@ -63,6 +63,10 @@ BEGIN
   );
 END $$;
 
+-- ========================================
+-- 正常ケースのテスト
+-- ========================================
+
 -- 有効なUUIDのビンゴカードが正常に作成されていることを確認
 SELECT ok(
   (SELECT COUNT(*) FROM bingo_cards WHERE user_id = '00000000-0000-0000-0000-000000000091'::uuid) = 1,
@@ -75,13 +79,39 @@ SELECT col_type_is(
   'マイグレーション後、user_idはUUID型であること'
 );
 
--- 外部キー制約が正しく機能することを確認
+-- ========================================
+-- 外部キー制約違反のテスト
+-- ========================================
+
+-- 存在しないユーザーIDでのINSERTが外部キー制約違反でエラーになることを確認
+SELECT throws_ok(
+  $$
+    INSERT INTO bingo_cards (space_id, user_id, numbers)
+    VALUES (
+      '00000000-0000-0000-0000-000000000092'::uuid,
+      '99999999-9999-9999-9999-999999999999'::uuid,
+      '[[1,2,3,4,5],[6,7,8,9,10],[11,12,0,13,14],[15,16,17,18,19],[20,21,22,23,24]]'::jsonb
+    )
+  $$,
+  '23503',  -- foreign_key_violation
+  NULL,
+  '存在しないuser_idでのINSERTは外部キー制約違反でエラーになること'
+);
+
+-- ========================================
+-- マイグレーション後のデータ整合性テスト
+-- ========================================
+
+-- マイグレーション実行後、全てのbingo_cardsのuser_idが有効なauth.usersを参照していることを確認
 SELECT ok(
-  (SELECT COUNT(*) 
-   FROM information_schema.table_constraints 
-   WHERE constraint_name = 'bingo_cards_user_id_fkey' 
-   AND table_name = 'bingo_cards') = 1,
-  '外部キー制約が存在し、無効なUUIDを防ぐこと'
+  NOT EXISTS (
+    SELECT 1 FROM bingo_cards bc
+    WHERE NOT EXISTS (
+      SELECT 1 FROM auth.users u
+      WHERE u.id = bc.user_id
+    )
+  ),
+  'マイグレーション後、全てのビンゴカードが有効なユーザーを参照していること'
 );
 
 -- テスト終了
