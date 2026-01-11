@@ -510,7 +510,17 @@ export function SpaceSettingsForm({
         action={updateAction}
         className="space-y-6"
         noValidate
-        onSubmit={() => form.handleSubmit()}
+        onSubmit={(e) => {
+          // TODO: Remove debug logging after verification
+          const formData = new FormData(e.currentTarget);
+          console.log("=== FormData Debug ===");
+          console.log("All FormData entries:");
+          for (const [key, value] of formData.entries()) {
+            console.log(`  ${key}: ${value}`);
+          }
+          console.log("=== End FormData Debug ===");
+          form.handleSubmit();
+        }}
       >
         {/* Basic Information */}
         <FieldSet>
@@ -773,6 +783,7 @@ export function SpaceSettingsForm({
                                     </FieldLabel>
                                     <RadioGroup
                                       disabled={isGatekeeperDisabled}
+                                      name={field.name}
                                       onValueChange={(value) => {
                                         field.handleChange(value);
                                       }}
@@ -863,6 +874,7 @@ export function SpaceSettingsForm({
                                     </FieldLabel>
                                     <RadioGroup
                                       disabled={isGatekeeperDisabled}
+                                      name={field.name}
                                       onValueChange={(value) => {
                                         field.handleChange(value);
                                       }}

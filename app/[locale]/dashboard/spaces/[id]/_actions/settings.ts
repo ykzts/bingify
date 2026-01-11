@@ -44,6 +44,14 @@ export async function updateSpaceSettings(
   formData: FormData
 ) {
   try {
+    // TODO: Remove debug logging after verification
+    console.log("=== Server FormData Debug ===");
+    console.log("All FormData entries received:");
+    for (const [key, value] of formData.entries()) {
+      console.log(`  ${key}: ${value}`);
+    }
+    console.log("=== End Server FormData Debug ===");
+
     if (!isValidUUID(spaceId)) {
       return {
         ...initialFormState,
