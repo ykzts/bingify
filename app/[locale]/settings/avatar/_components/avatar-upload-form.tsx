@@ -154,7 +154,7 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
               {previewUrl.startsWith("blob:") ? (
                 <AvatarImage alt={t("previewAlt")} src={previewUrl} />
               ) : (
-                <AvatarImage asChild>
+                <AvatarImage asChild src={previewUrl}>
                   <Image
                     alt={t("previewAlt")}
                     className="object-cover"

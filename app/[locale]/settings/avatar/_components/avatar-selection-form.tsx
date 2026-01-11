@@ -140,7 +140,7 @@ export function AvatarSelectionForm({
                 htmlFor="upload"
               >
                 <Avatar className="h-12 w-12">
-                  <AvatarImage asChild>
+                  <AvatarImage asChild src={uploadedAvatarUrl}>
                     <Image
                       alt={t("uploadedAvatar")}
                       className="object-cover"
@@ -172,7 +172,7 @@ export function AvatarSelectionForm({
                 htmlFor={avatar.provider}
               >
                 <Avatar className="h-12 w-12">
-                  <AvatarImage asChild>
+                  <AvatarImage asChild src={avatar.avatar_url}>
                     <Image
                       alt={getProviderLabel(avatar.provider)}
                       className="object-cover"

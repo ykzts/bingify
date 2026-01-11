@@ -154,7 +154,7 @@ export function ParticipantsTable({
                         <div className="flex items-center gap-3">
                           <Avatar className="size-8">
                             {avatarUrl ? (
-                              <AvatarImage asChild>
+                              <AvatarImage asChild src={avatarUrl}>
                                 <Image
                                   alt={displayName}
                                   className="object-cover"

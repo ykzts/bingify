@@ -221,7 +221,7 @@ export function AdminManagement({ spaceId }: Props) {
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
                     {admin.avatar_url && (
-                      <AvatarImage asChild>
+                      <AvatarImage asChild src={admin.avatar_url}>
                         <Image
                           alt={admin.full_name || "Admin"}
                           className="object-cover"

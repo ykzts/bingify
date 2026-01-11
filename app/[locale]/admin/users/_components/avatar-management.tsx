@@ -124,7 +124,7 @@ export function AvatarManagement({
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
               {userProfile.avatar_url ? (
-                <AvatarImage asChild>
+                <AvatarImage asChild src={userProfile.avatar_url}>
                   <Image
                     alt={userProfile.full_name || userProfile.email || "User"}
                     className="object-cover"
