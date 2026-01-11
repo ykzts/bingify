@@ -26,11 +26,15 @@ const nextConfig: NextConfig = {
         hostname: "static-cdn.jtvnw.net",
         protocol: "https",
       },
-      {
-        hostname: "127.0.0.1",
-        port: "54321",
-        protocol: "http",
-      },
+      ...(process.env.NODE_ENV === "development"
+        ? [
+            {
+              hostname: "127.0.0.1",
+              port: "54321",
+              protocol: "http" as const,
+            },
+          ]
+        : []),
       {
         hostname: "*.supabase.co",
         protocol: "https",
