@@ -30,3 +30,6 @@ BEGIN
   WHERE s.id = 1;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Set search_path for security to prevent search_path hijacking
+ALTER FUNCTION get_system_settings() SET search_path = pg_catalog, public;
