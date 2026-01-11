@@ -223,6 +223,24 @@ export function ScreenDisplay({
     };
   }, [spaceId]);
 
+  // Helper function to fetch participant profile
+  const fetchParticipantProfile = async (
+    userId: string
+  ): Promise<string | null> => {
+    const supabase = createClient();
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", userId)
+      .single();
+
+    if (profileError) {
+      console.warn(`Failed to fetch profile for user ${userId}:`, profileError);
+    }
+
+    return profile?.full_name || null;
+  };
+
   // Use useEffectEvent for participants update handling
   const onParticipantUpdate = useEffectEvent(
     async (payload: { new: ParticipantUpdate }) => {
@@ -255,14 +273,8 @@ export function ScreenDisplay({
         }
 
         // Fetch profile information from profiles table
-        const supabase = createClient();
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name")
-          .eq("id", updated.user_id)
-          .single();
-
-        const displayName = profile?.full_name || t("guestName");
+        const fullName = await fetchParticipantProfile(updated.user_id);
+        const displayName = fullName || t("guestName");
         const messageKey =
           updated.bingo_status === "bingo"
             ? "notificationBingo"
