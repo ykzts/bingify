@@ -773,6 +773,7 @@ export function SpaceSettingsForm({
                                     </FieldLabel>
                                     <RadioGroup
                                       disabled={isGatekeeperDisabled}
+                                      name={field.name}
                                       onValueChange={(value) => {
                                         field.handleChange(value);
                                       }}
@@ -863,6 +864,7 @@ export function SpaceSettingsForm({
                                     </FieldLabel>
                                     <RadioGroup
                                       disabled={isGatekeeperDisabled}
+                                      name={field.name}
                                       onValueChange={(value) => {
                                         field.handleChange(value);
                                       }}
