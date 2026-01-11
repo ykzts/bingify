@@ -1,63 +1,10 @@
 import { describe, expect, it } from "vitest";
-
-// テストのためのモック参加者データ
-interface MockParticipant {
-  bingo_status: "none" | "reach" | "bingo";
-  id: string;
-  joined_at: string | null;
-  profiles?: {
-    avatar_url: string | null;
-    full_name: string | null;
-  } | null;
-  user_id: string;
-}
-
-/**
- * 参加者リストを更新してソートする関数
- * これはparticipants-status.tsxから抽出したロジックをテストするためのコピーです
- */
-function updateParticipantList(
-  participants: MockParticipant[],
-  updatedId: string,
-  newStatus: "none" | "reach" | "bingo",
-  profiles?: { avatar_url: string | null; full_name: string | null } | null
-): MockParticipant[] {
-  const index = participants.findIndex((p) => p.id === updatedId);
-  if (index === -1) {
-    return participants;
-  }
-
-  const newList = [...participants];
-  newList[index] = {
-    ...newList[index],
-    bingo_status: newStatus,
-    // プロフィールが提供された場合は更新
-    ...(profiles !== undefined && { profiles }),
-  };
-
-  // ビンゴステータスでソート (bingo > reach > none) 次にjoined_atでソート
-  newList.sort((a, b) => {
-    const statusOrder: Record<"bingo" | "reach" | "none", number> = {
-      bingo: 0,
-      none: 2,
-      reach: 1,
-    };
-    const statusDiff =
-      statusOrder[a.bingo_status] - statusOrder[b.bingo_status];
-    if (statusDiff !== 0) {
-      return statusDiff;
-    }
-    const aTime = a.joined_at ? new Date(a.joined_at).getTime() : 0;
-    const bTime = b.joined_at ? new Date(b.joined_at).getTime() : 0;
-    return aTime - bTime;
-  });
-
-  return newList;
-}
+import type { Participant } from "../_hooks/use-participants";
+import { updateParticipantList } from "../participants-status";
 
 describe("ParticipantsStatus - updateParticipantList", () => {
   it("ビンゴステータスを更新する", () => {
-    const participants: MockParticipant[] = [
+    const participants: Participant[] = [
       {
         bingo_status: "none",
         id: "participant-1",
@@ -77,7 +24,7 @@ describe("ParticipantsStatus - updateParticipantList", () => {
   });
 
   it("プロフィール情報を更新する", () => {
-    const participants: MockParticipant[] = [
+    const participants: Participant[] = [
       {
         bingo_status: "none",
         id: "participant-1",
@@ -100,7 +47,7 @@ describe("ParticipantsStatus - updateParticipantList", () => {
   });
 
   it("プロフィール情報が提供されない場合は既存のプロフィールを保持する", () => {
-    const participants: MockParticipant[] = [
+    const participants: Participant[] = [
       {
         bingo_status: "none",
         id: "participant-1",
@@ -121,7 +68,7 @@ describe("ParticipantsStatus - updateParticipantList", () => {
   });
 
   it("ビンゴステータスに基づいて参加者をソートする (bingo > reach > none)", () => {
-    const participants: MockParticipant[] = [
+    const participants: Participant[] = [
       {
         bingo_status: "none",
         id: "participant-1",
@@ -162,7 +109,7 @@ describe("ParticipantsStatus - updateParticipantList", () => {
   });
 
   it("同じステータス内ではjoined_atの順序を保つ", () => {
-    const participants: MockParticipant[] = [
+    const participants: Participant[] = [
       {
         bingo_status: "reach",
         id: "participant-1",
@@ -200,7 +147,7 @@ describe("ParticipantsStatus - updateParticipantList", () => {
   });
 
   it("存在しない参加者IDの場合は元のリストを返す", () => {
-    const participants: MockParticipant[] = [
+    const participants: Participant[] = [
       {
         bingo_status: "none",
         id: "participant-1",
@@ -220,7 +167,7 @@ describe("ParticipantsStatus - updateParticipantList", () => {
   });
 
   it("プロフィールがnullの場合でも正しく処理する", () => {
-    const participants: MockParticipant[] = [
+    const participants: Participant[] = [
       {
         bingo_status: "none",
         id: "participant-1",
@@ -243,7 +190,7 @@ describe("ParticipantsStatus - updateParticipantList", () => {
   });
 
   it("複雑なシナリオ: 複数の参加者が異なるステータスでソートされる", () => {
-    const participants: MockParticipant[] = [
+    const participants: Participant[] = [
       {
         bingo_status: "none",
         id: "participant-1",

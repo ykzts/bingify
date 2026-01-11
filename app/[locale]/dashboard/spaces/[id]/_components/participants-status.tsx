@@ -65,30 +65,51 @@ function showStatusNotification(
 type ParticipantProfile = NonNullable<Participant["profiles"]>;
 
 /**
- * Fetch participant profile from profiles table
+ * Fetch participant profile from profiles table with retry mechanism
  */
 async function fetchParticipantProfile(
   userId: string
 ): Promise<ParticipantProfile | null> {
-  const supabase = createClient();
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("full_name, avatar_url")
-    .eq("id", userId)
-    .single();
+  const MAX_RETRIES = 3;
+  const BASE_DELAY_MS = 100;
 
-  if (profileError) {
-    console.warn(`Failed to fetch profile for user ${userId}:`, profileError);
-    return null;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    const supabase = createClient();
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("full_name, avatar_url")
+      .eq("id", userId)
+      .single();
+
+    if (!profileError) {
+      return profile;
+    }
+
+    // Log the error and retry attempt
+    if (attempt < MAX_RETRIES) {
+      const delay = BASE_DELAY_MS * 2 ** (attempt - 1) + Math.random() * 50;
+      console.warn(
+        `Failed to fetch profile for user ${userId} (attempt ${attempt}/${MAX_RETRIES}):`,
+        profileError,
+        `Retrying in ${Math.round(delay)}ms...`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    } else {
+      // All retries failed
+      console.warn(
+        `Failed to fetch profile for user ${userId} after ${MAX_RETRIES} attempts:`,
+        profileError
+      );
+    }
   }
 
-  return profile;
+  return null;
 }
 
 /**
  * Update and sort participant list
  */
-function updateParticipantList(
+export function updateParticipantList(
   participants: Participant[],
   updatedId: string,
   newStatus: "none" | "reach" | "bingo",
