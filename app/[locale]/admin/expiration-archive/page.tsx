@@ -1,12 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSystemSettings } from "@/lib/data/system-settings";
-import { AuthProvidersForm } from "../_components/auth-providers-form";
+import { ExpirationArchiveForm } from "../settings/_components/expiration-archive-form";
 
 export const dynamic = "force-dynamic";
 
-export default async function AuthProvidersPage({
+export default async function ExpirationArchivePage({
   params,
-}: PageProps<"/[locale]/admin/settings/auth-providers">) {
+}: PageProps<"/[locale]/admin/expiration-archive">) {
   const { locale } = await params;
   setRequestLocale(locale);
 
@@ -27,8 +27,10 @@ export default async function AuthProvidersPage({
   return (
     <div>
       <div className="mb-6">
-        <h2 className="font-bold text-2xl">{t("authProvidersTitle")}</h2>
-        <p className="mt-2 text-gray-600">{t("authProvidersDescription")}</p>
+        <h2 className="font-bold text-2xl">{t("expirationArchiveTitle")}</h2>
+        <p className="mt-2 text-gray-600">
+          {t("expirationArchiveDescription")}
+        </p>
       </div>
 
       {warnings && warnings.length > 0 && (
@@ -45,7 +47,7 @@ export default async function AuthProvidersPage({
       )}
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <AuthProvidersForm initialSettings={settings} />
+        <ExpirationArchiveForm initialSettings={settings} />
       </div>
     </div>
   );

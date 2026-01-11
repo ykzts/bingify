@@ -1,12 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSystemSettings } from "@/lib/data/system-settings";
-import { GeneralSettingsForm } from "../_components/general-settings-form";
+import { GeneralSettingsForm } from "../settings/_components/general-settings-form";
 
 export const dynamic = "force-dynamic";
 
 export default async function GeneralSettingsPage({
   params,
-}: PageProps<"/[locale]/admin/settings/general">) {
+}: PageProps<"/[locale]/admin/general">) {
   const { locale } = await params;
   setRequestLocale(locale);
 

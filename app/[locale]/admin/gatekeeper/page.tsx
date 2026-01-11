@@ -1,12 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSystemSettings } from "@/lib/data/system-settings";
-import { ResourceLimitsForm } from "../_components/resource-limits-form";
+import { AuthProvidersForm } from "../settings/_components/auth-providers-form";
 
 export const dynamic = "force-dynamic";
 
-export default async function ResourceLimitsPage({
+export default async function GatekeeperPage({
   params,
-}: PageProps<"/[locale]/admin/settings/resource-limits">) {
+}: PageProps<"/[locale]/admin/gatekeeper">) {
   const { locale } = await params;
   setRequestLocale(locale);
 
@@ -27,8 +27,8 @@ export default async function ResourceLimitsPage({
   return (
     <div>
       <div className="mb-6">
-        <h2 className="font-bold text-2xl">{t("resourceLimitsTitle")}</h2>
-        <p className="mt-2 text-gray-600">{t("resourceLimitsDescription")}</p>
+        <h2 className="font-bold text-2xl">{t("gatekeeperTitle")}</h2>
+        <p className="mt-2 text-gray-600">{t("gatekeeperDescription")}</p>
       </div>
 
       {warnings && warnings.length > 0 && (
@@ -45,7 +45,7 @@ export default async function ResourceLimitsPage({
       )}
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <ResourceLimitsForm initialSettings={settings} />
+        <AuthProvidersForm initialSettings={settings} />
       </div>
     </div>
   );

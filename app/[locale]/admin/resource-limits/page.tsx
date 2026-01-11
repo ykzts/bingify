@@ -1,12 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSystemSettings } from "@/lib/data/system-settings";
-import { ExpirationArchiveForm } from "../_components/expiration-archive-form";
+import { ResourceLimitsForm } from "../settings/_components/resource-limits-form";
 
 export const dynamic = "force-dynamic";
 
-export default async function ExpirationArchivePage({
+export default async function ResourceLimitsPage({
   params,
-}: PageProps<"/[locale]/admin/settings/expiration-archive">) {
+}: PageProps<"/[locale]/admin/resource-limits">) {
   const { locale } = await params;
   setRequestLocale(locale);
 
@@ -27,10 +27,8 @@ export default async function ExpirationArchivePage({
   return (
     <div>
       <div className="mb-6">
-        <h2 className="font-bold text-2xl">{t("expirationArchiveTitle")}</h2>
-        <p className="mt-2 text-gray-600">
-          {t("expirationArchiveDescription")}
-        </p>
+        <h2 className="font-bold text-2xl">{t("resourceLimitsTitle")}</h2>
+        <p className="mt-2 text-gray-600">{t("resourceLimitsDescription")}</p>
       </div>
 
       {warnings && warnings.length > 0 && (
@@ -47,7 +45,7 @@ export default async function ExpirationArchivePage({
       )}
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <ExpirationArchiveForm initialSettings={settings} />
+        <ResourceLimitsForm initialSettings={settings} />
       </div>
     </div>
   );

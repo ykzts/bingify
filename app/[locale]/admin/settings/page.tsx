@@ -10,5 +10,5 @@ export default async function AdminSettingsPage({
   setRequestLocale(locale);
 
   // Redirect to the general settings page
-  redirect(`/${locale}/admin/settings/general`);
+  redirect(`/${locale}/admin/general`);
 }
