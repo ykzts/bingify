@@ -4,7 +4,7 @@
 BEGIN;
 
 -- テストプランの設定（実行するテスト数を宣言）
-SELECT plan(47);
+SELECT plan(49);
 
 -- ========================================
 -- テーブル存在確認
@@ -53,6 +53,7 @@ SELECT has_column('public', 'spaces', 'updated_at', 'spaces.updated_at カラム
 SELECT has_column('public', 'bingo_cards', 'id', 'bingo_cards.id カラムが存在すること');
 SELECT has_column('public', 'bingo_cards', 'space_id', 'bingo_cards.space_id カラムが存在すること');
 SELECT has_column('public', 'bingo_cards', 'user_id', 'bingo_cards.user_id カラムが存在すること');
+SELECT col_type_is('public', 'bingo_cards', 'user_id', 'uuid', 'bingo_cards.user_id は uuid 型であること');
 SELECT has_column('public', 'bingo_cards', 'numbers', 'bingo_cards.numbers カラムが存在すること');
 SELECT has_column('public', 'bingo_cards', 'created_at', 'bingo_cards.created_at カラムが存在すること');
 
@@ -114,6 +115,13 @@ SELECT fk_ok(
   'public', 'space_roles', 'space_id',
   'public', 'spaces', 'id',
   'space_roles.space_id は spaces.id への外部キー制約があること'
+);
+
+-- bingo_cards.user_id -> auth.users.id
+SELECT fk_ok(
+  'public', 'bingo_cards', 'user_id',
+  'auth', 'users', 'id',
+  'bingo_cards.user_id は auth.users.id への外部キー制約があること'
 );
 
 -- テスト終了
