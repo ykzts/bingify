@@ -372,7 +372,8 @@
     "spaceActions": "Actions",
     "statusActive": "Active",
     "statusClosed": "Closed",
-    "statusDraft": "Draft"
+    "statusDraft": "Draft",
+    "viewSpaceAction": "View Space"
   },
   "DisplaySettings": {
     "backgroundDescription": "Change the screen background color. Transparent and chroma key (green/blue) options are available for streaming.",
