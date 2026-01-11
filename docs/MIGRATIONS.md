@@ -29,7 +29,7 @@ Supabaseの Personal Access Tokenです。
 
 **取得方法:**
 
-1. [Supabase Dashboard](https://supabase.com/dashboard) にログイン
+1. [Supabase Dashboard] (https://supabase.com/dashboard) にログイン
 2. 右上のアカウントメニューから **Account Settings** を開く
 3. **Access Tokens** タブを選択
 4. **Generate new token** をクリック
@@ -48,7 +48,7 @@ Supabaseプロジェクトの Project Reference IDです。
 
 **取得方法:**
 
-1. [Supabase Dashboard](https://supabase.com/dashboard) でプロジェクトを開く
+1. [Supabase Dashboard] (https://supabase.com/dashboard) でプロジェクトを開く
 2. Settings > Generalを選択
 3. **Reference ID** をコピー (例: `abcdefghijklmnop`)
 4. GitHubリポジトリの Secretsに `SUPABASE_PROJECT_ID` として保存
@@ -93,11 +93,11 @@ Supabaseプロジェクトの Project Reference IDです。
 
 ### ⚠️ 重要なルール: 既存のマイグレーションファイルは編集しない
 
-**既に mainブランチにマージされた (または Cloudに適用済みの)マイグレーションファイルは絶対に編集しないでください。**
+**既に mainブランチにマージされた (または Cloudに適用済みの) マイグレーションファイルは絶対に編集しないでください。**
 
 #### なぜ編集してはいけないのか
 
-Supabaseは、マイグレーションの適用状態を `supabase_migrations.schema_migrations` テーブルで管理しています。一度適用されたマイグレーションは、ファイル名 (タイムスタンプ)を基に「適用済み」として記録され、再度実行されることはありません。
+Supabaseは、マイグレーションの適用状態を `supabase_migrations.schema_migrations` テーブルで管理しています。一度適用されたマイグレーションは、ファイル名 (タイムスタンプ) を基に「適用済み」として記録され、再度実行されることはありません。
 
 既存のマイグレーションファイルを編集すると、以下の問題が発生します：
 
@@ -127,7 +127,7 @@ git diff supabase/migrations/20251226000000_add_archive_tables.sql
 # 新しいマイグレーションファイルを作成
 supabase migration new add_field_to_spaces_archive
 
-# 生成されたファイル (例: 20251227120000_add_field_to_spaces_archive.sql)に変更を記述
+# 生成されたファイル (例: 20251227120000_add_field_to_spaces_archive.sql) に変更を記述
 ALTER TABLE spaces_archive ADD COLUMN IF NOT EXISTS new_field TEXT;
 ```
 
@@ -137,7 +137,7 @@ ALTER TABLE spaces_archive ADD COLUMN IF NOT EXISTS new_field TEXT;
 
 PRレビュー時には、以下を確認してください：
 
-- [ ] 既存のマイグレーションファイル (既に mainブランチに存在するファイル)が変更されていないか
+- [ ] 既存のマイグレーションファイル (既に mainブランチに存在するファイル) が変更されていないか
 - [ ] スキーマ変更は新しいマイグレーションファイルとして追加されているか
 - [ ] 新しいマイグレーションファイルのタイムスタンプが最新のものより新しいか
 
@@ -391,7 +391,7 @@ ALTER TABLE spaces DROP COLUMN IF EXISTS new_column;
 
 マイグレーションファイルは以下の観点でレビューしてください：
 
-- [ ] **⚠️ 既存のマイグレーションファイル (既に mainブランチに存在するファイル)が編集されていない**
+- [ ] **⚠️ 既存のマイグレーションファイル (既に mainブランチに存在するファイル) が編集されていない**
 - [ ] 変更は新しいマイグレーションファイルとして追加されている
 - [ ] SQL 構文が正しい
 - [ ] 冪等性が確保されている (`IF EXISTS` / `IF NOT EXISTS`)
@@ -430,6 +430,6 @@ ALTER TABLE spaces DROP COLUMN IF EXISTS new_column;
 
 ## 参考リンク
 
-- [Supabase CLIドキュメント](https://supabase.com/docs/guides/cli)
-- [Supabaseマイグレーションガイド](https://supabase.com/docs/guides/cli/local-development#database-migrations)
-- [GitHub Actionsドキュメント](https://docs.github.com/actions)
+- [Supabase CLIドキュメント] (https://supabase.com/docs/guides/cli)
+- [Supabaseマイグレーションガイド] (https://supabase.com/docs/guides/cli/local-development#database-migrations)
+- [GitHub Actionsドキュメント] (https://docs.github.com/actions)

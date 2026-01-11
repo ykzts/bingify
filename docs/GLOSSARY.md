@@ -4,10 +4,10 @@
 
 ## 運用ルール
 
-- AI (Cursor/Copilot)にコードを書かせる際は、可能な限りこのファイルをコンテキスト (`@docs/GLOSSARY.md`)に含めるか、参照させるようにしてください。
+- AI (Cursor/Copilot) にコードを書かせる際は、可能な限りこのファイルをコンテキスト (`@docs/GLOSSARY.md`) に含めるか、参照させるようにしてください。
 - 新しい概念が登場した際は、随時このファイルを更新してください。
 - 用語の定義は、コード上の命名と一致させることを心がけてください。
-- **日本語・英語の表記ルールについては [STYLE_GUIDE.md](STYLE_GUIDE.md)を参照してください。**
+- **日本語・英語の表記ルールについては [STYLE_GUIDE.md] (STYLE_GUIDE.md) を参照してください。**
 
 ## UI表示における用語統一ルール
 
@@ -21,14 +21,14 @@
 | **Host / Owner**       | **ホスト** または **所有者**               | スペースの文脈では「ホスト」、技術的な文脈では「所有者」                                           |
 | **Participant**        | **参加者**                                 | ❌ ゲスト, ❌ ユーザー (参加者の文脈で)                                                            |
 | **Join**               | **参加する**                               | ❌ 入室する                                                                                        |
-| **Sign in / Sign out** | **ログイン / ログアウト**                  | ❌ サインイン, ❌ サインアウト<br>英語は "Sign in/Sign out" (動詞形)を使用                         |
+| **Sign in / Sign out** | **ログイン / ログアウト**                  | ❌ サインイン, ❌ サインアウト<br>英語は "Sign in/Sign out" (動詞形) を使用                         |
 | **View Token**         | **閲覧トークン**                           | 画面表示用の認証トークン                                                                           |
 | **Gatekeeper**         | **ゲートキーパー** または **アクセス制御** | 参加条件設定機能                                                                                   |
 | **Admin**              | **管理者**                                 | サイト管理者を指す場合                                                                             |
 
 **重要**:
 
-- 内部実装 (変数名、関数名、DBカラム名、スキーマフィールド等)では `shareKey` や `share_key` を使用
+- 内部実装 (変数名、関数名、DBカラム名、スキーマフィールド等) では `shareKey` や `share_key` を使用
 - ユーザーの目に触れる翻訳ファイル (`ja.json`) や UIコンポーネントのラベルでは必ず上記の日本語表記を使用すること
 - 特に「共有キー」の内部実装では `slug` は使用せず、`shareKey` または `share_key` に統一すること
 
@@ -36,7 +36,7 @@
 
 ## 1. ロール・権限定義
 
-Bingifyは**Supabase Authを利用したユーザー認証・ロール管理システム**を実装しています。OAuth (Google、Twitch)によるログインが必須であり、認証されたユーザーのみがスペースの作成や管理を行うことができます。
+Bingifyは**Supabase Authを利用したユーザー認証・ロール管理システム**を実装しています。OAuth (Google、Twitch) によるログインが必須であり、認証されたユーザーのみがスペースの作成や管理を行うことができます。
 
 ### 1.1 Site Admin (サイト管理者)
 
@@ -105,7 +105,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **UI表示ルール**:
 - ✅ 正しい表記: 「共有キー」
 - ❌ 使用禁止: 「シェアキー」「スラッグ」「slug」「Share key」 (日本語環境下)
-- コード内部 (変数名、関数名、DBカラム名、スキーマ)では `shareKey` または `share_key` を使用
+- コード内部 (変数名、関数名、DBカラム名、スキーマ) では `shareKey` または `share_key` を使用
 - ユーザーの目に触れる翻訳ファイルやUIラベルでは必ず「共有キー」を使用すること
 - **備考**: 将来的に日付サフィックスは有料オプションなどで省略可能となる可能性がある
 
@@ -180,7 +180,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 ### 3.3 Identity Linking (アイデンティティ連携)
 
-- **定義**: 複数の認証プロバイダー (Google, Twitch など)を同一ユーザーに紐付ける機能
+- **定義**: 複数の認証プロバイダー (Google, Twitch など) を同一ユーザーに紐付ける機能
 - **英語**: Identity Linking
 - **日本語**: アイデンティティ連携
 - **コード上の命名**:
@@ -213,7 +213,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 ### 3.6 Proxy (プロキシ)
 
-- **定義**: Next.jsの Proxy (旧 Middleware)。リクエストを処理し、URL書き換えやアクセス制御を行う
+- **定義**: Next.jsの Proxy (旧 Middleware) 。リクエストを処理し、URL書き換えやアクセス制御を行う
 - **英語**: Proxy
 - **日本語**: プロキシ
 - **コード上の命名**:
@@ -222,7 +222,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **主要機能**:
 - `/@<share_key>` → `/[locale]/spaces/[id]` への内部書き換え
 - Share Keyのバリデーション
-- **参考**: https://nextjs.org/docs/app/api-reference/file-conventions/proxy
+- **参考**: <https://nextjs.org/docs/app/api-reference/file-conventions/proxy>
 
 ### 3.7 Zod Schema (Zodスキーマ)
 
@@ -277,13 +277,13 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - `status` (TEXT): ステータス
 - `draft`: 準備中 (非公開)
 - `active`: 進行中 (公開)
-- `closed`: 終了 (閲覧のみ)- 手動終了と自動終了 (48時間経過)の両方を含む
+- `closed`: 終了 (閲覧のみ)- 手動終了と自動終了 (48時間経過) の両方を含む
 - `created_at`, `updated_at` (TIMESTAMP)
 
 **備考**:
 
-- `closed` スペースは一定期間 (デフォルト168時間 = 7日、システム設定画面の `archive_retention_hours` で設定可能)経過後、自動的に削除され `spaces_archive` テーブルに移動します
-- `spaces_archive` テーブル内のレコードは一定期間 (デフォルト2160時間 = 90日、システム設定画面の `spaces_archive_retention_hours` で設定可能)後にさらに削除されます
+- `closed` スペースは一定期間 (デフォルト168時間 = 7日、システム設定画面の `archive_retention_hours` で設定可能) 経過後、自動的に削除され `spaces_archive` テーブルに移動します
+- `spaces_archive` テーブル内のレコードは一定期間 (デフォルト2160時間 = 90日、システム設定画面の `spaces_archive_retention_hours` で設定可能) 後にさらに削除されます
 
 ### 5.2 bingo_cardsテーブル
 
@@ -349,14 +349,14 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 ### 7.3 next-intl
 
-- **定義**: Next.jsの国際化 (i18n)ライブラリ
+- **定義**: Next.jsの国際化 (i18n) ライブラリ
 - **言語**: `ja`, `en`
 - **メッセージファイル**: `messages/ja.json`, `messages/en.json`
 
 ### 7.4 Supabase
 
 - **定義**: オープンソースのFirebase代替サービス
-- **用途**: データベース (PostgreSQL)、リアルタイム同期、認証 (将来実装予定)
+- **用途**: データベース (PostgreSQL) 、リアルタイム同期、認証 (将来実装予定)
 
 ### 7.5 Conventional Commits
 
@@ -378,7 +378,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 ## 9. 参考資料
 
-- [README.md](../README.md): プロジェクト概要、セットアップ手順
-- [AGENTS.md](../AGENTS.md): AI開発者向けガイドライン
-- [CONTRIBUTING.md](../CONTRIBUTING.md): コーディング指針、PR作成ルール
-- [STYLE_GUIDE.md](STYLE_GUIDE.md): 日本語・英語表記の統一ルール
+- [README.md] (../README.md): プロジェクト概要、セットアップ手順
+- [AGENTS.md] (../AGENTS.md): AI開発者向けガイドライン
+- [CONTRIBUTING.md] (../CONTRIBUTING.md): コーディング指針、PR作成ルール
+- [STYLE_GUIDE.md] (STYLE_GUIDE.md): 日本語・英語表記の統一ルール
