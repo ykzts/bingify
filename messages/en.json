@@ -569,10 +569,13 @@
     "calledNumbers": "Called Numbers",
     "displayMode": "Display Mode",
     "displaySettings": "Display Settings",
+    "guestName": "Guest",
     "invalidToken": "This URL is invalid or has been regenerated.",
     "loading": "Loading...",
     "modeFull": "Full",
     "modeMinimal": "Minimal",
+    "notificationBingo": "{name} got BINGO!",
+    "notificationReach": "{name} has REACH!",
     "scanToJoin": "Scan to Join",
     "waitingForNumbers": "Waiting for numbers..."
   },
