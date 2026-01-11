@@ -11,7 +11,7 @@ import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
 import { checkBingoLines } from "@/lib/utils/bingo-checker";
-import { updateBingoStatus } from "../_actions/bingo";
+import { updateBingoStatusWithLines } from "../_actions/bingo";
 import { useBingoCard } from "../_hooks/use-bingo-card";
 
 interface Props {
@@ -145,7 +145,11 @@ export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
 
       if (newStatus !== previousStatusRef.current) {
         previousStatusRef.current = newStatus;
-        updateBingoStatus(spaceId, newStatus).catch((err) => {
+        updateBingoStatusWithLines({
+          bingoLines: newStatus === "bingo" ? result.bingoLines : undefined,
+          spaceId,
+          status: newStatus,
+        }).catch((err) => {
           console.error("Failed to update bingo status:", err);
         });
       }

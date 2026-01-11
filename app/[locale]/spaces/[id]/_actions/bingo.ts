@@ -1,5 +1,6 @@
 "use server";
 
+import type { BingoLine } from "@/lib/utils/bingo-checker";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
 
@@ -20,6 +21,12 @@ export interface BingoCardResult {
 export interface UpdateBingoStatusResult {
   error?: string;
   success: boolean;
+}
+
+export interface UpdateBingoStatusWithLinesInput {
+  bingoLines?: BingoLine[];
+  spaceId: string;
+  status: "none" | "reach" | "bingo";
 }
 
 const BINGO_CARD_SIZE = 5;
@@ -159,6 +166,89 @@ export async function getOrCreateBingoCard(
 
 /**
  * Update participant's bingo status (none, reach, or bingo)
+ * If status is "bingo" and bingoLines are provided, also record game result
+ */
+export async function updateBingoStatusWithLines(
+  input: UpdateBingoStatusWithLinesInput
+): Promise<UpdateBingoStatusResult> {
+  try {
+    if (!isValidUUID(input.spaceId)) {
+      return {
+        error: "Invalid space ID",
+        success: false,
+      };
+    }
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "Authentication required",
+        success: false,
+      };
+    }
+
+    // participantsテーブルのbingo_statusを更新
+    const { error: statusError } = await supabase
+      .from("participants")
+      .update({ bingo_status: input.status })
+      .eq("space_id", input.spaceId)
+      .eq("user_id", user.id);
+
+    if (statusError) {
+      console.error("Error updating bingo status:", statusError);
+      return {
+        error: "Failed to update bingo status",
+        success: false,
+      };
+    }
+
+    // ビンゴ達成時にゲーム結果を記録
+    if (input.status === "bingo" && input.bingoLines && input.bingoLines.length > 0) {
+      // パターンタイプを判定
+      const patternType =
+        input.bingoLines.length > 1 ? "multiple" : input.bingoLines[0].type;
+
+      // パターン詳細をJSON形式で保存
+      const patternDetails = input.bingoLines.map((line) => ({
+        index: line.index,
+        type: line.type,
+      }));
+
+      const { error: resultError } = await supabase
+        .from("game_results")
+        .insert({
+          pattern_details: patternDetails,
+          pattern_type: patternType,
+          space_id: input.spaceId,
+          user_id: user.id,
+        });
+
+      if (resultError) {
+        // ゲーム結果の記録に失敗してもステータス更新は成功として扱う
+        console.error("Error recording game result:", resultError);
+      }
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error in updateBingoStatusWithLines:", error);
+    return {
+      error: "An error occurred",
+      success: false,
+    };
+  }
+}
+
+/**
+ * Update participant's bingo status (none, reach, or bingo)
+ * @deprecated Use updateBingoStatusWithLines instead to record game results
  */
 export async function updateBingoStatus(
   spaceId: string,

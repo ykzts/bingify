@@ -276,6 +276,23 @@
     "statusReach": "リーチ",
     "viewCardButton": "カードを見る"
   },
+  "GameResults": {
+    "achievedAt": "達成日時",
+    "achievedPattern": "達成パターン",
+    "diagonal": "斜め",
+    "errorFetchResults": "ゲーム結果の読み込みに失敗しました",
+    "errorPermissionDenied": "ゲーム結果を表示する権限がありません",
+    "horizontal": "横",
+    "loadingResults": "ゲーム結果を読み込み中...",
+    "multiple": "複数ライン",
+    "noResults": "まだビンゴ達成者はいません",
+    "noResultsDescription": "参加者がビンゴを達成するとここに結果が表示されます",
+    "participant": "参加者",
+    "patternDetails": "パターン詳細",
+    "title": "ゲーム結果",
+    "vertical": "縦",
+    "winnerName": "勝者"
+  },
   "AvatarSettings": {
     "defaultAvatar": "デフォルトアバター",
     "description": "連携したアカウントから表示するアバターを選択できます。",

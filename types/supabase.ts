@@ -95,6 +95,44 @@ export type Database = {
           },
         ]
       }
+      game_results: {
+        Row: {
+          achieved_at: string
+          created_at: string
+          id: string
+          pattern_details: Json
+          pattern_type: string
+          space_id: string
+          user_id: string
+        }
+        Insert: {
+          achieved_at?: string
+          created_at?: string
+          id?: string
+          pattern_details?: Json
+          pattern_type: string
+          space_id: string
+          user_id: string
+        }
+        Update: {
+          achieved_at?: string
+          created_at?: string
+          id?: string
+          pattern_details?: Json
+          pattern_type?: string
+          space_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_results_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participants: {
         Row: {
           bingo_status: string | null
