@@ -23,7 +23,7 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
     const { data, error } = await supabase
       .from("system_settings")
       .select(
-        "default_user_role, features, max_participants_per_space, max_spaces_per_user, max_total_spaces, space_expiration_hours"
+        "archive_retention_hours, default_user_role, features, max_participants_per_space, max_spaces_per_user, max_total_spaces, space_expiration_hours, spaces_archive_retention_hours"
       )
       .eq("id", 1)
       .single();
