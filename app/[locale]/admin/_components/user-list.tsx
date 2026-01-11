@@ -157,7 +157,10 @@ export function UserList({
                       href={`${pathname}/${user.id}`}
                     >
                       <Avatar className="h-10 w-10">
-                        <AvatarImage asChild>
+                        <AvatarImage
+                          asChild
+                          src={user.avatar_url || "/default-avatar.png"}
+                        >
                           <Image
                             alt={user.full_name || user.email || "User"}
                             height={40}

@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertCircle, Loader2, RotateCcw, Trash2, User } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -122,10 +123,17 @@ export function AvatarManagement({
           <h4 className="mb-3 font-medium text-sm">{t("currentAvatar")}</h4>
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
-              <AvatarImage
-                alt={userProfile.full_name || userProfile.email || "User"}
-                src={userProfile.avatar_url || undefined}
-              />
+              {userProfile.avatar_url ? (
+                <AvatarImage asChild src={userProfile.avatar_url}>
+                  <Image
+                    alt={userProfile.full_name || userProfile.email || "User"}
+                    className="object-cover"
+                    fill
+                    sizes="64px"
+                    src={userProfile.avatar_url}
+                  />
+                </AvatarImage>
+              ) : null}
               <AvatarFallback>
                 {(() => {
                   if (userProfile.avatar_source === "google") {

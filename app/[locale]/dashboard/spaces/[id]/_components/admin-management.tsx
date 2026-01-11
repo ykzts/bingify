@@ -9,6 +9,7 @@ import {
   useTransform,
 } from "@tanstack/react-form-nextjs";
 import { Loader2, Trash2, UserPlus, Users } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -220,10 +221,15 @@ export function AdminManagement({ spaceId }: Props) {
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
                     {admin.avatar_url && (
-                      <AvatarImage
-                        alt={admin.full_name || "Admin"}
-                        src={admin.avatar_url}
-                      />
+                      <AvatarImage asChild src={admin.avatar_url}>
+                        <Image
+                          alt={admin.full_name || "Admin"}
+                          className="object-cover"
+                          fill
+                          sizes="40px"
+                          src={admin.avatar_url}
+                        />
+                      </AvatarImage>
                     )}
                     <AvatarFallback>
                       {admin.full_name?.charAt(0).toUpperCase() ||
