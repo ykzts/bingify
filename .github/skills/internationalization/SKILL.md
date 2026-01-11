@@ -16,7 +16,7 @@ Bingifyはnextintlを使用して、英語 (en) と日本語 (ja) をサポー�
 
 ## ロケール別ルート
 
-```
+```text
 /en/                # 英語版ホーム
 /en/dashboard       # 英語版ダッシュボード
 /ja/                # 日本語版ホーム

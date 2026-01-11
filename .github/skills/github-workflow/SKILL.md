@@ -18,7 +18,7 @@ BingifyはConventionalCommitsとGitHubFlowを採用し、チーム開発の効�
 
 ### コミットメッセージの形式
 
-```
+```text
 type(scope): subject
 ```
 
@@ -43,7 +43,7 @@ git commit -m "docs: update setup instructions"
 
 ## ブランチ戦略
 
-```
+```text
 main                    # 本番用
 feat/dashboard-spaces   # 新機能
 fix/auth-redirect       # バグ修正
