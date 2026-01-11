@@ -343,6 +343,7 @@ export interface UserSpace {
   participant_count?: number;
   share_key: string;
   status: string | null;
+  title: string | null;
 }
 
 export interface UserSpacesResult {
@@ -380,7 +381,7 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
     // Fetch spaces where user is owner
     const { data: ownedSpaces, error: ownedError } = await supabase
       .from("spaces")
-      .select("id, share_key, status, created_at")
+      .select("id, share_key, status, created_at, title")
       .eq("owner_id", user.id)
       .order("created_at", { ascending: false });
 
@@ -416,12 +417,13 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       id: string;
       share_key: string;
       status: string | null;
+      title: string | null;
     }> = [];
 
     if (adminSpaceIds.length > 0) {
       const { data: fetchedSpaces, error: spacesError } = await supabase
         .from("spaces")
-        .select("id, share_key, status, created_at")
+        .select("id, share_key, status, created_at, title")
         .in("id", adminSpaceIds);
 
       if (spacesError) {
@@ -451,12 +453,13 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       id: string;
       share_key: string;
       status: string | null;
+      title: string | null;
     }> = [];
 
     if (participantSpaceIds.length > 0) {
       const { data: fetchedSpaces, error: spacesError } = await supabase
         .from("spaces")
-        .select("id, share_key, status, created_at")
+        .select("id, share_key, status, created_at, title")
         .in("id", participantSpaceIds);
 
       if (spacesError) {
@@ -478,6 +481,7 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       is_owner: false,
       share_key: space.share_key,
       status: space.status,
+      title: space.title,
     }));
 
     // Combine and deduplicate hosted spaces (in case user is both owner and admin)
@@ -515,6 +519,7 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
         is_owner: false,
         share_key: space.share_key,
         status: space.status,
+        title: space.title,
       }))
       .sort(
         (a, b) =>
