@@ -11,8 +11,10 @@ import { StatusBadge } from "./status-badge";
 
 interface SpaceTabsProps {
   hostedSpaces: UserSpace[];
+  hostedTabLabel?: string;
   locale: string;
   participatedSpaces: UserSpace[];
+  participatedTabLabel?: string;
 }
 
 function SpaceTable({
@@ -94,17 +96,21 @@ function SpaceTable({
 
 export function SpaceTabs({
   hostedSpaces,
+  hostedTabLabel,
   locale,
   participatedSpaces,
+  participatedTabLabel,
 }: SpaceTabsProps) {
   const t = useTranslations("Dashboard");
 
   return (
     <Tabs defaultValue="hosted">
       <TabsList>
-        <TabsTrigger value="hosted">{t("hostedSpacesTab")}</TabsTrigger>
+        <TabsTrigger value="hosted">
+          {hostedTabLabel || t("hostedSpacesTab")}
+        </TabsTrigger>
         <TabsTrigger value="participated">
-          {t("participatedSpacesTab")}
+          {participatedTabLabel || t("participatedSpacesTab")}
         </TabsTrigger>
       </TabsList>
 
