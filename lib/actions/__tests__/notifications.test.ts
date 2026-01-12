@@ -159,7 +159,7 @@ describe("getNotifications", () => {
 
     expect(result.success).toBe(true);
     expect(result.data?.hasMore).toBe(true);
-    expect(mockQuery.range).toHaveBeenCalledWith(20, 40);
+    expect(mockQuery.range).toHaveBeenCalledWith(20, 39);
   });
 });
 

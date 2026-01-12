@@ -64,9 +64,9 @@ export async function getNotifications(
       };
     }
 
-    // ページング計算
+    // ページング計算（Supabaseのrangeは両端を含む）
     const from = (page - 1) * perPage;
-    const to = from + perPage;
+    const to = from + perPage - 1;
 
     // クエリ構築
     let query = supabase
@@ -92,7 +92,7 @@ export async function getNotifications(
     }
 
     // 次のページがあるかチェック
-    const hasMore = count ? to < count : false;
+    const hasMore = count ? from + perPage < count : false;
 
     return {
       data: {
