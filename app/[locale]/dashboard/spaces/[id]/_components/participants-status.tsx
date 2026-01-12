@@ -186,8 +186,17 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
         return;
       }
 
-      // Fetch updated profile information from profiles table
-      const profile = await fetchParticipantProfile(updated.user_id);
+      // Fetch updated profile information from profiles table with error handling
+      let profile: ParticipantProfile | null = null;
+      try {
+        profile = await fetchParticipantProfile(updated.user_id);
+      } catch (error) {
+        console.error(
+          `Error fetching profile for user ${updated.user_id}:`,
+          error
+        );
+        // profile remains null, which is handled gracefully by downstream code
+      }
 
       // Update the participant in the list
       queryClient.setQueryData<Participant[]>(
@@ -259,7 +268,9 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
         },
         (payload) => {
           const updated = payload.new as ParticipantUpdate;
-          onUpdate({ new: updated });
+          onUpdate({ new: updated }).catch((error) => {
+            console.error("Error in onUpdate handler:", error);
+          });
         }
       )
       .on(
