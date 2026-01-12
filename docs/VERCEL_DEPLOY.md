@@ -773,7 +773,7 @@ Next.js の Image Optimization は Vercel で自動的に有効化されます�
 - **ビンゴカード画像**: ユーザーがアップロードした画像を最適化
 - **OGP画像**: Open Graph 画像を最適化
 
-**best practices**:
+**Best practices**:
 
 - \`next/image\` コンポーネントを常に使用
 - 適切な \`width\` と \`height\` を指定
