@@ -24,30 +24,30 @@ export function NotificationBanner({ message, type }: NotificationBannerProps) {
         y: 0,
       }}
       className={cn(
-        "fixed top-8 left-1/2 z-50 -translate-x-1/2 rounded-2xl px-8 py-6 shadow-2xl backdrop-blur-md",
+        "fixed top-8 left-1/2 z-50 -translate-x-1/2 rounded-3xl px-10 py-8 shadow-2xl backdrop-blur-md md:px-12 md:py-10",
         isBingo
-          ? "bg-gradient-to-r from-yellow-400 to-orange-500"
-          : "bg-gradient-to-r from-blue-400 to-purple-500"
+          ? "bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 shadow-orange-500/50"
+          : "bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 shadow-purple-500/50"
       )}
       exit={{
         opacity: 0,
-        scale: 0.8,
-        y: -50,
+        scale: 0.85,
+        y: -60,
       }}
       initial={{
         opacity: 0,
-        scale: 0.8,
-        y: -50,
+        scale: 0.85,
+        y: -60,
       }}
       transition={{
-        damping: 15,
+        damping: 20,
         duration: 0.5,
         stiffness: 300,
         type: "spring",
       }}
     >
       <motion.div
-        animate={{ rotate: [0, -5, 5, -5, 5, 0] }}
+        animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
         transition={{
           delay: 0.3,
           duration: 0.6,
@@ -55,9 +55,10 @@ export function NotificationBanner({ message, type }: NotificationBannerProps) {
         }}
       >
         <p
-          className="whitespace-nowrap font-black text-2xl text-white md:text-4xl lg:text-5xl"
+          className="whitespace-nowrap font-black text-3xl text-white md:text-5xl lg:text-6xl"
           style={{
-            textShadow: "0 0 20px rgba(0,0,0,0.8), 2px 2px 4px rgba(0,0,0,0.5)",
+            textShadow:
+              "0 2px 12px rgba(0,0,0,0.4), 0 4px 24px rgba(0,0,0,0.3), 2px 2px 4px rgba(0,0,0,0.5)",
           }}
         >
           {isBingo ? "🎉 " : "🔥 "}
