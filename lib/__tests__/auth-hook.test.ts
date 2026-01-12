@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { normalizeAuthHookPayload } from "@/lib/schemas/auth-hook";
 
 describe("Auth Hook Payload Normalization", () => {
@@ -58,8 +58,8 @@ describe("Auth Hook Payload Normalization", () => {
           old_email: "oldemail@example.com",
           token: "token",
           token_hash: "hash",
-          token_new: "new_token",
           token_hash_new: "new_hash",
+          token_new: "new_token",
         },
         type: "user.email_change",
       };
