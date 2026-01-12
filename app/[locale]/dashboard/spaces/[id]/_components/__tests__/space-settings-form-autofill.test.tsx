@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 /**
  * スペース設定フォームの自動入力ロジックのテスト
  *
- * このテストは、YouTubeチャンネルIDとTwitchブロードキャスターIDの
+ * このテストは、YouTubeチャンネルIDの
  * 自動入力機能が正しく動作することを検証します。
  */
 describe("スペース設定フォームの自動入力", () => {
@@ -119,72 +119,6 @@ describe("スペース設定フォームの自動入力", () => {
       expect(shouldAutoFill).toBe(false);
       expect(mockSetFieldValue).not.toHaveBeenCalled();
       expect(mockGetOperatorYouTubeChannelId).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("TwitchブロードキャスターIDの自動入力", () => {
-    it("ソーシャル連携モード + Twitchプラットフォーム選択時に自動入力される", async () => {
-      const mockSetFieldValue = vi.fn();
-      const mockGetOperatorTwitchBroadcasterId = vi.fn().mockResolvedValue({
-        channelId: "123456789",
-        success: true,
-      });
-
-      const gatekeeperMode = "social";
-      const socialPlatform = "twitch";
-      const enteredTwitchBroadcasterId = "";
-      const fetchingOperatorTwitchId = false;
-      const verifiedChannels = undefined;
-
-      const shouldAutoFill =
-        gatekeeperMode === "social" &&
-        socialPlatform === "twitch" &&
-        !enteredTwitchBroadcasterId &&
-        !fetchingOperatorTwitchId;
-
-      expect(shouldAutoFill).toBe(true);
-
-      if (shouldAutoFill && !verifiedChannels?.twitch) {
-        const result = await mockGetOperatorTwitchBroadcasterId();
-        if (result.success && result.channelId) {
-          mockSetFieldValue("twitch_broadcaster_id", result.channelId);
-        }
-      }
-
-      expect(mockGetOperatorTwitchBroadcasterId).toHaveBeenCalledTimes(1);
-      expect(mockSetFieldValue).toHaveBeenCalledWith(
-        "twitch_broadcaster_id",
-        "123456789"
-      );
-    });
-
-    it("検証済みブロードキャスターIDのキャッシュがある場合はそれを使用する", () => {
-      const mockSetFieldValue = vi.fn();
-      const mockGetOperatorTwitchBroadcasterId = vi.fn();
-
-      const gatekeeperMode = "social";
-      const socialPlatform = "twitch";
-      const enteredTwitchBroadcasterId = "";
-      const fetchingOperatorTwitchId = false;
-      const verifiedChannels = { twitch: "987654321" };
-
-      const shouldAutoFill =
-        gatekeeperMode === "social" &&
-        socialPlatform === "twitch" &&
-        !enteredTwitchBroadcasterId &&
-        !fetchingOperatorTwitchId;
-
-      expect(shouldAutoFill).toBe(true);
-
-      if (shouldAutoFill && verifiedChannels?.twitch) {
-        mockSetFieldValue("twitch_broadcaster_id", verifiedChannels.twitch);
-      }
-
-      expect(mockSetFieldValue).toHaveBeenCalledWith(
-        "twitch_broadcaster_id",
-        "987654321"
-      );
-      expect(mockGetOperatorTwitchBroadcasterId).not.toHaveBeenCalled();
     });
   });
 
