@@ -359,12 +359,13 @@ CREATE POLICY "Users can delete their own notifications"
   USING (auth.uid() = user_id);
 
 -- Policy: System (service role) can insert notifications for any user
--- Note: service_role bypasses RLS entirely, so this policy serves as documentation
--- of the intended behavior. In practice, only server-side code using service_role
--- should create notifications. Client-side code cannot use this policy.
+-- Note: This policy is explicitly restricted to service_role to prevent
+-- client-side code from creating notifications for arbitrary users.
+-- Only server-side code using service_role can create notifications.
 CREATE POLICY "Service role can insert notifications"
   ON notifications
   FOR INSERT
+  TO service_role
   WITH CHECK (true);
 
 -- Enable Realtime for notifications table (for live updates)
