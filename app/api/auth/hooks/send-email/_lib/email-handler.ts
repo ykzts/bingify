@@ -8,6 +8,7 @@ import { PasswordChangedNotificationEmail } from "@/emails/auth/password-changed
 import { RecoveryEmail } from "@/emails/auth/recovery-email";
 import { sendAuthEmail } from "@/lib/mail";
 import type { NormalizedEmail } from "@/lib/schemas/auth-hook";
+import { getAbsoluteUrl } from "@/lib/utils/url";
 
 // ウェブフックシークレットを分割するための正規表現（例：「v1,whsec_xxx」→ 「v1」、「whsec_xxx」）
 const SECRET_SEPARATOR_REGEX = /[,\s]+/;
@@ -39,7 +40,7 @@ export function verifyWebhookSignature(
  * または単一値の場合はそのまま返す
  * @param secret - ウェブフックシークレット文字列
  * @returns 署名検証に使用する実際のシークレット値
- * @internal このメソッドはprivateですが、テストやその他のウェブフックハンドラーでの再利用を想定しています
+ * @internal このユーティリティはモジュール内部専用です
  */
 function resolveSecret(secret: string): string {
   const maybeParts = secret.split(SECRET_SEPARATOR_REGEX).filter(Boolean);
@@ -81,7 +82,7 @@ export async function handleEmailAction(
     }
 
     // アプリルートへのフォールバック（ルートがない場合は404かもしれませんが、空のリンクを避けます）
-    return `${siteUrl}/auth/confirm?token=${encodedVerificationToken}`;
+    return getAbsoluteUrl(`/auth/confirm?token=${encodedVerificationToken}`);
   };
 
   switch (emailActionType) {

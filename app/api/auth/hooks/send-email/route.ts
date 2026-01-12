@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { normalizeAuthHookPayload } from "@/lib/schemas/auth-hook";
+import { getAbsoluteUrl } from "@/lib/utils/url";
 import {
   handleEmailAction,
   verifyWebhookSignature,
@@ -83,10 +84,8 @@ export async function POST(request: NextRequest) {
     const language =
       user.app_metadata?.language || user.user_metadata?.language;
     const locale = language === "ja" ? "ja" : "en";
-    const siteUrl =
-      siteUrlOverride ||
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      "https://bingify.example.com";
+    // 既定は getAbsoluteUrl() に委譲し、オーバーライドがあれば優先
+    const siteUrl = siteUrlOverride || getAbsoluteUrl();
 
     // メールハンドラーにルーティング
     const emailSent = await handleEmailAction(
