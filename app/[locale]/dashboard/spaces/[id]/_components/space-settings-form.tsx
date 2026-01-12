@@ -380,8 +380,8 @@ export function SpaceSettingsForm({
     }
   }, [verifiedChannels]);
 
-  // YouTubeプラットフォーム選択時に自動的にチャンネルIDを入力
-  const autoFillYoutubeChannelId = useEffectEvent(
+  // 操作者のYouTubeチャンネルIDを取得する共通ヘルパー
+  const fetchAndSetOperatorYoutubeId = useEffectEvent(
     async (signal: AbortSignal) => {
       setFetchingOperatorYoutubeId(true);
       try {
@@ -389,19 +389,31 @@ export function SpaceSettingsForm({
 
         // AbortSignalをチェック（コンポーネントがアンマウントされた場合は更新しない）
         if (signal.aborted) {
-          return;
+          return null;
         }
 
         if (result.success && result.channelId) {
           setOperatorYoutubeChannelId(result.channelId);
-          form.setFieldValue("youtube_channel_id", result.channelId);
+          return result.channelId;
         }
+        return null;
       } catch (_error) {
-        // エラーは無視（自動入力できないだけ）
+        // エラーは無視
+        return null;
       } finally {
         if (!signal.aborted) {
           setFetchingOperatorYoutubeId(false);
         }
+      }
+    }
+  );
+
+  // YouTubeプラットフォーム選択時に自動的にチャンネルIDを入力
+  const autoFillYoutubeChannelId = useEffectEvent(
+    async (signal: AbortSignal) => {
+      const channelId = await fetchAndSetOperatorYoutubeId(signal);
+      if (channelId && !signal.aborted) {
+        form.setFieldValue("youtube_channel_id", channelId);
       }
     }
   );
@@ -450,25 +462,7 @@ export function SpaceSettingsForm({
 
   // 自動的に操作者のYouTubeチャンネルIDを取得（手動入力時の所有権チェック用）
   const fetchYoutubeOperatorId = useEffectEvent(async (signal: AbortSignal) => {
-    setFetchingOperatorYoutubeId(true);
-    try {
-      const result = await getOperatorYouTubeChannelId();
-
-      // AbortSignalをチェック（コンポーネントがアンマウントされた場合は更新しない）
-      if (signal.aborted) {
-        return;
-      }
-
-      if (result.success && result.channelId) {
-        setOperatorYoutubeChannelId(result.channelId);
-      }
-    } catch (_error) {
-      // エラーは無視（所有権チェックができないだけ）
-    } finally {
-      if (!signal.aborted) {
-        setFetchingOperatorYoutubeId(false);
-      }
-    }
+    await fetchAndSetOperatorYoutubeId(signal);
   });
 
   useEffect(() => {
