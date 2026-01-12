@@ -33,7 +33,14 @@ export function verifyWebhookSignature(
   }
 }
 
-// 環境変数の形式が「v1,whsec_xxx」の場合に対応して実際のシークレット値を抽出
+/**
+ * シークレット文字列からウェブフック署名値を抽出
+ * 形式：「v1,whsec_xxx」 → 「whsec_xxx」を返す
+ * または単一値の場合はそのまま返す
+ * @param secret - ウェブフックシークレット文字列
+ * @returns 署名検証に使用する実際のシークレット値
+ * @internal このメソッドはprivateですが、テストやその他のウェブフックハンドラーでの再利用を想定しています
+ */
 function resolveSecret(secret: string): string {
   const maybeParts = secret.split(SECRET_SEPARATOR_REGEX).filter(Boolean);
   if (maybeParts.length >= 2 && maybeParts[0] === "v1") {
@@ -63,17 +70,18 @@ export async function handleEmailAction(
     // confirmation_token（OTPコード）ではなく、ハッシュ値がデータベースに保存されています。
     // 参考: https://supabase.com/docs/guides/auth/auth-magic-link (PKCE フロー)
     const verificationToken = params.tokenHash || params.token || "";
+    const encodedVerificationToken = encodeURIComponent(verificationToken);
     const redirectTo = encodeURIComponent(siteUrl);
 
     if (supabaseUrl) {
       // Magic Link フローでのメール確認には token_hash パラメータを使用
       // 注意: パラメータ名は「token」ですが、Supabase /auth/v1/verify はハッシュ値を期待します
-      const url = `${supabaseUrl}/auth/v1/verify?type=${params.type}&token=${verificationToken}&redirect_to=${redirectTo}`;
+      const url = `${supabaseUrl}/auth/v1/verify?type=${params.type}&token=${encodedVerificationToken}&redirect_to=${redirectTo}`;
       return url;
     }
 
     // アプリルートへのフォールバック（ルートがない場合は404かもしれませんが、空のリンクを避けます）
-    return `${siteUrl}/auth/confirm?token=${verificationToken}`;
+    return `${siteUrl}/auth/confirm?token=${encodedVerificationToken}`;
   };
 
   switch (emailActionType) {

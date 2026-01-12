@@ -48,8 +48,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Zodを使用してペイロードを解析および正規化
-    const payload = JSON.parse(body);
+    // JSONペイロードを解析（エラーハンドリング付き）
+    let payload;
+    try {
+      payload = JSON.parse(body);
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON in request body" },
+        { status: 400 }
+      );
+    }
+
+    // Zodを使用してペイロードを正規化
     const normalized = normalizeAuthHookPayload(payload);
 
     if (!normalized) {

@@ -71,7 +71,7 @@ export function EmailChangedNotificationEmail({
             </InfoBox>
           </Section>
 
-          <EmailFooter companyName="Bingify" />
+          <EmailFooter companyName="Bingify" locale={locale} />
         </EmailContainer>
       </Body>
     </Html>

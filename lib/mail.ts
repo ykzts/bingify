@@ -95,7 +95,16 @@ export async function sendAuthEmail(options: AuthEmailOptions) {
   const emailHtml = await render(template);
   const emailText = toPlainText(emailHtml);
 
-  console.log("📬 Generated email HTML:\n", emailHtml);
+  // 開発環境でのデバッグロギング（DEBUG_EMAIL_LOG が有効な場合）
+  if (
+    process.env.NODE_ENV !== "production" &&
+    process.env.DEBUG_EMAIL_LOG === "true"
+  ) {
+    console.log("📬 Generated auth email", {
+      to: recipient,
+      subject,
+    });
+  }
 
   const mailOptions = {
     from: mailFrom,

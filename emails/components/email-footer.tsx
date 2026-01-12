@@ -3,6 +3,7 @@ import { Section, Text } from "@react-email/components";
 interface EmailFooterProps {
   companyName?: string;
   copyrightYear?: number;
+  locale?: string;
 }
 
 /**
@@ -12,16 +13,20 @@ interface EmailFooterProps {
 export function EmailFooter({
   companyName = "Bingify",
   copyrightYear = new Date().getFullYear(),
+  locale = "en",
 }: EmailFooterProps) {
+  const isJa = locale === "ja";
+  const description = isJa
+    ? "Bingifyは友人や家族とビンゴゲームを共有できるサービスです。"
+    : "Bingify is a service for sharing bingo games with friends and family.";
+  const rights = isJa ? "著作権" : "All rights reserved";
+
   return (
     <Section style={footerStyle}>
       <Text style={footerText}>
-        © {copyrightYear} {companyName}. All rights reserved.
+        © {copyrightYear} {companyName}. {rights}.
       </Text>
-      <Text style={footerLinkText}>
-        {companyName} is a service for sharing bingo games with friends and
-        family.
-      </Text>
+      <Text style={footerLinkText}>{description}</Text>
     </Section>
   );
 }

@@ -62,12 +62,12 @@ export function InviteEmail({
               <Text style={listItemStyle}>• {feature3}</Text>
             </InfoBox>
 
-            <OtpSection code={token} />
+            <OtpSection code={token} locale={locale} />
 
             <Text style={footerTextStyle}>{ignoredMessage}</Text>
           </Section>
 
-          <EmailFooter companyName="Bingify" />
+          <EmailFooter companyName="Bingify" locale={locale} />
         </EmailContainer>
       </Body>
     </Html>

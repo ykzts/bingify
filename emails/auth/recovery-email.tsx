@@ -51,7 +51,7 @@ export function RecoveryEmail({
 
             <EmailButton href={confirmationUrl} text={buttonText} />
 
-            <OtpSection code={token} />
+            <OtpSection code={token} locale={locale} />
 
             <WarningBox>
               <Text style={warningTitleStyle}>
@@ -63,7 +63,7 @@ export function RecoveryEmail({
             <Text style={footerTextStyle}>{ignoredMessage}</Text>
           </Section>
 
-          <EmailFooter companyName="Bingify" />
+          <EmailFooter companyName="Bingify" locale={locale} />
         </EmailContainer>
       </Body>
     </Html>
