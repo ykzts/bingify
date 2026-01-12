@@ -52,10 +52,18 @@ export async function getCroppedImg(
     0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y
   );
 
-  return new Promise((resolve) => {
-    canvas.toBlob((blob) => {
-      resolve(blob);
-    }, "image/jpeg");
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error("Failed to create blob from canvas"));
+        }
+      },
+      "image/jpeg",
+      0.9
+    );
   });
 }
 

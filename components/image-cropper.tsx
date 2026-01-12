@@ -18,6 +18,10 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { type Area, getCroppedImg } from "@/lib/utils/crop-image";
 
+const ZOOM_MIN = 1;
+const ZOOM_MAX = 3;
+const ZOOM_STEP = 0.1;
+
 interface ImageCropperProps {
   image: string;
   onCancel: () => void;
@@ -33,7 +37,7 @@ export function ImageCropper({
 }: ImageCropperProps) {
   const t = useTranslations("ImageCropper");
   const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(ZOOM_MIN);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,12 +112,12 @@ export function ImageCropper({
           <div className="space-y-2">
             <Label htmlFor="zoom-slider">{t("zoomLabel")}</Label>
             <Slider
-              defaultValue={[1]}
+              defaultValue={[ZOOM_MIN]}
               id="zoom-slider"
-              max={3}
-              min={1}
+              max={ZOOM_MAX}
+              min={ZOOM_MIN}
               onValueChange={(value) => setZoom(value[0])}
-              step={0.1}
+              step={ZOOM_STEP}
               value={[zoom]}
             />
           </div>
