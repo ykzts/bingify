@@ -108,10 +108,10 @@ Vercel は Next.js の開発元であるため、以下の機能が完全にサ�
    最低限必要な環境変数を設定:
 
    \`\`\`bash
-   NEXT_PUBLIC_SUPABASE_URL=https://supabase.example.com
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   NEXT_PUBLIC_SITE_URL=https://app.example.com
+   NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
    CRON_SECRET=your-random-secret
    \`\`\`
 
@@ -257,7 +257,7 @@ Vercel プロジェクト設定画面で環境変数を追加します。
 
 # Supabase接続
 
-NEXT_PUBLIC_SUPABASE_URL=https://supabase.example.com
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
@@ -510,7 +510,7 @@ Google および Twitch の OAuth 認証を有効にする手順です。
    [Google Cloud Console](https://console.cloud.google.com/) にアクセス:
    - "APIs & Services" → "Credentials" → "Create Credentials" → "OAuth 2.0 Client ID" を選択
    - Application type: "Web application"
-   - Authorized redirect URIs: \`https://supabase.example.com/auth/v1/callback\`
+   - Authorized redirect URIs: \`https://your-project.supabase.co/auth/v1/callback\`
 
 2. **クライアントIDとシークレットを取得**
 
@@ -533,7 +533,7 @@ Google および Twitch の OAuth 認証を有効にする手順です。
 
    [Twitch Developer Console](https://dev.twitch.tv/console/apps) にアクセス:
    - "Register Your Application" をクリック
-   - OAuth Redirect URL: \`https://supabase.example.com/auth/v1/callback\`
+   - OAuth Redirect URL: \`https://your-project.supabase.co/auth/v1/callback\`
    - Category: "Website Integration"
 
 2. **クライアントIDとシークレットを取得**
@@ -972,12 +972,12 @@ Bingify には以下の Cron ジョブが設定されています (\`vercel.json
 
 # cleanup ジョブをテスト
 
-curl -X POST https://app.example.com/api/cron/cleanup \
+curl -X POST https://your-domain.vercel.app/api/cron/cleanup \
  -H "Authorization: Bearer YOUR_CRON_SECRET"
 
 # token-refresh ジョブをテスト
 
-curl -X POST https://app.example.com/api/cron/token-refresh \
+curl -X POST https://your-domain.vercel.app/api/cron/token-refresh \
  -H "Authorization: Bearer YOUR_CRON_SECRET"
 \`\`\`
 
@@ -1080,9 +1080,9 @@ Error: connect ECONNREFUSED
 **解決方法**:
 
 1. OAuth プロバイダーのリダイレクトURIを確認:
-   - 正しいURL: \`https://supabase.example.com/auth/v1/callback\`
-   - 誤ったURL: \`http://supabase.example.com/auth/v1/callback\` (HTTP は不可)
-   - 誤ったURL: \`https://app.example.com/auth/callback\` (Vercel URL は不可)
+   - 正しいURL: \`https://your-project.supabase.co/auth/v1/callback\`
+   - 誤ったURL: \`http://your-project.supabase.co/auth/v1/callback\` (HTTP は不可)
+   - 誤ったURL: \`https://your-domain.vercel.app/auth/callback\` (Vercel URL は不可)
 2. 環境変数を確認:
    - \`SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID\`
    - \`SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET\`
@@ -1118,7 +1118,7 @@ Error: connect ECONNREFUSED
 4. 手動で Cron エンドポイントを実行してテスト:
 
    \`\`\`bash
-   curl -X POST https://app.example.com/api/cron/cleanup \
+   curl -X POST https://your-domain.vercel.app/api/cron/cleanup \
     -H "Authorization: Bearer YOUR_CRON_SECRET"
    \`\`\`
 
