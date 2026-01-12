@@ -43,11 +43,16 @@ COMMENT ON COLUMN announcements.ends_at IS 'Optional end time for announcement v
 ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
 
 -- Policy: All authenticated users can read published announcements
+-- within their display period (starts_at/ends_at)
 CREATE POLICY "Authenticated users can read published announcements"
   ON announcements
   FOR SELECT
   TO authenticated
-  USING (published = true);
+  USING (
+    published = true
+    AND (starts_at IS NULL OR starts_at <= CURRENT_TIMESTAMP)
+    AND (ends_at IS NULL OR ends_at > CURRENT_TIMESTAMP)
+  );
 
 -- Policy: Site admins can read all announcements
 CREATE POLICY "Site admins can read all announcements"
@@ -218,6 +223,12 @@ CREATE POLICY "Space owners can insert space announcements"
       WHERE s.id = space_announcements.space_id
         AND s.owner_id = auth.uid()
     )
+    -- Verify the announcement exists and is published
+    AND EXISTS (
+      SELECT 1 FROM announcements a
+      WHERE a.id = space_announcements.announcement_id
+        AND a.published = true
+    )
   );
 
 -- Policy: Space admins can insert announcements for their spaces
@@ -230,6 +241,12 @@ CREATE POLICY "Space admins can insert space announcements"
       WHERE sr.space_id = space_announcements.space_id
         AND sr.user_id = auth.uid()
         AND sr.role = 'admin'
+    )
+    -- Verify the announcement exists and is published
+    AND EXISTS (
+      SELECT 1 FROM announcements a
+      WHERE a.id = space_announcements.announcement_id
+        AND a.published = true
     )
   );
 
