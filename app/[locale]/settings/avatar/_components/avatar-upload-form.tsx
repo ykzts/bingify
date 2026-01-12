@@ -3,12 +3,12 @@
 import { AlertCircle, Loader2, Upload } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { useDropzone, type FileRejection } from "react-dropzone";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   AVATAR_MAX_FILE_SIZE,
   AVATAR_MIN_FILE_SIZE,
@@ -27,10 +27,7 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // プレビューURLのクリーンアップ
   useEffect(() => {
     return () => {
       if (previewUrl) {
@@ -39,36 +36,30 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
     };
   }, [previewUrl]);
 
-  const clearFileSelection = () => {
-    setSelectedFile(null);
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    setPreviewUrl(null);
-  };
-
-  const validateFile = (file: File): string | null => {
+  // react-dropzone用のカスタムバリデーター
+  const fileValidator = (file: File) => {
     if (file.size < AVATAR_MIN_FILE_SIZE) {
-      return t("errorFileEmpty");
+      return {
+        code: "file-too-small",
+        message: t("errorFileEmpty"),
+      };
     }
     if (file.size > AVATAR_MAX_FILE_SIZE) {
-      return t("errorFileSizeExceeded");
+      return {
+        code: "file-too-large",
+        message: t("errorFileSizeExceeded"),
+      };
     }
     if (!isValidAvatarMimeType(file.type)) {
-      return t("errorInvalidFileType");
+      return {
+        code: "file-invalid-type",
+        message: t("errorInvalidFileType"),
+      };
     }
     return null;
   };
 
   const handleFile = (file: File) => {
-    // クライアント側バリデーション
-    const validationError = validateFile(file);
-    if (validationError) {
-      setError(validationError);
-      clearFileSelection();
-      return;
-    }
-
     setError(null);
     setSelectedFile(file);
 
@@ -82,59 +73,38 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
     setPreviewUrl(url);
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      clearFileSelection();
+  // react-dropzoneのonDropコールバック
+  const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+    // エラーをクリア
+    setError(null);
+
+    // ファイルが拒否された場合
+    if (fileRejections.length > 0) {
+      const rejection = fileRejections[0];
+      if (rejection.errors.length > 0) {
+        setError(rejection.errors[0].message);
+      }
       return;
     }
 
-    handleFile(file);
-  };
-
-  const handleDragOver = (event: React.DragEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    // ドラッグされているアイテムがファイルかチェック
-    if (event.dataTransfer.types.includes("Files")) {
-      setIsDragOver(true);
+    // 受け入れられたファイルを処理
+    if (acceptedFiles.length > 0) {
+      handleFile(acceptedFiles[0]);
     }
   };
 
-  const handleDragLeave = (event: React.DragEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    // 実際にドロップゾーンから離れた時のみ状態を更新（子要素へのドラッグでチラつき防止）
-    const relatedTarget = event.relatedTarget as Node | null;
-    if (!(relatedTarget && event.currentTarget.contains(relatedTarget))) {
-      setIsDragOver(false);
-    }
-  };
-
-  const handleDrop = (event: React.DragEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setIsDragOver(false);
-
-    const file = event.dataTransfer.files?.[0];
-    if (!file) {
-      return;
-    }
-
-    // 画像ファイルかチェック（既存のバリデーション関数を使用）
-    if (!isValidAvatarMimeType(file.type)) {
-      setError(t("errorInvalidFileType"));
-      return;
-    }
-
-    handleFile(file);
-  };
-
-  const handleDropZoneClick = () => {
-    fileInputRef.current?.click();
-  };
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: {
+      "image/jpeg": [".jpg", ".jpeg"],
+      "image/png": [".png"],
+      "image/webp": [".webp"],
+    },
+    disabled: isPending,
+    maxFiles: 1,
+    multiple: false,
+    onDrop,
+    validator: fileValidator,
+  });
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -186,54 +156,39 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         {/* ドラッグアンドドロップゾーン */}
-        <button
+        <div
+          {...getRootProps()}
           className={cn(
-            "relative w-full cursor-pointer rounded-lg border-2 border-dashed p-8 transition-colors",
-            isDragOver
+            "cursor-pointer rounded-lg border-2 border-dashed p-8 transition-colors",
+            isDragActive
               ? "border-primary bg-primary/5"
               : "border-muted-foreground/25 hover:border-primary/50",
             isPending && "pointer-events-none opacity-50"
           )}
-          disabled={isPending}
-          onClick={handleDropZoneClick}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          type="button"
         >
+          <input {...getInputProps()} />
           <div className="flex flex-col items-center gap-2 text-center">
             <div
               className={cn(
                 "rounded-full p-3",
-                isDragOver ? "bg-primary/10" : "bg-muted"
+                isDragActive ? "bg-primary/10" : "bg-muted"
               )}
             >
               <Upload
                 className={cn(
                   "h-6 w-6",
-                  isDragOver ? "text-primary" : "text-muted-foreground"
+                  isDragActive ? "text-primary" : "text-muted-foreground"
                 )}
               />
             </div>
             <div className="space-y-1">
               <p className="font-medium text-sm">
-                {isDragOver ? t("dropHere") : t("dragOrClick")}
+                {isDragActive ? t("dropHere") : t("dragOrClick")}
               </p>
               <p className="text-muted-foreground text-xs">{t("fileHint")}</p>
             </div>
           </div>
-
-          {/* 非表示のファイル入力 */}
-          <Input
-            accept="image/jpeg,image/png,image/webp"
-            className="sr-only"
-            disabled={isPending}
-            id="avatar-file"
-            onChange={handleFileChange}
-            ref={fileInputRef}
-            type="file"
-          />
-        </button>
+        </div>
 
         {previewUrl && (
           <div className="flex items-center gap-4">
