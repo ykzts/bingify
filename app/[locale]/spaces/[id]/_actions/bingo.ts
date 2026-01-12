@@ -233,12 +233,9 @@ export async function updateBingoStatusWithLines(
           user_id: user.id,
         });
 
-      // 重複エラー（unique constraint violation）は無視し、その他のエラーはログに記録
+      // 重複エラー（unique constraint violation: code 23505）は無視し、その他のエラーはログに記録
       // ゲーム結果の記録に失敗してもステータス更新は成功として扱う
-      if (
-        resultError &&
-        !resultError.message?.includes("duplicate key value")
-      ) {
+      if (resultError && resultError.code !== "23505") {
         console.error("Error recording game result:", resultError);
       }
     }

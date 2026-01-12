@@ -70,7 +70,7 @@ export async function getGameResults(
       .eq("space_id", spaceId)
       .eq("user_id", user.id)
       .eq("role", "admin")
-      .single();
+      .maybeSingle();
 
     const isAdmin = !!adminRole;
 
