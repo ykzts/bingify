@@ -53,7 +53,7 @@ CREATE POLICY "Space admins can read game results for their spaces"
 -- Policy: Only authenticated users with verified bingo status can insert game results
 -- NOTE: This policy relies on bingo_status being set by server-side logic only.
 -- The participants.bingo_status field should be protected by UPDATE policies to prevent
--- users from manipulating their own status. See migration 20251230000000 for constraints.
+-- users from manipulating their own status. See migration 20260112000001_restrict_bingo_status_updates.sql for constraints.
 CREATE POLICY "Users can insert their own game results"
   ON game_results
   FOR INSERT

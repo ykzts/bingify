@@ -213,9 +213,24 @@ export async function updateBingoStatusWithLines(
       input.bingoLines &&
       input.bingoLines.length > 0
     ) {
-      // パターンタイプを判定
-      const patternType =
-        input.bingoLines.length > 1 ? "multiple" : input.bingoLines[0].type;
+      // パターンタイプを判定（DB の CHECK 制約に合わせてバリデーション）
+      const validPatternTypes = new Set([
+        "horizontal",
+        "vertical",
+        "diagonal",
+        "multiple",
+      ]);
+      const firstLineType = input.bingoLines[0].type;
+
+      let patternType: string;
+      if (input.bingoLines.length > 1) {
+        patternType = "multiple";
+      } else if (validPatternTypes.has(firstLineType)) {
+        patternType = firstLineType;
+      } else {
+        // フォールバック: 無効なパターンタイプは "multiple" として扱う
+        patternType = "multiple";
+      }
 
       // パターン詳細をJSON形式で保存
       const patternDetails = input.bingoLines.map((line) => ({
