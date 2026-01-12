@@ -203,10 +203,12 @@ export async function getGameResults(
       profiles?.map((p) => [p.id, { email: p.email, full_name: p.full_name }])
     );
 
-    const resultsWithProfiles: GameResultWithProfile[] = results.map((result) => ({
-      ...result,
-      profiles: profilesMap.get(result.user_id) || null,
-    }));
+    const resultsWithProfiles: GameResultWithProfile[] = results.map(
+      (result) => ({
+        ...result,
+        profiles: profilesMap.get(result.user_id) || null,
+      })
+    );
 
     return {
       results: resultsWithProfiles,
