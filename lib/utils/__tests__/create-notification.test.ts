@@ -225,6 +225,7 @@ describe("createNotification", () => {
       const notificationId = "notification-ghi";
 
       // 現在時刻を固定
+      vi.useFakeTimers();
       const now = new Date("2026-01-12T12:00:00.000Z");
       vi.setSystemTime(now);
 
