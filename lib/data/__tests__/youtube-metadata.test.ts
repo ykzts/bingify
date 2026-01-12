@@ -202,7 +202,7 @@ describe("fetchAndCacheYouTubeChannelMetadata", () => {
       }),
     });
 
-    mockSupabase.from = vi.fn((table: string) => {
+    mockSupabase.from = vi.fn().mockImplementation((table: string) => {
       if (table === "youtube_channels") {
         return {
           eq: mockEq,
@@ -296,7 +296,7 @@ describe("fetchAndCacheYouTubeChannelMetadata", () => {
       }),
     });
 
-    mockSupabase.from = vi.fn(() => ({
+    mockSupabase.from = vi.fn().mockImplementation(() => ({
       eq: mockEq,
       select: mockSelect,
       upsert: mockUpsert,
@@ -365,7 +365,7 @@ describe("fetchAndCacheYouTubeChannelMetadata", () => {
       }),
     });
 
-    mockSupabase.from = vi.fn(() => ({
+    mockSupabase.from = vi.fn().mockImplementation(() => ({
       eq: mockEq,
       select: mockSelect,
       upsert: mockUpsert,
