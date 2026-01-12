@@ -49,86 +49,28 @@
 
 ### Vercelでのデプロイ (推奨)
 
-Bingifyは Vercelでのホストを強く推奨します。Vercelは Next.jsアプリケーションの最適なパフォーマンスとシームレスな統合を提供します。
+Bingify は Vercel でのホストを強く推奨します。Vercel は Next.js アプリケーションの最適なパフォーマンスとシームレスな統合を提供します。
 
-#### 前提条件
+**詳細なVercelデプロイガイド**: [VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md)
 
-- GitHubアカウント
-- Vercelアカウント (無料プランで開始可能)
-- Supabaseプロジェクト (Cloud または OSS版)
+Vercel デプロイガイドには、以下の詳細情報が含まれています:
 
-#### デプロイ手順
+- クイックスタートガイド
+- 詳細なセットアップ手順 (Supabase連携、環境変数設定)
+- カスタムドメインの設定
+- CI/CD統合 (GitHub連携、プレビューデプロイ)
+- パフォーマンス最適化
+- モニタリングとデバッグ
+- Cronジョブの設定
+- トラブルシューティング
+- コスト管理
 
-1. **リポジトリをフォーク**
+**クイックスタート** (詳細は [VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md) を参照):
 
-   GitHubで Bingifyリポジトリをフォークします：
-
-   ```
-   https://github.com/ykzts/bingify
-   ```
-
-2. **Vercelにインポート**
-   - [Vercel Dashboard](https://vercel.com/dashboard) にアクセス
-   - "New Project" をクリック
-   - フォークしたリポジトリを選択
-   - "Import" をクリック
-
-3. **環境変数を設定**
-
-   Vercelプロジェクト設定で以下の環境変数を設定：
-
-   ```bash
-   # Supabase接続
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-
-   # サイトURL
-   NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
-
-   # ベータ版バナー (必要に応じて)
-   NEXT_PUBLIC_SHOW_BETA_BANNER=false
-
-   # Cron認証 (必須)
-   CRON_SECRET=your-random-secret
-
-   # SMTP設定 (お問い合わせフォーム用)
-   SMTP_HOST=smtp.example.com
-   SMTP_PORT=587
-   SMTP_USER=user
-   SMTP_PASS=password
-   SMTP_SECURE=false
-   MAIL_FROM=noreply@your-domain.com
-
-   # オプション: OAuth認証情報
-   SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=your-client-id
-   SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=your-secret
-   SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID=your-client-id
-   SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET=your-secret
-   ```
-
-4. **デプロイ**
-
-   "Deploy" をクリックしてデプロイを開始します。数分でデプロイが完了します。
-
-5. **ドメインの設定 (オプション)**
-   - Vercel Dashboard の "Settings" → "Domains" でカスタムドメインを追加
-   - DNS設定を更新してドメインを接続
-
-6. **Cronジョブの設定**
-
-   `vercel.json` にCron設定が含まれています。Vercelは自動的に以下のジョブをスケジュールします：
-   - クリーンアップジョブ: 毎日18:00 UTC
-   - トークン更新ジョブ: 5分ごと
-
-#### Vercelの利点
-
-- **ゼロコンフィグデプロイ**: Next.jsに最適化された自動設定
-- **自動スケーリング**: トラフィックに応じた自動スケール
-- **グローバルCDN**: 世界中で高速なコンテンツ配信
-- **自動HTTPS**: 無料のSSL証明書
-- **プレビューデプロイ**: PRごとの自動プレビュー環境
-- **組み込みCron**: `vercel.json` で定義されたCronジョブの自動実行
+1. [Bingify GitHubリポジトリ](https://github.com/ykzts/bingify)をフォーク
+2. [Vercel Dashboard](https://vercel.com/dashboard) でリポジトリをインポート
+3. 環境変数を設定 (最低限: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL`, `CRON_SECRET`)
+4. デプロイを実行
 
 ---
 

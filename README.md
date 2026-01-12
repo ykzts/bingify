@@ -59,9 +59,26 @@ pnpm dev
 pnpm local:stop
 ```
 
-## Docker デプロイ
+## デプロイ
 
-Bingify は Docker コンテナでのデプロイをサポートしています。
+Bingify は複数のデプロイ方法をサポートしています。
+
+### Vercel (推奨)
+
+Vercel は Next.js アプリケーションに最適化されたホスティングプラットフォームです。自動スケーリング、グローバルCDN、プレビューデプロイなど、強力な機能を提供します。
+
+**詳細なデプロイガイド**: [docs/VERCEL_DEPLOY.md](docs/VERCEL_DEPLOY.md)
+
+**クイックスタート**:
+
+1. [Bingify GitHubリポジトリ](https://github.com/ykzts/bingify)をフォーク
+2. [Vercel Dashboard](https://vercel.com/dashboard) でリポジトリをインポート
+3. 環境変数を設定
+4. デプロイを実行
+
+### Docker
+
+Docker コンテナでのデプロイもサポートしています。
 
 ### イメージのビルド
 
@@ -90,6 +107,8 @@ docker run -d \
   --env-file .env.production \
   bingify:latest
 ```
+
+**その他のデプロイ方法**: Docker、VPS、クラウドサーバーなどのセルフホスティングについては、[docs/SELF_HOSTED.md](docs/SELF_HOSTED.md) を参照してください。
 
 ### Docker イメージの特徴
 
