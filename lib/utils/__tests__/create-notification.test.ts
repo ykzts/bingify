@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { NotificationTypeValue } from "@/lib/types/notification";
 import { createNotification } from "../create-notification";
 
@@ -212,6 +212,11 @@ describe("createNotification", () => {
   });
 
   describe("expires_at計算", () => {
+    afterEach(() => {
+      // システム時刻をリセット
+      vi.useRealTimers();
+    });
+
     it("現在時刻から30日後のexpires_atを設定する", async () => {
       const userId = "user-123";
       const type: NotificationTypeValue = "system_update";
@@ -246,9 +251,6 @@ describe("createNotification", () => {
       const expectedExpiry = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
       expect(expiresAt.getTime()).toBe(expectedExpiry.getTime());
-
-      // システム時刻をリセット
-      vi.useRealTimers();
     });
   });
 
