@@ -19,7 +19,7 @@ export function EmailFooter({
   const description = isJa
     ? "Bingifyは友人や家族とビンゴゲームを共有できるサービスです。"
     : "Bingify is a service for sharing bingo games with friends and family.";
-  const rights = isJa ? "著作権" : "All rights reserved";
+  const rights = isJa ? "すべての権利を保有します" : "All rights reserved";
 
   return (
     <Section style={footerStyle}>

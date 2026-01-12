@@ -34,9 +34,9 @@ export function RecoveryEmail({
   const securityWarning = isJa
     ? "このリクエストに心当たりがない場合は、誰かがあなたのアカウントにアクセスしようとしている可能性があります。このメールを無視し、パスワードを変更することをお勧めします。"
     : "If you didn't request this password reset, someone may be trying to access your account. Please ignore this email and consider changing your password.";
-  const ignoredMessage = isJa
-    ? "このメールに心当たりがない場合は、無視していただいて構いません。"
-    : "If you didn't request this email, you can safely ignore it.";
+  const expirationNote = isJa
+    ? "このリンクは1時間後に有効期限が切れます。期限切れの場合は、再度パスワードリセットをリクエストしてください。"
+    : "This link will expire in 1 hour. If it has expired, please request a new password reset.";
 
   return (
     <Html lang={isJa ? "ja" : "en"}>
@@ -60,7 +60,7 @@ export function RecoveryEmail({
               <Text style={warningTextStyle}>{securityWarning}</Text>
             </WarningBox>
 
-            <Text style={footerTextStyle}>{ignoredMessage}</Text>
+            <Text style={footerTextStyle}>{expirationNote}</Text>
           </Section>
 
           <EmailFooter companyName="Bingify" locale={locale} />
