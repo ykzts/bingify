@@ -199,25 +199,33 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
       }
 
       // Update the participant in the list
+      // まず現在の参加者を取得して通知用データを準備
+      const currentParticipants = queryClient.getQueryData<Participant[]>([
+        "participants",
+        spaceId,
+      ]);
+      const currentParticipant = currentParticipants?.find(
+        (p) => p.id === updated.id
+      );
+
+      // 通知を setQueryData の外で実行
+      if (currentParticipant) {
+        const participantForNotification = {
+          ...currentParticipant,
+          profiles: profile,
+        };
+        showStatusNotification(
+          participantForNotification,
+          updated.bingo_status,
+          t
+        );
+      }
+
       queryClient.setQueryData<Participant[]>(
         ["participants", spaceId],
         (prev) => {
           if (!prev) {
             return [];
-          }
-          const currentParticipant = prev.find((p) => p.id === updated.id);
-          if (currentParticipant) {
-            // Create participant with refreshed profile data for notification display
-            // Note: profile may be null if fetch failed, which is acceptable
-            const participantForNotification = {
-              ...currentParticipant,
-              profiles: profile,
-            };
-            showStatusNotification(
-              participantForNotification,
-              updated.bingo_status,
-              t
-            );
           }
           return updateParticipantList(
             prev,
