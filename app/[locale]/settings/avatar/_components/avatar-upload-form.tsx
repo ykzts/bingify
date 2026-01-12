@@ -95,13 +95,21 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
   const handleDragOver = (event: React.DragEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    setIsDragOver(true);
+
+    // ドラッグされているアイテムがファイルかチェック
+    if (event.dataTransfer.types.includes("Files")) {
+      setIsDragOver(true);
+    }
   };
 
   const handleDragLeave = (event: React.DragEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    setIsDragOver(false);
+
+    // 実際にドロップゾーンから離れた時のみ状態を更新（子要素へのドラッグでチラつき防止）
+    if (event.currentTarget === event.target) {
+      setIsDragOver(false);
+    }
   };
 
   const handleDrop = (event: React.DragEvent<HTMLButtonElement>) => {
@@ -111,6 +119,12 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
 
     const file = event.dataTransfer.files?.[0];
     if (!file) {
+      return;
+    }
+
+    // 画像ファイルかチェック
+    if (!file.type.startsWith("image/")) {
+      setError(t("errorInvalidFileType"));
       return;
     }
 
