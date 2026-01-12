@@ -45,6 +45,7 @@ import {
   updateAndPublishSpace,
   updateSpaceSettings,
 } from "../_actions/settings";
+import { useVerifiedSocialChannels } from "../_hooks/use-verified-channels";
 import {
   spaceSettingsFormOpts,
   spaceSettingsFormSchema,
@@ -129,6 +130,9 @@ export function SpaceSettingsForm({
   const router = useRouter();
   const t = useTranslations("SpaceSettings");
   const [serverError, setServerError] = useState<string | null>(null);
+
+  // TanStack Queryを使用して検証済みチャンネルIDを取得
+  const { data: verifiedChannels } = useVerifiedSocialChannels();
 
   // 操作者自身のチャンネルID（権限チェック用）
   const [operatorYoutubeChannelId, setOperatorYoutubeChannelId] = useState<
@@ -365,6 +369,16 @@ export function SpaceSettingsForm({
       resetRequirementToNone();
     }
   }, [isCurrentRequirementDisabled]);
+
+  // 検証済みチャンネルIDをReact Queryから取得してステートに設定
+  useEffect(() => {
+    if (verifiedChannels?.youtube) {
+      setOperatorYoutubeChannelId(verifiedChannels.youtube);
+    }
+    if (verifiedChannels?.twitch) {
+      setOperatorTwitchBroadcasterId(verifiedChannels.twitch);
+    }
+  }, [verifiedChannels]);
 
   // 自動的に操作者のYouTubeチャンネルIDを取得（手動入力時の所有権チェック用）
   const fetchYoutubeOperatorId = useEffectEvent(async (signal: AbortSignal) => {

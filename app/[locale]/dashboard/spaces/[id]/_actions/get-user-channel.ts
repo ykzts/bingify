@@ -11,8 +11,13 @@ export interface UserChannelResult {
   success: boolean;
 }
 
+export interface VerifiedSocialChannels {
+  youtube?: string;
+  twitch?: string;
+}
+
 /**
- * 操作者（ログインユーザー）のYouTubeチャンネルIDを取得する
+ * 操作者（ログインユーザー）のYouTubeチャンネルIDを取得し、DBに保存する
  * ユーザー自身のOAuthトークンを使用してチャンネルIDを取得
  *
  * @returns ユーザーのチャンネルID or エラー
@@ -70,6 +75,26 @@ export async function getOperatorYouTubeChannelId(): Promise<UserChannelResult> 
       };
     }
 
+    // 検証済みチャンネルIDをDBに保存（upsert）
+    const { error: dbError } = await supabase
+      .from("verified_social_channels")
+      .upsert(
+        {
+          channel_id: channelResult.channelId,
+          provider: "youtube",
+          user_id: user.id,
+          verified_at: new Date().toISOString(),
+        },
+        {
+          onConflict: "user_id,provider",
+        }
+      );
+
+    if (dbError) {
+      console.error("Error saving verified YouTube channel:", dbError);
+      // DB保存エラーでも取得には成功しているので、successはtrueのまま返す
+    }
+
     return {
       channelId: channelResult.channelId,
       success: true,
@@ -84,7 +109,7 @@ export async function getOperatorYouTubeChannelId(): Promise<UserChannelResult> 
 }
 
 /**
- * 操作者（ログインユーザー）のTwitchブロードキャスターIDを取得する
+ * 操作者（ログインユーザー）のTwitchブロードキャスターIDを取得し、DBに保存する
  * ユーザー自身のOAuthトークンを使用してユーザーIDを取得
  *
  * @returns ユーザーのブロードキャスターID（ユーザーID） or エラー
@@ -125,6 +150,26 @@ export async function getOperatorTwitchBroadcasterId(): Promise<UserChannelResul
       };
     }
 
+    // 検証済みブロードキャスターIDをDBに保存（upsert）
+    const { error: dbError } = await supabase
+      .from("verified_social_channels")
+      .upsert(
+        {
+          channel_id: userIdResult.userId,
+          provider: "twitch",
+          user_id: user.id,
+          verified_at: new Date().toISOString(),
+        },
+        {
+          onConflict: "user_id,provider",
+        }
+      );
+
+    if (dbError) {
+      console.error("Error saving verified Twitch broadcaster:", dbError);
+      // DB保存エラーでも取得には成功しているので、successはtrueのまま返す
+    }
+
     return {
       channelId: userIdResult.userId,
       success: true,
@@ -135,5 +180,52 @@ export async function getOperatorTwitchBroadcasterId(): Promise<UserChannelResul
       error: "twitchBroadcasterIdConvertError",
       success: false,
     };
+  }
+}
+
+/**
+ * 操作者（ログインユーザー）の検証済みソーシャルチャンネルIDを取得する
+ * DBに保存されている検証済みIDを返す
+ *
+ * @returns 検証済みYouTubeチャンネルID、Twitchブロードキャスター ID
+ */
+export async function getVerifiedSocialChannels(): Promise<VerifiedSocialChannels> {
+  try {
+    // Supabaseクライアントを作成し、ユーザーを取得
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      return {};
+    }
+
+    // ユーザーの検証済みチャンネルを取得
+    const { data, error } = await supabase
+      .from("verified_social_channels")
+      .select("provider, channel_id")
+      .eq("user_id", user.id);
+
+    if (error || !data) {
+      console.error("Error fetching verified social channels:", error);
+      return {};
+    }
+
+    // プロバイダーごとにマッピング
+    const result: VerifiedSocialChannels = {};
+    for (const record of data) {
+      if (record.provider === "youtube") {
+        result.youtube = record.channel_id;
+      } else if (record.provider === "twitch") {
+        result.twitch = record.channel_id;
+      }
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Error getting verified social channels:", error);
+    return {};
   }
 }

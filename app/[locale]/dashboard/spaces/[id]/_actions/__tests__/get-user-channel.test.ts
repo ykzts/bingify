@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getOperatorTwitchBroadcasterId,
   getOperatorYouTubeChannelId,
+  getVerifiedSocialChannels,
 } from "../get-user-channel";
 
 // Mock dependencies
@@ -38,6 +39,12 @@ describe("getOperatorYouTubeChannelId", () => {
           error: null,
         }),
       },
+      from: vi.fn().mockReturnValue({
+        upsert: vi.fn().mockResolvedValue({
+          data: null,
+          error: null,
+        }),
+      }),
     };
 
     vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
@@ -56,6 +63,7 @@ describe("getOperatorYouTubeChannelId", () => {
     expect(result.error).toBeUndefined();
     expect(getOAuthToken).toHaveBeenCalledWith(mockSupabase, "google");
     expect(getUserYouTubeChannelId).toHaveBeenCalledWith("mock-youtube-token");
+    expect(mockSupabase.from).toHaveBeenCalledWith("verified_social_channels");
   });
 
   it("ユーザーが認証されていない場合はエラーを返す", async () => {
@@ -213,6 +221,12 @@ describe("getOperatorTwitchBroadcasterId", () => {
           error: null,
         }),
       },
+      from: vi.fn().mockReturnValue({
+        upsert: vi.fn().mockResolvedValue({
+          data: null,
+          error: null,
+        }),
+      }),
     };
 
     vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
@@ -231,6 +245,7 @@ describe("getOperatorTwitchBroadcasterId", () => {
     expect(result.error).toBeUndefined();
     expect(getOAuthToken).toHaveBeenCalledWith(mockSupabase, "twitch");
     expect(getUserTwitchId).toHaveBeenCalledWith("mock-twitch-token");
+    expect(mockSupabase.from).toHaveBeenCalledWith("verified_social_channels");
   });
 
   it("ユーザーが認証されていない場合はエラーを返す", async () => {
@@ -308,5 +323,116 @@ describe("getOperatorTwitchBroadcasterId", () => {
     expect(result.success).toBe(false);
     expect(result.error).toBe("Failed to get user information");
     expect(result.channelId).toBeUndefined();
+  });
+});
+
+describe("getVerifiedSocialChannels", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("検証済みYouTubeとTwitchチャンネルIDを取得する", async () => {
+    const { createClient } = await import("@/lib/supabase/server");
+
+    const mockSupabase = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: "user-123" } },
+          error: null,
+        }),
+      },
+      from: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({
+            data: [
+              { channel_id: "UC123456789", provider: "youtube" },
+              { channel_id: "987654321", provider: "twitch" },
+            ],
+            error: null,
+          }),
+        }),
+      }),
+    };
+
+    vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+
+    const result = await getVerifiedSocialChannels();
+
+    expect(result.youtube).toBe("UC123456789");
+    expect(result.twitch).toBe("987654321");
+  });
+
+  it("認証されていない場合は空オブジェクトを返す", async () => {
+    const { createClient } = await import("@/lib/supabase/server");
+
+    const mockSupabase = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: null },
+          error: { message: "Unauthorized" },
+        }),
+      },
+    };
+
+    vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+
+    const result = await getVerifiedSocialChannels();
+
+    expect(result).toEqual({});
+  });
+
+  it("検証済みチャンネルがない場合は空オブジェクトを返す", async () => {
+    const { createClient } = await import("@/lib/supabase/server");
+
+    const mockSupabase = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: "user-123" } },
+          error: null,
+        }),
+      },
+      from: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({
+            data: [],
+            error: null,
+          }),
+        }),
+      }),
+    };
+
+    vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+
+    const result = await getVerifiedSocialChannels();
+
+    expect(result).toEqual({});
+  });
+
+  it("YouTubeのみ検証済みの場合", async () => {
+    const { createClient } = await import("@/lib/supabase/server");
+
+    const mockSupabase = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: "user-123" } },
+          error: null,
+        }),
+      },
+      from: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({
+            data: [{ channel_id: "UC123456789", provider: "youtube" }],
+            error: null,
+          }),
+        }),
+      }),
+    };
+
+    vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+
+    const result = await getVerifiedSocialChannels();
+
+    expect(result.youtube).toBe("UC123456789");
+    expect(result.twitch).toBeUndefined();
   });
 });

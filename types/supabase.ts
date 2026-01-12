@@ -437,6 +437,36 @@ export type Database = {
         }
         Relationships: []
       }
+      verified_social_channels: {
+        Row: {
+          channel_id: string
+          created_at: string
+          id: string
+          provider: string
+          updated_at: string
+          user_id: string
+          verified_at: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          id?: string
+          provider: string
+          updated_at?: string
+          user_id: string
+          verified_at?: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          id?: string
+          provider?: string
+          updated_at?: string
+          user_id?: string
+          verified_at?: string
+        }
+        Relationships: []
+      }
       youtube_channels: {
         Row: {
           channel_id: string
