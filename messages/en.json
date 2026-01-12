@@ -540,6 +540,15 @@
     "title": "Turn Every Screen Into",
     "titleHighlight": "A Venue of Excitement."
   },
+  "ImageCropper": {
+    "cancelButton": "Cancel",
+    "cropButton": "Crop and Use",
+    "description": "Adjust the crop area and zoom to get the perfect square image",
+    "errorCropFailed": "Failed to crop image",
+    "processing": "Processing...",
+    "title": "Crop image",
+    "zoomLabel": "Zoom"
+  },
   "LanguageSwitcher": {
     "label": "Language",
     "selectLanguage": "Select language"
