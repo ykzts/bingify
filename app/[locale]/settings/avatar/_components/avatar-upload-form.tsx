@@ -107,7 +107,8 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
     event.stopPropagation();
 
     // 実際にドロップゾーンから離れた時のみ状態を更新（子要素へのドラッグでチラつき防止）
-    if (event.currentTarget === event.target) {
+    const relatedTarget = event.relatedTarget as Node | null;
+    if (!(relatedTarget && event.currentTarget.contains(relatedTarget))) {
       setIsDragOver(false);
     }
   };
