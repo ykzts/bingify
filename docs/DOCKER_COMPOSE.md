@@ -186,7 +186,7 @@ docker compose restart app
 services:
   app:
     ports:
-      - "8080:3000"  # ホストの8080ポートにマッピング
+      - "8080:3000" # ホストの8080ポートにマッピング
 ```
 
 ## 運用
@@ -365,10 +365,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: "2"
           memory: 2G
         reservations:
-          cpus: '1'
+          cpus: "1"
           memory: 1G
 ```
 
