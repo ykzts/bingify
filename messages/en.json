@@ -587,7 +587,10 @@
   "Notifications": {
     "allTab": "All",
     "emptyAll": "No notifications yet",
+    "emptyAllDescription": "New notifications will appear here",
     "emptyUnread": "No unread notifications",
+    "emptyUnreadDescription": "You've checked all notifications",
+    "errorGeneric": "An error occurred",
     "loadingNotifications": "Loading notifications...",
     "markAllRead": "Mark all as read",
     "markAllReadSuccess": "All notifications marked as read",

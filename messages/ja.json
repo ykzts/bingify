@@ -587,7 +587,10 @@
   "Notifications": {
     "allTab": "すべて",
     "emptyAll": "通知はまだありません",
+    "emptyAllDescription": "新しい通知が届くとここに表示されます",
     "emptyUnread": "未読の通知はありません",
+    "emptyUnreadDescription": "すべての通知を確認しました",
+    "errorGeneric": "エラーが発生しました",
     "loadingNotifications": "通知を読み込んでいます...",
     "markAllRead": "すべて既読にする",
     "markAllReadSuccess": "すべての通知を既読にしました",

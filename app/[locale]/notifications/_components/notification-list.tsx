@@ -72,8 +72,8 @@ function EmptyState({ isUnreadTab }: { isUnreadTab: boolean }) {
           </EmptyTitle>
           <EmptyDescription>
             {isUnreadTab
-              ? "すべての通知を確認しました"
-              : "新しい通知が届くとここに表示されます"}
+              ? t("emptyUnreadDescription")
+              : t("emptyAllDescription")}
           </EmptyDescription>
         </EmptyContent>
       </EmptyHeader>
@@ -121,7 +121,7 @@ export function NotificationList({ locale }: NotificationListProps) {
       toast.success(t("markAllReadSuccess"));
       invalidateNotifications();
     } else {
-      toast.error(result.error || "エラーが発生しました");
+      toast.error(result.error || t("errorGeneric"));
     }
   };
 
