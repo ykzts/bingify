@@ -94,12 +94,13 @@ export async function getActiveAnnouncements(): Promise<GetAnnouncementsResult> 
     }
 
     // published=true AND 日付範囲内のお知らせを取得
+    const now = new Date().toISOString();
     const { data: announcements, error } = await supabase
       .from("announcements")
       .select("*")
       .eq("published", true)
-      .or(`starts_at.is.null,starts_at.lte.${new Date().toISOString()}`)
-      .or(`ends_at.is.null,ends_at.gt.${new Date().toISOString()}`);
+      .or(`starts_at.is.null,starts_at.lte.${now}`)
+      .or(`ends_at.is.null,ends_at.gt.${now}`);
 
     if (error) {
       console.error("Error fetching active announcements:", error);
@@ -174,7 +175,7 @@ export async function getAllAnnouncements(): Promise<GetAnnouncementsResult> {
     const isAdmin = await checkAdminPermission();
     if (!isAdmin) {
       return {
-        error: "Admin permission required",
+        error: "Admin権限が必要です",
         success: false,
       };
     }
@@ -235,7 +236,7 @@ export async function createAnnouncement(
     const isAdmin = await checkAdminPermission();
     if (!isAdmin) {
       return {
-        error: "Admin permission required",
+        error: "Admin権限が必要です",
         success: false,
       };
     }
@@ -316,7 +317,7 @@ export async function updateAnnouncement(
     const isAdmin = await checkAdminPermission();
     if (!isAdmin) {
       return {
-        error: "Admin permission required",
+        error: "Admin権限が必要です",
         success: false,
       };
     }
@@ -389,7 +390,7 @@ export async function deleteAnnouncement(
     const isAdmin = await checkAdminPermission();
     if (!isAdmin) {
       return {
-        error: "Admin permission required",
+        error: "Admin権限が必要です",
         success: false,
       };
     }

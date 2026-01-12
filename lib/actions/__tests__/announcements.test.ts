@@ -237,7 +237,7 @@ describe("getAllAnnouncements", () => {
     const result = await getAllAnnouncements();
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe("Admin permission required");
+    expect(result.error).toBe("Admin権限が必要です");
   });
 
   it("adminユーザーは全お知らせを取得できる", async () => {
@@ -354,7 +354,7 @@ describe("createAnnouncement", () => {
     });
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe("Admin permission required");
+    expect(result.error).toBe("Admin権限が必要です");
   });
 
   it("adminユーザーはお知らせを作成できる", async () => {
@@ -471,7 +471,7 @@ describe("updateAnnouncement", () => {
     });
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe("Admin permission required");
+    expect(result.error).toBe("Admin権限が必要です");
   });
 
   it("adminユーザーはお知らせを更新できる", async () => {
@@ -550,7 +550,7 @@ describe("deleteAnnouncement", () => {
     const result = await deleteAnnouncement("ann-123");
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe("Admin permission required");
+    expect(result.error).toBe("Admin権限が必要です");
   });
 
   it("adminユーザーはお知らせを削除できる", async () => {
