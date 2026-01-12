@@ -540,6 +540,15 @@
     "title": "すべての画面を、",
     "titleHighlight": "熱狂の会場に。"
   },
+  "ImageCropper": {
+    "cancelButton": "キャンセル",
+    "cropButton": "トリミングして使用",
+    "description": "トリミング範囲とズームを調整して、正方形の画像を作成します",
+    "errorCropFailed": "画像のトリミングに失敗しました",
+    "processing": "処理中...",
+    "title": "画像をトリミング",
+    "zoomLabel": "ズーム"
+  },
   "LanguageSwitcher": {
     "label": "言語",
     "selectLanguage": "言語を選択"

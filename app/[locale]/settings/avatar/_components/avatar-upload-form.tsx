@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState, useTransition } from "react";
 import { type FileRejection, useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+import { ImageCropper } from "@/components/image-cropper";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -27,14 +28,19 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [showCropper, setShowCropper] = useState(false);
 
   useEffect(() => {
     return () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
+      if (imageToCrop) {
+        URL.revokeObjectURL(imageToCrop);
+      }
     };
-  }, [previewUrl]);
+  }, [previewUrl, imageToCrop]);
 
   // react-dropzone用のカスタムバリデーター
   const fileValidator = (file: File) => {
@@ -61,7 +67,24 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
 
   const handleFile = (file: File) => {
     setError(null);
-    setSelectedFile(file);
+
+    // 画像URLを生成してクロッパーを表示
+    const url = URL.createObjectURL(file);
+    setImageToCrop(url);
+    setShowCropper(true);
+  };
+
+  const handleCropComplete = (croppedFile: File) => {
+    setShowCropper(false);
+
+    // 古い画像URLをクリーンアップ
+    if (imageToCrop) {
+      URL.revokeObjectURL(imageToCrop);
+      setImageToCrop(null);
+    }
+
+    // クロップされたファイルを選択
+    setSelectedFile(croppedFile);
 
     // 古いプレビューURLをクリーンアップ
     if (previewUrl) {
@@ -69,8 +92,18 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
     }
 
     // 新しいプレビュー画像を生成
-    const url = URL.createObjectURL(file);
+    const url = URL.createObjectURL(croppedFile);
     setPreviewUrl(url);
+  };
+
+  const handleCropCancel = () => {
+    setShowCropper(false);
+
+    // 画像URLをクリーンアップ
+    if (imageToCrop) {
+      URL.revokeObjectURL(imageToCrop);
+      setImageToCrop(null);
+    }
   };
 
   // react-dropzoneのonDropコールバック
@@ -142,6 +175,15 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
 
   return (
     <div className="space-y-4">
+      {imageToCrop && (
+        <ImageCropper
+          image={imageToCrop}
+          onCancel={handleCropCancel}
+          onComplete={handleCropComplete}
+          open={showCropper}
+        />
+      )}
+
       <div>
         <h4 className="font-medium text-sm">{t("title")}</h4>
         <p className="text-muted-foreground text-xs">{t("description")}</p>
