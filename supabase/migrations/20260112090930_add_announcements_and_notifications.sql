@@ -359,14 +359,17 @@ CREATE POLICY "Users can delete their own notifications"
   USING (auth.uid() = user_id);
 
 -- Policy: System (service role) can insert notifications for any user
--- Note: This is handled by service_role which bypasses RLS
--- But we add this policy for clarity and potential future use
+-- Note: service_role bypasses RLS entirely, so this policy serves as documentation
+-- of the intended behavior. In practice, only server-side code using service_role
+-- should create notifications. Client-side code cannot use this policy.
 CREATE POLICY "Service role can insert notifications"
   ON notifications
   FOR INSERT
   WITH CHECK (true);
 
 -- Enable Realtime for notifications table (for live updates)
+-- Note: Realtime respects RLS policies, so users will only receive updates
+-- for notifications they have access to (their own notifications per the SELECT policy)
 ALTER PUBLICATION supabase_realtime ADD TABLE notifications;
 
 -- ============================================================================
