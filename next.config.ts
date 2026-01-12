@@ -41,6 +41,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  ...(process.env.DOCKER_BUILD === "true" && { output: "standalone" }),
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
 };
 
