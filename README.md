@@ -59,6 +59,84 @@ pnpm dev
 pnpm local:stop
 ```
 
+## Docker デプロイ
+
+Bingify は Docker コンテナでのデプロイをサポートしています。
+
+### Dockerfile を使用したデプロイ
+
+#### 1. イメージのビルド
+
+```bash
+docker build -t bingify:latest .
+```
+
+#### 2. コンテナの実行
+
+```bash
+docker run -d \
+  --name bingify \
+  -p 3000:3000 \
+  -e NEXT_PUBLIC_SUPABASE_URL=your_supabase_url \
+  -e NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key \
+  -e SUPABASE_SERVICE_ROLE_KEY=your_service_role_key \
+  bingify:latest
+```
+
+または、環境変数ファイルを使用：
+
+```bash
+docker run -d \
+  --name bingify \
+  -p 3000:3000 \
+  --env-file .env.production \
+  bingify:latest
+```
+
+### Docker Compose を使用したデプロイ
+
+より簡単にデプロイするには、Docker Compose を使用できます。
+
+#### 1. 環境変数の設定
+
+`.env` ファイルを作成し、必要な環境変数を設定します（`.env.local.example` を参考）。
+
+#### 2. サービスの起動
+
+```bash
+docker compose up -d
+```
+
+#### 3. ログの確認
+
+```bash
+docker compose logs -f bingify
+```
+
+#### 4. サービスの停止
+
+```bash
+docker compose down
+```
+
+### Docker イメージの特徴
+
+- **マルチステージビルド**: 最適化された小さなイメージサイズ
+- **Node.js 24 Alpine**: 軽量なベースイメージ
+- **非 root ユーザー**: セキュリティのための専用ユーザー (nextjs:nodejs)
+- **ヘルスチェック**: コンテナの健全性を自動監視
+- **Standalone 出力**: Next.js の最適化された出力モード
+
+### 必要な環境変数
+
+最低限必要な環境変数：
+
+- `NEXT_PUBLIC_SUPABASE_URL`: Supabase プロジェクトの URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase の匿名キー
+- `SUPABASE_SERVICE_ROLE_KEY`: Supabase のサービスロールキー
+
+その他のオプション環境変数については、`.env.local.example` を参照してください。
+
 ## 主要な機能
 
 ### 1. スペース作成

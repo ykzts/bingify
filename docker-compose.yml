@@ -1,0 +1,71 @@
+# docker-compose.yml - Sample Docker Compose configuration for Bingify
+# This file demonstrates how to run Bingify with Docker Compose
+
+services:
+  bingify:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # Application settings
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SITE_URL=http://localhost:3000
+      - NEXT_PUBLIC_SHOW_BETA_BANNER=true
+      
+      # Supabase configuration
+      # Replace these with your Supabase project credentials
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      
+      # Auth Hook Secret
+      - SEND_EMAIL_HOOK_SECRETS=${SEND_EMAIL_HOOK_SECRETS}
+      
+      # OAuth Providers (optional)
+      - SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=${SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID:-}
+      - SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=${SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET:-}
+      - SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID=${SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID:-}
+      - SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET=${SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET:-}
+      
+      # SMTP settings (optional)
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - MAIL_FROM=${MAIL_FROM:-}
+      
+      # Cloudflare Turnstile (optional)
+      - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY:-}
+      
+      # Google Analytics (optional)
+      - NEXT_PUBLIC_GA_MEASUREMENT_ID=${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
+      
+      # Cron secret (optional)
+      - CRON_SECRET=${CRON_SECRET:-}
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      start_period: 5s
+      retries: 3
+    
+    # Resource limits (adjust as needed)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+networks:
+  default:
+    name: bingify-network
