@@ -1225,3 +1225,4 @@ FATAL ERROR: Reached heap limit Allocation failed
 ## ライセンス
 
 Bingifyは [MIT License](https://github.com/ykzts/bingify/blob/main/LICENSE) の下で配布されています。
+
