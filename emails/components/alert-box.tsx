@@ -32,7 +32,13 @@ export function InfoBox({ children }: AlertBoxProps) {
  * OTP display section component
  * Used to highlight one-time passwords in monospace font
  */
-export function OtpSection({ code, locale = "en" }: { code: string; locale?: string }) {
+export function OtpSection({
+  code,
+  locale = "en",
+}: {
+  code: string;
+  locale?: string;
+}) {
   const isJa = locale === "ja";
   const label = isJa
     ? "ボタンが機能しない場合は、このコードを使用してください："

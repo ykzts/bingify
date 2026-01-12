@@ -101,8 +101,8 @@ export async function sendAuthEmail(options: AuthEmailOptions) {
     process.env.DEBUG_EMAIL_LOG === "true"
   ) {
     console.log("📬 Generated auth email", {
-      to: recipient,
       subject,
+      to: recipient,
     });
   }
 

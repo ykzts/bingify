@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { verifyWebhookSignature } from "@/app/api/auth/hooks/send-email/_lib/email-handler";
 
 describe("Email Handler", () => {
@@ -34,7 +34,11 @@ describe("Email Handler", () => {
       const secretWithVersion = "v1,whsec_invalid";
 
       // 実際の検証は失敗しますが、形式は処理されます
-      const result = verifyWebhookSignature(payload, headers, secretWithVersion);
+      const result = verifyWebhookSignature(
+        payload,
+        headers,
+        secretWithVersion
+      );
 
       expect(typeof result).toBe("boolean");
     });

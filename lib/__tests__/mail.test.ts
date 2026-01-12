@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("Mail Functions", () => {
   describe("sendAuthEmail", () => {
@@ -12,7 +12,7 @@ describe("Mail Functions", () => {
       expect(typeof sendAuthEmail).toBe("function");
     });
 
-    it("メール送信で DEBUG_EMAIL_LOG フラグを尊重する", async () => {
+    it("メール送信で DEBUG_EMAIL_LOG フラグを尊重する", () => {
       // 開発環境でのデバッグロギング機能がある場合、
       // このテストで環境変数の処理を検証できます。
       const originalEnv = process.env.DEBUG_EMAIL_LOG;

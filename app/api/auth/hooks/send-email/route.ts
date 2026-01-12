@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     // JSONペイロードを解析（エラーハンドリング付き）
-    let payload;
+    let payload: unknown;
     try {
       payload = JSON.parse(body);
     } catch {
