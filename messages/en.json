@@ -292,6 +292,8 @@
   },
   "AvatarUpload": {
     "description": "Upload JPEG, PNG, or WebP images (max 2MB)",
+    "dragOrClick": "Drag and drop an image here, or click to select",
+    "dropHere": "Drop the image here",
     "errorFileEmpty": "Empty files cannot be uploaded",
     "errorFileSizeExceeded": "File size must be less than 2MB",
     "errorGeneric": "An unexpected error occurred",
