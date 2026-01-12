@@ -380,27 +380,89 @@ export function SpaceSettingsForm({
     }
   }, [verifiedChannels]);
 
-  // 自動的に操作者のYouTubeチャンネルIDを取得（手動入力時の所有権チェック用）
-  const fetchYoutubeOperatorId = useEffectEvent(async (signal: AbortSignal) => {
-    setFetchingOperatorYoutubeId(true);
-    try {
-      const result = await getOperatorYouTubeChannelId();
+  // 操作者のYouTubeチャンネルIDを取得する共通ヘルパー
+  const fetchAndSetOperatorYoutubeId = useEffectEvent(
+    async (signal: AbortSignal) => {
+      setFetchingOperatorYoutubeId(true);
+      try {
+        const result = await getOperatorYouTubeChannelId();
 
-      // AbortSignalをチェック（コンポーネントがアンマウントされた場合は更新しない）
-      if (signal.aborted) {
+        // AbortSignalをチェック（コンポーネントがアンマウントされた場合は更新しない）
+        if (signal.aborted) {
+          return null;
+        }
+
+        if (result.success && result.channelId) {
+          setOperatorYoutubeChannelId(result.channelId);
+          return result.channelId;
+        }
+        return null;
+      } catch (_error) {
+        // エラーは無視
+        return null;
+      } finally {
+        if (!signal.aborted) {
+          setFetchingOperatorYoutubeId(false);
+        }
+      }
+    }
+  );
+
+  // YouTubeプラットフォーム選択時に自動的にチャンネルIDを入力
+  const autoFillYoutubeChannelId = useEffectEvent(
+    async (signal: AbortSignal) => {
+      const channelId = await fetchAndSetOperatorYoutubeId(signal);
+      if (channelId && !signal.aborted) {
+        form.setFieldValue("youtube_channel_id", channelId);
+      }
+    }
+  );
+
+  // YouTubeチャンネルIDをキャッシュから自動入力
+  const autoFillYoutubeFromCache = useEffectEvent(() => {
+    if (verifiedChannels?.youtube) {
+      form.setFieldValue("youtube_channel_id", verifiedChannels.youtube);
+    }
+  });
+
+  // ソーシャル連携タブに移動時、またはYouTubeプラットフォーム選択時に自動入力
+  useEffect(() => {
+    // 以下の条件を全て満たす場合に自動入力を実行
+    // 1. ゲートキーパーモードが "social"
+    // 2. ソーシャルプラットフォームが "youtube"
+    // 3. YouTubeチャンネルIDが未入力
+    // 4. 検証済みチャンネルIDが存在する（キャッシュ優先）、または取得中でない
+    if (
+      gatekeeperMode === "social" &&
+      socialPlatform === "youtube" &&
+      !enteredYoutubeChannelId &&
+      !fetchingOperatorYoutubeId
+    ) {
+      // キャッシュされた検証済みチャンネルIDがあればそれを使用
+      if (verifiedChannels?.youtube) {
+        autoFillYoutubeFromCache();
         return;
       }
 
-      if (result.success && result.channelId) {
-        setOperatorYoutubeChannelId(result.channelId);
-      }
-    } catch (_error) {
-      // エラーは無視（所有権チェックができないだけ）
-    } finally {
-      if (!signal.aborted) {
-        setFetchingOperatorYoutubeId(false);
-      }
+      // キャッシュがない場合はAPI経由で取得
+      const controller = new AbortController();
+      autoFillYoutubeChannelId(controller.signal);
+
+      return () => {
+        controller.abort();
+      };
     }
+  }, [
+    gatekeeperMode,
+    socialPlatform,
+    enteredYoutubeChannelId,
+    fetchingOperatorYoutubeId,
+    verifiedChannels,
+  ]);
+
+  // 自動的に操作者のYouTubeチャンネルIDを取得（手動入力時の所有権チェック用）
+  const fetchYoutubeOperatorId = useEffectEvent(async (signal: AbortSignal) => {
+    await fetchAndSetOperatorYoutubeId(signal);
   });
 
   useEffect(() => {
