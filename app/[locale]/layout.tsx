@@ -13,6 +13,7 @@ import { routing } from "@/i18n/routing";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import { Footer } from "./_components/footer";
 import { HeaderMenuWrapper } from "./_components/header-menu-wrapper";
+import { PreReleaseBanner } from "./_components/pre-release-banner";
 
 const nunito = Nunito({
   display: "swap",
@@ -56,6 +57,7 @@ export default async function LocaleLayout({
           <NextIntlClientProvider locale={locale} messages={messages}>
             <ConfirmProvider>
               <div className="flex min-h-screen flex-col">
+                <PreReleaseBanner />
                 <header className="sticky top-0 z-50 border-gray-200 border-b bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/80">
                   <div className="container mx-auto flex h-16 items-center justify-between px-4">
                     <HeaderMenuWrapper />
