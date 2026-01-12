@@ -25,6 +25,14 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'production' }}
 
+    env:
+      # Supabase config.toml で参照される環境変数のダミー値
+      SEND_EMAIL_HOOK_SECRETS: "v1,whsec_dummysecret1234567890abcdefghijk"
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID: "dummy-client-id"
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET: "dummy-secret"
+      SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID: "dummy-client-id"
+      SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET: "dummy-secret"
+
     permissions:
       contents: read
 

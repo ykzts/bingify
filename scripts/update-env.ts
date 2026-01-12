@@ -1,4 +1,5 @@
 import { execSync } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -90,9 +91,15 @@ try {
     ...parseEnvValues(existingContent),
     ...collectProcessEnvValues(),
   };
+
+  const hookSecret =
+    existingValues.SEND_EMAIL_HOOK_SECRETS ||
+    randomBytes(32).toString("base64");
+
   const updates: Record<string, string> = {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: ANON_KEY,
     NEXT_PUBLIC_SUPABASE_URL: API_URL,
+    SEND_EMAIL_HOOK_SECRETS: hookSecret,
     SUPABASE_SERVICE_ROLE_KEY: SERVICE_ROLE_KEY,
   };
 
