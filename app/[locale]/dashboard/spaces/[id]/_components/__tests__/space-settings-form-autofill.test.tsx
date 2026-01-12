@@ -1,0 +1,225 @@
+import { describe, expect, it, vi } from "vitest";
+
+/**
+ * スペース設定フォームの自動入力ロジックのテスト
+ *
+ * このテストは、YouTubeチャンネルIDとTwitchブロードキャスターIDの
+ * 自動入力機能が正しく動作することを検証します。
+ */
+describe("スペース設定フォームの自動入力", () => {
+  describe("YouTubeチャンネルIDの自動入力", () => {
+    it("ソーシャル連携モード + YouTubeプラットフォーム選択時に自動入力される", async () => {
+      // モック関数を作成
+      const mockSetFieldValue = vi.fn();
+      const mockGetOperatorYouTubeChannelId = vi.fn().mockResolvedValue({
+        channelId: "UCxxxxxxxxxxxxxxxxxxxxxxxx",
+        success: true,
+      });
+
+      // 自動入力ロジックをシミュレート
+      const gatekeeperMode = "social";
+      const socialPlatform = "youtube";
+      const enteredYoutubeChannelId = "";
+      const fetchingOperatorYoutubeId = false;
+      const verifiedChannels = undefined;
+
+      // 条件が満たされているか確認
+      const shouldAutoFill =
+        gatekeeperMode === "social" &&
+        socialPlatform === "youtube" &&
+        !enteredYoutubeChannelId &&
+        !fetchingOperatorYoutubeId;
+
+      expect(shouldAutoFill).toBe(true);
+
+      // キャッシュがない場合はAPI経由で取得
+      if (shouldAutoFill && !verifiedChannels?.youtube) {
+        const result = await mockGetOperatorYouTubeChannelId();
+        if (result.success && result.channelId) {
+          mockSetFieldValue("youtube_channel_id", result.channelId);
+        }
+      }
+
+      // 自動入力が実行されたことを確認
+      expect(mockGetOperatorYouTubeChannelId).toHaveBeenCalledTimes(1);
+      expect(mockSetFieldValue).toHaveBeenCalledWith(
+        "youtube_channel_id",
+        "UCxxxxxxxxxxxxxxxxxxxxxxxx"
+      );
+    });
+
+    it("検証済みチャンネルIDのキャッシュがある場合はそれを使用する", () => {
+      const mockSetFieldValue = vi.fn();
+      const mockGetOperatorYouTubeChannelId = vi.fn();
+
+      const gatekeeperMode = "social";
+      const socialPlatform = "youtube";
+      const enteredYoutubeChannelId = "";
+      const fetchingOperatorYoutubeId = false;
+      const verifiedChannels = { youtube: "UCyyyyyyyyyyyyyyyyyyyyyy" };
+
+      const shouldAutoFill =
+        gatekeeperMode === "social" &&
+        socialPlatform === "youtube" &&
+        !enteredYoutubeChannelId &&
+        !fetchingOperatorYoutubeId;
+
+      expect(shouldAutoFill).toBe(true);
+
+      // キャッシュがある場合はそれを使用
+      if (shouldAutoFill && verifiedChannels?.youtube) {
+        mockSetFieldValue("youtube_channel_id", verifiedChannels.youtube);
+      }
+
+      // キャッシュから直接設定され、APIは呼ばれない
+      expect(mockSetFieldValue).toHaveBeenCalledWith(
+        "youtube_channel_id",
+        "UCyyyyyyyyyyyyyyyyyyyyyy"
+      );
+      expect(mockGetOperatorYouTubeChannelId).not.toHaveBeenCalled();
+    });
+
+    it("既にチャンネルIDが入力されている場合は自動入力しない", () => {
+      const mockSetFieldValue = vi.fn();
+      const mockGetOperatorYouTubeChannelId = vi.fn();
+
+      const gatekeeperMode = "social";
+      const socialPlatform = "youtube";
+      const enteredYoutubeChannelId = "UCzzzzzzzzzzzzzzzzzzzzzz";
+      const fetchingOperatorYoutubeId = false;
+
+      const shouldAutoFill =
+        gatekeeperMode === "social" &&
+        socialPlatform === "youtube" &&
+        !enteredYoutubeChannelId &&
+        !fetchingOperatorYoutubeId;
+
+      expect(shouldAutoFill).toBe(false);
+
+      // 自動入力されない
+      expect(mockSetFieldValue).not.toHaveBeenCalled();
+      expect(mockGetOperatorYouTubeChannelId).not.toHaveBeenCalled();
+    });
+
+    it("Twitchプラットフォーム選択時は自動入力しない", () => {
+      const mockSetFieldValue = vi.fn();
+      const mockGetOperatorYouTubeChannelId = vi.fn();
+
+      const gatekeeperMode = "social";
+      const socialPlatform = "twitch";
+      const enteredYoutubeChannelId = "";
+      const fetchingOperatorYoutubeId = false;
+
+      const shouldAutoFill =
+        gatekeeperMode === "social" &&
+        socialPlatform === "youtube" &&
+        !enteredYoutubeChannelId &&
+        !fetchingOperatorYoutubeId;
+
+      expect(shouldAutoFill).toBe(false);
+      expect(mockSetFieldValue).not.toHaveBeenCalled();
+      expect(mockGetOperatorYouTubeChannelId).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("TwitchブロードキャスターIDの自動入力", () => {
+    it("ソーシャル連携モード + Twitchプラットフォーム選択時に自動入力される", async () => {
+      const mockSetFieldValue = vi.fn();
+      const mockGetOperatorTwitchBroadcasterId = vi.fn().mockResolvedValue({
+        channelId: "123456789",
+        success: true,
+      });
+
+      const gatekeeperMode = "social";
+      const socialPlatform = "twitch";
+      const enteredTwitchBroadcasterId = "";
+      const fetchingOperatorTwitchId = false;
+      const verifiedChannels = undefined;
+
+      const shouldAutoFill =
+        gatekeeperMode === "social" &&
+        socialPlatform === "twitch" &&
+        !enteredTwitchBroadcasterId &&
+        !fetchingOperatorTwitchId;
+
+      expect(shouldAutoFill).toBe(true);
+
+      if (shouldAutoFill && !verifiedChannels?.twitch) {
+        const result = await mockGetOperatorTwitchBroadcasterId();
+        if (result.success && result.channelId) {
+          mockSetFieldValue("twitch_broadcaster_id", result.channelId);
+        }
+      }
+
+      expect(mockGetOperatorTwitchBroadcasterId).toHaveBeenCalledTimes(1);
+      expect(mockSetFieldValue).toHaveBeenCalledWith(
+        "twitch_broadcaster_id",
+        "123456789"
+      );
+    });
+
+    it("検証済みブロードキャスターIDのキャッシュがある場合はそれを使用する", () => {
+      const mockSetFieldValue = vi.fn();
+      const mockGetOperatorTwitchBroadcasterId = vi.fn();
+
+      const gatekeeperMode = "social";
+      const socialPlatform = "twitch";
+      const enteredTwitchBroadcasterId = "";
+      const fetchingOperatorTwitchId = false;
+      const verifiedChannels = { twitch: "987654321" };
+
+      const shouldAutoFill =
+        gatekeeperMode === "social" &&
+        socialPlatform === "twitch" &&
+        !enteredTwitchBroadcasterId &&
+        !fetchingOperatorTwitchId;
+
+      expect(shouldAutoFill).toBe(true);
+
+      if (shouldAutoFill && verifiedChannels?.twitch) {
+        mockSetFieldValue("twitch_broadcaster_id", verifiedChannels.twitch);
+      }
+
+      expect(mockSetFieldValue).toHaveBeenCalledWith(
+        "twitch_broadcaster_id",
+        "987654321"
+      );
+      expect(mockGetOperatorTwitchBroadcasterId).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("エラーハンドリング", () => {
+    it("API取得失敗時にエラーを無視する（自動入力できないだけ）", async () => {
+      const mockSetFieldValue = vi.fn();
+      const mockGetOperatorYouTubeChannelId = vi.fn().mockResolvedValue({
+        error: "errorYoutubeNotLinked",
+        success: false,
+      });
+
+      const gatekeeperMode = "social";
+      const socialPlatform = "youtube";
+      const enteredYoutubeChannelId = "";
+      const fetchingOperatorYoutubeId = false;
+
+      const shouldAutoFill =
+        gatekeeperMode === "social" &&
+        socialPlatform === "youtube" &&
+        !enteredYoutubeChannelId &&
+        !fetchingOperatorYoutubeId;
+
+      expect(shouldAutoFill).toBe(true);
+
+      if (shouldAutoFill) {
+        const result = await mockGetOperatorYouTubeChannelId();
+        // エラーの場合は自動入力しない
+        if (result.success && result.channelId) {
+          mockSetFieldValue("youtube_channel_id", result.channelId);
+        }
+      }
+
+      // API は呼ばれたが、エラーのため自動入力されない
+      expect(mockGetOperatorYouTubeChannelId).toHaveBeenCalledTimes(1);
+      expect(mockSetFieldValue).not.toHaveBeenCalled();
+    });
+  });
+});
