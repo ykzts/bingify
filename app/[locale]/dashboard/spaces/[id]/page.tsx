@@ -14,6 +14,7 @@ import { BingoGameManager } from "./_components/bingo-game-manager";
 import { ClosedSpaceParticipants } from "./_components/closed-space-participants";
 import { DisplaySettingsDialog } from "./_components/display-settings-dialog";
 import { DraftStatusView } from "./_components/draft-status-view";
+import { GameResultsView } from "./_components/game-results-view";
 import { ParticipantsStatus } from "./_components/participants-status";
 import { SpaceSettingsSheet } from "./_components/space-settings-sheet";
 import { SpaceUrlShare } from "./_components/space-url-share";
@@ -177,6 +178,8 @@ export default async function AdminSpacePage({
               <p className="text-gray-600">{t("closeSpaceDescription")}</p>
             </div>
           </div>
+
+          <GameResultsView spaceId={space.id} />
 
           <ClosedSpaceParticipants
             maxParticipants={space.max_participants}

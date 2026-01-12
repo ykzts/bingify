@@ -500,6 +500,24 @@
     "sourceCode": "Source Code",
     "terms": "Terms of Service"
   },
+  "GameResults": {
+    "achievedAt": "Achieved At",
+    "achievedPattern": "Achieved Pattern",
+    "diagonal": "Diagonal",
+    "errorFetchResults": "Failed to load game results",
+    "errorPermissionDenied": "You don't have permission to view game results",
+    "horizontal": "Horizontal",
+    "loadingResults": "Loading game results...",
+    "multiple": "Multiple Lines",
+    "noResults": "No bingo winners yet",
+    "noResultsDescription": "Game results will appear here when participants achieve bingo",
+    "participant": "Participant",
+    "patternDetails": "Pattern Details",
+    "title": "Game Results",
+    "unknownUser": "Unknown User",
+    "vertical": "Vertical",
+    "winnerName": "Winner"
+  },
   "HeaderMenu": {
     "admin": "Admin",
     "dashboard": "Dashboard",

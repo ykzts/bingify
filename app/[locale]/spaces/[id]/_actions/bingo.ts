@@ -1,7 +1,16 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import type { BingoLine } from "@/lib/utils/bingo-checker";
 import { isValidUUID } from "@/lib/utils/uuid";
+
+// Valid pattern types matching database CHECK constraint
+const VALID_PATTERN_TYPES = new Set([
+  "horizontal",
+  "vertical",
+  "diagonal",
+  "multiple",
+] as const);
 
 export interface BingoCard {
   created_at: string;
@@ -20,6 +29,12 @@ export interface BingoCardResult {
 export interface UpdateBingoStatusResult {
   error?: string;
   success: boolean;
+}
+
+export interface UpdateBingoStatusWithLinesInput {
+  bingoLines?: BingoLine[];
+  spaceId: string;
+  status: "none" | "reach" | "bingo";
 }
 
 const BINGO_CARD_SIZE = 5;
@@ -159,6 +174,112 @@ export async function getOrCreateBingoCard(
 
 /**
  * Update participant's bingo status (none, reach, or bingo)
+ * If status is "bingo" and bingoLines are provided, also record game result
+ */
+export async function updateBingoStatusWithLines(
+  input: UpdateBingoStatusWithLinesInput
+): Promise<UpdateBingoStatusResult> {
+  try {
+    if (!isValidUUID(input.spaceId)) {
+      return {
+        error: "Invalid space ID",
+        success: false,
+      };
+    }
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "Authentication required",
+        success: false,
+      };
+    }
+
+    // participantsテーブルのbingo_statusを更新
+    const { error: statusError } = await supabase
+      .from("participants")
+      .update({ bingo_status: input.status })
+      .eq("space_id", input.spaceId)
+      .eq("user_id", user.id);
+
+    if (statusError) {
+      console.error("Error updating bingo status:", statusError);
+      return {
+        error: "Failed to update bingo status",
+        success: false,
+      };
+    }
+
+    // ビンゴ達成時にゲーム結果を記録
+    if (
+      input.status === "bingo" &&
+      input.bingoLines &&
+      input.bingoLines.length > 0
+    ) {
+      // パターンタイプを判定（DB の CHECK 制約に合わせてバリデーション）
+      const firstLineType = input.bingoLines[0].type;
+
+      let patternType: string;
+      if (input.bingoLines.length > 1) {
+        patternType = "multiple";
+      } else if (VALID_PATTERN_TYPES.has(firstLineType)) {
+        patternType = firstLineType;
+      } else {
+        // ここには通常到達しないはず（BingoLine.type は horizontal | vertical | diagonal）
+        // 想定外のパターンタイプが入ってきた場合はバグの可能性があるためログを出力しつつ、
+        // DB の CHECK 制約を満たすために安全なフォールバックとして "multiple" を使用する
+        console.error(
+          "Unexpected bingo line type detected in updateBingoStatusWithLines:",
+          firstLineType,
+          "in bingoLines:",
+          input.bingoLines
+        );
+        patternType = "multiple";
+      }
+
+      // パターン詳細をJSON形式で保存
+      const patternDetails = input.bingoLines.map((line) => ({
+        index: line.index,
+        type: line.type,
+      }));
+
+      // ゲーム結果を記録（unique constraint により重複は自動的に防止される）
+      const { error: resultError } = await supabase
+        .from("game_results")
+        .insert({
+          pattern_details: patternDetails,
+          pattern_type: patternType,
+          space_id: input.spaceId,
+          user_id: user.id,
+        });
+
+      // 重複エラー（unique constraint violation: code 23505）は無視し、その他のエラーはログに記録
+      // ゲーム結果の記録に失敗してもステータス更新は成功として扱う
+      if (resultError && resultError.code !== "23505") {
+        console.error("Error recording game result:", resultError);
+      }
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error in updateBingoStatusWithLines:", error);
+    return {
+      error: "An error occurred",
+      success: false,
+    };
+  }
+}
+
+/**
+ * Update participant's bingo status (none, reach, or bingo)
+ * @deprecated Use updateBingoStatusWithLines instead to record game results
  */
 export async function updateBingoStatus(
   spaceId: string,
