@@ -384,141 +384,229 @@ export function ScreenDisplay({
             <motion.h1
               animate={{ opacity: 1, scale: 1 }}
               className={cn(
-                "font-black text-[clamp(8rem,20vw,16rem)] drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)]",
+                "font-black text-[clamp(10rem,25vw,20rem)] leading-none",
                 textColor
               )}
-              initial={{ opacity: 0, scale: 0 }}
+              initial={{ opacity: 0, scale: 0.8 }}
               key={displayNumber}
               style={{
                 textShadow:
                   theme === "light"
-                    ? "0 0 20px rgba(0,0,0,0.3), 2px 2px 0 rgba(0,0,0,0.2)"
-                    : "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
+                    ? "0 4px 12px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.1), 2px 2px 0 rgba(0,0,0,0.1)"
+                    : "0 4px 16px rgba(0,0,0,0.9), 0 8px 32px rgba(0,0,0,0.7), 4px 4px 0 rgba(0,0,0,0.6)",
                 WebkitTextStroke:
-                  theme === "light" ? "3px rgba(0,0,0,0.2)" : "3px black",
+                  theme === "light"
+                    ? "2px rgba(0,0,0,0.15)"
+                    : "2px rgba(0,0,0,0.8)",
               }}
               transition={{
-                damping: 20,
-                stiffness: 260,
+                damping: 25,
+                stiffness: 300,
                 type: "spring",
               }}
             >
               {displayNumber}
             </motion.h1>
           ) : (
-            <div className="text-center">
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
               <p
                 className={cn(
-                  "font-bold text-4xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]",
+                  "font-bold text-[clamp(2rem,5vw,4rem)] leading-tight",
                   textColor
                 )}
                 style={{
+                  textShadow:
+                    theme === "light"
+                      ? "0 2px 8px rgba(0,0,0,0.12)"
+                      : "0 2px 8px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.5)",
                   WebkitTextStroke:
-                    theme === "light" ? "1px rgba(0,0,0,0.2)" : "1px black",
+                    theme === "light"
+                      ? "1px rgba(0,0,0,0.1)"
+                      : "1px rgba(0,0,0,0.6)",
                 }}
               >
                 {t("waitingForNumbers")}
               </p>
-            </div>
+            </motion.div>
           )}
         </div>
       ) : (
         /* Full Mode: 2-Column Layout (Landscape) / Vertical Stack (Portrait) */
-        <div className="flex h-screen w-full flex-col gap-4 p-4 lg:flex-row lg:gap-6 lg:p-6">
+        <div className="flex h-screen w-full flex-col gap-6 p-6 md:gap-8 md:p-8 lg:flex-row lg:gap-10 lg:p-10">
           {/* Left Panel: Current Number + QR Code */}
-          <div className="flex flex-col items-center justify-center gap-6 lg:w-[35%] lg:gap-8">
+          <div className="flex flex-col items-center justify-center gap-8 lg:w-[40%] lg:gap-10">
             {/* Current Number */}
             <div className="flex flex-1 items-center justify-center">
               {displayNumber !== null ? (
                 <motion.h1
                   animate={{ opacity: 1, scale: 1 }}
                   className={cn(
-                    "font-black text-[clamp(6rem,15vw,12rem)] drop-shadow-[0_8px_8px_rgba(0,0,0,0.9)] lg:text-[clamp(8rem,20vh,20rem)]",
+                    "font-black text-[clamp(8rem,18vw,14rem)] leading-none lg:text-[clamp(10rem,18vh,18rem)]",
                     textColor
                   )}
-                  initial={{ opacity: 0, scale: 0 }}
+                  initial={{ opacity: 0, scale: 0.8 }}
                   key={displayNumber}
                   style={{
                     textShadow:
                       theme === "light"
-                        ? "0 0 20px rgba(0,0,0,0.3), 2px 2px 0 rgba(0,0,0,0.2)"
-                        : "0 0 20px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5)",
+                        ? "0 4px 12px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.1), 2px 2px 0 rgba(0,0,0,0.1)"
+                        : "0 4px 16px rgba(0,0,0,0.9), 0 8px 32px rgba(0,0,0,0.7), 4px 4px 0 rgba(0,0,0,0.6)",
                     WebkitTextStroke:
-                      theme === "light" ? "3px rgba(0,0,0,0.2)" : "3px black",
+                      theme === "light"
+                        ? "2px rgba(0,0,0,0.15)"
+                        : "2px rgba(0,0,0,0.8)",
                   }}
                   transition={{
-                    damping: 20,
-                    stiffness: 260,
+                    damping: 25,
+                    stiffness: 300,
                     type: "spring",
                   }}
                 >
                   {displayNumber}
                 </motion.h1>
               ) : (
-                <div className="text-center">
+                <motion.div
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                >
                   <p
                     className={cn(
-                      "font-bold text-3xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] lg:text-4xl",
+                      "font-bold text-[clamp(2rem,4vw,3.5rem)] leading-tight lg:text-[clamp(2.5rem,4vh,4rem)]",
                       textColor
                     )}
                     style={{
+                      textShadow:
+                        theme === "light"
+                          ? "0 2px 8px rgba(0,0,0,0.12)"
+                          : "0 2px 8px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.5)",
                       WebkitTextStroke:
-                        theme === "light" ? "1px rgba(0,0,0,0.2)" : "1px black",
+                        theme === "light"
+                          ? "1px rgba(0,0,0,0.1)"
+                          : "1px rgba(0,0,0,0.6)",
                     }}
                   >
                     {t("waitingForNumbers")}
                   </p>
-                </div>
+                </motion.div>
               )}
             </div>
 
             {/* QR Code */}
-            <div className="flex flex-col items-center gap-2">
-              <div className="rounded-xl bg-white p-4">
+            <motion.div
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center gap-3"
+              initial={{ opacity: 0, scale: 0.9 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <div className="rounded-2xl bg-white p-5 shadow-lg">
                 <QRCodeSVG
                   aria-label={t("scanToJoin")}
-                  size={160}
+                  size={180}
                   title={t("scanToJoin")}
                   value={participationUrl}
                 />
               </div>
-              <p className={cn("text-center font-bold text-sm", textColor)}>
+              <p
+                className={cn(
+                  "text-center font-semibold text-base leading-tight",
+                  textColor
+                )}
+                style={{
+                  textShadow:
+                    theme === "light"
+                      ? "0 1px 2px rgba(0,0,0,0.1)"
+                      : "0 1px 4px rgba(0,0,0,0.6)",
+                }}
+              >
                 {t("scanToJoin")}
               </p>
-            </div>
+            </motion.div>
           </div>
 
           {/* Right Panel: History Grid */}
-          <div
+          <motion.div
+            animate={{ opacity: 1, x: 0 }}
             className={cn(
-              "flex flex-1 items-center rounded-xl p-4 backdrop-blur-md lg:w-[65%] lg:p-6",
-              theme === "light" ? "bg-white/80" : "bg-black/70"
+              "flex flex-1 items-center rounded-2xl p-6 shadow-lg backdrop-blur-md md:p-8 lg:w-[60%]",
+              theme === "light"
+                ? "bg-white/90 shadow-black/5"
+                : "bg-black/75 shadow-black/50"
             )}
+            initial={{ opacity: 0, x: 20 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
           >
             <div className="w-full">
-              <h2 className={cn("mb-3 font-bold text-xl lg:mb-4", textColor)}>
+              <h2
+                className={cn(
+                  "mb-4 font-bold text-2xl leading-tight md:mb-6 md:text-3xl",
+                  textColor
+                )}
+                style={{
+                  textShadow:
+                    theme === "light"
+                      ? "0 1px 3px rgba(0,0,0,0.1)"
+                      : "0 2px 4px rgba(0,0,0,0.6)",
+                }}
+              >
                 {t("calledNumbers")}
               </h2>
-              <div className="grid grid-cols-10 gap-1.5 lg:grid-cols-[repeat(15,minmax(0,1fr))] lg:gap-2">
+              <div className="grid grid-cols-10 gap-2 md:gap-2.5 lg:grid-cols-[repeat(15,minmax(0,1fr))]">
                 {Array.from({ length: 75 }, (_, i) => i + 1).map((number) => {
                   const isCalled = historySet.has(number);
+
+                  // Determine classes based on called status and theme
+                  let numberClasses = "";
+                  if (isCalled) {
+                    numberClasses =
+                      theme === "light"
+                        ? "bg-blue-500 text-white shadow-md shadow-blue-500/30"
+                        : "bg-blue-600 text-white shadow-md shadow-blue-600/50";
+                  } else {
+                    numberClasses =
+                      theme === "light"
+                        ? "border-2 border-gray-300 bg-gray-100 text-gray-600"
+                        : "border-2 border-gray-600 bg-gray-800/60 text-gray-400";
+                  }
+
                   return (
-                    <div
-                      className={cn(
-                        "flex aspect-square items-center justify-center rounded font-bold text-xs lg:text-sm",
+                    <motion.div
+                      animate={
                         isCalled
-                          ? "bg-blue-600 text-white"
-                          : "border border-gray-500 bg-gray-800/50 text-gray-500"
+                          ? {
+                              backgroundColor:
+                                theme === "light"
+                                  ? "rgb(59, 130, 246)"
+                                  : "rgb(37, 99, 235)",
+                              scale: 1,
+                            }
+                          : {}
+                      }
+                      className={cn(
+                        "flex aspect-square items-center justify-center rounded-lg font-bold text-sm transition-colors duration-300 md:rounded-xl md:text-base",
+                        numberClasses
                       )}
+                      initial={false}
                       key={number}
+                      transition={{
+                        damping: 15,
+                        stiffness: 200,
+                        type: "spring",
+                      }}
                     >
                       {number}
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </div>
