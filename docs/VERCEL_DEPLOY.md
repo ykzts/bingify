@@ -108,10 +108,10 @@ Vercel は Next.js の開発元であるため、以下の機能が完全にサ�
    最低限必要な環境変数を設定:
 
    \`\`\`bash
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_URL=https://supabase.example.com
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
+   NEXT_PUBLIC_SITE_URL=https://app.example.com
    CRON_SECRET=your-random-secret
    \`\`\`
 
@@ -257,7 +257,7 @@ Vercel プロジェクト設定画面で環境変数を追加します。
 
 # Supabase接続
 
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://supabase.example.com
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
@@ -295,7 +295,7 @@ SMTP_PORT=587
 SMTP_USER=user
 SMTP_PASS=password
 SMTP_SECURE=false
-MAIL_FROM=noreply@your-domain.com
+MAIL_FROM=noreply@example.com
 \`\`\`
 
 完全な環境変数のリストは、[環境変数リファレンス](#環境変数リファレンス)を参照してください。
@@ -350,12 +350,12 @@ Bingify の動作に必要な環境変数の完全なリストです。
 | \`NEXT_PUBLIC_SUPABASE_URL\`      | SupabaseプロジェクトURL                 | \`https://xxx.supabase.co\`         | Supabase Dashboard → Settings → API         |
 | \`NEXT_PUBLIC_SUPABASE_ANON_KEY\` | Supabase匿名キー (公開用)               | \`eyJhbGciOiJIUzI1NiIsInR5cCI6...\` | Supabase Dashboard → Settings → API         |
 | \`SUPABASE_SERVICE_ROLE_KEY\`     | Supabaseサービスロールキー (⚠️秘密情報) | \`eyJhbGciOiJIUzI1NiIsInR5cCI6...\` | Supabase Dashboard → Settings → API         |
-| \`NEXT_PUBLIC_SITE_URL\`          | サイトURL (OAuth リダイレクト用)        | \`https://your-domain.com\`         | Vercel のデプロイURL またはカスタムドメイン |
+| \`NEXT_PUBLIC_SITE_URL\`          | サイトURL (OAuth リダイレクト用)        | \`https://example.com\`             | Vercel のデプロイURL またはカスタムドメイン |
 | \`CRON_SECRET\`                   | Cronジョブ認証用シークレット            | \`your-random-secret-string\`       | \`openssl rand -base64 32\` で生成          |
 
 **重要**:
 
-- \`NEXT_PUBLIC_\` プレフィックスがある変数はクライアント側で使用されます
+- \`NEXT*PUBLIC*\` プレフィックスがある変数はクライアント側で使用されます
 - \`SUPABASE_SERVICE_ROLE_KEY\` は管理者権限を持つため、絶対に公開しないでください
 - \`CRON_SECRET\` を設定しないと、不正なCronジョブの実行を防げません
 
@@ -370,14 +370,14 @@ Bingify の動作に必要な環境変数の完全なリストです。
 
 **SMTP設定 (お問い合わせフォーム)**:
 
-| 変数名          | 説明                 | 例                          |
-| :-------------- | :------------------- | :-------------------------- |
-| \`SMTP_HOST\`   | SMTPサーバーホスト   | \`smtp.example.com\`        |
-| \`SMTP_PORT\`   | SMTPポート           | \`587\`                     |
-| \`SMTP_USER\`   | SMTPユーザー名       | \`user\`                    |
-| \`SMTP_PASS\`   | SMTPパスワード       | \`password\`                |
-| \`SMTP_SECURE\` | TLS使用フラグ        | \`false\`                   |
-| \`MAIL_FROM\`   | 送信元メールアドレス | \`noreply@your-domain.com\` |
+| 変数名          | 説明                 | 例                      |
+| :-------------- | :------------------- | :---------------------- |
+| \`SMTP_HOST\`   | SMTPサーバーホスト   | \`smtp.example.com\`    |
+| \`SMTP_PORT\`   | SMTPポート           | \`587\`                 |
+| \`SMTP_USER\`   | SMTPユーザー名       | \`user\`                |
+| \`SMTP_PASS\`   | SMTPパスワード       | \`password\`            |
+| \`SMTP_SECURE\` | TLS使用フラグ        | \`false\`               |
+| \`MAIL_FROM\`   | 送信元メールアドレス | \`noreply@example.com\` |
 
 送信先は \`profiles\` テーブルの \`role = 'admin'\` のユーザーに自動送信されます。
 
@@ -426,7 +426,7 @@ Vercel と Supabase の連携における詳細な設定方法です。
 
 **GitHub Actions による自動マイグレーション**:
 
-1. PRを作成し、\`supabase/migrations/**/*.sql\` に変更を含める
+1. PRを作成し、\`supabase/migrations/\*_/_.sql\` に変更を含める
 2. PRがレビュー・承認される
 3. \`main\` ブランチへマージ
 4. GitHub Actionsが自動的にマイグレーションを Cloud Supabaseに適用
@@ -510,7 +510,7 @@ Google および Twitch の OAuth 認証を有効にする手順です。
    [Google Cloud Console](https://console.cloud.google.com/) にアクセス:
    - "APIs & Services" → "Credentials" → "Create Credentials" → "OAuth 2.0 Client ID" を選択
    - Application type: "Web application"
-   - Authorized redirect URIs: \`https://your-project.supabase.co/auth/v1/callback\`
+   - Authorized redirect URIs: \`https://supabase.example.com/auth/v1/callback\`
 
 2. **クライアントIDとシークレットを取得**
 
@@ -533,7 +533,7 @@ Google および Twitch の OAuth 認証を有効にする手順です。
 
    [Twitch Developer Console](https://dev.twitch.tv/console/apps) にアクセス:
    - "Register Your Application" をクリック
-   - OAuth Redirect URL: \`https://your-project.supabase.co/auth/v1/callback\`
+   - OAuth Redirect URL: \`https://supabase.example.com/auth/v1/callback\`
    - Category: "Website Integration"
 
 2. **クライアントIDとシークレットを取得**
@@ -972,12 +972,12 @@ Bingify には以下の Cron ジョブが設定されています (\`vercel.json
 
 # cleanup ジョブをテスト
 
-curl -X POST https://your-domain.vercel.app/api/cron/cleanup \
+curl -X POST https://app.example.com/api/cron/cleanup \
  -H "Authorization: Bearer YOUR_CRON_SECRET"
 
 # token-refresh ジョブをテスト
 
-curl -X POST https://your-domain.vercel.app/api/cron/token-refresh \
+curl -X POST https://app.example.com/api/cron/token-refresh \
  -H "Authorization: Bearer YOUR_CRON_SECRET"
 \`\`\`
 
@@ -1030,8 +1030,8 @@ Error: Cannot find module 'next'
 
 1. Vercel Dashboard の "Settings" → "Environment Variables" で設定を確認
 2. 環境 (Production、Preview、Development) が正しく選択されているか確認
-3. \`NEXT_PUBLIC_\` プレフィックスの有無を確認
-   - クライアント側で使用する変数には \`NEXT_PUBLIC_\` が必要
+3. \`NEXT*PUBLIC*\` プレフィックスの有無を確認
+   - クライアント側で使用する変数には \`NEXT*PUBLIC*\` が必要
    - サーバー側のみで使用する変数には不要
 4. 環境変数を更新した後は、**必ず再デプロイ**を実行
    - Vercel Dashboard の "Deployments" → "..." → "Redeploy"
@@ -1080,9 +1080,9 @@ Error: connect ECONNREFUSED
 **解決方法**:
 
 1. OAuth プロバイダーのリダイレクトURIを確認:
-   - 正しいURL: \`https://your-project.supabase.co/auth/v1/callback\`
-   - 誤ったURL: \`http://your-project.supabase.co/auth/v1/callback\` (HTTP は不可)
-   - 誤ったURL: \`https://your-domain.vercel.app/auth/callback\` (Vercel URL は不可)
+   - 正しいURL: \`https://supabase.example.com/auth/v1/callback\`
+   - 誤ったURL: \`http://supabase.example.com/auth/v1/callback\` (HTTP は不可)
+   - 誤ったURL: \`https://app.example.com/auth/callback\` (Vercel URL は不可)
 2. 環境変数を確認:
    - \`SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID\`
    - \`SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET\`
@@ -1118,7 +1118,7 @@ Error: connect ECONNREFUSED
 4. 手動で Cron エンドポイントを実行してテスト:
 
    \`\`\`bash
-   curl -X POST https://your-domain.vercel.app/api/cron/cleanup \
+   curl -X POST https://app.example.com/api/cron/cleanup \
     -H "Authorization: Bearer YOUR_CRON_SECRET"
    \`\`\`
 
