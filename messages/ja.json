@@ -584,6 +584,20 @@
     "description": "お探しのページは存在しないか、移動した可能性があります。",
     "title": "ページが見つかりません"
   },
+  "Notifications": {
+    "allTab": "すべて",
+    "emptyAll": "通知はまだありません",
+    "emptyUnread": "未読の通知はありません",
+    "loadingNotifications": "通知を読み込んでいます...",
+    "markAllRead": "すべて既読にする",
+    "markAllReadSuccess": "すべての通知を既読にしました",
+    "metaDescription": "通知を表示・管理",
+    "metaTitle": "通知",
+    "next": "次へ",
+    "previous": "前へ",
+    "title": "通知",
+    "unreadTab": "未読"
+  },
   "OAuth": {
     "errorInsufficientPermissions": "OAuth権限が不足しています。必要な権限でアカウントを再接続してください。",
     "errorNetworkError": "アカウント確認中にネットワークエラーが発生しました。もう一度お試しください。",

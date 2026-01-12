@@ -584,6 +584,20 @@
     "description": "The page you are looking for does not exist or has been moved.",
     "title": "Page Not Found"
   },
+  "Notifications": {
+    "allTab": "All",
+    "emptyAll": "No notifications yet",
+    "emptyUnread": "No unread notifications",
+    "loadingNotifications": "Loading notifications...",
+    "markAllRead": "Mark all as read",
+    "markAllReadSuccess": "All notifications marked as read",
+    "metaDescription": "View and manage your notifications",
+    "metaTitle": "Notifications",
+    "next": "Next",
+    "previous": "Previous",
+    "title": "Notifications",
+    "unreadTab": "Unread"
+  },
   "OAuth": {
     "errorInsufficientPermissions": "Insufficient OAuth permissions. Please reconnect your account with the required permissions.",
     "errorNetworkError": "Network error occurred while verifying your account. Please try again.",
