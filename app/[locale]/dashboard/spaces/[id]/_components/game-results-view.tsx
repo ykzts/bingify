@@ -35,11 +35,18 @@ export function GameResultsView({ spaceId }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let mounted = true;
+
     const fetchResults = async () => {
       setLoading(true);
       setError(null);
 
       const response = await getGameResults(spaceId);
+
+      // コンポーネントがアンマウントされている場合は状態更新をスキップ
+      if (!mounted) {
+        return;
+      }
 
       if (response.success && response.results) {
         setResults(response.results);
@@ -54,6 +61,10 @@ export function GameResultsView({ spaceId }: Props) {
     };
 
     fetchResults();
+
+    return () => {
+      mounted = false;
+    };
   }, [spaceId, t]);
 
   const formatPatternType = (type: string): string => {
