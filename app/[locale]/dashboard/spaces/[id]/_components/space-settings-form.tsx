@@ -380,6 +380,74 @@ export function SpaceSettingsForm({
     }
   }, [verifiedChannels]);
 
+  // YouTubeプラットフォーム選択時に自動的にチャンネルIDを入力
+  const autoFillYoutubeChannelId = useEffectEvent(
+    async (signal: AbortSignal) => {
+      setFetchingOperatorYoutubeId(true);
+      try {
+        const result = await getOperatorYouTubeChannelId();
+
+        // AbortSignalをチェック（コンポーネントがアンマウントされた場合は更新しない）
+        if (signal.aborted) {
+          return;
+        }
+
+        if (result.success && result.channelId) {
+          setOperatorYoutubeChannelId(result.channelId);
+          form.setFieldValue("youtube_channel_id", result.channelId);
+        }
+      } catch (_error) {
+        // エラーは無視（自動入力できないだけ）
+      } finally {
+        if (!signal.aborted) {
+          setFetchingOperatorYoutubeId(false);
+        }
+      }
+    }
+  );
+
+  // YouTubeチャンネルIDをキャッシュから自動入力
+  const autoFillYoutubeFromCache = useEffectEvent(() => {
+    if (verifiedChannels?.youtube) {
+      form.setFieldValue("youtube_channel_id", verifiedChannels.youtube);
+    }
+  });
+
+  // ソーシャル連携タブに移動時、またはYouTubeプラットフォーム選択時に自動入力
+  useEffect(() => {
+    // 以下の条件を全て満たす場合に自動入力を実行
+    // 1. ゲートキーパーモードが "social"
+    // 2. ソーシャルプラットフォームが "youtube"
+    // 3. YouTubeチャンネルIDが未入力
+    // 4. 検証済みチャンネルIDが存在する（キャッシュ優先）、または取得中でない
+    if (
+      gatekeeperMode === "social" &&
+      socialPlatform === "youtube" &&
+      !enteredYoutubeChannelId &&
+      !fetchingOperatorYoutubeId
+    ) {
+      // キャッシュされた検証済みチャンネルIDがあればそれを使用
+      if (verifiedChannels?.youtube) {
+        autoFillYoutubeFromCache();
+        return;
+      }
+
+      // キャッシュがない場合はAPI経由で取得
+      const controller = new AbortController();
+      autoFillYoutubeChannelId(controller.signal);
+
+      return () => {
+        controller.abort();
+      };
+    }
+  }, [
+    gatekeeperMode,
+    socialPlatform,
+    enteredYoutubeChannelId,
+    fetchingOperatorYoutubeId,
+    verifiedChannels,
+  ]);
+
   // 自動的に操作者のYouTubeチャンネルIDを取得（手動入力時の所有権チェック用）
   const fetchYoutubeOperatorId = useEffectEvent(async (signal: AbortSignal) => {
     setFetchingOperatorYoutubeId(true);
@@ -450,6 +518,39 @@ export function SpaceSettingsForm({
     }
   });
 
+  // Twitchプラットフォーム選択時に自動的にブロードキャスターIDを入力
+  const autoFillTwitchBroadcasterId = useEffectEvent(
+    async (signal: AbortSignal) => {
+      setFetchingOperatorTwitchId(true);
+      try {
+        const result = await getOperatorTwitchBroadcasterId();
+
+        // AbortSignalをチェック（コンポーネントがアンマウントされた場合は更新しない）
+        if (signal.aborted) {
+          return;
+        }
+
+        if (result.success && result.channelId) {
+          setOperatorTwitchBroadcasterId(result.channelId);
+          form.setFieldValue("twitch_broadcaster_id", result.channelId);
+        }
+      } catch (_error) {
+        // エラーは無視（自動入力できないだけ）
+      } finally {
+        if (!signal.aborted) {
+          setFetchingOperatorTwitchId(false);
+        }
+      }
+    }
+  );
+
+  // TwitchブロードキャスターIDをキャッシュから自動入力
+  const autoFillTwitchFromCache = useEffectEvent(() => {
+    if (verifiedChannels?.twitch) {
+      form.setFieldValue("twitch_broadcaster_id", verifiedChannels.twitch);
+    }
+  });
+
   useEffect(() => {
     // TwitchブロードキャスターIDが入力されているが、操作者のIDがまだ取得されていない場合
     if (
@@ -472,6 +573,41 @@ export function SpaceSettingsForm({
     fetchingOperatorTwitchId,
     socialPlatform,
     gatekeeperMode,
+  ]);
+
+  // ソーシャル連携タブに移動時、またはTwitchプラットフォーム選択時に自動入力
+  useEffect(() => {
+    // 以下の条件を全て満たす場合に自動入力を実行
+    // 1. ゲートキーパーモードが "social"
+    // 2. ソーシャルプラットフォームが "twitch"
+    // 3. TwitchブロードキャスターIDが未入力
+    // 4. 検証済みチャンネルIDが存在する（キャッシュ優先）、または取得中でない
+    if (
+      gatekeeperMode === "social" &&
+      socialPlatform === "twitch" &&
+      !enteredTwitchBroadcasterId &&
+      !fetchingOperatorTwitchId
+    ) {
+      // キャッシュされた検証済みチャンネルIDがあればそれを使用
+      if (verifiedChannels?.twitch) {
+        autoFillTwitchFromCache();
+        return;
+      }
+
+      // キャッシュがない場合はAPI経由で取得
+      const controller = new AbortController();
+      autoFillTwitchBroadcasterId(controller.signal);
+
+      return () => {
+        controller.abort();
+      };
+    }
+  }, [
+    gatekeeperMode,
+    socialPlatform,
+    enteredTwitchBroadcasterId,
+    fetchingOperatorTwitchId,
+    verifiedChannels,
   ]);
 
   // Calculate effective gatekeeper mode (fallback to "none" if current mode is not available)
