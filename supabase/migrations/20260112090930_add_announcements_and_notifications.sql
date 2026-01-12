@@ -171,14 +171,40 @@ COMMENT ON COLUMN space_announcements.pinned IS 'Whether this announcement is pi
 -- Enable RLS on space_announcements table
 ALTER TABLE space_announcements ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can read space announcements for spaces they have access to
-CREATE POLICY "Users can read space announcements"
+-- Policy: Space owners can read announcements for their spaces
+CREATE POLICY "Space owners can read space announcements"
   ON space_announcements
   FOR SELECT
   USING (
     EXISTS (
       SELECT 1 FROM spaces s
       WHERE s.id = space_announcements.space_id
+        AND s.owner_id = auth.uid()
+    )
+  );
+
+-- Policy: Space admins can read announcements for their spaces
+CREATE POLICY "Space admins can read space announcements"
+  ON space_announcements
+  FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM space_roles sr
+      WHERE sr.space_id = space_announcements.space_id
+        AND sr.user_id = auth.uid()
+        AND sr.role = 'admin'
+    )
+  );
+
+-- Policy: Participants can read announcements for their spaces
+CREATE POLICY "Participants can read space announcements"
+  ON space_announcements
+  FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM participants p
+      WHERE p.space_id = space_announcements.space_id
+        AND p.user_id = auth.uid()
     )
   );
 
