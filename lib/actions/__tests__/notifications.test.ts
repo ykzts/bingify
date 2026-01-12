@@ -25,6 +25,18 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(() => Promise.resolve(mockSupabase)),
 }));
 
+/**
+ * 複数のfrom呼び出しを順番に返すヘルパー関数
+ */
+function createSequentialFromMock(...mocks: unknown[]) {
+  let callCount = 0;
+  return () => {
+    const result = mocks[callCount];
+    callCount++;
+    return result;
+  };
+}
+
 describe("getNotifications", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -310,11 +322,9 @@ describe("markNotificationRead", () => {
       update: vi.fn().mockReturnThis(),
     };
 
-    let callCount = 0;
-    mockSupabase.from.mockImplementation(() => {
-      callCount++;
-      return callCount === 1 ? mockSelectQuery : mockUpdateQuery;
-    });
+    mockSupabase.from.mockImplementation(
+      createSequentialFromMock(mockSelectQuery, mockUpdateQuery)
+    );
 
     const result = await markNotificationRead("notif-123");
 
@@ -469,11 +479,9 @@ describe("deleteNotification", () => {
       eq: vi.fn().mockReturnValue(mockEqChain),
     };
 
-    let callCount = 0;
-    mockSupabase.from.mockImplementation(() => {
-      callCount++;
-      return callCount === 1 ? mockSelectQuery : mockDeleteQuery;
-    });
+    mockSupabase.from.mockImplementation(
+      createSequentialFromMock(mockSelectQuery, mockDeleteQuery)
+    );
 
     const result = await deleteNotification("notif-123");
 
