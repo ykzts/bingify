@@ -43,6 +43,9 @@ export function GameResultsView({ spaceId }: Props) {
 
       if (response.success && response.results) {
         setResults(response.results);
+      } else if (response.error === "Permission denied") {
+        // マップ特定のエラーを適切な翻訳文字列に
+        setError(t("errorPermissionDenied"));
       } else {
         setError(response.error || t("errorFetchResults"));
       }
@@ -58,8 +61,13 @@ export function GameResultsView({ spaceId }: Props) {
     if (validTypes.includes(type)) {
       return t(type as "horizontal" | "vertical" | "diagonal" | "multiple");
     }
-    // Fallback: return the raw value if it's not a recognized pattern type
-    return type;
+    // データベースCHECK制約により、ここには到達しないはず
+    // 想定外の値が来た場合はログに記録し、安全な表示を行う
+    console.error(
+      "Unexpected pattern_type value encountered in GameResultsView:",
+      type
+    );
+    return t("multiple"); // 安全なフォールバック
   };
 
   if (loading) {

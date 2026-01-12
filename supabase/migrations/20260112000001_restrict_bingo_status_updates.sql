@@ -1,27 +1,25 @@
 -- Restrict updates to participants.bingo_status to prevent security exploits
--- Users should not be able to arbitrarily set their bingo_status to 'bingo'
--- Only server-side actions can update bingo_status
+-- Users should not be able to arbitrarily set their bingo_status to 'bingo' or 'reach'
+-- Only server-side actions (service_role) can update bingo_status to non-'none' values
 
--- Policy: Users cannot update bingo_status field
--- Server actions use service_role which bypasses RLS
-CREATE POLICY "Users cannot update bingo_status"
+-- First, drop the existing permissive UPDATE policy that allows any field changes
+DROP POLICY IF EXISTS "Users can update own participant record" ON participants;
+
+-- Drop the ineffective policy if it exists from previous migration attempts
+DROP POLICY IF EXISTS "Users cannot update bingo_status" ON participants;
+
+-- Create a new, restrictive UPDATE policy
+-- This policy prevents users from setting bingo_status to 'reach' or 'bingo'
+-- They can only set it to 'none' (for voluntary resets)
+-- Server-side logic using service_role bypasses RLS and can set any value
+CREATE POLICY "Users can only reset their bingo_status to none"
   ON participants
   FOR UPDATE
   USING (auth.uid() = user_id)
   WITH CHECK (
-    -- Allow users to update their own participant record
-    -- but prevent changing bingo_status except to 'none'
     auth.uid() = user_id
-    AND (
-      -- Only allow setting bingo_status to 'none' (allowing resets)
-      bingo_status = 'none'
-      -- For all other updates, bingo_status must not be changed
-      -- This prevents users from setting status to 'reach' or 'bingo'
-      OR NOT EXISTS (
-        SELECT 1
-        FROM participants p
-        WHERE p.id = participants.id
-          AND p.bingo_status IS DISTINCT FROM bingo_status
-      )
-    )
+    -- Only allow bingo_status to be 'none'
+    -- This means users cannot UPDATE to 'reach' or 'bingo'
+    -- Server-side code (service_role) bypasses RLS entirely
+    AND bingo_status = 'none'
   );

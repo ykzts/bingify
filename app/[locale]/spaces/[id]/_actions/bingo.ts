@@ -4,6 +4,14 @@ import { createClient } from "@/lib/supabase/server";
 import type { BingoLine } from "@/lib/utils/bingo-checker";
 import { isValidUUID } from "@/lib/utils/uuid";
 
+// Valid pattern types matching database CHECK constraint
+const VALID_PATTERN_TYPES = new Set([
+  "horizontal",
+  "vertical",
+  "diagonal",
+  "multiple",
+] as const);
+
 export interface BingoCard {
   created_at: string;
   id: string;
@@ -214,21 +222,23 @@ export async function updateBingoStatusWithLines(
       input.bingoLines.length > 0
     ) {
       // パターンタイプを判定（DB の CHECK 制約に合わせてバリデーション）
-      const validPatternTypes = new Set([
-        "horizontal",
-        "vertical",
-        "diagonal",
-        "multiple",
-      ]);
       const firstLineType = input.bingoLines[0].type;
 
       let patternType: string;
       if (input.bingoLines.length > 1) {
         patternType = "multiple";
-      } else if (validPatternTypes.has(firstLineType)) {
+      } else if (VALID_PATTERN_TYPES.has(firstLineType)) {
         patternType = firstLineType;
       } else {
-        // フォールバック: 無効なパターンタイプは "multiple" として扱う
+        // ここには通常到達しないはず（BingoLine.type は horizontal | vertical | diagonal）
+        // 想定外のパターンタイプが入ってきた場合はバグの可能性があるためログを出力しつつ、
+        // DB の CHECK 制約を満たすために安全なフォールバックとして "multiple" を使用する
+        console.error(
+          "Unexpected bingo line type detected in updateBingoStatusWithLines:",
+          firstLineType,
+          "in bingoLines:",
+          input.bingoLines
+        );
         patternType = "multiple";
       }
 
