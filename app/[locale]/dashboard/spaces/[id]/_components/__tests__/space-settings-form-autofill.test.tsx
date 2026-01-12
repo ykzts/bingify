@@ -18,10 +18,12 @@ describe("スペース設定フォームの自動入力", () => {
 
       // 自動入力ロジックをシミュレート
       const gatekeeperMode = "social";
-      const socialPlatform = "youtube";
+      const socialPlatform: "youtube" | "twitch" = "youtube";
       const enteredYoutubeChannelId = "";
       const fetchingOperatorYoutubeId = false;
-      const verifiedChannels = undefined;
+      const verifiedChannels:
+        | { youtube?: string; twitch?: string }
+        | undefined = undefined;
 
       // 条件が満たされているか確認
       const shouldAutoFill =
@@ -33,7 +35,10 @@ describe("スペース設定フォームの自動入力", () => {
       expect(shouldAutoFill).toBe(true);
 
       // キャッシュがない場合はAPI経由で取得
-      if (shouldAutoFill && !verifiedChannels?.youtube) {
+      const youtubeChannel = (
+        verifiedChannels as { youtube?: string } | undefined
+      )?.youtube;
+      if (!youtubeChannel) {
         const result = await mockGetOperatorYouTubeChannelId();
         if (result.success && result.channelId) {
           mockSetFieldValue("youtube_channel_id", result.channelId);
@@ -53,7 +58,7 @@ describe("スペース設定フォームの自動入力", () => {
       const mockGetOperatorYouTubeChannelId = vi.fn();
 
       const gatekeeperMode = "social";
-      const socialPlatform = "youtube";
+      const socialPlatform: "youtube" | "twitch" = "youtube";
       const enteredYoutubeChannelId = "";
       const fetchingOperatorYoutubeId = false;
       const verifiedChannels = { youtube: "UCyyyyyyyyyyyyyyyyyyyyyy" };
@@ -84,7 +89,7 @@ describe("スペース設定フォームの自動入力", () => {
       const mockGetOperatorYouTubeChannelId = vi.fn();
 
       const gatekeeperMode = "social";
-      const socialPlatform = "youtube";
+      const socialPlatform: "youtube" | "twitch" = "youtube";
       const enteredYoutubeChannelId = "UCzzzzzzzzzzzzzzzzzzzzzz";
       const fetchingOperatorYoutubeId = false;
 
@@ -106,7 +111,8 @@ describe("スペース設定フォームの自動入力", () => {
       const mockGetOperatorYouTubeChannelId = vi.fn();
 
       const gatekeeperMode = "social";
-      const socialPlatform = "twitch";
+      // Use type assertion to prevent narrowing
+      const socialPlatform = "twitch" as "youtube" | "twitch";
       const enteredYoutubeChannelId = "";
       const fetchingOperatorYoutubeId = false;
 
@@ -131,7 +137,7 @@ describe("スペース設定フォームの自動入力", () => {
       });
 
       const gatekeeperMode = "social";
-      const socialPlatform = "youtube";
+      const socialPlatform: "youtube" | "twitch" = "youtube";
       const enteredYoutubeChannelId = "";
       const fetchingOperatorYoutubeId = false;
 
