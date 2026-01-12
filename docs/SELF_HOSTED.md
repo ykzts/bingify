@@ -543,7 +543,7 @@ Basic認証は公開前の制限やステージング環境の保護に使用で
 
 ## データベースの設定
 
-Bingifyは PostgreSQL 15以上を必要とします。Supabaseの使用を強く推奨しますが、PostgreSQL互換データベースでも動作可能です。
+Bingifyは Supabaseを使用します。Supabase Cloud (推奨) またはSupabase OSS版を使用してください。
 
 ### Supabase Cloud (推奨)
 
@@ -611,167 +611,13 @@ Supabase Cloudは最も簡単で推奨される方法です。
 
 Supabaseのオープンソース版を自分でホストすることも可能です。
 
-#### 前提条件
+詳細なセットアップ手順については、[Supabase公式ドキュメント](https://supabase.com/docs/guides/self-hosting)を参照してください。
 
-- Docker と Docker Compose
-- 4GB以上のRAM
-- 10GB以上のストレージ
+**重要なポイント**:
 
-#### セットアップ手順
-
-1. **Supabase CLIをインストール**
-
-   ```bash
-   pnpm add -g supabase
-   ```
-
-2. **Supabaseプロジェクトを初期化**
-
-   ```bash
-   supabase init
-   ```
-
-3. **ローカルSupabaseを起動**
-
-   ```bash
-   supabase start
-   ```
-
-   これにより、以下のサービスが起動します：
-   - PostgreSQL (ポート: 54322)
-   - PostgREST (ポート: 54321)
-   - Realtime (ポート: 54323)
-   - Auth (ポート: 54324)
-   - Storage (ポート: 54325)
-   - Studio (ポート: 54323)
-
-4. **接続情報を取得**
-
-   ```bash
-   supabase status
-   ```
-
-   出力された接続情報を環境変数に設定します。
-
-5. **マイグレーションを適用**
-
-   Bingifyリポジトリの `supabase/migrations` ディレクトリをコピー：
-
-   ```bash
-   cp -r /path/to/bingify/supabase/migrations/* ./supabase/migrations/
-   supabase db reset
-   ```
-
-6. **本番環境用の設定**
-
-   `supabase/config.toml` を編集して本番環境用の設定を行います：
-
-   ```toml
-   [api]
-   enabled = true
-   port = 54321
-   schemas = ["public", "graphql_public"]
-   extra_search_path = ["public"]
-
-   [db]
-   port = 54322
-   major_version = 15
-
-   [auth]
-   enabled = true
-   site_url = "https://your-domain.com"
-   additional_redirect_urls = ["https://your-domain.com/**"]
-   ```
-
-7. **データベースをバックアップ**
-
-   定期的なバックアップスクリプトを設定します：
-
-   ```bash
-   pg_dump -U postgres -h localhost -p 54322 postgres > backup.sql
-   ```
-
-#### Supabase OSS版の利点と注意点
-
-**利点**:
-
-- **完全なコントロール**: すべてのデータと設定を管理
-- **コスト削減**: インフラコストのみ
-- **プライバシー**: データを自分のインフラに保持
-
-**注意点**:
-
-- **運用負荷**: バックアップ、アップデート、監視を自分で管理
-- **スケーリング**: 手動でのスケーリング設定が必要
-- **機能差**: Cloud版の一部機能 (自動バックアップ、グローバル分散など) が利用不可
-
----
-
-### PostgreSQL互換データベース
-
-Supabaseを使用せず、標準のPostgreSQLや互換データベースを使用することも可能です。ただし、Realtime機能と認証機能は利用できません。
-
-#### 対応データベース
-
-- PostgreSQL 15以上
-- CockroachDB (PostgreSQL互換モード)
-- YugabyteDB (PostgreSQL互換モード)
-
-#### セットアップ手順
-
-1. **PostgreSQL 15以上をインストール**
-
-   ```bash
-   # Ubuntu/Debian
-   sudo apt-get install postgresql-15
-
-   # または Dockerを使用
-   docker run -d \
-     --name postgres \
-     -e POSTGRES_PASSWORD=password \
-     -p 5432:5432 \
-     postgres:15-alpine
-   ```
-
-2. **データベースとユーザーを作成**
-
-   ```sql
-   CREATE DATABASE bingify;
-   CREATE USER bingify_user WITH PASSWORD 'secure-password';
-   GRANT ALL PRIVILEGES ON DATABASE bingify TO bingify_user;
-   ```
-
-3. **マイグレーションを実行**
-
-   `supabase/migrations/*.sql` ファイルを順番に実行します：
-
-   ```bash
-   psql -U bingify_user -d bingify -f supabase/migrations/20241220000000_init.sql
-   # 他のマイグレーションファイルも同様に実行
-   ```
-
-4. **接続情報を設定**
-
-   `.env.production.local` に接続情報を設定します：
-
-   ```bash
-   NEXT_PUBLIC_SUPABASE_URL=http://localhost:3000
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy-key
-   SUPABASE_SERVICE_ROLE_KEY=dummy-key
-   DATABASE_URL=postgresql://bingify_user:secure-password@localhost:5432/bingify
-   ```
-
-   **注意**: Supabase固有の機能 (Realtime、Auth) は動作しません。
-
-#### 制限事項
-
-標準のPostgreSQLを使用する場合、以下の制限があります：
-
-- **Realtime機能**: リアルタイム同期が動作しないため、手動リフレッシュが必要
-- **認証機能**: Supabase Authが利用できないため、代替認証システムの実装が必要
-- **Row Level Security**: RLSポリシーは機能しますが、Supabase固有の関数 (`auth.uid()` など) は動作しません
-
-**推奨事項**: 特別な理由がない限り、Supabase CloudまたはSupabase OSS版の使用を強く推奨します。
+- Bingifyリポジトリの `supabase/migrations` ディレクトリにあるマイグレーションファイルを適用する必要があります
+- `supabase/config.toml` の設定を本番環境に合わせて調整してください
+- 定期的なバックアップとアップデートの運用計画を立ててください
 
 ---
 
@@ -1225,4 +1071,3 @@ FATAL ERROR: Reached heap limit Allocation failed
 ## ライセンス
 
 Bingifyは [MIT License](https://github.com/ykzts/bingify/blob/main/LICENSE) の下で配布されています。
-
