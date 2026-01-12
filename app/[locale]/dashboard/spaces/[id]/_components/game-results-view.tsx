@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertCircle } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/table";
 import type { GameResultWithProfile } from "@/lib/actions/game-results";
 import { getGameResults } from "@/lib/actions/game-results";
+import { formatDateTime } from "@/lib/utils/date-format";
 
 interface Props {
   spaceId: string;
@@ -28,6 +29,7 @@ interface Props {
 
 export function GameResultsView({ spaceId }: Props) {
   const t = useTranslations("GameResults");
+  const locale = useLocale();
   const [results, setResults] = useState<GameResultWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,24 +54,12 @@ export function GameResultsView({ spaceId }: Props) {
   }, [spaceId, t]);
 
   const formatPatternType = (type: string): string => {
-    const key = type as
-      | "horizontal"
-      | "vertical"
-      | "diagonal"
-      | "multiple"
-      | "none";
-    return t(key);
-  };
-
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("ja-JP", {
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(date);
+    const validTypes = ["horizontal", "vertical", "diagonal", "multiple"];
+    if (validTypes.includes(type)) {
+      return t(type as "horizontal" | "vertical" | "diagonal" | "multiple");
+    }
+    // Fallback: return the raw value if it's not a recognized pattern type
+    return type;
   };
 
   if (loading) {
@@ -135,13 +125,13 @@ export function GameResultsView({ spaceId }: Props) {
                     <TableCell className="font-medium">
                       {result.profiles?.full_name ||
                         result.profiles?.email ||
-                        "Unknown User"}
+                        t("unknownUser")}
                     </TableCell>
                     <TableCell>
                       {formatPatternType(result.pattern_type)}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {formatDate(result.achieved_at)}
+                      {formatDateTime(result.achieved_at, locale)}
                     </TableCell>
                   </TableRow>
                 ))}

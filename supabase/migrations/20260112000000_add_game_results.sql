@@ -54,7 +54,7 @@ CREATE POLICY "Service role can insert game results"
   FOR INSERT
   WITH CHECK (
     -- Only service_role can insert
-    current_setting('request.jwt.claims', true)::json->>'role' = 'service_role'
+    current_setting('request.jwt.claims', true)::json->>'role' IS NOT DISTINCT FROM 'service_role'
   );
 
 -- Policy: No updates or deletes allowed to maintain data integrity

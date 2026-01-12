@@ -514,6 +514,7 @@
     "participant": "Participant",
     "patternDetails": "Pattern Details",
     "title": "Game Results",
+    "unknownUser": "Unknown User",
     "vertical": "Vertical",
     "winnerName": "Winner"
   },

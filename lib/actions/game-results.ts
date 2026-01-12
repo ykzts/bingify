@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import type { BingoLine } from "@/lib/utils/bingo-checker";
 import { isValidUUID } from "@/lib/utils/uuid";
 import type { Tables } from "@/types/supabase";
 
@@ -18,86 +17,6 @@ export interface GetGameResultsResult {
   error?: string;
   results?: GameResultWithProfile[];
   success: boolean;
-}
-
-export interface RecordGameResultInput {
-  bingoLines: BingoLine[];
-  spaceId: string;
-}
-
-export interface RecordGameResultResult {
-  error?: string;
-  resultId?: string;
-  success: boolean;
-}
-
-/**
- * ビンゴ達成時にゲーム結果を記録する
- * この関数はサーバーサイドから呼び出される（service_role権限）
- */
-export async function recordGameResult(
-  input: RecordGameResultInput
-): Promise<RecordGameResultResult> {
-  try {
-    if (!isValidUUID(input.spaceId)) {
-      return {
-        error: "Invalid space ID",
-        success: false,
-      };
-    }
-
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return {
-        error: "Authentication required",
-        success: false,
-      };
-    }
-
-    // パターンタイプを判定
-    const patternType = determinePatternType(input.bingoLines);
-
-    // パターン詳細をJSON形式で保存
-    const patternDetails = input.bingoLines.map((line) => ({
-      index: line.index,
-      type: line.type,
-    }));
-
-    const { data: result, error } = await supabase
-      .from("game_results")
-      .insert({
-        pattern_details: patternDetails,
-        pattern_type: patternType,
-        space_id: input.spaceId,
-        user_id: user.id,
-      })
-      .select("id")
-      .single();
-
-    if (error) {
-      console.error("Error recording game result:", error);
-      return {
-        error: "Failed to record game result",
-        success: false,
-      };
-    }
-
-    return {
-      resultId: result.id,
-      success: true,
-    };
-  } catch (error) {
-    console.error("Error in recordGameResult:", error);
-    return {
-      error: "An error occurred",
-      success: false,
-    };
-  }
 }
 
 /**
@@ -194,7 +113,7 @@ export async function getGameResults(
       .in("id", userIds);
 
     if (profilesError) {
-      console.error("Error fetching profiles:", profilesError);
+      console.warn("Failed to fetch profiles for game results:", profilesError);
       // プロフィール情報がなくても結果は返す
     }
 
@@ -221,20 +140,4 @@ export async function getGameResults(
       success: false,
     };
   }
-}
-
-/**
- * ビンゴラインからパターンタイプを判定する
- */
-function determinePatternType(bingoLines: BingoLine[]): string {
-  if (bingoLines.length === 0) {
-    return "none";
-  }
-
-  if (bingoLines.length > 1) {
-    return "multiple";
-  }
-
-  const line = bingoLines[0];
-  return line.type;
 }
