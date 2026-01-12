@@ -1,5 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { NotificationTypeValue } from "@/lib/types/notification";
+import type {
+  NotificationMetadata,
+  NotificationTypeValue,
+} from "@/lib/types/notification";
 import type { Json } from "@/types/supabase";
 import { getErrorMessage } from "./error-message";
 
@@ -13,22 +16,6 @@ export interface CreateNotificationResult {
   notificationId?: string;
   /** 処理の成功/失敗 */
   success: boolean;
-}
-
-/**
- * 通知メタデータの型
- */
-export interface NotificationMetadata {
-  /** カスタムアクションURL */
-  action_url?: string;
-  /** アナウンスメントID */
-  announcement_id?: string;
-  /** 送信者のユーザーID */
-  sender_id?: string;
-  /** スペースID */
-  space_id?: string;
-  /** その他のメタデータ */
-  [key: string]: unknown;
 }
 
 /**
