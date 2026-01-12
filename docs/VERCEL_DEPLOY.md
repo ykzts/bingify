@@ -355,7 +355,7 @@ Bingify の動作に必要な環境変数の完全なリストです。
 
 **重要**:
 
-- \`NEXT*PUBLIC*\` プレフィックスがある変数はクライアント側で使用されます
+- \`NEXT_PUBLIC_\` プレフィックスがある変数はクライアント側で使用されます
 - \`SUPABASE_SERVICE_ROLE_KEY\` は管理者権限を持つため、絶対に公開しないでください
 - \`CRON_SECRET\` を設定しないと、不正なCronジョブの実行を防げません
 
@@ -426,7 +426,7 @@ Vercel と Supabase の連携における詳細な設定方法です。
 
 **GitHub Actions による自動マイグレーション**:
 
-1. PRを作成し、\`supabase/migrations/\*_/_.sql\` に変更を含める
+1. PRを作成し、\`supabase/migrations/**/*.sql\` に変更を含める
 2. PRがレビュー・承認される
 3. \`main\` ブランチへマージ
 4. GitHub Actionsが自動的にマイグレーションを Cloud Supabaseに適用
@@ -1030,8 +1030,8 @@ Error: Cannot find module 'next'
 
 1. Vercel Dashboard の "Settings" → "Environment Variables" で設定を確認
 2. 環境 (Production、Preview、Development) が正しく選択されているか確認
-3. \`NEXT*PUBLIC*\` プレフィックスの有無を確認
-   - クライアント側で使用する変数には \`NEXT*PUBLIC*\` が必要
+3. \`NEXT_PUBLIC_\` プレフィックスの有無を確認
+   - クライアント側で使用する変数には \`NEXT_PUBLIC_\` が必要
    - サーバー側のみで使用する変数には不要
 4. 環境変数を更新した後は、**必ず再デプロイ**を実行
    - Vercel Dashboard の "Deployments" → "..." → "Redeploy"
