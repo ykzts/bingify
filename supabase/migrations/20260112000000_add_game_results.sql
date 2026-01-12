@@ -16,6 +16,9 @@ CREATE INDEX IF NOT EXISTS idx_game_results_space_id ON game_results(space_id);
 CREATE INDEX IF NOT EXISTS idx_game_results_user_id ON game_results(user_id);
 CREATE INDEX IF NOT EXISTS idx_game_results_achieved_at ON game_results(achieved_at);
 
+-- Add unique constraint to prevent duplicate game results for the same user in the same space
+CREATE UNIQUE INDEX IF NOT EXISTS idx_game_results_space_user_unique ON game_results(space_id, user_id);
+
 -- Add comment to explain pattern_details structure
 COMMENT ON COLUMN game_results.pattern_details IS 'JSONB array of bingo lines: [{"type": "horizontal", "index": 0}, ...]';
 
@@ -47,14 +50,21 @@ CREATE POLICY "Space admins can read game results for their spaces"
     )
   );
 
--- Policy: Only server-side (authenticated service) can insert game results
--- This prevents users from manually inserting fake game results
-CREATE POLICY "Service role can insert game results"
+-- Policy: Authenticated users can insert their own game results
+-- This allows users to record their bingo achievements
+CREATE POLICY "Users can insert their own game results"
   ON game_results
   FOR INSERT
   WITH CHECK (
-    -- Only service_role can insert
-    current_setting('request.jwt.claims', true)::json->>'role' IS NOT DISTINCT FROM 'service_role'
+    -- Users can only insert results for themselves
+    auth.uid() = user_id
+    -- And they must be a participant in the space
+    AND EXISTS (
+      SELECT 1 FROM participants p
+      WHERE p.space_id = game_results.space_id
+        AND p.user_id = auth.uid()
+        AND p.bingo_status = 'bingo'
+    )
   );
 
 -- Policy: No updates or deletes allowed to maintain data integrity

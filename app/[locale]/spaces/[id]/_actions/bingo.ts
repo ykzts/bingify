@@ -213,47 +213,33 @@ export async function updateBingoStatusWithLines(
       input.bingoLines &&
       input.bingoLines.length > 0
     ) {
-      // 既に同じspace_idとuser_idのゲーム結果が存在するか確認し、重複登録を防止
-      const { data: existingResults, error: existingResultsError } =
-        await supabase
-          .from("game_results")
-          .select("id")
-          .eq("space_id", input.spaceId)
-          .eq("user_id", user.id)
-          .limit(1);
+      // パターンタイプを判定
+      const patternType =
+        input.bingoLines.length > 1 ? "multiple" : input.bingoLines[0].type;
 
-      if (existingResultsError) {
-        // ゲーム結果の確認に失敗してもステータス更新は成功として扱う
-        console.error(
-          "Error checking existing game result:",
-          existingResultsError
-        );
-      } else if (!existingResults || existingResults.length === 0) {
-        // パターンタイプを判定
-        // Note: This logic is duplicated from determinePatternType in lib/actions/game-results.ts
-        // Keeping it inline here to avoid unnecessary imports in the bingo actions file
-        const patternType =
-          input.bingoLines.length > 1 ? "multiple" : input.bingoLines[0].type;
+      // パターン詳細をJSON形式で保存
+      const patternDetails = input.bingoLines.map((line) => ({
+        index: line.index,
+        type: line.type,
+      }));
 
-        // パターン詳細をJSON形式で保存
-        const patternDetails = input.bingoLines.map((line) => ({
-          index: line.index,
-          type: line.type,
-        }));
+      // ゲーム結果を記録（unique constraint により重複は自動的に防止される）
+      const { error: resultError } = await supabase
+        .from("game_results")
+        .insert({
+          pattern_details: patternDetails,
+          pattern_type: patternType,
+          space_id: input.spaceId,
+          user_id: user.id,
+        });
 
-        const { error: resultError } = await supabase
-          .from("game_results")
-          .insert({
-            pattern_details: patternDetails,
-            pattern_type: patternType,
-            space_id: input.spaceId,
-            user_id: user.id,
-          });
-
-        if (resultError) {
-          // ゲーム結果の記録に失敗してもステータス更新は成功として扱う
-          console.error("Error recording game result:", resultError);
-        }
+      // 重複エラー（unique constraint violation）は無視し、その他のエラーはログに記録
+      // ゲーム結果の記録に失敗してもステータス更新は成功として扱う
+      if (
+        resultError &&
+        !resultError.message?.includes("duplicate key value")
+      ) {
+        console.error("Error recording game result:", resultError);
       }
     }
 
