@@ -7,8 +7,8 @@
 # ==========================================
 FROM node:24-alpine AS deps
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@10.27.0 --activate
+# Install pnpm globally
+RUN npm install -g pnpm@10.27.0
 
 WORKDIR /app
 
@@ -23,8 +23,8 @@ RUN pnpm install --frozen-lockfile
 # ==========================================
 FROM node:24-alpine AS builder
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@10.27.0 --activate
+# Install pnpm globally
+RUN npm install -g pnpm@10.27.0
 
 WORKDIR /app
 
