@@ -38,6 +38,7 @@ COPY . .
 # Note: In production, these should be passed as build args or secrets
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV DOCKER_BUILD=true
 
 # Build the Next.js application
 RUN pnpm build

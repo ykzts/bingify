@@ -63,15 +63,13 @@ pnpm local:stop
 
 Bingify は Docker コンテナでのデプロイをサポートしています。
 
-### Dockerfile を使用したデプロイ
-
-#### 1. イメージのビルド
+### イメージのビルド
 
 ```bash
 docker build -t bingify:latest .
 ```
 
-#### 2. コンテナの実行
+### コンテナの実行
 
 ```bash
 docker run -d \
@@ -93,39 +91,12 @@ docker run -d \
   bingify:latest
 ```
 
-### Docker Compose を使用したデプロイ
-
-より簡単にデプロイするには、Docker Compose を使用できます。
-
-#### 1. 環境変数の設定
-
-`.env` ファイルを作成し、必要な環境変数を設定します（`.env.local.example` を参考）。
-
-#### 2. サービスの起動
-
-```bash
-docker compose up -d
-```
-
-#### 3. ログの確認
-
-```bash
-docker compose logs -f bingify
-```
-
-#### 4. サービスの停止
-
-```bash
-docker compose down
-```
-
 ### Docker イメージの特徴
 
 - **マルチステージビルド**: 最適化された小さなイメージサイズ
 - **Node.js 24 Alpine**: 軽量なベースイメージ
 - **非 root ユーザー**: セキュリティのための専用ユーザー (nextjs:nodejs)
 - **ヘルスチェック**: コンテナの健全性を自動監視
-- **Standalone 出力**: Next.js の最適化された出力モード
 
 ### 必要な環境変数
 
