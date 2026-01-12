@@ -4,6 +4,7 @@ chat:
 issue_enrichment:
   labeling:
     auto_apply_labels: true
+    in_progress_fortune: false
     labeling_instructions:
       - label: "type: bug"
         instructions: |
