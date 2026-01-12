@@ -10,6 +10,14 @@ jobs:
   ci:
     runs-on: ubuntu-24.04
 
+    env:
+      # Supabase config.toml で参照される環境変数のダミー値
+      SEND_EMAIL_HOOK_SECRETS: "v1,whsec_dummysecret1234567890abcdefghijk"
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID: "dummy-client-id"
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET: "dummy-secret"
+      SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID: "dummy-client-id"
+      SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET: "dummy-secret"
+
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 

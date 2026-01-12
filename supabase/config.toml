@@ -234,34 +234,15 @@ otp_expiry = 3600
 # sender_name = "Admin"
 
 # Uncomment to customize email template
-# [auth.email.template.confirmation]
-# subject = "メールアドレスの確認 / Confirm Your Email"
-# content_path = "./templates/confirmation.html"
-
 # [auth.email.template.invite]
-# subject = "Bingifyへの招待 / Invitation to Bingify"
-# content_path = "./templates/invite.html"
-
-# [auth.email.template.recovery]
-# subject = "パスワードのリセット / Reset Your Password"
-# content_path = "./templates/recovery.html"
-
-# [auth.email.template.email_change]
-# subject = "メールアドレスの変更確認 / Confirm Email Change"
-# content_path = "./templates/email_change.html"
+# subject = "You have been invited"
+# content_path = "./supabase/templates/invite.html"
 
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]
 # enabled = true
-# subject = "パスワードが変更されました / Password Changed"
+# subject = "Your password has been changed"
 # content_path = "./templates/password_changed_notification.html"
-
-# Email change notification - uncomment in production to enable
-# The template file is ready at ./templates/email_changed_notification.html
-# [auth.email.notification.email_changed]
-# enabled = true
-# subject = "メールアドレスが変更されました / Email Address Changed"
-# content_path = "./templates/email_changed_notification.html"
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
@@ -293,6 +274,15 @@ max_frequency = "5s"
 # [auth.hook.custom_access_token]
 # enabled = true
 # uri = "pg-functions://<database>/<schema>/<hook_name>"
+
+# Auth email hook - Sends authentication emails via Next.js Route Handler
+# Uses HMAC-SHA256 signature verification for security
+# Secret must be set in .env.local as SEND_EMAIL_HOOK_SECRETS
+# Note: Use host.docker.internal to access the host machine from Docker container
+[auth.hook.send_email]
+enabled = true
+uri = "http://host.docker.internal:3000/api/auth/hooks/send-email"
+secrets = "env(SEND_EMAIL_HOOK_SECRETS)"
 
 # Configure one of the supported SMS providers: `twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`.
 [auth.sms.twilio]

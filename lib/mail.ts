@@ -1,6 +1,7 @@
 import { render, toPlainText } from "@react-email/render";
 import nodemailer from "nodemailer";
 import type Mail from "nodemailer/lib/mailer";
+import type { ReactNode } from "react";
 import { ContactFormEmail } from "@/emails/contact-form-email";
 
 /**
@@ -25,6 +26,12 @@ export interface ContactEmailOptions {
   message: string;
   name: string;
   recipients: Array<string | Mail.Address>;
+}
+
+export interface AuthEmailOptions {
+  recipient: string;
+  subject: string;
+  template: ReactNode;
 }
 
 /**
@@ -64,6 +71,38 @@ export async function sendContactEmail(options: ContactEmailOptions) {
     subject: `【お問い合わせ】${name}様より`,
     text: emailText,
     to: recipients,
+  };
+
+  await transporter.sendMail(mailOptions);
+}
+
+/**
+ * Send authentication email using React Email template
+ * Used for email confirmations, password resets, etc.
+ */
+export async function sendAuthEmail(options: AuthEmailOptions) {
+  const { recipient, subject, template } = options;
+
+  const mailFrom = process.env.MAIL_FROM;
+
+  if (!mailFrom) {
+    throw new Error("Mail configuration is missing");
+  }
+
+  const transporter = createTransporter();
+
+  // React Emailを使用してHTMLとテキスト版を自動生成
+  const emailHtml = await render(template);
+  const emailText = toPlainText(emailHtml);
+
+  console.log("📬 Generated email HTML:\n", emailHtml);
+
+  const mailOptions = {
+    from: mailFrom,
+    html: emailHtml,
+    subject,
+    text: emailText,
+    to: recipient,
   };
 
   await transporter.sendMail(mailOptions);
