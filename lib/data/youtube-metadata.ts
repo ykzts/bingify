@@ -4,6 +4,9 @@ import { createOAuth2ClientFromToken } from "@/lib/oauth/create-oauth-client";
 import { shouldRefreshMetadata } from "@/lib/types/social-metadata";
 import type { Database, Tables, TablesInsert } from "@/types/supabase";
 
+// @プレフィックスを削除するための正規表現
+const HANDLE_PREFIX_REGEX = /^@/;
+
 /**
  * YouTube Data API v3からチャンネルの詳細情報を取得
  */
@@ -33,7 +36,9 @@ async function fetchYouTubeChannelDetails(
   // ただし、すべてのカスタムURLがこの形式とは限らないため、
   // 実際の値を確認してから使用することを推奨
   // handleはデータベースに@なしで保存する（表示時に@を付与）
-  const handle = snippet?.customUrl || null;
+  const handle = snippet?.customUrl
+    ? snippet.customUrl.replace(HANDLE_PREFIX_REGEX, "")
+    : null;
 
   return {
     channel_id: channelId,
