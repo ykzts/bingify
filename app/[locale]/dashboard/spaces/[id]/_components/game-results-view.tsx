@@ -79,7 +79,7 @@ export function GameResultsView({ spaceId }: Props) {
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center text-muted-foreground py-8">
+          <div className="py-8 text-center text-muted-foreground">
             {t("loadingResults")}
           </div>
         </CardContent>
@@ -115,9 +115,9 @@ export function GameResultsView({ spaceId }: Props) {
       </CardHeader>
       <CardContent>
         {results.length === 0 ? (
-          <div className="text-center text-muted-foreground py-8">
+          <div className="py-8 text-center text-muted-foreground">
             <p className="font-medium">{t("noResults")}</p>
-            <p className="text-sm mt-2">{t("noResultsDescription")}</p>
+            <p className="mt-2 text-sm">{t("noResultsDescription")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -133,7 +133,9 @@ export function GameResultsView({ spaceId }: Props) {
                 {results.map((result) => (
                   <TableRow key={result.id}>
                     <TableCell className="font-medium">
-                      {result.profiles?.full_name || result.profiles?.email || "Unknown User"}
+                      {result.profiles?.full_name ||
+                        result.profiles?.email ||
+                        "Unknown User"}
                     </TableCell>
                     <TableCell>
                       {formatPatternType(result.pattern_type)}

@@ -1,7 +1,7 @@
 "use server";
 
-import type { BingoLine } from "@/lib/utils/bingo-checker";
 import { createClient } from "@/lib/supabase/server";
+import type { BingoLine } from "@/lib/utils/bingo-checker";
 import { isValidUUID } from "@/lib/utils/uuid";
 import type { Tables } from "@/types/supabase";
 
@@ -155,25 +155,17 @@ export async function getGameResults(
 
     const isAdmin = !!adminRole;
 
-    if (!isOwner && !isAdmin) {
+    if (!(isOwner || isAdmin)) {
       return {
         error: "Permission denied",
         success: false,
       };
     }
 
-    // ゲーム結果を取得（プロフィール情報含む）
+    // ゲーム結果を取得
     const { data: results, error } = await supabase
       .from("game_results")
-      .select(
-        `
-        *,
-        profiles:user_id (
-          email,
-          full_name
-        )
-      `
-      )
+      .select("*")
       .eq("space_id", spaceId)
       .order("achieved_at", { ascending: false });
 
@@ -185,8 +177,39 @@ export async function getGameResults(
       };
     }
 
+    if (!results || results.length === 0) {
+      return {
+        results: [],
+        success: true,
+      };
+    }
+
+    // ユーザーIDのリストを取得
+    const userIds = [...new Set(results.map((r) => r.user_id))];
+
+    // プロフィール情報を取得
+    const { data: profiles, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, email, full_name")
+      .in("id", userIds);
+
+    if (profilesError) {
+      console.error("Error fetching profiles:", profilesError);
+      // プロフィール情報がなくても結果は返す
+    }
+
+    // プロフィール情報をマージ
+    const profilesMap = new Map(
+      profiles?.map((p) => [p.id, { email: p.email, full_name: p.full_name }])
+    );
+
+    const resultsWithProfiles: GameResultWithProfile[] = results.map((result) => ({
+      ...result,
+      profiles: profilesMap.get(result.user_id) || null,
+    }));
+
     return {
-      results: results as GameResultWithProfile[],
+      results: resultsWithProfiles,
       success: true,
     };
   } catch (error) {

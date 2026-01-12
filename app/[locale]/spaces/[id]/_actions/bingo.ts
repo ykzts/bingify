@@ -1,7 +1,7 @@
 "use server";
 
-import type { BingoLine } from "@/lib/utils/bingo-checker";
 import { createClient } from "@/lib/supabase/server";
+import type { BingoLine } from "@/lib/utils/bingo-checker";
 import { isValidUUID } from "@/lib/utils/uuid";
 
 export interface BingoCard {
@@ -208,7 +208,11 @@ export async function updateBingoStatusWithLines(
     }
 
     // ビンゴ達成時にゲーム結果を記録
-    if (input.status === "bingo" && input.bingoLines && input.bingoLines.length > 0) {
+    if (
+      input.status === "bingo" &&
+      input.bingoLines &&
+      input.bingoLines.length > 0
+    ) {
       // パターンタイプを判定
       const patternType =
         input.bingoLines.length > 1 ? "multiple" : input.bingoLines[0].type;
