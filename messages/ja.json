@@ -580,6 +580,10 @@
     "errorTokenExpired": "OAuthトークンの有効期限が切れているか、取り消されています。アカウントを再接続してください。",
     "errorUnknown": "OAuth確認中に予期しないエラーが発生しました。もう一度お試しください。"
   },
+  "PreReleaseBanner": {
+    "description": "Bingifyは現在ベータ版です。予期しない動作やデータの損失が発生する可能性があります。",
+    "learnMore": "詳細"
+  },
   "Privacy": {
     "metaDescription": "Bingifyのプライバシーポリシーをご覧ください。個人情報の収集、利用、保護の方法について説明しています。",
     "metaTitle": "プライバシーポリシー"
