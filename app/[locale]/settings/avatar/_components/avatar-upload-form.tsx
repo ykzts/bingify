@@ -122,8 +122,8 @@ export function AvatarUploadForm({ onUploadSuccess }: AvatarUploadFormProps) {
       return;
     }
 
-    // 画像ファイルかチェック
-    if (!file.type.startsWith("image/")) {
+    // 画像ファイルかチェック（既存のバリデーション関数を使用）
+    if (!isValidAvatarMimeType(file.type)) {
       setError(t("errorInvalidFileType"));
       return;
     }
