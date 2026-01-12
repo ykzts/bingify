@@ -62,13 +62,58 @@ function showStatusNotification(
   }
 }
 
+type ParticipantProfile = NonNullable<Participant["profiles"]>;
+
+/**
+ * Fetch participant profile from profiles table with retry mechanism
+ */
+async function fetchParticipantProfile(
+  userId: string
+): Promise<ParticipantProfile | null> {
+  const MAX_RETRIES = 3;
+  const BASE_DELAY_MS = 100;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    const supabase = createClient();
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("full_name, avatar_url")
+      .eq("id", userId)
+      .single();
+
+    if (!profileError) {
+      return profile;
+    }
+
+    // Log the error and retry attempt
+    if (attempt < MAX_RETRIES) {
+      const delay = BASE_DELAY_MS * 2 ** (attempt - 1) + Math.random() * 50;
+      console.warn(
+        `Failed to fetch profile for user ${userId} (attempt ${attempt}/${MAX_RETRIES}):`,
+        profileError,
+        `Retrying in ${Math.round(delay)}ms...`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    } else {
+      // All retries failed
+      console.warn(
+        `Failed to fetch profile for user ${userId} after ${MAX_RETRIES} attempts:`,
+        profileError
+      );
+    }
+  }
+
+  return null;
+}
+
 /**
  * Update and sort participant list
  */
-function updateParticipantList(
+export function updateParticipantList(
   participants: Participant[],
   updatedId: string,
-  newStatus: "none" | "reach" | "bingo"
+  newStatus: "none" | "reach" | "bingo",
+  profiles?: ParticipantProfile | null
 ): Participant[] {
   const index = participants.findIndex((p) => p.id === updatedId);
   if (index === -1) {
@@ -79,6 +124,9 @@ function updateParticipantList(
   newList[index] = {
     ...newList[index],
     bingo_status: newStatus,
+    // Update profiles if provided. When undefined, existing profiles are preserved.
+    // When null, profiles are explicitly set to null. When an object, profiles are updated.
+    ...(profiles !== undefined && { profiles }),
   };
 
   // Sort by bingo status (bingo > reach > none) then by joined_at
@@ -118,36 +166,77 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
   } | null>(null);
 
   // Use useEffectEvent to separate event logic from effect dependencies
-  const onUpdate = useEffectEvent((payload: { new: ParticipantUpdate }) => {
-    const updated = payload.new;
+  const onUpdate = useEffectEvent(
+    async (payload: { new: ParticipantUpdate }) => {
+      const updated = payload.new;
 
-    // Validate payload structure
-    if (!(updated?.id && updated.user_id && updated.bingo_status)) {
-      console.error("Invalid participant update payload:", payload);
-      return;
-    }
-
-    // Validate bingo_status value
-    if (!["none", "reach", "bingo"].includes(updated.bingo_status)) {
-      console.error("Invalid bingo_status value:", updated.bingo_status);
-      return;
-    }
-
-    // Update the participant in the list
-    queryClient.setQueryData<Participant[]>(
-      ["participants", spaceId],
-      (prev) => {
-        if (!prev) {
-          return [];
-        }
-        const currentParticipant = prev.find((p) => p.id === updated.id);
-        if (currentParticipant) {
-          showStatusNotification(currentParticipant, updated.bingo_status, t);
-        }
-        return updateParticipantList(prev, updated.id, updated.bingo_status);
+      // Validate payload structure (check for null/undefined, not falsy values)
+      if (
+        updated?.id == null ||
+        updated.user_id == null ||
+        updated.bingo_status == null
+      ) {
+        console.error("Invalid participant update payload:", payload);
+        return;
       }
-    );
-  });
+
+      // Validate bingo_status value
+      if (!["none", "reach", "bingo"].includes(updated.bingo_status)) {
+        console.error("Invalid bingo_status value:", updated.bingo_status);
+        return;
+      }
+
+      // Fetch updated profile information from profiles table with error handling
+      let profile: ParticipantProfile | null = null;
+      try {
+        profile = await fetchParticipantProfile(updated.user_id);
+      } catch (error) {
+        console.error(
+          `Error fetching profile for user ${updated.user_id}:`,
+          error
+        );
+        // profile remains null, which is handled gracefully by downstream code
+      }
+
+      // Update the participant in the list
+      // まず現在の参加者を取得して通知用データを準備
+      const currentParticipants = queryClient.getQueryData<Participant[]>([
+        "participants",
+        spaceId,
+      ]);
+      const currentParticipant = currentParticipants?.find(
+        (p) => p.id === updated.id
+      );
+
+      // 通知を setQueryData の外で実行
+      if (currentParticipant) {
+        const participantForNotification = {
+          ...currentParticipant,
+          profiles: profile,
+        };
+        showStatusNotification(
+          participantForNotification,
+          updated.bingo_status,
+          t
+        );
+      }
+
+      queryClient.setQueryData<Participant[]>(
+        ["participants", spaceId],
+        (prev) => {
+          if (!prev) {
+            return [];
+          }
+          return updateParticipantList(
+            prev,
+            updated.id,
+            updated.bingo_status,
+            profile
+          );
+        }
+      );
+    }
+  );
 
   const onInsert = useEffectEvent(() => {
     // Refetch participants when a new one joins
@@ -187,7 +276,9 @@ export function ParticipantsStatus({ spaceId, maxParticipants }: Props) {
         },
         (payload) => {
           const updated = payload.new as ParticipantUpdate;
-          onUpdate({ new: updated });
+          onUpdate({ new: updated }).catch((error) => {
+            console.error("Error in onUpdate handler:", error);
+          });
         }
       )
       .on(
