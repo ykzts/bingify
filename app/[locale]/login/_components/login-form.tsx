@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Link } from "@/i18n/navigation";
 import { buildAuthCallbackUrl } from "@/lib/auth/callback-url";
 import {
   buildOAuthCallbackUrl,
@@ -249,6 +250,27 @@ export function LoginForm({ providers, systemSettings }: Props) {
           </CardContent>
         </Card>
       )}
+
+      <p className="text-center text-gray-500 text-sm">
+        {t.rich("agreeToTerms", {
+          privacyLink: (chunks) => (
+            <Link
+              className="text-purple-600 underline hover:text-purple-700"
+              href="/privacy"
+            >
+              {chunks}
+            </Link>
+          ),
+          termsLink: (chunks) => (
+            <Link
+              className="text-purple-600 underline hover:text-purple-700"
+              href="/terms"
+            >
+              {chunks}
+            </Link>
+          ),
+        })}
+      </p>
     </div>
   );
 }
