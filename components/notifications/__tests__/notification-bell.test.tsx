@@ -10,6 +10,40 @@ vi.mock("@/hooks/use-unread-count", () => ({
   useUnreadCount: vi.fn(),
 }));
 
+// useNotificationsフックのモック（NotificationDropdownで使用）
+vi.mock("@/hooks/use-notifications", () => ({
+  useNotifications: vi.fn(() => ({
+    data: { hasMore: false, notifications: [] },
+    error: null,
+    fetchError: undefined,
+    hasMore: false,
+    isLoading: false,
+    notifications: [],
+  })),
+}));
+
+// useInvalidateNotificationsフックのモック
+vi.mock("@/hooks/use-invalidate-notifications", () => ({
+  useInvalidateNotifications: vi.fn(() => vi.fn()),
+}));
+
+// next-intl/navigationのモック（NotificationDropdownで使用）
+vi.mock("@/i18n/navigation", () => ({
+  useRouter: vi.fn(() => ({
+    back: vi.fn(),
+    forward: vi.fn(),
+    prefetch: vi.fn(),
+    push: vi.fn(),
+    refresh: vi.fn(),
+    replace: vi.fn(),
+  })),
+}));
+
+// markNotificationReadアクションのモック
+vi.mock("@/lib/actions/notifications", () => ({
+  markNotificationRead: vi.fn(),
+}));
+
 import { useUnreadCount } from "@/hooks/use-unread-count";
 
 /**
@@ -28,6 +62,10 @@ function createWrapper() {
     NotificationBell: {
       comingSoon: "Notification list coming soon",
       notifications: "Notifications",
+    },
+    NotificationDropdown: {
+      empty: "No notifications",
+      viewAll: "View all",
     },
   };
 

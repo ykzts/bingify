@@ -585,8 +585,11 @@
     "title": "Page Not Found"
   },
   "NotificationBell": {
-    "comingSoon": "Notification list coming soon",
     "notifications": "Notifications"
+  },
+  "NotificationDropdown": {
+    "empty": "No notifications",
+    "viewAll": "View all"
   },
   "Notifications": {
     "allTab": "All",
