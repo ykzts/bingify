@@ -57,6 +57,13 @@ describe("getSpaceAnnouncements", () => {
   });
 
   it("無効なスペースIDの場合はエラーを返す", async () => {
+    const mockUser = { id: "user-123" };
+
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
+
     const result = await getSpaceAnnouncements("invalid-id");
 
     expect(result.success).toBe(false);

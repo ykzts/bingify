@@ -84,13 +84,6 @@ export async function getSpaceAnnouncements(
   spaceId: string
 ): Promise<GetSpaceAnnouncementsResult> {
   try {
-    if (!isValidUUID(spaceId)) {
-      return {
-        error: "無効なスペースIDです",
-        success: false,
-      };
-    }
-
     const supabase = await createClient();
 
     // 認証チェック
@@ -102,6 +95,14 @@ export async function getSpaceAnnouncements(
     if (authError || !user) {
       return {
         error: "認証が必要です",
+        success: false,
+      };
+    }
+
+    // UUID検証
+    if (!isValidUUID(spaceId)) {
+      return {
+        error: "無効なスペースIDです",
         success: false,
       };
     }
@@ -195,13 +196,6 @@ export async function createSpaceAnnouncement(
   }
 ): Promise<SpaceAnnouncementActionResult> {
   try {
-    if (!isValidUUID(spaceId)) {
-      return {
-        error: "無効なスペースIDです",
-        success: false,
-      };
-    }
-
     const supabase = await createClient();
 
     // 認証チェック
@@ -213,6 +207,14 @@ export async function createSpaceAnnouncement(
     if (authError || !user) {
       return {
         error: "認証が必要です",
+        success: false,
+      };
+    }
+
+    // UUID検証
+    if (!isValidUUID(spaceId)) {
+      return {
+        error: "無効なスペースIDです",
         success: false,
       };
     }
@@ -342,20 +344,6 @@ export async function updateSpaceAnnouncement(
   data: UpdateSpaceAnnouncementInput
 ): Promise<SpaceAnnouncementActionResult> {
   try {
-    if (!isValidUUID(spaceId)) {
-      return {
-        error: "無効なスペースIDです",
-        success: false,
-      };
-    }
-
-    if (!isValidUUID(announcementId)) {
-      return {
-        error: "無効なお知らせIDです",
-        success: false,
-      };
-    }
-
     const supabase = await createClient();
 
     // 認証チェック
@@ -367,6 +355,21 @@ export async function updateSpaceAnnouncement(
     if (authError || !user) {
       return {
         error: "認証が必要です",
+        success: false,
+      };
+    }
+
+    // UUID検証
+    if (!isValidUUID(spaceId)) {
+      return {
+        error: "無効なスペースIDです",
+        success: false,
+      };
+    }
+
+    if (!isValidUUID(announcementId)) {
+      return {
+        error: "無効なお知らせIDです",
         success: false,
       };
     }
@@ -485,20 +488,6 @@ export async function deleteSpaceAnnouncement(
   announcementId: string
 ): Promise<SpaceAnnouncementActionResult> {
   try {
-    if (!isValidUUID(spaceId)) {
-      return {
-        error: "無効なスペースIDです",
-        success: false,
-      };
-    }
-
-    if (!isValidUUID(announcementId)) {
-      return {
-        error: "無効なお知らせIDです",
-        success: false,
-      };
-    }
-
     const supabase = await createClient();
 
     // 認証チェック
@@ -510,6 +499,21 @@ export async function deleteSpaceAnnouncement(
     if (authError || !user) {
       return {
         error: "認証が必要です",
+        success: false,
+      };
+    }
+
+    // UUID検証
+    if (!isValidUUID(spaceId)) {
+      return {
+        error: "無効なスペースIDです",
+        success: false,
+      };
+    }
+
+    if (!isValidUUID(announcementId)) {
+      return {
+        error: "無効なお知らせIDです",
         success: false,
       };
     }
@@ -569,20 +573,6 @@ export async function togglePinSpaceAnnouncement(
   announcementId: string
 ): Promise<SpaceAnnouncementActionResult> {
   try {
-    if (!isValidUUID(spaceId)) {
-      return {
-        error: "無効なスペースIDです",
-        success: false,
-      };
-    }
-
-    if (!isValidUUID(announcementId)) {
-      return {
-        error: "無効なお知らせIDです",
-        success: false,
-      };
-    }
-
     const supabase = await createClient();
 
     // 認証チェック
@@ -594,6 +584,21 @@ export async function togglePinSpaceAnnouncement(
     if (authError || !user) {
       return {
         error: "認証が必要です",
+        success: false,
+      };
+    }
+
+    // UUID検証
+    if (!isValidUUID(spaceId)) {
+      return {
+        error: "無効なスペースIDです",
+        success: false,
+      };
+    }
+
+    if (!isValidUUID(announcementId)) {
+      return {
+        error: "無効なお知らせIDです",
         success: false,
       };
     }
