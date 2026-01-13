@@ -52,10 +52,9 @@ describe("NotificationItem", () => {
         title: "Important Update",
       });
 
-      render(
-        <NotificationItem locale="en" notification={notification} />,
-        { wrapper: createWrapper() }
-      );
+      render(<NotificationItem locale="en" notification={notification} />, {
+        wrapper: createWrapper(),
+      });
 
       expect(screen.getByText("Important Update")).toBeInTheDocument();
     });

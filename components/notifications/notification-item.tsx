@@ -6,14 +6,14 @@ import {
   Mail,
   Megaphone,
   ShieldAlert,
-  Trophy,
   Trash2,
+  Trophy,
   UserCog,
   X,
 } from "lucide-react";
 import Link from "next/link";
-import type { Notification } from "@/lib/types/notification";
 import { Button } from "@/components/ui/button";
+import type { Notification } from "@/lib/types/notification";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/utils/date-format";
 
@@ -142,17 +142,17 @@ export function NotificationItem({
         </div>
 
         {notification.content && variant === "expanded" && (
-          <p className="line-clamp-2 text-sm text-gray-600">
+          <p className="line-clamp-2 text-gray-600 text-sm">
             {notification.content}
           </p>
         )}
 
-        <p className="text-xs text-gray-400">
+        <p className="text-gray-400 text-xs">
           {formatRelativeTime(notification.created_at || "", locale)}
         </p>
       </div>
 
-      <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
         {!notification.read && onMarkRead && (
           <Button
             onClick={handleMarkRead}
