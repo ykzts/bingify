@@ -584,6 +584,10 @@
     "description": "The page you are looking for does not exist or has been moved.",
     "title": "Page Not Found"
   },
+  "NotificationBell": {
+    "comingSoon": "Notification list coming soon",
+    "notifications": "Notifications"
+  },
   "Notifications": {
     "allTab": "All",
     "emptyAll": "No notifications yet",

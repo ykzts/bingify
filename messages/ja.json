@@ -584,6 +584,10 @@
     "description": "お探しのページは存在しないか、移動した可能性があります。",
     "title": "ページが見つかりません"
   },
+  "NotificationBell": {
+    "comingSoon": "通知リストは近日公開予定です",
+    "notifications": "通知"
+  },
   "Notifications": {
     "allTab": "すべて",
     "emptyAll": "通知はまだありません",
