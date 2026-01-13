@@ -44,6 +44,10 @@ async function checkSpacePermissionInternal(
 
 /**
  * スペースへのowner/admin権限をチェックする（既存のSupabaseクライアントを使用）
+ *
+ * Server Actions など、既に Supabase クライアントを持っている場合に使用します。
+ * ページコンポーネントから直接使用する場合は checkIsSpaceAdmin を使用してください。
+ *
  * @param supabase - Supabaseクライアント
  * @param spaceId - スペースID
  * @param userId - ユーザーID
