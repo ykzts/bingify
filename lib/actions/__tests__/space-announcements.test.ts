@@ -772,15 +772,11 @@ describe("deleteSpaceAnnouncement", () => {
       select: vi.fn().mockReturnThis(),
     };
 
-    const mockEqChain2 = {
+    const mockDeleteQuery = {
+      delete: vi.fn().mockReturnThis(),
       eq: vi.fn().mockResolvedValue({
         error: null,
       }),
-    };
-
-    const mockDeleteQuery = {
-      delete: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnValue(mockEqChain2),
     };
 
     mockSupabase.from.mockImplementation(

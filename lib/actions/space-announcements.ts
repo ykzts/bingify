@@ -531,15 +531,14 @@ export async function deleteSpaceAnnouncement(
       };
     }
 
-    // スペースお知らせを削除（CASCADE により announcements も削除される）
+    // お知らせを削除（CASCADE により space_announcements も削除される）
     const { error: deleteError } = await supabase
-      .from("space_announcements")
+      .from("announcements")
       .delete()
-      .eq("space_id", spaceId)
-      .eq("announcement_id", announcementId);
+      .eq("id", announcementId);
 
     if (deleteError) {
-      console.error("Error deleting space announcement:", deleteError);
+      console.error("Error deleting announcement:", deleteError);
       return {
         error: "スペースお知らせの削除に失敗しました",
         success: false,
