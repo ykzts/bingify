@@ -51,8 +51,7 @@ vi.mock("@/components/formatted-text", () => ({
 
 // confirm provider のモック
 vi.mock("@/components/providers/confirm-provider", () => ({
-  useConfirm: () =>
-    vi.fn().mockImplementation(() => Promise.resolve(true)),
+  useConfirm: () => vi.fn().mockImplementation(() => Promise.resolve(true)),
 }));
 
 // sonner のモック
