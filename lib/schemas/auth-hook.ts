@@ -200,26 +200,22 @@ function buildNormalizedEmail(
   action: string
 ): z.infer<typeof NormalizedEmailSchema> {
   return {
-    // 新メールアドレス用トークン
+    // 新メールアドレス用トークン（OTP コード）
     change_email_new_token_new:
       action === "email_change"
         ? emailData.token_new || emailData.token || ""
         : undefined,
-    // 新メールアドレス用トークンハッシュ（token_hash を優先、フォールバックで token_new）
+    // 新メールアドレス用トークンハッシュ（検証用）
     change_email_new_token_new_hash:
-      action === "email_change"
-        ? emailData.token_hash || emailData.token_new || ""
-        : undefined,
+      action === "email_change" ? emailData.token_hash || "" : undefined,
     change_email_old_new:
       action === "email_change" ? emailData.old_email : undefined,
-    // 旧メールアドレス用トークン
+    // 旧メールアドレス用トークン（OTP コード）
     change_email_old_token:
       action === "email_change" ? emailData.token || "" : undefined,
-    // 旧メールアドレス用トークンハッシュ（token_hash_new を優先、フォールバックで token）
+    // 旧メールアドレス用トークンハッシュ（検証用）
     change_email_old_token_hash:
-      action === "email_change"
-        ? emailData.token_hash_new || emailData.token || ""
-        : undefined,
+      action === "email_change" ? emailData.token_hash_new || "" : undefined,
     confirmation_hash:
       action === "confirmation"
         ? emailData.token_hash || emailData.token || ""

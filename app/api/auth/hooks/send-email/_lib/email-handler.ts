@@ -182,12 +182,8 @@ export async function handleEmailAction(
         email.change_email_old_token && email.change_email_old_token_hash;
 
       // 新メールアドレスへの確認メール送信
-      // メールテンプレートの OTP 表示用にトークンを取得
-      // （ハッシュよりもトークンを優先、なければハッシュをフォールバック）
-      const newToken =
-        email.change_email_new_token_new ||
-        email.change_email_new_token_new_hash ||
-        "";
+      // メールテンプレートの OTP 表示用にトークンを取得（通常は6桁の数字）
+      const newToken = email.change_email_new_token_new || "";
       const newConfirmationUrl = buildVerifyUrl({
         token: email.change_email_new_token_new,
         tokenHash: email.change_email_new_token_new_hash,
@@ -209,7 +205,8 @@ export async function handleEmailAction(
 
       // 旧メールアドレスへの確認メール送信（double_confirm_changes 有効時）
       if (oldEmail && hasOldToken) {
-        const oldToken = email.change_email_old_token || "";
+        // hasOldToken が true の場合、これらのフィールドは必ず存在する
+        const oldToken = email.change_email_old_token!;
         const oldConfirmationUrl = buildVerifyUrl({
           token: email.change_email_old_token,
           tokenHash: email.change_email_old_token_hash,
