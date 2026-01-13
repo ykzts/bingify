@@ -11,6 +11,7 @@ import type {
   LocaleType,
   ThemeType,
 } from "@/lib/types/screen-settings";
+import { checkIsSpaceAdmin } from "@/lib/utils/space-permissions";
 import { BingoGameManager } from "./_components/bingo-game-manager";
 import { ClosedSpaceParticipants } from "./_components/closed-space-participants";
 import { DisplaySettingsDialog } from "./_components/display-settings-dialog";
@@ -51,6 +52,9 @@ export default async function AdminSpacePage({
 
   // Check if current user is owner
   const isOwner = space.owner_id === user?.id;
+
+  // Check if current user is admin (for announcement management)
+  const isAdmin = await checkIsSpaceAdmin(id, user?.id);
 
   // Get OAuth provider identities for the owner (to check available OAuth tokens)
   const identities = user?.identities || [];
@@ -153,7 +157,7 @@ export default async function AdminSpacePage({
       </div>
 
       {/* Space Announcements Section */}
-      <SpaceAnnouncementList isAdmin={true} spaceId={space.id} />
+      <SpaceAnnouncementList isAdmin={isAdmin} spaceId={space.id} />
 
       {/* Main Content Area - Status-based rendering */}
       {space.status === "draft" && (
