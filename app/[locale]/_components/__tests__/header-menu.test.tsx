@@ -10,7 +10,7 @@ describe("HeaderMenuのログインボタン表示ロジック", () => {
     it("ログインページではログインボタンが表示されない", () => {
       // テスト条件
       const user: null = null;
-      const pathname = "/login";
+      const pathname: string = "/login";
 
       // ログインページの場合は何も表示しない
       const shouldShowLoginButton = user === null && pathname !== "/login";
@@ -21,7 +21,7 @@ describe("HeaderMenuのログインボタン表示ロジック", () => {
     it("ログインページ以外ではログインボタンが表示される", () => {
       // テスト条件
       const user: null = null;
-      const pathname = "/";
+      const pathname: string = "/";
 
       // ログインページ以外の場合はログインボタンを表示
       const shouldShowLoginButton = user === null && pathname !== "/login";
@@ -32,7 +32,7 @@ describe("HeaderMenuのログインボタン表示ロジック", () => {
     it("ダッシュボードページではログインボタンが表示される", () => {
       // テスト条件
       const user: null = null;
-      const pathname = "/dashboard";
+      const pathname: string = "/dashboard";
 
       // ログインページ以外の場合はログインボタンを表示
       const shouldShowLoginButton = user === null && pathname !== "/login";
@@ -50,7 +50,7 @@ describe("HeaderMenuのログインボタン表示ロジック", () => {
         full_name: "Test User",
         role: "user",
       };
-      const pathname = "/";
+      const pathname: string = "/";
 
       // ログイン済みの場合はログインボタンを表示しない
       const shouldShowLoginButton = user === null && pathname !== "/login";
@@ -66,7 +66,7 @@ describe("HeaderMenuのログインボタン表示ロジック", () => {
         full_name: "Test User",
         role: "user",
       };
-      const pathname = "/login";
+      const pathname: string = "/login";
 
       // ログイン済みの場合はログインボタンを表示しない
       const shouldShowLoginButton = user === null && pathname !== "/login";
