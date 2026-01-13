@@ -69,6 +69,12 @@ describe("Auth Hook Payload Normalization", () => {
       expect(result).toBeDefined();
       if (result) {
         expect(result.email.change_email_old_new).toBe("oldemail@example.com");
+        // 旧メールアドレス用トークン（token + token_hash_new）
+        expect(result.email.change_email_old_token).toBe("token");
+        expect(result.email.change_email_old_token_hash).toBe("new_hash");
+        // 新メールアドレス用トークン（token_new + token_hash）
+        expect(result.email.change_email_new_token_new).toBe("new_token");
+        expect(result.email.change_email_new_token_new_hash).toBe("hash");
       }
     });
 

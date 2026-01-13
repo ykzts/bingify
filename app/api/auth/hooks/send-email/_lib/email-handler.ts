@@ -54,6 +54,7 @@ function resolveSecret(secret: string): string {
 /**
  * Supabaseの認証アクションタイプに基づいて適切なメールを送信
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 認証アクションの種類ごとに分岐が必要なため
 export async function handleEmailAction(
   emailActionType: string,
   email: NormalizedEmail,
@@ -171,11 +172,18 @@ export async function handleEmailAction(
     }
 
     case "email_change": {
-      const token =
-        email.change_email_new_token_new ||
-        email.change_email_new_token_new_hash ||
-        "";
-      const confirmationUrl = buildVerifyUrl({
+      // Supabase の double_confirm_changes = true の場合、
+      // 新旧両方のメールアドレスに確認メールを送信する必要がある。
+      // トークンマッピング（後方互換性のため命名が逆転している）:
+      // - token_new + token_hash → 新メールアドレス用
+      // - token + token_hash_new → 旧メールアドレス用
+
+      const oldEmail = email.change_email_old_new;
+
+      // 新メールアドレスへの確認メール送信
+      // メールテンプレートの OTP 表示用にトークンを取得（通常は6桁の数字）
+      const newToken = email.change_email_new_token_new || "";
+      const newConfirmationUrl = buildVerifyUrl({
         token: email.change_email_new_token_new,
         tokenHash: email.change_email_new_token_new_hash,
         type: "email_change",
@@ -188,11 +196,39 @@ export async function handleEmailAction(
             ? "メールアドレス変更の確認"
             : "Confirm Your Email Change",
         template: React.createElement(EmailChangeEmail, {
-          confirmationUrl,
+          confirmationUrl: newConfirmationUrl,
           locale,
-          token,
+          token: newToken,
         }),
       });
+
+      // 旧メールアドレスへの確認メール送信（double_confirm_changes 有効時）
+      if (
+        oldEmail &&
+        email.change_email_old_token &&
+        email.change_email_old_token_hash
+      ) {
+        const oldToken = email.change_email_old_token;
+        const oldConfirmationUrl = buildVerifyUrl({
+          token: email.change_email_old_token,
+          tokenHash: email.change_email_old_token_hash,
+          type: "email_change",
+        });
+
+        await sendAuthEmail({
+          recipient: oldEmail,
+          subject:
+            locale === "ja"
+              ? "メールアドレス変更の確認"
+              : "Confirm Your Email Change",
+          template: React.createElement(EmailChangeEmail, {
+            confirmationUrl: oldConfirmationUrl,
+            locale,
+            token: oldToken,
+          }),
+        });
+      }
+
       return true;
     }
 
