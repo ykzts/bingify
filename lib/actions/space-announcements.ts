@@ -6,6 +6,7 @@ import {
   updateSpaceAnnouncementSchema,
 } from "@/lib/schemas/announcement";
 import { createClient } from "@/lib/supabase/server";
+import { checkSpacePermission } from "@/lib/utils/space-permissions";
 import { isValidUUID } from "@/lib/utils/uuid";
 import type { Tables } from "@/types/supabase";
 
@@ -32,45 +33,6 @@ export interface GetSpaceAnnouncementsResult {
 export interface SpaceAnnouncementActionResult {
   error?: string;
   success: boolean;
-}
-
-/**
- * スペースへのowner/admin権限をチェックする
- * @param supabase - Supabaseクライアント
- * @param spaceId - スペースID
- * @param userId - ユーザーID
- * @returns 権限があればtrue、なければfalse
- */
-async function checkSpacePermission(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  spaceId: string,
-  userId: string
-): Promise<boolean> {
-  // スペースが存在し、オーナーかどうかをチェック
-  const { data: space } = await supabase
-    .from("spaces")
-    .select("owner_id")
-    .eq("id", spaceId)
-    .single();
-
-  if (!space) {
-    return false;
-  }
-
-  const isOwner = space.owner_id === userId;
-
-  // 管理者ロールをチェック
-  const { data: adminRole } = await supabase
-    .from("space_roles")
-    .select("id")
-    .eq("space_id", spaceId)
-    .eq("user_id", userId)
-    .eq("role", "admin")
-    .maybeSingle();
-
-  const isAdmin = !!adminRole;
-
-  return isOwner || isAdmin;
 }
 
 /**

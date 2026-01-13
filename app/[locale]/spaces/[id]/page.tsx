@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { getSystemSettings } from "@/lib/data/system-settings";
 import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
+import { checkIsSpaceAdmin } from "@/lib/utils/space-permissions";
 import {
   checkUserParticipation,
   getSpaceById,
@@ -53,47 +54,6 @@ export async function generateMetadata({
       title: displayTitle,
     },
   };
-}
-
-/**
- * ユーザーがスペースのownerまたはadminかどうかをチェックする
- */
-async function checkIsSpaceAdmin(
-  spaceId: string,
-  userId: string | undefined
-): Promise<boolean> {
-  if (!userId) {
-    return false;
-  }
-
-  const supabase = await createClient();
-
-  // スペース情報を取得
-  const { data: space } = await supabase
-    .from("spaces")
-    .select("owner_id")
-    .eq("id", spaceId)
-    .single();
-
-  if (!space) {
-    return false;
-  }
-
-  // オーナーかどうかをチェック
-  const isOwner = space.owner_id === userId;
-
-  // 管理者ロールをチェック
-  const { data: adminRole } = await supabase
-    .from("space_roles")
-    .select("id")
-    .eq("space_id", spaceId)
-    .eq("user_id", userId)
-    .eq("role", "admin")
-    .maybeSingle();
-
-  const isAdmin = !!adminRole;
-
-  return isOwner || isAdmin;
 }
 
 export default async function UserSpacePage({
