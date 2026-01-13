@@ -3,16 +3,44 @@ import { z } from "zod";
 /**
  * Supabase Auth Hookのメールデータスキーマ
  * 新しい形式（email_dataフィールド）とレガシー形式（emailフィールド）の両方に対応
+ *
+ * 新しい形式のスキーマはSupabase公式ドキュメントのJSON Schemaをベースに定義
+ * @see https://supabase.com/docs/guides/auth/auth-hooks/send-email-hook
+ * @see ./auth-hook-json-schema.json - 公式JSON Schemaの参照コピー
  */
 
-// 新しいペイロード構造（email_dataフィールド）
+/**
+ * email_dataスキーマ
+ * Supabase公式JSON Schemaから派生（すべてのフィールドをoptionalに設定）
+ *
+ * 注意: JSON Schemaではいくつかのフィールドがrequiredとされていますが、
+ * 実際のペイロードは email_action_type に応じて異なるフィールドのみを含むため、
+ * すべてoptionalとして定義しています。
+ */
 const EmailDataSchema = z
   .object({
-    email_action_type: z.string().optional(),
-    factor_type: z.string().optional(),
+    email_action_type: z
+      .enum([
+        "email",
+        "email_change",
+        "email_changed_notification",
+        "identity_linked_notification",
+        "identity_unlinked_notification",
+        "invite",
+        "magiclink",
+        "mfa_factor_enrolled_notification",
+        "mfa_factor_unenrolled_notification",
+        "password_changed_notification",
+        "phone_changed_notification",
+        "reauthentication",
+        "recovery",
+        "signup",
+      ])
+      .optional(),
+    factor_type: z.enum(["totp"]).optional(),
     old_email: z.string().optional(),
     old_phone: z.string().optional(),
-    provider: z.string().optional(),
+    provider: z.enum(["email"]).optional(),
     redirect_to: z.string().optional(),
     site_url: z.string().optional(),
     token: z.string().optional(),
@@ -21,6 +49,68 @@ const EmailDataSchema = z
     token_new: z.string().optional(),
   })
   .optional();
+
+/**
+ * userスキーマ
+ * Supabase公式JSON Schemaから派生（すべてのフィールドをoptionalに設定）
+ *
+ * アプリ固有の拡張として、app_metadata と user_metadata に language フィールドを追加
+ */
+const UserSchema = z
+  .object({
+    app_metadata: z
+      .object({
+        language: z.string().optional(),
+        provider: z.enum(["email"]).optional(),
+        providers: z.array(z.enum(["email"])).optional(),
+      })
+      .passthrough()
+      .optional(),
+    aud: z.enum(["authenticated"]).optional(),
+    created_at: z.string().optional(),
+    email: z.string().optional(),
+    id: z.string().optional(),
+    identities: z
+      .array(
+        z
+          .object({
+            created_at: z.string().optional(),
+            email: z.string().optional(),
+            id: z.string().optional(),
+            identity_data: z
+              .object({
+                email: z.string().optional(),
+                email_verified: z.boolean().optional(),
+                phone_verified: z.boolean().optional(),
+                sub: z.string().optional(),
+              })
+              .passthrough()
+              .optional(),
+            identity_id: z.string().optional(),
+            last_sign_in_at: z.string().optional(),
+            provider: z.enum(["email"]).optional(),
+            updated_at: z.string().optional(),
+            user_id: z.string().optional(),
+          })
+          .passthrough()
+      )
+      .optional(),
+    is_anonymous: z.boolean().optional(),
+    phone: z.string().optional(),
+    role: z.enum(["anon", "authenticated"]).optional(),
+    updated_at: z.string().optional(),
+    user_metadata: z
+      .object({
+        email: z.string().optional(),
+        email_verified: z.boolean().optional(),
+        language: z.string().optional(),
+        phone_verified: z.boolean().optional(),
+        sub: z.string().optional(),
+      })
+      .passthrough()
+      .optional(),
+  })
+  .passthrough();
 
 // レガシーペイロード構造（emailフィールド）
 const LegacyEmailSchema = z.object({
@@ -34,21 +124,6 @@ const LegacyEmailSchema = z.object({
   invite_token_hash: z.string().optional(),
   recovery_token: z.string().optional(),
   recovery_token_hash: z.string().optional(),
-});
-
-// ユーザーメタデータ
-const UserSchema = z.object({
-  app_metadata: z
-    .object({
-      language: z.string().optional(),
-    })
-    .optional(),
-  email: z.string().email().optional(),
-  user_metadata: z
-    .object({
-      language: z.string().optional(),
-    })
-    .optional(),
 });
 
 // Auth Hookペイロード（両形式を受け入れる）
