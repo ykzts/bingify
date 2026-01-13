@@ -764,7 +764,7 @@
     "announcementEndsAtLabel": "終了日時",
     "announcementPinnedHelp": "お知らせリストの最上部に固定する",
     "announcementPinnedLabel": "最上部に固定",
-    "announcementPriorityError": "重要",
+    "announcementPriorityError": "緊急",
     "announcementPriorityHelp": "表示の重要度を設定",
     "announcementPriorityInfo": "通常",
     "announcementPriorityLabel": "優先度",
@@ -793,14 +793,6 @@
     "pinned": "ピン留め",
     "processing": "処理中...",
     "title": "お知らせ"
-  },
-  "SpaceAnnouncements": {
-    "createAnnouncement": "お知らせを作成",
-    "editAnnouncement": "お知らせを編集",
-    "managementButton": "お知らせを管理",
-    "noAnnouncements": "お知らせはありません",
-    "pinned": "ピン留め",
-    "title": "スペースのお知らせ"
   },
   "SpaceLanding": {
     "emailRequirement": "メールアドレス要件",

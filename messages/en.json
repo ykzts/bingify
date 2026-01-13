@@ -794,14 +794,6 @@
     "processing": "Processing...",
     "title": "Announcements"
   },
-  "SpaceAnnouncements": {
-    "createAnnouncement": "Create announcement",
-    "editAnnouncement": "Edit announcement",
-    "managementButton": "Manage announcements",
-    "noAnnouncements": "No announcements",
-    "pinned": "Pinned",
-    "title": "Space announcements"
-  },
   "SpaceLanding": {
     "emailRequirement": "Email Requirement",
     "loginNote": "You need to sign in and join this space to participate in the bingo game.",
