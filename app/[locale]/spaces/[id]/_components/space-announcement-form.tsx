@@ -35,8 +35,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import type { SpaceAnnouncementWithDetails } from "@/lib/actions/space-announcements";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import type { Tables } from "@/types/supabase";
 import {
   createSpaceAnnouncementAction,
   deleteSpaceAnnouncementAction,
@@ -48,15 +48,13 @@ import {
 } from "../_lib/form-options";
 
 interface SpaceAnnouncementFormProps {
-  announcement?: Tables<"announcements">;
-  announcementId?: string;
+  announcement?: SpaceAnnouncementWithDetails;
   onSuccess?: () => void;
   spaceId: string;
 }
 
 export function SpaceAnnouncementForm({
   announcement,
-  announcementId,
   onSuccess,
   spaceId,
 }: SpaceAnnouncementFormProps) {
@@ -65,11 +63,13 @@ export function SpaceAnnouncementForm({
   const confirm = useConfirm();
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const isEditMode = !!announcement && !!announcementId;
+  const isEditMode = !!announcement;
+  const announcementId = announcement?.announcement_id;
 
-  const action = isEditMode
-    ? updateSpaceAnnouncementAction.bind(null, spaceId, announcementId)
-    : createSpaceAnnouncementAction.bind(null, spaceId);
+  const action =
+    isEditMode && announcementId
+      ? updateSpaceAnnouncementAction.bind(null, spaceId, announcementId)
+      : createSpaceAnnouncementAction.bind(null, spaceId);
 
   const [state, formAction] = useActionState(action, undefined);
 
@@ -77,16 +77,20 @@ export function SpaceAnnouncementForm({
     ...spaceAnnouncementFormOpts,
     defaultValues: announcement
       ? {
-          content: announcement.content,
-          ends_at: announcement.ends_at
-            ? new Date(announcement.ends_at).toISOString().slice(0, 16)
+          content: announcement.announcements.content,
+          ends_at: announcement.announcements.ends_at
+            ? new Date(announcement.announcements.ends_at)
+                .toISOString()
+                .slice(0, 16)
             : "",
-          pinned: false, // Will be set from space_announcements table if needed
-          priority: announcement.priority,
-          starts_at: announcement.starts_at
-            ? new Date(announcement.starts_at).toISOString().slice(0, 16)
+          pinned: announcement.pinned,
+          priority: announcement.announcements.priority,
+          starts_at: announcement.announcements.starts_at
+            ? new Date(announcement.announcements.starts_at)
+                .toISOString()
+                .slice(0, 16)
             : "",
-          title: announcement.title,
+          title: announcement.announcements.title,
         }
       : spaceAnnouncementFormOpts.defaultValues,
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
