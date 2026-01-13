@@ -705,6 +705,18 @@
     "warningTitle": "重要",
     "welcomeMessage": "ようこそ！まだ管理者が設定されていません。下のボタンをクリックして、最初の管理者として登録してください。"
   },
+  "SpaceAnnouncement": {
+    "deleteButton": "削除",
+    "deleteConfirm": "このお知らせを削除してもよろしいですか？",
+    "deleteSuccess": "お知らせを削除しました",
+    "editButton": "編集",
+    "emptyMessage": "お知らせはまだありません",
+    "emptyMessageDescription": "スペースのオーナーまたは管理者がお知らせを作成すると、ここに表示されます。",
+    "loadingMessage": "お知らせを読み込んでいます...",
+    "manageButton": "お知らせを管理",
+    "pinned": "ピン留め",
+    "title": "お知らせ"
+  },
   "SpaceLanding": {
     "emailRequirement": "メールアドレス要件",
     "loginNote": "このスペースに参加してビンゴゲームに参加するには、ログインが必要です。",
