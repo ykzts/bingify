@@ -35,9 +35,26 @@ pnpm install
 
 ### 2. 環境変数の設定
 
-環境変数の設定には、以下の2つの方法があります:
+環境変数の設定には、以下の3つの方法があります:
 
-#### 方法A: 環境変数生成スクリプトを使用（推奨）
+#### 方法A: Supabaseから自動取得（推奨）
+
+Supabaseローカルインスタンスから自動的に設定を取得します:
+
+```bash
+# Supabaseを起動
+pnpm supabase:start
+
+# 環境変数を自動生成
+pnpm dev:env
+```
+
+このコマンドは以下を自動実行します:
+- Supabaseインスタンスからキーを取得
+- ランダムなシークレットキーの自動生成
+- 既存の `.env.local` の値を保持
+
+#### 方法B: 対話形式で設定
 
 対話形式で環境変数を設定できるスクリプトを用意しています:
 
@@ -63,7 +80,7 @@ pnpm env:generate --non-interactive
 pnpm env:generate --force
 ```
 
-#### 方法B: 手動で設定
+#### 方法C: 手動で設定
 
 `.env.local.example` をコピーして、Supabaseの接続情報を手動で設定します:
 

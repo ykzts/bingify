@@ -99,7 +99,7 @@
     "check": "ultracite fix .",
     "check:ci": "biome ci .",
     "dev": "next dev",
-    "dev:env": "node scripts/update-env.ts",
+    "dev:env": "node scripts/generate-env.ts --from-supabase --non-interactive --force",
     "env:generate": "node scripts/generate-env.ts",
     "format": "ultracite fix .",
     "format:check": "ultracite check .",

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { execSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -18,6 +19,46 @@ const REQUIRED_VARS = [
 
 // 自動生成が必要なシークレット
 const AUTO_GENERATED_SECRETS = ["SEND_EMAIL_HOOK_SECRETS", "CRON_SECRET"];
+
+/**
+ * プロセス環境変数から値を収集する
+ */
+const collectProcessEnvValues = (): Record<string, string> => {
+  const values: Record<string, string> = {};
+
+  for (const [key, value] of Object.entries(process.env)) {
+    if (typeof value === "string") {
+      values[key] = value;
+    }
+  }
+
+  return values;
+};
+
+/**
+ * Supabaseの実行中のインスタンスから設定を取得する
+ */
+const fetchSupabaseConfig = (): {
+  API_URL: string;
+  ANON_KEY: string;
+  SERVICE_ROLE_KEY: string;
+} | null => {
+  try {
+    const output = execSync("pnpm exec supabase status -o json", {
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    const config = JSON.parse(output);
+    const { API_URL, ANON_KEY, SERVICE_ROLE_KEY } = config ?? {};
+
+    if (API_URL && ANON_KEY && SERVICE_ROLE_KEY) {
+      return { ANON_KEY, API_URL, SERVICE_ROLE_KEY };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
 
 /**
  * .env.local.exampleファイルを読み込んでパースする
@@ -54,6 +95,25 @@ const parseExistingEnv = (filePath: string): Record<string, string> => {
 
   const content = fs.readFileSync(filePath, "utf8");
   return parseEnvTemplate(content);
+};
+
+/**
+ * 既存の環境変数値を収集する（ファイル＋プロセス環境変数）
+ */
+const collectExistingValues = (
+  filePath: string,
+  includeProcessEnv = false
+): Record<string, string> => {
+  const fileValues = parseExistingEnv(filePath);
+
+  if (includeProcessEnv) {
+    return {
+      ...fileValues,
+      ...collectProcessEnvValues(),
+    };
+  }
+
+  return fileValues;
 };
 
 /**
@@ -267,9 +327,94 @@ const mergeTemplateDefaults = (
 };
 
 /**
+ * Supabaseモードで設定を取得する
+ */
+const handleSupabaseMode = (): ReturnType<typeof fetchSupabaseConfig> => {
+  console.log("🔄 Supabase インスタンスから設定を取得しています...");
+  const supabaseConfig = fetchSupabaseConfig();
+
+  if (!supabaseConfig) {
+    console.error("❌ Supabase の設定を取得できませんでした");
+    console.error(
+      'Supabase が起動していることを確認してください: "pnpm exec supabase start"'
+    );
+    process.exit(1);
+  }
+  console.log("✅ Supabase の設定を取得しました");
+  return supabaseConfig;
+};
+
+/**
+ * 既存ファイルの上書き確認と処理
+ */
+const handleExistingFile = async (
+  isInteractive: boolean,
+  forceOverwrite: boolean
+): Promise<void> => {
+  if (!fs.existsSync(ENV_FILE) || forceOverwrite) {
+    return;
+  }
+
+  if (isInteractive) {
+    const shouldOverwrite = await confirmOverwrite();
+    if (!shouldOverwrite) {
+      console.log("✅ 処理をキャンセルしました");
+      process.exit(0);
+    }
+  } else {
+    console.log("ℹ️  .env.local は既に存在します。既存の値を保持します");
+  }
+};
+
+/**
+ * 対話的に値を収集する
+ */
+const collectInteractiveValues = async (
+  mergedValues: Record<string, string>,
+  templateValues: Record<string, string>
+): Promise<Record<string, string>> => {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  let result = await promptRequiredValues(rl, mergedValues);
+  result = await promptOptionalValues(rl, result, templateValues);
+
+  rl.close();
+  return result;
+};
+
+/**
+ * バリデーションエラーを表示
+ */
+const displayValidationErrors = (
+  missing: string[],
+  fromSupabase: boolean
+): void => {
+  console.error("\n❌ エラー: 以下の必須環境変数が設定されていません:");
+  for (const key of missing) {
+    console.error(`  - ${key}`);
+  }
+  if (fromSupabase) {
+    console.error(
+      '\nSupabase が起動していることを確認してください: "pnpm exec supabase start"'
+    );
+  } else {
+    console.error("\n対話モードで実行するか、手動で設定してください。");
+  }
+};
+
+/**
  * メイン処理
  */
 const main = async () => {
+  // コマンドライン引数の解析
+  const args = process.argv.slice(2);
+  const isInteractive = !args.includes("--non-interactive");
+  const forceOverwrite = args.includes("--force");
+  const fromSupabase = args.includes("--from-supabase");
+
   console.log("🚀 環境変数生成スクリプト\n");
 
   // テンプレートファイルの存在確認
@@ -281,41 +426,30 @@ const main = async () => {
   // テンプレートと既存の値を読み込み
   const templateContent = fs.readFileSync(TEMPLATE_FILE, "utf8");
   const templateValues = parseEnvTemplate(templateContent);
-  const existingValues = parseExistingEnv(ENV_FILE);
+  const existingValues = collectExistingValues(ENV_FILE, fromSupabase);
 
-  // 対話モードの確認
-  const args = process.argv.slice(2);
-  const isInteractive = !args.includes("--non-interactive");
-  const forceOverwrite = args.includes("--force");
+  // Supabaseから設定を取得
+  const supabaseConfig = fromSupabase ? handleSupabaseMode() : null;
 
   // 既存ファイルの確認
-  if (fs.existsSync(ENV_FILE) && !forceOverwrite) {
-    if (isInteractive) {
-      const shouldOverwrite = await confirmOverwrite();
-      if (!shouldOverwrite) {
-        console.log("✅ 処理をキャンセルしました");
-        process.exit(0);
-      }
-    } else {
-      console.log("ℹ️  .env.local は既に存在します。既存の値を保持します");
-    }
+  await handleExistingFile(isInteractive, forceOverwrite);
+
+  // 値のマージ
+  let mergedValues = { ...existingValues };
+
+  // Supabaseの設定を適用
+  if (supabaseConfig) {
+    mergedValues.NEXT_PUBLIC_SUPABASE_URL = supabaseConfig.API_URL;
+    mergedValues.NEXT_PUBLIC_SUPABASE_ANON_KEY = supabaseConfig.ANON_KEY;
+    mergedValues.SUPABASE_SERVICE_ROLE_KEY = supabaseConfig.SERVICE_ROLE_KEY;
   }
 
-  // 値のマージと自動生成
-  let mergedValues = { ...existingValues };
+  // 自動生成シークレット
   mergedValues = generateAutoSecrets(mergedValues);
 
-  // 対話モードの場合は、入力を求める
-  if (isInteractive) {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-
-    mergedValues = await promptRequiredValues(rl, mergedValues);
-    mergedValues = await promptOptionalValues(rl, mergedValues, templateValues);
-
-    rl.close();
+  // 対話モードでの入力
+  if (isInteractive && !fromSupabase) {
+    mergedValues = await collectInteractiveValues(mergedValues, templateValues);
   }
 
   // テンプレートの値をデフォルトとして使用
@@ -324,11 +458,7 @@ const main = async () => {
   // バリデーション
   const missing = validateRequired(mergedValues);
   if (missing.length > 0) {
-    console.error("\n❌ エラー: 以下の必須環境変数が設定されていません:");
-    for (const key of missing) {
-      console.error(`  - ${key}`);
-    }
-    console.error("\n対話モードで実行するか、手動で設定してください。");
+    displayValidationErrors(missing, fromSupabase);
     process.exit(1);
   }
 
@@ -338,9 +468,12 @@ const main = async () => {
 
   console.log("\n✅ .env.local を生成しました");
   console.log(`\n📄 ファイル: ${ENV_FILE}`);
-  console.log("\n次のステップ:");
-  console.log("  1. .env.local を確認して、必要に応じて編集してください");
-  console.log("  2. pnpm dev でアプリケーションを起動してください");
+
+  if (!fromSupabase) {
+    console.log("\n次のステップ:");
+    console.log("  1. .env.local を確認して、必要に応じて編集してください");
+    console.log("  2. pnpm dev でアプリケーションを起動してください");
+  }
 };
 
 main().catch((error) => {
