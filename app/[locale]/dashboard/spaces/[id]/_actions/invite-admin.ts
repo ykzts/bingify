@@ -5,6 +5,7 @@ import {
   initialFormState,
 } from "@tanstack/react-form-nextjs";
 import { createClient } from "@/lib/supabase/server";
+import { createNotification } from "@/lib/utils/create-notification";
 import { isValidUUID } from "@/lib/utils/uuid";
 import {
   type InviteAdminFormValues,
@@ -32,7 +33,7 @@ async function checkSpaceOwnership(
 ) {
   const { data: space, error: spaceError } = await supabase
     .from("spaces")
-    .select("owner_id")
+    .select("owner_id, title, share_key")
     .eq("id", spaceId)
     .single();
 
@@ -204,6 +205,30 @@ export async function inviteAdminAction(
         ...initialFormState,
         errors: ["管理者の追加に失敗しました"],
       };
+    }
+
+    // Get space information for notification
+    const { data: spaceData } = await supabase
+      .from("spaces")
+      .select("title, share_key")
+      .eq("id", spaceId)
+      .single();
+
+    // Create notification for the invited user
+    if (spaceData) {
+      const spaceTitle = spaceData.title || spaceData.share_key;
+      const linkUrl = `/dashboard/spaces/${spaceId}`;
+
+      await createNotification(
+        targetUser.id,
+        "space_invitation",
+        `スペース「${spaceTitle}」への招待`,
+        "あなたはスペースの管理者として招待されました",
+        linkUrl,
+        {
+          space_id: spaceId,
+        }
+      );
     }
 
     // Return success state

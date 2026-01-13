@@ -658,6 +658,12 @@ export async function deleteSpace(spaceId: string): Promise<DeleteSpaceResult> {
       };
     }
 
+    // TODO: 通知統合 - スペースが削除された際の通知作成
+    // 実装時: 全参加者と管理者に通知を送信
+    // 例: createNotification(userId, 'space_deleted', ...)
+    // 必要な情報: space情報（title, share_key）、全参加者と管理者のuser_id一覧
+    // 注意: スペースは既に削除されているため、削除前に情報を取得する必要がある
+
     return {
       success: true,
     };

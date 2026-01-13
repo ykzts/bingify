@@ -237,6 +237,11 @@ export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
       };
     }
 
+    // TODO: 通知統合 - スペースがクローズされた際の通知作成
+    // 実装時: 全参加者と管理者に通知を送信
+    // 例: createNotification(userId, 'space_closed', ...)
+    // 必要な情報: space情報（title, share_key）、全参加者と管理者のuser_id一覧
+
     return {
       success: true,
     };
@@ -459,6 +464,10 @@ export async function kickParticipant(
         success: false,
       };
     }
+
+    // TODO: 通知統合 - 参加者がキックされた際の通知作成
+    // 実装時: createNotification(participantUserId, 'participant_kicked', ...)
+    // 必要な情報: participantのuser_id, space情報（title, share_key）
 
     return {
       success: true,
