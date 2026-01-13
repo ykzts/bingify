@@ -4,6 +4,7 @@ import { ConfirmationEmail } from "@/emails/auth/confirmation-email";
 import { EmailChangeEmail } from "@/emails/auth/email-change-email";
 import { EmailChangedNotificationEmail } from "@/emails/auth/email-changed-notification-email";
 import { InviteEmail } from "@/emails/auth/invite-email";
+import { MagicLinkEmail } from "@/emails/auth/magic-link-email";
 import { PasswordChangedNotificationEmail } from "@/emails/auth/password-changed-notification-email";
 import { RecoveryEmail } from "@/emails/auth/recovery-email";
 import { sendAuthEmail } from "@/lib/mail";
@@ -128,13 +129,12 @@ export async function handleEmailAction(
       return true;
     }
 
-    case "recovery":
-    case "magiclink": {
+    case "recovery": {
       const token = email.recovery_token || email.recovery_token_hash || "";
       const confirmationUrl = buildVerifyUrl({
         token: email.recovery_token,
         tokenHash: email.recovery_token_hash,
-        type: emailActionType,
+        type: "recovery",
       });
 
       await sendAuthEmail({
@@ -142,6 +142,26 @@ export async function handleEmailAction(
         subject:
           locale === "ja" ? "パスワードのリセット" : "Reset Your Password",
         template: React.createElement(RecoveryEmail, {
+          confirmationUrl,
+          locale,
+          token,
+        }),
+      });
+      return true;
+    }
+
+    case "magiclink": {
+      const token = email.recovery_token || email.recovery_token_hash || "";
+      const confirmationUrl = buildVerifyUrl({
+        token: email.recovery_token,
+        tokenHash: email.recovery_token_hash,
+        type: "magiclink",
+      });
+
+      await sendAuthEmail({
+        recipient: userEmail,
+        subject: locale === "ja" ? "Bingifyにログイン" : "Sign In to Bingify",
+        template: React.createElement(MagicLinkEmail, {
           confirmationUrl,
           locale,
           token,
