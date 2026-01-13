@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { SpaceAnnouncementList } from "@/components/announcements/space-announcement-list";
 import { redirect } from "@/i18n/navigation";
 import { getSpace } from "@/lib/data/spaces";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
@@ -150,6 +151,10 @@ export default async function AdminSpacePage({
           />
         </div>
       </div>
+
+      {/* Space Announcements Section */}
+      <SpaceAnnouncementList isAdmin={true} spaceId={space.id} />
+
       {/* Main Content Area - Status-based rendering */}
       {space.status === "draft" && (
         <DraftStatusView locale={locale} spaceId={space.id} />
