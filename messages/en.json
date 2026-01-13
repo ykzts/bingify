@@ -600,6 +600,7 @@
     "selectLanguage": "Select language"
   },
   "Login": {
+    "agreeToTerms": "By signing in, you agree to our <termsLink>Terms of Service</termsLink> and <privacyLink>Privacy Policy</privacyLink>.",
     "closeEmailForm": "Close Email Form",
     "description": "Sign in to host games or manage your account.",
     "descriptionSpace": "Sign in to join this bingo space and participate in the game.",

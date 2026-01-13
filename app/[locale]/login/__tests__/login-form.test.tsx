@@ -6,25 +6,55 @@ import { LoginForm } from "../_components/login-form";
 // next-intlのモック
 vi.mock("next-intl", () => ({
   useLocale: () => "ja",
-  useTranslations: () => (key: string) => {
-    const translations: Record<string, string> = {
-      closeEmailForm: "メールフォームを閉じる",
-      description:
-        "ゲームのホストやアカウント管理のためにログインしてください。",
-      emailButton: "メールアドレスでログイン",
-      emailInputLabel: "メールアドレス",
-      emailInputPlaceholder: "your@email.com",
-      emailSendButton: "マジックリンクを送信",
-      emailSending: "送信中...",
-      emailSuccess: "メールを確認してください!ログインリンクを送信しました。",
-      errorEmailInvalid: "有効なメールアドレスを入力してください",
-      errorMessage:
-        "ログイン中にエラーが発生しました。もう一度お試しください。",
-      orDivider: "または",
-      title: "Bingifyにログイン",
+  useTranslations: () => {
+    const t = (key: string) => {
+      const translations: Record<string, string> = {
+        agreeToTerms:
+          "ログインすることで、<termsLink>利用規約</termsLink>と<privacyLink>プライバシーポリシー</privacyLink>に同意したものとみなします。",
+        closeEmailForm: "メールフォームを閉じる",
+        description:
+          "ゲームのホストやアカウント管理のためにログインしてください。",
+        emailButton: "メールアドレスでログイン",
+        emailInputLabel: "メールアドレス",
+        emailInputPlaceholder: "your@email.com",
+        emailSendButton: "マジックリンクを送信",
+        emailSending: "送信中...",
+        emailSuccess: "メールを確認してください!ログインリンクを送信しました。",
+        errorEmailInvalid: "有効なメールアドレスを入力してください",
+        errorMessage:
+          "ログイン中にエラーが発生しました。もう一度お試しください。",
+        orDivider: "または",
+        title: "Bingifyにログイン",
+      };
+      return translations[key] || key;
     };
-    return translations[key] || key;
+    t.rich = (
+      key: string,
+      values?: Record<string, (chunks: React.ReactNode) => React.ReactElement>
+    ) => {
+      const text = t(key);
+      if (!values) {
+        return text;
+      }
+
+      // 簡易的なリッチテキストのレンダリング
+      let result: React.ReactNode = text;
+      for (const [tag, fn] of Object.entries(values)) {
+        const regex = new RegExp(`<${tag}>([^<]+)</${tag}>`, "g");
+        const parts = text.split(regex);
+        result = parts.map((part, i) => (i % 2 === 1 ? fn(part) : part));
+      }
+      return result;
+    };
+    return t;
   },
+}));
+
+// @/i18n/navigationのモック
+vi.mock("@/i18n/navigation", () => ({
+  Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  ),
 }));
 
 // next/navigationのモック

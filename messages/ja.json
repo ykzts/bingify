@@ -600,6 +600,7 @@
     "selectLanguage": "言語を選択"
   },
   "Login": {
+    "agreeToTerms": "ログインすることで、<termsLink>利用規約</termsLink>と<privacyLink>プライバシーポリシー</privacyLink>に同意したものとみなします。",
     "closeEmailForm": "メールフォームを閉じる",
     "description": "ゲームのホストやアカウント管理のためにログインしてください。",
     "descriptionSpace": "ログインして、このビンゴスペースに参加しましょう。",
