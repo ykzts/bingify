@@ -1,10 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "additionalProperties": true,
   "description": "Supabase Auth Hook Send Email payload schema",
   "properties": {
     "email_data": {
-      "additionalProperties": true,
       "properties": {
         "email_action_type": {
           "enum": [
@@ -53,37 +51,51 @@
           "x-faker": "internet.url"
         },
         "token": {
+          "pattern": "^[0-9]{6}$",
           "type": "string",
           "x-faker": {
             "fake": "{{helpers.replaceSymbols('######')}}"
           }
         },
         "token_hash": {
+          "maxLength": 30,
+          "minLength": 16,
           "type": "string",
           "x-faker": {
             "fake": "{{random.alphaNumeric(30)}}"
           }
         },
         "token_hash_new": {
+          "maxLength": 30,
+          "minLength": 16,
           "type": "string",
           "x-faker": {
             "fake": "{{random.alphaNumeric(30)}}"
           }
         },
         "token_new": {
+          "maxLength": 30,
+          "minLength": 16,
           "type": "string",
           "x-faker": {
             "fake": "{{random.alphaNumeric(30)}}"
           }
         }
       },
+      "required": [
+        "token",
+        "token_hash",
+        "redirect_to",
+        "email_action_type",
+        "site_url",
+        "token_new",
+        "token_hash_new"
+      ],
       "type": "object"
     },
     "user": {
-      "additionalProperties": true,
       "properties": {
         "app_metadata": {
-          "additionalProperties": true,
           "properties": {
             "provider": {
               "enum": ["email"],
@@ -120,7 +132,6 @@
         },
         "identities": {
           "items": {
-            "additionalProperties": true,
             "properties": {
               "created_at": {
                 "format": "date-time",
@@ -136,7 +147,6 @@
                 "x-faker": "random.uuid"
               },
               "identity_data": {
-                "additionalProperties": true,
                 "properties": {
                   "email": {
                     "type": "string",
@@ -180,6 +190,17 @@
                 "x-faker": "random.uuid"
               }
             },
+            "required": [
+              "identity_id",
+              "id",
+              "user_id",
+              "identity_data",
+              "provider",
+              "last_sign_in_at",
+              "created_at",
+              "updated_at",
+              "email"
+            ],
             "type": "object"
           },
           "type": "array"
@@ -204,7 +225,6 @@
           "x-faker": "date.recent"
         },
         "user_metadata": {
-          "additionalProperties": true,
           "properties": {
             "email": {
               "type": "string",
@@ -226,8 +246,22 @@
           "type": "object"
         }
       },
+      "required": [
+        "id",
+        "aud",
+        "role",
+        "email",
+        "phone",
+        "app_metadata",
+        "user_metadata",
+        "identities",
+        "created_at",
+        "updated_at",
+        "is_anonymous"
+      ],
       "type": "object"
     }
   },
+  "required": ["user", "email_data"],
   "type": "object"
 }

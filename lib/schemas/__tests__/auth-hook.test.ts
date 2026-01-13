@@ -30,8 +30,10 @@ describe("Auth Hook Schema", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.email_data?.email_action_type).toBe("signup");
-        expect(result.data.user?.email).toBe("user@example.com");
+        expect((result.data.email_data as any)?.email_action_type).toBe(
+          "signup"
+        );
+        expect((result.data.user as any)?.email).toBe("user@example.com");
       }
     });
 
@@ -51,8 +53,10 @@ describe("Auth Hook Schema", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.email?.email_action_type).toBe("confirmation");
-        expect(result.data.user?.email).toBe("user@example.com");
+        expect((result.data.email as any)?.email_action_type).toBe(
+          "confirmation"
+        );
+        expect((result.data.user as any)?.email).toBe("user@example.com");
       }
     });
 
@@ -113,8 +117,8 @@ describe("Auth Hook Schema", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.email_data?.token).toBe("token123");
-        expect(result.data.email_data?.token_hash).toBeUndefined();
+        expect((result.data.email_data as any)?.token).toBe("token123");
+        expect((result.data.email_data as any)?.token_hash).toBeUndefined();
       }
     });
 
@@ -136,7 +140,7 @@ describe("Auth Hook Schema", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.user?.app_metadata?.language).toBe("ja");
+        expect((result.data.user as any)?.app_metadata?.language).toBe("ja");
       }
     });
 
@@ -158,7 +162,7 @@ describe("Auth Hook Schema", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.user?.user_metadata?.language).toBe("en");
+        expect((result.data.user as any)?.user_metadata?.language).toBe("en");
       }
     });
 
@@ -202,8 +206,10 @@ describe("Auth Hook Schema", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.user?.identities).toHaveLength(1);
-        expect(result.data.user?.identities?.[0]?.provider).toBe("email");
+        expect((result.data.user as any)?.identities).toHaveLength(1);
+        expect((result.data.user as any)?.identities?.[0]?.provider).toBe(
+          "email"
+        );
       }
     });
   });
