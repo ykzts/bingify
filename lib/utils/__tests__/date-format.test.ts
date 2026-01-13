@@ -4,6 +4,7 @@ import {
   formatDateShort,
   formatDateSuffix,
   formatDateTime,
+  formatRelativeTime,
 } from "../date-format";
 
 // Regex patterns for formatDateTime tests
@@ -127,6 +128,76 @@ describe("date-format", () => {
     it("無効な日付の場合は空文字を返す", () => {
       const result = formatDateSuffix("invalid-date");
       expect(result).toBe("");
+    });
+  });
+
+  describe("formatRelativeTime", () => {
+    it("数秒前の時刻を相対表示する（英語）", () => {
+      const now = new Date();
+      const past = new Date(now.getTime() - 30 * 1000);
+      const result = formatRelativeTime(past, "en");
+      expect(result).toContain("second");
+    });
+
+    it("数分前の時刻を相対表示する（英語）", () => {
+      const now = new Date();
+      const past = new Date(now.getTime() - 5 * 60 * 1000);
+      const result = formatRelativeTime(past, "en");
+      expect(result).toContain("minute");
+    });
+
+    it("数時間前の時刻を相対表示する（英語）", () => {
+      const now = new Date();
+      const past = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+      const result = formatRelativeTime(past, "en");
+      expect(result).toContain("hour");
+    });
+
+    it("数日前の時刻を相対表示する（英語）", () => {
+      const now = new Date();
+      const past = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+      const result = formatRelativeTime(past, "en");
+      expect(result).toContain("day");
+    });
+
+    it("数週間前の時刻を相対表示する（英語）", () => {
+      const now = new Date();
+      const past = new Date(now.getTime() - 2 * 7 * 24 * 60 * 60 * 1000);
+      const result = formatRelativeTime(past, "en");
+      expect(result).toContain("week");
+    });
+
+    it("数ヶ月前の時刻を相対表示する（英語）", () => {
+      const now = new Date();
+      const past = new Date(now.getTime() - 45 * 24 * 60 * 60 * 1000);
+      const result = formatRelativeTime(past, "en");
+      expect(result).toContain("month");
+    });
+
+    it("数年前の時刻を相対表示する（英語）", () => {
+      const now = new Date();
+      const past = new Date(now.getTime() - 400 * 24 * 60 * 60 * 1000);
+      const result = formatRelativeTime(past, "en");
+      expect(result).toContain("year");
+    });
+
+    it("日本語ロケールで相対時刻をフォーマットする", () => {
+      const now = new Date();
+      const past = new Date(now.getTime() - 5 * 60 * 1000);
+      const result = formatRelativeTime(past, "ja");
+      expect(result).toContain("分");
+    });
+
+    it("文字列の日付をフォーマットする", () => {
+      const now = new Date();
+      const past = new Date(now.getTime() - 5 * 60 * 1000);
+      const result = formatRelativeTime(past.toISOString(), "en");
+      expect(result).toContain("minute");
+    });
+
+    it("無効な日付の場合は '-' を返す", () => {
+      const result = formatRelativeTime("invalid-date", "en");
+      expect(result).toBe("-");
     });
   });
 });
