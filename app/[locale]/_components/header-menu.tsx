@@ -4,6 +4,7 @@ import { LayoutDashboard, LogOut, Settings, Shield, User } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -109,6 +110,9 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
           </Link>
         )}
       </nav>
+
+      {/* 通知ベル */}
+      <NotificationBell />
 
       {/* ユーザーメニュー */}
       <DropdownMenu onOpenChange={setOpen} open={open}>
