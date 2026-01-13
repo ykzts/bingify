@@ -64,21 +64,29 @@ const generateEnvFile = (
 describe("generate-env スクリプト", () => {
   beforeEach(() => {
     // テストファイルのクリーンアップ
-    if (fs.existsSync(TEST_ENV_FILE)) {
+    try {
       fs.unlinkSync(TEST_ENV_FILE);
+    } catch {
+      // ファイルが存在しない場合は無視
     }
-    if (fs.existsSync(TEST_TEMPLATE_FILE)) {
+    try {
       fs.unlinkSync(TEST_TEMPLATE_FILE);
+    } catch {
+      // ファイルが存在しない場合は無視
     }
   });
 
   afterEach(() => {
     // テストファイルのクリーンアップ
-    if (fs.existsSync(TEST_ENV_FILE)) {
+    try {
       fs.unlinkSync(TEST_ENV_FILE);
+    } catch {
+      // ファイルが存在しない場合は無視
     }
-    if (fs.existsSync(TEST_TEMPLATE_FILE)) {
+    try {
       fs.unlinkSync(TEST_TEMPLATE_FILE);
+    } catch {
+      // ファイルが存在しない場合は無視
     }
   });
 

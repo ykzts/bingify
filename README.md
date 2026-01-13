@@ -35,7 +35,37 @@ pnpm install
 
 ### 2. 環境変数の設定
 
-`.env.local.example` をコピーして、Supabaseの接続情報を設定します。
+環境変数の設定には、以下の2つの方法があります:
+
+#### 方法A: 環境変数生成スクリプトを使用（推奨）
+
+対話形式で環境変数を設定できるスクリプトを用意しています:
+
+```bash
+pnpm env:generate
+```
+
+このスクリプトは以下の機能を提供します:
+- 必須項目の対話的な入力
+- ランダムなシークレットキーの自動生成
+- 既存の `.env.local` がある場合の値の保持
+- 入力値のバリデーション
+
+**非対話モード（CI/CD環境向け）:**
+
+```bash
+pnpm env:generate --non-interactive
+```
+
+**強制上書きモード:**
+
+```bash
+pnpm env:generate --force
+```
+
+#### 方法B: 手動で設定
+
+`.env.local.example` をコピーして、Supabaseの接続情報を手動で設定します:
 
 ```bash
 cp .env.local.example .env.local
