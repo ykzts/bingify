@@ -643,6 +643,22 @@ export async function deleteSpace(spaceId: string): Promise<DeleteSpaceResult> {
       };
     }
 
+    // TODO: 通知統合 - スペースが削除された際の通知作成
+    // 実装時: 削除前に以下の情報を取得する必要がある
+    // 1. スペース情報（title, share_key）の取得
+    //    const { data: spaceInfo } = await supabase.from("spaces")
+    //      .select("title, share_key").eq("id", spaceId).single();
+    // 2. 全参加者のuser_id一覧を取得
+    //    const { data: participants } = await supabase.from("participants")
+    //      .select("user_id").eq("space_id", spaceId);
+    // 3. 全管理者のuser_id一覧を取得
+    //    const { data: admins } = await supabase.from("space_roles")
+    //      .select("user_id").eq("space_id", spaceId);
+    // 4. スペース削除後、各ユーザーに通知を送信
+    //    for (const userId of [...participantIds, ...adminIds]) {
+    //      await createNotification(userId, 'space_deleted', ...);
+    //    }
+
     // Delete the space (RLS policy ensures only owner can delete)
     const { error } = await supabase
       .from("spaces")

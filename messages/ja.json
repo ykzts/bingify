@@ -652,6 +652,8 @@
     "metaTitle": "通知",
     "next": "次へ",
     "previous": "前へ",
+    "spaceInvitationContent": "あなたはスペースの管理者として招待されました",
+    "spaceInvitationTitle": "スペース「{spaceName}」への招待",
     "title": "通知",
     "unreadTab": "未読"
   },

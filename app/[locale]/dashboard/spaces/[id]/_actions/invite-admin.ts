@@ -4,7 +4,9 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
+import { getLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { createNotification } from "@/lib/utils/create-notification";
 import { isValidUUID } from "@/lib/utils/uuid";
 import {
   type InviteAdminFormValues,
@@ -204,6 +206,48 @@ export async function inviteAdminAction(
         ...initialFormState,
         errors: ["管理者の追加に失敗しました"],
       };
+    }
+
+    // Get space information for notification
+    const { data: spaceData } = await supabase
+      .from("spaces")
+      .select("title, share_key")
+      .eq("id", spaceId)
+      .single();
+
+    // Create notification for the invited user
+    if (spaceData) {
+      const spaceTitle = spaceData.title || spaceData.share_key;
+      const linkUrl = `/dashboard/spaces/${spaceId}`;
+
+      // Get locale and translations for notification
+      const locale = await getLocale();
+      const t = await getTranslations({ locale, namespace: "Notifications" });
+
+      // Get localized notification messages
+      const localizedTitle = t("spaceInvitationTitle", {
+        spaceName: spaceTitle,
+      });
+      const localizedContent = t("spaceInvitationContent");
+
+      const notificationResult = await createNotification(
+        targetUser.id,
+        "space_invitation",
+        localizedTitle,
+        localizedContent,
+        linkUrl,
+        {
+          space_id: spaceId,
+        }
+      );
+
+      // Log notification creation failure, but don't block the invitation
+      if (!notificationResult.success) {
+        console.error(
+          "Failed to create notification for invited user:",
+          notificationResult.error
+        );
+      }
     }
 
     // Return success state

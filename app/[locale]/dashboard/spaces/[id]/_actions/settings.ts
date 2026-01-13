@@ -978,6 +978,10 @@ export async function removeAdmin(
       };
     }
 
+    // TODO: 通知統合 - 管理者権限が削除された際の通知作成
+    // 実装時: createNotification(adminUserId, 'admin_removed', ...)
+    // 必要な情報: space情報（title, share_key）
+
     return {
       success: true,
     };
