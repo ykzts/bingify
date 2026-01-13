@@ -118,7 +118,7 @@ export type NormalizedEmail = z.infer<typeof NormalizedEmailSchema>;
 export const NormalizedPayloadSchema = z.object({
   email: NormalizedEmailSchema,
   siteUrlOverride: z.string().url().optional(),
-  user: UserSchema.optional(),
+  user: z.custom<GeneratedUser>().optional(),
 });
 
 export type NormalizedPayload = z.infer<typeof NormalizedPayloadSchema>;
