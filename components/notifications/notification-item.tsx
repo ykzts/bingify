@@ -64,17 +64,6 @@ export function NotificationItem({
   const metadata = notification.metadata as { action_url?: string } | null;
   const linkUrl = metadata?.action_url;
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (!notification.read && onMarkRead) {
-      onMarkRead(notification.id);
-    }
-
-    if (linkUrl) {
-      e.preventDefault();
-      window.location.href = linkUrl;
-    }
-  };
-
   const handleMarkRead = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -92,15 +81,7 @@ export function NotificationItem({
   };
 
   const content = (
-    <button
-      className={cn(
-        "group relative flex w-full gap-4 rounded-lg border p-4 text-left transition-colors hover:bg-gray-50",
-        !notification.read && "border-purple-200 bg-purple-50/50",
-        linkUrl && "cursor-pointer"
-      )}
-      onClick={handleClick}
-      type="button"
-    >
+    <>
       <div className="flex-shrink-0">
         <div
           className={cn(
@@ -169,16 +150,36 @@ export function NotificationItem({
           </Button>
         )}
       </div>
-    </button>
+    </>
   );
 
   if (linkUrl) {
     return (
-      <Link className="block" href={linkUrl}>
+      <Link
+        className={cn(
+          "group relative flex w-full gap-4 rounded-lg border p-4 text-left transition-colors hover:bg-gray-50",
+          !notification.read && "border-purple-200 bg-purple-50/50"
+        )}
+        href={linkUrl}
+        onClick={() => {
+          if (!notification.read && onMarkRead) {
+            onMarkRead(notification.id);
+          }
+        }}
+      >
         {content}
       </Link>
     );
   }
 
-  return content;
+  return (
+    <div
+      className={cn(
+        "group relative flex w-full gap-4 rounded-lg border p-4 text-left transition-colors",
+        !notification.read && "border-purple-200 bg-purple-50/50"
+      )}
+    >
+      {content}
+    </div>
+  );
 }

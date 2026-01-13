@@ -1,12 +1,17 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Notification } from "@/lib/types/notification";
 import { NotificationItem } from "../notification-item";
 
 // 正規表現をトップレベルで定義
 const DELETE_BUTTON_NAME_REGEX = /delete/i;
+
+// 各テスト後にクリーンアップ
+afterEach(() => {
+  cleanup();
+});
 
 /**
  * テスト用のラッパーコンポーネント
