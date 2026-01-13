@@ -214,9 +214,7 @@ export function AnnouncementForm({
                 {(field: any) => (
                   <Field>
                     <FieldContent>
-                      <FieldLabel>
-                        {t("announcementTitleLabel")}
-                      </FieldLabel>
+                      <FieldLabel>{t("announcementTitleLabel")}</FieldLabel>
                       <Input
                         disabled={isSubmitting}
                         maxLength={200}
@@ -245,9 +243,7 @@ export function AnnouncementForm({
                 {(field: any) => (
                   <Field>
                     <FieldContent>
-                      <FieldLabel>
-                        {t("announcementContentLabel")}
-                      </FieldLabel>
+                      <FieldLabel>{t("announcementContentLabel")}</FieldLabel>
                       <Textarea
                         className="min-h-[150px]"
                         disabled={isSubmitting}
@@ -276,9 +272,7 @@ export function AnnouncementForm({
                 {(field: any) => (
                   <Field>
                     <FieldContent>
-                      <FieldLabel>
-                        {t("announcementPriorityLabel")}
-                      </FieldLabel>
+                      <FieldLabel>{t("announcementPriorityLabel")}</FieldLabel>
                       <Select
                         disabled={isSubmitting}
                         name={field.name}

@@ -1,14 +1,14 @@
 "use server";
 
-import { createServerValidate } from "@tanstack/react-form-nextjs";
+import {
+  createServerValidate,
+  initialFormState,
+} from "@tanstack/react-form-nextjs";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
 import type { Tables } from "@/types/supabase";
-import {
-  type AnnouncementFormValues,
-  announcementFormOpts,
-} from "../_lib/form-options";
+import { announcementFormOpts } from "../_lib/form-options";
 
 interface ActionResult {
   error?: string;
@@ -87,6 +87,7 @@ export async function getAllAnnouncements(
 
 const createAnnouncementValidate = createServerValidate({
   ...announcementFormOpts,
+  onServerValidate: () => undefined,
 });
 
 export async function createAnnouncementAction(
@@ -94,46 +95,56 @@ export async function createAnnouncementAction(
   formData: FormData
 ) {
   const { isAdmin, userId } = await verifyAdminRole();
-  if (!isAdmin || !userId) {
+  if (!(isAdmin && userId)) {
     return {
-      error: "errorNoPermission",
+      ...initialFormState,
+      errors: ["errorNoPermission"],
       meta: { success: false },
     };
   }
 
   try {
-    const validatedData = (await createAnnouncementValidate(
-      formData
-    )) as AnnouncementFormValues;
+    await createAnnouncementValidate(formData);
+
+    const title = (formData.get("title") as string) || "";
+    const content = (formData.get("content") as string) || "";
+    const priority = (formData.get("priority") as string) || "info";
+    const starts_at = (formData.get("starts_at") as string) || "";
+    const ends_at = (formData.get("ends_at") as string) || "";
+    const dismissible = formData.has("dismissible");
+    const published = formData.has("published");
 
     const adminClient = createAdminClient();
 
     const { error } = await adminClient.from("announcements").insert({
-      content: validatedData.content,
+      content,
       created_by: userId,
-      dismissible: validatedData.dismissible,
-      ends_at: validatedData.ends_at || null,
-      priority: validatedData.priority,
-      published: validatedData.published,
-      starts_at: validatedData.starts_at || null,
-      title: validatedData.title,
+      dismissible,
+      ends_at: ends_at || null,
+      priority: priority as "info" | "warning" | "error",
+      published,
+      starts_at: starts_at || null,
+      title,
     });
 
     if (error) {
       console.error("Failed to create announcement:", error);
       return {
-        error: "errorCreateFailed",
+        ...initialFormState,
+        errors: ["errorCreateFailed"],
         meta: { success: false },
       };
     }
 
     return {
+      ...initialFormState,
       meta: { success: true },
     };
   } catch (error) {
     console.error("Error in createAnnouncementAction:", error);
     return {
-      error: "errorGeneric",
+      ...initialFormState,
+      errors: ["errorGeneric"],
       meta: { success: false },
     };
   }
@@ -141,6 +152,7 @@ export async function createAnnouncementAction(
 
 const updateAnnouncementValidate = createServerValidate({
   ...announcementFormOpts,
+  onServerValidate: () => undefined,
 });
 
 export async function updateAnnouncementAction(
@@ -150,7 +162,8 @@ export async function updateAnnouncementAction(
 ) {
   if (!isValidUUID(announcementId)) {
     return {
-      error: "errorInvalidUuid",
+      ...initialFormState,
+      errors: ["errorInvalidUuid"],
       meta: { success: false },
     };
   }
@@ -158,46 +171,56 @@ export async function updateAnnouncementAction(
   const { isAdmin } = await verifyAdminRole();
   if (!isAdmin) {
     return {
-      error: "errorNoPermission",
+      ...initialFormState,
+      errors: ["errorNoPermission"],
       meta: { success: false },
     };
   }
 
   try {
-    const validatedData = (await updateAnnouncementValidate(
-      formData
-    )) as AnnouncementFormValues;
+    await updateAnnouncementValidate(formData);
+
+    const title = (formData.get("title") as string) || "";
+    const content = (formData.get("content") as string) || "";
+    const priority = (formData.get("priority") as string) || "info";
+    const starts_at = (formData.get("starts_at") as string) || "";
+    const ends_at = (formData.get("ends_at") as string) || "";
+    const dismissible = formData.has("dismissible");
+    const published = formData.has("published");
 
     const adminClient = createAdminClient();
 
     const { error } = await adminClient
       .from("announcements")
       .update({
-        content: validatedData.content,
-        dismissible: validatedData.dismissible,
-        ends_at: validatedData.ends_at || null,
-        priority: validatedData.priority,
-        published: validatedData.published,
-        starts_at: validatedData.starts_at || null,
-        title: validatedData.title,
+        content,
+        dismissible,
+        ends_at: ends_at || null,
+        priority: priority as "info" | "warning" | "error",
+        published,
+        starts_at: starts_at || null,
+        title,
       })
       .eq("id", announcementId);
 
     if (error) {
       console.error("Failed to update announcement:", error);
       return {
-        error: "errorUpdateFailed",
+        ...initialFormState,
+        errors: ["errorUpdateFailed"],
         meta: { success: false },
       };
     }
 
     return {
+      ...initialFormState,
       meta: { success: true },
     };
   } catch (error) {
     console.error("Error in updateAnnouncementAction:", error);
     return {
-      error: "errorGeneric",
+      ...initialFormState,
+      errors: ["errorGeneric"],
       meta: { success: false },
     };
   }
