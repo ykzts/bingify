@@ -9,7 +9,7 @@ describe("HeaderMenuのログインボタン表示ロジック", () => {
   describe("未ログインユーザーの場合", () => {
     it("ログインページではログインボタンが表示されない", () => {
       // テスト条件
-      const user = null;
+      const user: null = null;
       const pathname = "/login";
 
       // ログインページの場合は何も表示しない
@@ -20,7 +20,7 @@ describe("HeaderMenuのログインボタン表示ロジック", () => {
 
     it("ログインページ以外ではログインボタンが表示される", () => {
       // テスト条件
-      const user = null;
+      const user: null = null;
       const pathname = "/";
 
       // ログインページ以外の場合はログインボタンを表示
@@ -31,7 +31,7 @@ describe("HeaderMenuのログインボタン表示ロジック", () => {
 
     it("ダッシュボードページではログインボタンが表示される", () => {
       // テスト条件
-      const user = null;
+      const user: null = null;
       const pathname = "/dashboard";
 
       // ログインページ以外の場合はログインボタンを表示
