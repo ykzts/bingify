@@ -1,26 +1,75 @@
 import { z } from "zod";
+import authHookJsonSchema from "./auth-hook-json-schema.json" with {
+  type: "json",
+};
 
 /**
  * Supabase Auth Hookのメールデータスキーマ
  * 新しい形式（email_dataフィールド）とレガシー形式（emailフィールド）の両方に対応
+ *
+ * 新しい形式のスキーマはSupabase公式ドキュメントのJSON Schemaから z.fromJSONSchema() で自動生成
+ * @see https://supabase.com/docs/guides/auth/auth-hooks/send-email-hook
+ * @see ./auth-hook-json-schema.json - 公式JSON Schemaの参照コピー（required フィールドを削除済み）
  */
 
-// 新しいペイロード構造（email_dataフィールド）
-const EmailDataSchema = z
-  .object({
-    email_action_type: z.string().optional(),
-    factor_type: z.string().optional(),
-    old_email: z.string().optional(),
-    old_phone: z.string().optional(),
-    provider: z.string().optional(),
-    redirect_to: z.string().optional(),
-    site_url: z.string().optional(),
-    token: z.string().optional(),
-    token_hash: z.string().optional(),
-    token_hash_new: z.string().optional(),
-    token_new: z.string().optional(),
-  })
-  .optional();
+// Supabase公式JSON SchemaからZodスキーマを生成
+// 注意: x-fakerなどの拡張プロパティはZodでは無視される
+// JSON Schema の required フィールドは削除済みなので、すべてのフィールドがoptional
+const GeneratedSchema = z.fromJSONSchema(
+  authHookJsonSchema as unknown as Parameters<typeof z.fromJSONSchema>[0]
+) as z.ZodObject<{
+  email_data: z.ZodOptional<z.ZodType>;
+  user: z.ZodOptional<z.ZodType>;
+}>;
+
+// 生成されたスキーマから email_data を抽出
+const EmailDataSchema = GeneratedSchema.shape.email_data;
+
+// 生成されたスキーマの型定義
+interface GeneratedEmailData {
+  email_action_type?: string;
+  factor_type?: string;
+  old_email?: string;
+  old_phone?: string;
+  provider?: string;
+  redirect_to?: string;
+  site_url?: string;
+  token?: string;
+  token_hash?: string;
+  token_hash_new?: string;
+  token_new?: string;
+  [key: string]: unknown;
+}
+
+interface GeneratedUser {
+  app_metadata?: {
+    language?: string;
+    provider?: string;
+    providers?: string[];
+    [key: string]: unknown;
+  };
+  aud?: string;
+  created_at?: string;
+  email?: string;
+  id?: string;
+  identities?: Array<{
+    [key: string]: unknown;
+  }>;
+  is_anonymous?: boolean;
+  phone?: string;
+  role?: string;
+  updated_at?: string;
+  user_metadata?: {
+    language?: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+// 生成されたスキーマから user を抽出
+// アプリ固有の language フィールドはpassthroughで許容されるため、
+// 生成されたスキーマをそのまま使用
+const UserSchema = GeneratedSchema.shape.user;
 
 // レガシーペイロード構造（emailフィールド）
 const LegacyEmailSchema = z.object({
@@ -34,21 +83,6 @@ const LegacyEmailSchema = z.object({
   invite_token_hash: z.string().optional(),
   recovery_token: z.string().optional(),
   recovery_token_hash: z.string().optional(),
-});
-
-// ユーザーメタデータ
-const UserSchema = z.object({
-  app_metadata: z
-    .object({
-      language: z.string().optional(),
-    })
-    .optional(),
-  email: z.string().email().optional(),
-  user_metadata: z
-    .object({
-      language: z.string().optional(),
-    })
-    .optional(),
 });
 
 // Auth Hookペイロード（両形式を受け入れる）
@@ -84,7 +118,7 @@ export type NormalizedEmail = z.infer<typeof NormalizedEmailSchema>;
 export const NormalizedPayloadSchema = z.object({
   email: NormalizedEmailSchema,
   siteUrlOverride: z.string().url().optional(),
-  user: UserSchema.optional(),
+  user: z.custom<GeneratedUser>().optional(),
 });
 
 export type NormalizedPayload = z.infer<typeof NormalizedPayloadSchema>;
@@ -107,7 +141,10 @@ export function normalizeAuthHookPayload(
 
   // 新しい形式（email_dataが存在）の場合、それを使用
   if (email_data) {
-    return normalizeNewPayload(email_data, user);
+    return normalizeNewPayload(
+      email_data as GeneratedEmailData,
+      user as GeneratedUser
+    );
   }
 
   // レガシー形式（emailフィールドが存在）
@@ -127,8 +164,8 @@ export function normalizeAuthHookPayload(
  * 新しいペイロード形式（email_data）を正規化
  */
 function normalizeNewPayload(
-  emailData: Exclude<z.infer<typeof EmailDataSchema>, undefined>,
-  user: z.infer<typeof UserSchema> | undefined
+  emailData: GeneratedEmailData,
+  user: GeneratedUser | undefined
 ): NormalizedPayload | null {
   const siteUrlOverride = normalizeSiteUrl(
     emailData.redirect_to || emailData.site_url
@@ -148,7 +185,7 @@ function normalizeNewPayload(
  * 生のメールデータから正規化されたメールオブジェクトを構築
  */
 function buildNormalizedEmail(
-  emailData: Exclude<z.infer<typeof EmailDataSchema>, undefined>,
+  emailData: GeneratedEmailData,
   action: string
 ): z.infer<typeof NormalizedEmailSchema> {
   return {

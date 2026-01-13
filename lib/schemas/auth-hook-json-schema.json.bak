@@ -1,0 +1,267 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Supabase Auth Hook Send Email payload schema",
+  "properties": {
+    "email_data": {
+      "properties": {
+        "email_action_type": {
+          "enum": [
+            "signup",
+            "invite",
+            "magiclink",
+            "recovery",
+            "email_change",
+            "email",
+            "reauthentication",
+            "password_changed_notification",
+            "email_changed_notification",
+            "phone_changed_notification",
+            "identity_linked_notification",
+            "identity_unlinked_notification",
+            "mfa_factor_enrolled_notification",
+            "mfa_factor_unenrolled_notification"
+          ],
+          "type": "string",
+          "x-faker": "random.arrayElement"
+        },
+        "factor_type": {
+          "enum": ["totp"],
+          "type": "string"
+        },
+        "old_email": {
+          "type": "string",
+          "x-faker": "internet.email"
+        },
+        "old_phone": {
+          "type": "string",
+          "x-faker": {
+            "fake": "{{phone.phoneNumber('+1##########')}}"
+          }
+        },
+        "provider": {
+          "enum": ["email"],
+          "type": "string"
+        },
+        "redirect_to": {
+          "type": "string",
+          "x-faker": "internet.url"
+        },
+        "site_url": {
+          "type": "string",
+          "x-faker": "internet.url"
+        },
+        "token": {
+          "pattern": "^[0-9]{6}$",
+          "type": "string",
+          "x-faker": {
+            "fake": "{{helpers.replaceSymbols('######')}}"
+          }
+        },
+        "token_hash": {
+          "maxLength": 30,
+          "minLength": 16,
+          "type": "string",
+          "x-faker": {
+            "fake": "{{random.alphaNumeric(30)}}"
+          }
+        },
+        "token_hash_new": {
+          "maxLength": 30,
+          "minLength": 16,
+          "type": "string",
+          "x-faker": {
+            "fake": "{{random.alphaNumeric(30)}}"
+          }
+        },
+        "token_new": {
+          "maxLength": 30,
+          "minLength": 16,
+          "type": "string",
+          "x-faker": {
+            "fake": "{{random.alphaNumeric(30)}}"
+          }
+        }
+      },
+      "required": [
+        "token",
+        "token_hash",
+        "redirect_to",
+        "email_action_type",
+        "site_url",
+        "token_new",
+        "token_hash_new"
+      ],
+      "type": "object"
+    },
+    "user": {
+      "properties": {
+        "app_metadata": {
+          "properties": {
+            "provider": {
+              "enum": ["email"],
+              "type": "string"
+            },
+            "providers": {
+              "items": {
+                "enum": ["email"],
+                "type": "string"
+              },
+              "maxItems": 1,
+              "minItems": 1,
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "aud": {
+          "enum": ["authenticated"],
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "type": "string",
+          "x-faker": "date.recent"
+        },
+        "email": {
+          "type": "string",
+          "x-faker": "internet.email"
+        },
+        "id": {
+          "type": "string",
+          "x-faker": "random.uuid"
+        },
+        "identities": {
+          "items": {
+            "properties": {
+              "created_at": {
+                "format": "date-time",
+                "type": "string",
+                "x-faker": "date.recent"
+              },
+              "email": {
+                "type": "string",
+                "x-faker": "internet.email"
+              },
+              "id": {
+                "type": "string",
+                "x-faker": "random.uuid"
+              },
+              "identity_data": {
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "x-faker": "internet.email"
+                  },
+                  "email_verified": {
+                    "type": "boolean",
+                    "x-faker": "random.boolean"
+                  },
+                  "phone_verified": {
+                    "type": "boolean",
+                    "x-faker": "random.boolean"
+                  },
+                  "sub": {
+                    "type": "string",
+                    "x-faker": "random.uuid"
+                  }
+                },
+                "type": "object"
+              },
+              "identity_id": {
+                "type": "string",
+                "x-faker": "random.uuid"
+              },
+              "last_sign_in_at": {
+                "format": "date-time",
+                "type": "string",
+                "x-faker": "date.recent"
+              },
+              "provider": {
+                "enum": ["email"],
+                "type": "string"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "type": "string",
+                "x-faker": "date.recent"
+              },
+              "user_id": {
+                "type": "string",
+                "x-faker": "random.uuid"
+              }
+            },
+            "required": [
+              "identity_id",
+              "id",
+              "user_id",
+              "identity_data",
+              "provider",
+              "last_sign_in_at",
+              "created_at",
+              "updated_at",
+              "email"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "is_anonymous": {
+          "type": "boolean",
+          "x-faker": "random.boolean"
+        },
+        "phone": {
+          "type": "string",
+          "x-faker": {
+            "fake": "{{phone.phoneNumber('+1##########')}}"
+          }
+        },
+        "role": {
+          "enum": ["anon", "authenticated"],
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "type": "string",
+          "x-faker": "date.recent"
+        },
+        "user_metadata": {
+          "properties": {
+            "email": {
+              "type": "string",
+              "x-faker": "internet.email"
+            },
+            "email_verified": {
+              "type": "boolean",
+              "x-faker": "random.boolean"
+            },
+            "phone_verified": {
+              "type": "boolean",
+              "x-faker": "random.boolean"
+            },
+            "sub": {
+              "type": "string",
+              "x-faker": "random.uuid"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "aud",
+        "role",
+        "email",
+        "phone",
+        "app_metadata",
+        "user_metadata",
+        "identities",
+        "created_at",
+        "updated_at",
+        "is_anonymous"
+      ],
+      "type": "object"
+    }
+  },
+  "required": ["user", "email_data"],
+  "type": "object"
+}

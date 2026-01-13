@@ -1,0 +1,216 @@
+import { describe, expect, it } from "vitest";
+import { AuthHookPayloadSchema } from "@/lib/schemas/auth-hook";
+
+describe("Auth Hook Schema", () => {
+  describe("AuthHookPayloadSchema", () => {
+    it("新しい形式（email_data）のペイロードを検証する", () => {
+      const payload = {
+        email_data: {
+          email_action_type: "signup",
+          redirect_to: "https://example.com",
+          site_url: "https://example.com",
+          token: "123456",
+          token_hash: "hash123456789012345678901234",
+          token_hash_new: "newhash12345678901234567890",
+          token_new: "newtoken12345678901234567890",
+        },
+        user: {
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
+          email: "user@example.com",
+          id: "user-id",
+          is_anonymous: false,
+          phone: "+1234567890",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
+        },
+      };
+
+      const result = AuthHookPayloadSchema.safeParse(payload);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect((result.data.email_data as any)?.email_action_type).toBe(
+          "signup"
+        );
+        expect((result.data.user as any)?.email).toBe("user@example.com");
+      }
+    });
+
+    it("レガシー形式（email）のペイロードを検証する", () => {
+      const payload = {
+        email: {
+          confirmation_hash: "hash123",
+          confirmation_token: "token123",
+          email_action_type: "confirmation",
+        },
+        user: {
+          email: "user@example.com",
+        },
+      };
+
+      const result = AuthHookPayloadSchema.safeParse(payload);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect((result.data.email as any)?.email_action_type).toBe(
+          "confirmation"
+        );
+        expect((result.data.user as any)?.email).toBe("user@example.com");
+      }
+    });
+
+    it("email_action_typeのenumバリデーションが機能する", () => {
+      const validTypes = [
+        "signup",
+        "invite",
+        "magiclink",
+        "recovery",
+        "email_change",
+        "email",
+        "reauthentication",
+        "password_changed_notification",
+        "email_changed_notification",
+        "phone_changed_notification",
+        "identity_linked_notification",
+        "identity_unlinked_notification",
+        "mfa_factor_enrolled_notification",
+        "mfa_factor_unenrolled_notification",
+      ];
+
+      for (const type of validTypes) {
+        const payload = {
+          email_data: {
+            email_action_type: type,
+          },
+        };
+
+        const result = AuthHookPayloadSchema.safeParse(payload);
+        expect(result.success).toBe(true);
+      }
+    });
+
+    it("無効なemail_action_typeを拒否する", () => {
+      const payload = {
+        email_data: {
+          email_action_type: "invalid_type",
+        },
+      };
+
+      const result = AuthHookPayloadSchema.safeParse(payload);
+
+      expect(result.success).toBe(false);
+    });
+
+    it("部分的なペイロード（一部のフィールドのみ）を受け入れる", () => {
+      const payload = {
+        email_data: {
+          email_action_type: "recovery",
+          token: "token123",
+        },
+        user: {
+          email: "user@example.com",
+        },
+      };
+
+      const result = AuthHookPayloadSchema.safeParse(payload);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect((result.data.email_data as any)?.token).toBe("token123");
+        expect((result.data.email_data as any)?.token_hash).toBeUndefined();
+      }
+    });
+
+    it("user.app_metadataのカスタムlanguageフィールドを受け入れる", () => {
+      const payload = {
+        email_data: {
+          email_action_type: "signup",
+        },
+        user: {
+          app_metadata: {
+            language: "ja",
+            provider: "email",
+          },
+          email: "user@example.com",
+        },
+      };
+
+      const result = AuthHookPayloadSchema.safeParse(payload);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect((result.data.user as any)?.app_metadata?.language).toBe("ja");
+      }
+    });
+
+    it("user.user_metadataのカスタムlanguageフィールドを受け入れる", () => {
+      const payload = {
+        email_data: {
+          email_action_type: "signup",
+        },
+        user: {
+          email: "user@example.com",
+          user_metadata: {
+            email: "user@example.com",
+            language: "en",
+          },
+        },
+      };
+
+      const result = AuthHookPayloadSchema.safeParse(payload);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect((result.data.user as any)?.user_metadata?.language).toBe("en");
+      }
+    });
+
+    it("空のペイロードでも検証が成功する（すべてoptional）", () => {
+      const payload = {};
+
+      const result = AuthHookPayloadSchema.safeParse(payload);
+
+      expect(result.success).toBe(true);
+    });
+
+    it("identitiesフィールドを含む完全なuserオブジェクトを受け入れる", () => {
+      const payload = {
+        email_data: {
+          email_action_type: "signup",
+        },
+        user: {
+          email: "user@example.com",
+          id: "user-id",
+          identities: [
+            {
+              created_at: "2024-01-01T00:00:00Z",
+              email: "user@example.com",
+              id: "identity-id",
+              identity_data: {
+                email: "user@example.com",
+                email_verified: true,
+                sub: "user-id",
+              },
+              identity_id: "identity-id",
+              last_sign_in_at: "2024-01-01T00:00:00Z",
+              provider: "email",
+              updated_at: "2024-01-01T00:00:00Z",
+              user_id: "user-id",
+            },
+          ],
+        },
+      };
+
+      const result = AuthHookPayloadSchema.safeParse(payload);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect((result.data.user as any)?.identities).toHaveLength(1);
+        expect((result.data.user as any)?.identities?.[0]?.provider).toBe(
+          "email"
+        );
+      }
+    });
+  });
+});
