@@ -223,8 +223,8 @@ importers:
         specifier: 0.34.5
         version: 0.34.5
       supabase:
-        specifier: 2.72.2
-        version: 2.72.2
+        specifier: 2.72.3
+        version: 2.72.3
       tailwindcss:
         specifier: 4.1.18
         version: 4.1.18
@@ -4185,8 +4185,8 @@ packages:
       babel-plugin-macros:
         optional: true
 
-  supabase@2.72.2:
-    resolution: {integrity: sha512-vnLeNqLGJnuqs4XkE1dYCGF6dSiRV4/BGExUEexUnyEhiR9+VDvTVt1/LM45hFbG4WF2hiVgePu5JDuwcpY8Tg==}
+  supabase@2.72.3:
+    resolution: {integrity: sha512-c0vpDmMFS/A5XyBFJzQqil/GSldFOj5dzzeBwtDo7pKTp/M9i4cajq/I7GgJXAzXNNTjzuXmmdL8EXrACSIJaw==}
     engines: {npm: '>=8'}
     hasBin: true
 
@@ -8967,7 +8967,7 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.28.5
 
-  supabase@2.72.2:
+  supabase@2.72.3:
     dependencies:
       bin-links: 6.0.0
       https-proxy-agent: 7.0.6
