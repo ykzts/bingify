@@ -470,10 +470,23 @@ const main = async () => {
   }
 };
 
-main().catch((error) => {
-  console.error(
-    "\n❌ エラーが発生しました:",
-    error instanceof Error ? error.message : String(error)
-  );
-  process.exit(1);
-});
+// Export functions for testing
+export {
+  LINE_SPLIT_REGEX,
+  QUOTED_VALUE_REGEX,
+  generateEnvFile,
+  parseEnvTemplate,
+  validateRequired,
+  wrapWithTemplateQuotes,
+};
+
+// Run main only if this file is executed directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error(
+      "\n❌ エラーが発生しました:",
+      error instanceof Error ? error.message : String(error)
+    );
+    process.exit(1);
+  });
+}

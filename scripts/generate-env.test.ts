@@ -2,63 +2,14 @@ import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import {
+  generateEnvFile,
+  parseEnvTemplate,
+  validateRequired,
+} from "./generate-env.js";
 
 const TEST_ENV_FILE = path.join(process.cwd(), ".env.test");
 const TEST_TEMPLATE_FILE = path.join(process.cwd(), ".env.example.test");
-const LINE_SPLIT_REGEX = /\r?\n/;
-
-// テスト用のヘルパー関数
-const parseEnvTemplate = (content: string): Record<string, string> => {
-  const values: Record<string, string> = {};
-
-  for (const line of content.split(LINE_SPLIT_REGEX)) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) {
-      continue;
-    }
-
-    const eqIndex = line.indexOf("=");
-    if (eqIndex === -1) {
-      continue;
-    }
-
-    const key = line.slice(0, eqIndex).trim();
-    const value = line.slice(eqIndex + 1).trim();
-    values[key] = value;
-  }
-
-  return values;
-};
-
-const generateEnvFile = (
-  templateContent: string,
-  values: Record<string, string>
-): string => {
-  const templateLines = templateContent.split(LINE_SPLIT_REGEX);
-
-  const renderedLines = templateLines.map((line) => {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) {
-      return line;
-    }
-
-    const eqIndex = line.indexOf("=");
-    if (eqIndex === -1) {
-      return line;
-    }
-
-    const key = line.slice(0, eqIndex).trim();
-
-    if (Object.hasOwn(values, key)) {
-      return `${key}=${values[key]}`;
-    }
-
-    return line;
-  });
-
-  const newContent = renderedLines.join("\n");
-  return newContent.endsWith("\n") ? newContent : `${newContent}\n`;
-};
 
 describe("generate-env スクリプト", () => {
   beforeEach(() => {
@@ -261,47 +212,25 @@ NORMAL_VAR=value
   });
 
   it("必須項目のバリデーションを行う", () => {
-    const requiredVars = [
-      "NEXT_PUBLIC_SUPABASE_URL",
-      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-      "SUPABASE_SERVICE_ROLE_KEY",
-    ];
-
     const incompleteValues: Record<string, string> = {
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "test-key",
       NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
     };
 
-    const missing: string[] = [];
-    for (const key of requiredVars) {
-      if (!incompleteValues[key] || incompleteValues[key].trim() === "") {
-        missing.push(key);
-      }
-    }
+    const missing = validateRequired(incompleteValues);
 
     expect(missing).toContain("SUPABASE_SERVICE_ROLE_KEY");
     expect(missing).toHaveLength(1);
   });
 
   it("完全な値セットでバリデーションが成功する", () => {
-    const requiredVars = [
-      "NEXT_PUBLIC_SUPABASE_URL",
-      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-      "SUPABASE_SERVICE_ROLE_KEY",
-    ];
-
     const completeValues: Record<string, string> = {
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "test-key",
       NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
       SUPABASE_SERVICE_ROLE_KEY: "test-service-role-key",
     };
 
-    const missing: string[] = [];
-    for (const key of requiredVars) {
-      if (!completeValues[key] || completeValues[key].trim() === "") {
-        missing.push(key);
-      }
-    }
+    const missing = validateRequired(completeValues);
 
     expect(missing).toHaveLength(0);
   });
