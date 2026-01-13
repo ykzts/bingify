@@ -75,15 +75,6 @@ function EmailLoginForm({
             disabled={isEmailSending}
             id="email"
             onChange={(e) => onEmailChange(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !isEmailSending) {
-                e.preventDefault();
-                const form = e.currentTarget.form;
-                if (form) {
-                  form.requestSubmit();
-                }
-              }
-            }}
             placeholder={t("emailInputPlaceholder")}
             type="email"
             value={email}
