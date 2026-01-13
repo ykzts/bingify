@@ -4,6 +4,7 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
+import { getLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { createNotification } from "@/lib/utils/create-notification";
 import { isValidUUID } from "@/lib/utils/uuid";
@@ -219,11 +220,21 @@ export async function inviteAdminAction(
       const spaceTitle = spaceData.title || spaceData.share_key;
       const linkUrl = `/dashboard/spaces/${spaceId}`;
 
+      // Get locale and translations for notification
+      const locale = await getLocale();
+      const t = await getTranslations({ locale, namespace: "Notifications" });
+
+      // Get localized notification messages
+      const localizedTitle = t("spaceInvitationTitle", {
+        spaceName: spaceTitle,
+      });
+      const localizedContent = t("spaceInvitationContent");
+
       const notificationResult = await createNotification(
         targetUser.id,
         "space_invitation",
-        `スペース「${spaceTitle}」への招待`,
-        "あなたはスペースの管理者として招待されました",
+        localizedTitle,
+        localizedContent,
         linkUrl,
         {
           space_id: spaceId,
