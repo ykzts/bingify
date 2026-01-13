@@ -322,6 +322,34 @@
     "statusReach": "リーチ",
     "viewCardButton": "カードを見る"
   },
+  "Announcements": {
+    "content": {
+      "placeholder": "お知らせの内容を入力してください...",
+      "title": "内容"
+    },
+    "createAnnouncement": "お知らせを作成",
+    "createError": "お知らせの作成に失敗しました",
+    "createSuccess": "お知らせを作成しました",
+    "deleteAnnouncement": "お知らせを削除",
+    "deleteConfirm": "このお知らせを削除してもよろしいですか？この操作は取り消せません。",
+    "deleteError": "お知らせの削除に失敗しました",
+    "deleteSuccess": "お知らせを削除しました",
+    "dismissButton": "非表示",
+    "dismissible": "非表示可能",
+    "editAnnouncement": "お知らせを編集",
+    "endsAt": "終了日時",
+    "preview": "プレビュー",
+    "priority": {
+      "error": "重要",
+      "info": "通常",
+      "warning": "警告"
+    },
+    "published": "公開",
+    "startsAt": "開始日時",
+    "title": "お知らせ",
+    "updateError": "お知らせの更新に失敗しました",
+    "updateSuccess": "お知らせを更新しました"
+  },
   "AvatarSettings": {
     "defaultAvatar": "デフォルトアバター",
     "description": "連携したアカウントから表示するアバターを選択できます。",
@@ -640,6 +668,7 @@
   },
   "Notifications": {
     "allTab": "すべて",
+    "deleteNotification": "通知を削除",
     "emptyAll": "通知はまだありません",
     "emptyAllDescription": "新しい通知が届くとここに表示されます",
     "emptyUnread": "未読の通知はありません",
@@ -648,12 +677,25 @@
     "loadingNotifications": "通知を読み込んでいます...",
     "markAllRead": "すべて既読にする",
     "markAllReadSuccess": "すべての通知を既読にしました",
+    "markAsRead": "既読にする",
     "metaDescription": "通知を表示・管理",
     "metaTitle": "通知",
     "next": "次へ",
+    "noNotifications": "通知はありません",
     "previous": "前へ",
     "title": "通知",
-    "unreadTab": "未読"
+    "types": {
+      "announcementCreated": "お知らせが作成されました",
+      "announcementDeleted": "お知らせが削除されました",
+      "announcementUpdated": "お知らせが更新されました",
+      "spaceAnnouncement": "スペースのお知らせ",
+      "spaceClosed": "スペースが終了しました",
+      "spaceInvite": "スペースへの招待",
+      "systemNotification": "システム通知"
+    },
+    "unreadCount": "{count}件の未読",
+    "unreadTab": "未読",
+    "viewAll": "すべて見る"
   },
   "OAuth": {
     "errorInsufficientPermissions": "OAuth権限が不足しています。必要な権限でアカウントを再接続してください。",
@@ -751,6 +793,14 @@
     "pinned": "ピン留め",
     "processing": "処理中...",
     "title": "お知らせ"
+  },
+  "SpaceAnnouncements": {
+    "createAnnouncement": "お知らせを作成",
+    "editAnnouncement": "お知らせを編集",
+    "managementButton": "お知らせを管理",
+    "noAnnouncements": "お知らせはありません",
+    "pinned": "ピン留め",
+    "title": "スペースのお知らせ"
   },
   "SpaceLanding": {
     "emailRequirement": "メールアドレス要件",

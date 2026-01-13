@@ -322,6 +322,34 @@
     "statusReach": "REACH",
     "viewCardButton": "View Card"
   },
+  "Announcements": {
+    "content": {
+      "placeholder": "Enter announcement content...",
+      "title": "Content"
+    },
+    "createAnnouncement": "Create announcement",
+    "createError": "Failed to create announcement",
+    "createSuccess": "Announcement created successfully",
+    "deleteAnnouncement": "Delete announcement",
+    "deleteConfirm": "Are you sure you want to delete this announcement? This action cannot be undone.",
+    "deleteError": "Failed to delete announcement",
+    "deleteSuccess": "Announcement deleted successfully",
+    "dismissButton": "Dismiss",
+    "dismissible": "Dismissible",
+    "editAnnouncement": "Edit announcement",
+    "endsAt": "End date/time",
+    "preview": "Preview",
+    "priority": {
+      "error": "Critical",
+      "info": "Info",
+      "warning": "Important"
+    },
+    "published": "Published",
+    "startsAt": "Start date/time",
+    "title": "Announcements",
+    "updateError": "Failed to update announcement",
+    "updateSuccess": "Announcement updated successfully"
+  },
   "AvatarSettings": {
     "defaultAvatar": "Default Avatar",
     "description": "Select which avatar to display from your linked accounts.",
@@ -640,6 +668,7 @@
   },
   "Notifications": {
     "allTab": "All",
+    "deleteNotification": "Delete notification",
     "emptyAll": "No notifications yet",
     "emptyAllDescription": "New notifications will appear here",
     "emptyUnread": "No unread notifications",
@@ -648,12 +677,25 @@
     "loadingNotifications": "Loading notifications...",
     "markAllRead": "Mark all as read",
     "markAllReadSuccess": "All notifications marked as read",
+    "markAsRead": "Mark as read",
     "metaDescription": "View and manage your notifications",
     "metaTitle": "Notifications",
     "next": "Next",
+    "noNotifications": "No notifications",
     "previous": "Previous",
     "title": "Notifications",
-    "unreadTab": "Unread"
+    "types": {
+      "announcementCreated": "Announcement created",
+      "announcementDeleted": "Announcement deleted",
+      "announcementUpdated": "Announcement updated",
+      "spaceAnnouncement": "Space announcement",
+      "spaceClosed": "Space closed",
+      "spaceInvite": "Space invitation",
+      "systemNotification": "System notification"
+    },
+    "unreadCount": "{count} unread",
+    "unreadTab": "Unread",
+    "viewAll": "View all"
   },
   "OAuth": {
     "errorInsufficientPermissions": "Insufficient OAuth permissions. Please reconnect your account with the required permissions.",
@@ -751,6 +793,14 @@
     "pinned": "Pinned",
     "processing": "Processing...",
     "title": "Announcements"
+  },
+  "SpaceAnnouncements": {
+    "createAnnouncement": "Create announcement",
+    "editAnnouncement": "Edit announcement",
+    "managementButton": "Manage announcements",
+    "noAnnouncements": "No announcements",
+    "pinned": "Pinned",
+    "title": "Space announcements"
   },
   "SpaceLanding": {
     "emailRequirement": "Email Requirement",
