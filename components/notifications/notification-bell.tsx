@@ -2,15 +2,16 @@
 
 import { Bell } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuPortal,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUnreadCount } from "@/hooks/use-unread-count";
+import { NotificationDropdown } from "./notification-dropdown";
 
 /**
  * 通知ベルアイコンコンポーネント
@@ -19,9 +20,10 @@ import { useUnreadCount } from "@/hooks/use-unread-count";
 export function NotificationBell() {
   const t = useTranslations("NotificationBell");
   const { count } = useUnreadCount();
+  const [open, setOpen] = useState(false);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={setOpen} open={open}>
       <DropdownMenuTrigger asChild>
         <Button
           aria-label={t("notifications")}
@@ -43,11 +45,7 @@ export function NotificationBell() {
       </DropdownMenuTrigger>
 
       <DropdownMenuPortal>
-        <DropdownMenuContent align="end" className="z-[100] w-80">
-          <div className="p-4 text-center text-muted-foreground text-sm">
-            {t("comingSoon")}
-          </div>
-        </DropdownMenuContent>
+        <NotificationDropdown onOpenChange={setOpen} />
       </DropdownMenuPortal>
     </DropdownMenu>
   );

@@ -585,8 +585,11 @@
     "title": "ページが見つかりません"
   },
   "NotificationBell": {
-    "comingSoon": "通知リストは近日公開予定です",
     "notifications": "通知"
+  },
+  "NotificationDropdown": {
+    "empty": "通知はありません",
+    "viewAll": "すべて見る"
   },
   "Notifications": {
     "allTab": "すべて",
