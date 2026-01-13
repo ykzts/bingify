@@ -88,31 +88,33 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
 
   return (
     <>
-      {/* ナビゲーションリンク */}
-      <nav className="flex items-center gap-2">
-        <Link
-          aria-current={isActivePath("/dashboard") ? "page" : undefined}
-          className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
-          href="/dashboard"
-        >
-          <LayoutDashboard className="h-4 w-4" />
-          <span className="sr-only sm:not-sr-only">{t("dashboard")}</span>
-        </Link>
-
-        {user.role === "admin" && (
+      {/* ナビゲーションリンクと通知 */}
+      <div className="flex items-center gap-2">
+        <nav className="flex items-center gap-2">
           <Link
-            aria-current={isActivePath("/admin") ? "page" : undefined}
+            aria-current={isActivePath("/dashboard") ? "page" : undefined}
             className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
-            href="/admin"
+            href="/dashboard"
           >
-            <Shield className="h-4 w-4" />
-            <span className="sr-only sm:not-sr-only">{t("admin")}</span>
+            <LayoutDashboard className="h-4 w-4" />
+            <span className="sr-only sm:not-sr-only">{t("dashboard")}</span>
           </Link>
-        )}
-      </nav>
 
-      {/* 通知ベル */}
-      <NotificationBell />
+          {user.role === "admin" && (
+            <Link
+              aria-current={isActivePath("/admin") ? "page" : undefined}
+              className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
+              href="/admin"
+            >
+              <Shield className="h-4 w-4" />
+              <span className="sr-only sm:not-sr-only">{t("admin")}</span>
+            </Link>
+          )}
+        </nav>
+
+        {/* 通知ベル */}
+        <NotificationBell />
+      </div>
 
       {/* ユーザーメニュー */}
       <DropdownMenu onOpenChange={setOpen} open={open}>
