@@ -64,6 +64,8 @@ const UserSchema = z
         provider: z.enum(["email"]).optional(),
         providers: z.array(z.enum(["email"])).optional(),
       })
+      // passthroughを使用してSupabaseが将来追加する可能性のあるフィールドを許容
+      // アプリ固有のカスタムフィールドも保存可能
       .passthrough()
       .optional(),
     aud: z.enum(["authenticated"]).optional(),
@@ -107,9 +109,11 @@ const UserSchema = z
         phone_verified: z.boolean().optional(),
         sub: z.string().optional(),
       })
+      // passthroughを使用してアプリ固有のカスタムメタデータを許容
       .passthrough()
       .optional(),
   })
+  // passthroughを使用してSupabaseが追加する可能性のある新しいフィールドを許容
   .passthrough();
 
 // レガシーペイロード構造（emailフィールド）
