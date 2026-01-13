@@ -88,99 +88,100 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
 
   return (
     <>
-      {/* ナビゲーションリンクと通知 */}
-      <div className="flex items-center gap-2">
-        <nav className="flex items-center gap-2">
+      {/* ナビゲーションリンク */}
+      <nav className="flex items-center gap-2">
+        <Link
+          aria-current={isActivePath("/dashboard") ? "page" : undefined}
+          className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
+          href="/dashboard"
+        >
+          <LayoutDashboard className="h-4 w-4" />
+          <span className="sr-only sm:not-sr-only">{t("dashboard")}</span>
+        </Link>
+
+        {user.role === "admin" && (
           <Link
-            aria-current={isActivePath("/dashboard") ? "page" : undefined}
+            aria-current={isActivePath("/admin") ? "page" : undefined}
             className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
-            href="/dashboard"
+            href="/admin"
           >
-            <LayoutDashboard className="h-4 w-4" />
-            <span className="sr-only sm:not-sr-only">{t("dashboard")}</span>
+            <Shield className="h-4 w-4" />
+            <span className="sr-only sm:not-sr-only">{t("admin")}</span>
           </Link>
+        )}
+      </nav>
 
-          {user.role === "admin" && (
-            <Link
-              aria-current={isActivePath("/admin") ? "page" : undefined}
-              className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
-              href="/admin"
-            >
-              <Shield className="h-4 w-4" />
-              <span className="sr-only sm:not-sr-only">{t("admin")}</span>
-            </Link>
-          )}
-        </nav>
-
+      {/* 通知ベルとユーザーメニュー */}
+      <div className="flex items-center gap-2">
         {/* 通知ベル */}
         <NotificationBell />
-      </div>
 
-      {/* ユーザーメニュー */}
-      <DropdownMenu onOpenChange={setOpen} open={open}>
-        <DropdownMenuTrigger asChild>
-          <Button
-            aria-label={t("menu")}
-            className="rounded-full"
-            type="button"
-            variant="ghost"
-          >
-            {user.avatar_url ? (
-              <Image
-                alt={user.full_name || user.email || t("userAvatar")}
-                className="rounded-full object-cover"
-                height={32}
-                src={user.avatar_url}
-                width={32}
-              />
-            ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
-                <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-              </div>
-            )}
-          </Button>
-        </DropdownMenuTrigger>
-
-        <DropdownMenuPortal>
-          <DropdownMenuContent
-            align="end"
-            className="z-[100] min-w-[240px]"
-            sideOffset={8}
-          >
-            <div className="px-3 py-2">
-              <p className="font-medium text-sm">
-                {user.full_name || user.email}
-              </p>
-              {user.full_name && user.email && (
-                <p className="text-muted-foreground text-sm">{user.email}</p>
-              )}
-            </div>
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem asChild>
-              <Link
-                className="flex cursor-pointer items-center gap-2"
-                href="/settings/profile"
-              >
-                <Settings className="h-4 w-4" />
-                {t("settings")}
-              </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem
-              className="disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={isLoggingOut}
-              onSelect={handleLogout}
+        {/* ユーザーメニュー */}
+        <DropdownMenu onOpenChange={setOpen} open={open}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              aria-label={t("menu")}
+              className="rounded-full"
+              type="button"
+              variant="ghost"
             >
-              <LogOut className="h-4 w-4" />
-              {t("logout")}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenuPortal>
-      </DropdownMenu>
+              {user.avatar_url ? (
+                <Image
+                  alt={user.full_name || user.email || t("userAvatar")}
+                  className="rounded-full object-cover"
+                  height={32}
+                  src={user.avatar_url}
+                  width={32}
+                />
+              ) : (
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                  <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                </div>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuPortal>
+            <DropdownMenuContent
+              align="end"
+              className="z-[100] min-w-[240px]"
+              sideOffset={8}
+            >
+              <div className="px-3 py-2">
+                <p className="font-medium text-sm">
+                  {user.full_name || user.email}
+                </p>
+                {user.full_name && user.email && (
+                  <p className="text-muted-foreground text-sm">{user.email}</p>
+                )}
+              </div>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem asChild>
+                <Link
+                  className="flex cursor-pointer items-center gap-2"
+                  href="/settings/profile"
+                >
+                  <Settings className="h-4 w-4" />
+                  {t("settings")}
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                className="disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={isLoggingOut}
+                onSelect={handleLogout}
+              >
+                <LogOut className="h-4 w-4" />
+                {t("logout")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
+        </DropdownMenu>
+      </div>
     </>
   );
 }

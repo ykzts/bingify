@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuPortal,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUnreadCount } from "@/hooks/use-unread-count";
@@ -29,7 +30,7 @@ export function NotificationBell() {
           type="button"
           variant="outline"
         >
-          <Bell className="h-4 w-4" />
+          <Bell className="size-4" />
           {count > 0 && (
             <Badge
               className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
@@ -40,11 +41,14 @@ export function NotificationBell() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="z-[100] w-80">
-        <div className="p-4 text-center text-muted-foreground text-sm">
-          {t("comingSoon")}
-        </div>
-      </DropdownMenuContent>
+
+      <DropdownMenuPortal>
+        <DropdownMenuContent align="end" className="z-[100] w-80">
+          <div className="p-4 text-center text-muted-foreground text-sm">
+            {t("comingSoon")}
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenuPortal>
     </DropdownMenu>
   );
 }
