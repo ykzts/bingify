@@ -6,6 +6,8 @@ import {
   getTranslations,
   setRequestLocale,
 } from "next-intl/server";
+import { Suspense } from "react";
+import { AnnouncementBanner } from "@/components/announcements/announcement-banner";
 import { ConfirmProvider } from "@/components/providers/confirm-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -58,6 +60,9 @@ export default async function LocaleLayout({
             <ConfirmProvider>
               <div className="flex min-h-screen flex-col">
                 <PreReleaseBanner />
+                <Suspense fallback={null}>
+                  <AnnouncementBanner />
+                </Suspense>
                 <header className="sticky top-0 z-50 border-gray-200 border-b bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/80">
                   <div className="container mx-auto flex h-16 items-center justify-between px-4">
                     <HeaderMenuWrapper />
