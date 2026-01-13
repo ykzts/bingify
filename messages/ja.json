@@ -116,6 +116,8 @@
     "fullName": "名前",
     "metaDescription": "スペース、ユーザー、認証プロバイダー、システム設定を管理",
     "metaTitle": "管理ダッシュボード",
+    "mobileMenuClose": "メニューを閉じる",
+    "mobileMenuOpen": "ナビゲーションメニューを開く",
     "navAnnouncements": "お知らせ",
     "navAuthProviders": "認証プロバイダー",
     "navExpirationArchive": "有効期限とアーカイブ",

@@ -116,6 +116,8 @@
     "fullName": "Name",
     "metaDescription": "Manage spaces, users, authentication providers, and system settings",
     "metaTitle": "Admin Dashboard",
+    "mobileMenuClose": "Close menu",
+    "mobileMenuOpen": "Open navigation menu",
     "navAnnouncements": "Announcements",
     "navAuthProviders": "Authentication Providers",
     "navExpirationArchive": "Expiration & Archive",
