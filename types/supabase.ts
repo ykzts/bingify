@@ -100,15 +100,7 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "announcements_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       bingo_cards: {
         Row: {
@@ -351,38 +343,6 @@ export type Database = {
           },
         ]
       }
-      space_roles: {
-        Row: {
-          created_at: string | null
-          id: string
-          role: string
-          space_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          role?: string
-          space_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          role?: string
-          space_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "space_roles_space_id_fkey"
-            columns: ["space_id"]
-            isOneToOne: false
-            referencedRelation: "spaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       space_announcements: {
         Row: {
           announcement_id: string
@@ -415,6 +375,38 @@ export type Database = {
           },
           {
             foreignKeyName: "space_announcements_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      space_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: string
+          space_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role?: string
+          space_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: string
+          space_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_roles_space_id_fkey"
             columns: ["space_id"]
             isOneToOne: false
             referencedRelation: "spaces"
