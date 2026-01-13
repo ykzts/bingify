@@ -49,7 +49,7 @@ describe("getSpaceAnnouncements", () => {
     });
 
     const result = await getSpaceAnnouncements(
-      "00000000-0000-0000-0000-000000000001"
+      "550e8400-e29b-41d4-a716-446655440001"
     );
 
     expect(result.success).toBe(false);
@@ -83,14 +83,14 @@ describe("getSpaceAnnouncements", () => {
       select: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({
         data: null,
-        error: new Error("Not found"),
+        error: null,
       }),
     };
 
     mockSupabase.from.mockReturnValue(mockSpaceQuery);
 
     const result = await getSpaceAnnouncements(
-      "00000000-0000-0000-0000-000000000001"
+      "550e8400-e29b-41d4-a716-446655440001"
     );
 
     expect(result.success).toBe(false);
@@ -178,9 +178,12 @@ describe("getSpaceAnnouncements", () => {
       order: vi.fn().mockReturnValue(mockOrderChain2),
     };
 
-    const mockAnnouncementQuery = {
+    const mockEqChain = {
       eq: vi.fn().mockReturnValue(mockOrderChain1),
-      select: vi.fn().mockReturnThis(),
+    };
+
+    const mockAnnouncementQuery = {
+      select: vi.fn().mockReturnValue(mockEqChain),
     };
 
     mockSupabase.from.mockImplementation(
@@ -188,7 +191,7 @@ describe("getSpaceAnnouncements", () => {
     );
 
     const result = await getSpaceAnnouncements(
-      "00000000-0000-0000-0000-000000000001"
+      "550e8400-e29b-41d4-a716-446655440001"
     );
 
     expect(result.success).toBe(true);
@@ -264,9 +267,12 @@ describe("getSpaceAnnouncements", () => {
       order: vi.fn().mockReturnValue(mockOrderChain2),
     };
 
-    const mockAnnouncementQuery = {
+    const mockEqChain = {
       eq: vi.fn().mockReturnValue(mockOrderChain1),
-      select: vi.fn().mockReturnThis(),
+    };
+
+    const mockAnnouncementQuery = {
+      select: vi.fn().mockReturnValue(mockEqChain),
     };
 
     mockSupabase.from.mockImplementation(
@@ -274,7 +280,7 @@ describe("getSpaceAnnouncements", () => {
     );
 
     const result = await getSpaceAnnouncements(
-      "00000000-0000-0000-0000-000000000001"
+      "550e8400-e29b-41d4-a716-446655440001"
     );
 
     expect(result.success).toBe(true);
@@ -295,7 +301,7 @@ describe("createSpaceAnnouncement", () => {
     });
 
     const result = await createSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
+      "550e8400-e29b-41d4-a716-446655440001",
       {
         content: "テストお知らせ",
         priority: "info",
@@ -338,7 +344,7 @@ describe("createSpaceAnnouncement", () => {
     );
 
     const result = await createSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
+      "550e8400-e29b-41d4-a716-446655440001",
       {
         content: "テストお知らせ",
         priority: "info",
@@ -404,7 +410,7 @@ describe("createSpaceAnnouncement", () => {
     );
 
     const result = await createSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
+      "550e8400-e29b-41d4-a716-446655440001",
       {
         content: "テストお知らせ",
         pinned: true,
@@ -470,7 +476,7 @@ describe("createSpaceAnnouncement", () => {
     );
 
     const result = await createSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
+      "550e8400-e29b-41d4-a716-446655440001",
       {
         content: "テストお知らせ",
         priority: "info",
@@ -494,8 +500,8 @@ describe("updateSpaceAnnouncement", () => {
     });
 
     const result = await updateSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
-      "00000000-0000-0000-0000-000000000002",
+      "550e8400-e29b-41d4-a716-446655440001",
+      "550e8400-e29b-41d4-a716-446655440002",
       {
         title: "更新されたタイトル",
       }
@@ -536,8 +542,8 @@ describe("updateSpaceAnnouncement", () => {
     );
 
     const result = await updateSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
-      "00000000-0000-0000-0000-000000000002",
+      "550e8400-e29b-41d4-a716-446655440001",
+      "550e8400-e29b-41d4-a716-446655440002",
       {
         title: "更新されたタイトル",
       }
@@ -604,8 +610,8 @@ describe("updateSpaceAnnouncement", () => {
     );
 
     const result = await updateSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
-      "00000000-0000-0000-0000-000000000002",
+      "550e8400-e29b-41d4-a716-446655440001",
+      "550e8400-e29b-41d4-a716-446655440002",
       {
         title: "更新されたタイトル",
       }
@@ -649,10 +655,14 @@ describe("updateSpaceAnnouncement", () => {
       }),
     };
 
-    const mockUpdateQuery = {
+    const mockEqChain2 = {
       eq: vi.fn().mockResolvedValue({
         error: null,
       }),
+    };
+
+    const mockUpdateQuery = {
+      eq: vi.fn().mockReturnValue(mockEqChain2),
       update: vi.fn().mockReturnThis(),
     };
 
@@ -666,8 +676,8 @@ describe("updateSpaceAnnouncement", () => {
     );
 
     const result = await updateSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
-      "00000000-0000-0000-0000-000000000002",
+      "550e8400-e29b-41d4-a716-446655440001",
+      "550e8400-e29b-41d4-a716-446655440002",
       {
         pinned: true,
       }
@@ -689,8 +699,8 @@ describe("deleteSpaceAnnouncement", () => {
     });
 
     const result = await deleteSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
-      "00000000-0000-0000-0000-000000000002"
+      "550e8400-e29b-41d4-a716-446655440001",
+      "550e8400-e29b-41d4-a716-446655440002"
     );
 
     expect(result.success).toBe(false);
@@ -728,8 +738,8 @@ describe("deleteSpaceAnnouncement", () => {
     );
 
     const result = await deleteSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
-      "00000000-0000-0000-0000-000000000002"
+      "550e8400-e29b-41d4-a716-446655440001",
+      "550e8400-e29b-41d4-a716-446655440002"
     );
 
     expect(result.success).toBe(false);
@@ -762,11 +772,15 @@ describe("deleteSpaceAnnouncement", () => {
       select: vi.fn().mockReturnThis(),
     };
 
-    const mockDeleteQuery = {
-      delete: vi.fn().mockReturnThis(),
+    const mockEqChain2 = {
       eq: vi.fn().mockResolvedValue({
         error: null,
       }),
+    };
+
+    const mockDeleteQuery = {
+      delete: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnValue(mockEqChain2),
     };
 
     mockSupabase.from.mockImplementation(
@@ -774,8 +788,8 @@ describe("deleteSpaceAnnouncement", () => {
     );
 
     const result = await deleteSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
-      "00000000-0000-0000-0000-000000000002"
+      "550e8400-e29b-41d4-a716-446655440001",
+      "550e8400-e29b-41d4-a716-446655440002"
     );
 
     expect(result.success).toBe(true);
@@ -794,8 +808,8 @@ describe("togglePinSpaceAnnouncement", () => {
     });
 
     const result = await togglePinSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
-      "00000000-0000-0000-0000-000000000002"
+      "550e8400-e29b-41d4-a716-446655440001",
+      "550e8400-e29b-41d4-a716-446655440002"
     );
 
     expect(result.success).toBe(false);
@@ -833,8 +847,8 @@ describe("togglePinSpaceAnnouncement", () => {
     );
 
     const result = await togglePinSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
-      "00000000-0000-0000-0000-000000000002"
+      "550e8400-e29b-41d4-a716-446655440001",
+      "550e8400-e29b-41d4-a716-446655440002"
     );
 
     expect(result.success).toBe(false);
@@ -876,10 +890,14 @@ describe("togglePinSpaceAnnouncement", () => {
       }),
     };
 
-    const mockUpdateQuery = {
+    const mockEqChain2 = {
       eq: vi.fn().mockResolvedValue({
         error: null,
       }),
+    };
+
+    const mockUpdateQuery = {
+      eq: vi.fn().mockReturnValue(mockEqChain2),
       update: vi.fn().mockReturnThis(),
     };
 
@@ -893,8 +911,8 @@ describe("togglePinSpaceAnnouncement", () => {
     );
 
     const result = await togglePinSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
-      "00000000-0000-0000-0000-000000000002"
+      "550e8400-e29b-41d4-a716-446655440001",
+      "550e8400-e29b-41d4-a716-446655440002"
     );
 
     expect(result.success).toBe(true);
@@ -936,10 +954,14 @@ describe("togglePinSpaceAnnouncement", () => {
       }),
     };
 
-    const mockUpdateQuery = {
+    const mockEqChain2 = {
       eq: vi.fn().mockResolvedValue({
         error: null,
       }),
+    };
+
+    const mockUpdateQuery = {
+      eq: vi.fn().mockReturnValue(mockEqChain2),
       update: vi.fn().mockReturnThis(),
     };
 
@@ -953,8 +975,8 @@ describe("togglePinSpaceAnnouncement", () => {
     );
 
     const result = await togglePinSpaceAnnouncement(
-      "00000000-0000-0000-0000-000000000001",
-      "00000000-0000-0000-0000-000000000002"
+      "550e8400-e29b-41d4-a716-446655440001",
+      "550e8400-e29b-41d4-a716-446655440002"
     );
 
     expect(result.success).toBe(true);
