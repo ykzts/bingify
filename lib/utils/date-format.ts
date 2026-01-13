@@ -100,3 +100,53 @@ export function formatDateSuffix(
 
   return `${year}${month}${day}`;
 }
+
+/**
+ * ロケールに応じた相対時刻フォーマット
+ * 例: "2 minutes ago" (en), "2分前" (ja)
+ */
+export function formatRelativeTime(
+  date: Date | string | number,
+  locale: string
+): string {
+  const dateObj =
+    typeof date === "string" || typeof date === "number"
+      ? new Date(date)
+      : date;
+
+  if (Number.isNaN(dateObj.getTime())) {
+    return "-";
+  }
+
+  const now = new Date();
+  const diffMs = now.getTime() - dateObj.getTime();
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+  const diffWeeks = Math.floor(diffDays / 7);
+  const diffMonths = Math.floor(diffDays / 30);
+  const diffYears = Math.floor(diffDays / 365);
+
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+
+  if (diffSeconds < 60) {
+    return rtf.format(-diffSeconds, "second");
+  }
+  if (diffMinutes < 60) {
+    return rtf.format(-diffMinutes, "minute");
+  }
+  if (diffHours < 24) {
+    return rtf.format(-diffHours, "hour");
+  }
+  if (diffDays < 7) {
+    return rtf.format(-diffDays, "day");
+  }
+  if (diffWeeks < 4) {
+    return rtf.format(-diffWeeks, "week");
+  }
+  if (diffMonths < 12) {
+    return rtf.format(-diffMonths, "month");
+  }
+  return rtf.format(-diffYears, "year");
+}
