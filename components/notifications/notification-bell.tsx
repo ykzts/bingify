@@ -28,7 +28,7 @@ export function NotificationBell() {
           className="relative"
           size="icon"
           type="button"
-          variant="outline"
+          variant="ghost"
         >
           <Bell className="size-4" />
           {count > 0 && (
