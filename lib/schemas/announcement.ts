@@ -50,6 +50,18 @@ export const createSpaceAnnouncementSchema = z.object({
 });
 
 /**
+ * スペースアナウンスメント更新スキーマ
+ */
+export const updateSpaceAnnouncementSchema = z.object({
+  content: announcementContentSchema.optional(),
+  ends_at: z.string().datetime().optional().nullable(),
+  pinned: z.boolean().optional(),
+  priority: announcementPrioritySchema.optional(),
+  starts_at: z.string().datetime().optional().nullable(),
+  title: announcementTitleSchema.optional(),
+});
+
+/**
  * アナウンスメント非表示スキーマ
  */
 export const dismissAnnouncementSchema = z.object({
@@ -60,6 +72,9 @@ export type CreateAnnouncementInput = z.infer<typeof createAnnouncementSchema>;
 export type UpdateAnnouncementInput = z.infer<typeof updateAnnouncementSchema>;
 export type CreateSpaceAnnouncementInput = z.infer<
   typeof createSpaceAnnouncementSchema
+>;
+export type UpdateSpaceAnnouncementInput = z.infer<
+  typeof updateSpaceAnnouncementSchema
 >;
 export type DismissAnnouncementInput = z.infer<
   typeof dismissAnnouncementSchema
