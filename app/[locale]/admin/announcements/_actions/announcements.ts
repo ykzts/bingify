@@ -140,8 +140,14 @@ export async function createAnnouncementAction(
       ...initialFormState,
       meta: { success: true },
     };
-  } catch (error) {
-    console.error("Error in createAnnouncementAction:", error);
+  } catch (e) {
+    // Check if it's a ServerValidateError from TanStack Form
+    if (e && typeof e === "object" && "formState" in e) {
+      return (e as { formState: unknown }).formState;
+    }
+
+    // Some other error occurred
+    console.error("Error in createAnnouncementAction:", e);
     return {
       ...initialFormState,
       errors: ["errorGeneric"],
@@ -216,8 +222,14 @@ export async function updateAnnouncementAction(
       ...initialFormState,
       meta: { success: true },
     };
-  } catch (error) {
-    console.error("Error in updateAnnouncementAction:", error);
+  } catch (e) {
+    // Check if it's a ServerValidateError from TanStack Form
+    if (e && typeof e === "object" && "formState" in e) {
+      return (e as { formState: unknown }).formState;
+    }
+
+    // Some other error occurred
+    console.error("Error in updateAnnouncementAction:", e);
     return {
       ...initialFormState,
       errors: ["errorGeneric"],
