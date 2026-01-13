@@ -1,5 +1,6 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { LoginForm } from "../_components/login-form";
 
 // next-intlのモック
@@ -8,7 +9,8 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => {
     const translations: Record<string, string> = {
       closeEmailForm: "メールフォームを閉じる",
-      description: "ゲームのホストやアカウント管理のためにログインしてください。",
+      description:
+        "ゲームのホストやアカウント管理のためにログインしてください。",
       emailButton: "メールアドレスでログイン",
       emailInputLabel: "メールアドレス",
       emailInputPlaceholder: "your@email.com",
@@ -16,7 +18,8 @@ vi.mock("next-intl", () => ({
       emailSending: "送信中...",
       emailSuccess: "メールを確認してください!ログインリンクを送信しました。",
       errorEmailInvalid: "有効なメールアドレスを入力してください",
-      errorMessage: "ログイン中にエラーが発生しました。もう一度お試しください。",
+      errorMessage:
+        "ログイン中にエラーが発生しました。もう一度お試しください。",
       orDivider: "または",
       title: "Bingifyにログイン",
     };
@@ -32,28 +35,50 @@ vi.mock("next/navigation", () => ({
 }));
 
 // Supabase clientのモック
+const mockSignInWithOtp = vi.fn().mockResolvedValue({ error: null });
 vi.mock("@/lib/supabase/client", () => ({
   createClient: () => ({
     auth: {
       signInWithOAuth: vi.fn(),
-      signInWithOtp: vi.fn().mockResolvedValue({ error: null }),
+      signInWithOtp: mockSignInWithOtp,
     },
   }),
 }));
 
 describe("LoginForm - Enterキー送信", () => {
   it("メールアドレス入力フィールドでEnterキーを押すとフォームが送信される", async () => {
+    mockSignInWithOtp.mockClear();
+
     const mockProviders: never[] = [];
-    const mockSystemSettings = {
-      enableProviderAvatars: false,
-      enableYouTubeLivestream: false,
+    const mockSystemSettings: SystemSettings = {
+      archive_retention_hours: 72,
+      default_user_role: "user",
+      features: {
+        gatekeeper: {
+          email: { enabled: false },
+          twitch: {
+            enabled: false,
+            follower: { enabled: false },
+            subscriber: { enabled: false },
+          },
+          youtube: {
+            enabled: false,
+            subscriber: { enabled: false },
+          },
+        },
+      },
+      max_participants_per_space: 100,
+      max_spaces_per_user: 10,
+      max_total_spaces: 1000,
+      space_expiration_hours: 24,
+      spaces_archive_retention_hours: 168,
     };
 
     render(
       <LoginForm
         providers={mockProviders}
         systemSettings={mockSystemSettings}
-      />,
+      />
     );
 
     // メールアドレス入力フィールドを取得
@@ -65,17 +90,33 @@ describe("LoginForm - Enterキー送信", () => {
       target: { value: "test@example.com" },
     });
 
-    // Enterキーを押下
-    fireEvent.keyDown(emailInput, {
-      key: "Enter",
-      code: "Enter",
-      charCode: 13,
+    // Enterキーを押下してフォームを送信
+    // HTML標準では、input要素でEnterキーを押すとフォームが送信される
+    const form = emailInput.closest("form");
+    if (form) {
+      fireEvent.submit(form);
+    }
+
+    // フォーム送信が実行され、signInWithOtpが呼ばれることを確認
+    await waitFor(() => {
+      expect(mockSignInWithOtp).toHaveBeenCalledWith({
+        email: "test@example.com",
+        options: {
+          data: {
+            language: "ja",
+          },
+          emailRedirectTo: expect.any(String),
+        },
+      });
     });
 
-    // form.requestSubmit()が呼ばれることを確認
-    // この時点でフォーム送信が試行される
-    // 実際のSupabase呼び出しはモックされているため、
-    // フォームの動作が正しいことを確認できれば十分
-    expect(emailInput).toHaveValue("test@example.com");
+    // 成功メッセージが表示されることを確認
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          "メールを確認してください!ログインリンクを送信しました。"
+        )
+      ).toBeInTheDocument();
+    });
   });
 });
