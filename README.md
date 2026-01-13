@@ -35,10 +35,57 @@ pnpm install
 
 ### 2. 環境変数の設定
 
-`.env.local.example` をコピーして、Supabaseの接続情報を設定します。
+環境変数の設定には、以下の3つの方法があります:
+
+#### 方法A: Supabaseから自動取得（推奨）
+
+Supabaseローカルインスタンスから自動的に設定を取得します:
 
 ```bash
-cp .env.local.example .env.local
+# Supabaseを起動
+pnpm supabase:start
+
+# 環境変数を自動生成
+pnpm dev:env
+```
+
+このコマンドは以下を自動実行します:
+- Supabaseインスタンスからキーを取得
+- ランダムなシークレットキーの自動生成
+- 既存の `.env` の値を保持
+
+#### 方法B: 対話形式で設定
+
+対話形式で環境変数を設定できるスクリプトを用意しています:
+
+```bash
+pnpm env:generate
+```
+
+このスクリプトは以下の機能を提供します:
+- 必須項目の対話的な入力
+- ランダムなシークレットキーの自動生成
+- 既存の `.env` がある場合の値の保持
+- 入力値のバリデーション
+
+**非対話モード（CI/CD環境向け）:**
+
+```bash
+pnpm env:generate --non-interactive
+```
+
+**強制上書きモード:**
+
+```bash
+pnpm env:generate --force
+```
+
+#### 方法C: 手動で設定
+
+`.env.example` をコピーして、Supabaseの接続情報を手動で設定します:
+
+```bash
+cp .env.example .env
 ```
 
 ### 3. ローカル開発環境の起動
@@ -125,7 +172,7 @@ docker run -d \
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase の匿名キー
 - `SUPABASE_SERVICE_ROLE_KEY`: Supabase のサービスロールキー
 
-その他のオプション環境変数については、`.env.local.example` を参照してください。
+その他のオプション環境変数については、`.env.example` を参照してください。
 
 ## 主要な機能
 
@@ -236,7 +283,7 @@ pnpm supabase:test
 
 ## 環境変数
 
-ローカル開発時は `.env.local.example` に記載されている値を参照してください。本番環境では Supabase Cloudを使用します。
+ローカル開発時は `.env.example` に記載されている値を参照してください。本番環境では Supabase Cloudを使用します。
 
 ## データベースマイグレーション
 
