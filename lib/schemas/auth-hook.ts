@@ -195,6 +195,7 @@ function normalizeNewPayload(
  * フォールバック処理は、Supabase のバージョンや設定により一部フィールドが
  * 欠けている場合の互換性維持のために実装されています。
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 各認証アクションタイプごとに条件分岐が必要
 function buildNormalizedEmail(
   emailData: GeneratedEmailData,
   action: string

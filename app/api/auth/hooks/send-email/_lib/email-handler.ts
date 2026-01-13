@@ -54,6 +54,7 @@ function resolveSecret(secret: string): string {
 /**
  * Supabaseの認証アクションタイプに基づいて適切なメールを送信
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 認証アクションの種類ごとに分岐が必要なため
 export async function handleEmailAction(
   emailActionType: string,
   email: NormalizedEmail,
@@ -178,8 +179,6 @@ export async function handleEmailAction(
       // - token + token_hash_new → 旧メールアドレス用
 
       const oldEmail = email.change_email_old_new;
-      const hasOldToken =
-        email.change_email_old_token && email.change_email_old_token_hash;
 
       // 新メールアドレスへの確認メール送信
       // メールテンプレートの OTP 表示用にトークンを取得（通常は6桁の数字）
@@ -204,9 +203,12 @@ export async function handleEmailAction(
       });
 
       // 旧メールアドレスへの確認メール送信（double_confirm_changes 有効時）
-      if (oldEmail && hasOldToken) {
-        // hasOldToken が true の場合、これらのフィールドは必ず存在する
-        const oldToken = email.change_email_old_token!;
+      if (
+        oldEmail &&
+        email.change_email_old_token &&
+        email.change_email_old_token_hash
+      ) {
+        const oldToken = email.change_email_old_token;
         const oldConfirmationUrl = buildVerifyUrl({
           token: email.change_email_old_token,
           tokenHash: email.change_email_old_token_hash,
