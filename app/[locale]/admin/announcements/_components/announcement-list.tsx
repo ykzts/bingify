@@ -41,6 +41,7 @@ export function AnnouncementList({
   const [editingAnnouncement, setEditingAnnouncement] =
     useState<Tables<"announcements"> | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [editDialogId, setEditDialogId] = useState<string | null>(null);
 
   const handleDelete = async (announcementId: string) => {
     if (
@@ -70,11 +71,13 @@ export function AnnouncementList({
 
   const handleEdit = (announcement: Tables<"announcements">) => {
     setEditingAnnouncement(announcement);
+    setEditDialogId(announcement.id);
   };
 
   const handleFormSuccess = () => {
     setIsCreateDialogOpen(false);
     setEditingAnnouncement(null);
+    setEditDialogId(null);
     window.location.reload();
   };
 
@@ -189,7 +192,15 @@ export function AnnouncementList({
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex gap-2">
-                      <Dialog>
+                      <Dialog
+                        onOpenChange={(open) => {
+                          if (!open) {
+                            setEditDialogId(null);
+                            setEditingAnnouncement(null);
+                          }
+                        }}
+                        open={editDialogId === announcement.id}
+                      >
                         <DialogTrigger asChild>
                           <Button
                             onClick={() => handleEdit(announcement)}
@@ -200,12 +211,13 @@ export function AnnouncementList({
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
-                          {editingAnnouncement?.id === announcement.id && (
-                            <AnnouncementForm
-                              announcement={editingAnnouncement}
-                              onSuccess={handleFormSuccess}
-                            />
-                          )}
+                          {editDialogId === announcement.id &&
+                            editingAnnouncement?.id === announcement.id && (
+                              <AnnouncementForm
+                                announcement={editingAnnouncement}
+                                onSuccess={handleFormSuccess}
+                              />
+                            )}
                         </DialogContent>
                       </Dialog>
                       <Button
