@@ -6,7 +6,7 @@
 
 ```bash
 pnpm install
-cp .env.local.example .env.local
+cp .env.example .env
 pnpm local:setup
 pnpm dev
 ```

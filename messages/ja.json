@@ -734,13 +734,23 @@
     "announcementTitlePlaceholder": "お知らせのタイトルを入力してください...",
     "announcementUpdateButton": "お知らせを更新",
     "announcementUpdateSuccess": "お知らせを更新しました",
+    "deleteButton": "削除",
+    "deleteConfirm": "このお知らせを削除してもよろしいですか？",
+    "deleteSuccess": "お知らせを削除しました",
     "deleting": "削除中...",
+    "editButton": "編集",
+    "emptyMessage": "お知らせはまだありません",
+    "emptyMessageDescription": "スペースのオーナーまたは管理者がお知らせを作成すると、ここに表示されます。",
     "errorCreateFailed": "お知らせの作成に失敗しました",
     "errorGeneric": "エラーが発生しました",
     "errorInvalidAnnouncementId": "無効なお知らせIDです",
     "errorInvalidSpaceId": "無効なスペースIDです",
     "errorUpdateFailed": "お知らせの更新に失敗しました",
+    "loadingMessage": "お知らせを読み込んでいます...",
+    "manageButton": "お知らせを管理",
+    "pinned": "ピン留め",
     "processing": "処理中..."
+    "title": "お知らせ"
   },
   "SpaceLanding": {
     "emailRequirement": "メールアドレス要件",
