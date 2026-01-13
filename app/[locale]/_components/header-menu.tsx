@@ -57,12 +57,16 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
   };
 
   if (!user) {
+    // トップページからログインする場合はダッシュボードへリダイレクト
+    const loginHref =
+      pathname === "/" ? "/login?redirect=/dashboard" : "/login";
+
     return (
       <>
         <div />
         <Link
           className="rounded-md border border-gray-300 bg-white px-4 py-1.5 font-medium text-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
-          href="/login"
+          href={loginHref}
         >
           {t("login")}
         </Link>
