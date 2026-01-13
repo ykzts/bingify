@@ -340,7 +340,7 @@
     "endsAt": "終了日時",
     "preview": "プレビュー",
     "priority": {
-      "error": "重要",
+      "error": "緊急",
       "info": "通常",
       "warning": "警告"
     },
