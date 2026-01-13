@@ -122,6 +122,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
             <Button
               aria-label={t("menu")}
               className="rounded-full"
+              size="icon"
               type="button"
               variant="ghost"
             >
