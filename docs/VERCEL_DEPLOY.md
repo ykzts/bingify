@@ -426,7 +426,7 @@ Vercel と Supabase の連携における詳細な設定方法です。
 
 **GitHub Actions による自動マイグレーション**:
 
-1. PRを作成し、\`supabase/migrations/\*_/_.sql\` に変更を含める
+1. PRを作成し、\`supabase/migrations/**/*.sql\` に変更を含める
 2. PRがレビュー・承認される
 3. \`main\` ブランチへマージ
 4. GitHub Actionsが自動的にマイグレーションを Cloud Supabaseに適用
