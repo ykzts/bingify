@@ -25,7 +25,7 @@ export async function createSpaceAnnouncementAction(
   if (!isValidUUID(spaceId)) {
     return {
       ...initialFormState,
-      errors: ["無効なスペースIDです"],
+      errors: ["errorInvalidSpaceId"],
       meta: { success: false },
     };
   }
@@ -52,7 +52,7 @@ export async function createSpaceAnnouncementAction(
     if (!result.success) {
       return {
         ...initialFormState,
-        errors: [result.error || "お知らせの作成に失敗しました"],
+        errors: [result.error || "errorCreateFailed"],
         meta: { success: false },
       };
     }
@@ -71,7 +71,7 @@ export async function createSpaceAnnouncementAction(
     console.error("Error in createSpaceAnnouncementAction:", e);
     return {
       ...initialFormState,
-      errors: ["エラーが発生しました"],
+      errors: ["errorGeneric"],
       meta: { success: false },
     };
   }
@@ -91,7 +91,7 @@ export async function updateSpaceAnnouncementAction(
   if (!isValidUUID(spaceId)) {
     return {
       ...initialFormState,
-      errors: ["無効なスペースIDです"],
+      errors: ["errorInvalidSpaceId"],
       meta: { success: false },
     };
   }
@@ -99,7 +99,7 @@ export async function updateSpaceAnnouncementAction(
   if (!isValidUUID(announcementId)) {
     return {
       ...initialFormState,
-      errors: ["無効なお知らせIDです"],
+      errors: ["errorInvalidAnnouncementId"],
       meta: { success: false },
     };
   }
@@ -126,7 +126,7 @@ export async function updateSpaceAnnouncementAction(
     if (!result.success) {
       return {
         ...initialFormState,
-        errors: [result.error || "お知らせの更新に失敗しました"],
+        errors: [result.error || "errorUpdateFailed"],
         meta: { success: false },
       };
     }
@@ -145,7 +145,7 @@ export async function updateSpaceAnnouncementAction(
     console.error("Error in updateSpaceAnnouncementAction:", e);
     return {
       ...initialFormState,
-      errors: ["エラーが発生しました"],
+      errors: ["errorGeneric"],
       meta: { success: false },
     };
   }

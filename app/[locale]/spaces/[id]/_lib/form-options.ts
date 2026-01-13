@@ -8,10 +8,10 @@ import {
 
 export const spaceAnnouncementFormSchema = z.object({
   content: announcementContentSchema,
-  ends_at: z.string().optional(),
+  ends_at: z.string().datetime().optional().or(z.literal("")),
   pinned: z.boolean(),
   priority: announcementPrioritySchema,
-  starts_at: z.string().optional(),
+  starts_at: z.string().datetime().optional().or(z.literal("")),
   title: announcementTitleSchema,
 });
 

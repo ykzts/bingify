@@ -735,6 +735,11 @@
     "announcementUpdateButton": "お知らせを更新",
     "announcementUpdateSuccess": "お知らせを更新しました",
     "deleting": "削除中...",
+    "errorCreateFailed": "お知らせの作成に失敗しました",
+    "errorGeneric": "エラーが発生しました",
+    "errorInvalidAnnouncementId": "無効なお知らせIDです",
+    "errorInvalidSpaceId": "無効なスペースIDです",
+    "errorUpdateFailed": "お知らせの更新に失敗しました",
     "processing": "処理中..."
   },
   "SpaceLanding": {

@@ -735,6 +735,11 @@
     "announcementUpdateButton": "Update Announcement",
     "announcementUpdateSuccess": "Announcement updated successfully",
     "deleting": "Deleting...",
+    "errorCreateFailed": "Failed to create announcement",
+    "errorGeneric": "An error occurred",
+    "errorInvalidAnnouncementId": "Invalid announcement ID",
+    "errorInvalidSpaceId": "Invalid space ID",
+    "errorUpdateFailed": "Failed to update announcement",
     "processing": "Processing..."
   },
   "SpaceLanding": {
