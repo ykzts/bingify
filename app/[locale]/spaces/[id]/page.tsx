@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { SpaceAnnouncementList } from "@/components/announcements/space-announcement-list";
 import { Link } from "@/i18n/navigation";
 import { getSystemSettings } from "@/lib/data/system-settings";
 import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
@@ -54,6 +55,47 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * ユーザーがスペースのownerまたはadminかどうかをチェックする
+ */
+async function checkIsSpaceAdmin(
+  spaceId: string,
+  userId: string | undefined
+): Promise<boolean> {
+  if (!userId) {
+    return false;
+  }
+
+  const supabase = await createClient();
+
+  // スペース情報を取得
+  const { data: space } = await supabase
+    .from("spaces")
+    .select("owner_id")
+    .eq("id", spaceId)
+    .single();
+
+  if (!space) {
+    return false;
+  }
+
+  // オーナーかどうかをチェック
+  const isOwner = space.owner_id === userId;
+
+  // 管理者ロールをチェック
+  const { data: adminRole } = await supabase
+    .from("space_roles")
+    .select("id")
+    .eq("space_id", spaceId)
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
+
+  const isAdmin = !!adminRole;
+
+  return isOwner || isAdmin;
+}
+
 export default async function UserSpacePage({
   params,
 }: PageProps<"/[locale]/spaces/[id]">) {
@@ -104,6 +146,9 @@ export default async function UserSpacePage({
     // Check if user is a participant to show their final card
     const isParticipant = await checkUserParticipation(id);
 
+    // Check if current user is admin (for announcement management)
+    const isAdmin = await checkIsSpaceAdmin(id, user?.id);
+
     if (!isParticipant) {
       // Non-participants see event ended message
       return (
@@ -120,6 +165,11 @@ export default async function UserSpacePage({
               >
                 {t("backToHome")}
               </Link>
+            </div>
+
+            {/* Announcements Section */}
+            <div className="mb-6">
+              <SpaceAnnouncementList isAdmin={isAdmin} spaceId={id} />
             </div>
 
             <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
@@ -147,6 +197,11 @@ export default async function UserSpacePage({
             </Link>
           </div>
 
+          {/* Announcements Section */}
+          <div className="mb-6">
+            <SpaceAnnouncementList isAdmin={isAdmin} spaceId={id} />
+          </div>
+
           {/* Event Ended Message */}
           <div className="mb-6 rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
             <EventEndedView />
@@ -169,8 +224,11 @@ export default async function UserSpacePage({
     notFound();
   }
 
-  // Check if user is already a participant
+  // Check if user is a participant
   const isParticipant = await checkUserParticipation(id);
+
+  // Check if current user is admin (for announcement management)
+  const isAdmin = await checkIsSpaceAdmin(id, user?.id);
 
   // Fetch system settings for OAuth scope configuration
   const systemSettingsResult = await getSystemSettings();
@@ -206,6 +264,11 @@ export default async function UserSpacePage({
             </Link>
           </div>
 
+          {/* Announcements Section */}
+          <div className="mb-6">
+            <SpaceAnnouncementList isAdmin={isAdmin} spaceId={id} />
+          </div>
+
           {/* Landing Page for non-participants */}
           <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
             <SpaceLandingPage publicInfo={publicInfo} />
@@ -239,6 +302,11 @@ export default async function UserSpacePage({
           >
             {t("backToHome")}
           </Link>
+        </div>
+
+        {/* Announcements Section */}
+        <div className="mb-6">
+          <SpaceAnnouncementList isAdmin={isAdmin} spaceId={id} />
         </div>
 
         {/* Main Space Content - Bingo Game */}
