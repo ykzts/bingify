@@ -333,15 +333,24 @@ export async function updateAnnouncement(
     }
 
     // お知らせを更新
-    const { error: updateError } = await supabase
+    const { data: updated, error: updateError } = await supabase
       .from("announcements")
       .update(validationResult.data)
-      .eq("id", id);
+      .eq("id", id)
+      .select();
 
     if (updateError) {
       console.error("Error updating announcement:", updateError);
       return {
         error: "お知らせの更新に失敗しました",
+        success: false,
+      };
+    }
+
+    // 更新された行が存在しない場合はエラー
+    if (!updated || updated.length === 0) {
+      return {
+        error: "お知らせが見つかりません",
         success: false,
       };
     }

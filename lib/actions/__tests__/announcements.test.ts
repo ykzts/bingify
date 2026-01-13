@@ -476,6 +476,13 @@ describe("updateAnnouncement", () => {
 
   it("adminユーザーはお知らせを更新できる", async () => {
     const mockUser = { id: "admin-123" };
+    const mockUpdatedData = [
+      {
+        content: "更新されたコンテンツ",
+        id: "ann-123",
+        title: "更新されたタイトル",
+      },
+    ];
 
     mockSupabase.auth.getUser.mockResolvedValue({
       data: { user: mockUser },
@@ -491,10 +498,15 @@ describe("updateAnnouncement", () => {
       }),
     };
 
-    const mockUpdateQuery = {
-      eq: vi.fn().mockResolvedValue({
+    const mockSelectChain = {
+      select: vi.fn().mockResolvedValue({
+        data: mockUpdatedData,
         error: null,
       }),
+    };
+
+    const mockUpdateQuery = {
+      eq: vi.fn().mockReturnValue(mockSelectChain),
       update: vi.fn().mockReturnThis(),
     };
 
@@ -508,6 +520,47 @@ describe("updateAnnouncement", () => {
 
     expect(result.success).toBe(true);
     expect(mockUpdateQuery.update).toHaveBeenCalled();
+  });
+
+  it("存在しないIDの場合はエラーを返す", async () => {
+    const mockUser = { id: "admin-123" };
+
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
+
+    const mockProfileQuery = {
+      eq: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { role: "admin" },
+        error: null,
+      }),
+    };
+
+    const mockSelectChain = {
+      select: vi.fn().mockResolvedValue({
+        data: [],
+        error: null,
+      }),
+    };
+
+    const mockUpdateQuery = {
+      eq: vi.fn().mockReturnValue(mockSelectChain),
+      update: vi.fn().mockReturnThis(),
+    };
+
+    mockSupabase.from.mockImplementation(
+      createSequentialFromMock(mockProfileQuery, mockUpdateQuery)
+    );
+
+    const result = await updateAnnouncement("non-existent-id", {
+      title: "更新されたタイトル",
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe("お知らせが見つかりません");
   });
 });
 
