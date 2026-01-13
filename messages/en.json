@@ -652,6 +652,8 @@
     "metaTitle": "Notifications",
     "next": "Next",
     "previous": "Previous",
+    "spaceInvitationContent": "You have been invited as an administrator",
+    "spaceInvitationTitle": "Invitation to space \"{spaceName}\"",
     "title": "Notifications",
     "unreadTab": "Unread"
   },

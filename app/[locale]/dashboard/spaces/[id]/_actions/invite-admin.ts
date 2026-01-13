@@ -33,7 +33,7 @@ async function checkSpaceOwnership(
 ) {
   const { data: space, error: spaceError } = await supabase
     .from("spaces")
-    .select("owner_id, title, share_key")
+    .select("owner_id")
     .eq("id", spaceId)
     .single();
 
@@ -219,7 +219,7 @@ export async function inviteAdminAction(
       const spaceTitle = spaceData.title || spaceData.share_key;
       const linkUrl = `/dashboard/spaces/${spaceId}`;
 
-      await createNotification(
+      const notificationResult = await createNotification(
         targetUser.id,
         "space_invitation",
         `スペース「${spaceTitle}」への招待`,
@@ -229,6 +229,14 @@ export async function inviteAdminAction(
           space_id: spaceId,
         }
       );
+
+      // Log notification creation failure, but don't block the invitation
+      if (!notificationResult.success) {
+        console.error(
+          "Failed to create notification for invited user:",
+          notificationResult.error
+        );
+      }
     }
 
     // Return success state
