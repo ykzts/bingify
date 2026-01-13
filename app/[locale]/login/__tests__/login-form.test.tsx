@@ -63,6 +63,7 @@ describe("LoginForm - Enterキー送信", () => {
           },
           youtube: {
             enabled: false,
+            member: { enabled: false },
             subscriber: { enabled: false },
           },
         },
