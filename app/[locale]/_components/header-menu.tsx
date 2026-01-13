@@ -57,6 +57,16 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
   };
 
   if (!user) {
+    // ログインページでは何も表示しない
+    if (pathname === "/login") {
+      return (
+        <>
+          <div />
+          <div />
+        </>
+      );
+    }
+
     // トップページからログインする場合はダッシュボードへリダイレクト
     const loginHref =
       pathname === "/" ? "/login?redirect=/dashboard" : "/login";
