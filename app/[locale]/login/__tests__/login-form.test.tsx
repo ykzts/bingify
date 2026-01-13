@@ -30,22 +30,19 @@ vi.mock("next-intl", () => ({
     };
     t.rich = (
       key: string,
-      values?: Record<
-        string,
-        (chunks: React.ReactNode) => React.ReactElement
-      >
+      values?: Record<string, (chunks: React.ReactNode) => React.ReactElement>
     ) => {
       const text = t(key);
-      if (!values) return text;
-      
+      if (!values) {
+        return text;
+      }
+
       // 簡易的なリッチテキストのレンダリング
       let result: React.ReactNode = text;
       for (const [tag, fn] of Object.entries(values)) {
         const regex = new RegExp(`<${tag}>([^<]+)</${tag}>`, "g");
         const parts = text.split(regex);
-        result = parts.map((part, i) =>
-          i % 2 === 1 ? fn(part) : part
-        );
+        result = parts.map((part, i) => (i % 2 === 1 ? fn(part) : part));
       }
       return result;
     };
