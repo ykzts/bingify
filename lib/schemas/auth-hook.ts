@@ -76,6 +76,8 @@ const LegacyEmailSchema = z.object({
   change_email_new_token_new: z.string().optional(),
   change_email_new_token_new_hash: z.string().optional(),
   change_email_old_new: z.string().optional(),
+  change_email_old_token: z.string().optional(),
+  change_email_old_token_hash: z.string().optional(),
   confirmation_hash: z.string().optional(),
   confirmation_token: z.string().optional(),
   email_action_type: z.string(),
@@ -101,6 +103,8 @@ export const NormalizedEmailSchema = z.object({
   change_email_new_token_new: z.string().optional(),
   change_email_new_token_new_hash: z.string().optional(),
   change_email_old_new: z.string().optional(),
+  change_email_old_token: z.string().optional(),
+  change_email_old_token_hash: z.string().optional(),
   confirmation_hash: z.string().optional(),
   confirmation_token: z.string().optional(),
   email_action_type: z.string(),
@@ -195,13 +199,16 @@ function buildNormalizedEmail(
         : undefined,
     change_email_new_token_new_hash:
       action === "email_change"
-        ? emailData.token_hash_new ||
-          emailData.token_hash ||
-          emailData.token ||
-          ""
+        ? emailData.token_hash || emailData.token_new || ""
         : undefined,
     change_email_old_new:
       action === "email_change" ? emailData.old_email : undefined,
+    change_email_old_token:
+      action === "email_change" ? emailData.token || "" : undefined,
+    change_email_old_token_hash:
+      action === "email_change"
+        ? emailData.token_hash_new || emailData.token || ""
+        : undefined,
     confirmation_hash:
       action === "confirmation"
         ? emailData.token_hash || emailData.token || ""
