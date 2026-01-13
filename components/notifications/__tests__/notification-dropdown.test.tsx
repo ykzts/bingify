@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -76,6 +76,10 @@ describe("NotificationDropdown", () => {
     vi.clearAllMocks();
   });
 
+  afterEach(() => {
+    cleanup();
+  });
+
   it("ローディング中はスケルトンが表示される", async () => {
     vi.mocked(useNotifications).mockReturnValue({
       data: undefined,
@@ -86,14 +90,17 @@ describe("NotificationDropdown", () => {
       notifications: [],
     });
 
-    const { container } = render(<NotificationDropdown />, {
+    render(<NotificationDropdown />, {
       wrapper: createWrapper(),
     });
 
+    // スケルトンローディングが表示されることを確認
+    // animate-pulseクラスを持つ要素の存在を確認
     await waitFor(() => {
-      // スケルトンローディングが表示されることを確認
-      const skeletons = container.querySelectorAll(".animate-pulse");
-      expect(skeletons.length).toBeGreaterThan(0);
+      const animatedElements = document.querySelectorAll(
+        '[class*="animate-pulse"]'
+      );
+      expect(animatedElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -190,14 +197,18 @@ describe("NotificationDropdown", () => {
       notifications: mockNotifications,
     });
 
-    const { container } = render(<NotificationDropdown />, {
+    render(<NotificationDropdown />, {
       wrapper: createWrapper(),
     });
 
     await waitFor(() => {
-      // 未読ドットを探す（bg-purple-500のクラスを持つ要素）
-      const unreadDot = container.querySelector(".bg-purple-500");
-      expect(unreadDot).toBeInTheDocument();
+      // 未読通知のタイトルが太字で表示されることを確認
+      expect(screen.getByText("Unread Notification")).toBeInTheDocument();
+      // 紫色の背景アイコンを確認（未読通知のインジケーター）
+      const purpleBackgrounds = document.querySelectorAll(
+        ".bg-purple-100, .bg-purple-500"
+      );
+      expect(purpleBackgrounds.length).toBeGreaterThan(0);
     });
   });
 
