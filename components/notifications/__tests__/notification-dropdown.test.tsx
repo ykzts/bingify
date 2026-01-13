@@ -3,7 +3,10 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { NotificationDropdown } from "../notification-dropdown";
 
 // useNotificationsフックのモック
@@ -34,8 +37,6 @@ vi.mock("@/i18n/navigation", () => ({
 }));
 
 import { useNotifications } from "@/hooks/use-notifications";
-import { useRouter } from "@/i18n/navigation";
-import { markNotificationRead } from "@/lib/actions/notifications";
 
 /**
  * テスト用のラッパーコンポーネント
