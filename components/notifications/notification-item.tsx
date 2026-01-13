@@ -92,21 +92,14 @@ export function NotificationItem({
   };
 
   const content = (
-    <div
+    <button
       className={cn(
         "group relative flex w-full gap-4 rounded-lg border p-4 text-left transition-colors hover:bg-gray-50",
         !notification.read && "border-purple-200 bg-purple-50/50",
         linkUrl && "cursor-pointer"
       )}
       onClick={handleClick}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          handleClick(e as unknown as React.MouseEvent);
-        }
-      }}
-      role="button"
-      tabIndex={0}
+      type="button"
     >
       <div className="flex-shrink-0">
         <div
@@ -176,7 +169,7 @@ export function NotificationItem({
           </Button>
         )}
       </div>
-    </div>
+    </button>
   );
 
   if (linkUrl) {

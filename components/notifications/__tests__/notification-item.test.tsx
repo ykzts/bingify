@@ -5,6 +5,9 @@ import { describe, expect, it, vi } from "vitest";
 import type { Notification } from "@/lib/types/notification";
 import { NotificationItem } from "../notification-item";
 
+// 正規表現をトップレベルで定義
+const DELETE_BUTTON_NAME_REGEX = /delete/i;
+
 /**
  * テスト用のラッパーコンポーネント
  */
@@ -176,7 +179,7 @@ describe("NotificationItem", () => {
       );
 
       const deleteButton = screen.getByRole("button", {
-        name: /delete/i,
+        name: DELETE_BUTTON_NAME_REGEX,
       });
       expect(deleteButton).toBeInTheDocument();
     });
@@ -195,7 +198,7 @@ describe("NotificationItem", () => {
       );
 
       const deleteButton = screen.getByRole("button", {
-        name: /delete/i,
+        name: DELETE_BUTTON_NAME_REGEX,
       });
       fireEvent.click(deleteButton);
 
