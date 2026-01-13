@@ -187,24 +187,35 @@ function normalizeNewPayload(
 
 /**
  * 生のメールデータから正規化されたメールオブジェクトを構築
+ *
+ * email_change アクション用のトークンマッピング（Supabase の後方互換性により命名が逆転）:
+ * - 新メールアドレス用: token_new + token_hash
+ * - 旧メールアドレス用: token + token_hash_new
+ *
+ * フォールバック処理は、Supabase のバージョンや設定により一部フィールドが
+ * 欠けている場合の互換性維持のために実装されています。
  */
 function buildNormalizedEmail(
   emailData: GeneratedEmailData,
   action: string
 ): z.infer<typeof NormalizedEmailSchema> {
   return {
+    // 新メールアドレス用トークン
     change_email_new_token_new:
       action === "email_change"
         ? emailData.token_new || emailData.token || ""
         : undefined,
+    // 新メールアドレス用トークンハッシュ（token_hash を優先、フォールバックで token_new）
     change_email_new_token_new_hash:
       action === "email_change"
         ? emailData.token_hash || emailData.token_new || ""
         : undefined,
     change_email_old_new:
       action === "email_change" ? emailData.old_email : undefined,
+    // 旧メールアドレス用トークン
     change_email_old_token:
       action === "email_change" ? emailData.token || "" : undefined,
+    // 旧メールアドレス用トークンハッシュ（token_hash_new を優先、フォールバックで token）
     change_email_old_token_hash:
       action === "email_change"
         ? emailData.token_hash_new || emailData.token || ""

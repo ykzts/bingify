@@ -182,6 +182,8 @@ export async function handleEmailAction(
         email.change_email_old_token && email.change_email_old_token_hash;
 
       // 新メールアドレスへの確認メール送信
+      // メールテンプレートの OTP 表示用にトークンを取得
+      // （ハッシュよりもトークンを優先、なければハッシュをフォールバック）
       const newToken =
         email.change_email_new_token_new ||
         email.change_email_new_token_new_hash ||
