@@ -705,6 +705,18 @@
     "warningTitle": "Important",
     "welcomeMessage": "Welcome! No administrator has been set up yet. Click the button below to register yourself as the first administrator."
   },
+  "SpaceAnnouncement": {
+    "deleteButton": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this announcement?",
+    "deleteSuccess": "Announcement deleted successfully",
+    "editButton": "Edit",
+    "emptyMessage": "No announcements yet",
+    "emptyMessageDescription": "Announcements will appear here when the space owner or admins create them.",
+    "loadingMessage": "Loading announcements...",
+    "manageButton": "Manage Announcements",
+    "pinned": "Pinned",
+    "title": "Announcements"
+  },
   "SpaceLanding": {
     "emailRequirement": "Email Requirement",
     "loginNote": "You need to sign in and join this space to participate in the bingo game.",
