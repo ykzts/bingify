@@ -47,7 +47,7 @@ done
 ## 環境 / サービス
 
 - Supabase: `lib/supabase/server.ts` / `client.ts` を利用。
-- 環境変数は `.env.local.example` を参照し、必要に応じ `.env.local` を作成。
+- 環境変数は `.env.example` を参照し、必要に応じ `.env` を作成。
 
 ## 開発手順
 
@@ -297,7 +297,7 @@ type(scope): brief subject
    - ❌ 特定の開発者の環境でのみ必要な設定手順
    - **代替案**:
      - 一般的な手順は README.md に統合
-     - 環境固有の情報は `.env.local.example` に記載
+     - 環境固有の情報は `.env.example` に記載
 
 4. **API リファレンスの重複**
    - ❌ 外部ライブラリのAPIドキュメントのコピー

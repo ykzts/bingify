@@ -5,8 +5,8 @@ import fs from "node:fs";
 import path from "node:path";
 import readline from "node:readline/promises";
 
-const ENV_FILE = path.join(process.cwd(), ".env.local");
-const TEMPLATE_FILE = path.join(process.cwd(), ".env.local.example");
+const ENV_FILE = path.join(process.cwd(), ".env");
+const TEMPLATE_FILE = path.join(process.cwd(), ".env.example");
 const LINE_SPLIT_REGEX = /\r?\n/;
 const QUOTED_VALUE_REGEX = /^(["'])(.*)\1$/;
 
@@ -18,7 +18,7 @@ const REQUIRED_VARS = [
 ];
 
 // 自動生成が必要なシークレット
-const AUTO_GENERATED_SECRETS = ["SEND_EMAIL_HOOK_SECRETS", "CRON_SECRET"];
+const AUTO_GENERATED_SECRETS = ["CRON_SECRET"];
 
 /**
  * プロセス環境変数から値を収集する
@@ -61,7 +61,7 @@ const fetchSupabaseConfig = (): {
 };
 
 /**
- * .env.local.exampleファイルを読み込んでパースする
+ * .env.exampleファイルを読み込んでパースする
  */
 const parseEnvTemplate = (content: string): Record<string, string> => {
   const values: Record<string, string> = {};
@@ -86,7 +86,7 @@ const parseEnvTemplate = (content: string): Record<string, string> => {
 };
 
 /**
- * 既存の.env.localファイルから値を読み込む
+ * 既存の.envファイルから値を読み込む
  */
 const parseExistingEnv = (filePath: string): Record<string, string> => {
   if (!fs.existsSync(filePath)) {
@@ -177,7 +177,7 @@ const validateRequired = (values: Record<string, string>): string[] => {
 };
 
 /**
- * .env.localファイルを生成する
+ * .envファイルを生成する
  */
 const generateEnvFile = (
   templateContent: string,
@@ -220,7 +220,7 @@ const confirmOverwrite = async (): Promise<boolean> => {
   });
 
   const answer = await rl.question(
-    "\n⚠️  .env.local は既に存在します。上書きしますか？ (y/N): "
+    "\n⚠️  .env は既に存在します。上書きしますか？ (y/N): "
   );
   rl.close();
 
@@ -237,14 +237,8 @@ const generateAutoSecrets = (
 
   for (const key of AUTO_GENERATED_SECRETS) {
     if (!result[key] || result[key].trim() === "") {
-      if (key === "SEND_EMAIL_HOOK_SECRETS") {
-        // SEND_EMAIL_HOOK_SECRETS は "v1,whsec_" プレフィックスが必要
-        result[key] = `v1,whsec_${randomBytes(32).toString("base64")}`;
-        console.log(`✨ ${key} を自動生成しました`);
-      } else {
-        result[key] = generateSecret();
-        console.log(`✨ ${key} を自動生成しました`);
-      }
+      result[key] = generateSecret();
+      console.log(`✨ ${key} を自動生成しました`);
     }
   }
 
@@ -362,7 +356,7 @@ const handleExistingFile = async (
       process.exit(0);
     }
   } else {
-    console.log("ℹ️  .env.local は既に存在します。既存の値を保持します");
+    console.log("ℹ️  .env は既に存在します。既存の値を保持します");
   }
 };
 
@@ -462,16 +456,16 @@ const main = async () => {
     process.exit(1);
   }
 
-  // .env.local ファイルを生成
+  // .env ファイルを生成
   const newContent = generateEnvFile(templateContent, mergedValues);
   fs.writeFileSync(ENV_FILE, newContent);
 
-  console.log("\n✅ .env.local を生成しました");
+  console.log("\n✅ .env を生成しました");
   console.log(`\n📄 ファイル: ${ENV_FILE}`);
 
   if (!fromSupabase) {
     console.log("\n次のステップ:");
-    console.log("  1. .env.local を確認して、必要に応じて編集してください");
+    console.log("  1. .env を確認して、必要に応じて編集してください");
     console.log("  2. pnpm dev でアプリケーションを起動してください");
   }
 };

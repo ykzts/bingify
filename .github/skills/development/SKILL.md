@@ -32,7 +32,7 @@ pnpm install
 ### 環境変数の設定
 
 ```bash
-cp .env.local.example .env.local
+cp .env.example .env
 ```
 
 ### Supabaseのセットアップ

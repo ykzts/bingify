@@ -3,10 +3,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-const TEST_ENV_FILE = path.join(process.cwd(), ".env.local.test");
-const TEST_TEMPLATE_FILE = path.join(process.cwd(), ".env.local.example.test");
+const TEST_ENV_FILE = path.join(process.cwd(), ".env.test");
+const TEST_TEMPLATE_FILE = path.join(process.cwd(), ".env.example.test");
 const LINE_SPLIT_REGEX = /\r?\n/;
-const HOOK_SECRET_PREFIX_REGEX = /^v1,whsec_/;
 
 // テスト用のヘルパー関数
 const parseEnvTemplate = (content: string): Record<string, string> => {
@@ -90,7 +89,7 @@ describe("generate-env スクリプト", () => {
     }
   });
 
-  it("テンプレートから新しい.env.localを生成する", () => {
+  it("テンプレートから新しい.envを生成する", () => {
     const templateContent = `# Supabase設定
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
@@ -259,12 +258,6 @@ NORMAL_VAR=value
     expect(secret1).toHaveLength(44); // Base64エンコードされた32バイトは44文字
     expect(secret2).toHaveLength(44);
     expect(secret1).not.toBe(secret2); // 異なるシークレットが生成される
-  });
-
-  it("SEND_EMAIL_HOOK_SECRETSのプレフィックスを処理する", () => {
-    const secret = `v1,whsec_${randomBytes(32).toString("base64")}`;
-    expect(secret).toMatch(HOOK_SECRET_PREFIX_REGEX);
-    expect(secret.length).toBeGreaterThan(50);
   });
 
   it("必須項目のバリデーションを行う", () => {
