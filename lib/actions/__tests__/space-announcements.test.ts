@@ -387,6 +387,57 @@ describe("getSpaceAnnouncements", () => {
     );
   });
 
+  it("権限チェック中のデータベースエラーを適切に処理する", async () => {
+    const mockUser = { id: "user-123" };
+
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
+
+    const mockSpaceQuery = {
+      eq: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { id: "space-123", owner_id: "owner-123" },
+        error: null,
+      }),
+    };
+
+    const mockRoleQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: null,
+        error: { code: "PGRST301", message: "Database connection failed" },
+      }),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    const mockParticipantQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    mockSupabase.from.mockImplementation(
+      createSequentialFromMock(
+        mockSpaceQuery,
+        mockRoleQuery,
+        mockParticipantQuery
+      )
+    );
+
+    const result = await getSpaceAnnouncements(
+      "550e8400-e29b-41d4-a716-446655440001"
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe("権限確認中にエラーが発生しました");
+  });
+
   it("スペースオーナーはお知らせを閲覧できる", async () => {
     const mockUser = { id: "owner-123" };
     const mockSpaceAnnouncements = [

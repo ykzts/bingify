@@ -171,6 +171,18 @@ export async function getSpaceAnnouncements(
         .maybeSingle(),
     ]);
 
+    // データベースエラーをチェック
+    if (roleResult.error || participantResult.error) {
+      console.error("Error checking permissions:", {
+        participantError: participantResult.error,
+        roleError: roleResult.error,
+      });
+      return {
+        error: "権限確認中にエラーが発生しました",
+        success: false,
+      };
+    }
+
     const isAdmin = !!roleResult.data;
     const isParticipant = !!participantResult.data;
 
