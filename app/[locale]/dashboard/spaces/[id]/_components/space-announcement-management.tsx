@@ -4,6 +4,7 @@ import { Edit, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { SpaceAnnouncementForm } from "@/app/[locale]/spaces/[id]/_components/space-announcement-form";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -13,7 +14,6 @@ import {
   getSpaceAnnouncements,
   type SpaceAnnouncementWithDetails,
 } from "@/lib/actions/space-announcements";
-import { SpaceAnnouncementForm } from "../../../spaces/[id]/_components/space-announcement-form";
 
 interface SpaceAnnouncementManagementProps {
   spaceId: string;
@@ -71,11 +71,11 @@ export function SpaceAnnouncementManagement({
         toast.success(t("deleteSuccess"));
         loadAnnouncements();
       } else {
-        toast.error(result.error || "Failed to delete announcement");
+        toast.error(result.error || t("errorGeneric"));
       }
     } catch (err) {
       console.error("Failed to delete announcement:", err);
-      toast.error("An unexpected error occurred");
+      toast.error(t("errorGeneric"));
     }
   };
 
@@ -174,7 +174,7 @@ export function SpaceAnnouncementManagement({
                         </DialogTrigger>
                         <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
                           <SpaceAnnouncementForm
-                            announcement={editingAnnouncement || undefined}
+                            announcement={editingAnnouncement ?? undefined}
                             onSuccess={handleFormSuccess}
                             spaceId={spaceId}
                           />
