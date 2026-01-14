@@ -36,6 +36,69 @@ export interface SpaceAnnouncementActionResult {
 }
 
 /**
+ * お知らせを日付範囲でフィルタする
+ * published=trueかつ日付範囲内（starts_at <= now < ends_at）のもののみを返す
+ */
+function filterAnnouncementsByDate(
+  announcements: SpaceAnnouncementWithDetails[]
+): SpaceAnnouncementWithDetails[] {
+  const now = new Date();
+  return announcements.filter((sa) => {
+    const announcement = sa.announcements;
+    if (!announcement?.published) {
+      return false;
+    }
+
+    // starts_at チェック（nullまたは過去）
+    if (announcement.starts_at) {
+      const startsAt = new Date(announcement.starts_at);
+      if (startsAt > now) {
+        return false;
+      }
+    }
+
+    // ends_at チェック（nullまたは未来）
+    if (announcement.ends_at) {
+      const endsAt = new Date(announcement.ends_at);
+      if (endsAt <= now) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}
+
+/**
+ * スペースお知らせをデータベースから取得する
+ * pinned DESC → created_at DESC の順でソート
+ */
+async function fetchSpaceAnnouncements(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  spaceId: string
+): Promise<GetSpaceAnnouncementsResult> {
+  const { data: spaceAnnouncements, error } = await supabase
+    .from("space_announcements")
+    .select("*, announcements(*)")
+    .eq("space_id", spaceId)
+    .order("pinned", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching space announcements:", error);
+    return {
+      error: "スペースお知らせの取得に失敗しました",
+      success: false,
+    };
+  }
+
+  return {
+    data: filterAnnouncementsByDate(spaceAnnouncements || []),
+    success: true,
+  };
+}
+
+/**
  * スペースのお知らせ一覧を取得する
  * pinned DESC → created_at DESC の順でソートし、日付範囲でフィルタする
  *
@@ -72,7 +135,7 @@ export async function getSpaceAnnouncements(
     // スペースが存在するかチェック
     const { data: space } = await supabase
       .from("spaces")
-      .select("id")
+      .select("id, owner_id")
       .eq("id", spaceId)
       .single();
 
@@ -83,53 +146,56 @@ export async function getSpaceAnnouncements(
       };
     }
 
-    // スペースお知らせを取得（お知らせ詳細を含む）
-    const { data: spaceAnnouncements, error } = await supabase
-      .from("space_announcements")
-      .select("*, announcements(*)")
-      .eq("space_id", spaceId)
-      .order("pinned", { ascending: false })
-      .order("created_at", { ascending: false });
+    // 参加者チェック: オーナー、管理者、または参加者のみがアクセス可能
+    const isOwner = space.owner_id === user.id;
 
-    if (error) {
-      console.error("Error fetching space announcements:", error);
+    // オーナーの場合はそのままアクセスを許可（パフォーマンス最適化）
+    if (isOwner) {
+      return await fetchSpaceAnnouncements(supabase, spaceId);
+    }
+
+    // 管理者ロールまたは参加者をチェック（並列実行）
+    const [roleResult, participantResult] = await Promise.all([
+      supabase
+        .from("space_roles")
+        .select("id")
+        .eq("space_id", spaceId)
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle(),
+      supabase
+        .from("participants")
+        .select("id")
+        .eq("space_id", spaceId)
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]);
+
+    // データベースエラーをチェック
+    if (roleResult.error || participantResult.error) {
+      console.error("Error checking permissions:", {
+        participantError: participantResult.error,
+        roleError: roleResult.error,
+      });
       return {
-        error: "スペースお知らせの取得に失敗しました",
+        error: "権限確認中にエラーが発生しました",
         success: false,
       };
     }
 
-    // 日付範囲でフィルタ（published=trueかつ日付範囲内のもののみ）
-    const now = new Date();
-    const filteredAnnouncements = (spaceAnnouncements || []).filter((sa) => {
-      const announcement = sa.announcements;
-      if (!announcement?.published) {
-        return false;
-      }
+    const isAdmin = !!roleResult.data;
+    const isParticipant = !!participantResult.data;
 
-      // starts_at チェック（nullまたは過去）
-      if (announcement.starts_at) {
-        const startsAt = new Date(announcement.starts_at);
-        if (startsAt > now) {
-          return false;
-        }
-      }
+    // 管理者または参加者のいずれでもない場合はエラーを返す
+    if (!(isAdmin || isParticipant)) {
+      return {
+        error: "このスペースのお知らせを閲覧する権限がありません",
+        success: false,
+      };
+    }
 
-      // ends_at チェック（nullまたは未来）
-      if (announcement.ends_at) {
-        const endsAt = new Date(announcement.ends_at);
-        if (endsAt <= now) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    return {
-      data: filteredAnnouncements as SpaceAnnouncementWithDetails[],
-      success: true,
-    };
+    // スペースお知らせを取得
+    return await fetchSpaceAnnouncements(supabase, spaceId);
   } catch (error) {
     console.error("Error in getSpaceAnnouncements:", error);
     return {
