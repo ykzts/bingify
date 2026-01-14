@@ -258,16 +258,11 @@ function normalizeSiteUrl(url?: string): string | undefined {
 
 /**
  * Supabaseの認証アクションを内部アクションタイプにマッピング
- * 
- * Note: Supabase sends "signup" for both password-based signup AND Magic Link (OTP) signup.
- * We need to treat "signup" as a Magic Link (recovery-type) action since it uses the same
- * token/token_hash fields that the magiclink handler expects (recovery_token/recovery_token_hash).
  */
 function mapEmailAction(action?: string): string {
   switch (action) {
     case "signup":
-      // Magic Link OTP signup should be treated as "magiclink" since it uses recovery_token fields
-      return "magiclink";
+      return "confirmation";
     case "recovery":
       return "recovery";
     case "magiclink":
