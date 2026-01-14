@@ -68,7 +68,9 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
           className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md py-2 text-gray-700 text-xs transition-colors hover:bg-gray-100 aria-[current=page]:text-purple-600 dark:text-gray-300 dark:aria-[current=page]:text-purple-400 dark:hover:bg-gray-800"
           href="/dashboard"
         >
-          <LayoutDashboard className="h-5 w-5" />
+          <div className="flex h-5 w-5 items-center justify-center">
+            <LayoutDashboard className="h-5 w-5" />
+          </div>
           <span>{t("dashboard")}</span>
         </Link>
 
@@ -79,13 +81,17 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
             className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md py-2 text-gray-700 text-xs transition-colors hover:bg-gray-100 aria-[current=page]:text-purple-600 dark:text-gray-300 dark:aria-[current=page]:text-purple-400 dark:hover:bg-gray-800"
             href="/admin"
           >
-            <Shield className="h-5 w-5" />
+            <div className="flex h-5 w-5 items-center justify-center">
+              <Shield className="h-5 w-5" />
+            </div>
             <span>{t("admin")}</span>
           </Link>
         )}
 
-        <div className="flex flex-1 flex-col items-center justify-center gap-1">
-          <NotificationBell />
+        <div className="flex flex-1 flex-col items-center justify-center gap-1 py-2">
+          <div className="flex h-5 w-5 items-center justify-center">
+            <NotificationBell />
+          </div>
           <span className="text-gray-700 text-xs dark:text-gray-300">
             {t("notifications")}
           </span>
@@ -96,21 +102,22 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
             <Button
               aria-label={t("menu")}
               className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md py-2 text-gray-700 text-xs transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-              size="icon"
               type="button"
               variant="ghost"
             >
-              {user.avatar_url ? (
-                <Image
-                  alt={user.full_name || user.email || t("userAvatar")}
-                  className="rounded-full object-cover"
-                  height={20}
-                  src={user.avatar_url}
-                  width={20}
-                />
-              ) : (
-                <User className="h-5 w-5" />
-              )}
+              <div className="flex h-5 w-5 items-center justify-center">
+                {user.avatar_url ? (
+                  <Image
+                    alt={user.full_name || user.email || t("userAvatar")}
+                    className="rounded-full object-cover"
+                    height={20}
+                    src={user.avatar_url}
+                    width={20}
+                  />
+                ) : (
+                  <User className="h-5 w-5" />
+                )}
+              </div>
               <span>{t("menu")}</span>
             </Button>
           </DropdownMenuTrigger>
