@@ -10,10 +10,8 @@ interface ConditionalHeaderProps {
 export function ConditionalHeader({ children }: ConditionalHeaderProps) {
   const pathname = usePathname();
 
-  // ログインページではヘッダーを非表示
-  if (pathname === "/login") {
-    return null;
-  }
+  // ログインページではヘッダーを非表示（CSSで制御し、再マウントを防ぐ）
+  const isHidden = pathname === "/login";
 
-  return <>{children}</>;
+  return <div className={isHidden ? "hidden" : "contents"}>{children}</div>;
 }
