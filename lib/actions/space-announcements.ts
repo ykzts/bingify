@@ -36,6 +36,40 @@ export interface SpaceAnnouncementActionResult {
 }
 
 /**
+ * お知らせを日付範囲でフィルタする
+ * published=trueかつ日付範囲内（starts_at <= now < ends_at）のもののみを返す
+ */
+function filterAnnouncementsByDate(
+  announcements: SpaceAnnouncementWithDetails[]
+): SpaceAnnouncementWithDetails[] {
+  const now = new Date();
+  return announcements.filter((sa) => {
+    const announcement = sa.announcements;
+    if (!announcement?.published) {
+      return false;
+    }
+
+    // starts_at チェック（nullまたは過去）
+    if (announcement.starts_at) {
+      const startsAt = new Date(announcement.starts_at);
+      if (startsAt > now) {
+        return false;
+      }
+    }
+
+    // ends_at チェック（nullまたは未来）
+    if (announcement.ends_at) {
+      const endsAt = new Date(announcement.ends_at);
+      if (endsAt <= now) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}
+
+/**
  * スペースのお知らせ一覧を取得する
  * pinned DESC → created_at DESC の順でソートし、日付範囲でフィルタする
  *
@@ -86,29 +120,53 @@ export async function getSpaceAnnouncements(
     // 参加者チェック: オーナー、管理者、または参加者のみがアクセス可能
     const isOwner = space.owner_id === user.id;
 
-    // 管理者ロールをチェック
-    const { data: adminRole } = await supabase
-      .from("space_roles")
-      .select("id")
-      .eq("space_id", spaceId)
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .maybeSingle();
+    // オーナーの場合はそのままアクセスを許可（パフォーマンス最適化）
+    if (isOwner) {
+      // スペースお知らせを取得（お知らせ詳細を含む）
+      const { data: spaceAnnouncements, error } = await supabase
+        .from("space_announcements")
+        .select("*, announcements(*)")
+        .eq("space_id", spaceId)
+        .order("pinned", { ascending: false })
+        .order("created_at", { ascending: false });
 
-    const isAdmin = !!adminRole;
+      if (error) {
+        console.error("Error fetching space announcements:", error);
+        return {
+          error: "スペースお知らせの取得に失敗しました",
+          success: false,
+        };
+      }
 
-    // 参加者チェック
-    const { data: participant } = await supabase
-      .from("participants")
-      .select("id")
-      .eq("space_id", spaceId)
-      .eq("user_id", user.id)
-      .maybeSingle();
+      // 日付範囲でフィルタ（published=trueかつ日付範囲内のもののみ）
+      return {
+        data: filterAnnouncementsByDate(spaceAnnouncements || []),
+        success: true,
+      };
+    }
 
-    const isParticipant = !!participant;
+    // 管理者ロールまたは参加者をチェック（並列実行）
+    const [roleResult, participantResult] = await Promise.all([
+      supabase
+        .from("space_roles")
+        .select("id")
+        .eq("space_id", spaceId)
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle(),
+      supabase
+        .from("participants")
+        .select("id")
+        .eq("space_id", spaceId)
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]);
 
-    // オーナー、管理者、参加者のいずれでもない場合はエラーを返す
-    if (!(isOwner || isAdmin || isParticipant)) {
+    const isAdmin = !!roleResult.data;
+    const isParticipant = !!participantResult.data;
+
+    // 管理者または参加者のいずれでもない場合はエラーを返す
+    if (!(isAdmin || isParticipant)) {
       return {
         error: "このスペースのお知らせを閲覧する権限がありません",
         success: false,
@@ -132,34 +190,8 @@ export async function getSpaceAnnouncements(
     }
 
     // 日付範囲でフィルタ（published=trueかつ日付範囲内のもののみ）
-    const now = new Date();
-    const filteredAnnouncements = (spaceAnnouncements || []).filter((sa) => {
-      const announcement = sa.announcements;
-      if (!announcement?.published) {
-        return false;
-      }
-
-      // starts_at チェック（nullまたは過去）
-      if (announcement.starts_at) {
-        const startsAt = new Date(announcement.starts_at);
-        if (startsAt > now) {
-          return false;
-        }
-      }
-
-      // ends_at チェック（nullまたは未来）
-      if (announcement.ends_at) {
-        const endsAt = new Date(announcement.ends_at);
-        if (endsAt <= now) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
     return {
-      data: filteredAnnouncements as SpaceAnnouncementWithDetails[],
+      data: filterAnnouncementsByDate(spaceAnnouncements || []),
       success: true,
     };
   } catch (error) {

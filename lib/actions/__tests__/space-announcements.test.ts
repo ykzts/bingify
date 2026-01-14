@@ -423,24 +423,6 @@ describe("getSpaceAnnouncements", () => {
       }),
     };
 
-    const mockRoleQuery = {
-      eq: vi.fn().mockReturnThis(),
-      maybeSingle: vi.fn().mockResolvedValue({
-        data: null,
-        error: null,
-      }),
-      select: vi.fn().mockReturnThis(),
-    };
-
-    const mockParticipantQuery = {
-      eq: vi.fn().mockReturnThis(),
-      maybeSingle: vi.fn().mockResolvedValue({
-        data: null,
-        error: null,
-      }),
-      select: vi.fn().mockReturnThis(),
-    };
-
     const mockOrderChain2 = {
       order: vi.fn().mockResolvedValue({
         data: mockSpaceAnnouncements,
@@ -461,12 +443,7 @@ describe("getSpaceAnnouncements", () => {
     };
 
     mockSupabase.from.mockImplementation(
-      createSequentialFromMock(
-        mockSpaceQuery,
-        mockRoleQuery,
-        mockParticipantQuery,
-        mockAnnouncementQuery
-      )
+      createSequentialFromMock(mockSpaceQuery, mockAnnouncementQuery)
     );
 
     const result = await getSpaceAnnouncements(
