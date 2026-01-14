@@ -752,6 +752,7 @@
     "welcomeMessage": "Welcome! No administrator has been set up yet. Click the button below to register yourself as the first administrator."
   },
   "SpaceAnnouncement": {
+    "actionsLabel": "Actions",
     "announcementContentHelp": "Maximum 5000 characters",
     "announcementContentLabel": "Content",
     "announcementContentPlaceholder": "Enter announcement content...",
@@ -780,6 +781,7 @@
     "announcementTitlePlaceholder": "Enter announcement title...",
     "announcementUpdateButton": "Update Announcement",
     "announcementUpdateSuccess": "Announcement updated successfully",
+    "createButton": "Create Announcement",
     "deleteButton": "Delete",
     "deleteConfirm": "Are you sure you want to delete this announcement?",
     "deleteSuccess": "Announcement deleted successfully",
@@ -792,11 +794,15 @@
     "errorInvalidAnnouncementId": "Invalid announcement ID",
     "errorInvalidSpaceId": "Invalid space ID",
     "errorUpdateFailed": "Failed to update announcement",
+    "loading": "Loading",
     "loadingMessage": "Loading announcements...",
     "manageButton": "Manage Announcements",
     "pinned": "Pinned",
+    "pinnedLabel": "Pinned",
     "processing": "Processing...",
-    "title": "Announcements"
+    "statusLabel": "Status",
+    "title": "Announcements",
+    "titleLabel": "Title"
   },
   "SpaceLanding": {
     "emailRequirement": "Email Requirement",
