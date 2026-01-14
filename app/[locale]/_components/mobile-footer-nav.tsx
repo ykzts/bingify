@@ -44,6 +44,7 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
     } catch (error) {
       console.error("Logout error:", error);
       setIsLoggingOut(false);
+      setOpen(true);
     }
   };
 
@@ -60,11 +61,11 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
 
   return (
     <nav className="fixed right-0 bottom-0 left-0 z-50 border-gray-200 border-t bg-white/95 backdrop-blur-sm md:hidden dark:border-gray-800 dark:bg-gray-950/95">
-      <div className="container mx-auto flex h-16 items-center justify-around px-4">
+      <div className="container mx-auto flex h-16 items-center px-4">
         <Link
           aria-current={isActivePath("/dashboard") ? "page" : undefined}
           aria-label={t("dashboard")}
-          className="flex flex-col items-center justify-center gap-1 rounded-md px-3 py-2 text-gray-700 text-xs transition-colors hover:bg-gray-100 aria-[current=page]:text-purple-600 dark:text-gray-300 dark:aria-[current=page]:text-purple-400 dark:hover:bg-gray-800"
+          className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md py-2 text-gray-700 text-xs transition-colors hover:bg-gray-100 aria-[current=page]:text-purple-600 dark:text-gray-300 dark:aria-[current=page]:text-purple-400 dark:hover:bg-gray-800"
           href="/dashboard"
         >
           <LayoutDashboard className="h-5 w-5" />
@@ -75,7 +76,7 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
           <Link
             aria-current={isActivePath("/admin") ? "page" : undefined}
             aria-label={t("admin")}
-            className="flex flex-col items-center justify-center gap-1 rounded-md px-3 py-2 text-gray-700 text-xs transition-colors hover:bg-gray-100 aria-[current=page]:text-purple-600 dark:text-gray-300 dark:aria-[current=page]:text-purple-400 dark:hover:bg-gray-800"
+            className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md py-2 text-gray-700 text-xs transition-colors hover:bg-gray-100 aria-[current=page]:text-purple-600 dark:text-gray-300 dark:aria-[current=page]:text-purple-400 dark:hover:bg-gray-800"
             href="/admin"
           >
             <Shield className="h-5 w-5" />
@@ -83,7 +84,7 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
           </Link>
         )}
 
-        <div className="flex flex-col items-center justify-center gap-1">
+        <div className="flex flex-1 flex-col items-center justify-center gap-1">
           <NotificationBell />
           <span className="text-gray-700 text-xs dark:text-gray-300">
             {t("notifications")}
@@ -94,7 +95,7 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
           <DropdownMenuTrigger asChild>
             <Button
               aria-label={t("menu")}
-              className="flex flex-col items-center justify-center gap-1 rounded-md px-3 py-2 text-gray-700 text-xs transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md py-2 text-gray-700 text-xs transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
               size="icon"
               type="button"
               variant="ghost"

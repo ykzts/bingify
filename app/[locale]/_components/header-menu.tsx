@@ -77,6 +77,17 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
 
   return (
     <>
+      {/* ロゴ - モバイルのみ表示 */}
+      <Link className="flex md:hidden" href="/">
+        <Image
+          alt="Bingify"
+          className="h-8 w-auto"
+          height={32}
+          src="/logo.svg"
+          width={122}
+        />
+      </Link>
+
       {/* ナビゲーションリンク - デスクトップのみ表示 */}
       <nav className="hidden items-center gap-2 md:flex">
         <Link
