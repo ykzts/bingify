@@ -179,15 +179,19 @@ function normalizeNewPayload(
   // Workaround: Supabase may send "signup" for Magic Link (OTP) authentication.
   // Detect this by checking if user already exists (created_at is recent).
   // Magic Link for existing users should use recovery token fields, not confirmation.
-  if (action === "confirmation" && user) {
-    // If user was created more than 1 minute ago, this is likely a Magic Link login, not a new signup
-    const createdAt = user.created_at ? new Date(user.created_at).getTime() : 0;
-    const now = Date.now();
-    const oneMinuteAgo = now - 60 * 1000;
+  if (action === "confirmation" && user && user.created_at) {
+    // Only check timestamp if created_at is present and valid
+    const createdAt = new Date(user.created_at).getTime();
 
-    if (createdAt < oneMinuteAgo) {
-      // Existing user - treat as magic link
-      action = "magiclink";
+    // Skip if created_at is invalid (NaN)
+    if (!Number.isNaN(createdAt)) {
+      const now = Date.now();
+      const oneMinuteAgo = now - 60 * 1000;
+
+      if (createdAt < oneMinuteAgo) {
+        // Existing user - treat as magic link
+        action = "magiclink";
+      }
     }
   }
 
