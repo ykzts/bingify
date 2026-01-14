@@ -70,6 +70,35 @@ function filterAnnouncementsByDate(
 }
 
 /**
+ * スペースお知らせをデータベースから取得する
+ * pinned DESC → created_at DESC の順でソート
+ */
+async function fetchSpaceAnnouncements(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  spaceId: string
+): Promise<GetSpaceAnnouncementsResult> {
+  const { data: spaceAnnouncements, error } = await supabase
+    .from("space_announcements")
+    .select("*, announcements(*)")
+    .eq("space_id", spaceId)
+    .order("pinned", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching space announcements:", error);
+    return {
+      error: "スペースお知らせの取得に失敗しました",
+      success: false,
+    };
+  }
+
+  return {
+    data: filterAnnouncementsByDate(spaceAnnouncements || []),
+    success: true,
+  };
+}
+
+/**
  * スペースのお知らせ一覧を取得する
  * pinned DESC → created_at DESC の順でソートし、日付範囲でフィルタする
  *
@@ -122,27 +151,7 @@ export async function getSpaceAnnouncements(
 
     // オーナーの場合はそのままアクセスを許可（パフォーマンス最適化）
     if (isOwner) {
-      // スペースお知らせを取得（お知らせ詳細を含む）
-      const { data: spaceAnnouncements, error } = await supabase
-        .from("space_announcements")
-        .select("*, announcements(*)")
-        .eq("space_id", spaceId)
-        .order("pinned", { ascending: false })
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching space announcements:", error);
-        return {
-          error: "スペースお知らせの取得に失敗しました",
-          success: false,
-        };
-      }
-
-      // 日付範囲でフィルタ（published=trueかつ日付範囲内のもののみ）
-      return {
-        data: filterAnnouncementsByDate(spaceAnnouncements || []),
-        success: true,
-      };
+      return await fetchSpaceAnnouncements(supabase, spaceId);
     }
 
     // 管理者ロールまたは参加者をチェック（並列実行）
@@ -173,27 +182,8 @@ export async function getSpaceAnnouncements(
       };
     }
 
-    // スペースお知らせを取得（お知らせ詳細を含む）
-    const { data: spaceAnnouncements, error } = await supabase
-      .from("space_announcements")
-      .select("*, announcements(*)")
-      .eq("space_id", spaceId)
-      .order("pinned", { ascending: false })
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching space announcements:", error);
-      return {
-        error: "スペースお知らせの取得に失敗しました",
-        success: false,
-      };
-    }
-
-    // 日付範囲でフィルタ（published=trueかつ日付範囲内のもののみ）
-    return {
-      data: filterAnnouncementsByDate(spaceAnnouncements || []),
-      success: true,
-    };
+    // スペースお知らせを取得
+    return await fetchSpaceAnnouncements(supabase, spaceId);
   } catch (error) {
     console.error("Error in getSpaceAnnouncements:", error);
     return {
