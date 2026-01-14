@@ -17,7 +17,7 @@ import {
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-interface HeaderMenuProps {
+interface MobileFooterNavProps {
   user: {
     avatar_url?: string | null;
     email?: string | null;
@@ -26,7 +26,7 @@ interface HeaderMenuProps {
   } | null;
 }
 
-export function HeaderMenu({ user }: HeaderMenuProps) {
+export function MobileFooterNav({ user }: MobileFooterNavProps) {
   const t = useTranslations("HeaderMenu");
   const router = useRouter();
   const pathname = usePathname();
@@ -49,68 +49,53 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
   };
 
   const isActivePath = (path: string) => {
-    // ルートパスの特別処理
     if (path === "/") {
       return pathname === "/";
     }
-    // 完全一致またはサブパスで始まる場合
     return pathname === path || pathname.startsWith(`${path}/`);
   };
 
   if (!user) {
-    // トップページからログインする場合はダッシュボードへリダイレクト
-    const loginHref =
-      pathname === "/" ? "/login?redirect=/dashboard" : "/login";
-
-    return (
-      <>
-        <div />
-        <Link
-          className="rounded-md border border-gray-300 bg-white px-4 py-1.5 font-medium text-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
-          href={loginHref}
-        >
-          {t("login")}
-        </Link>
-      </>
-    );
+    return null;
   }
 
   return (
-    <>
-      {/* ナビゲーションリンク - デスクトップのみ表示 */}
-      <nav className="hidden items-center gap-2 md:flex">
+    <nav className="fixed right-0 bottom-0 left-0 z-50 border-gray-200 border-t bg-white/95 backdrop-blur-sm md:hidden dark:border-gray-800 dark:bg-gray-950/95">
+      <div className="container mx-auto flex h-16 items-center justify-around px-4">
         <Link
           aria-current={isActivePath("/dashboard") ? "page" : undefined}
-          className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
+          aria-label={t("dashboard")}
+          className="flex flex-col items-center justify-center gap-1 rounded-md px-3 py-2 text-gray-700 text-xs transition-colors hover:bg-gray-100 aria-[current=page]:text-purple-600 dark:text-gray-300 dark:aria-[current=page]:text-purple-400 dark:hover:bg-gray-800"
           href="/dashboard"
         >
-          <LayoutDashboard className="h-4 w-4" />
-          <span className="sr-only sm:not-sr-only">{t("dashboard")}</span>
+          <LayoutDashboard className="h-5 w-5" />
+          <span>{t("dashboard")}</span>
         </Link>
 
         {user.role === "admin" && (
           <Link
             aria-current={isActivePath("/admin") ? "page" : undefined}
-            className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
+            aria-label={t("admin")}
+            className="flex flex-col items-center justify-center gap-1 rounded-md px-3 py-2 text-gray-700 text-xs transition-colors hover:bg-gray-100 aria-[current=page]:text-purple-600 dark:text-gray-300 dark:aria-[current=page]:text-purple-400 dark:hover:bg-gray-800"
             href="/admin"
           >
-            <Shield className="h-4 w-4" />
-            <span className="sr-only sm:not-sr-only">{t("admin")}</span>
+            <Shield className="h-5 w-5" />
+            <span>{t("admin")}</span>
           </Link>
         )}
-      </nav>
 
-      {/* 通知ベルとユーザーメニュー - デスクトップのみ表示 */}
-      <div className="hidden items-center gap-2 md:flex">
-        {/* 通知ベル */}
-        <NotificationBell />
+        <div className="flex flex-col items-center justify-center gap-1">
+          <NotificationBell />
+          <span className="text-gray-700 text-xs dark:text-gray-300">
+            {t("notifications")}
+          </span>
+        </div>
 
-        {/* ユーザーメニュー */}
         <DropdownMenu onOpenChange={setOpen} open={open}>
           <DropdownMenuTrigger asChild>
             <Button
               aria-label={t("menu")}
-              className="rounded-full"
+              className="flex flex-col items-center justify-center gap-1 rounded-md px-3 py-2 text-gray-700 text-xs transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
               size="icon"
               type="button"
               variant="ghost"
@@ -119,15 +104,14 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
                 <Image
                   alt={user.full_name || user.email || t("userAvatar")}
                   className="rounded-full object-cover"
-                  height={32}
+                  height={20}
                   src={user.avatar_url}
-                  width={32}
+                  width={20}
                 />
               ) : (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
-                  <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-                </div>
+                <User className="h-5 w-5" />
               )}
+              <span>{t("menu")}</span>
             </Button>
           </DropdownMenuTrigger>
 
@@ -135,6 +119,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
             <DropdownMenuContent
               align="end"
               className="z-[100] min-w-[240px]"
+              side="top"
               sideOffset={8}
             >
               <div className="px-3 py-2">
@@ -172,6 +157,6 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
           </DropdownMenuPortal>
         </DropdownMenu>
       </div>
-    </>
+    </nav>
   );
 }

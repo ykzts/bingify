@@ -16,6 +16,7 @@ import { getAbsoluteUrl } from "@/lib/utils/url";
 import { ConditionalHeader } from "./_components/conditional-header";
 import { Footer } from "./_components/footer";
 import { HeaderMenuWrapper } from "./_components/header-menu-wrapper";
+import { MobileFooterNavWrapper } from "./_components/mobile-footer-nav-wrapper";
 import { PreReleaseBanner } from "./_components/pre-release-banner";
 
 const nunito = Nunito({
@@ -71,8 +72,11 @@ export default async function LocaleLayout({
                     </div>
                   </header>
                 </ConditionalHeader>
-                <main className="flex-1">{children}</main>
+                <main className="flex-1 pb-16 md:pb-0">{children}</main>
                 <Footer />
+                <Suspense fallback={null}>
+                  <MobileFooterNavWrapper />
+                </Suspense>
               </div>
               <Toaster />
             </ConfirmProvider>
