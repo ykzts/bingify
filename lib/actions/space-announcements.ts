@@ -72,13 +72,45 @@ export async function getSpaceAnnouncements(
     // スペースが存在するかチェック
     const { data: space } = await supabase
       .from("spaces")
-      .select("id")
+      .select("id, owner_id")
       .eq("id", spaceId)
       .single();
 
     if (!space) {
       return {
         error: "スペースが見つかりません",
+        success: false,
+      };
+    }
+
+    // 参加者チェック: オーナー、管理者、または参加者のみがアクセス可能
+    const isOwner = space.owner_id === user.id;
+
+    // 管理者ロールをチェック
+    const { data: adminRole } = await supabase
+      .from("space_roles")
+      .select("id")
+      .eq("space_id", spaceId)
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    const isAdmin = !!adminRole;
+
+    // 参加者チェック
+    const { data: participant } = await supabase
+      .from("participants")
+      .select("id")
+      .eq("space_id", spaceId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    const isParticipant = !!participant;
+
+    // オーナー、管理者、参加者のいずれでもない場合はエラーを返す
+    if (!(isOwner || isAdmin || isParticipant)) {
+      return {
+        error: "このスペースのお知らせを閲覧する権限がありません",
         success: false,
       };
     }

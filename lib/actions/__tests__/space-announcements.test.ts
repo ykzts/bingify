@@ -162,9 +162,27 @@ describe("getSpaceAnnouncements", () => {
       eq: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({
-        data: { id: "space-123" },
+        data: { id: "space-123", owner_id: "owner-123" },
         error: null,
       }),
+    };
+
+    const mockRoleQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    const mockParticipantQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: { id: "participant-123" },
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
     };
 
     const mockOrderChain2 = {
@@ -187,7 +205,12 @@ describe("getSpaceAnnouncements", () => {
     };
 
     mockSupabase.from.mockImplementation(
-      createSequentialFromMock(mockSpaceQuery, mockAnnouncementQuery)
+      createSequentialFromMock(
+        mockSpaceQuery,
+        mockRoleQuery,
+        mockParticipantQuery,
+        mockAnnouncementQuery
+      )
     );
 
     const result = await getSpaceAnnouncements(
@@ -251,9 +274,27 @@ describe("getSpaceAnnouncements", () => {
       eq: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({
-        data: { id: "space-123" },
+        data: { id: "space-123", owner_id: "owner-123" },
         error: null,
       }),
+    };
+
+    const mockRoleQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    const mockParticipantQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: { id: "participant-123" },
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
     };
 
     const mockOrderChain2 = {
@@ -276,7 +317,12 @@ describe("getSpaceAnnouncements", () => {
     };
 
     mockSupabase.from.mockImplementation(
-      createSequentialFromMock(mockSpaceQuery, mockAnnouncementQuery)
+      createSequentialFromMock(
+        mockSpaceQuery,
+        mockRoleQuery,
+        mockParticipantQuery,
+        mockAnnouncementQuery
+      )
     );
 
     const result = await getSpaceAnnouncements(
@@ -286,6 +332,332 @@ describe("getSpaceAnnouncements", () => {
     expect(result.success).toBe(true);
     expect(result.data?.length).toBe(1);
     expect(result.data?.[0]?.announcements.published).toBe(true);
+  });
+
+  it("非参加者のアクセスを拒否する", async () => {
+    const mockUser = { id: "non-participant-123" };
+
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
+
+    const mockSpaceQuery = {
+      eq: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { id: "space-123", owner_id: "owner-123" },
+        error: null,
+      }),
+    };
+
+    const mockRoleQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    const mockParticipantQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    mockSupabase.from.mockImplementation(
+      createSequentialFromMock(
+        mockSpaceQuery,
+        mockRoleQuery,
+        mockParticipantQuery
+      )
+    );
+
+    const result = await getSpaceAnnouncements(
+      "550e8400-e29b-41d4-a716-446655440001"
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe(
+      "このスペースのお知らせを閲覧する権限がありません"
+    );
+  });
+
+  it("スペースオーナーはお知らせを閲覧できる", async () => {
+    const mockUser = { id: "owner-123" };
+    const mockSpaceAnnouncements = [
+      {
+        announcement_id: "ann-1",
+        announcements: {
+          content: "テストお知らせ",
+          created_at: "2024-01-01T00:00:00Z",
+          ends_at: null,
+          id: "ann-1",
+          priority: "info",
+          published: true,
+          starts_at: null,
+          title: "テスト",
+        },
+        created_at: "2024-01-01T00:00:00Z",
+        id: "sa-1",
+        pinned: false,
+        space_id: "space-123",
+      },
+    ];
+
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
+
+    const mockSpaceQuery = {
+      eq: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { id: "space-123", owner_id: "owner-123" },
+        error: null,
+      }),
+    };
+
+    const mockRoleQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    const mockParticipantQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    const mockOrderChain2 = {
+      order: vi.fn().mockResolvedValue({
+        data: mockSpaceAnnouncements,
+        error: null,
+      }),
+    };
+
+    const mockOrderChain1 = {
+      order: vi.fn().mockReturnValue(mockOrderChain2),
+    };
+
+    const mockEqChain = {
+      eq: vi.fn().mockReturnValue(mockOrderChain1),
+    };
+
+    const mockAnnouncementQuery = {
+      select: vi.fn().mockReturnValue(mockEqChain),
+    };
+
+    mockSupabase.from.mockImplementation(
+      createSequentialFromMock(
+        mockSpaceQuery,
+        mockRoleQuery,
+        mockParticipantQuery,
+        mockAnnouncementQuery
+      )
+    );
+
+    const result = await getSpaceAnnouncements(
+      "550e8400-e29b-41d4-a716-446655440001"
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data).toBeDefined();
+    expect(result.data?.length).toBe(1);
+  });
+
+  it("スペース管理者はお知らせを閲覧できる", async () => {
+    const mockUser = { id: "admin-123" };
+    const mockSpaceAnnouncements = [
+      {
+        announcement_id: "ann-1",
+        announcements: {
+          content: "テストお知らせ",
+          created_at: "2024-01-01T00:00:00Z",
+          ends_at: null,
+          id: "ann-1",
+          priority: "info",
+          published: true,
+          starts_at: null,
+          title: "テスト",
+        },
+        created_at: "2024-01-01T00:00:00Z",
+        id: "sa-1",
+        pinned: false,
+        space_id: "space-123",
+      },
+    ];
+
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
+
+    const mockSpaceQuery = {
+      eq: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { id: "space-123", owner_id: "owner-123" },
+        error: null,
+      }),
+    };
+
+    const mockRoleQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: { id: "role-123", role: "admin" },
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    const mockParticipantQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    const mockOrderChain2 = {
+      order: vi.fn().mockResolvedValue({
+        data: mockSpaceAnnouncements,
+        error: null,
+      }),
+    };
+
+    const mockOrderChain1 = {
+      order: vi.fn().mockReturnValue(mockOrderChain2),
+    };
+
+    const mockEqChain = {
+      eq: vi.fn().mockReturnValue(mockOrderChain1),
+    };
+
+    const mockAnnouncementQuery = {
+      select: vi.fn().mockReturnValue(mockEqChain),
+    };
+
+    mockSupabase.from.mockImplementation(
+      createSequentialFromMock(
+        mockSpaceQuery,
+        mockRoleQuery,
+        mockParticipantQuery,
+        mockAnnouncementQuery
+      )
+    );
+
+    const result = await getSpaceAnnouncements(
+      "550e8400-e29b-41d4-a716-446655440001"
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data).toBeDefined();
+    expect(result.data?.length).toBe(1);
+  });
+
+  it("参加者はお知らせを閲覧できる", async () => {
+    const mockUser = { id: "participant-123" };
+    const mockSpaceAnnouncements = [
+      {
+        announcement_id: "ann-1",
+        announcements: {
+          content: "テストお知らせ",
+          created_at: "2024-01-01T00:00:00Z",
+          ends_at: null,
+          id: "ann-1",
+          priority: "info",
+          published: true,
+          starts_at: null,
+          title: "テスト",
+        },
+        created_at: "2024-01-01T00:00:00Z",
+        id: "sa-1",
+        pinned: false,
+        space_id: "space-123",
+      },
+    ];
+
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
+
+    const mockSpaceQuery = {
+      eq: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { id: "space-123", owner_id: "owner-123" },
+        error: null,
+      }),
+    };
+
+    const mockRoleQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    const mockParticipantQuery = {
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: { id: "participant-123" },
+        error: null,
+      }),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    const mockOrderChain2 = {
+      order: vi.fn().mockResolvedValue({
+        data: mockSpaceAnnouncements,
+        error: null,
+      }),
+    };
+
+    const mockOrderChain1 = {
+      order: vi.fn().mockReturnValue(mockOrderChain2),
+    };
+
+    const mockEqChain = {
+      eq: vi.fn().mockReturnValue(mockOrderChain1),
+    };
+
+    const mockAnnouncementQuery = {
+      select: vi.fn().mockReturnValue(mockEqChain),
+    };
+
+    mockSupabase.from.mockImplementation(
+      createSequentialFromMock(
+        mockSpaceQuery,
+        mockRoleQuery,
+        mockParticipantQuery,
+        mockAnnouncementQuery
+      )
+    );
+
+    const result = await getSpaceAnnouncements(
+      "550e8400-e29b-41d4-a716-446655440001"
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data).toBeDefined();
+    expect(result.data?.length).toBe(1);
   });
 });
 
