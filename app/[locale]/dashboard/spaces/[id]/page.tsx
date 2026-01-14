@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { SpaceAnnouncementList } from "@/components/announcements/space-announcement-list";
 import { redirect } from "@/i18n/navigation";
 import { getSpace } from "@/lib/data/spaces";
 import { systemFeaturesSchema } from "@/lib/schemas/system-settings";
@@ -11,7 +10,6 @@ import type {
   LocaleType,
   ThemeType,
 } from "@/lib/types/screen-settings";
-import { checkIsSpaceAdmin } from "@/lib/utils/space-permissions";
 import { BingoGameManager } from "./_components/bingo-game-manager";
 import { ClosedSpaceParticipants } from "./_components/closed-space-participants";
 import { DisplaySettingsDialog } from "./_components/display-settings-dialog";
@@ -52,9 +50,6 @@ export default async function AdminSpacePage({
 
   // Check if current user is owner
   const isOwner = space.owner_id === user?.id;
-
-  // Check if current user is admin (for announcement management)
-  const isAdmin = await checkIsSpaceAdmin(id, user?.id);
 
   // Get OAuth provider identities for the owner (to check available OAuth tokens)
   const identities = user?.identities || [];
@@ -155,10 +150,6 @@ export default async function AdminSpacePage({
           />
         </div>
       </div>
-
-      {/* Space Announcements Section */}
-      <SpaceAnnouncementList isAdmin={isAdmin} spaceId={space.id} />
-
       {/* Main Content Area - Status-based rendering */}
       {space.status === "draft" && (
         <DraftStatusView locale={locale} spaceId={space.id} />
