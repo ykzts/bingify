@@ -88,7 +88,34 @@ pnpm env:generate --force
 cp .env.example .env
 ```
 
-### 3. ローカル開発環境の起動
+### 3. Auth Hook Secretの設定（Magic Link認証に必要）
+
+Magic Linkによるパスワードレスログインを使用する場合、Auth Hook Secretの設定が必要です。
+
+**重要:** `.env` ファイルにSupabaseとNext.jsの**両方**で同じ値を設定する必要があります。
+
+```bash
+# ランダムなシークレットを生成
+openssl rand -base64 32
+
+# .env ファイルに以下の形式で追加:
+# SEND_EMAIL_HOOK_SECRETS=v1,whsec_<上記で生成した値>
+```
+
+または、`pnpm env:generate` を使用すると自動的に生成されます。
+
+**確認方法:**
+
+Auth Hook設定が正しく動作しているか確認するには:
+
+```bash
+# 開発サーバー起動後、以下のURLにアクセス
+curl http://localhost:3000/api/auth/hooks/send-email
+```
+
+正常な場合、`"status": "ok"` が返されます。
+
+### 4. ローカル開発環境の起動
 
 ```bash
 # Supabaseローカルインスタンスを起動
@@ -100,11 +127,47 @@ pnpm dev
 
 アプリケーションは [http://localhost:3000](http://localhost:3000) で起動します。
 
-### 4. ローカルインスタンスの停止
+### 5. ローカルインスタンスの停止
 
 ```bash
 pnpm local:stop
 ```
+
+## トラブルシューティング
+
+### Magic Linkログインが失敗する
+
+**症状:** Magic Linkログイン時に「Invalid payload sent to hook」エラーが表示される
+
+**原因:** `SEND_EMAIL_HOOK_SECRETS` が未設定、または形式が正しくない
+
+**解決方法:**
+
+1. `.env` ファイルが存在し、`SEND_EMAIL_HOOK_SECRETS` が設定されていることを確認:
+   ```bash
+   cat .env | grep SEND_EMAIL_HOOK_SECRETS
+   ```
+
+2. 形式が `v1,whsec_<base64文字列>` であることを確認
+
+3. Auth Hookエンドポイントが正常に動作していることを確認:
+   ```bash
+   curl http://localhost:3000/api/auth/hooks/send-email
+   ```
+
+4. Supabaseを再起動して設定を反映:
+   ```bash
+   pnpm local:stop
+   pnpm local:setup
+   ```
+
+5. Next.jsアプリケーションを再起動:
+   ```bash
+   # Ctrl+C で停止後
+   pnpm dev
+   ```
+
+**詳細:** Supabase CLI は `.env` ファイルから環境変数を読み込みます。`supabase/config.toml` の `[auth.hook.send_email]` セクションで `secrets = "env(SEND_EMAIL_HOOK_SECRETS)"` と設定されているため、`.env` ファイルに値が必要です。
 
 ## デプロイ
 
