@@ -13,6 +13,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import { getAbsoluteUrl } from "@/lib/utils/url";
+import { ConditionalHeader } from "./_components/conditional-header";
 import { Footer } from "./_components/footer";
 import { HeaderMenuWrapper } from "./_components/header-menu-wrapper";
 import { PreReleaseBanner } from "./_components/pre-release-banner";
@@ -63,11 +64,13 @@ export default async function LocaleLayout({
                 <Suspense fallback={null}>
                   <AnnouncementBanner />
                 </Suspense>
-                <header className="sticky top-0 z-50 border-gray-200 border-b bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/80">
-                  <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                    <HeaderMenuWrapper />
-                  </div>
-                </header>
+                <ConditionalHeader>
+                  <header className="sticky top-0 z-50 border-gray-200 border-b bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/80">
+                    <div className="container mx-auto flex h-16 items-center justify-between px-4">
+                      <HeaderMenuWrapper />
+                    </div>
+                  </header>
+                </ConditionalHeader>
                 <main className="flex-1">{children}</main>
                 <Footer />
               </div>

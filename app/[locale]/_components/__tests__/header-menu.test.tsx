@@ -4,20 +4,11 @@ import { describe, expect, it } from "vitest";
  * HeaderMenuコンポーネントのログインボタン表示ロジックのテスト
  *
  * このテストは、未ログインユーザーにログインボタンが表示されることを検証します。
+ * ヘッダー全体の表示制御は ConditionalHeader コンポーネントで行われます。
  */
 describe("HeaderMenuのログインボタン表示ロジック", () => {
   describe("未ログインユーザーの場合", () => {
     it("ログインボタンが表示される", () => {
-      // テスト条件
-      const user: null = null;
-
-      // 未ログインの場合はログインボタンを表示
-      const shouldShowLoginButton = user === null;
-
-      expect(shouldShowLoginButton).toBe(true);
-    });
-
-    it("ダッシュボードページでもログインボタンが表示される", () => {
       // テスト条件
       const user: null = null;
 
