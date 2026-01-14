@@ -174,7 +174,26 @@ function normalizeNewPayload(
   const siteUrlOverride = normalizeSiteUrl(
     emailData.redirect_to || emailData.site_url
   );
-  const action = mapEmailAction(emailData.email_action_type);
+  let action = mapEmailAction(emailData.email_action_type);
+
+  // Workaround: Supabase may send "signup" for Magic Link (OTP) authentication.
+  // Detect this by checking if user already exists (created_at is recent).
+  // Magic Link for existing users should use recovery token fields, not confirmation.
+  if (action === "confirmation" && user && user.created_at) {
+    // Only check timestamp if created_at is present and valid
+    const createdAt = new Date(user.created_at).getTime();
+
+    // Skip if created_at is invalid (NaN)
+    if (!Number.isNaN(createdAt)) {
+      const now = Date.now();
+      const oneMinuteAgo = now - 60 * 1000;
+
+      if (createdAt < oneMinuteAgo) {
+        // Existing user - treat as magic link
+        action = "magiclink";
+      }
+    }
+  }
 
   const normalizedEmail = buildNormalizedEmail(emailData, action);
 
@@ -258,6 +277,9 @@ function normalizeSiteUrl(url?: string): string | undefined {
 
 /**
  * Supabaseの認証アクションを内部アクションタイプにマッピング
+ *
+ * Note: Supabase may send "signup" for both password-based signup and Magic Link OTP.
+ * To distinguish, we check the email_data context in normalizeNewPayload.
  */
 function mapEmailAction(action?: string): string {
   switch (action) {
