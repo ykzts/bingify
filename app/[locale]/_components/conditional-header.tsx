@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { Activity } from "react";
 import { usePathname } from "@/i18n/navigation";
 
 interface ConditionalHeaderProps {
@@ -10,8 +11,8 @@ interface ConditionalHeaderProps {
 export function ConditionalHeader({ children }: ConditionalHeaderProps) {
   const pathname = usePathname();
 
-  // ログインページではヘッダーを非表示（CSSで制御し、再マウントを防ぐ）
-  const isHidden = pathname === "/login";
+  // ログインページではヘッダーを非アクティブ化（再マウントを防ぐ）
+  const isActive = pathname !== "/login";
 
-  return <div className={isHidden ? "hidden" : "contents"}>{children}</div>;
+  return <Activity mode={isActive ? "visible" : "hidden"}>{children}</Activity>;
 }
