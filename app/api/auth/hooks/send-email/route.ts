@@ -53,7 +53,9 @@ export async function POST(request: NextRequest) {
     let payload: unknown;
     try {
       payload = JSON.parse(body);
+      console.log("[Auth Hook] Received payload:", JSON.stringify(payload, null, 2));
     } catch {
+      console.error("[Auth Hook] Invalid JSON in request body");
       return NextResponse.json(
         { error: "Invalid JSON in request body" },
         { status: 400 }
@@ -64,6 +66,7 @@ export async function POST(request: NextRequest) {
     const normalized = normalizeAuthHookPayload(payload);
 
     if (!normalized) {
+      console.error("[Auth Hook] Failed to normalize payload. Raw payload:", JSON.stringify(payload, null, 2));
       return NextResponse.json(
         { error: "Invalid payload structure" },
         { status: 400 }

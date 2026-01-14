@@ -138,6 +138,7 @@ export function normalizeAuthHookPayload(
   const result = AuthHookPayloadSchema.safeParse(payload);
 
   if (!result.success) {
+    console.error("[normalizeAuthHookPayload] Schema validation failed:", JSON.stringify(result.error.errors, null, 2));
     return null;
   }
 
@@ -161,6 +162,7 @@ export function normalizeAuthHookPayload(
   }
 
   // 有効なメールデータが見つかりません
+  console.error("[normalizeAuthHookPayload] No valid email data found in payload");
   return null;
 }
 
@@ -258,11 +260,16 @@ function normalizeSiteUrl(url?: string): string | undefined {
 
 /**
  * Supabaseの認証アクションを内部アクションタイプにマッピング
+ * 
+ * Note: Supabase sends "signup" for both password-based signup AND Magic Link (OTP) signup.
+ * We need to treat "signup" as a Magic Link (recovery-type) action since it uses the same
+ * token/token_hash fields that the magiclink handler expects (recovery_token/recovery_token_hash).
  */
 function mapEmailAction(action?: string): string {
   switch (action) {
     case "signup":
-      return "confirmation";
+      // Magic Link OTP signup should be treated as "magiclink" since it uses recovery_token fields
+      return "magiclink";
     case "recovery":
       return "recovery";
     case "magiclink":
