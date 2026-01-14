@@ -277,21 +277,7 @@ max_frequency = "5s"
 
 # Auth email hook - Sends authentication emails via Next.js Route Handler
 # Uses HMAC-SHA256 signature verification for security
-# Secret must be set in .env file as SEND_EMAIL_HOOK_SECRETS
-# 
-# IMPORTANT: 
-# - Supabase CLI reads environment variables from the .env file in project root
-# - The secret format must be: v1,whsec_<base64_string>
-# - Generate with: openssl rand -base64 32
-# - After setting, restart Supabase: pnpm local:stop && pnpm local:setup
-# 
-# Troubleshooting:
-# - If you get "Invalid payload sent to hook" error, check that:
-#   1. .env file exists and contains SEND_EMAIL_HOOK_SECRETS
-#   2. The format is correct (v1,whsec_...)
-#   3. Supabase has been restarted after setting the value
-# - Test the endpoint: curl http://localhost:3000/api/auth/hooks/send-email
-# 
+# Secret must be set in .env.local as SEND_EMAIL_HOOK_SECRETS
 # Note: Use host.docker.internal to access the host machine from Docker container
 [auth.hook.send_email]
 enabled = true
