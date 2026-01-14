@@ -71,7 +71,7 @@ export function MobileFooterNavWrapper() {
     };
   }, []);
 
-  if (user === undefined || user === null) {
+  if (!user) {
     return null;
   }
 

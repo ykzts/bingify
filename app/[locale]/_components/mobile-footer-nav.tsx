@@ -44,7 +44,6 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
     } catch (error) {
       console.error("Logout error:", error);
       setIsLoggingOut(false);
-      setOpen(true);
     }
   };
 
