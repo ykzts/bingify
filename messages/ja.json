@@ -752,6 +752,7 @@
     "welcomeMessage": "ようこそ！まだ管理者が設定されていません。下のボタンをクリックして、最初の管理者として登録してください。"
   },
   "SpaceAnnouncement": {
+    "actionsLabel": "操作",
     "announcementContentHelp": "最大5000文字",
     "announcementContentLabel": "内容",
     "announcementContentPlaceholder": "お知らせの内容を入力してください...",
@@ -780,6 +781,7 @@
     "announcementTitlePlaceholder": "お知らせのタイトルを入力してください...",
     "announcementUpdateButton": "お知らせを更新",
     "announcementUpdateSuccess": "お知らせを更新しました",
+    "createButton": "お知らせを作成",
     "deleteButton": "削除",
     "deleteConfirm": "このお知らせを削除してもよろしいですか？",
     "deleteSuccess": "お知らせを削除しました",
@@ -792,11 +794,15 @@
     "errorInvalidAnnouncementId": "無効なお知らせIDです",
     "errorInvalidSpaceId": "無効なスペースIDです",
     "errorUpdateFailed": "お知らせの更新に失敗しました",
+    "loading": "読み込み中",
     "loadingMessage": "お知らせを読み込んでいます...",
     "manageButton": "お知らせを管理",
     "pinned": "ピン留め",
+    "pinnedLabel": "ピン留め",
     "processing": "処理中...",
-    "title": "お知らせ"
+    "statusLabel": "ステータス",
+    "title": "お知らせ",
+    "titleLabel": "タイトル"
   },
   "SpaceLanding": {
     "emailRequirement": "メールアドレス要件",

@@ -16,6 +16,7 @@ import { DisplaySettingsDialog } from "./_components/display-settings-dialog";
 import { DraftStatusView } from "./_components/draft-status-view";
 import { GameResultsView } from "./_components/game-results-view";
 import { ParticipantsStatus } from "./_components/participants-status";
+import { SpaceAnnouncementButton } from "./_components/space-announcement-management";
 import { SpaceSettingsSheet } from "./_components/space-settings-sheet";
 import { SpaceUrlShare } from "./_components/space-url-share";
 
@@ -127,6 +128,7 @@ export default async function AdminSpacePage({
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
+          <SpaceAnnouncementButton spaceId={space.id} />
           <DisplaySettingsDialog
             initialBackground={initialBackground}
             initialDisplayMode={initialDisplayMode}
