@@ -58,17 +58,6 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
   };
 
   if (!user) {
-    // ログインページでは何も表示しない
-    // 2つの空要素を返すことで、justify-betweenレイアウトを維持
-    if (pathname === "/login") {
-      return (
-        <>
-          <div />
-          <div />
-        </>
-      );
-    }
-
     // トップページからログインする場合はダッシュボードへリダイレクト
     const loginHref =
       pathname === "/" ? "/login?redirect=/dashboard" : "/login";
