@@ -138,7 +138,6 @@ export function normalizeAuthHookPayload(
   const result = AuthHookPayloadSchema.safeParse(payload);
 
   if (!result.success) {
-    console.error("[normalizeAuthHookPayload] Schema validation failed:", JSON.stringify(result.error.errors, null, 2));
     return null;
   }
 
@@ -162,7 +161,6 @@ export function normalizeAuthHookPayload(
   }
 
   // 有効なメールデータが見つかりません
-  console.error("[normalizeAuthHookPayload] No valid email data found in payload");
   return null;
 }
 
