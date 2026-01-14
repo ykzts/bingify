@@ -53,7 +53,7 @@ describe("Auth Hook Endpoint", () => {
       expect(response.status).toBe(200);
 
       response.json().then((body) => {
-        expect(body.configuration.secretFormat).toBe("partial");
+        expect(body.configuration.secretFormat).toBe("v1 (incomplete)");
       });
 
       vi.unstubAllEnvs();
@@ -68,7 +68,7 @@ describe("Auth Hook Endpoint", () => {
       expect(response.status).toBe(200);
 
       response.json().then((body) => {
-        expect(body.configuration.secretFormat).toBe("invalid");
+        expect(body.configuration.secretFormat).toBe("other");
       });
 
       vi.unstubAllEnvs();

@@ -5,6 +5,7 @@ import {
   handleEmailAction,
   verifyWebhookSignature,
 } from "./_lib/email-handler";
+import { validateSecretFormat } from "./_lib/secret-validator";
 
 /**
  * Supabaseの認証フックでメール送信リクエストを処理
@@ -12,7 +13,6 @@ import {
  * Supabase Authからウェブフックを受け取り、適切なメールテンプレートにルーティングします。
  * すべてのリクエストはHMAC-SHA256署名で検証されます。
  */
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 認証フローのエラーハンドリングには詳細な分岐が必要
 export async function POST(request: NextRequest) {
   try {
     // ヘッダーからウェブフック署名を取得
@@ -24,17 +24,7 @@ export async function POST(request: NextRequest) {
     // 必須ヘッダーとシークレットが存在するか検証
     if (!(signature && timestamp && id && secret)) {
       // 詳細なエラーログを出力（デバッグ用）
-      // secretFormatの判定を分離して可読性を向上
-      let secretFormat = "not set";
-      if (secret) {
-        if (secret.startsWith("v1,whsec_")) {
-          secretFormat = "v1,whsec_...";
-        } else if (secret.startsWith("v1,")) {
-          secretFormat = "v1 (incomplete)";
-        } else {
-          secretFormat = "other";
-        }
-      }
+      const secretFormat = validateSecretFormat(secret);
 
       console.error("[Auth Hook] Missing required headers or secret:", {
         hasId: !!id,
@@ -193,18 +183,7 @@ export async function POST(request: NextRequest) {
 export function GET() {
   const secret = process.env.SEND_EMAIL_HOOK_SECRETS;
   const hasSecret = !!secret;
-
-  // secretFormatの判定を分離して可読性を向上
-  let secretFormat = "not set";
-  if (secret) {
-    if (secret.startsWith("v1,whsec_")) {
-      secretFormat = "valid";
-    } else if (secret.startsWith("v1,")) {
-      secretFormat = "partial";
-    } else {
-      secretFormat = "invalid";
-    }
-  }
+  const secretFormat = validateSecretFormat(secret);
 
   return NextResponse.json(
     {
