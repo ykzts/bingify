@@ -958,13 +958,13 @@
   },
   "AnnouncementActions": {
     "errorAdminRequired": "Admin権限が必要です",
-    "errorAnnouncementNotFound": "お知らせが見つかりません",
     "errorCreateFailed": "お知らせの作成に失敗しました",
     "errorDeleteFailed": "お知らせの削除に失敗しました",
     "errorDismissFailed": "お知らせの非表示に失敗しました",
     "errorFetchAnnouncementsFailed": "お知らせの取得に失敗しました",
     "errorGeneric": "エラーが発生しました",
-    "errorInvalidData": "入力値が不正です",
+    "errorInvalidInput": "入力値が不正です",
+    "errorNotFound": "お知らせが見つかりません",
     "errorUnauthorized": "認証が必要です",
     "errorUpdateFailed": "お知らせの更新に失敗しました"
   },

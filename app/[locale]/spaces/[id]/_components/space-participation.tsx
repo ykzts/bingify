@@ -204,7 +204,7 @@ export function SpaceParticipation({
       await Promise.all([refetchJoined(), refetchInfo()]);
       router.refresh();
     } else {
-      setError(result.errorKey ? t(result.errorKey) : t("errorJoinFailed"));
+      setError(result.error || t("errorJoinFailed"));
     }
 
     setIsJoining(false);
@@ -363,7 +363,7 @@ export function SpaceParticipation({
       await Promise.all([refetchJoined(), refetchInfo()]);
       router.refresh();
     } else {
-      setError(result.errorKey ? t(result.errorKey) : t("errorLeaveFailed"));
+      setError(result.error || t("errorLeaveFailed"));
     }
 
     setIsLeaving(false);

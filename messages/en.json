@@ -957,13 +957,13 @@
   },
   "AnnouncementActions": {
     "errorAdminRequired": "Admin permission required",
-    "errorAnnouncementNotFound": "Announcement not found",
     "errorCreateFailed": "Failed to create announcement",
     "errorDeleteFailed": "Failed to delete announcement",
     "errorDismissFailed": "Failed to dismiss announcement",
     "errorFetchAnnouncementsFailed": "Failed to fetch announcements",
     "errorGeneric": "An error occurred",
-    "errorInvalidData": "Invalid input data",
+    "errorInvalidInput": "Invalid input",
+    "errorNotFound": "Announcement not found",
     "errorUnauthorized": "Authentication required",
     "errorUpdateFailed": "Failed to update announcement"
   },

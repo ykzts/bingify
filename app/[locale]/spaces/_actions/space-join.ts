@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import {
   getOAuthToken,
   isTokenExpired,
@@ -16,7 +17,6 @@ import { isValidUUID } from "@/lib/utils/uuid";
 
 export interface JoinSpaceState {
   error?: string;
-  errorKey?: string;
   success: boolean;
 }
 
@@ -140,6 +140,7 @@ async function verifyYouTubeSubscription(
   requirement: "subscriber" | "member",
   spaceOwnerId: string
 ): Promise<JoinSpaceState | null> {
+  const t = await getTranslations("UserSpace");
   const supabase = await createClient();
 
   // 1. 参加者のトークンを取得
@@ -149,7 +150,7 @@ async function verifyYouTubeSubscription(
     !(participantTokenResult.success && participantTokenResult.access_token)
   ) {
     return {
-      errorKey: "errorYouTubeVerificationRequired",
+      error: t("errorYouTubeVerificationRequired"),
       success: false,
     };
   }
@@ -162,7 +163,7 @@ async function verifyYouTubeSubscription(
 
   if (!(ownerTokenResult.success && ownerTokenResult.access_token)) {
     return {
-      errorKey: "errorYouTubeVerificationFailed",
+      error: t("errorYouTubeVerificationFailed"),
       success: false,
     };
   }
@@ -180,14 +181,14 @@ async function verifyYouTubeSubscription(
 
     if (result.error) {
       return {
-        errorKey: "errorYouTubeVerificationFailed",
+        error: t("errorYouTubeVerificationFailed"),
         success: false,
       };
     }
 
     if (!result.isMember) {
       return {
-        errorKey: "errorYouTubeNotMember",
+        error: t("errorYouTubeNotMember"),
         success: false,
       };
     }
@@ -205,14 +206,14 @@ async function verifyYouTubeSubscription(
 
   if (result.error) {
     return {
-      errorKey: "errorYouTubeVerificationFailed",
+      error: t("errorYouTubeVerificationFailed"),
       success: false,
     };
   }
 
   if (!result.isSubscribed) {
     return {
-      errorKey: "errorYouTubeNotSubscribed",
+      error: t("errorYouTubeNotSubscribed"),
       success: false,
     };
   }
@@ -225,6 +226,7 @@ async function verifyTwitchRequirements(
   requirement: "follower" | "subscriber",
   spaceOwnerId: string
 ): Promise<JoinSpaceState | null> {
+  const t = await getTranslations("UserSpace");
   const supabase = await createClient();
 
   // 1. 参加者のトークンを取得
@@ -234,7 +236,7 @@ async function verifyTwitchRequirements(
     !(participantTokenResult.success && participantTokenResult.access_token)
   ) {
     return {
-      errorKey: "errorTwitchVerificationRequired",
+      error: t("errorTwitchVerificationRequired"),
       success: false,
     };
   }
@@ -247,7 +249,7 @@ async function verifyTwitchRequirements(
 
   if (!(ownerTokenResult.success && ownerTokenResult.access_token)) {
     return {
-      errorKey: "errorTwitchVerificationFailed",
+      error: t("errorTwitchVerificationFailed"),
       success: false,
     };
   }
@@ -265,14 +267,14 @@ async function verifyTwitchRequirements(
 
     if (followResult.error) {
       return {
-        errorKey: "errorTwitchVerificationFailed",
+        error: t("errorTwitchVerificationFailed"),
         success: false,
       };
     }
 
     if (!followResult.isFollowing) {
       return {
-        errorKey: "errorTwitchNotFollowing",
+        error: t("errorTwitchNotFollowing"),
         success: false,
       };
     }
@@ -289,14 +291,14 @@ async function verifyTwitchRequirements(
 
     if (subResult.error) {
       return {
-        errorKey: "errorTwitchVerificationFailed",
+        error: t("errorTwitchVerificationFailed"),
         success: false,
       };
     }
 
     if (!subResult.isSubscribed) {
       return {
-        errorKey: "errorTwitchNotSubscribed",
+        error: t("errorTwitchNotSubscribed"),
         success: false,
       };
     }
@@ -305,11 +307,13 @@ async function verifyTwitchRequirements(
   return null;
 }
 
-function verifyEmailAllowlist(
+async function verifyEmailAllowlist(
   userEmail: string,
   allowedPatterns: string[],
   blockedPatterns?: string[]
-): JoinSpaceState | null {
+): Promise<JoinSpaceState | null> {
+  const t = await getTranslations("UserSpace");
+  
   // Check blocked list first (if both allowed and blocked have same pattern, blocked takes priority)
   if (
     blockedPatterns &&
@@ -317,7 +321,7 @@ function verifyEmailAllowlist(
     checkEmailAllowed(userEmail, blockedPatterns)
   ) {
     return {
-      errorKey: "errorEmailBlocked",
+      error: t("errorEmailBlocked"),
       success: false,
     };
   }
@@ -325,7 +329,7 @@ function verifyEmailAllowlist(
   // Check allowed list
   if (!checkEmailAllowed(userEmail, allowedPatterns)) {
     return {
-      errorKey: "errorEmailNotAllowed",
+      error: t("errorEmailNotAllowed"),
       success: false,
     };
   }
@@ -343,7 +347,7 @@ async function verifyGatekeeperRules(
     gatekeeperRules?.email?.allowed &&
     gatekeeperRules.email.allowed.length > 0
   ) {
-    const verificationResult = verifyEmailAllowlist(
+    const verificationResult = await verifyEmailAllowlist(
       userEmail,
       gatekeeperRules.email.allowed,
       gatekeeperRules.email.blocked
@@ -389,11 +393,13 @@ async function verifyGatekeeperRules(
 }
 
 export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
+  const t = await getTranslations("UserSpace");
+  
   try {
     // Validate UUID format
     if (!isValidUUID(spaceId)) {
       return {
-        errorKey: "errorInvalidSpace",
+        error: t("errorInvalidSpace"),
         success: false,
       };
     }
@@ -407,7 +413,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
 
     if (!user) {
       return {
-        errorKey: "errorUnauthorized",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -416,7 +422,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
     const userEmail = user.email;
     if (!userEmail) {
       return {
-        errorKey: "errorUnauthorized",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -430,14 +436,14 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
 
     if (!space) {
       return {
-        errorKey: "errorInvalidSpace",
+        error: t("errorInvalidSpace"),
         success: false,
       };
     }
 
     if (space.status !== "active") {
       return {
-        errorKey: "errorSpaceClosed",
+        error: t("errorSpaceClosed"),
         success: false,
       };
     }
@@ -446,7 +452,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
     if (!space.owner_id) {
       console.error("Space owner_id is null:", space.id);
       return {
-        errorKey: "errorInvalidSpace",
+        error: t("errorInvalidSpace"),
         success: false,
       };
     }
@@ -464,7 +470,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
       if (!space.created_at) {
         console.error("Space created_at is null:", space.id);
         return {
-          errorKey: "errorInvalidSpace",
+          error: t("errorInvalidSpace"),
           success: false,
         };
       }
@@ -476,7 +482,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
       );
       if (new Date() > expirationDate) {
         return {
-          errorKey: "errorSpaceClosed",
+          error: t("errorSpaceClosed"),
           success: false,
         };
       }
@@ -511,14 +517,14 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
       // Check if it's a quota error
       if (error.code === "P0001" || error.message.includes("limit reached")) {
         return {
-          errorKey: "errorQuotaReached",
+          error: t("errorQuotaReached"),
           success: false,
         };
       }
 
       console.error("Database error:", error);
       return {
-        errorKey: "errorJoinFailed",
+        error: t("errorJoinFailed"),
         success: false,
       };
     }
@@ -529,18 +535,20 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
   } catch (error) {
     console.error("Error joining space:", error);
     return {
-      errorKey: "errorGeneric",
+      error: t("errorGeneric"),
       success: false,
     };
   }
 }
 
 export async function leaveSpace(spaceId: string): Promise<JoinSpaceState> {
+  const t = await getTranslations("UserSpace");
+  
   try {
     // Validate UUID format
     if (!isValidUUID(spaceId)) {
       return {
-        errorKey: "errorInvalidSpace",
+        error: t("errorInvalidSpace"),
         success: false,
       };
     }
@@ -554,7 +562,7 @@ export async function leaveSpace(spaceId: string): Promise<JoinSpaceState> {
 
     if (!user) {
       return {
-        errorKey: "errorUnauthorized",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -569,7 +577,7 @@ export async function leaveSpace(spaceId: string): Promise<JoinSpaceState> {
     if (error) {
       console.error("Database error:", error);
       return {
-        errorKey: "errorLeaveFailed",
+        error: t("errorLeaveFailed"),
         success: false,
       };
     }
@@ -580,7 +588,7 @@ export async function leaveSpace(spaceId: string): Promise<JoinSpaceState> {
   } catch (error) {
     console.error("Error leaving space:", error);
     return {
-      errorKey: "errorGeneric",
+      error: t("errorGeneric"),
       success: false,
     };
   }

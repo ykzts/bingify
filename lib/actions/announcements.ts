@@ -221,6 +221,8 @@ export async function getAllAnnouncements(): Promise<GetAnnouncementsResult> {
 export async function createAnnouncement(
   data: CreateAnnouncementInput
 ): Promise<AnnouncementActionResult> {
+  const t = await getTranslations("AnnouncementActions");
+  
   try {
     const supabase = await createClient();
 
@@ -232,7 +234,7 @@ export async function createAnnouncement(
 
     if (authError || !user) {
       return {
-        error: "認証が必要です",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -241,7 +243,7 @@ export async function createAnnouncement(
     const isAdmin = await checkAdminPermission();
     if (!isAdmin) {
       return {
-        error: "Admin権限が必要です",
+        error: t("errorAdminRequired"),
         success: false,
       };
     }
@@ -251,7 +253,7 @@ export async function createAnnouncement(
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0];
       return {
-        error: firstError?.message || "入力値が不正です",
+        error: firstError?.message || t("errorInvalidInput"),
         success: false,
       };
     }
@@ -302,6 +304,8 @@ export async function updateAnnouncement(
   id: string,
   data: UpdateAnnouncementInput
 ): Promise<AnnouncementActionResult> {
+  const t = await getTranslations("AnnouncementActions");
+  
   try {
     const supabase = await createClient();
 
@@ -313,7 +317,7 @@ export async function updateAnnouncement(
 
     if (authError || !user) {
       return {
-        error: "認証が必要です",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -322,7 +326,7 @@ export async function updateAnnouncement(
     const isAdmin = await checkAdminPermission();
     if (!isAdmin) {
       return {
-        error: "Admin権限が必要です",
+        error: t("errorAdminRequired"),
         success: false,
       };
     }
@@ -332,7 +336,7 @@ export async function updateAnnouncement(
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0];
       return {
-        error: firstError?.message || "入力値が不正です",
+        error: firstError?.message || t("errorInvalidInput"),
         success: false,
       };
     }
@@ -347,7 +351,7 @@ export async function updateAnnouncement(
     if (updateError) {
       console.error("Error updating announcement:", updateError);
       return {
-        error: "お知らせの更新に失敗しました",
+        error: t("errorUpdateFailed"),
         success: false,
       };
     }
@@ -355,7 +359,7 @@ export async function updateAnnouncement(
     // 更新された行が存在しない場合はエラー
     if (!updated || updated.length === 0) {
       return {
-        error: "お知らせが見つかりません",
+        error: t("errorNotFound"),
         success: false,
       };
     }
@@ -397,7 +401,7 @@ export async function deleteAnnouncement(
 
     if (authError || !user) {
       return {
-        error: "認証が必要です",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -406,7 +410,7 @@ export async function deleteAnnouncement(
     const isAdmin = await checkAdminPermission();
     if (!isAdmin) {
       return {
-        error: "Admin権限が必要です",
+        error: t("errorAdminRequired"),
         success: false,
       };
     }
