@@ -727,7 +727,7 @@
     "displayMode": "表示モード",
     "displaySettings": "表示設定",
     "exitFullscreen": "フルスクリーンを終了",
-    "fullscreenHint": "F キーでフルスクリーンを切り替え",
+    "fullscreenHint": "Fキーでフルスクリーンを切り替え",
     "guestName": "ゲスト",
     "invalidToken": "このURLは無効か、再生成されています。",
     "loading": "読み込み中...",
