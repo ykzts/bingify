@@ -17,6 +17,7 @@ import {
 import { usePathname, useRouter } from "@/i18n/navigation";
 import type { SystemFeatures } from "@/lib/types/settings";
 import type { Space } from "@/lib/types/space";
+import { getSpaceStatusTranslationKey } from "@/lib/utils/space-status";
 import { AdminManagement } from "./admin-management";
 import { DangerZone } from "./danger-zone";
 import { SpaceSettingsForm } from "./space-settings-form";
@@ -98,16 +99,6 @@ export function SpaceSettingsSheet({
 
   const isClosed = space.status === "closed";
 
-  const getStatusText = (): string => {
-    if (space.status === "draft") {
-      return t("settingsStatusDraft");
-    }
-    if (space.status === "closed") {
-      return t("settingsStatusClosed");
-    }
-    return t("settingsStatusActive");
-  };
-
   return (
     <Sheet onOpenChange={handleOpenChange} open={open}>
       <SheetTrigger asChild>
@@ -120,7 +111,14 @@ export function SpaceSettingsSheet({
         <SheetHeader>
           <SheetTitle>{t("settingsTitle")}</SheetTitle>
           <SheetDescription>
-            {space.share_key} - {getStatusText()}
+            {space.share_key} -{" "}
+            {t(
+              getSpaceStatusTranslationKey(
+                // Database schema uses string | null, but runtime values are guaranteed to be SpaceStatus
+                space.status as "active" | "draft" | "closed" | null,
+                "AdminSpace"
+              )
+            )}
           </SheetDescription>
         </SheetHeader>
         <div className="mt-6 space-y-8 px-6">

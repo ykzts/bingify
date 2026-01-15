@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "@/i18n/navigation";
 import { formatDateShort } from "@/lib/utils/date-format";
+import { getSpaceStatusTranslationKey } from "@/lib/utils/space-status";
 import type { UserSpace } from "../_actions/space-management";
 import { SpaceActionsDropdown } from "./space-actions-dropdown";
 import { StatusBadge } from "./status-badge";
@@ -25,16 +26,6 @@ function SpaceTable({
   spaces: UserSpace[];
 }) {
   const t = useTranslations("Dashboard");
-
-  const getStatusLabel = (status: string | null): string => {
-    if (status === "active") {
-      return t("statusActive");
-    }
-    if (status === "draft") {
-      return t("statusDraft");
-    }
-    return t("statusClosed");
-  };
 
   return (
     <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
@@ -78,7 +69,12 @@ function SpaceTable({
               </td>
               <td className="px-4 py-3">
                 <StatusBadge
-                  label={getStatusLabel(space.status)}
+                  label={t(
+                    getSpaceStatusTranslationKey(
+                      // Database schema uses string | null, but runtime values are guaranteed to be SpaceStatus
+                      space.status as "active" | "draft" | "closed" | null
+                    )
+                  )}
                   status={space.status || "closed"}
                 />
               </td>
