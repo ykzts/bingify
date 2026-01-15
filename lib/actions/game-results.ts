@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
 import type { Tables } from "@/types/supabase";
@@ -26,10 +27,12 @@ export interface GetGameResultsResult {
 export async function getGameResults(
   spaceId: string
 ): Promise<GetGameResultsResult> {
+  const t = await getTranslations("GameResultActions");
+  
   try {
     if (!isValidUUID(spaceId)) {
       return {
-        error: "Invalid space ID",
+        error: t("errorInvalidSpaceId"),
         success: false,
       };
     }
@@ -42,7 +45,7 @@ export async function getGameResults(
 
     if (!user) {
       return {
-        error: "Authentication required",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -56,7 +59,7 @@ export async function getGameResults(
 
     if (!space) {
       return {
-        error: "Space not found",
+        error: t("errorSpaceNotFound"),
         success: false,
       };
     }
@@ -76,7 +79,7 @@ export async function getGameResults(
 
     if (!(isOwner || isAdmin)) {
       return {
-        error: "Permission denied",
+        error: t("errorPermissionDenied"),
         success: false,
       };
     }
@@ -91,7 +94,7 @@ export async function getGameResults(
     if (error) {
       console.error("Error fetching game results:", error);
       return {
-        error: "Failed to fetch game results",
+        error: t("errorFetchResults"),
         success: false,
       };
     }
@@ -136,7 +139,7 @@ export async function getGameResults(
   } catch (error) {
     console.error("Error in getGameResults:", error);
     return {
-      error: "An error occurred",
+      error: t("errorGeneric"),
       success: false,
     };
   }

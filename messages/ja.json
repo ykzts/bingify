@@ -912,6 +912,19 @@
     "youtubeSubscriber": "チャンネル登録者のみ",
     "youtubeSubscriberDescription": "指定したYouTubeチャンネルの登録者のみが参加できます"
   },
+  "SpaceAnnouncementActions": {
+    "errorCreateFailed": "スペースお知らせの作成に失敗しました",
+    "errorDeleteFailed": "スペースお知らせの削除に失敗しました",
+    "errorFetchFailed": "スペースお知らせの取得に失敗しました",
+    "errorGeneric": "エラーが発生しました",
+    "errorInvalidAnnouncementId": "無効なお知らせIDです",
+    "errorInvalidSpaceId": "無効なスペースIDです",
+    "errorNoViewPermission": "このスペースのお知らせを閲覧する権限がありません",
+    "errorSpaceNotFound": "スペースが見つかりません",
+    "errorSpaceNotFoundOrNoPermission": "スペースが見つからないか、権限がありません",
+    "errorUnauthorized": "認証が必要です",
+    "errorUpdateFailed": "スペースお知らせの更新に失敗しました"
+  },
   "Support": {
     "description": "Bingifyはボランティアによって運営されているオープンソースプロジェクトです。あなたのサポートが、ホスティング費用や継続的な開発を支えます。",
     "heading": "開発を支援する",
@@ -943,6 +956,26 @@
     "usernameLabel": "名前",
     "usernamePlaceholder": "名前を入力してください"
   },
+  "AnnouncementActions": {
+    "errorAdminRequired": "Admin権限が必要です",
+    "errorAnnouncementNotFound": "お知らせが見つかりません",
+    "errorCreateFailed": "お知らせの作成に失敗しました",
+    "errorDeleteFailed": "お知らせの削除に失敗しました",
+    "errorDismissFailed": "お知らせの非表示に失敗しました",
+    "errorFetchAnnouncementsFailed": "お知らせの取得に失敗しました",
+    "errorGeneric": "エラーが発生しました",
+    "errorInvalidData": "入力値が不正です",
+    "errorUnauthorized": "認証が必要です",
+    "errorUpdateFailed": "お知らせの更新に失敗しました"
+  },
+  "GameResultActions": {
+    "errorFetchResults": "ゲーム結果の取得に失敗しました",
+    "errorGeneric": "エラーが発生しました",
+    "errorInvalidSpaceId": "無効なスペースIDです",
+    "errorPermissionDenied": "権限がありません",
+    "errorSpaceNotFound": "スペースが見つかりません",
+    "errorUnauthorized": "認証が必要です"
+  },
   "NotificationActions": {
     "errorCountUnread": "未読通知数の取得に失敗しました",
     "errorDeleteNotificationFailed": "通知の削除に失敗しました",
@@ -954,6 +987,13 @@
     "errorNoDeletePermission": "この通知を削除する権限がありません",
     "errorNotificationNotFound": "通知が見つかりません",
     "errorUnauthorized": "認証が必要です"
+  },
+  "ScreenSettingsActions": {
+    "errorGeneric": "エラーが発生しました",
+    "errorPermissionDenied": "権限がありません",
+    "errorSpaceNotFound": "スペースが見つかりません",
+    "errorUnauthorized": "認証が必要です",
+    "errorUpdateFailed": "設定の更新に失敗しました"
   },
   "ServerActions": {
     "errorGeneric": "予期しないエラーが発生しました",
