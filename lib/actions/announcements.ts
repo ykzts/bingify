@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import {
   type CreateAnnouncementInput,
@@ -77,6 +78,8 @@ async function checkAdminPermission(): Promise<boolean> {
  * @returns 有効なお知らせ一覧
  */
 export async function getActiveAnnouncements(): Promise<GetAnnouncementsResult> {
+  const t = await getTranslations("AnnouncementActions");
+  
   try {
     const supabase = await createClient();
 
@@ -88,7 +91,7 @@ export async function getActiveAnnouncements(): Promise<GetAnnouncementsResult> 
 
     if (authError || !user) {
       return {
-        error: "認証が必要です",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -105,7 +108,7 @@ export async function getActiveAnnouncements(): Promise<GetAnnouncementsResult> 
     if (error) {
       console.error("Error fetching active announcements:", error);
       return {
-        error: "お知らせの取得に失敗しました",
+        error: t("errorFetchAnnouncementsFailed"),
         success: false,
       };
     }
@@ -142,7 +145,7 @@ export async function getActiveAnnouncements(): Promise<GetAnnouncementsResult> 
   } catch (error) {
     console.error("Error in getActiveAnnouncements:", error);
     return {
-      error: "エラーが発生しました",
+      error: t("errorGeneric"),
       success: false,
     };
   }
@@ -155,6 +158,8 @@ export async function getActiveAnnouncements(): Promise<GetAnnouncementsResult> 
  * @returns すべてのお知らせ一覧
  */
 export async function getAllAnnouncements(): Promise<GetAnnouncementsResult> {
+  const t = await getTranslations("AnnouncementActions");
+  
   try {
     const supabase = await createClient();
 
@@ -189,7 +194,7 @@ export async function getAllAnnouncements(): Promise<GetAnnouncementsResult> {
     if (error) {
       console.error("Error fetching all announcements:", error);
       return {
-        error: "お知らせの取得に失敗しました",
+        error: t("errorFetchAnnouncementsFailed"),
         success: false,
       };
     }
@@ -201,7 +206,7 @@ export async function getAllAnnouncements(): Promise<GetAnnouncementsResult> {
   } catch (error) {
     console.error("Error in getAllAnnouncements:", error);
     return {
-      error: "エラーが発生しました",
+      error: t("errorGeneric"),
       success: false,
     };
   }
@@ -266,7 +271,7 @@ export async function createAnnouncement(
     if (insertError) {
       console.error("Error creating announcement:", insertError);
       return {
-        error: "お知らせの作成に失敗しました",
+        error: t("errorCreateFailed"),
         success: false,
       };
     }
@@ -280,7 +285,7 @@ export async function createAnnouncement(
   } catch (error) {
     console.error("Error in createAnnouncement:", error);
     return {
-      error: "エラーが発生しました",
+      error: t("errorGeneric"),
       success: false,
     };
   }
@@ -364,7 +369,7 @@ export async function updateAnnouncement(
   } catch (error) {
     console.error("Error in updateAnnouncement:", error);
     return {
-      error: "エラーが発生しました",
+      error: t("errorGeneric"),
       success: false,
     };
   }
@@ -379,6 +384,8 @@ export async function updateAnnouncement(
 export async function deleteAnnouncement(
   id: string
 ): Promise<AnnouncementActionResult> {
+  const t = await getTranslations("AnnouncementActions");
+  
   try {
     const supabase = await createClient();
 
@@ -413,7 +420,7 @@ export async function deleteAnnouncement(
     if (deleteError) {
       console.error("Error deleting announcement:", deleteError);
       return {
-        error: "お知らせの削除に失敗しました",
+        error: t("errorDeleteFailed"),
         success: false,
       };
     }
@@ -427,7 +434,7 @@ export async function deleteAnnouncement(
   } catch (error) {
     console.error("Error in deleteAnnouncement:", error);
     return {
-      error: "エラーが発生しました",
+      error: t("errorGeneric"),
       success: false,
     };
   }
@@ -442,6 +449,8 @@ export async function deleteAnnouncement(
 export async function dismissAnnouncement(
   announcementId: string
 ): Promise<AnnouncementActionResult> {
+  const t = await getTranslations("AnnouncementActions");
+  
   try {
     const supabase = await createClient();
 
@@ -474,7 +483,7 @@ export async function dismissAnnouncement(
     if (upsertError) {
       console.error("Error dismissing announcement:", upsertError);
       return {
-        error: "お知らせの非表示に失敗しました",
+        error: t("errorDismissFailed"),
         success: false,
       };
     }
@@ -488,7 +497,7 @@ export async function dismissAnnouncement(
   } catch (error) {
     console.error("Error in dismissAnnouncement:", error);
     return {
-      error: "エラーが発生しました",
+      error: t("errorGeneric"),
       success: false,
     };
   }
@@ -500,6 +509,8 @@ export async function dismissAnnouncement(
  * @returns 非表示お知らせID配列
  */
 export async function getDismissedAnnouncements(): Promise<GetDismissedAnnouncementsResult> {
+  const t = await getTranslations("AnnouncementActions");
+  
   try {
     const supabase = await createClient();
 
@@ -525,7 +536,7 @@ export async function getDismissedAnnouncements(): Promise<GetDismissedAnnouncem
     if (error) {
       console.error("Error fetching dismissed announcements:", error);
       return {
-        error: "非表示お知らせの取得に失敗しました",
+        error: t("errorFetchAnnouncementsFailed"),
         success: false,
       };
     }
@@ -539,7 +550,7 @@ export async function getDismissedAnnouncements(): Promise<GetDismissedAnnouncem
   } catch (error) {
     console.error("Error in getDismissedAnnouncements:", error);
     return {
-      error: "エラーが発生しました",
+      error: t("errorGeneric"),
       success: false,
     };
   }
