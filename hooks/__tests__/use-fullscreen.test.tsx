@@ -21,8 +21,7 @@ describe("useFullscreen", () => {
     // 型エラーを回避するため as any を使用
     HTMLElement.prototype.requestFullscreen =
       mockRequestFullscreen as HTMLElement["requestFullscreen"];
-    document.exitFullscreen =
-      mockExitFullscreen as Document["exitFullscreen"];
+    document.exitFullscreen = mockExitFullscreen as Document["exitFullscreen"];
   });
 
   afterEach(() => {
