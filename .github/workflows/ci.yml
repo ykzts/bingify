@@ -32,6 +32,8 @@ jobs:
 
       - name: Setup local environment
         run: pnpm local:setup
+        env:
+          SUPABASE_INTERNAL_IMAGE_REGISTRY: ghcr.io
 
       - name: Sync environment variables
         run: pnpm dev:env
