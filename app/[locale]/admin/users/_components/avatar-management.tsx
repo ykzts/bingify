@@ -25,6 +25,16 @@ interface AvatarManagementProps {
   userProfile: Tables<"profiles">;
 }
 
+function AvatarProviderIcon({ source }: { source: string | null }) {
+  if (source === "google") {
+    return <ProviderIcon provider="google" />;
+  }
+  if (source === "twitch") {
+    return <ProviderIcon provider="twitch" />;
+  }
+  return <User aria-hidden="true" className="size-5" />;
+}
+
 export function AvatarManagement({
   userId,
   userProfile,
@@ -135,15 +145,7 @@ export function AvatarManagement({
                 </AvatarImage>
               ) : null}
               <AvatarFallback>
-                {(() => {
-                  if (userProfile.avatar_source === "google") {
-                    return <ProviderIcon provider="google" />;
-                  }
-                  if (userProfile.avatar_source === "twitch") {
-                    return <ProviderIcon provider="twitch" />;
-                  }
-                  return <User aria-hidden="true" className="size-5" />;
-                })()}
+                <AvatarProviderIcon source={userProfile.avatar_source} />
               </AvatarFallback>
             </Avatar>
             <div>

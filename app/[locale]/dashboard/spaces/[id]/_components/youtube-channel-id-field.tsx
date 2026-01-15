@@ -124,6 +124,73 @@ export function YoutubeChannelIdField({
     return enteredChannelId;
   };
 
+  const renderInputContent = () => {
+    if (loadingMetadata && enteredChannelId) {
+      return (
+        <InputGroupAddon>
+          <Badge className="flex items-center gap-1" variant="outline">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            <span>{t("loading")}</span>
+            <div className="inline-flex h-3 w-3 items-center justify-center opacity-50">
+              <X className="h-3 w-3" />
+            </div>
+          </Badge>
+          <input
+            className="sr-only"
+            name={field.name}
+            readOnly
+            ref={inputRef}
+            tabIndex={0}
+            type="text"
+            value={enteredChannelId || ""}
+          />
+        </InputGroupAddon>
+      );
+    }
+    if (metadata) {
+      return (
+        <InputGroupAddon>
+          <Badge className="flex items-center gap-1" variant="outline">
+            <span>{getBadgeText()}</span>
+            <button
+              aria-label={t("removeChannel")}
+              className="inline-flex h-3 w-3 cursor-pointer items-center justify-center disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={isPending}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete();
+              }}
+              type="button"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </Badge>
+          <input
+            className="sr-only"
+            name={field.name}
+            onKeyDown={handleKeyDown}
+            readOnly
+            ref={inputRef}
+            tabIndex={0}
+            type="text"
+            value={enteredChannelId || ""}
+          />
+        </InputGroupAddon>
+      );
+    }
+    return (
+      <InputGroupInput
+        disabled={true}
+        name={field.name}
+        placeholder={t("youtubeChannelIdPlaceholder")}
+        ref={inputRef}
+        required={true}
+        type="text"
+        value=""
+      />
+    );
+  };
+
   return (
     <Field>
       <FieldContent>
@@ -131,80 +198,7 @@ export function YoutubeChannelIdField({
 
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <InputGroup>
-              {(() => {
-                if (loadingMetadata && enteredChannelId) {
-                  return (
-                    <InputGroupAddon>
-                      <Badge
-                        className="flex items-center gap-1"
-                        variant="outline"
-                      >
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                        <span>{t("loading")}</span>
-                        <div className="inline-flex h-3 w-3 items-center justify-center opacity-50">
-                          <X className="h-3 w-3" />
-                        </div>
-                      </Badge>
-                      <input
-                        className="sr-only"
-                        name={field.name}
-                        readOnly
-                        ref={inputRef}
-                        tabIndex={0}
-                        type="text"
-                        value={enteredChannelId || ""}
-                      />
-                    </InputGroupAddon>
-                  );
-                }
-                if (metadata) {
-                  return (
-                    <InputGroupAddon>
-                      <Badge
-                        className="flex items-center gap-1"
-                        variant="outline"
-                      >
-                        <span>{getBadgeText()}</span>
-                        <button
-                          aria-label={t("removeChannel")}
-                          className="inline-flex h-3 w-3 cursor-pointer items-center justify-center disabled:cursor-not-allowed disabled:opacity-50"
-                          disabled={isPending}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete();
-                          }}
-                          type="button"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                      <input
-                        className="sr-only"
-                        name={field.name}
-                        onKeyDown={handleKeyDown}
-                        readOnly
-                        ref={inputRef}
-                        tabIndex={0}
-                        type="text"
-                        value={enteredChannelId || ""}
-                      />
-                    </InputGroupAddon>
-                  );
-                }
-                return (
-                  <InputGroupInput
-                    disabled={true}
-                    name={field.name}
-                    placeholder={t("youtubeChannelIdPlaceholder")}
-                    ref={inputRef}
-                    required={true}
-                    type="text"
-                    value=""
-                  />
-                );
-              })()}
-            </InputGroup>
+            <InputGroup>{renderInputContent()}</InputGroup>
           </div>
           <Button
             disabled={isPending || fetchingOperatorYoutubeId}

@@ -26,6 +26,16 @@ function SpaceTable({
 }) {
   const t = useTranslations("Dashboard");
 
+  const getStatusLabel = (status: string | null): string => {
+    if (status === "active") {
+      return t("statusActive");
+    }
+    if (status === "draft") {
+      return t("statusDraft");
+    }
+    return t("statusClosed");
+  };
+
   return (
     <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
       <table className="w-full text-left text-sm">
@@ -68,15 +78,7 @@ function SpaceTable({
               </td>
               <td className="px-4 py-3">
                 <StatusBadge
-                  label={(() => {
-                    if (space.status === "active") {
-                      return t("statusActive");
-                    }
-                    if (space.status === "draft") {
-                      return t("statusDraft");
-                    }
-                    return t("statusClosed");
-                  })()}
+                  label={getStatusLabel(space.status)}
                   status={space.status || "closed"}
                 />
               </td>
