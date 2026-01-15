@@ -114,6 +114,7 @@ export function SpaceSettingsSheet({
             {space.share_key} -{" "}
             {t(
               getSpaceStatusTranslationKey(
+                // Database schema uses string | null, but runtime values are guaranteed to be SpaceStatus
                 space.status as "active" | "draft" | "closed" | null,
                 "AdminSpace"
               )
