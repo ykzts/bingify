@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import type {
   BackgroundType,
@@ -26,6 +27,7 @@ export async function updateScreenSettings(
     theme: ThemeType;
   }
 ): Promise<UpdateScreenSettingsResult> {
+  const t = await getTranslations("ScreenSettingsActions");
   const supabase = await createClient();
 
   // First, verify that the user has permission to update this space
@@ -37,7 +39,7 @@ export async function updateScreenSettings(
 
   if (spaceError || !space) {
     return {
-      error: "Space not found",
+      error: t("errorSpaceNotFound"),
       success: false,
     };
   }
@@ -50,7 +52,7 @@ export async function updateScreenSettings(
 
   if (authError || !user) {
     return {
-      error: "Authentication required",
+      error: t("errorUnauthorized"),
       success: false,
     };
   }
@@ -68,7 +70,7 @@ export async function updateScreenSettings(
 
   if (!(isOwner || isAdmin)) {
     return {
-      error: "Permission denied",
+      error: t("errorPermissionDenied"),
       success: false,
     };
   }
@@ -89,7 +91,7 @@ export async function updateScreenSettings(
 
   if (upsertError) {
     return {
-      error: "Failed to update settings",
+      error: t("errorUpdateFailed"),
       success: false,
     };
   }

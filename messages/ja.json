@@ -324,6 +324,18 @@
     "statusReach": "リーチ",
     "viewCardButton": "カードを見る"
   },
+  "AnnouncementActions": {
+    "errorAdminRequired": "Admin権限が必要です",
+    "errorCreateFailed": "お知らせの作成に失敗しました",
+    "errorDeleteFailed": "お知らせの削除に失敗しました",
+    "errorDismissFailed": "お知らせの非表示に失敗しました",
+    "errorFetchAnnouncementsFailed": "お知らせの取得に失敗しました",
+    "errorGeneric": "エラーが発生しました",
+    "errorInvalidInput": "入力値が不正です",
+    "errorNotFound": "お知らせが見つかりません",
+    "errorUnauthorized": "認証が必要です",
+    "errorUpdateFailed": "お知らせの更新に失敗しました"
+  },
   "Announcements": {
     "content": {
       "placeholder": "お知らせの内容を入力してください...",
@@ -578,6 +590,14 @@
     "sourceCode": "ソースコード",
     "terms": "利用規約"
   },
+  "GameResultActions": {
+    "errorFetchResults": "ゲーム結果の取得に失敗しました",
+    "errorGeneric": "エラーが発生しました",
+    "errorInvalidSpaceId": "無効なスペースIDです",
+    "errorPermissionDenied": "権限がありません",
+    "errorSpaceNotFound": "スペースが見つかりません",
+    "errorUnauthorized": "認証が必要です"
+  },
   "GameResults": {
     "achievedAt": "達成日時",
     "achievedPattern": "達成パターン",
@@ -662,6 +682,18 @@
     "description": "お探しのページは存在しないか、移動した可能性があります。",
     "title": "ページが見つかりません"
   },
+  "NotificationActions": {
+    "errorCountUnread": "未読通知数の取得に失敗しました",
+    "errorDeleteNotificationFailed": "通知の削除に失敗しました",
+    "errorFetchNotifications": "通知の取得に失敗しました",
+    "errorGeneric": "エラーが発生しました",
+    "errorMarkAllReadFailed": "すべての通知の既読化に失敗しました",
+    "errorMarkReadFailed": "通知の既読化に失敗しました",
+    "errorNoAccessPermission": "この通知にアクセスする権限がありません",
+    "errorNoDeletePermission": "この通知を削除する権限がありません",
+    "errorNotificationNotFound": "通知が見つかりません",
+    "errorUnauthorized": "認証が必要です"
+  },
   "NotificationBell": {
     "notifications": "通知"
   },
@@ -717,6 +749,13 @@
     "metaDescription": "Bingifyのプライバシーポリシーをご覧ください。個人情報の収集、利用、保護の方法について説明しています。",
     "metaTitle": "プライバシーポリシー"
   },
+  "ScreenSettingsActions": {
+    "errorGeneric": "エラーが発生しました",
+    "errorPermissionDenied": "権限がありません",
+    "errorSpaceNotFound": "スペースが見つかりません",
+    "errorUnauthorized": "認証が必要です",
+    "errorUpdateFailed": "設定の更新に失敗しました"
+  },
   "ScreenView": {
     "background": "背景",
     "bgBlue": "青",
@@ -735,6 +774,10 @@
     "notificationReach": "{name} さんがリーチになりました！",
     "scanToJoin": "スキャンして参加",
     "waitingForNumbers": "番号の呼び出しを待っています..."
+  },
+  "ServerActions": {
+    "errorGeneric": "予期しないエラーが発生しました",
+    "errorUnauthorized": "認証が必要です"
   },
   "Setup": {
     "claimButton": "管理者権限を取得",
@@ -804,6 +847,19 @@
     "statusLabel": "ステータス",
     "title": "お知らせ",
     "titleLabel": "タイトル"
+  },
+  "SpaceAnnouncementActions": {
+    "errorCreateFailed": "スペースお知らせの作成に失敗しました",
+    "errorDeleteFailed": "スペースお知らせの削除に失敗しました",
+    "errorFetchFailed": "スペースお知らせの取得に失敗しました",
+    "errorGeneric": "エラーが発生しました",
+    "errorInvalidAnnouncementId": "無効なお知らせIDです",
+    "errorInvalidSpaceId": "無効なスペースIDです",
+    "errorNoViewPermission": "このスペースのお知らせを閲覧する権限がありません",
+    "errorSpaceNotFound": "スペースが見つかりません",
+    "errorSpaceNotFoundOrNoPermission": "スペースが見つからないか、権限がありません",
+    "errorUnauthorized": "認証が必要です",
+    "errorUpdateFailed": "スペースお知らせの更新に失敗しました"
   },
   "SpaceLanding": {
     "emailRequirement": "メールアドレス要件",

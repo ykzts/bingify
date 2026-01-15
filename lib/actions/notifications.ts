@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import type { Notification } from "@/lib/types/notification";
 
@@ -53,6 +54,8 @@ export async function getNotifications(
   perPage = 20,
   unreadOnly = false
 ): Promise<GetNotificationsResult> {
+  const t = await getTranslations("NotificationActions");
+
   try {
     const supabase = await createClient();
 
@@ -64,7 +67,7 @@ export async function getNotifications(
 
     if (authError || !user) {
       return {
-        error: "認証が必要です",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -91,7 +94,7 @@ export async function getNotifications(
     if (error) {
       console.error("Error fetching notifications:", error);
       return {
-        error: "通知の取得に失敗しました",
+        error: t("errorFetchNotifications"),
         success: false,
       };
     }
@@ -109,7 +112,7 @@ export async function getNotifications(
   } catch (error) {
     console.error("Error in getNotifications:", error);
     return {
-      error: "エラーが発生しました",
+      error: t("errorGeneric"),
       success: false,
     };
   }
@@ -121,6 +124,8 @@ export async function getNotifications(
  * @returns 未読通知の数
  */
 export async function getUnreadCount(): Promise<GetUnreadCountResult> {
+  const t = await getTranslations("NotificationActions");
+
   try {
     const supabase = await createClient();
 
@@ -132,7 +137,7 @@ export async function getUnreadCount(): Promise<GetUnreadCountResult> {
 
     if (authError || !user) {
       return {
-        error: "認証が必要です",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -147,7 +152,7 @@ export async function getUnreadCount(): Promise<GetUnreadCountResult> {
     if (error) {
       console.error("Error counting unread notifications:", error);
       return {
-        error: "未読通知数の取得に失敗しました",
+        error: t("errorCountUnread"),
         success: false,
       };
     }
@@ -161,7 +166,7 @@ export async function getUnreadCount(): Promise<GetUnreadCountResult> {
   } catch (error) {
     console.error("Error in getUnreadCount:", error);
     return {
-      error: "エラーが発生しました",
+      error: t("errorGeneric"),
       success: false,
     };
   }
@@ -176,6 +181,8 @@ export async function getUnreadCount(): Promise<GetUnreadCountResult> {
 export async function markNotificationRead(
   notificationId: string
 ): Promise<NotificationActionResult> {
+  const t = await getTranslations("NotificationActions");
+
   try {
     const supabase = await createClient();
 
@@ -187,7 +194,7 @@ export async function markNotificationRead(
 
     if (authError || !user) {
       return {
-        error: "認証が必要です",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -201,14 +208,14 @@ export async function markNotificationRead(
 
     if (fetchError || !notification) {
       return {
-        error: "通知が見つかりません",
+        error: t("errorNotificationNotFound"),
         success: false,
       };
     }
 
     if (notification.user_id !== user.id) {
       return {
-        error: "この通知にアクセスする権限がありません",
+        error: t("errorNoAccessPermission"),
         success: false,
       };
     }
@@ -223,7 +230,7 @@ export async function markNotificationRead(
     if (updateError) {
       console.error("Error marking notification as read:", updateError);
       return {
-        error: "通知の既読化に失敗しました",
+        error: t("errorMarkReadFailed"),
         success: false,
       };
     }
@@ -237,7 +244,7 @@ export async function markNotificationRead(
   } catch (error) {
     console.error("Error in markNotificationRead:", error);
     return {
-      error: "エラーが発生しました",
+      error: t("errorGeneric"),
       success: false,
     };
   }
@@ -249,6 +256,8 @@ export async function markNotificationRead(
  * @returns 操作結果
  */
 export async function markAllNotificationsRead(): Promise<NotificationActionResult> {
+  const t = await getTranslations("NotificationActions");
+
   try {
     const supabase = await createClient();
 
@@ -260,7 +269,7 @@ export async function markAllNotificationsRead(): Promise<NotificationActionResu
 
     if (authError || !user) {
       return {
-        error: "認証が必要です",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -275,7 +284,7 @@ export async function markAllNotificationsRead(): Promise<NotificationActionResu
     if (updateError) {
       console.error("Error marking all notifications as read:", updateError);
       return {
-        error: "すべての通知の既読化に失敗しました",
+        error: t("errorMarkAllReadFailed"),
         success: false,
       };
     }
@@ -289,7 +298,7 @@ export async function markAllNotificationsRead(): Promise<NotificationActionResu
   } catch (error) {
     console.error("Error in markAllNotificationsRead:", error);
     return {
-      error: "エラーが発生しました",
+      error: t("errorGeneric"),
       success: false,
     };
   }
@@ -304,6 +313,8 @@ export async function markAllNotificationsRead(): Promise<NotificationActionResu
 export async function deleteNotification(
   notificationId: string
 ): Promise<NotificationActionResult> {
+  const t = await getTranslations("NotificationActions");
+
   try {
     const supabase = await createClient();
 
@@ -315,7 +326,7 @@ export async function deleteNotification(
 
     if (authError || !user) {
       return {
-        error: "認証が必要です",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
@@ -329,14 +340,14 @@ export async function deleteNotification(
 
     if (fetchError || !notification) {
       return {
-        error: "通知が見つかりません",
+        error: t("errorNotificationNotFound"),
         success: false,
       };
     }
 
     if (notification.user_id !== user.id) {
       return {
-        error: "この通知を削除する権限がありません",
+        error: t("errorNoDeletePermission"),
         success: false,
       };
     }
@@ -351,7 +362,7 @@ export async function deleteNotification(
     if (deleteError) {
       console.error("Error deleting notification:", deleteError);
       return {
-        error: "通知の削除に失敗しました",
+        error: t("errorDeleteNotificationFailed"),
         success: false,
       };
     }
@@ -365,7 +376,7 @@ export async function deleteNotification(
   } catch (error) {
     console.error("Error in deleteNotification:", error);
     return {
-      error: "エラーが発生しました",
+      error: t("errorGeneric"),
       success: false,
     };
   }
