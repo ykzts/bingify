@@ -32,15 +32,17 @@ export function DraftStatusView({ locale, spaceId }: Props) {
   }, [publishState.success, router, spaceId, locale]);
 
   return (
-    <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+    <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800">
       <div className="max-w-md text-center">
         <div className="mb-6 flex justify-center">
-          <div className="rounded-full bg-purple-100 p-4">
-            <Rocket className="h-12 w-12 text-purple-600" />
+          <div className="rounded-full bg-purple-100 p-4 dark:bg-purple-900/30">
+            <Rocket className="h-12 w-12 text-purple-600 dark:text-purple-400" />
           </div>
         </div>
         <h2 className="mb-3 font-bold text-2xl">{t("draftMainTitle")}</h2>
-        <p className="mb-6 text-gray-600">{t("draftMainMessage")}</p>
+        <p className="mb-6 text-gray-600 dark:text-gray-400">
+          {t("draftMainMessage")}
+        </p>
 
         <form action={publishAction}>
           <Button disabled={isPublishing} size="lg" type="submit">

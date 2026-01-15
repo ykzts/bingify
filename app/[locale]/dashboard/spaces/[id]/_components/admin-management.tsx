@@ -136,7 +136,7 @@ export function AdminManagement({ spaceId }: Props) {
       </SectionHeader>
 
       {/* Invite Admin Form */}
-      <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+      <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
         <h3 className="mb-3 font-semibold text-sm">管理者を招待</h3>
         <FormErrors
           className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3"
@@ -205,8 +205,8 @@ export function AdminManagement({ spaceId }: Props) {
           </div>
         )}
         {!(loading || error) && admins.length === 0 && (
-          <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
-            <p className="text-gray-500 text-sm">
+          <div className="rounded-lg border border-gray-200 bg-white p-8 text-center dark:border-gray-700 dark:bg-gray-800">
+            <p className="text-gray-500 text-sm dark:text-gray-400">
               まだ管理者は招待されていません
             </p>
           </div>
@@ -215,7 +215,7 @@ export function AdminManagement({ spaceId }: Props) {
           <div className="space-y-2">
             {admins.map((admin) => (
               <div
-                className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4"
+                className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
                 key={admin.user_id}
               >
                 <div className="flex items-center gap-3">
