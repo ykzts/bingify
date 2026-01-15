@@ -5,7 +5,7 @@
 # ==========================================
 # Stage 1: Dependencies
 # ==========================================
-FROM node:24-alpine@sha256:c921b97d4b74f51744057454b306b418cf693865e73b8100559189605f6955b8 AS deps
+FROM node:24-alpine@sha256:abba54e1aa65f9d795ec66541e3e829986072483bf7812ea66df83dd69f95dae AS deps
 
 # Install pnpm globally
 RUN npm install -g pnpm@10.27.0
@@ -21,7 +21,7 @@ RUN pnpm install --frozen-lockfile
 # ==========================================
 # Stage 2: Builder
 # ==========================================
-FROM node:24-alpine@sha256:c921b97d4b74f51744057454b306b418cf693865e73b8100559189605f6955b8 AS builder
+FROM node:24-alpine@sha256:abba54e1aa65f9d795ec66541e3e829986072483bf7812ea66df83dd69f95dae AS builder
 
 # Install pnpm globally
 RUN npm install -g pnpm@10.27.0
@@ -46,7 +46,7 @@ RUN pnpm build
 # ==========================================
 # Stage 3: Production Runner
 # ==========================================
-FROM node:24-alpine@sha256:c921b97d4b74f51744057454b306b418cf693865e73b8100559189605f6955b8 AS runner
+FROM node:24-alpine@sha256:abba54e1aa65f9d795ec66541e3e829986072483bf7812ea66df83dd69f95dae AS runner
 
 WORKDIR /app
 
