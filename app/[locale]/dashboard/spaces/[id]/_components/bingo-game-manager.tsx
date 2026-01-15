@@ -127,7 +127,9 @@ export function BingoGameManager({ spaceId }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="mb-4 font-semibold text-xl">{t("bingoGameManager")}</h2>
+        <h2 className="mb-4 font-semibold text-xl dark:text-gray-100">
+          {t("bingoGameManager")}
+        </h2>
 
         <div className="mb-4">
           <Button

@@ -122,7 +122,9 @@ export default async function AdminSpacePage({
       {/* Header with Action Buttons */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="font-bold text-3xl">{t("heading")}</h1>
+          <h1 className="font-bold text-3xl dark:text-gray-100">
+            {t("heading")}
+          </h1>
           <p className="mt-1 text-gray-600 dark:text-gray-400">
             {t("spaceId")}: {space.share_key}
           </p>
@@ -174,7 +176,7 @@ export default async function AdminSpacePage({
         <>
           <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <div className="text-center">
-              <h2 className="mb-2 font-bold text-2xl">
+              <h2 className="mb-2 font-bold text-2xl dark:text-gray-100">
                 {t("closeSpaceTitle")}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">

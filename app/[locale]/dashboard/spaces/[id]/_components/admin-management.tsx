@@ -137,7 +137,9 @@ export function AdminManagement({ spaceId }: Props) {
 
       {/* Invite Admin Form */}
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
-        <h3 className="mb-3 font-semibold text-sm">管理者を招待</h3>
+        <h3 className="mb-3 font-semibold text-sm dark:text-gray-100">
+          管理者を招待
+        </h3>
         <FormErrors
           className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3"
           errors={formErrors}
@@ -192,7 +194,9 @@ export function AdminManagement({ spaceId }: Props) {
 
       {/* Admin List */}
       <div>
-        <h3 className="mb-3 font-semibold text-sm">現在の管理者</h3>
+        <h3 className="mb-3 font-semibold text-sm dark:text-gray-100">
+          現在の管理者
+        </h3>
         {removeError && <FieldErrors className="mb-3" errors={[removeError]} />}
         {loading && (
           <div className="flex items-center justify-center py-8">

@@ -39,7 +39,9 @@ export function DraftStatusView({ locale, spaceId }: Props) {
             <Rocket className="h-12 w-12 text-purple-600 dark:text-purple-400" />
           </div>
         </div>
-        <h2 className="mb-3 font-bold text-2xl">{t("draftMainTitle")}</h2>
+        <h2 className="mb-3 font-bold text-2xl dark:text-gray-100">
+          {t("draftMainTitle")}
+        </h2>
         <p className="mb-6 text-gray-600 dark:text-gray-400">
           {t("draftMainMessage")}
         </p>
