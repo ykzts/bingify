@@ -125,15 +125,17 @@ export function ContactForm({ locale }: Props) {
   };
 
   return (
-    <div className="w-full max-w-2xl rounded-lg border bg-white p-8 shadow-lg">
+    <div className="w-full max-w-2xl rounded-lg border bg-white p-8 shadow-lg dark:border-gray-700 dark:bg-gray-800">
       <div className="mb-6 flex items-center gap-3">
-        <div className="rounded-full bg-purple-100 p-3">
-          <Mail className="h-6 w-6 text-purple-600" />
+        <div className="rounded-full bg-purple-100 p-3 dark:bg-purple-900/30">
+          <Mail className="h-6 w-6 text-purple-600 dark:text-purple-400" />
         </div>
-        <h1 className="font-bold text-2xl">{t("title")}</h1>
+        <h1 className="font-bold text-2xl dark:text-gray-100">{t("title")}</h1>
       </div>
 
-      <p className="mb-6 text-gray-600">{t("description")}</p>
+      <p className="mb-6 text-gray-600 dark:text-gray-400">
+        {t("description")}
+      </p>
 
       <div className="mb-6 flex justify-end">
         <Button
