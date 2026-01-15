@@ -313,7 +313,7 @@ async function verifyEmailAllowlist(
   blockedPatterns?: string[]
 ): Promise<JoinSpaceState | null> {
   const t = await getTranslations("UserSpace");
-  
+
   // Check blocked list first (if both allowed and blocked have same pattern, blocked takes priority)
   if (
     blockedPatterns &&
@@ -394,7 +394,7 @@ async function verifyGatekeeperRules(
 
 export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
   const t = await getTranslations("UserSpace");
-  
+
   try {
     // Validate UUID format
     if (!isValidUUID(spaceId)) {
@@ -543,7 +543,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
 
 export async function leaveSpace(spaceId: string): Promise<JoinSpaceState> {
   const t = await getTranslations("UserSpace");
-  
+
   try {
     // Validate UUID format
     if (!isValidUUID(spaceId)) {

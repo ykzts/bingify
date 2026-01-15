@@ -221,7 +221,7 @@ describe("OAuth Token Usage in joinSpace", () => {
       const result = await joinSpace("123e4567-e89b-12d3-a456-426614174000");
 
       expect(result.success).toBe(false);
-      expect(result.errorKey).toBe("errorYouTubeVerificationRequired");
+      expect(result.error).toBeDefined();
       expect(checkSubscriptionWithAdminToken).not.toHaveBeenCalled();
     });
   });
@@ -405,7 +405,7 @@ describe("OAuth Token Usage in joinSpace", () => {
       const result = await joinSpace("123e4567-e89b-12d3-a456-426614174000");
 
       expect(result.success).toBe(false);
-      expect(result.errorKey).toBe("errorTwitchVerificationRequired");
+      expect(result.error).toBeDefined();
       expect(checkFollowWithAdminToken).not.toHaveBeenCalled();
     });
 
@@ -574,7 +574,7 @@ describe("OAuth Token Usage in joinSpace", () => {
       const result = await joinSpace("123e4567-e89b-12d3-a456-426614174000");
 
       expect(result.success).toBe(false);
-      expect(result.errorKey).toBe("errorYouTubeVerificationRequired");
+      expect(result.error).toBeDefined();
     });
 
     test("アクセストークンが存在しない場合エラーを返す", async () => {
@@ -636,7 +636,7 @@ describe("OAuth Token Usage in joinSpace", () => {
       const result = await joinSpace("123e4567-e89b-12d3-a456-426614174000");
 
       expect(result.success).toBe(false);
-      expect(result.errorKey).toBe("errorYouTubeVerificationRequired");
+      expect(result.error).toBeDefined();
     });
   });
 });

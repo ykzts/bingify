@@ -1,7 +1,7 @@
 "use server";
 
-import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import type { Notification } from "@/lib/types/notification";
 
@@ -55,7 +55,7 @@ export async function getNotifications(
   unreadOnly = false
 ): Promise<GetNotificationsResult> {
   const t = await getTranslations("NotificationActions");
-  
+
   try {
     const supabase = await createClient();
 
@@ -125,7 +125,7 @@ export async function getNotifications(
  */
 export async function getUnreadCount(): Promise<GetUnreadCountResult> {
   const t = await getTranslations("NotificationActions");
-  
+
   try {
     const supabase = await createClient();
 
@@ -182,7 +182,7 @@ export async function markNotificationRead(
   notificationId: string
 ): Promise<NotificationActionResult> {
   const t = await getTranslations("NotificationActions");
-  
+
   try {
     const supabase = await createClient();
 
@@ -257,7 +257,7 @@ export async function markNotificationRead(
  */
 export async function markAllNotificationsRead(): Promise<NotificationActionResult> {
   const t = await getTranslations("NotificationActions");
-  
+
   try {
     const supabase = await createClient();
 
@@ -314,7 +314,7 @@ export async function deleteNotification(
   notificationId: string
 ): Promise<NotificationActionResult> {
   const t = await getTranslations("NotificationActions");
-  
+
   try {
     const supabase = await createClient();
 

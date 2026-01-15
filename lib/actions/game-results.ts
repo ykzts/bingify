@@ -28,7 +28,7 @@ export async function getGameResults(
   spaceId: string
 ): Promise<GetGameResultsResult> {
   const t = await getTranslations("GameResultActions");
-  
+
   try {
     if (!isValidUUID(spaceId)) {
       return {

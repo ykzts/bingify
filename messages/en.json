@@ -324,6 +324,18 @@
     "statusReach": "REACH",
     "viewCardButton": "View Card"
   },
+  "AnnouncementActions": {
+    "errorAdminRequired": "Admin permission required",
+    "errorCreateFailed": "Failed to create announcement",
+    "errorDeleteFailed": "Failed to delete announcement",
+    "errorDismissFailed": "Failed to dismiss announcement",
+    "errorFetchAnnouncementsFailed": "Failed to fetch announcements",
+    "errorGeneric": "An error occurred",
+    "errorInvalidInput": "Invalid input",
+    "errorNotFound": "Announcement not found",
+    "errorUnauthorized": "Authentication required",
+    "errorUpdateFailed": "Failed to update announcement"
+  },
   "Announcements": {
     "content": {
       "placeholder": "Enter announcement content...",
@@ -578,6 +590,14 @@
     "sourceCode": "Source Code",
     "terms": "Terms of Service"
   },
+  "GameResultActions": {
+    "errorFetchResults": "Failed to fetch game results",
+    "errorGeneric": "An error occurred",
+    "errorInvalidSpaceId": "Invalid space ID",
+    "errorPermissionDenied": "Permission denied",
+    "errorSpaceNotFound": "Space not found",
+    "errorUnauthorized": "Authentication required"
+  },
   "GameResults": {
     "achievedAt": "Achieved At",
     "achievedPattern": "Achieved Pattern",
@@ -662,6 +682,18 @@
     "description": "The page you are looking for does not exist or has been moved.",
     "title": "Page Not Found"
   },
+  "NotificationActions": {
+    "errorCountUnread": "Failed to count unread notifications",
+    "errorDeleteNotificationFailed": "Failed to delete notification",
+    "errorFetchNotifications": "Failed to fetch notifications",
+    "errorGeneric": "An error occurred",
+    "errorMarkAllReadFailed": "Failed to mark all notifications as read",
+    "errorMarkReadFailed": "Failed to mark notification as read",
+    "errorNoAccessPermission": "You don't have permission to access this notification",
+    "errorNoDeletePermission": "You don't have permission to delete this notification",
+    "errorNotificationNotFound": "Notification not found",
+    "errorUnauthorized": "Authentication required"
+  },
   "NotificationBell": {
     "notifications": "Notifications"
   },
@@ -717,6 +749,13 @@
     "metaDescription": "Read Bingify's Privacy Policy to understand how we collect, use, and protect your personal information.",
     "metaTitle": "Privacy Policy"
   },
+  "ScreenSettingsActions": {
+    "errorGeneric": "An error occurred",
+    "errorPermissionDenied": "Permission denied",
+    "errorSpaceNotFound": "Space not found",
+    "errorUnauthorized": "Authentication required",
+    "errorUpdateFailed": "Failed to update settings"
+  },
   "ScreenView": {
     "background": "Background",
     "bgBlue": "Blue",
@@ -735,6 +774,10 @@
     "notificationReach": "{name} has REACH!",
     "scanToJoin": "Scan to Join",
     "waitingForNumbers": "Waiting for numbers..."
+  },
+  "ServerActions": {
+    "errorGeneric": "An unexpected error occurred",
+    "errorUnauthorized": "Authentication required"
   },
   "Setup": {
     "claimButton": "Claim Admin Role",
@@ -804,6 +847,19 @@
     "statusLabel": "Status",
     "title": "Announcements",
     "titleLabel": "Title"
+  },
+  "SpaceAnnouncementActions": {
+    "errorCreateFailed": "Failed to create space announcement",
+    "errorDeleteFailed": "Failed to delete space announcement",
+    "errorFetchFailed": "Failed to fetch space announcements",
+    "errorGeneric": "An error occurred",
+    "errorInvalidAnnouncementId": "Invalid announcement ID",
+    "errorInvalidSpaceId": "Invalid space ID",
+    "errorNoViewPermission": "You don't have permission to view announcements for this space",
+    "errorSpaceNotFound": "Space not found",
+    "errorSpaceNotFoundOrNoPermission": "Space not found or you don't have permission",
+    "errorUnauthorized": "Authentication required",
+    "errorUpdateFailed": "Failed to update space announcement"
   },
   "SpaceLanding": {
     "emailRequirement": "Email Requirement",
@@ -911,19 +967,6 @@
     "youtubeSubscriber": "Subscribers only",
     "youtubeSubscriberDescription": "Only subscribers of the specified YouTube channel can join"
   },
-  "SpaceAnnouncementActions": {
-    "errorCreateFailed": "Failed to create space announcement",
-    "errorDeleteFailed": "Failed to delete space announcement",
-    "errorFetchFailed": "Failed to fetch space announcements",
-    "errorGeneric": "An error occurred",
-    "errorInvalidAnnouncementId": "Invalid announcement ID",
-    "errorInvalidSpaceId": "Invalid space ID",
-    "errorNoViewPermission": "You don't have permission to view announcements for this space",
-    "errorSpaceNotFound": "Space not found",
-    "errorSpaceNotFoundOrNoPermission": "Space not found or you don't have permission",
-    "errorUnauthorized": "Authentication required",
-    "errorUpdateFailed": "Failed to update space announcement"
-  },
   "Support": {
     "description": "Bingify is an open-source project maintained by volunteers. Your support helps cover hosting costs and enables continued development.",
     "heading": "Support Development",
@@ -954,49 +997,6 @@
     "usernameHelp": "Maximum 50 characters",
     "usernameLabel": "Name",
     "usernamePlaceholder": "Enter your name"
-  },
-  "AnnouncementActions": {
-    "errorAdminRequired": "Admin permission required",
-    "errorCreateFailed": "Failed to create announcement",
-    "errorDeleteFailed": "Failed to delete announcement",
-    "errorDismissFailed": "Failed to dismiss announcement",
-    "errorFetchAnnouncementsFailed": "Failed to fetch announcements",
-    "errorGeneric": "An error occurred",
-    "errorInvalidInput": "Invalid input",
-    "errorNotFound": "Announcement not found",
-    "errorUnauthorized": "Authentication required",
-    "errorUpdateFailed": "Failed to update announcement"
-  },
-  "GameResultActions": {
-    "errorFetchResults": "Failed to fetch game results",
-    "errorGeneric": "An error occurred",
-    "errorInvalidSpaceId": "Invalid space ID",
-    "errorPermissionDenied": "Permission denied",
-    "errorSpaceNotFound": "Space not found",
-    "errorUnauthorized": "Authentication required"
-  },
-  "NotificationActions": {
-    "errorCountUnread": "Failed to count unread notifications",
-    "errorDeleteNotificationFailed": "Failed to delete notification",
-    "errorFetchNotifications": "Failed to fetch notifications",
-    "errorGeneric": "An error occurred",
-    "errorMarkAllReadFailed": "Failed to mark all notifications as read",
-    "errorMarkReadFailed": "Failed to mark notification as read",
-    "errorNoAccessPermission": "You don't have permission to access this notification",
-    "errorNoDeletePermission": "You don't have permission to delete this notification",
-    "errorNotificationNotFound": "Notification not found",
-    "errorUnauthorized": "Authentication required"
-  },
-  "ScreenSettingsActions": {
-    "errorGeneric": "An error occurred",
-    "errorPermissionDenied": "Permission denied",
-    "errorSpaceNotFound": "Space not found",
-    "errorUnauthorized": "Authentication required",
-    "errorUpdateFailed": "Failed to update settings"
-  },
-  "ServerActions": {
-    "errorGeneric": "An unexpected error occurred",
-    "errorUnauthorized": "Authentication required"
   },
   "UserSpace": {
     "alreadyJoined": "You are already a member of this space",
