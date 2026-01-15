@@ -1,10 +1,17 @@
 "use client";
 
-import { AlertCircle, InfoIcon, TriangleAlert, X } from "lucide-react";
+import {
+  AlertCircle,
+  ChevronRight,
+  InfoIcon,
+  TriangleAlert,
+  X,
+} from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { FormattedText } from "@/components/formatted-text";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import {
   dismissAnnouncement,
   getActiveAnnouncements,
@@ -17,6 +24,7 @@ import type { Announcement } from "@/lib/types/announcement";
  * ページトップに固定表示され、優先度に基づいて最も重要なお知らせを表示します
  */
 export function AnnouncementBanner() {
+  const t = useTranslations("Announcements");
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -116,8 +124,14 @@ export function AnnouncementBanner() {
       <Alert className={className} variant={variant}>
         {icon}
         <AlertTitle>{announcement.title}</AlertTitle>
-        <AlertDescription>
-          <FormattedText text={announcement.content} />
+        <AlertDescription className="flex items-center gap-2">
+          <Link
+            className="inline-flex items-center gap-1 font-medium text-sm hover:underline"
+            href={`/announcements/${announcement.id}`}
+          >
+            {t("viewDetails")}
+            <ChevronRight className="size-4" />
+          </Link>
         </AlertDescription>
         {announcement.dismissible && (
           <Button

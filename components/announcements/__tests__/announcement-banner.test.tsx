@@ -16,10 +16,22 @@ vi.mock("@/lib/actions/announcements", () => ({
   getDismissedAnnouncements: vi.fn(),
 }));
 
-// FormattedText コンポーネントのモック
-vi.mock("@/components/formatted-text", () => ({
-  FormattedText: ({ text }: { text: string | null | undefined }) => (
-    <div data-testid="formatted-text">{text}</div>
+// next-intlのモック
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      viewDetails: "詳細を見る",
+    };
+    return translations[key] || key;
+  },
+}));
+
+// Linkコンポーネントのモック
+vi.mock("@/i18n/navigation", () => ({
+  Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a data-testid="announcement-link" href={href}>
+      {children}
+    </a>
   ),
 }));
 
@@ -128,7 +140,7 @@ describe("AnnouncementBanner", () => {
 
     await waitFor(() => {
       expect(screen.getByText("エラー通知")).toBeInTheDocument();
-      expect(screen.getByText("エラーメッセージです")).toBeInTheDocument();
+      expect(screen.getByTestId("announcement-link")).toBeInTheDocument();
     });
 
     // 他のお知らせは表示されない
@@ -321,7 +333,7 @@ describe("AnnouncementBanner", () => {
     expect(alert).toBeInTheDocument();
   });
 
-  it("FormattedText コンポーネントでコンテンツがレンダリングされる", async () => {
+  it("詳細リンクが正しく表示される", async () => {
     vi.mocked(getActiveAnnouncements).mockResolvedValue({
       data: [mockAnnouncements[0]],
       success: true,
@@ -334,8 +346,10 @@ describe("AnnouncementBanner", () => {
     render(<AnnouncementBanner />);
 
     await waitFor(() => {
-      expect(screen.getByTestId("formatted-text")).toBeInTheDocument();
-      expect(screen.getByText("エラーメッセージです")).toBeInTheDocument();
+      const link = screen.getByTestId("announcement-link");
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute("href", "/announcements/error-1");
+      expect(screen.getByText("詳細を見る")).toBeInTheDocument();
     });
   });
 

@@ -26,6 +26,15 @@ export interface GetAnnouncementsResult {
 }
 
 /**
+ * 単一お知らせ取得結果の型
+ */
+export interface GetAnnouncementResult {
+  data?: Announcement;
+  error?: string;
+  success: boolean;
+}
+
+/**
  * お知らせ操作結果の型
  */
 export interface AnnouncementActionResult {
@@ -69,6 +78,64 @@ async function checkAdminPermission(): Promise<boolean> {
   }
 
   return profile.role === "admin";
+}
+
+/**
+ * IDでお知らせを取得する
+ * 公開中で日付範囲内のお知らせのみ返す
+ *
+ * @param id - お知らせID
+ * @returns お知らせ
+ */
+export async function getAnnouncementById(
+  id: string
+): Promise<GetAnnouncementResult> {
+  try {
+    const supabase = await createClient();
+
+    // 認証チェック
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return {
+        error: "認証が必要です",
+        success: false,
+      };
+    }
+
+    // お知らせを取得（published=true AND 日付範囲内）
+    const now = new Date().toISOString();
+    const { data: announcement, error } = await supabase
+      .from("announcements")
+      .select("*")
+      .eq("id", id)
+      .eq("published", true)
+      .or(`starts_at.is.null,starts_at.lte.${now}`)
+      .or(`ends_at.is.null,ends_at.gt.${now}`)
+      .single();
+
+    if (error) {
+      console.error("Error fetching announcement by ID:", error);
+      return {
+        error: "お知らせが見つかりません",
+        success: false,
+      };
+    }
+
+    return {
+      data: announcement as Announcement,
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error in getAnnouncementById:", error);
+    return {
+      error: "エラーが発生しました",
+      success: false,
+    };
+  }
 }
 
 /**
