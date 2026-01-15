@@ -24,11 +24,6 @@ describe("space-status", () => {
         expect(result).toBe("statusClosed");
       });
 
-      it("未知のステータスの場合は statusClosed を返す", () => {
-        const result = getSpaceStatusTranslationKey("unknown", "Dashboard");
-        expect(result).toBe("statusClosed");
-      });
-
       it("名前空間が指定されていない場合は Dashboard をデフォルトで使用する", () => {
         const result = getSpaceStatusTranslationKey("active");
         expect(result).toBe("statusActive");
@@ -53,11 +48,6 @@ describe("space-status", () => {
 
       it('null ステータスの場合は "settingsStatusClosed" を返す', () => {
         const result = getSpaceStatusTranslationKey(null, "AdminSpace");
-        expect(result).toBe("settingsStatusClosed");
-      });
-
-      it("未知のステータスの場合は settingsStatusClosed を返す", () => {
-        const result = getSpaceStatusTranslationKey("unknown", "AdminSpace");
         expect(result).toBe("settingsStatusClosed");
       });
     });

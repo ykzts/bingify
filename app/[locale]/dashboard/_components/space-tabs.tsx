@@ -69,7 +69,11 @@ function SpaceTable({
               </td>
               <td className="px-4 py-3">
                 <StatusBadge
-                  label={t(getSpaceStatusTranslationKey(space.status))}
+                  label={t(
+                    getSpaceStatusTranslationKey(
+                      space.status as "active" | "draft" | "closed" | null
+                    )
+                  )}
                   status={space.status || "closed"}
                 />
               </td>

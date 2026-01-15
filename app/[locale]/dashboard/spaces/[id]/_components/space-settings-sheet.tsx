@@ -112,7 +112,12 @@ export function SpaceSettingsSheet({
           <SheetTitle>{t("settingsTitle")}</SheetTitle>
           <SheetDescription>
             {space.share_key} -{" "}
-            {t(getSpaceStatusTranslationKey(space.status, "AdminSpace"))}
+            {t(
+              getSpaceStatusTranslationKey(
+                space.status as "active" | "draft" | "closed" | null,
+                "AdminSpace"
+              )
+            )}
           </SheetDescription>
         </SheetHeader>
         <div className="mt-6 space-y-8 px-6">
