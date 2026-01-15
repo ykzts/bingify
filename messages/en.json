@@ -325,11 +325,13 @@
     "viewCardButton": "View Card"
   },
   "Announcements": {
+    "backToTop": "Back to Top",
     "content": {
       "placeholder": "Enter announcement content...",
       "title": "Content"
     },
     "createAnnouncement": "Create announcement",
+    "createdAt": "Posted",
     "createError": "Failed to create announcement",
     "createSuccess": "Announcement created successfully",
     "deleteAnnouncement": "Delete announcement",
@@ -340,17 +342,23 @@
     "dismissible": "Dismissible",
     "editAnnouncement": "Edit announcement",
     "endsAt": "End date/time",
+    "metaDescription": "View announcement details",
+    "metaTitle": "Announcement",
+    "notFound": "Announcement not found",
+    "notFoundDescription": "This announcement may have been deleted or has expired.",
     "preview": "Preview",
     "priority": {
       "error": "Critical",
       "info": "Info",
+      "label": "Priority",
       "warning": "Important"
     },
     "published": "Published",
     "startsAt": "Start date/time",
     "title": "Announcements",
     "updateError": "Failed to update announcement",
-    "updateSuccess": "Announcement updated successfully"
+    "updateSuccess": "Announcement updated successfully",
+    "viewDetails": "View Details"
   },
   "AvatarSettings": {
     "defaultAvatar": "Default Avatar",

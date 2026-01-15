@@ -325,11 +325,13 @@
     "viewCardButton": "カードを見る"
   },
   "Announcements": {
+    "backToTop": "トップに戻る",
     "content": {
       "placeholder": "お知らせの内容を入力してください...",
       "title": "内容"
     },
     "createAnnouncement": "お知らせを作成",
+    "createdAt": "投稿日時",
     "createError": "お知らせの作成に失敗しました",
     "createSuccess": "お知らせを作成しました",
     "deleteAnnouncement": "お知らせを削除",
@@ -340,17 +342,23 @@
     "dismissible": "非表示可能",
     "editAnnouncement": "お知らせを編集",
     "endsAt": "終了日時",
+    "metaDescription": "お知らせの詳細を表示",
+    "metaTitle": "お知らせ",
+    "notFound": "お知らせが見つかりません",
+    "notFoundDescription": "このお知らせは削除されたか、掲載期間が終了している可能性があります。",
     "preview": "プレビュー",
     "priority": {
       "error": "緊急",
       "info": "通常",
+      "label": "優先度",
       "warning": "警告"
     },
     "published": "公開",
     "startsAt": "開始日時",
     "title": "お知らせ",
     "updateError": "お知らせの更新に失敗しました",
-    "updateSuccess": "お知らせを更新しました"
+    "updateSuccess": "お知らせを更新しました",
+    "viewDetails": "詳細を見る"
   },
   "AvatarSettings": {
     "defaultAvatar": "デフォルトアバター",
