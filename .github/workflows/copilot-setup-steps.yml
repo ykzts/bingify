@@ -43,6 +43,8 @@ jobs:
 
       - name: Start Supabase
         run: pnpm exec supabase start
+        env:
+          SUPABASE_INTERNAL_IMAGE_REGISTRY: ghcr.io
 
       - name: Sync environment variables
         run: pnpm dev:env
