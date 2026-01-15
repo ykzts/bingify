@@ -20,6 +20,25 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
+// next-intl/serverのモック
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(() => {
+    const translations: Record<string, string> = {
+      errorCountUnread: "未読通知数の取得に失敗しました",
+      errorDeleteNotificationFailed: "通知の削除に失敗しました",
+      errorFetchNotifications: "通知の取得に失敗しました",
+      errorGeneric: "エラーが発生しました",
+      errorMarkAllReadFailed: "すべての通知の既読化に失敗しました",
+      errorMarkReadFailed: "通知の既読化に失敗しました",
+      errorNoAccessPermission: "この通知にアクセスする権限がありません",
+      errorNoDeletePermission: "この通知を削除する権限がありません",
+      errorNotificationNotFound: "通知が見つかりません",
+      errorUnauthorized: "認証が必要です",
+    };
+    return (key: string) => translations[key] || key;
+  }),
+}));
+
 // Supabaseクライアントのモック
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(() => Promise.resolve(mockSupabase)),

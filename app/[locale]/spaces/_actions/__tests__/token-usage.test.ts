@@ -15,6 +15,32 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(() => mockSupabase),
 }));
 
+// next-intl/serverのモック
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(() => {
+    const translations: Record<string, string> = {
+      errorEmailBlocked: "このメールアドレスは参加が制限されています",
+      errorEmailNotAllowed: "このメールアドレスではスペースに参加できません。許可されたドメイン・アドレスをご確認ください。",
+      errorGeneric: "予期しないエラーが発生しました",
+      errorInvalidSpace: "無効なスペースIDです",
+      errorJoinFailed: "スペースへの参加に失敗しました",
+      errorLeaveFailed: "スペースからの退出に失敗しました",
+      errorQuotaReached: "スペースの参加者数が上限に達しています",
+      errorSpaceClosed: "このスペースは終了しています",
+      errorTwitchNotFollowing: "このスペースに参加するには、指定されたTwitch配信者をフォローする必要があります",
+      errorTwitchNotSubscribed: "このスペースに参加するには、指定されたTwitch配信者のサブスクライバーである必要があります",
+      errorTwitchVerificationFailed: "Twitch連携の確認に失敗しました。もう一度お試しください。",
+      errorTwitchVerificationRequired: "このスペースに参加するには、Twitchアカウントの確認が必要です",
+      errorUnauthorized: "認証が必要です。ログインしてください。",
+      errorYouTubeNotMember: "このスペースに参加するには、指定されたYouTubeチャンネルのメンバーシップに加入する必要があります",
+      errorYouTubeNotSubscribed: "このスペースに参加するには、指定されたYouTubeチャンネルを登録する必要があります",
+      errorYouTubeVerificationFailed: "YouTube連携の確認に失敗しました。もう一度お試しください。",
+      errorYouTubeVerificationRequired: "このスペースに参加するには、YouTubeアカウントの確認が必要です",
+    };
+    return (key: string) => translations[key] || key;
+  }),
+}));
+
 // OAuth token storage のモック
 vi.mock("@/lib/oauth/token-storage", () => ({
   getOAuthToken: vi.fn(),

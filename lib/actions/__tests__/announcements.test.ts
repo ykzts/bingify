@@ -22,6 +22,25 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
+// next-intl/serverのモック
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(() => {
+    const translations: Record<string, string> = {
+      errorAdminRequired: "Admin権限が必要です",
+      errorCreateFailed: "お知らせの作成に失敗しました",
+      errorDeleteFailed: "お知らせの削除に失敗しました",
+      errorDismissFailed: "お知らせの非表示に失敗しました",
+      errorFetchAnnouncementsFailed: "お知らせの取得に失敗しました",
+      errorGeneric: "エラーが発生しました",
+      errorInvalidInput: "入力値が不正です",
+      errorNotFound: "お知らせが見つかりません",
+      errorUnauthorized: "認証が必要です",
+      errorUpdateFailed: "お知らせの更新に失敗しました",
+    };
+    return (key: string) => translations[key] || key;
+  }),
+}));
+
 // Supabaseクライアントのモック
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(() => Promise.resolve(mockSupabase)),
