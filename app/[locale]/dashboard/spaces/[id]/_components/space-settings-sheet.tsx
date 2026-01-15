@@ -98,6 +98,16 @@ export function SpaceSettingsSheet({
 
   const isClosed = space.status === "closed";
 
+  const getStatusText = (): string => {
+    if (space.status === "draft") {
+      return t("settingsStatusDraft");
+    }
+    if (space.status === "closed") {
+      return t("settingsStatusClosed");
+    }
+    return t("settingsStatusActive");
+  };
+
   return (
     <Sheet onOpenChange={handleOpenChange} open={open}>
       <SheetTrigger asChild>
@@ -110,15 +120,7 @@ export function SpaceSettingsSheet({
         <SheetHeader>
           <SheetTitle>{t("settingsTitle")}</SheetTitle>
           <SheetDescription>
-            {space.share_key} - {(() => {
-              if (space.status === "draft") {
-                return t("settingsStatusDraft");
-              }
-              if (space.status === "closed") {
-                return t("settingsStatusClosed");
-              }
-              return t("settingsStatusActive");
-            })()}
+            {space.share_key} - {getStatusText()}
           </SheetDescription>
         </SheetHeader>
         <div className="mt-6 space-y-8 px-6">
