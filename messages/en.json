@@ -942,6 +942,22 @@
     "usernameLabel": "Name",
     "usernamePlaceholder": "Enter your name"
   },
+  "NotificationActions": {
+    "errorCountUnread": "Failed to count unread notifications",
+    "errorDeleteNotificationFailed": "Failed to delete notification",
+    "errorFetchNotifications": "Failed to fetch notifications",
+    "errorGeneric": "An error occurred",
+    "errorMarkAllReadFailed": "Failed to mark all notifications as read",
+    "errorMarkReadFailed": "Failed to mark notification as read",
+    "errorNoAccessPermission": "You don't have permission to access this notification",
+    "errorNoDeletePermission": "You don't have permission to delete this notification",
+    "errorNotificationNotFound": "Notification not found",
+    "errorUnauthorized": "Authentication required"
+  },
+  "ServerActions": {
+    "errorGeneric": "An unexpected error occurred",
+    "errorUnauthorized": "Authentication required"
+  },
   "UserSpace": {
     "alreadyJoined": "You are already a member of this space",
     "backToHome": "Back to Home",

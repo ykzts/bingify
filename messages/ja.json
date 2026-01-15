@@ -943,6 +943,22 @@
     "usernameLabel": "名前",
     "usernamePlaceholder": "名前を入力してください"
   },
+  "NotificationActions": {
+    "errorCountUnread": "未読通知数の取得に失敗しました",
+    "errorDeleteNotificationFailed": "通知の削除に失敗しました",
+    "errorFetchNotifications": "通知の取得に失敗しました",
+    "errorGeneric": "エラーが発生しました",
+    "errorMarkAllReadFailed": "すべての通知の既読化に失敗しました",
+    "errorMarkReadFailed": "通知の既読化に失敗しました",
+    "errorNoAccessPermission": "この通知にアクセスする権限がありません",
+    "errorNoDeletePermission": "この通知を削除する権限がありません",
+    "errorNotificationNotFound": "通知が見つかりません",
+    "errorUnauthorized": "認証が必要です"
+  },
+  "ServerActions": {
+    "errorGeneric": "予期しないエラーが発生しました",
+    "errorUnauthorized": "認証が必要です"
+  },
   "UserSpace": {
     "alreadyJoined": "あなたは既にこのスペースのメンバーです",
     "backToHome": "ホームに戻る",
