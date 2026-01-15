@@ -773,6 +773,8 @@
     "calledNumbers": "Called Numbers",
     "displayMode": "Display Mode",
     "displaySettings": "Display Settings",
+    "exitFullscreen": "Exit Fullscreen",
+    "fullscreenHint": "Press F to toggle fullscreen",
     "guestName": "Guest",
     "invalidToken": "This URL is invalid or has been regenerated.",
     "loading": "Loading...",
@@ -780,6 +782,7 @@
     "modeMinimal": "Minimal",
     "notificationBingo": "{name} got BINGO!",
     "notificationReach": "{name} has REACH!",
+    "requestFullscreen": "Enter Fullscreen",
     "scanToJoin": "Scan to Join",
     "waitingForNumbers": "Waiting for numbers..."
   },
