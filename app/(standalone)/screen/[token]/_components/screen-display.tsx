@@ -1,6 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { Maximize, Minimize } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
@@ -9,6 +10,7 @@ import { useScreen } from "@/components/providers/screen-provider";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { useDrumRoll } from "@/hooks/use-drum-roll";
+import { useFullscreen } from "@/hooks/use-fullscreen";
 import { createClient } from "@/lib/supabase/client";
 import type {
   BackgroundType,
@@ -69,6 +71,9 @@ export function ScreenDisplay({
   } = useDrumRoll({
     duration: 1800, // 1.8 seconds
   });
+
+  // フルスクリーン機能
+  const { isFullscreen, toggleFullscreen } = useFullscreen();
 
   // Use screen context for background and locale state
   const { locale: contextLocale, setBackground, setLocale } = useScreen();
@@ -366,6 +371,29 @@ export function ScreenDisplay({
         theme === "light" ? "bg-white" : ""
       )}
     >
+      {/* フルスクリーンボタン */}
+      <button
+        aria-label={isFullscreen ? t("exitFullscreen") : t("requestFullscreen")}
+        className={cn(
+          "group fixed top-6 right-6 z-50 flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-sm transition-all duration-200 hover:scale-105",
+          theme === "light"
+            ? "bg-white/90 text-gray-900 shadow-lg hover:bg-white hover:shadow-xl"
+            : "bg-black/75 text-white shadow-black/50 shadow-lg hover:bg-black/90 hover:shadow-xl"
+        )}
+        onClick={toggleFullscreen}
+        title={t("fullscreenHint")}
+        type="button"
+      >
+        {isFullscreen ? (
+          <Minimize className="h-5 w-5" />
+        ) : (
+          <Maximize className="h-5 w-5" />
+        )}
+        <span className="hidden sm:inline">
+          {isFullscreen ? t("exitFullscreen") : t("requestFullscreen")}
+        </span>
+      </button>
+
       {/* Notification Banner */}
       <AnimatePresence>
         {notification && (

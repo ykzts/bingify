@@ -726,6 +726,8 @@
     "calledNumbers": "呼ばれた番号",
     "displayMode": "表示モード",
     "displaySettings": "表示設定",
+    "exitFullscreen": "フルスクリーンを終了",
+    "fullscreenHint": "F キーでフルスクリーンを切り替え",
     "guestName": "ゲスト",
     "invalidToken": "このURLは無効か、再生成されています。",
     "loading": "読み込み中...",
@@ -733,6 +735,7 @@
     "modeMinimal": "最小",
     "notificationBingo": "{name} さんがビンゴを達成しました！",
     "notificationReach": "{name} さんがリーチになりました！",
+    "requestFullscreen": "フルスクリーンで表示",
     "scanToJoin": "スキャンして参加",
     "waitingForNumbers": "番号の呼び出しを待っています..."
   },
