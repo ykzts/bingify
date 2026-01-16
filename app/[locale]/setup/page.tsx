@@ -41,18 +41,22 @@ function SetupContent() {
   const t = useTranslations("Setup");
 
   return (
-    <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
+    <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800">
       <div className="mb-6 text-center">
-        <h1 className="mb-2 font-bold text-3xl">{t("title")}</h1>
-        <p className="text-gray-600">{t("subtitle")}</p>
+        <h1 className="mb-2 font-bold text-3xl dark:text-gray-100">
+          {t("title")}
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">{t("subtitle")}</p>
       </div>
 
       <div className="mb-6 space-y-4">
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-          <p className="text-blue-800 text-sm">{t("welcomeMessage")}</p>
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/50">
+          <p className="text-blue-800 text-sm dark:text-blue-300">
+            {t("welcomeMessage")}
+          </p>
         </div>
 
-        <div className="space-y-2 text-gray-700 text-sm">
+        <div className="space-y-2 text-gray-700 text-sm dark:text-gray-300">
           <p>{t("description1")}</p>
           <p>{t("description2")}</p>
         </div>
@@ -60,12 +64,14 @@ function SetupContent() {
 
       <ClaimAdminButton />
 
-      <div className="mt-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-        <p className="flex items-center gap-2 font-semibold text-sm text-yellow-800">
+      <div className="mt-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-900 dark:bg-yellow-950/50">
+        <p className="flex items-center gap-2 font-semibold text-sm text-yellow-800 dark:text-yellow-300">
           <AlertTriangle aria-hidden="true" className="size-4" />
           {t("warningTitle")}
         </p>
-        <p className="mt-1 text-sm text-yellow-700">{t("warningMessage")}</p>
+        <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-400">
+          {t("warningMessage")}
+        </p>
       </div>
     </div>
   );
