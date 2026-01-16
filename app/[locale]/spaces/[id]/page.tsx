@@ -87,13 +87,18 @@ export default async function UserSpacePage({
 
     // Owner sees waiting screen
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="mb-4 font-bold text-2xl text-gray-900">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
+          <h1 className="mb-4 font-bold text-2xl text-gray-900 dark:text-gray-100">
             {t("draftTitle")}
           </h1>
-          <p className="mb-6 text-gray-600">{t("draftMessage")}</p>
-          <Link className="text-purple-600 hover:underline" href="/">
+          <p className="mb-6 text-gray-600 dark:text-gray-400">
+            {t("draftMessage")}
+          </p>
+          <Link
+            className="text-purple-600 hover:underline dark:text-purple-400"
+            href="/"
+          >
             {t("backToHome")}
           </Link>
         </div>
@@ -112,15 +117,19 @@ export default async function UserSpacePage({
     if (!isParticipant) {
       // Non-participants see event ended message
       return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <div className="mx-auto max-w-4xl p-6">
             <div className="mb-6 flex items-center justify-between">
               <div>
-                <h1 className="mb-1 font-bold text-2xl">{space.share_key}</h1>
-                <p className="text-gray-600 text-sm">{t("spaceSubtitle")}</p>
+                <h1 className="mb-1 font-bold text-2xl dark:text-gray-100">
+                  {space.share_key}
+                </h1>
+                <p className="text-gray-600 text-sm dark:text-gray-400">
+                  {t("spaceSubtitle")}
+                </p>
               </div>
               <Link
-                className="text-gray-600 text-sm hover:text-gray-900 hover:underline"
+                className="text-gray-600 text-sm hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-gray-100"
                 href="/"
               >
                 {t("backToHome")}
@@ -132,7 +141,7 @@ export default async function UserSpacePage({
               <SpaceAnnouncementList isAdmin={isAdmin} spaceId={id} />
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+            <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800">
               <EventEndedView />
             </div>
           </div>
@@ -142,15 +151,19 @@ export default async function UserSpacePage({
 
     // Participants see their final card (read-only)
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="mx-auto max-w-4xl p-6">
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h1 className="mb-1 font-bold text-2xl">{space.share_key}</h1>
-              <p className="text-gray-600 text-sm">{t("spaceSubtitle")}</p>
+              <h1 className="mb-1 font-bold text-2xl dark:text-gray-100">
+                {space.share_key}
+              </h1>
+              <p className="text-gray-600 text-sm dark:text-gray-400">
+                {t("spaceSubtitle")}
+              </p>
             </div>
             <Link
-              className="text-gray-600 text-sm hover:text-gray-900 hover:underline"
+              className="text-gray-600 text-sm hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-gray-100"
               href="/"
             >
               {t("backToHome")}
@@ -163,13 +176,13 @@ export default async function UserSpacePage({
           </div>
 
           {/* Event Ended Message */}
-          <div className="mb-6 rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+          <div className="mb-6 rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <EventEndedView />
           </div>
 
           {/* Participant's Final Result */}
-          <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
-            <h2 className="mb-6 text-center font-bold text-2xl">
+          <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <h2 className="mb-6 text-center font-bold text-2xl dark:text-gray-100">
               {t("yourFinalResultTitle")}
             </h2>
             <BingoCardDisplay readOnly spaceId={id} />
@@ -204,20 +217,22 @@ export default async function UserSpacePage({
     }
 
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Space Content */}
         <div className="mx-auto max-w-4xl p-6">
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h1 className="mb-1 font-bold text-2xl">
+              <h1 className="mb-1 font-bold text-2xl dark:text-gray-100">
                 {publicInfo.hideMetadata
                   ? tLanding("privateSpace")
                   : publicInfo.share_key}
               </h1>
-              <p className="text-gray-600 text-sm">{t("spaceSubtitle")}</p>
+              <p className="text-gray-600 text-sm dark:text-gray-400">
+                {t("spaceSubtitle")}
+              </p>
             </div>
             <Link
-              className="text-gray-600 text-sm hover:text-gray-900 hover:underline"
+              className="text-gray-600 text-sm hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-gray-100"
               href="/"
             >
               {t("backToHome")}
@@ -230,7 +245,7 @@ export default async function UserSpacePage({
           </div>
 
           {/* Landing Page for non-participants */}
-          <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+          <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <SpaceLandingPage publicInfo={publicInfo} />
           </div>
 
@@ -248,16 +263,20 @@ export default async function UserSpacePage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Space Content */}
       <div className="mx-auto max-w-4xl p-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="mb-1 font-bold text-2xl">{space.share_key}</h1>
-            <p className="text-gray-600 text-sm">{t("spaceSubtitle")}</p>
+            <h1 className="mb-1 font-bold text-2xl dark:text-gray-100">
+              {space.share_key}
+            </h1>
+            <p className="text-gray-600 text-sm dark:text-gray-400">
+              {t("spaceSubtitle")}
+            </p>
           </div>
           <Link
-            className="text-gray-600 text-sm hover:text-gray-900 hover:underline"
+            className="text-gray-600 text-sm hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-gray-100"
             href="/"
           >
             {t("backToHome")}
@@ -270,7 +289,7 @@ export default async function UserSpacePage({
         </div>
 
         {/* Main Space Content - Bingo Game */}
-        <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+        <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <BingoCardDisplay spaceId={id} />
         </div>
 
