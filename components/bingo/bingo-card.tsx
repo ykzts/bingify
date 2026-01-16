@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
+import { getBingoCellClassName } from "@/lib/utils/bingo-cell-styles";
 import type { BingoLine } from "@/lib/utils/bingo-checker";
 import { BingoLineOverlay } from "./bingo-line-overlay";
 
@@ -14,10 +15,6 @@ interface Props {
 }
 
 const FREE_SPACE_VALUE = 0;
-const BINGO_BLUE = "#2563eb";
-const BINGO_WHITE = "#ffffff";
-const BINGO_BLACK = "#000000";
-const BINGO_BORDER_GRAY = "#d1d5db";
 
 function BingoCell({
   colIndex,
@@ -43,19 +40,13 @@ function BingoCell({
       animate={
         isCalled
           ? {
-              backgroundColor: BINGO_BLUE,
-              color: BINGO_WHITE,
               scale: readonly ? 1 : [1, 1.1, 1],
             }
-          : {
-              backgroundColor: BINGO_WHITE,
-              color: BINGO_BLACK,
-            }
+          : {}
       }
-      className="flex aspect-square items-center justify-center rounded border-2 font-bold text-xl"
+      className={getBingoCellClassName(isCalled)}
       key={key}
       style={{
-        borderColor: isCalled ? BINGO_BLUE : BINGO_BORDER_GRAY,
         cursor: readonly ? "default" : "pointer",
       }}
       transition={{ duration: readonly ? 0 : 0.3 }}

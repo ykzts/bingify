@@ -10,6 +10,7 @@ import { BingoLineOverlay } from "@/components/bingo/bingo-line-overlay";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
+import { getBingoCellClassName } from "@/lib/utils/bingo-cell-styles";
 import { checkBingoLines } from "@/lib/utils/bingo-checker";
 import { updateBingoStatusWithLines } from "../_actions/bingo";
 import { useBingoCard } from "../_hooks/use-bingo-card";
@@ -20,10 +21,6 @@ interface Props {
 }
 
 const FREE_SPACE_VALUE = 0;
-const BINGO_BLUE = "#2563eb";
-const BINGO_WHITE = "#ffffff";
-const BINGO_BLACK = "#000000";
-const BINGO_BORDER_GRAY = "#d1d5db";
 
 export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
   const t = useTranslations("UserSpace");
@@ -302,20 +299,12 @@ export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
                   animate={
                     isCalled
                       ? {
-                          backgroundColor: BINGO_BLUE,
-                          color: BINGO_WHITE,
                           scale: [1, 1.1, 1],
                         }
-                      : {
-                          backgroundColor: BINGO_WHITE,
-                          color: BINGO_BLACK,
-                        }
+                      : {}
                   }
-                  className="flex aspect-square items-center justify-center rounded border-2 font-bold text-xl"
+                  className={getBingoCellClassName(isCalled)}
                   key={key}
-                  style={{
-                    borderColor: isCalled ? BINGO_BLUE : BINGO_BORDER_GRAY,
-                  }}
                   transition={{ duration: 0.3 }}
                 >
                   {isFreeSpace ? t("freeSpace") : number}
