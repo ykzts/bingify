@@ -87,7 +87,7 @@ export async function MDXContent({ contentPath, locale }: MDXContentProps) {
       <div className="px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <Link
-            className="mb-8 inline-flex items-center text-gray-600 text-sm transition-colors hover:text-gray-900"
+            className="mb-8 inline-flex items-center text-gray-600 text-sm transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
             href="/"
           >
             <svg
@@ -106,7 +106,7 @@ export async function MDXContent({ contentPath, locale }: MDXContentProps) {
             </svg>
             {t("backToHome")}
           </Link>
-          <div className="prose prose-slate lg:prose-lg mx-auto">
+          <div className="prose prose-slate dark:prose-invert lg:prose-lg mx-auto">
             <Content />
           </div>
         </div>
