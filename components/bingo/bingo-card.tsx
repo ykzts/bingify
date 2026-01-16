@@ -14,10 +14,6 @@ interface Props {
 }
 
 const FREE_SPACE_VALUE = 0;
-const BINGO_BLUE = "#2563eb";
-const BINGO_WHITE = "#ffffff";
-const BINGO_BLACK = "#000000";
-const BINGO_BORDER_GRAY = "#d1d5db";
 
 function BingoCell({
   colIndex,
@@ -43,19 +39,17 @@ function BingoCell({
       animate={
         isCalled
           ? {
-              backgroundColor: BINGO_BLUE,
-              color: BINGO_WHITE,
               scale: readonly ? 1 : [1, 1.1, 1],
             }
-          : {
-              backgroundColor: BINGO_WHITE,
-              color: BINGO_BLACK,
-            }
+          : {}
       }
-      className="flex aspect-square items-center justify-center rounded border-2 font-bold text-xl"
+      className={`flex aspect-square items-center justify-center rounded border-2 font-bold text-xl ${
+        isCalled
+          ? "border-blue-600 bg-blue-600 text-white dark:border-blue-500 dark:bg-blue-500"
+          : "border-gray-300 bg-white text-black dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+      }`}
       key={key}
       style={{
-        borderColor: isCalled ? BINGO_BLUE : BINGO_BORDER_GRAY,
         cursor: readonly ? "default" : "pointer",
       }}
       transition={{ duration: readonly ? 0 : 0.3 }}

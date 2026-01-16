@@ -82,7 +82,7 @@ export function BingoLineOverlay({
             initial={{ opacity: 0 }}
             // biome-ignore lint/suspicious/noArrayIndexKey: Index is stable for this use case
             key={index}
-            stroke="#f59e0b"
+            stroke="hsl(var(--primary))"
             strokeLinecap="round"
             strokeWidth="0.08"
             transition={{ delay: index * 0.2, duration: 0.6 }}
