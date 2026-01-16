@@ -54,11 +54,11 @@ export default async function LoginPage({
     systemSettingsResult.settings || DEFAULT_SYSTEM_SETTINGS;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-red-100 via-amber-50 to-sky-100">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-red-100 via-amber-50 to-sky-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Suspense
         fallback={
           <div className="flex items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-transparent dark:border-gray-600 dark:border-t-transparent" />
           </div>
         }
       >

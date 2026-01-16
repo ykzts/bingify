@@ -56,16 +56,18 @@ function EmailLoginForm({
   return (
     <div className="space-y-4">
       {emailSuccess && (
-        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4">
-          <CheckCircle className="h-5 w-5 text-green-600" />
-          <p className="text-green-800 text-sm">{t("emailSuccess")}</p>
+        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950">
+          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+          <p className="text-green-800 text-sm dark:text-green-300">
+            {t("emailSuccess")}
+          </p>
         </div>
       )}
 
       {emailError && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
-          <AlertCircle className="h-5 w-5 text-red-600" />
-          <p className="text-red-800 text-sm">{emailError}</p>
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950">
+          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+          <p className="text-red-800 text-sm dark:text-red-300">{emailError}</p>
         </div>
       )}
 
@@ -177,14 +179,14 @@ export function LoginForm({ providers, systemSettings }: Props) {
   return (
     <div className="mx-auto max-w-md space-y-6 p-8">
       <div className="space-y-2 text-center">
-        <h1 className="font-bold text-3xl">{t("title")}</h1>
-        <p className="text-gray-600">{t("description")}</p>
+        <h1 className="font-bold text-3xl dark:text-gray-100">{t("title")}</h1>
+        <p className="text-gray-600 dark:text-gray-400">{t("description")}</p>
       </div>
 
       {displayError && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
-          <AlertCircle className="h-5 w-5 text-red-600" />
-          <p className="text-red-800 text-sm">
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950">
+          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+          <p className="text-red-800 text-sm dark:text-red-300">
             {error ? t("errorMessage") : displayError}
           </p>
         </div>
@@ -206,7 +208,9 @@ export function LoginForm({ providers, systemSettings }: Props) {
       {providers.length > 0 && (
         <div className="flex items-center gap-4">
           <Separator className="flex-1" />
-          <span className="text-gray-500 text-sm">{t("orDivider")}</span>
+          <span className="text-gray-500 text-sm dark:text-gray-400">
+            {t("orDivider")}
+          </span>
           <Separator className="flex-1" />
         </div>
       )}
@@ -251,11 +255,11 @@ export function LoginForm({ providers, systemSettings }: Props) {
         </Card>
       )}
 
-      <p className="text-center text-gray-500 text-sm">
+      <p className="text-center text-gray-500 text-sm dark:text-gray-400">
         {t.rich("agreeToTerms", {
           privacyLink: (chunks) => (
             <Link
-              className="text-purple-600 underline hover:text-purple-700"
+              className="text-purple-600 underline hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
               href="/privacy"
             >
               {chunks}
@@ -263,7 +267,7 @@ export function LoginForm({ providers, systemSettings }: Props) {
           ),
           termsLink: (chunks) => (
             <Link
-              className="text-purple-600 underline hover:text-purple-700"
+              className="text-purple-600 underline hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
               href="/terms"
             >
               {chunks}
