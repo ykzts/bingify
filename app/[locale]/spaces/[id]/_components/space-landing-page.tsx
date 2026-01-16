@@ -21,9 +21,11 @@ function YoutubeRequirement({ youtube }: YoutubeRequirementProps) {
 
   return (
     <div className="flex gap-3">
-      <Youtube className="mt-1 h-5 w-5 shrink-0 text-gray-500" />
+      <Youtube className="mt-1 h-5 w-5 shrink-0 text-gray-500 dark:text-gray-400" />
       <div className="flex-1 space-y-2">
-        <p className="font-medium text-sm">{t("youtubeRequirement")}</p>
+        <p className="font-medium text-sm dark:text-gray-100">
+          {t("youtubeRequirement")}
+        </p>
         {/* Channel Info */}
         {(youtube.channel_title || youtube.thumbnail_url) && (
           <div className="flex items-center gap-3">
@@ -39,7 +41,7 @@ function YoutubeRequirement({ youtube }: YoutubeRequirementProps) {
             <div className="flex-1">
               {youtube.channel_title && (
                 <a
-                  className="font-medium text-sm hover:underline"
+                  className="font-medium text-sm hover:underline dark:text-gray-100"
                   href={`https://www.youtube.com/channel/${youtube.channelId}`}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -48,12 +50,14 @@ function YoutubeRequirement({ youtube }: YoutubeRequirementProps) {
                 </a>
               )}
               {youtube.handle && (
-                <p className="text-gray-500 text-xs">@{youtube.handle}</p>
+                <p className="text-gray-500 text-xs dark:text-gray-400">
+                  @{youtube.handle}
+                </p>
               )}
             </div>
           </div>
         )}
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-600 text-sm dark:text-gray-400">
           {youtube.requirement === "subscriber"
             ? t("youtubeSubscriberRequired")
             : t("youtubeMemberRequired")}
@@ -74,9 +78,11 @@ function TwitchRequirement({ twitch }: TwitchRequirementProps) {
 
   return (
     <div className="flex gap-3">
-      <Twitch className="mt-1 h-5 w-5 shrink-0 text-gray-500" />
+      <Twitch className="mt-1 h-5 w-5 shrink-0 text-gray-500 dark:text-gray-400" />
       <div className="flex-1 space-y-2">
-        <p className="font-medium text-sm">{t("twitchRequirement")}</p>
+        <p className="font-medium text-sm dark:text-gray-100">
+          {t("twitchRequirement")}
+        </p>
         {/* Broadcaster Info */}
         {(twitch.display_name || twitch.profile_image_url) && (
           <div className="flex items-center gap-3">
@@ -92,7 +98,7 @@ function TwitchRequirement({ twitch }: TwitchRequirementProps) {
             <div className="flex-1">
               {twitch.display_name && twitch.username && (
                 <a
-                  className="font-medium text-sm hover:underline"
+                  className="font-medium text-sm hover:underline dark:text-gray-100"
                   href={`https://www.twitch.tv/${twitch.username}`}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -101,17 +107,19 @@ function TwitchRequirement({ twitch }: TwitchRequirementProps) {
                 </a>
               )}
               {twitch.display_name && !twitch.username && (
-                <span className="font-medium text-sm">
+                <span className="font-medium text-sm dark:text-gray-100">
                   {twitch.display_name}
                 </span>
               )}
               {twitch.username && (
-                <p className="text-gray-500 text-xs">@{twitch.username}</p>
+                <p className="text-gray-500 text-xs dark:text-gray-400">
+                  @{twitch.username}
+                </p>
               )}
             </div>
           </div>
         )}
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-600 text-sm dark:text-gray-400">
           {twitch.requirement === "subscriber"
             ? t("twitchSubscriberRequired")
             : t("twitchFollowerRequired")}
@@ -130,15 +138,21 @@ export function SpaceLandingPage({ publicInfo }: Props) {
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="max-w-md space-y-6 text-center">
           <div className="flex justify-center">
-            <div className="rounded-full bg-purple-100 p-6">
-              <Lock className="h-12 w-12 text-purple-600" />
+            <div className="rounded-full bg-purple-100 p-6 dark:bg-purple-900/30">
+              <Lock className="h-12 w-12 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="font-bold text-2xl">{t("privateSpaceTitle")}</h2>
-            <p className="text-gray-600">{t("privateSpaceDescription")}</p>
+            <h2 className="font-bold text-2xl dark:text-gray-100">
+              {t("privateSpaceTitle")}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              {t("privateSpaceDescription")}
+            </p>
           </div>
-          <p className="text-gray-600 text-sm">{t("loginToJoinNote")}</p>
+          <p className="text-gray-600 text-sm dark:text-gray-400">
+            {t("loginToJoinNote")}
+          </p>
         </div>
       </div>
     );
@@ -149,30 +163,32 @@ export function SpaceLandingPage({ publicInfo }: Props) {
     <div className="space-y-8">
       {/* Header Section */}
       <div className="space-y-4">
-        <h1 className="font-bold text-3xl">
+        <h1 className="font-bold text-3xl dark:text-gray-100">
           {publicInfo.title || publicInfo.share_key}
         </h1>
         <FormattedText
-          className="text-gray-600 text-lg"
+          className="text-gray-600 text-lg dark:text-gray-400"
           text={publicInfo.description}
         />
       </div>
 
       {/* Requirements Section */}
       {publicInfo.gatekeeper_rules && (
-        <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-6">
-          <h2 className="font-semibold text-lg">{t("requirementsTitle")}</h2>
+        <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-900">
+          <h2 className="font-semibold text-lg dark:text-gray-100">
+            {t("requirementsTitle")}
+          </h2>
           <div className="space-y-4">
             {/* Email Requirements */}
             {publicInfo.gatekeeper_rules.email?.allowed &&
               publicInfo.gatekeeper_rules.email.allowed.length > 0 && (
                 <div className="flex gap-3">
-                  <Mail className="mt-1 h-5 w-5 shrink-0 text-gray-500" />
+                  <Mail className="mt-1 h-5 w-5 shrink-0 text-gray-500 dark:text-gray-400" />
                   <div className="space-y-2">
-                    <p className="font-medium text-sm">
+                    <p className="font-medium text-sm dark:text-gray-100">
                       {t("emailRequirement")}
                     </p>
-                    <ul className="list-inside list-disc space-y-1 text-gray-600 text-sm">
+                    <ul className="list-inside list-disc space-y-1 text-gray-600 text-sm dark:text-gray-400">
                       {publicInfo.gatekeeper_rules.email.allowed.map(
                         (pattern) => (
                           <li className="font-mono" key={pattern}>
@@ -201,8 +217,10 @@ export function SpaceLandingPage({ publicInfo }: Props) {
       )}
 
       {/* Info Note */}
-      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-        <p className="text-blue-800 text-sm">{t("loginNote")}</p>
+      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/30">
+        <p className="text-blue-800 text-sm dark:text-blue-200">
+          {t("loginNote")}
+        </p>
       </div>
     </div>
   );

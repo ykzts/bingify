@@ -227,15 +227,15 @@ export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
   if (isPending) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">{t("loading")}</div>
+        <div className="text-gray-500 dark:text-gray-400">{t("loading")}</div>
       </div>
     );
   }
 
   if (error || !bingoCard) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-        <p className="text-red-800 text-sm">
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/30">
+        <p className="text-red-800 text-sm dark:text-red-200">
           {error instanceof Error ? error.message : t("errorLoadingCard")}
         </p>
       </div>
@@ -256,7 +256,7 @@ export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="mb-4 text-center font-bold text-2xl">
+        <h2 className="mb-4 text-center font-bold text-2xl dark:text-gray-100">
           {t("bingoCardTitle")}
         </h2>
 
@@ -279,7 +279,7 @@ export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
         <div className="mx-auto grid max-w-md grid-cols-5 gap-2">
           {["B", "I", "N", "G", "O"].map((letter) => (
             <div
-              className="flex aspect-square items-center justify-center font-bold text-2xl text-blue-600"
+              className="flex aspect-square items-center justify-center font-bold text-2xl text-blue-600 dark:text-blue-400"
               key={letter}
             >
               {letter}
@@ -318,12 +318,12 @@ export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
       </div>
 
       <div>
-        <h3 className="mb-3 text-center font-semibold text-lg">
+        <h3 className="mb-3 text-center font-semibold text-lg dark:text-gray-100">
           {t("recentCalledNumbers")}
         </h3>
         <div className="mx-auto max-w-md">
           {displayCalledNumbers.size === 0 ? (
-            <p className="text-center text-gray-500 text-sm">
+            <p className="text-center text-gray-500 text-sm dark:text-gray-400">
               {t("noNumbersCalled")}
             </p>
           ) : (
@@ -334,7 +334,7 @@ export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
                 .map((number) => (
                   <motion.div
                     animate={{ opacity: 1, scale: 1 }}
-                    className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 font-bold text-white"
+                    className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 font-bold text-white dark:bg-blue-500"
                     initial={{ opacity: 0, scale: 0 }}
                     key={number}
                     transition={{ duration: 0.3 }}
