@@ -37,7 +37,7 @@ export function ProfileSettingsFormCard({
   title,
 }: ProfileSettingsFormCardProps) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
       <SectionHeader description={description} icon={Icon}>
         {title}
       </SectionHeader>
