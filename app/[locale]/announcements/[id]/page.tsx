@@ -97,7 +97,7 @@ export default async function AnnouncementDetailPage({
         </Alert>
 
         {/* メタ情報 */}
-        <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
               <dt className="font-medium text-gray-600 dark:text-gray-400">
