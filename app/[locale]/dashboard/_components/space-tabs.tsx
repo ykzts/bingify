@@ -28,9 +28,9 @@ function SpaceTable({
   const t = useTranslations("Dashboard");
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+    <div className="overflow-hidden rounded-lg border bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
       <table className="w-full text-left text-sm">
-        <thead className="border-b bg-gray-50 text-gray-500">
+        <thead className="border-b bg-gray-50 text-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400">
           <tr>
             <th className="px-4 py-3 font-medium">{t("historySpaceName")}</th>
             <th className="px-4 py-3 font-medium">{t("historyStatus")}</th>
@@ -40,25 +40,28 @@ function SpaceTable({
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
           {spaces.map((space) => (
-            <tr className="transition-colors hover:bg-gray-50" key={space.id}>
-              <td className="px-4 py-3 font-medium text-gray-900">
+            <tr
+              className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+              key={space.id}
+            >
+              <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
                 <Link
-                  className="flex flex-col gap-1 transition-colors hover:text-purple-600"
+                  className="flex flex-col gap-1 transition-colors hover:text-purple-600 dark:hover:text-purple-400"
                   href={`/dashboard/spaces/${space.id}`}
                 >
                   <div className="flex items-center gap-2">
                     {space.title || space.share_key}
                     {space.is_owner === false && (
-                      <span className="rounded bg-blue-100 px-2 py-0.5 text-blue-800 text-xs">
+                      <span className="rounded bg-blue-100 px-2 py-0.5 text-blue-800 text-xs dark:bg-blue-900 dark:text-blue-200">
                         {t("adminBadge")}
                       </span>
                     )}
                   </div>
                   {space.status === "active" &&
                     space.participant_count !== undefined && (
-                      <p className="flex items-center gap-1 text-gray-500 text-xs">
+                      <p className="flex items-center gap-1 text-gray-500 text-xs dark:text-gray-400">
                         <Users className="h-3 w-3" />
                         {t("activeSpaceParticipants", {
                           count: space.participant_count || 0,
@@ -78,7 +81,7 @@ function SpaceTable({
                   status={space.status || "closed"}
                 />
               </td>
-              <td className="px-4 py-3 text-gray-500">
+              <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
                 {formatDateShort(space.created_at || 0, locale)}
               </td>
               <td className="px-4 py-3 text-right">
@@ -114,8 +117,10 @@ export function SpaceTabs({
 
       <TabsContent value="hosted">
         {hostedSpaces.length === 0 ? (
-          <div className="overflow-hidden rounded-lg border bg-white p-8 text-center shadow-sm">
-            <p className="text-gray-500 text-sm">{t("hostedSpacesEmpty")}</p>
+          <div className="overflow-hidden rounded-lg border bg-white p-8 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <p className="text-gray-500 text-sm dark:text-gray-400">
+              {t("hostedSpacesEmpty")}
+            </p>
           </div>
         ) : (
           <SpaceTable locale={locale} spaces={hostedSpaces} />
@@ -124,8 +129,8 @@ export function SpaceTabs({
 
       <TabsContent value="participated">
         {participatedSpaces.length === 0 ? (
-          <div className="overflow-hidden rounded-lg border bg-white p-8 text-center shadow-sm">
-            <p className="text-gray-500 text-sm">
+          <div className="overflow-hidden rounded-lg border bg-white p-8 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <p className="text-gray-500 text-sm dark:text-gray-400">
               {t("participatedSpacesEmpty")}
             </p>
           </div>
