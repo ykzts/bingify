@@ -25,7 +25,7 @@ export default async function ContactPage({
   setRequestLocale(locale);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 p-4 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950">
       <ContactForm locale={locale} />
     </div>
   );
