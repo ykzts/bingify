@@ -69,10 +69,12 @@ function SuggestionDisplay({
   const suggestion = suggestionMatch?.[1] || "";
 
   return (
-    <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
-      <p className="mb-2 text-amber-800 text-sm">{t("suggestionPrefix")}</p>
+    <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950">
+      <p className="mb-2 text-amber-800 text-sm dark:text-amber-200">
+        {t("suggestionPrefix")}
+      </p>
       <div className="flex items-center gap-2">
-        <code className="flex-1 rounded bg-white px-3 py-2 font-mono text-sm">
+        <code className="flex-1 rounded bg-white px-3 py-2 font-mono text-sm dark:bg-gray-800 dark:text-gray-200">
           {suggestion}
         </code>
         <Button onClick={onAcceptSuggestion} size="sm" type="button">
@@ -183,7 +185,7 @@ export function CreateSpaceForm() {
       onSubmit={() => form.handleSubmit()}
     >
       <FormErrors
-        className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4"
+        className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950"
         errors={formErrors}
       />
 
@@ -240,18 +242,18 @@ export function CreateSpaceForm() {
                 </InputGroupAddon>
               </InputGroup>
 
-              <div className="mb-2 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                <AlertTriangle className="h-4 w-4 text-amber-600" />
-                <p className="text-amber-800 text-sm">
+              <div className="mb-2 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950">
+                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                <p className="text-amber-800 text-sm dark:text-amber-200">
                   この共有キーを知っているユーザーは誰でも参加できます
                 </p>
               </div>
 
-              <p className="mb-2 text-gray-500 text-sm">
+              <p className="mb-2 text-gray-500 text-sm dark:text-gray-400">
                 公開URL:{" "}
                 <span className="font-mono">
                   {getAbsoluteUrl()}
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
                     @{(field.state.value as string) || "..."}-{dateSuffix}
                   </span>
                 </span>
@@ -262,15 +264,17 @@ export function CreateSpaceForm() {
                 <div className="mt-2 flex items-center gap-2">
                   {checking && (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                      <span className="text-gray-500 text-sm">確認中...</span>
+                      <Loader2 className="h-4 w-4 animate-spin text-gray-400 dark:text-gray-500" />
+                      <span className="text-gray-500 text-sm dark:text-gray-400">
+                        確認中...
+                      </span>
                     </>
                   )}
 
                   {!checking && available === true && (
                     <>
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-green-600 text-sm">
+                      <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+                      <span className="text-green-600 text-sm dark:text-green-400">
                         この共有キーは使用可能です
                       </span>
                     </>
@@ -278,8 +282,8 @@ export function CreateSpaceForm() {
 
                   {!checking && available === false && (
                     <>
-                      <AlertCircle className="h-4 w-4 text-amber-600" />
-                      <span className="text-amber-600 text-sm">
+                      <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                      <span className="text-amber-600 text-sm dark:text-amber-400">
                         この共有キーは既に使用されています
                       </span>
                     </>
@@ -289,10 +293,10 @@ export function CreateSpaceForm() {
 
               {/* Field-level errors */}
               {field.state.meta.errors.length > 0 && (
-                <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-3">
+                <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950">
                   {field.state.meta.errors.map((error) => (
                     <p
-                      className="text-red-800 text-sm"
+                      className="text-red-800 text-sm dark:text-red-200"
                       key={getErrorMessage(error)}
                     >
                       {getErrorMessage(error)}
@@ -359,7 +363,9 @@ export function CreateSpaceForm() {
         {isSubmitting ? t("creatingButton") : t("createButton")}
       </Button>
 
-      <p className="text-center text-gray-500 text-sm">{t("settingsNotice")}</p>
+      <p className="text-center text-gray-500 text-sm dark:text-gray-400">
+        {t("settingsNotice")}
+      </p>
     </form>
   );
 }

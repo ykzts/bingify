@@ -46,14 +46,16 @@ export default async function DashboardPage({
       {/* --- SECTION 1: Create Form --- */}
       <section>
         <div className="mb-6">
-          <h1 className="font-bold text-2xl text-gray-900">
+          <h1 className="font-bold text-2xl text-gray-900 dark:text-gray-100">
             {t("createFormTitle")}
           </h1>
-          <p className="text-gray-500 text-sm">{t("createFormDescription")}</p>
+          <p className="text-gray-500 text-sm dark:text-gray-400">
+            {t("createFormDescription")}
+          </p>
         </div>
 
         {/* Form area with card style */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <CreateSpaceForm />
         </div>
       </section>
@@ -61,10 +63,10 @@ export default async function DashboardPage({
       {/* --- Divider --- */}
       <div className="relative">
         <div aria-hidden="true" className="absolute inset-0 flex items-center">
-          <div className="w-full border-gray-200 border-t" />
+          <div className="w-full border-gray-200 border-t dark:border-gray-700" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-gray-50 px-2 text-gray-500 text-sm">
+          <span className="bg-gray-50 px-2 text-gray-500 text-sm dark:bg-gray-900 dark:text-gray-400">
             {t("dividerText")}
           </span>
         </div>
@@ -72,8 +74,8 @@ export default async function DashboardPage({
 
       {/* Show error if data fetch failed */}
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p className="text-red-800 text-sm">{error}</p>
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950">
+          <p className="text-red-800 text-sm dark:text-red-200">{error}</p>
         </div>
       )}
 
@@ -87,7 +89,7 @@ export default async function DashboardPage({
           {/* Hosted active spaces */}
           {activeHostedSpaces.map((space) => (
             <div
-              className="flex flex-col items-center justify-between gap-4 rounded-lg border border-green-200 bg-green-50 p-4 shadow-sm sm:flex-row"
+              className="flex flex-col items-center justify-between gap-4 rounded-lg border border-green-200 bg-green-50 p-4 shadow-sm sm:flex-row dark:border-green-800 dark:bg-green-950"
               key={space.id}
             >
               <div className="flex items-center gap-4">
@@ -101,13 +103,13 @@ export default async function DashboardPage({
                   <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500" />
                 </span>
                 <div>
-                  <p className="font-bold text-green-900">
+                  <p className="font-bold text-green-900 dark:text-green-100">
                     {space.title || space.share_key}{" "}
-                    <span className="text-green-700 text-xs">
+                    <span className="text-green-700 text-xs dark:text-green-300">
                       ({t("activeSpaceLabel")})
                     </span>
                   </p>
-                  <p className="flex items-center gap-1 text-green-700 text-xs">
+                  <p className="flex items-center gap-1 text-green-700 text-xs dark:text-green-300">
                     <Users className="h-3 w-3" />
                     {t("activeSpaceParticipants", {
                       count: space.participant_count || 0,
@@ -117,14 +119,14 @@ export default async function DashboardPage({
               </div>
               <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
                 <Link
-                  className="w-full rounded border border-green-200 bg-white px-4 py-2 font-bold text-green-700 text-sm shadow-sm transition hover:bg-green-100 sm:w-auto"
+                  className="w-full rounded border border-green-200 bg-white px-4 py-2 font-bold text-green-700 text-sm shadow-sm transition hover:bg-green-100 sm:w-auto dark:border-green-700 dark:bg-gray-800 dark:text-green-300 dark:hover:bg-gray-700"
                   href={`/dashboard/spaces/${space.id}`}
                 >
                   {t("activeSpaceBackToAdmin")}
                 </Link>
                 {space.is_also_participant && (
                   <Link
-                    className="w-full rounded border border-green-200 bg-white px-4 py-2 font-bold text-green-700 text-sm shadow-sm transition hover:bg-green-100 sm:w-auto"
+                    className="w-full rounded border border-green-200 bg-white px-4 py-2 font-bold text-green-700 text-sm shadow-sm transition hover:bg-green-100 sm:w-auto dark:border-green-700 dark:bg-gray-800 dark:text-green-300 dark:hover:bg-gray-700"
                     href={`/spaces/${space.id}`}
                   >
                     {t("viewSpaceAction")}
@@ -136,7 +138,7 @@ export default async function DashboardPage({
           {/* Participated active spaces */}
           {activeParticipatedSpaces.map((space) => (
             <div
-              className="flex flex-col items-center justify-between gap-4 rounded-lg border border-green-200 bg-green-50 p-4 shadow-sm sm:flex-row"
+              className="flex flex-col items-center justify-between gap-4 rounded-lg border border-green-200 bg-green-50 p-4 shadow-sm sm:flex-row dark:border-green-800 dark:bg-green-950"
               key={space.id}
             >
               <div className="flex items-center gap-4">
@@ -150,13 +152,13 @@ export default async function DashboardPage({
                   <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500" />
                 </span>
                 <div>
-                  <p className="font-bold text-green-900">
+                  <p className="font-bold text-green-900 dark:text-green-100">
                     {space.title || space.share_key}{" "}
-                    <span className="text-green-700 text-xs">
+                    <span className="text-green-700 text-xs dark:text-green-300">
                       ({t("activeSpaceLabel")})
                     </span>
                   </p>
-                  <p className="flex items-center gap-1 text-green-700 text-xs">
+                  <p className="flex items-center gap-1 text-green-700 text-xs dark:text-green-300">
                     <Users className="h-3 w-3" />
                     {t("activeSpaceParticipants", {
                       count: space.participant_count || 0,
@@ -165,7 +167,7 @@ export default async function DashboardPage({
                 </div>
               </div>
               <Link
-                className="w-full rounded border border-green-200 bg-white px-4 py-2 font-bold text-green-700 text-sm shadow-sm transition hover:bg-green-100 sm:w-auto"
+                className="w-full rounded border border-green-200 bg-white px-4 py-2 font-bold text-green-700 text-sm shadow-sm transition hover:bg-green-100 sm:w-auto dark:border-green-700 dark:bg-gray-800 dark:text-green-300 dark:hover:bg-gray-700"
                 href={`/spaces/${space.id}`}
               >
                 {t("viewSpaceAction")}
@@ -179,13 +181,15 @@ export default async function DashboardPage({
       <section>
         <SectionHeader icon={FileText}>{t("draftSectionTitle")}</SectionHeader>
         {draftHostedSpaces.length === 0 ? (
-          <div className="overflow-hidden rounded-lg border bg-white p-8 text-center shadow-sm">
-            <p className="text-gray-500 text-sm">{t("draftSpacesEmpty")}</p>
+          <div className="overflow-hidden rounded-lg border bg-white p-8 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <p className="text-gray-500 text-sm dark:text-gray-400">
+              {t("draftSpacesEmpty")}
+            </p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+          <div className="overflow-hidden rounded-lg border bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <table className="w-full text-left text-sm">
-              <thead className="border-b bg-gray-50 text-gray-500">
+              <thead className="border-b bg-gray-50 text-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400">
                 <tr>
                   <th className="px-4 py-3 font-medium">
                     {t("historySpaceName")}
@@ -199,33 +203,33 @@ export default async function DashboardPage({
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                 {draftHostedSpaces.map((space) => (
                   <tr
-                    className="transition-colors hover:bg-gray-50"
+                    className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
                     key={space.id}
                   >
-                    <td className="px-4 py-3 font-medium text-gray-900">
+                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
                       <Link
-                        className="transition-colors hover:text-purple-600"
+                        className="transition-colors hover:text-purple-600 dark:hover:text-purple-400"
                         href={`/dashboard/spaces/${space.id}`}
                       >
                         {space.title || space.share_key}
                       </Link>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 font-medium text-xs text-yellow-800">
+                      <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 font-medium text-xs text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
                         {t("statusDraft")}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-500">
+                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
                       {space.created_at
                         ? new Date(space.created_at).toLocaleDateString(locale)
                         : ""}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link
-                        className="rounded border border-gray-200 bg-white px-3 py-1.5 text-gray-700 text-sm shadow-sm transition hover:bg-gray-50"
+                        className="rounded border border-gray-200 bg-white px-3 py-1.5 text-gray-700 text-sm shadow-sm transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                         href={`/dashboard/spaces/${space.id}`}
                       >
                         {t("manageAction")}
