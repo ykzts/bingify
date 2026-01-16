@@ -127,7 +127,9 @@ export function BingoGameManager({ spaceId }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="mb-4 font-semibold text-xl">{t("bingoGameManager")}</h2>
+        <h2 className="mb-4 font-semibold text-xl dark:text-gray-100">
+          {t("bingoGameManager")}
+        </h2>
 
         <div className="mb-4">
           <Button
@@ -140,14 +142,16 @@ export function BingoGameManager({ spaceId }: Props) {
           </Button>
         </div>
 
-        <div className="text-gray-600 text-sm">
+        <div className="text-gray-600 text-sm dark:text-gray-400">
           {t("calledNumbersCount", { count: calledValuesSet.size, total: 75 })}
         </div>
       </div>
 
       <div>
-        <h3 className="mb-3 font-medium text-gray-900">{t("calledNumbers")}</h3>
-        <div className="grid max-h-96 grid-cols-10 gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-4 md:grid-cols-[repeat(15,minmax(0,1fr))]">
+        <h3 className="mb-3 font-medium text-gray-900 dark:text-gray-100">
+          {t("calledNumbers")}
+        </h3>
+        <div className="grid max-h-96 grid-cols-10 gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-4 md:grid-cols-[repeat(15,minmax(0,1fr))] dark:border-gray-700 dark:bg-gray-900">
           {Array.from({ length: 75 }, (_, i) => i + 1).map((number) => {
             const isCalled = calledValuesSet.has(number);
             return (
@@ -155,7 +159,7 @@ export function BingoGameManager({ spaceId }: Props) {
                 className={`flex aspect-square items-center justify-center rounded font-bold text-sm ${
                   isCalled
                     ? "bg-blue-600 text-white"
-                    : "border border-gray-300 bg-white text-gray-400"
+                    : "border border-gray-300 bg-white text-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500"
                 }`}
                 key={number}
               >

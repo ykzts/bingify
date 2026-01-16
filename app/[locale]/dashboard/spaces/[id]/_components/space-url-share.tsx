@@ -32,10 +32,15 @@ export function SpaceUrlShare({ shareKey }: Props) {
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
       <div className="space-y-4">
-        <h2 className="font-semibold text-lg">{t("spaceUrlSection")}</h2>
-        <p className="text-gray-600 text-sm" id="space-url-description">
+        <h2 className="font-semibold text-lg dark:text-gray-100">
+          {t("spaceUrlSection")}
+        </h2>
+        <p
+          className="text-gray-600 text-sm dark:text-gray-400"
+          id="space-url-description"
+        >
           {t("spaceUrlDescription")}
         </p>
         <div className="space-y-2">
