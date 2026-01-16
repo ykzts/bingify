@@ -148,31 +148,35 @@ export function AccountLinkingForm({
     <div className="space-y-6">
       <div className="space-y-2">
         <h1 className="font-bold text-3xl">{t("title")}</h1>
-        <p className="text-gray-600">{t("description")}</p>
+        <p className="text-gray-600 dark:text-gray-400">{t("description")}</p>
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
-          <AlertCircle className="h-5 w-5 text-red-600" />
-          <p className="text-red-800 text-sm">{error}</p>
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950/50">
+          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+          <p className="text-red-800 text-sm dark:text-red-300">{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4">
-          <CheckCircle className="h-5 w-5 text-green-600" />
-          <p className="text-green-800 text-sm">{success}</p>
+        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950/50">
+          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+          <p className="text-green-800 text-sm dark:text-green-300">
+            {success}
+          </p>
         </div>
       )}
 
       <div className="space-y-4">
         <h2 className="font-semibold text-lg">{t("linkedEmail")}</h2>
-        <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4">
+        <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center gap-3">
-            <Mail className="h-5 w-5 text-gray-600" />
+            <Mail className="h-5 w-5 text-gray-600 dark:text-gray-400" />
             <div>
               <p className="font-medium">{t("registeredEmail")}</p>
-              <p className="text-gray-500 text-sm">{user.email}</p>
+              <p className="text-gray-500 text-sm dark:text-gray-400">
+                {user.email}
+              </p>
             </div>
           </div>
         </div>
@@ -188,14 +192,14 @@ export function AccountLinkingForm({
 
             return (
               <div
-                className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4"
+                className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
                 key={provider.name}
               >
                 <div className="flex items-center gap-3">
                   <ProviderIcon provider={provider.name} />
                   <div>
                     <p className="font-medium">{provider.label}</p>
-                    <p className="text-gray-500 text-sm">
+                    <p className="text-gray-500 text-sm dark:text-gray-400">
                       {linked ? t("statusLinked") : t("statusNotLinked")}
                     </p>
                   </div>
@@ -228,8 +232,10 @@ export function AccountLinkingForm({
         </div>
       </div>
 
-      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-        <p className="text-amber-800 text-sm">{t("note")}</p>
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/50">
+        <p className="text-amber-800 text-sm dark:text-amber-300">
+          {t("note")}
+        </p>
       </div>
     </div>
   );
