@@ -24,8 +24,8 @@ export function ClaimAdminButton() {
   return (
     <form action={formAction}>
       {state.error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
-          <p className="text-red-800 text-sm">
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950">
+          <p className="text-red-800 text-sm dark:text-red-200">
             {t(`errors.${state.error}`, { default: t("errors.errorGeneric") })}
           </p>
         </div>
