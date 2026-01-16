@@ -10,6 +10,7 @@ import { BingoLineOverlay } from "@/components/bingo/bingo-line-overlay";
 import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { useCalledNumbers } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/client";
+import { getBingoCellClassName } from "@/lib/utils/bingo-cell-styles";
 import { checkBingoLines } from "@/lib/utils/bingo-checker";
 import { updateBingoStatusWithLines } from "../_actions/bingo";
 import { useBingoCard } from "../_hooks/use-bingo-card";
@@ -302,11 +303,7 @@ export function BingoCardDisplay({ spaceId, readOnly = false }: Props) {
                         }
                       : {}
                   }
-                  className={`flex aspect-square items-center justify-center rounded border-2 font-bold text-xl ${
-                    isCalled
-                      ? "border-blue-600 bg-blue-600 text-white dark:border-blue-500 dark:bg-blue-500"
-                      : "border-gray-300 bg-white text-black dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                  }`}
+                  className={getBingoCellClassName(isCalled)}
                   key={key}
                   transition={{ duration: 0.3 }}
                 >

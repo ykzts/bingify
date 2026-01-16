@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
+import { getBingoCellClassName } from "@/lib/utils/bingo-cell-styles";
 import type { BingoLine } from "@/lib/utils/bingo-checker";
 import { BingoLineOverlay } from "./bingo-line-overlay";
 
@@ -43,11 +44,7 @@ function BingoCell({
             }
           : {}
       }
-      className={`flex aspect-square items-center justify-center rounded border-2 font-bold text-xl ${
-        isCalled
-          ? "border-blue-600 bg-blue-600 text-white dark:border-blue-500 dark:bg-blue-500"
-          : "border-gray-300 bg-white text-black dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-      }`}
+      className={getBingoCellClassName(isCalled)}
       key={key}
       style={{
         cursor: readonly ? "default" : "pointer",
