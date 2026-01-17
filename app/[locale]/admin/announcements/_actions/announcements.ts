@@ -1,16 +1,12 @@
 "use server";
 
-import {
-  createServerValidate,
-  initialFormState,
-} from "@tanstack/react-form-nextjs";
+import { initialFormState } from "@tanstack/react-form-nextjs";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
 import type { Tables } from "@/types/supabase";
-import { announcementFormOpts } from "../_lib/form-options";
 
 interface ActionResult {
   error?: string;
@@ -202,11 +198,6 @@ export async function getAnnouncementWithTranslations(
   }
 }
 
-const createAnnouncementValidate = createServerValidate({
-  ...announcementFormOpts,
-  onServerValidate: () => undefined,
-});
-
 async function createParentAnnouncement(
   adminClient: ReturnType<typeof createAdminClient>,
   userId: string,
@@ -378,8 +369,6 @@ export async function createAnnouncementAction(
   }
 
   try {
-    await createAnnouncementValidate(formData);
-
     // Extract common fields
     const commonData = extractCommonData(formData);
 
@@ -435,11 +424,6 @@ export async function createAnnouncementAction(
     };
   }
 }
-
-const updateAnnouncementValidate = createServerValidate({
-  ...announcementFormOpts,
-  onServerValidate: () => undefined,
-});
 
 interface AnnouncementData {
   content: string;
@@ -672,8 +656,6 @@ export async function updateAnnouncementAction(
   }
 
   try {
-    await updateAnnouncementValidate(formData);
-
     const adminClient = createAdminClient();
 
     // Get the current announcement to check if it's a parent or translation
