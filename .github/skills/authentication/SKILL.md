@@ -57,7 +57,7 @@ export function LoginForm() {
 - [app/auth/[provider]/callback/route.ts](../../../app/auth/%5Bprovider%5D/callback/route.ts) が処理：
   1. **リトライロジック**: `exchangeCodeForSession()` を最大2回まで実行（ネットワークエラー時は再試行）
   2. **セッション取得**: 交換後に `getSession()` でセッション情報を取得
-  3. **トークン保存**: OAuth トークン（`provider_token`, `provider_refresh_token`）を `upsertOAuthToken()` 経由でSupabase Vaultに暗号化して保存
+  3. **トークン保存**: OAuth トークン（`provider_token`, `provider_refresh_token`）を RPC 関数 `upsert_oauth_token` / `get_oauth_token` 経由で保存。暗号化・復号は Supabase Vault 側（RPC 層）で自動的に処理される
   4. **メタデータ設定**: 言語情報を `user_metadata.language` に設定
   5. **リダイレクト**: 認証成功後、`redirect` パラメータで指定した遷移先（またはダッシュボード）へリダイレクト
 
@@ -143,7 +143,8 @@ export function proxy(request: NextRequest) {
 
 ```typescript
 // テストでのシミュレーション
-const browser = (await mcp_next) - devtools_browser_eval.start();
+// 注: mcp_next は別途初期化が必要な場合は await で取得
+const browser = await devtools_browser_eval.start();
 await browser.navigate("http://localhost:3000/login");
 await browser.fill_form([
   { selector: 'input[type="email"]', value: "user@example.com" },
@@ -196,7 +197,7 @@ const {
 
 ### デバッグ方法
 
-1. **ブラウザコンソール**: `localStorage` の `sb-*` キーでセッションクッキーを確認
+1. **ブラウザ開発者ツール**: Application タブの Cookies セクションまたは Network タブで Supabase セッションクッキー（例: `sb-<project-ref>-auth-token`）を確認。このリポジトリは `@supabase/ssr` の `createServerClient` とクッキーアダプターを使用したクッキーベースのセッション管理を採用（[lib/supabase/server.ts](../../../lib/supabase/server.ts) 参照）
 2. **Supabase ダッシュボード**: [console.supabase.com](https://console.supabase.com) で認証状態を確認
 3. **Server Actions ログ**: `pnpm dev` の出力でサーバー側エラーを確認
 
