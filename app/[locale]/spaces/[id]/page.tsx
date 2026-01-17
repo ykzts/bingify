@@ -3,8 +3,6 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SpaceAnnouncementList } from "@/components/announcements/space-announcement-list";
 import { Link } from "@/i18n/navigation";
-import { getSystemSettings } from "@/lib/data/system-settings";
-import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
 import { checkIsSpaceAdmin } from "@/lib/utils/space-permissions";
 import {
@@ -203,11 +201,6 @@ export default async function UserSpacePage({
   // Check if current user is admin (for announcement management)
   const isAdmin = await checkIsSpaceAdmin(id, user?.id);
 
-  // Fetch system settings for OAuth scope configuration
-  const systemSettingsResult = await getSystemSettings();
-  const systemSettings =
-    systemSettingsResult.settings || DEFAULT_SYSTEM_SETTINGS;
-
   // For non-participants, fetch public info to show landing page
   if (!isParticipant) {
     const publicInfo = await getSpacePublicInfo(id);
@@ -251,11 +244,7 @@ export default async function UserSpacePage({
 
           {/* Participant Info Section */}
           <div className="mt-6">
-            <SpaceParticipation
-              spaceId={id}
-              spaceInfo={space}
-              systemSettings={systemSettings}
-            />
+            <SpaceParticipation spaceId={id} spaceInfo={space} />
           </div>
         </div>
       </div>
@@ -295,11 +284,7 @@ export default async function UserSpacePage({
 
         {/* Participant Info Section */}
         <div className="mt-6">
-          <SpaceParticipation
-            spaceId={id}
-            spaceInfo={space}
-            systemSettings={systemSettings}
-          />
+          <SpaceParticipation spaceId={id} spaceInfo={space} />
         </div>
       </div>
     </div>

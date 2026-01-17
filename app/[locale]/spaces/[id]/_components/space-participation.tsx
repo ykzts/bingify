@@ -1,16 +1,11 @@
 "use client";
 
-import { Loader2, Twitch, Users, Youtube } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { Loader2, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  buildOAuthCallbackUrl,
-  getScopesForProvider,
-} from "@/lib/auth/oauth-utils";
-import type { SystemSettings } from "@/lib/schemas/system-settings";
-import { createClient } from "@/lib/supabase/client";
+import { Link } from "@/i18n/navigation";
 import type { JoinSpaceState, SpaceInfo } from "../../_actions/space-join";
 import {
   checkOAuthTokenAvailability,
@@ -22,15 +17,10 @@ import {
   useUserParticipation,
 } from "../_hooks/use-participation";
 
-// SessionStorage keys for OAuth completion tracking
-const YOUTUBE_OAUTH_COMPLETE_KEY = "youtube_oauth_complete";
-const TWITCH_OAUTH_COMPLETE_KEY = "twitch_oauth_complete";
-
 interface SpaceParticipationProps {
   compact?: boolean;
   spaceId: string;
   spaceInfo: SpaceInfo;
-  systemSettings: SystemSettings;
 }
 
 interface JoinButtonProps {
@@ -99,18 +89,14 @@ export function SpaceParticipation({
   compact = false,
   spaceId,
   spaceInfo,
-  systemSettings,
 }: SpaceParticipationProps) {
   const t = useTranslations("UserSpace");
   const router = useRouter();
-  const pathname = usePathname();
   const [isJoining, setIsJoining] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasYouTubeToken, setHasYouTubeToken] = useState(false);
-  const [hasTwitchToken, setHasTwitchToken] = useState(false);
-  const [waitingForOAuth, setWaitingForOAuth] = useState(false);
-  const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
+  const [hasYouTubeToken, setHasYouTubeToken] = useState<boolean | null>(null);
+  const [hasTwitchToken, setHasTwitchToken] = useState<boolean | null>(null);
 
   // Use queries for participant data
   const {
@@ -127,7 +113,6 @@ export function SpaceParticipation({
   const isLoading = isLoadingInfo || isLoadingJoined;
 
   // Check if YouTube verification is required
-  // This logic matches the server-side verification in actions.ts verifyGatekeeperRules
   const requiresYouTube = useMemo(
     () =>
       spaceInfo.gatekeeper_rules?.youtube?.channelId &&
@@ -137,7 +122,6 @@ export function SpaceParticipation({
   );
 
   // Check if Twitch verification is required
-  // This logic matches the server-side verification in actions.ts verifyGatekeeperRules
   const requiresTwitch = useMemo(
     () =>
       spaceInfo.gatekeeper_rules?.twitch?.broadcasterId &&
@@ -146,58 +130,34 @@ export function SpaceParticipation({
     [spaceInfo.gatekeeper_rules]
   );
 
-  // Handle visibility change listener cleanup when waiting for OAuth
+  // Check for existing OAuth tokens on mount
   useEffect(() => {
-    if (!waitingForOAuth) {
+    // Only check if user hasn't joined yet
+    if (hasJoined) {
       return;
     }
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        // Give a small delay to allow OAuth redirect to complete if it was successful
-        setTimeout(() => {
-          // If we're still on this page and haven't redirected, reset the state
-          setIsJoining(false);
-          setWaitingForOAuth(false);
-        }, 1000);
+    const checkTokens = async () => {
+      // Check YouTube token if required
+      if (requiresYouTube) {
+        const result = await checkOAuthTokenAvailability("google");
+        setHasYouTubeToken(result.available);
+      }
+
+      // Check Twitch token if required
+      if (requiresTwitch) {
+        const result = await checkOAuthTokenAvailability("twitch");
+        setHasTwitchToken(result.available);
       }
     };
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    // Cleanup: remove the listener when component unmounts or waitingForOAuth changes
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [waitingForOAuth]);
-
-  // Use useEffectEvent to check existing OAuth tokens without including all dependencies
-  const checkExistingTokens = useEffectEvent(async () => {
-    // Check YouTube token if required
-    if (requiresYouTube && !hasYouTubeToken) {
-      const result = await checkOAuthTokenAvailability("google");
-      if (result.available) {
-        setHasYouTubeToken(true);
-        console.log("既存の有効なYouTubeトークンが見つかりました");
-      }
-    }
-
-    // Check Twitch token if required
-    if (requiresTwitch && !hasTwitchToken) {
-      const result = await checkOAuthTokenAvailability("twitch");
-      if (result.available) {
-        setHasTwitchToken(true);
-        console.log("既存の有効なTwitchトークンが見つかりました");
-      }
-    }
-  });
+    checkTokens();
+  }, [hasJoined, requiresYouTube, requiresTwitch]);
 
   const handleJoin = useEffectEvent(async () => {
     setIsJoining(true);
     setError(null);
 
-    // トークンはサーバー側でデータベースから取得されるため、
-    // ここでは何も渡す必要がない
     const result = await joinSpace(spaceId);
 
     if (result.success) {
@@ -209,149 +169,6 @@ export function SpaceParticipation({
 
     setIsJoining(false);
   });
-
-  // Use useEffectEvent to handle OAuth completion check
-  const checkOAuthCompletion = useEffectEvent(async () => {
-    let shouldTriggerJoin = false;
-
-    // Check YouTube OAuth completion
-    if (sessionStorage.getItem(YOUTUBE_OAUTH_COMPLETE_KEY)) {
-      sessionStorage.removeItem(YOUTUBE_OAUTH_COMPLETE_KEY);
-      if (requiresYouTube) {
-        const result = await checkOAuthTokenAvailability("google");
-        if (result.available) {
-          setHasYouTubeToken(true);
-          shouldTriggerJoin = true;
-          console.log("YouTube OAuth完了: トークンを確認しました");
-        }
-      }
-    }
-
-    // Check Twitch OAuth completion
-    if (sessionStorage.getItem(TWITCH_OAUTH_COMPLETE_KEY)) {
-      sessionStorage.removeItem(TWITCH_OAUTH_COMPLETE_KEY);
-      if (requiresTwitch) {
-        const result = await checkOAuthTokenAvailability("twitch");
-        if (result.available) {
-          setHasTwitchToken(true);
-          shouldTriggerJoin = true;
-          console.log("Twitch OAuth完了: トークンを確認しました");
-        }
-      }
-    }
-
-    if (shouldTriggerJoin) {
-      setShouldAutoJoin(true);
-    }
-  });
-
-  // Check for existing OAuth tokens in database on mount
-  useEffect(() => {
-    // Only check if user hasn't joined yet
-    if (hasJoined) {
-      return;
-    }
-
-    // First check for OAuth completion flags
-    checkOAuthCompletion();
-
-    // Then check for existing tokens
-    checkExistingTokens();
-  }, [hasJoined]);
-
-  // Auto-join after OAuth completion
-  useEffect(() => {
-    if (shouldAutoJoin && !hasJoined && !isJoining) {
-      setShouldAutoJoin(false);
-      handleJoin();
-    }
-  }, [shouldAutoJoin, hasJoined, isJoining]);
-
-  const handleYouTubeVerify = async () => {
-    setIsJoining(true);
-    setError(null);
-
-    try {
-      // Set flag in sessionStorage before OAuth redirect
-      // This allows us to detect when the user returns from OAuth
-      sessionStorage.setItem(YOUTUBE_OAUTH_COMPLETE_KEY, "true");
-
-      const supabase = createClient();
-
-      // Use linkIdentity to add YouTube scope to existing session
-      // This is the correct method for authenticated users requesting additional OAuth scopes
-      const { error: oauthError } = await supabase.auth.linkIdentity({
-        options: {
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent",
-          },
-          redirectTo: buildOAuthCallbackUrl("google", pathname),
-          scopes: getScopesForProvider("google", systemSettings),
-        },
-        provider: "google",
-      });
-
-      if (oauthError) {
-        console.error("OAuth error:", oauthError);
-        // Clear the flag if OAuth initiation failed
-        sessionStorage.removeItem(YOUTUBE_OAUTH_COMPLETE_KEY);
-        setError(t("errorYouTubeVerificationFailed"));
-        setIsJoining(false);
-      } else {
-        // Set waiting state to trigger the visibility change listener
-        // The listener will reset isJoining if the user returns without completing OAuth
-        setWaitingForOAuth(true);
-      }
-    } catch (err) {
-      console.error("Error during YouTube verification:", err);
-      // Clear the flag if an exception occurred
-      sessionStorage.removeItem(YOUTUBE_OAUTH_COMPLETE_KEY);
-      setError(t("errorYouTubeVerificationFailed"));
-      setIsJoining(false);
-    }
-  };
-
-  const handleTwitchVerify = async () => {
-    setIsJoining(true);
-    setError(null);
-
-    try {
-      // Set flag in sessionStorage before OAuth redirect
-      // This allows us to detect when the user returns from OAuth
-      sessionStorage.setItem(TWITCH_OAUTH_COMPLETE_KEY, "true");
-
-      const supabase = createClient();
-
-      // Use linkIdentity for consistency with YouTube implementation
-      // This adds Twitch scope to existing session for authenticated users
-      const { error: oauthError } = await supabase.auth.linkIdentity({
-        options: {
-          redirectTo: buildOAuthCallbackUrl("twitch", pathname),
-          scopes: getScopesForProvider("twitch", systemSettings),
-        },
-        provider: "twitch",
-      });
-
-      if (oauthError) {
-        console.error("OAuth error:", oauthError);
-        // Clear the flag if OAuth initiation failed
-        sessionStorage.removeItem(TWITCH_OAUTH_COMPLETE_KEY);
-        setError(t("errorTwitchVerificationFailed"));
-        setIsJoining(false);
-      } else {
-        // Set waiting state to trigger the visibility change listener
-        // The listener will reset isJoining if the user returns without completing OAuth
-        setWaitingForOAuth(true);
-      }
-    } catch (err) {
-      console.error("Error during Twitch verification:", err);
-      // Clear the flag if an exception occurred
-      sessionStorage.removeItem(TWITCH_OAUTH_COMPLETE_KEY);
-      setError(t("errorTwitchVerificationFailed"));
-      setIsJoining(false);
-    }
-  };
 
   const handleLeave = async () => {
     setIsLeaving(true);
@@ -369,36 +186,50 @@ export function SpaceParticipation({
     setIsLeaving(false);
   };
 
-  // Helper function to render the appropriate join button
+  // Helper function to render the appropriate join button or account settings link
   const renderJoinButton = (compact?: boolean) => {
-    const iconClassName = compact ? "h-4 w-4" : "h-5 w-5";
+    // Show loading state if token check is still in progress
+    if (requiresYouTube && hasYouTubeToken === null) {
+      return null; // Will show loading indicator
+    }
 
+    if (requiresTwitch && hasTwitchToken === null) {
+      return null; // Will show loading indicator
+    }
+
+    // If YouTube token is required but not available, show link to account settings
     if (requiresYouTube && !hasYouTubeToken) {
       return (
-        <JoinButton
-          compact={compact}
-          icon={<Youtube className={iconClassName} />}
-          isJoining={isJoining}
-          onClick={handleYouTubeVerify}
-          text={t("verifyAndJoinButton")}
-          textLoading={t("verifyingAndJoining")}
-        />
+        <Button
+          asChild
+          className={compact ? "" : "w-full"}
+          type="button"
+          variant="outline"
+        >
+          <Link href="/settings/connections">
+            {t("youTubeAccountLinkRequiredButton")}
+          </Link>
+        </Button>
       );
     }
 
+    // If Twitch token is required but not available, show link to account settings
     if (requiresTwitch && !hasTwitchToken) {
       return (
-        <JoinButton
-          compact={compact}
-          icon={<Twitch className={iconClassName} />}
-          isJoining={isJoining}
-          onClick={handleTwitchVerify}
-          text={t("verifyAndJoinButton")}
-          textLoading={t("verifyingAndJoining")}
-        />
+        <Button
+          asChild
+          className={compact ? "" : "w-full"}
+          type="button"
+          variant="outline"
+        >
+          <Link href="/settings/connections">
+            {t("twitchAccountLinkRequiredButton")}
+          </Link>
+        </Button>
       );
     }
 
+    // All tokens are available, show normal join button
     return (
       <JoinButton
         compact={compact}
@@ -410,7 +241,11 @@ export function SpaceParticipation({
     );
   };
 
-  if (isLoading) {
+  if (
+    isLoading ||
+    (requiresYouTube && hasYouTubeToken === null) ||
+    (requiresTwitch && hasTwitchToken === null)
+  ) {
     return (
       <div
         className={`flex items-center justify-center ${compact ? "py-2" : "py-8"}`}
@@ -435,19 +270,19 @@ export function SpaceParticipation({
   return (
     <div className="space-y-4">
       {/* YouTube Requirement Notice - Only show if token is missing */}
-      {requiresYouTube && !hasYouTubeToken && !hasJoined && (
+      {requiresYouTube && hasYouTubeToken === false && !hasJoined && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
           <p className="text-blue-800 text-sm">
-            {t("errorYouTubeVerificationRequired")}
+            {t("youTubeAccountLinkRequired")}
           </p>
         </div>
       )}
 
       {/* Twitch Requirement Notice - Only show if token is missing */}
-      {requiresTwitch && !hasTwitchToken && !hasJoined && (
+      {requiresTwitch && hasTwitchToken === false && !hasJoined && (
         <div className="rounded-lg border border-purple-200 bg-purple-50 p-4">
           <p className="text-purple-800 text-sm">
-            {t("errorTwitchVerificationRequired")}
+            {t("twitchAccountLinkRequired")}
           </p>
         </div>
       )}
