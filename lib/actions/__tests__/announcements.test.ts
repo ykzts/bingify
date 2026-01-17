@@ -471,6 +471,7 @@ describe("createAnnouncement", () => {
     const result = await createAnnouncement({
       content: "テストお知らせ",
       dismissible: true,
+      locale: "ja",
       priority: "info",
       published: true,
       title: "テスト",
@@ -502,6 +503,7 @@ describe("createAnnouncement", () => {
     const result = await createAnnouncement({
       content: "テストお知らせ",
       dismissible: true,
+      locale: "ja",
       priority: "info",
       published: true,
       title: "テスト",
@@ -541,6 +543,7 @@ describe("createAnnouncement", () => {
     const result = await createAnnouncement({
       content: "テストお知らせ",
       dismissible: true,
+      locale: "ja",
       priority: "info",
       published: true,
       title: "テスト",
@@ -572,6 +575,7 @@ describe("createAnnouncement", () => {
     const result = await createAnnouncement({
       content: "テストお知らせ",
       dismissible: true,
+      locale: "ja",
       priority: "info",
       published: true,
       title: "", // 空のタイトル（不正）
@@ -820,13 +824,26 @@ describe("dismissAnnouncement", () => {
       error: null,
     });
 
+    // First query: fetch announcement to get parent_id
+    const mockAnnouncementQuery = {
+      eq: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { id: "ann-123", parent_id: null },
+        error: null,
+      }),
+    };
+
+    // Second query: upsert dismissal
     const mockUpsertQuery = {
       upsert: vi.fn().mockResolvedValue({
         error: null,
       }),
     };
 
-    mockSupabase.from.mockReturnValue(mockUpsertQuery);
+    mockSupabase.from.mockImplementation(
+      createSequentialFromMock(mockAnnouncementQuery, mockUpsertQuery)
+    );
 
     const result = await dismissAnnouncement("ann-123");
 
