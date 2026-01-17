@@ -172,7 +172,7 @@ supabase link --project-ref your-project-ref
 supabase db push
 ```
 
-**代替方法**: Supabase Dashboardの "SQL Editor" から `supabase/migrations/\*.SQL` ファイルの内容を手動で実行することもできます。
+**代替方法**: Supabase Dashboardの "SQL Editor" から `supabase/migrations/\*.sql` ファイルの内容を手動で実行することもできます。
 
 #### 1.4 Realtime機能の有効化
 
@@ -200,8 +200,8 @@ Supabase Dashboardの "Database" → "Replication" で以下のテーブルのRe
 ローカルで環境変数を事前に確認したい場合:
 
 ```bash
-Git clone https://github.com/your-username/bingify.git
-cd Bingify
+git clone https://github.com/your-username/bingify.git
+cd bingify
 ```
 
 `.env.local.example` を参考に、必要な環境変数をリストアップします。
@@ -222,7 +222,7 @@ cd Bingify
 
 **Configure Project** 画面で以下を設定:
 
-- **Project Name**: プロジェクト名 (例: `Bingify`)
+- **Project Name**: プロジェクト名 (例: `bingify`)
 - **Framework Preset**: Next.js (自動検出されます)
 - **Root Directory**: `./` (変更不要)
 - **Build Command**: `pnpm build` (自動設定されます)
@@ -275,7 +275,7 @@ CRON_SECRET=your-random-secret-string
 ターミナルで以下のコマンドを実行して安全なランダム文字列を生成:
 
 ```bash
-OpenSSL rand -base64 32
+openssl rand -base64 32
 ```
 
 #### 4.3 推奨の環境変数を設定
@@ -351,11 +351,11 @@ Bingifyの動作に必要な環境変数の完全なリストです。
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase匿名キー (公開用)               | `eyJhbGciOiJIUzI1NiIsInR5cCI6...` | Supabase Dashboard → Settings → API         |
 | `SUPABASE_SERVICE_ROLE_KEY`     | Supabaseサービスロールキー (⚠️秘密情報) | `eyJhbGciOiJIUzI1NiIsInR5cCI6...` | Supabase Dashboard → Settings → API         |
 | `NEXT_PUBLIC_SITE_URL`          | サイトURL (OAuth リダイレクト用)        | `https://example.com`             | Vercel のデプロイURL またはカスタムドメイン |
-| `CRON_SECRET`                   | Cronジョブ認証用シークレット            | `your-random-secret-string`       | `OpenSSL rand -base64 32` で生成          |
+| `CRON_SECRET`                   | Cronジョブ認証用シークレット            | `your-random-secret-string`       | `openssl rand -base64 32` で生成          |
 
 **重要**:
 
-- `NEXT*PUBLIC*` プレフィックスがある変数はクライアント側で使用されます
+- `NEXT_PUBLIC_*` プレフィックスがある変数はクライアント側で使用されます
 - `SUPABASE_SERVICE_ROLE_KEY` は管理者権限を持つため、絶対に公開しないでください
 - `CRON_SECRET` を設定しないと、不正なCronジョブの実行を防げません
 
@@ -391,8 +391,8 @@ Bingifyの動作に必要な環境変数の完全なリストです。
 | :------------------------------------------ | :-------------------------- | :------------------------------------------------------------- |
 | `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` | Google OAuth クライアントID | [Google Cloud Console](https://console.cloud.google.com/)      |
 | `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET`    | Google OAuth シークレット   | Google Cloud Console                                           |
-| `SUPABASE_AUTH_EXTERNAL_Twitch_CLIENT_ID` | Twitch OAuth クライアントID | [Twitch Developer Console](https://dev.twitch.tv/console/apps) |
-| `SUPABASE_AUTH_EXTERNAL_Twitch_SECRET`    | Twitch OAuth シークレット   | Twitch Developer Console                                       |
+| `SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID` | Twitch OAuth クライアントID | [Twitch Developer Console](https://dev.twitch.tv/console/apps) |
+| `SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET`    | Twitch OAuth シークレット   | Twitch Developer Console                                       |
 
 **アクセス制御**:
 
@@ -422,11 +422,11 @@ VercelとSupabaseの連携における詳細な設定方法です。
 
 #### 自動デプロイ (推奨)
 
-`supabase/migrations` ディレクトリ配下の `.SQL` マイグレーションファイルは、`main` ブランチへのマージ時に自動的にCloud Supabaseへデプロイされます。
+`supabase/migrations` ディレクトリ配下の `.sql` マイグレーションファイルは、`main` ブランチへのマージ時に自動的にCloud Supabaseへデプロイされます。
 
 **GitHub Actions による自動マイグレーション**:
 
-1. PRを作成し、`supabase/migrations/\*_/_.SQL` に変更を含める
+1. PRを作成し、`supabase/migrations/\*.sql` に変更を含める
 2. PRがレビュー・承認される
 3. `main` ブランチへマージ
 4. GitHub Actionsが自動的にマイグレーションをCloud Supabaseに適用
@@ -479,7 +479,7 @@ SupabaseのRow Level Security (RLS) は、データベースレベルでのア�
 - `bingo_cards`: 認証済みユーザーはカードを作成・表示可能
 - `called_numbers`: スペース所有者のみ番号を呼び出し可能
 
-RLSポリシーはマイグレーションで自動的に設定されます (`supabase/migrations/\*.SQL`)。
+RLSポリシーはマイグレーションで自動的に設定されます (`supabase/migrations/\*.sql`)。
 
 ### Realtime機能の設定
 
@@ -543,8 +543,8 @@ GoogleおよびTwitchのOAuth認証を有効にする手順です。
 3. **Vercelに環境変数を設定**
 
    ```bash
-   SUPABASE_AUTH_EXTERNAL_Twitch_CLIENT_ID=your-client-id
-   SUPABASE_AUTH_EXTERNAL_Twitch_SECRET=your-secret
+   SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID=your-client-id
+   SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET=your-secret
    ```
 
 4. **Supabase Dashboard でプロバイダーを有効化**
@@ -574,7 +574,7 @@ VercelのデフォルトURL (`your-project.vercel.app`) ではなく、独自ド
 Vercelは以下のドメインタイプをサポートします:
 
 - **Apex Domain** (例: `example.com`): ルートドメイン
-- **Subdomain** (例: `Bingify.example.com`): サブドメイン
+- **Subdomain** (例: `bingify.example.com`): サブドメイン
 - **Wildcard** (例: `\*.example.com`): ワイルドカードドメイン (Proプラン以上)
 
 **推奨**: サブドメインを使用すると、DNS設定が簡単です (CNAMEレコードのみ)。
@@ -589,7 +589,7 @@ Vercelは以下のドメインタイプをサポートします:
 
 | Type  | Name        | Value                     |
 | :---- | :---------- | :------------------------ |
-| CNAME | `Bingify` | `cname.vercel-dns.com.` |
+| CNAME | `bingify` | `cname.vercel-dns.com.` |
 
 ドメインレジストラー (例: Cloudflare, GoDaddy, Namecheap) のDNS管理画面で上記のレコードを追加します。
 
@@ -613,7 +613,7 @@ DNS設定後、変更が伝播するまで数分から48時間かかる場合が
 
 # サブドメインの場合
 
-nslookup Bingify.example.com
+nslookup bingify.example.com
 
 # Apexドメインの場合
 
@@ -793,7 +793,7 @@ protocol: "https",
 },
 {
 hostname: "*.supabase.co",
-protocol: "HTTPs",
+protocol: "https",
 },
 ],
 },
@@ -942,7 +942,7 @@ Bingifyには以下のCronジョブが設定されています (`vercel.json`):
 {
 "crons":[
 {
-"path": "/API/cron/cleanup",
+"path": "/api/cron/cleanup",
 "schedule": "0 18 * * *"
 },
 {
@@ -977,7 +977,7 @@ cURL -X POST https://your-domain.vercel.app/api/cron/cleanup \
 
 # token-refresh ジョブをテスト
 
-cURL -X POST https://your-domain.vercel.app/api/cron/token-refresh \
+curl -X POST https://your-domain.vercel.app/api/cron/token-refresh \
  -H "Authorization: Bearer YOUR_CRON_SECRET"
 ```
 
@@ -1053,7 +1053,7 @@ Error: connect ECONNREFUSED
 3. ネットワーク接続を確認:
 
    ```bash
-   cURL $NEXT_PUBLIC_SUPABASE_URL
+   curl $NEXT_PUBLIC_SUPABASE_URL
    ```
 
 4. Supabase Dashboardで "Paused" 状態になっていないか確認 (無料プランは非アクティブ時に自動停止)
@@ -1118,7 +1118,7 @@ Error: connect ECONNREFUSED
 4. 手動でCronエンドポイントを実行してテスト:
 
    ```bash
-   cURL -X POST https://your-domain.vercel.app/api/cron/cleanup \
+   curl -X POST https://your-domain.vercel.app/api/cron/cleanup \
     -H "Authorization: Bearer YOUR_CRON_SECRET"
    ```
 
@@ -1170,7 +1170,7 @@ Vercelの料金プランとコスト管理のポイントです。
 
 ### Bingify のリソース
 
-- **GitHub リポジトリ**: [https://github.com/ykzts/Bingify](https://github.com/ykzts/bingify)
+- **GitHub リポジトリ**: [https://github.com/ykzts/bingify](https://github.com/ykzts/bingify)
 - **Issue トラッカー**: [https://github.com/ykzts/bingify/issues](https://github.com/ykzts/bingify/issues)
 - **Readme**: [README.md](../README.md)
 - **コントリビューションガイド**: [CONTRIBUTING.md](../CONTRIBUTING.md)
