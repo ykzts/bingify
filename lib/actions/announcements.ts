@@ -12,11 +12,6 @@ import { createClient } from "@/lib/supabase/server";
 import type { Announcement } from "@/lib/types/announcement";
 
 /**
- * お知らせ関連のキャッシュ再検証パス
- */
-const ANNOUNCEMENT_REVALIDATE_PATH = "/[locale]/dashboard";
-
-/**
  * お知らせ取得結果の型
  */
 export interface GetAnnouncementsResult {
@@ -372,7 +367,8 @@ export async function createAnnouncement(
     }
 
     // キャッシュ再検証
-    revalidatePath(ANNOUNCEMENT_REVALIDATE_PATH, "page");
+    revalidatePath("/[locale]", "layout");
+    revalidatePath("/[locale]/dashboard", "page");
 
     return {
       success: true,
@@ -458,7 +454,9 @@ export async function updateAnnouncement(
     }
 
     // キャッシュ再検証
-    revalidatePath(ANNOUNCEMENT_REVALIDATE_PATH, "page");
+    revalidatePath("/[locale]", "layout");
+    revalidatePath("/[locale]/dashboard", "page");
+    revalidatePath(`/[locale]/announcements/${id}`, "page");
 
     return {
       success: true,
@@ -523,7 +521,9 @@ export async function deleteAnnouncement(
     }
 
     // キャッシュ再検証
-    revalidatePath(ANNOUNCEMENT_REVALIDATE_PATH, "page");
+    revalidatePath("/[locale]", "layout");
+    revalidatePath("/[locale]/dashboard", "page");
+    revalidatePath(`/[locale]/announcements/${id}`, "page");
 
     return {
       success: true,
@@ -605,7 +605,8 @@ export async function dismissAnnouncement(
     }
 
     // キャッシュ再検証
-    revalidatePath(ANNOUNCEMENT_REVALIDATE_PATH, "page");
+    revalidatePath("/[locale]", "layout");
+    revalidatePath("/[locale]/dashboard", "page");
 
     return {
       success: true,
