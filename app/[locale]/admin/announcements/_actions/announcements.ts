@@ -85,6 +85,68 @@ export async function getAllAnnouncements(
   }
 }
 
+export async function getAnnouncementWithTranslations(
+  announcementId: string
+): Promise<{
+  announcement?: Tables<"announcements">;
+  error?: string;
+  translation?: Tables<"announcements">;
+}> {
+  try {
+    if (!isValidUUID(announcementId)) {
+      return {
+        error: "errorInvalidUuid",
+      };
+    }
+
+    const { isAdmin } = await verifyAdminRole();
+    if (!isAdmin) {
+      return {
+        error: "errorNoPermission",
+      };
+    }
+
+    const adminClient = createAdminClient();
+
+    // Get the main announcement
+    const { data: announcement, error: announcementError } = await adminClient
+      .from("announcements")
+      .select("*")
+      .eq("id", announcementId)
+      .single();
+
+    if (announcementError || !announcement) {
+      console.error("Failed to fetch announcement:", announcementError);
+      return {
+        error: "errorGeneric",
+      };
+    }
+
+    // Determine the parent ID and get translations
+    const parentId = announcement.parent_id || announcement.id;
+    const currentLocale = announcement.locale;
+    const otherLocale = currentLocale === "ja" ? "en" : "ja";
+
+    // Get the translation
+    const { data: translation } = await adminClient
+      .from("announcements")
+      .select("*")
+      .eq("parent_id", parentId)
+      .eq("locale", otherLocale)
+      .maybeSingle();
+
+    return {
+      announcement,
+      translation: translation || undefined,
+    };
+  } catch (error) {
+    console.error("Error in getAnnouncementWithTranslations:", error);
+    return {
+      error: "errorGeneric",
+    };
+  }
+}
+
 const createAnnouncementValidate = createServerValidate({
   ...announcementFormOpts,
   onServerValidate: () => undefined,
@@ -348,8 +410,8 @@ export async function updateAnnouncementAction(
     };
   }
 
-  const { isAdmin } = await verifyAdminRole();
-  if (!isAdmin) {
+  const { isAdmin, userId } = await verifyAdminRole();
+  if (!(isAdmin && userId)) {
     return {
       ...initialFormState,
       errors: ["errorNoPermission"],
@@ -360,33 +422,17 @@ export async function updateAnnouncementAction(
   try {
     await updateAnnouncementValidate(formData);
 
-    const title = (formData.get("title") as string) || "";
-    const content = (formData.get("content") as string) || "";
-    const priority = (formData.get("priority") as string) || "info";
-    const locale = (formData.get("locale") as string) || "ja";
-    const starts_at = (formData.get("starts_at") as string) || "";
-    const ends_at = (formData.get("ends_at") as string) || "";
-    const dismissible = formData.has("dismissible");
-    const published = formData.has("published");
-
     const adminClient = createAdminClient();
 
-    const { error } = await adminClient
+    // Get the current announcement to check if it's a parent or translation
+    const { data: currentAnnouncement, error: fetchError } = await adminClient
       .from("announcements")
-      .update({
-        content,
-        dismissible,
-        ends_at: ends_at || null,
-        locale: locale as "en" | "ja",
-        priority: priority as "info" | "warning" | "error",
-        published,
-        starts_at: starts_at || null,
-        title,
-      })
-      .eq("id", announcementId);
+      .select("id, parent_id, locale")
+      .eq("id", announcementId)
+      .single();
 
-    if (error) {
-      console.error("Failed to update announcement:", error);
+    if (fetchError || !currentAnnouncement) {
+      console.error("Failed to fetch announcement:", fetchError);
       return {
         ...initialFormState,
         errors: ["errorUpdateFailed"],
@@ -394,9 +440,172 @@ export async function updateAnnouncementAction(
       };
     }
 
+    // Extract common fields
+    const commonData = {
+      dismissible: formData.has("dismissible"),
+      ends_at: (formData.get("ends_at") as string) || null,
+      priority: ((formData.get("priority") as string) || "info") as
+        | "info"
+        | "warning"
+        | "error",
+      published: formData.has("published"),
+      starts_at: (formData.get("starts_at") as string) || null,
+    };
+
+    // Extract language-specific data
+    const jaTitle = (formData.get("ja.title") as string) || "";
+    const jaContent = (formData.get("ja.content") as string) || "";
+    const jaData =
+      jaTitle && jaContent ? { content: jaContent, title: jaTitle } : null;
+
+    const enTitle = (formData.get("en.title") as string) || "";
+    const enContent = (formData.get("en.content") as string) || "";
+    const enData =
+      enTitle && enContent ? { content: enContent, title: enTitle } : null;
+
+    // At least one language must be provided
+    if (!(jaData || enData)) {
+      return {
+        ...initialFormState,
+        errors: ["At least one language must be provided"],
+        meta: { success: false },
+      };
+    }
+
+    const warnings: string[] = [];
+
+    // Determine the parent ID for translations
+    const parentId = currentAnnouncement.parent_id || currentAnnouncement.id;
+
+    // Update Japanese announcement (parent or find existing translation)
+    if (jaData) {
+      if (
+        currentAnnouncement.locale === "ja" &&
+        !currentAnnouncement.parent_id
+      ) {
+        // Update the current announcement as it's the Japanese parent
+        const { error } = await adminClient
+          .from("announcements")
+          .update({
+            ...commonData,
+            ...jaData,
+            locale: "ja",
+          })
+          .eq("id", currentAnnouncement.id);
+
+        if (error) {
+          console.error("Failed to update Japanese announcement:", error);
+          return {
+            ...initialFormState,
+            errors: ["errorUpdateFailed"],
+            meta: { success: false },
+          };
+        }
+      } else {
+        // Find or create Japanese translation
+        const { data: existingJa } = await adminClient
+          .from("announcements")
+          .select("id")
+          .eq("parent_id", parentId)
+          .eq("locale", "ja")
+          .maybeSingle();
+
+        if (existingJa) {
+          const { error } = await adminClient
+            .from("announcements")
+            .update({
+              ...commonData,
+              ...jaData,
+            })
+            .eq("id", existingJa.id);
+
+          if (error) {
+            console.error("Failed to update Japanese translation:", error);
+            warnings.push("Japanese translation failed to update");
+          }
+        } else {
+          const { error } = await adminClient.from("announcements").insert({
+            ...commonData,
+            ...jaData,
+            created_by: userId,
+            locale: "ja",
+            parent_id: parentId,
+          });
+
+          if (error) {
+            console.error("Failed to create Japanese translation:", error);
+            warnings.push("Japanese translation failed to create");
+          }
+        }
+      }
+    }
+
+    // Update English announcement (parent or find existing translation)
+    if (enData) {
+      if (
+        currentAnnouncement.locale === "en" &&
+        !currentAnnouncement.parent_id
+      ) {
+        // Update the current announcement as it's the English parent
+        const { error } = await adminClient
+          .from("announcements")
+          .update({
+            ...commonData,
+            ...enData,
+            locale: "en",
+          })
+          .eq("id", currentAnnouncement.id);
+
+        if (error) {
+          console.error("Failed to update English announcement:", error);
+          return {
+            ...initialFormState,
+            errors: ["errorUpdateFailed"],
+            meta: { success: false },
+          };
+        }
+      } else {
+        // Find or create English translation
+        const { data: existingEn } = await adminClient
+          .from("announcements")
+          .select("id")
+          .eq("parent_id", parentId)
+          .eq("locale", "en")
+          .maybeSingle();
+
+        if (existingEn) {
+          const { error } = await adminClient
+            .from("announcements")
+            .update({
+              ...commonData,
+              ...enData,
+            })
+            .eq("id", existingEn.id);
+
+          if (error) {
+            console.error("Failed to update English translation:", error);
+            warnings.push("English translation failed to update");
+          }
+        } else {
+          const { error } = await adminClient.from("announcements").insert({
+            ...commonData,
+            ...enData,
+            created_by: userId,
+            locale: "en",
+            parent_id: parentId,
+          });
+
+          if (error) {
+            console.error("Failed to create English translation:", error);
+            warnings.push("English translation failed to create");
+          }
+        }
+      }
+    }
+
     return {
       ...initialFormState,
-      meta: { success: true },
+      meta: { success: true, warnings },
     };
   } catch (e) {
     // Check if it's a ServerValidateError from TanStack Form

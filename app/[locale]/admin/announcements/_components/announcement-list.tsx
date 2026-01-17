@@ -40,6 +40,8 @@ export function AnnouncementList({
   const [deleting, setDeleting] = useState<string | null>(null);
   const [editingAnnouncement, setEditingAnnouncement] =
     useState<Tables<"announcements"> | null>(null);
+  const [editingTranslation, setEditingTranslation] =
+    useState<Tables<"announcements"> | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editDialogId, setEditDialogId] = useState<string | null>(null);
 
@@ -69,14 +71,27 @@ export function AnnouncementList({
     setDeleting(null);
   };
 
-  const handleEdit = (announcement: Tables<"announcements">) => {
+  const handleEdit = async (announcement: Tables<"announcements">) => {
     setEditingAnnouncement(announcement);
     setEditDialogId(announcement.id);
+
+    // Fetch translation data
+    const { getAnnouncementWithTranslations } = await import(
+      "../_actions/announcements"
+    );
+    const result = await getAnnouncementWithTranslations(announcement.id);
+
+    if (result.translation) {
+      setEditingTranslation(result.translation);
+    } else {
+      setEditingTranslation(null);
+    }
   };
 
   const handleFormSuccess = () => {
     setIsCreateDialogOpen(false);
     setEditingAnnouncement(null);
+    setEditingTranslation(null);
     setEditDialogId(null);
     window.location.reload();
   };
@@ -210,6 +225,7 @@ export function AnnouncementList({
                           if (!open) {
                             setEditDialogId(null);
                             setEditingAnnouncement(null);
+                            setEditingTranslation(null);
                           }
                         }}
                         open={editDialogId === announcement.id}
@@ -229,6 +245,7 @@ export function AnnouncementList({
                               <AnnouncementForm
                                 announcement={editingAnnouncement}
                                 onSuccess={handleFormSuccess}
+                                translation={editingTranslation || undefined}
                               />
                             )}
                         </DialogContent>
