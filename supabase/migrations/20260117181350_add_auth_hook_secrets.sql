@@ -126,13 +126,29 @@ BEGIN
 
   -- Update or create secret in Vault
   IF v_existing_secret_id IS NOT NULL THEN
-    -- Update existing secret
-    SELECT vault.update_secret(v_existing_secret_id, p_secret) INTO v_secret_id;
-    v_created_secret := FALSE;
+    -- Validate existing secret exists before attempting update
+    IF EXISTS (SELECT 1 FROM vault.secrets WHERE id = v_existing_secret_id) THEN
+      -- Update existing secret (vault.update_secret returns void, not uuid)
+      PERFORM vault.update_secret(v_existing_secret_id, p_secret);
+      v_secret_id := v_existing_secret_id;
+      v_created_secret := FALSE;
+    ELSE
+      -- Existing secret missing (orphaned reference), create new one
+      SELECT vault.create_secret(p_secret) INTO v_secret_id;
+      v_created_secret := TRUE;
+      
+      IF v_secret_id IS NULL THEN
+        RAISE EXCEPTION 'Failed to create auth hook secret';
+      END IF;
+    END IF;
   ELSE
     -- Create new secret
     SELECT vault.create_secret(p_secret) INTO v_secret_id;
     v_created_secret := TRUE;
+    
+    IF v_secret_id IS NULL THEN
+      RAISE EXCEPTION 'Failed to create auth hook secret';
+    END IF;
   END IF;
 
   -- Upsert the secret record (singleton)
