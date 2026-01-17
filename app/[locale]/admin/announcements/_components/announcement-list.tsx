@@ -126,6 +126,12 @@ export function AnnouncementList({
                 className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
                 scope="col"
               >
+                {t("announcementLocaleLabel")}
+              </th>
+              <th
+                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+                scope="col"
+              >
                 {t("announcementPriority")}
               </th>
               <th
@@ -151,7 +157,7 @@ export function AnnouncementList({
           <tbody className="divide-y divide-gray-200 bg-white">
             {announcements.length === 0 ? (
               <tr>
-                <td className="px-6 py-4 text-center text-gray-500" colSpan={5}>
+                <td className="px-6 py-4 text-center text-gray-500" colSpan={6}>
                   {t("announcementNoData")}
                 </td>
               </tr>
@@ -160,6 +166,13 @@ export function AnnouncementList({
                 <tr key={announcement.id}>
                   <td className="px-6 py-4 text-gray-900 text-sm">
                     {announcement.title}
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    <Badge variant="outline">
+                      {announcement.locale === "ja"
+                        ? t("announcementLocaleJa")
+                        : t("announcementLocaleEn")}
+                    </Badge>
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <Badge

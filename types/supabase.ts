@@ -68,6 +68,8 @@ export type Database = {
           dismissible: boolean
           ends_at: string | null
           id: string
+          locale: string
+          parent_id: string | null
           priority: string
           published: boolean
           starts_at: string | null
@@ -81,6 +83,8 @@ export type Database = {
           dismissible?: boolean
           ends_at?: string | null
           id?: string
+          locale?: string
+          parent_id?: string | null
           priority: string
           published?: boolean
           starts_at?: string | null
@@ -94,13 +98,23 @@ export type Database = {
           dismissible?: boolean
           ends_at?: string | null
           id?: string
+          locale?: string
+          parent_id?: string | null
           priority?: string
           published?: boolean
           starts_at?: string | null
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "announcements_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "announcements"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bingo_cards: {
         Row: {

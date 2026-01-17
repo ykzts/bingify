@@ -16,8 +16,8 @@ export async function generateMetadata({
   const { id, locale } = await params;
   const t = await getTranslations({ locale, namespace: "Announcements" });
 
-  // お知らせを取得してタイトルを使用
-  const result = await getAnnouncementById(id);
+  // お知らせを取得してタイトルを使用（ロケールベースのフォールバック付き）
+  const result = await getAnnouncementById(id, locale);
 
   const title =
     result.success && result.data ? result.data.title : t("metaTitle");
@@ -40,8 +40,8 @@ export default async function AnnouncementDetailPage({
 
   const t = await getTranslations("Announcements");
 
-  // お知らせを取得
-  const result = await getAnnouncementById(id);
+  // お知らせを取得（ロケールベースのフォールバック付き）
+  const result = await getAnnouncementById(id, locale);
 
   // お知らせが見つからない場合は404
   if (!(result.success && result.data)) {

@@ -7,7 +7,7 @@ import {
   TriangleAlert,
   X,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import type { Announcement } from "@/lib/types/announcement";
  */
 export function AnnouncementBanner() {
   const t = useTranslations("Announcements");
+  const locale = useLocale();
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,9 +35,9 @@ export function AnnouncementBanner() {
     const loadAnnouncement = async () => {
       setIsLoading(true);
       try {
-        // アクティブなお知らせと非表示済みお知らせを並行取得
+        // アクティブなお知らせと非表示済みお知らせを並行取得（ロケール指定）
         const [activeResult, dismissedResult] = await Promise.allSettled([
-          getActiveAnnouncements(),
+          getActiveAnnouncements(locale),
           getDismissedAnnouncements(),
         ]);
 
@@ -81,7 +82,7 @@ export function AnnouncementBanner() {
     };
 
     loadAnnouncement();
-  }, []);
+  }, [locale]);
 
   const handleDismiss = async () => {
     if (!announcement) {

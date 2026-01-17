@@ -18,6 +18,7 @@ vi.mock("@/lib/actions/announcements", () => ({
 
 // next-intlのモック
 vi.mock("next-intl", () => ({
+  useLocale: () => "ja",
   useTranslations: () => (key: string) => {
     const translations: Record<string, string> = {
       viewDetails: "詳細を見る",
@@ -50,6 +51,8 @@ const mockAnnouncements: Announcement[] = [
     dismissible: true,
     ends_at: null,
     id: "error-1",
+    locale: "ja",
+    parent_id: null,
     priority: "error",
     published: true,
     starts_at: null,
@@ -63,6 +66,8 @@ const mockAnnouncements: Announcement[] = [
     dismissible: true,
     ends_at: null,
     id: "warning-1",
+    locale: "ja",
+    parent_id: null,
     priority: "warning",
     published: true,
     starts_at: null,
@@ -76,6 +81,8 @@ const mockAnnouncements: Announcement[] = [
     dismissible: true,
     ends_at: null,
     id: "info-1",
+    locale: "ja",
+    parent_id: null,
     priority: "info",
     published: true,
     starts_at: null,

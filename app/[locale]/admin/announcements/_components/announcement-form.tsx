@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import type { Tables } from "@/types/supabase";
@@ -59,6 +60,7 @@ export function AnnouncementForm({
   const router = useRouter();
   const t = useTranslations("Admin");
   const [showPreview, setShowPreview] = useState(false);
+  const [activeLanguageTab, setActiveLanguageTab] = useState<"ja" | "en">("ja");
 
   const isEditMode = !!announcement;
 
@@ -72,17 +74,23 @@ export function AnnouncementForm({
     ...announcementFormOpts,
     defaultValues: announcement
       ? {
-          content: announcement.content,
           dismissible: announcement.dismissible,
+          en: {
+            content: "",
+            title: "",
+          },
           ends_at: announcement.ends_at
             ? new Date(announcement.ends_at).toISOString().slice(0, 16)
             : "",
+          ja: {
+            content: announcement.content,
+            title: announcement.title,
+          },
           priority: announcement.priority,
           published: announcement.published,
           starts_at: announcement.starts_at
             ? new Date(announcement.starts_at).toISOString().slice(0, 16)
             : "",
-          title: announcement.title,
         }
       : announcementFormOpts.defaultValues,
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
@@ -120,21 +128,37 @@ export function AnnouncementForm({
 
   useEffect(() => {
     const meta = (state as Record<string, unknown>)?.meta as
-      | { success?: boolean }
+      | { success?: boolean; warnings?: string[] }
       | undefined;
     if (meta?.success) {
+      // Show warnings if any
+      if (meta.warnings && meta.warnings.length > 0) {
+        for (const warning of meta.warnings) {
+          toast.warning(warning);
+        }
+      }
       handleSuccess();
     }
   }, [state]);
 
-  const titleValue = useStore(form.store, (formState) => {
+  const jaTitleValue = useStore(form.store, (formState) => {
     const values = formState.values as AnnouncementFormValues;
-    return values.title || "";
+    return values.ja?.title || "";
   });
 
-  const contentValue = useStore(form.store, (formState) => {
+  const jaContentValue = useStore(form.store, (formState) => {
     const values = formState.values as AnnouncementFormValues;
-    return values.content || "";
+    return values.ja?.content || "";
+  });
+
+  const enTitleValue = useStore(form.store, (formState) => {
+    const values = formState.values as AnnouncementFormValues;
+    return values.en?.title || "";
+  });
+
+  const enContentValue = useStore(form.store, (formState) => {
+    const values = formState.values as AnnouncementFormValues;
+    return values.en?.content || "";
   });
 
   const priorityValue = useStore(form.store, (formState) => {
@@ -183,20 +207,52 @@ export function AnnouncementForm({
       </div>
 
       {showPreview ? (
-        <div className="mt-6 rounded-lg border p-6">
-          <div className="mb-4 flex items-center gap-2">
-            <Badge variant={getPriorityBadgeVariant(priorityValue as string)}>
-              {t(
-                `announcementPriority${(priorityValue as string).charAt(0).toUpperCase()}${(priorityValue as string).slice(1)}`
-              )}
-            </Badge>
-            <h3 className="font-semibold text-lg">
-              {titleValue || t("announcementPreviewNoTitle")}
-            </h3>
-          </div>
-          <div className="whitespace-pre-wrap text-gray-700">
-            {contentValue || t("announcementPreviewNoContent")}
-          </div>
+        <div className="mt-6 space-y-4">
+          <Tabs
+            onValueChange={(value) =>
+              setActiveLanguageTab(value as "ja" | "en")
+            }
+            value={activeLanguageTab}
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="ja">{t("announcementLocaleJa")}</TabsTrigger>
+              <TabsTrigger value="en">{t("announcementLocaleEn")}</TabsTrigger>
+            </TabsList>
+            <TabsContent className="rounded-lg border p-6" value="ja">
+              <div className="mb-4 flex items-center gap-2">
+                <Badge
+                  variant={getPriorityBadgeVariant(priorityValue as string)}
+                >
+                  {t(
+                    `announcementPriority${(priorityValue as string).charAt(0).toUpperCase()}${(priorityValue as string).slice(1)}`
+                  )}
+                </Badge>
+                <h3 className="font-semibold text-lg">
+                  {jaTitleValue || t("announcementPreviewNoTitle")}
+                </h3>
+              </div>
+              <div className="whitespace-pre-wrap text-gray-700">
+                {jaContentValue || t("announcementPreviewNoContent")}
+              </div>
+            </TabsContent>
+            <TabsContent className="rounded-lg border p-6" value="en">
+              <div className="mb-4 flex items-center gap-2">
+                <Badge
+                  variant={getPriorityBadgeVariant(priorityValue as string)}
+                >
+                  {t(
+                    `announcementPriority${(priorityValue as string).charAt(0).toUpperCase()}${(priorityValue as string).slice(1)}`
+                  )}
+                </Badge>
+                <h3 className="font-semibold text-lg">
+                  {enTitleValue || t("announcementPreviewNoTitle")}
+                </h3>
+              </div>
+              <div className="whitespace-pre-wrap text-gray-700">
+                {enContentValue || t("announcementPreviewNoContent")}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       ) : (
         <form
@@ -209,63 +265,169 @@ export function AnnouncementForm({
 
           <FieldSet>
             <FieldGroup>
-              <form.Field name="title">
-                {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
-                {(field: any) => (
-                  <Field>
-                    <FieldContent>
-                      <FieldLabel>{t("announcementTitleLabel")}</FieldLabel>
-                      <Input
-                        disabled={isSubmitting}
-                        maxLength={200}
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder={t("announcementTitlePlaceholder")}
-                        type="text"
-                        value={field.state.value}
-                      />
-                      <FieldDescription>
-                        {t("announcementTitleHelp")}
-                      </FieldDescription>
-                      {field.state.meta.errors.length > 0 && (
-                        <InlineFieldError>
-                          {getErrorMessage(field.state.meta.errors[0])}
-                        </InlineFieldError>
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              </form.Field>
+              {/* Language Tabs for Title and Content */}
+              <div className="space-y-4">
+                <div>
+                  <FieldLabel>{t("announcementLocaleLabel")}</FieldLabel>
+                  <FieldDescription>
+                    At least one language must be provided. Both Japanese and
+                    English are optional.
+                  </FieldDescription>
+                </div>
+                <Tabs
+                  onValueChange={(value) =>
+                    setActiveLanguageTab(value as "ja" | "en")
+                  }
+                  value={activeLanguageTab}
+                >
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="ja">
+                      {t("announcementLocaleJa")}
+                    </TabsTrigger>
+                    <TabsTrigger value="en">
+                      {t("announcementLocaleEn")}
+                    </TabsTrigger>
+                  </TabsList>
 
-              <form.Field name="content">
-                {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
-                {(field: any) => (
-                  <Field>
-                    <FieldContent>
-                      <FieldLabel>{t("announcementContentLabel")}</FieldLabel>
-                      <Textarea
-                        className="min-h-[150px]"
-                        disabled={isSubmitting}
-                        maxLength={5000}
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder={t("announcementContentPlaceholder")}
-                        value={field.state.value}
-                      />
-                      <FieldDescription>
-                        {t("announcementContentHelp")}
-                      </FieldDescription>
-                      {field.state.meta.errors.length > 0 && (
-                        <InlineFieldError>
-                          {getErrorMessage(field.state.meta.errors[0])}
-                        </InlineFieldError>
+                  {/* Japanese Content */}
+                  <TabsContent className="space-y-4" value="ja">
+                    <form.Field name="ja.title">
+                      {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                      {(field: any) => (
+                        <Field>
+                          <FieldContent>
+                            <FieldLabel>
+                              {t("announcementTitleLabel")} (日本語)
+                            </FieldLabel>
+                            <Input
+                              disabled={isSubmitting}
+                              maxLength={200}
+                              name={field.name}
+                              onBlur={field.handleBlur}
+                              onChange={(e) =>
+                                field.handleChange(e.target.value)
+                              }
+                              placeholder={t("announcementTitlePlaceholder")}
+                              type="text"
+                              value={field.state.value}
+                            />
+                            <FieldDescription>
+                              {t("announcementTitleHelp")}
+                            </FieldDescription>
+                            {field.state.meta.errors.length > 0 && (
+                              <InlineFieldError>
+                                {getErrorMessage(field.state.meta.errors[0])}
+                              </InlineFieldError>
+                            )}
+                          </FieldContent>
+                        </Field>
                       )}
-                    </FieldContent>
-                  </Field>
-                )}
-              </form.Field>
+                    </form.Field>
+
+                    <form.Field name="ja.content">
+                      {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                      {(field: any) => (
+                        <Field>
+                          <FieldContent>
+                            <FieldLabel>
+                              {t("announcementContentLabel")} (日本語)
+                            </FieldLabel>
+                            <Textarea
+                              className="min-h-[150px]"
+                              disabled={isSubmitting}
+                              maxLength={5000}
+                              name={field.name}
+                              onBlur={field.handleBlur}
+                              onChange={(e) =>
+                                field.handleChange(e.target.value)
+                              }
+                              placeholder={t("announcementContentPlaceholder")}
+                              value={field.state.value}
+                            />
+                            <FieldDescription>
+                              {t("announcementContentHelp")}
+                            </FieldDescription>
+                            {field.state.meta.errors.length > 0 && (
+                              <InlineFieldError>
+                                {getErrorMessage(field.state.meta.errors[0])}
+                              </InlineFieldError>
+                            )}
+                          </FieldContent>
+                        </Field>
+                      )}
+                    </form.Field>
+                  </TabsContent>
+
+                  {/* English Content */}
+                  <TabsContent className="space-y-4" value="en">
+                    <form.Field name="en.title">
+                      {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                      {(field: any) => (
+                        <Field>
+                          <FieldContent>
+                            <FieldLabel>
+                              {t("announcementTitleLabel")} (English)
+                            </FieldLabel>
+                            <Input
+                              disabled={isSubmitting}
+                              maxLength={200}
+                              name={field.name}
+                              onBlur={field.handleBlur}
+                              onChange={(e) =>
+                                field.handleChange(e.target.value)
+                              }
+                              placeholder={t("announcementTitlePlaceholder")}
+                              type="text"
+                              value={field.state.value}
+                            />
+                            <FieldDescription>
+                              {t("announcementTitleHelp")}
+                            </FieldDescription>
+                            {field.state.meta.errors.length > 0 && (
+                              <InlineFieldError>
+                                {getErrorMessage(field.state.meta.errors[0])}
+                              </InlineFieldError>
+                            )}
+                          </FieldContent>
+                        </Field>
+                      )}
+                    </form.Field>
+
+                    <form.Field name="en.content">
+                      {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                      {(field: any) => (
+                        <Field>
+                          <FieldContent>
+                            <FieldLabel>
+                              {t("announcementContentLabel")} (English)
+                            </FieldLabel>
+                            <Textarea
+                              className="min-h-[150px]"
+                              disabled={isSubmitting}
+                              maxLength={5000}
+                              name={field.name}
+                              onBlur={field.handleBlur}
+                              onChange={(e) =>
+                                field.handleChange(e.target.value)
+                              }
+                              placeholder={t("announcementContentPlaceholder")}
+                              value={field.state.value}
+                            />
+                            <FieldDescription>
+                              {t("announcementContentHelp")}
+                            </FieldDescription>
+                            {field.state.meta.errors.length > 0 && (
+                              <InlineFieldError>
+                                {getErrorMessage(field.state.meta.errors[0])}
+                              </InlineFieldError>
+                            )}
+                          </FieldContent>
+                        </Field>
+                      )}
+                    </form.Field>
+                  </TabsContent>
+                </Tabs>
+              </div>
 
               <form.Field name="priority">
                 {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}

@@ -81,15 +81,17 @@ async function checkAdminPermission(): Promise<boolean> {
 }
 
 /**
- * IDでお知らせを取得する
+ * IDでお知らせを取得する（ロケールベースのフォールバック機能付き）
  * 公開中で日付範囲内のお知らせのみ返す
  * 認証不要（未認証ユーザーも利用可能）
  *
  * @param id - お知らせID
+ * @param locale - 優先ロケール
  * @returns お知らせ
  */
 export async function getAnnouncementById(
-  id: string
+  id: string,
+  locale?: string
 ): Promise<GetAnnouncementResult> {
   try {
     const supabase = await createClient();
@@ -101,8 +103,9 @@ export async function getAnnouncementById(
       .select("*")
       .eq("id", id)
       .eq("published", true)
-      .or(`starts_at.is.null,starts_at.lte.${now}`)
-      .or(`ends_at.is.null,ends_at.gt.${now}`)
+      .or(
+        `and(starts_at.is.null,ends_at.is.null),and(starts_at.is.null,ends_at.gt.${now}),and(starts_at.lte.${now},ends_at.is.null),and(starts_at.lte.${now},ends_at.gt.${now})`
+      )
       .single();
 
     if (error) {
@@ -111,6 +114,32 @@ export async function getAnnouncementById(
         error: "お知らせが見つかりません",
         success: false,
       };
+    }
+
+    // ロケールが指定されており、取得したお知らせのロケールと異なる場合は翻訳版を探す
+    if (locale && announcement.locale !== locale) {
+      // 親IDを特定（現在のお知らせが親の場合はそのID、翻訳版の場合は親のID）
+      const parentId = announcement.parent_id || announcement.id;
+
+      // 指定されたロケールの翻訳版または親お知らせを検索
+      // 日付条件(4パターン) × parent_id条件(2パターン) = 8つの組み合わせ
+      const { data: translation } = await supabase
+        .from("announcements")
+        .select("*")
+        .eq("locale", locale)
+        .eq("published", true)
+        .or(
+          `and(starts_at.is.null,ends_at.is.null,parent_id.eq.${parentId}),and(starts_at.is.null,ends_at.is.null,id.eq.${parentId},parent_id.is.null),and(starts_at.is.null,ends_at.gt.${now},parent_id.eq.${parentId}),and(starts_at.is.null,ends_at.gt.${now},id.eq.${parentId},parent_id.is.null),and(starts_at.lte.${now},ends_at.is.null,parent_id.eq.${parentId}),and(starts_at.lte.${now},ends_at.is.null,id.eq.${parentId},parent_id.is.null),and(starts_at.lte.${now},ends_at.gt.${now},parent_id.eq.${parentId}),and(starts_at.lte.${now},ends_at.gt.${now},id.eq.${parentId},parent_id.is.null)`
+        )
+        .single();
+
+      // 翻訳版が見つかった場合はそれを返す
+      if (translation) {
+        return {
+          data: translation as Announcement,
+          success: true,
+        };
+      }
     }
 
     return {
@@ -131,9 +160,12 @@ export async function getAnnouncementById(
  * 優先度順（error > warning > info）、作成日時降順でソート
  * 認証不要（未認証ユーザーも利用可能）
  *
+ * @param locale - ロケール（未指定の場合はすべてのロケールを取得）
  * @returns 有効なお知らせ一覧
  */
-export async function getActiveAnnouncements(): Promise<GetAnnouncementsResult> {
+export async function getActiveAnnouncements(
+  locale?: string
+): Promise<GetAnnouncementsResult> {
   const t = await getTranslations("AnnouncementActions");
 
   try {
@@ -141,12 +173,20 @@ export async function getActiveAnnouncements(): Promise<GetAnnouncementsResult> 
 
     // published=true AND 日付範囲内のお知らせを取得
     const now = new Date().toISOString();
-    const { data: announcements, error } = await supabase
+    let query = supabase
       .from("announcements")
       .select("*")
       .eq("published", true)
-      .or(`starts_at.is.null,starts_at.lte.${now}`)
-      .or(`ends_at.is.null,ends_at.gt.${now}`);
+      .or(
+        `and(starts_at.is.null,ends_at.is.null),and(starts_at.is.null,ends_at.gt.${now}),and(starts_at.lte.${now},ends_at.is.null),and(starts_at.lte.${now},ends_at.gt.${now})`
+      );
+
+    // ロケールが指定されている場合はフィルタリング
+    if (locale) {
+      query = query.eq("locale", locale);
+    }
+
+    const { data: announcements, error } = await query;
 
     if (error) {
       console.error("Error fetching active announcements:", error);
@@ -307,6 +347,8 @@ export async function createAnnouncement(
       created_by: user.id,
       dismissible: validationResult.data.dismissible,
       ends_at: validationResult.data.ends_at,
+      locale: validationResult.data.locale,
+      parent_id: validationResult.data.parent_id,
       priority: validationResult.data.priority,
       published: validationResult.data.published,
       starts_at: validationResult.data.starts_at,
@@ -489,6 +531,7 @@ export async function deleteAnnouncement(
 
 /**
  * お知らせを非表示にする
+ * 親お知らせIDを使用して、すべての翻訳版に対して非表示が適用される
  *
  * @param announcementId - お知らせID
  * @returns 操作結果
@@ -514,12 +557,30 @@ export async function dismissAnnouncement(
       };
     }
 
-    // announcement_dismissals へ UPSERT
+    // お知らせを取得して親IDを確認
+    const { data: announcement, error: fetchError } = await supabase
+      .from("announcements")
+      .select("id, parent_id")
+      .eq("id", announcementId)
+      .single();
+
+    if (fetchError || !announcement) {
+      console.error("Error fetching announcement for dismiss:", fetchError);
+      return {
+        error: t("errorNotFound"),
+        success: false,
+      };
+    }
+
+    // 親IDを特定（現在のお知らせが親の場合はそのID、翻訳版の場合は親のID）
+    const effectiveId = announcement.parent_id || announcement.id;
+
+    // announcement_dismissals へ UPSERT（親IDで記録）
     const { error: upsertError } = await supabase
       .from("announcement_dismissals")
       .upsert(
         {
-          announcement_id: announcementId,
+          announcement_id: effectiveId,
           user_id: user.id,
         },
         {
@@ -543,6 +604,70 @@ export async function dismissAnnouncement(
     };
   } catch (error) {
     console.error("Error in dismissAnnouncement:", error);
+    return {
+      error: t("errorGeneric"),
+      success: false,
+    };
+  }
+}
+
+/**
+ * お知らせの翻訳版を取得する（Admin専用）
+ *
+ * @param parentId - 親お知らせID
+ * @returns 翻訳版お知らせ一覧
+ */
+export async function getAnnouncementTranslations(
+  parentId: string
+): Promise<GetAnnouncementsResult> {
+  const t = await getTranslations("AnnouncementActions");
+
+  try {
+    const supabase = await createClient();
+
+    // 認証チェック
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return {
+        error: "認証が必要です",
+        success: false,
+      };
+    }
+
+    // Admin権限チェック
+    const isAdmin = await checkAdminPermission();
+    if (!isAdmin) {
+      return {
+        error: "Admin権限が必要です",
+        success: false,
+      };
+    }
+
+    // 親お知らせの翻訳版を取得
+    const { data: translations, error } = await supabase
+      .from("announcements")
+      .select("*")
+      .eq("parent_id", parentId)
+      .order("locale", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching announcement translations:", error);
+      return {
+        error: t("errorFetchAnnouncementsFailed"),
+        success: false,
+      };
+    }
+
+    return {
+      data: (translations || []) as Announcement[],
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error in getAnnouncementTranslations:", error);
     return {
       error: t("errorGeneric"),
       success: false,
