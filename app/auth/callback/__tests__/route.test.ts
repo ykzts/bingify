@@ -147,7 +147,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("refererにロケールがある場合認証成功時にローカライズされたダッシュボードにリダイレクトする", async () => {
@@ -171,7 +173,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/ja/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/ja/?login_success=true`
+    );
   });
 
   it("refererヘッダーの欠落を適切に処理する", async () => {
@@ -191,7 +195,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("不正なreferer URLを適切に処理する", async () => {
@@ -215,7 +221,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("referer内の無効なロケールを無視し非ローカライズパスにリダイレクトする", async () => {
@@ -239,7 +247,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("認証エラー時に不正なreferer URLを処理する", async () => {
@@ -296,7 +306,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/dashboard?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/dashboard?login_success=true`
+    );
   });
 
   it("redirectパラメータがロケール付きで指定されている場合ローカライズされた指定パスにリダイレクトする", async () => {
@@ -323,7 +335,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/ja/admin?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/ja/admin?login_success=true`
+    );
   });
 
   it("redirectパラメータに既にロケールが含まれている場合を処理する", async () => {
@@ -350,7 +364,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/ja/dashboard?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/ja/dashboard?login_success=true`
+    );
   });
 
   it("redirectパラメータ内のプロトコル相対URLを拒否する", async () => {
@@ -377,7 +393,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("redirectパラメータ内の絶対URLを拒否する", async () => {
@@ -404,7 +422,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("コロンを含むクエリパラメータ付きのredirectを受け入れる", async () => {
@@ -489,7 +509,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("空文字列のredirectを拒否する", async () => {
@@ -516,7 +538,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("エンコードされたスラッシュを含むredirectを拒否する", async () => {
@@ -543,7 +567,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("パストラバーサルを含むredirectを拒否する", async () => {
@@ -570,7 +596,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("エンコードされたパストラバーサルを含むredirectを拒否する", async () => {
@@ -597,7 +625,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("バックスラッシュを含むパスを処理する", async () => {
@@ -627,7 +657,7 @@ describe("Auth Callback Route", () => {
     // Backslashes are normalized by URL parsing - this is expected behavior
     // The actual path will be resolved by the server
     expect(response.headers.get("location")).toContain(`${origin}/`);
-    expect(response.headers.get("location")).toContain(`login_success=true`);
+    expect(response.headers.get("location")).toContain("login_success=true");
   });
 
   it("javascript:プロトコルを含むredirectを拒否する", async () => {
@@ -654,7 +684,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("data:プロトコルを含むredirectを拒否する", async () => {
@@ -681,7 +713,9 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("フラグメント内のvbscript:プロトコルを含むredirectを拒否する", async () => {
@@ -708,6 +742,8 @@ describe("Auth Callback Route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 });

@@ -164,7 +164,9 @@ describe("Auth [Provider] Callback Route", () => {
     const response = await GET(request, createContext("google"));
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/?login_success=true`
+    );
   });
 
   it("redirectパラメータが指定されている場合指定されたパスにリダイレクトする", async () => {
@@ -203,7 +205,9 @@ describe("Auth [Provider] Callback Route", () => {
     const response = await GET(request, createContext("twitch"));
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(`${origin}/dashboard?login_success=true`);
+    expect(response.headers.get("location")).toBe(
+      `${origin}/dashboard?login_success=true`
+    );
   });
 
   describe("OAuth Token Storage", () => {
@@ -245,7 +249,9 @@ describe("Auth [Provider] Callback Route", () => {
       const response = await GET(request, createContext("google"));
 
       expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+      expect(response.headers.get("location")).toBe(
+        `${origin}/?login_success=true`
+      );
       // URLから取得したプロバイダー(google)が使用されることを確認
       // app_metadata.provider(twitch)ではなく、URLのプロバイダーが優先される
       expect(mockUpsertOAuthToken).toHaveBeenCalledWith(mockSupabase, {
@@ -294,7 +300,9 @@ describe("Auth [Provider] Callback Route", () => {
       const response = await GET(request, createContext("twitch"));
 
       expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+      expect(response.headers.get("location")).toBe(
+        `${origin}/?login_success=true`
+      );
       // URLから取得したプロバイダー(twitch)が使用されることを確認
       // app_metadata.provider(google)の古いキャッシュ値ではなく、URLから取得
       expect(mockUpsertOAuthToken).toHaveBeenCalledWith(mockSupabase, {
@@ -343,7 +351,9 @@ describe("Auth [Provider] Callback Route", () => {
       const response = await GET(request, createContext("google"));
 
       expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+      expect(response.headers.get("location")).toBe(
+        `${origin}/?login_success=true`
+      );
       expect(mockUpsertOAuthToken).not.toHaveBeenCalled();
     });
 
@@ -393,7 +403,9 @@ describe("Auth [Provider] Callback Route", () => {
       const response = await GET(request, createContext("twitch"));
 
       expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe(`${origin}/?login_success=true`);
+      expect(response.headers.get("location")).toBe(
+        `${origin}/?login_success=true`
+      );
       expect(mockUpsertOAuthToken).toHaveBeenCalled();
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         expect.stringContaining("Failed to store OAuth token"),
