@@ -51,7 +51,7 @@ export function LoginForm() {
 - ユーザー認可後、`redirectTo` で指定したコールバックURLへリダイレクト
   - 例: `https://example.com/auth/google/callback`
 
-### 3. コールバック処理(コード→セッション交換)
+### 3. コールバック処理 (コード→セッション交換)
 
 - プロバイダーからリダイレクトされた `/auth/[provider]/callback` で `code` パラメータを受け取ります
 - [app/auth/[provider]/callback/route.ts](../../../app/auth/%5Bprovider%5D/callback/route.ts) が処理：
@@ -123,7 +123,7 @@ export function proxy(request: NextRequest) {
 
 開発環境でのログイン動作確認は以下のいずれかで行えます。
 
-#### 方法 1: Magic Link(メール OTP)を使用
+#### 方法 1: Magic Link (メール OTP) を使用
 
 メールOTPによるログインはMailpitを使用して確認できます。
 

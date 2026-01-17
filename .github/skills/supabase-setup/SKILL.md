@@ -12,7 +12,7 @@ metadata:
 
 ## 概要
 
-BingifyはSupabaseをバックエンドデータベースとして使用します。ローカル開発ではSupabase CLIで完全なPostgSQL環境を提供します。
+BingifyはSupabaseをバックエンドデータベースとして使用します。ローカル開発ではSupabase CLIで完全なPostgreSQLの環境を提供します。
 
 ## ローカルセットアップ
 

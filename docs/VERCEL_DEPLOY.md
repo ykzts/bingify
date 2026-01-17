@@ -730,9 +730,9 @@ VercelはGitHubと深く統合されており、自動デプロイとプレビ�
 
 ```bash
 
-# cURL でデプロイをトリガー
+# curl でデプロイをトリガー
 
-cURL -X POST https://api.vercel.com/v1/integrations/deploy/xxxxx/xxxxx
+curl -X POST https://api.vercel.com/v1/integrations/deploy/xxxxx/xxxxx
 ```
 
 **用途**:
@@ -972,7 +972,7 @@ Bingifyには以下のCronジョブが設定されています (`vercel.json`):
 
 # cleanup ジョブをテスト
 
-cURL -X POST https://your-domain.vercel.app/api/cron/cleanup \
+curl -X POST https://your-domain.vercel.app/api/cron/cleanup \
  -H "Authorization: Bearer YOUR_CRON_SECRET"
 
 # token-refresh ジョブをテスト
@@ -1015,12 +1015,12 @@ Error: Cannot find module 'next'
 
 **解決方法**:
 
-1. `package.JSON` が正しくコミットされているか確認
+1. `package.json` が正しくコミットされているか確認
 2. Vercelの "Settings" → "General" → "Build & Development Settings" で以下を確認:
    - **Build Command**: `pnpm build`
    - **Install Command**: `pnpm install`
 3. Node.jsバージョンを確認 (24.xが必要):
-   - `package.JSON` に `"engines": { "node": "24.x" }` を追加
+   - `package.json` に `"engines": { "node": "24.x" }` を追加
 
 #### **問題**: 環境変数が反映されない
 
@@ -1030,8 +1030,8 @@ Error: Cannot find module 'next'
 
 1. Vercel Dashboardの "Settings" → "Environment Variables" で設定を確認
 2. 環境 (Production、Preview、Development) が正しく選択されているか確認
-3. `NEXT*PUBLIC*` プレフィックスの有無を確認
-   - クライアント側で使用する変数には `NEXT*PUBLIC*` が必要
+3. `NEXT_PUBLIC_` プレフィックスの有無を確認
+   - クライアント側で使用する変数には `NEXT_PUBLIC_` が必要
    - サーバー側のみで使用する変数には不要
 4. 環境変数を更新した後は、**必ず再デプロイ**を実行
    - Vercel Dashboardの "Deployments" → "..." → "Redeploy"
