@@ -64,4 +64,4 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================================
 -- Part 3: Add comments
 -- ============================================================================
-COMMENT ON TABLE announcements IS 'System-wide announcements displayed to users. Japanese announcement (parent_id IS NULL) with English translation (parent_id references Japanese).';
+COMMENT ON TABLE announcements IS 'System-wide announcements displayed to users. Supports multilingual content via parent-child relationships.';
