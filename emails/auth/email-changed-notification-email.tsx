@@ -28,7 +28,7 @@ export async function EmailChangedNotificationEmail({
       <Preview>{t("subject")}</Preview>
       <Body style={bodyStyle}>
         <EmailContainer>
-          <EmailHeader title="Email Change Confirmed" />
+          <EmailHeader title={t("subject")} />
 
           <Section style={contentStyle}>
             <Text style={greetingStyle}>{t("greeting")}</Text>
