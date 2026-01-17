@@ -48,8 +48,9 @@ export function EmailHookSecretManagement({ initialSecret, updatedAt }: Props) {
 
     if (
       !(await confirm({
-        actionButton: t("deleteButton"),
-        title: t("deleteConfirm"),
+        description: t("deleteConfirm"),
+        title: t("deleteButton"),
+        variant: "destructive",
       }))
     ) {
       return;
