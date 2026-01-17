@@ -44,6 +44,7 @@
     "announcementLocaleHelp": "Select the language for this announcement",
     "announcementLocaleJa": "Japanese",
     "announcementLocaleLabel": "Language",
+    "announcementLocaleWithTranslations": "{locale} + {translations}",
     "announcementNoData": "No announcements",
     "announcementNoDateRange": "No date restriction",
     "announcementPreviewNoContent": "(No content)",

@@ -27,7 +27,9 @@ import { AnnouncementForm } from "./announcement-form";
 interface AnnouncementListProps {
   currentPage: number;
   hasMore?: boolean;
-  initialAnnouncements: Tables<"announcements">[];
+  initialAnnouncements: (Tables<"announcements"> & {
+    translations?: { locale: string }[];
+  })[];
 }
 
 export function AnnouncementList({
@@ -112,6 +114,30 @@ export function AnnouncementList({
     }
   };
 
+  const getLocaleDisplay = (announcement: (typeof announcements)[0]) => {
+    const getLocaleName = (localeCode: string) => {
+      return localeCode === "ja"
+        ? t("announcementLocaleJa")
+        : t("announcementLocaleEn");
+    };
+
+    const parentLocale = getLocaleName(announcement.locale);
+
+    const translations = announcement.translations || [];
+    if (translations.length === 0) {
+      return parentLocale;
+    }
+
+    const translationLocales = translations
+      .map((translation) => getLocaleName(translation.locale))
+      .join(", ");
+
+    return t("announcementLocaleWithTranslations", {
+      locale: parentLocale,
+      translations: translationLocales,
+    });
+  };
+
   const hasPrevious = currentPage > 1;
 
   return (
@@ -187,9 +213,7 @@ export function AnnouncementList({
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <Badge variant="outline">
-                      {announcement.locale === "ja"
-                        ? t("announcementLocaleJa")
-                        : t("announcementLocaleEn")}
+                      {getLocaleDisplay(announcement)}
                     </Badge>
                   </td>
                   <td className="px-6 py-4 text-sm">
