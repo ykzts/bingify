@@ -12,7 +12,7 @@ metadata:
 
 ## 概要
 
-BingifyはSupabaseAuth (メール/パスワード、OAuth) を使用し、認証は[proxy.ts](../../../proxy.ts)およびミドルウェア（[lib/middleware/auth-handlers.ts](../../../lib/middleware/auth-handlers.ts)）で保護されます。
+BingifyはSupabaseAuth (メールOTP/Magic Link、OAuth) を使用し、認証は[proxy.ts](../../../proxy.ts)およびミドルウェア（[lib/middleware/auth-handlers.ts](../../../lib/middleware/auth-handlers.ts)）で保護されます。
 
 ## ログインフロー
 
