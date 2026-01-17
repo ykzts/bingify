@@ -97,7 +97,7 @@ pnpm format:docs       # Markdown フォーマット
 
 - **新規パッケージ**: npm registry確認 → `pnpm add <pkg>@latest`
 - **ライブラリ ドキュメント**: Context7 MCPを自動的に使用
-- **リンター**: 自動ツール（Biome）に任せる。LLMにStyle Guideを判定させない
+- **リンター**: 自動ツール (Biome) に任せる。LLMにStyle Guideを判定させない
 - **自動生成**: AGENTS.mdは手動作成。`/init` コマンド不使用
 
 ## File-scoped コマンド優先

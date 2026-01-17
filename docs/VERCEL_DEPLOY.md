@@ -95,9 +95,9 @@ VercelはNext.jsの開発元であるため、以下の機能が完全にサポ�
 
 1. **リポジトリをフォーク**
 
-   \`\`\`
-   https://github.com/ykzts/Bingify
-   \`\`\`
+   ```
+   https://github.com/ykzts/bingify
+   ```
 
 2. **Vercelにインポート**
 
