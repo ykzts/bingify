@@ -53,35 +53,8 @@ pnpm test -- --watch
 pnpm test -- --coverage
 ```
 
-## Biome (リント・フォーマット)
-
-```bash
-# チェック
-pnpm check
-
-# 自動修正
-pnpm check:fix
-```
-
-## CI/CDチェック
-
-コミット前に実行：
-
-```bash
-pnpm check       # Lint + Format
-pnpm type-check  # TypeScript
-pnpm test        # Vitest
-```
-
-## ドキュメントのフォーマット
-
-SKILL.mdを編集した場合は、以下でフォーマットしてください：
-
-```bash
-pnpm format:docs
-```
-
 ## 参考
 
 - [Vitest公式ドキュメント](https://vitest.dev/)
 - [Biomejs公式ドキュメント](https://biomejs.dev/)
+- [github-workflow スキル](../github-workflow/SKILL.md) - CI/CD チェックの詳細

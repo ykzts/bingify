@@ -12,125 +12,196 @@ metadata:
 
 ## 概要
 
-BingifyはSupabaseAuth (メール/パスワード、OAuth) とミドルウェア保護を使用します。
+BingifyはSupabaseAuth (メール/パスワード、OAuth) を使用し、認証は[proxy.ts](../../../proxy.ts)およびミドルウェア（[lib/middleware/auth-handlers.ts](../../../lib/middleware/auth-handlers.ts)）で保護されます。
 
-## ログインフォーム
+## ログインフロー
+
+### 1. ログインページ
+
+[app/[locale]/login/page.tsx](../../../app/%5Blocale%5D/login/page.tsx) で以下を処理：
+
+- ユーザーがメールアドレスを入力
+- OAuthプロバイダー（Google、Twitch など）のボタンをクリック
+- `redirect` クエリパラメータで認証後の遷移先を指定
+
+### 2. OAuthフロー（例：Google OAuth）
 
 ```tsx
+// 実装例: app/[locale]/login/_components/login-form.tsx
 "use client";
 
-import { useActionState } from "react";
-import { signInWithOtp } from "./actions";
-
-export function SignInForm() {
-  const [state, action] = useActionState(signInWithOtp, undefined);
-
+export function LoginForm() {
+  // signInWithOAuth呼び出し → プロバイダーのログインページへリダイレクト
   return (
-    <form action={action}>
-      <input type="email" name="email" required />
-      <button type="submit">Send magic link</button>
-      {state?.error && <p>{state.error}</p>}
-    </form>
+    <button
+      onClick={async () => {
+        await signInWithGoogle(redirect);
+      }}
+    >
+      Sign in with Google
+    </button>
   );
 }
 ```
 
-## ServerActionでの認証
+**実装詳細**:
 
-```tsx
-"use server";
+- `signInWithGoogle()` などのServer Actions は [app/[locale]/login/\_actions/](../../../app/%5Blocale%5D/login/_actions/) に配置
+- `supabase.auth.signInWithOAuth()` でプロバイダーのログインページにリダイレクト
+- ユーザー認可後、`redirectTo` で指定したコールバックURLへリダイレクト
+  - 例: `https://example.com/auth/google/callback`
 
-import { createClient } from "@/lib/supabase/server";
+### 3. コールバック処理（コード→セッション交換）
 
-export async function signInWithOtp(prevState: unknown, formData: FormData) {
-  const supabase = createClient();
-  const email = formData.get("email") as string;
+- プロバイダーからリダイレクトされた `/auth/[provider]/callback` で `code` パラメータを受け取ります
+- [app/auth/[provider]/callback/route.ts](../../../app/auth/%5Bprovider%5D/callback/route.ts) が処理：
+  1. **リトライロジック**: `exchangeCodeForSession()` を最大2回まで実行（ネットワークエラー時は再試行）
+  2. **セッション取得**: 交換後に `getSession()` でセッション情報を取得
+  3. **トークン保存**: OAuth トークン（`provider_token`, `provider_refresh_token`）を `upsertOAuthToken()` 経由でSupabase Vaultに暗号化して保存
+  4. **メタデータ設定**: 言語情報を `user_metadata.language` に設定
+  5. **リダイレクト**: 認証成功後、`redirect` パラメータで指定した遷移先（またはダッシュボード）へリダイレクト
 
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      // Magic Linkの遷移先（メール内リンク）
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-    },
-  });
+**エラーハンドリング**:
 
-  if (error) {
-    return { error: error.message };
-  }
+- OAuth トークン交換失敗時: `/login?error=auth_failed` へリダイレクト
+- セッション取得失敗時: `/login?error=auth_failed` へリダイレクト
 
-  return { success: true };
-}
-```
+**参考実装**:
 
-## OAuthフロー
-
-```tsx
-// Google OAuth（リダイレクト先はプロバイダー別のコールバック）
-export async function signInWithGoogle() {
-  const supabase = createClient();
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      // 例: https://example.com/auth/google/callback
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/google/callback`,
-    },
-  });
-
-  if (error) {
-    // 必要に応じてクライアント側でエラー表示
-    return;
-  }
-
-  if (data?.url) {
-    redirect(data.url);
-  }
-}
-```
-
-### コールバック処理（コード→セッション交換／トークン保存）
-
-- リダイレクト後、`/auth/[provider]/callback` で `code` を受け取り、`exchangeCodeForSession` をリトライ付きで実行してセッションを確立します。
-- その後、`session.provider_token` と `session.provider_refresh_token` を取得し、`upsertOAuthToken()` を呼び出してデータベース（Supabase Vault によりDB関数レイヤーで暗号化）へ安全に保存します。
-- 実装例: [app/auth/[provider]/callback/route.ts](../../../app/auth/%5Bprovider%5D/callback/route.ts) 内で `upsertOAuthToken` を利用しています。
-- トークン利用時は [lib/oauth/token-storage.ts](../../../lib/oauth/token-storage.ts) の `getOAuthToken()`／`getOAuthTokenWithRefresh()` を使って復号・期限管理を行います。失効や取り消しは `deleteOAuthToken()` を使用します。
-
-参考実装:
-
-- `signInWithGoogle()`（上記）
-- コールバックハンドラ: [app/auth/[provider]/callback/route.ts](../../../app/auth/%5Bprovider%5D/callback/route.ts)
-- トークン保存ラッパー: `upsertOAuthToken()`（[lib/oauth/token-storage.ts](../../../lib/oauth/token-storage.ts)）
+- [app/auth/[provider]/callback/route.ts](../../../app/auth/%5Bprovider%5D/callback/route.ts) - OAuth コールバック処理
+- [app/auth/callback/route.ts](../../../app/auth/callback/route.ts) - メール OTP コールバック処理
 
 ## ミドルウェア保護
 
-```tsx
-// middleware.ts
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
-import { NextRequest, NextResponse } from "next/server";
+### 実装位置
 
-export async function middleware(request: NextRequest) {
-  const response = NextResponse.next();
-  const supabase = createMiddlewareClient({ req: request, res: response });
+- [proxy.ts](../../../proxy.ts) - 統一エントリーポイント
+- [lib/middleware/auth-handlers.ts](../../../lib/middleware/auth-handlers.ts) - 認証ハンドラー
 
-  const { data } = await supabase.auth.getSession();
+### 保護ルート
 
-  if (!data.session && request.nextUrl.pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(new URL("/login", request.url));
+**ダッシュボード保護** (`/dashboard/*`):
+
+- `handleAuthenticatedRoute()` で認証ユーザーのみ許可
+- 未認証の場合、`/login` へリダイレクト（`redirect` パラメータで元のパスを指定）
+
+**管理画面保護** (`/admin/*`):
+
+- `handleAdminAuth()` で Admin ロールのみ許可
+- 未認証の場合、`/login` へリダイレクト
+- 認証済みだが Admin ロールがない場合、ホームへリダイレクト
+
+### 実装例
+
+```typescript
+// proxy.ts から抽出
+export function proxy(request: NextRequest) {
+  // 1. Basic Auth チェック（最優先）
+  const authResponse = checkBasicAuth(request);
+  if (authResponse) {
+    return authResponse;
   }
 
-  return response;
+  // 2. ダッシュボード保護
+  if (isDashboardPath(pathname)) {
+    return handleAuthenticatedRoute(request, pathname);
+  }
+
+  // 3. 管理画面保護
+  if (isAdminPath(pathname)) {
+    return handleAdminAuth(request, pathname);
+  }
+
+  // 4. その他のルーティング
+  return intlMiddleware(request);
 }
 ```
 
-## ドキュメントのフォーマット
+## コーディングエージェント向け：ログイン方法
 
-SKILL.mdを編集した場合は、以下でフォーマットしてください：
+### 開発環境でのテスト
+
+開発環境でのログイン動作確認は以下のいずれかで行えます。
+
+#### 方法 1: Magic Link（メール OTP）を使用
+
+メール OTP によるログインは Mailpit を使用して確認できます。
+
+**前提条件**:
+
+- Supabase が起動している: `pnpm run local:setup`
+- Mailpit が起動している（Supabase の一部）
+
+**ステップ**:
+
+1. [http://localhost:3000/login](http://localhost:3000/login) にアクセス
+2. メールアドレスを入力して「Send Magic Link」をクリック
+3. Mailpit UI ([http://localhost:54324](http://localhost:54324)) でメールを確認
+4. メール内のマジックリンクをクリックでログイン完了
+
+**ブラウザ自動化での実装例**:
+
+```typescript
+// テストでのシミュレーション
+const browser = (await mcp_next) - devtools_browser_eval.start();
+await browser.navigate("http://localhost:3000/login");
+await browser.fill_form([
+  { selector: 'input[type="email"]', value: "user@example.com" },
+]);
+await browser.click('button[type="submit"]');
+// Mailpit からトークンを取得してコールバックをシミュレート
+```
+
+#### 方法 2: OAuth プロバイダーをモック
+
+OAuth フローのテストは、Supabase のテスト設定やスタブ化を使用します。
+
+**参考**:
+
+- [app/auth/[provider]/callback/**tests**/route.test.ts](../../../app/auth/%5Bprovider%5D/callback/__tests__/route.test.ts) - OAuth コールバックテスト例
+- OAuth トークン交換のリトライロジック、エラーハンドリングをカバー
+
+#### 方法 3: データベースダイレクトアクセス
+
+開発環境では `supabase` CLI でデータベースに直接アクセス可能：
 
 ```bash
-pnpm format:docs
+pnpm exec supabase db push  # マイグレーション実行
+pnpm exec supabase status   # Supabase ステータス確認
 ```
+
+詳細は [supabase-setup スキル](../supabase-setup/SKILL.md) を参照してください。
+
+### セッション検証
+
+ログイン後のセッション状態は以下で確認：
+
+```typescript
+// クライアント側
+const {
+  data: { user },
+  error,
+} = await supabase.auth.getUser();
+if (user) {
+  console.log("Logged in as:", user.email);
+}
+
+// サーバー側（Server Actions）
+const supabase = await createClient();
+const {
+  data: { user },
+  error,
+} = await supabase.auth.getUser();
+```
+
+### デバッグ方法
+
+1. **ブラウザコンソール**: `localStorage` の `sb-*` キーでセッションクッキーを確認
+2. **Supabase ダッシュボード**: [console.supabase.com](https://console.supabase.com) で認証状態を確認
+3. **Server Actions ログ**: `pnpm dev` の出力でサーバー側エラーを確認
 
 ## 参考
 
 - [Supabase Auth](https://supabase.com/docs/guides/auth)
-- [mailpit-testing スキル](../mailpit-testing/SKILL.md)
+- [mailpit-testing スキル](../mailpit-testing/SKILL.md) - メールのローカルテスト
+- [supabase-setup スキル](../supabase-setup/SKILL.md) - データベース初期化

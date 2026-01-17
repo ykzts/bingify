@@ -67,19 +67,43 @@ git push origin feat/dashboard-spaces
 
 ## CI/CDチェック
 
+プルリクエスト作成前に、以下を実行してすべてが成功することを確認してください：
+
 ```bash
-pnpm check       # Lint + Format
+pnpm check       # Lint + Format（Biome）
 pnpm type-check  # TypeScript
 pnpm test        # Vitest
 ```
 
-## ドキュメントのフォーマット
+詳細は [testing スキル](../testing/SKILL.md) を参照してください。
 
-SKILL.mdを編集した場合は、以下でフォーマットしてください：
+## ドキュメント編集
+
+SKILL.md を含むMarkdownドキュメント編集後は、コミット前に以下を実行してください：
 
 ```bash
 pnpm format:docs
 ```
+
+## GitHub Actions
+
+GitHub Actions でアクションを使用する際は、以下のルールに従ってください：
+
+- タグ指定（例: `@v4`）ではなく、**フルコミットSHA** を使用
+- 末尾に `# vX.Y.Z` の形式でバージョンコメント付与
+- Renovate が `helpers:pinGitHubActionDigests` プリセットで自動更新
+
+**例:**
+
+```yaml
+- uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+```
+
+**理由:**
+
+- セキュリティ: タグ変更による意図しない挙動変更を防止
+- 再現性: ワークフロー実行の厳密な再現が可能
+- 監査可能性: 使用されたアクション版を明確に記録
 
 ## 参考
 

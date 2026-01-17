@@ -23,40 +23,50 @@ git clone https://github.com/ykzts/bingify.git
 cd bingify
 ```
 
-### パッケージのインストール
+### 環境構築
 
 ```bash
-pnpm install
+pnpm install          # パッケージのインストール
+pnpm local:setup      # Supabaseとデータベース初期化
+pnpm dev              # 開発サーバー起動
 ```
 
-### 環境変数の設定
-
-```bash
-cp .env.example .env
-```
-
-### Supabaseのセットアップ
-
-```bash
-pnpm local:setup
-```
-
-### 開発サーバー起動
-
-```bash
-pnpm dev
-```
+Supabaseへのアクセス情報や設定詳細は [supabase-setup スキル](../supabase-setup/SKILL.md) を参照してください。
 
 ## コード規約
 
+### TypeScript & Next.js
+
+- **Next.js 型安全な Props**：
+  - レイアウトコンポーネントには `LayoutProps<Route>` を使用
+  - ページコンポーネントには `PageProps<Route>` を使用
+  - これらの型は `pnpm typegen` で自動生成（`.next/types/routes.d.ts`）
+  - `params` と `searchParams` は `Promise` として扱い、`await` で解決
+
 ### UIコンポーネント
 
-- shadcn/uiコンポーネントは`@/components/ui`に配置 (自動生成、手動編集禁止)
-- カスタムコンポーネントは`@/components`に配置
+- Shadcn/ui コンポーネントは `@/components/ui` に配置（自動生成、手動編集禁止）
+- カスタムコンポーネントは `@/components` に配置
+- `cn` ユーティリティ（`lib/utils.ts`）でクラス結合
+
+**Shadcn/ui 管理**:
+
+```bash
+# 新規追加
+pnpm dlx shadcn@latest add <component-name>
+
+# 既存コンポーネントの更新（上書き）
+pnpm dlx shadcn@latest add --yes --overwrite <component-name>
+```
 
 ### スタイリング
 
 TailwindCSSを使用 (CSS-first)：
+
+- デザイントークンは `messages/` から参照
+- Theme Color: Purple (Primary: `#a78bfa`)
+- Icons: Lucide React
+- メインアクションボタンには `primary` バリアント（デフォルト）を使用
 
 ```tsx
 import { cn } from "@/lib/utils";
@@ -90,9 +100,15 @@ const userSchema = z.object({
 type User = z.infer<typeof userSchema>;
 ```
 
-### フォーム処理
+### バリデーション・フォーム処理
 
-TanStackForm+ServerActions+Zod：
+TanStack Form + Server Actions + Zod：
+
+- `formOptions` で共有フォームオプション定義
+- `createServerValidate` でサーバー側バリデーション実装
+- `useForm` + `useActionState` + `mergeForm` で状態統合
+- `form.Field` でフィールドレベルバリデーション
+- エラーは `field.state.meta.errors` から取得
 
 ```tsx
 "use client";
@@ -122,9 +138,9 @@ export function UserForm() {
 }
 ```
 
-### ServerActions
+### Server Actions
 
-バリデーション・DB操作はサーバーサイド：
+フォーム処理・データ操作はサーバーサイド：
 
 ```tsx
 "use server";
@@ -145,15 +161,26 @@ export async function createUser(data: unknown) {
 }
 ```
 
-## ドキュメントのフォーマット
+### エラー・成功フィードバック
 
-すべてのMarkdownドキュメント（`.md`）はPrettierで自動フォーマットされます：
+- **エラー表示**: shadcn/ui `Alert` コンポーネント（`destructive` variant）+ `AlertCircle` アイコン
+- **成功通知**: Sonner `toast.success()` を使用
+
+### コメント・コード規約
+
+- コメントは最小限、必要な箇所のみ（日本語）
+- JSON/JS オブジェクトキーはアルファベット順に並べる
+- 複雑なロジックには必ずテストを追加（日本語で記述）
+
+## コード品質チェック
 
 ```bash
-pnpm format:docs
+pnpm check       # Biome: Lint + Format
+pnpm type-check  # TypeScript 型チェック
+pnpm test        # Vitest によるテスト実行
 ```
 
-SKILL.mdを含むドキュメントを編集した場合は、コミット前に実行してください。
+詳細は [testing スキル](../testing/SKILL.md) と [github-workflow スキル](../github-workflow/SKILL.md) を参照してください。
 
 ## 参考
 

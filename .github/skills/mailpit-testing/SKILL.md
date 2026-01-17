@@ -17,7 +17,7 @@ BingifyはMailpitを使用して、ローカル開発環境でメール送信の
 ## Mailpit WebUIへのアクセス
 
 ```
-http://localhost:1025
+http://localhost:54324
 ```
 
 Mailpit WebUIでは、送信されたすべてのメールを確認できます。
@@ -64,21 +64,13 @@ export async function submitContactForm(data: unknown) {
 メール情報の取得：
 
 ```bash
-curl http://localhost:1025/api/v1/messages
+curl http://localhost:54324/api/v1/messages
 ```
 
 ## メールをクリア
 
 ```bash
-curl -X DELETE http://localhost:1025/api/v1/messages
-```
-
-## ドキュメントのフォーマット
-
-SKILL.mdを編集した場合は、以下でフォーマットしてください：
-
-```bash
-pnpm format:docs
+curl -X DELETE http://localhost:54324/api/v1/messages
 ```
 
 ## 参考
