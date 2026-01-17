@@ -3,15 +3,12 @@
 import { Loader2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useEffectEvent, useMemo, useState } from "react";
+import { useEffectEvent, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { JoinSpaceState, SpaceInfo } from "../../_actions/space-join";
-import {
-  checkOAuthTokenAvailability,
-  joinSpace,
-  leaveSpace,
-} from "../../_actions/space-join";
+import { joinSpace, leaveSpace } from "../../_actions/space-join";
+import { useOAuthTokenCheck } from "../_hooks/use-oauth-token-check";
 import {
   useParticipantInfo,
   useUserParticipation,
@@ -95,8 +92,6 @@ export function SpaceParticipation({
   const [isJoining, setIsJoining] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasYouTubeToken, setHasYouTubeToken] = useState<boolean | null>(null);
-  const [hasTwitchToken, setHasTwitchToken] = useState<boolean | null>(null);
 
   // Use queries for participant data
   const {
@@ -130,39 +125,12 @@ export function SpaceParticipation({
     [spaceInfo.gatekeeper_rules]
   );
 
-  // Check for existing OAuth tokens on mount
-  useEffect(() => {
-    // Only check if user hasn't joined yet
-    if (hasJoined) {
-      return;
-    }
+  // Check OAuth tokens using TanStack Query
+  const { data: hasYouTubeToken = null, isPending: isCheckingYouTubeToken } =
+    useOAuthTokenCheck("google", Boolean(requiresYouTube && !hasJoined));
 
-    const checkTokens = async () => {
-      // Check YouTube token if required
-      if (requiresYouTube) {
-        try {
-          const result = await checkOAuthTokenAvailability("google");
-          setHasYouTubeToken(result.available);
-        } catch (error) {
-          console.error("Error checking YouTube token availability:", error);
-          setHasYouTubeToken(false);
-        }
-      }
-
-      // Check Twitch token if required
-      if (requiresTwitch) {
-        try {
-          const result = await checkOAuthTokenAvailability("twitch");
-          setHasTwitchToken(result.available);
-        } catch (error) {
-          console.error("Error checking Twitch token availability:", error);
-          setHasTwitchToken(false);
-        }
-      }
-    };
-
-    checkTokens();
-  }, [hasJoined, requiresYouTube, requiresTwitch]);
+  const { data: hasTwitchToken = null, isPending: isCheckingTwitchToken } =
+    useOAuthTokenCheck("twitch", Boolean(requiresTwitch && !hasJoined));
 
   const handleJoin = useEffectEvent(async () => {
     setIsJoining(true);
@@ -198,15 +166,6 @@ export function SpaceParticipation({
 
   // Helper function to render the appropriate join button or account settings link
   const renderJoinButton = (compact?: boolean) => {
-    // Show loading state if token check is still in progress
-    if (requiresYouTube && hasYouTubeToken === null) {
-      return null; // Will show loading indicator
-    }
-
-    if (requiresTwitch && hasTwitchToken === null) {
-      return null; // Will show loading indicator
-    }
-
     // If YouTube token is required but not available, show link to account settings
     if (requiresYouTube && !hasYouTubeToken) {
       return (
@@ -251,11 +210,7 @@ export function SpaceParticipation({
     );
   };
 
-  if (
-    isLoading ||
-    (requiresYouTube && hasYouTubeToken === null) ||
-    (requiresTwitch && hasTwitchToken === null)
-  ) {
+  if (isLoading || isCheckingYouTubeToken || isCheckingTwitchToken) {
     return (
       <div
         className={`flex items-center justify-center ${compact ? "py-2" : "py-8"}`}
