@@ -51,11 +51,45 @@ import {
 interface AnnouncementFormProps {
   announcement?: Tables<"announcements">;
   onSuccess?: () => void;
+  translation?: Tables<"announcements">;
+}
+
+function getFormDefaultValues(
+  announcement: Tables<"announcements"> | undefined,
+  translation: Tables<"announcements"> | undefined
+): AnnouncementFormValues {
+  if (!announcement) {
+    return announcementFormOpts.defaultValues;
+  }
+
+  const isJapanese = announcement.locale === "ja";
+  const isEnglish = announcement.locale === "en";
+
+  return {
+    dismissible: announcement.dismissible,
+    en: {
+      content: isEnglish ? announcement.content : translation?.content || "",
+      title: isEnglish ? announcement.title : translation?.title || "",
+    },
+    ends_at: announcement.ends_at
+      ? new Date(announcement.ends_at).toISOString().slice(0, 16)
+      : "",
+    ja: {
+      content: isJapanese ? announcement.content : translation?.content || "",
+      title: isJapanese ? announcement.title : translation?.title || "",
+    },
+    priority: announcement.priority as "error" | "info" | "warning",
+    published: announcement.published,
+    starts_at: announcement.starts_at
+      ? new Date(announcement.starts_at).toISOString().slice(0, 16)
+      : "",
+  };
 }
 
 export function AnnouncementForm({
   announcement,
   onSuccess,
+  translation,
 }: AnnouncementFormProps) {
   const router = useRouter();
   const t = useTranslations("Admin");
@@ -72,27 +106,7 @@ export function AnnouncementForm({
 
   const form = useForm({
     ...announcementFormOpts,
-    defaultValues: announcement
-      ? {
-          dismissible: announcement.dismissible,
-          en: {
-            content: "",
-            title: "",
-          },
-          ends_at: announcement.ends_at
-            ? new Date(announcement.ends_at).toISOString().slice(0, 16)
-            : "",
-          ja: {
-            content: announcement.content,
-            title: announcement.title,
-          },
-          priority: announcement.priority,
-          published: announcement.published,
-          starts_at: announcement.starts_at
-            ? new Date(announcement.starts_at).toISOString().slice(0, 16)
-            : "",
-        }
-      : announcementFormOpts.defaultValues,
+    defaultValues: getFormDefaultValues(announcement, translation),
     // biome-ignore lint/style/noNonNullAssertion: TanStack Form pattern requires non-null assertion for mergeForm
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
     validationLogic: revalidateLogic({
