@@ -63,17 +63,22 @@ export async function getEmailHookSecret(): Promise<GetEmailHookSecretResult> {
       return { error: "errorFetchFailed" };
     }
 
-    if (!data?.success) {
+    // Type assertion for the RPC result
+    const result = data as
+      | { success: false; error: string }
+      | { success: true; data: { secret: string; updated_at: string } };
+
+    if (!result?.success) {
       // Secret not found is not an error - it just means it hasn't been set yet
-      if (data?.error === "Secret not found") {
+      if (result?.error === "Secret not found") {
         return { secret: undefined };
       }
-      return { error: data?.error || "errorFetchFailed" };
+      return { error: result?.error || "errorFetchFailed" };
     }
 
     return {
-      secret: data.data?.secret,
-      updatedAt: data.data?.updated_at,
+      secret: result.data?.secret,
+      updatedAt: result.data?.updated_at,
     };
   } catch (error) {
     console.error("Error in getEmailHookSecret:", error);
@@ -121,8 +126,11 @@ export async function upsertEmailHookSecret(
       return { error: "errorUpsertFailed" };
     }
 
-    if (!data?.success) {
-      return { error: data?.error || "errorUpsertFailed" };
+    // Type assertion for the RPC result
+    const result = data as { success: boolean; error?: string };
+
+    if (!result?.success) {
+      return { error: result?.error || "errorUpsertFailed" };
     }
 
     // Revalidate the email hook page
@@ -160,8 +168,11 @@ export async function deleteEmailHookSecret(): Promise<DeleteEmailHookSecretResu
       return { error: "errorDeleteFailed" };
     }
 
-    if (!data?.success) {
-      return { error: data?.error || "errorDeleteFailed" };
+    // Type assertion for the RPC result
+    const result = data as { success: boolean; error?: string };
+
+    if (!result?.success) {
+      return { error: result?.error || "errorDeleteFailed" };
     }
 
     // Revalidate the email hook page

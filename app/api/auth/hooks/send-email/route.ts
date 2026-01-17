@@ -17,8 +17,15 @@ async function getEmailHookSecret(): Promise<string | null> {
     const supabase = await createClient();
     const { data, error } = await supabase.rpc("get_auth_hook_secret");
 
-    if (!error && data?.success && data.data?.secret) {
-      return data.data.secret;
+    if (!error && data) {
+      // Type assertion for the RPC result
+      const result = data as
+        | { success: false; error: string }
+        | { success: true; data: { secret: string } };
+
+      if (result.success && result.data?.secret) {
+        return result.data.secret;
+      }
     }
   } catch (error) {
     // Fall through to environment variable
@@ -27,7 +34,9 @@ async function getEmailHookSecret(): Promise<string | null> {
 
   // Fallback to environment variable (supports both old and new naming)
   return (
-    process.env.SEND_EMAIL_HOOK_SECRET || process.env.SEND_EMAIL_HOOK_SECRETS
+    process.env.SEND_EMAIL_HOOK_SECRET ||
+    process.env.SEND_EMAIL_HOOK_SECRETS ||
+    null
   );
 }
 

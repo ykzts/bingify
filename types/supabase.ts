@@ -719,11 +719,13 @@ export type Database = {
           expired_space_ids: string[]
         }[]
       }
+      delete_auth_hook_secret: { Args: never; Returns: Json }
       delete_oauth_token: { Args: { p_provider: string }; Returns: Json }
       delete_oauth_token_for_user: {
         Args: { p_provider: string; p_user_id: string }
         Returns: Json
       }
+      get_auth_hook_secret: { Args: never; Returns: Json }
       get_expired_oauth_tokens: {
         Args: never
         Returns: {
@@ -756,6 +758,7 @@ export type Database = {
         Args: { p_lock_key: number }
         Returns: boolean
       }
+      upsert_auth_hook_secret: { Args: { p_secret: string }; Returns: Json }
       upsert_oauth_token: {
         Args: {
           p_access_token: string
