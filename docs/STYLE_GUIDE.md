@@ -90,9 +90,9 @@
 
 **カテゴリ:**
 
-- **組織名・サービス名:** GitHub, Supabase, Twitch, Google, YouTube, Facebook
-- **技術名・ブランド:** React, Next.js, OAuth, API, Cookie (HTTPクッキーとして), Node.js, PostgreSQL
-- **業界標準の略語:** URL, HTTP, JSON, UUID, SQL, RLS, JWT
+- **組織名・サービス名:** Supabase, Twitch, Google, YouTube
+- **技術名・ブランド:** Next.js, OAuth, Cookie (HTTPクッキーとして), PostgreSQL
+- **業界標準の略語:** JSON, UUID, RLS, JWT
 
 **理由:**
 
