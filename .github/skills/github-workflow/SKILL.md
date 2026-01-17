@@ -79,7 +79,7 @@ pnpm test        # Vitest
 
 ## ドキュメント編集
 
-SKILL.md を含むMarkdownドキュメント編集後は、コミット前に以下を実行してください：
+SKILL.mdを含むMarkdownドキュメント編集後は、コミット前に以下を実行してください：
 
 ```bash
 pnpm format:docs
@@ -87,11 +87,11 @@ pnpm format:docs
 
 ## GitHub Actions
 
-GitHub Actions でアクションを使用する際は、以下のルールに従ってください：
+GitHub Actionsでアクションを使用する際は、以下のルールに従ってください：
 
 - タグ指定（例: `@v4`）ではなく、**フルコミットSHA** を使用
 - 末尾に `# vX.Y.Z` の形式でバージョンコメント付与
-- Renovate が `helpers:pinGitHubActionDigests` プリセットで自動更新
+- Renovateが `helpers:pinGitHubActionDigests` プリセットで自動更新
 
 **例:**
 
@@ -108,4 +108,4 @@ GitHub Actions でアクションを使用する際は、以下のルールに�
 ## 参考
 
 - [Conventional Commits](https://www.conventionalcommits.org/)
-- [GitHub Flow](https://guides.github.com/introduction/flow/)
+- [GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow)

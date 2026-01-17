@@ -12,7 +12,7 @@ metadata:
 
 ## 概要
 
-BingifyはNext.js+AppRouter、TailwindCSS、shadcn/ui、Supabaseを使用したプロジェクトです。エージェントが効率的に開発できるよう、プロジェクト固有のルールと実装パターンを提供します。
+BingifyはNext.js+AppRouter、Tailwind CSS、shadcn/ui、Supabaseを使用したプロジェクトです。エージェントが効率的に開発できるよう、プロジェクト固有のルールと実装パターンを提供します。
 
 ## セットアップ手順
 
@@ -45,11 +45,11 @@ Supabaseへのアクセス情報や設定詳細は [supabase-setup スキル](..
 
 ### UIコンポーネント
 
-- Shadcn/ui コンポーネントは `@/components/ui` に配置（自動生成、手動編集禁止）
+- shadcn/uiコンポーネントは `@/components/ui` に配置 (自動生成、手動編集禁止)
 - カスタムコンポーネントは `@/components` に配置
-- `cn` ユーティリティ（`lib/utils.ts`）でクラス結合
+- `cn` ユーティリティ (`lib/utils.ts`) でクラス結合
 
-**Shadcn/ui 管理**:
+**shadcn/ui 管理**:
 
 ```bash
 # 新規追加
@@ -61,7 +61,7 @@ pnpm dlx shadcn@latest add --yes --overwrite <component-name>
 
 ### スタイリング
 
-TailwindCSSを使用 (CSS-first)：
+Tailwind CSSを使用 (CSS-first)：
 
 - デザイントークンは `messages/` から参照
 - Theme Color: Purple (Primary: `#a78bfa`)
@@ -169,7 +169,7 @@ export async function createUser(data: unknown) {
 ### コメント・コード規約
 
 - コメントは最小限、必要な箇所のみ（日本語）
-- JSON/JS オブジェクトキーはアルファベット順に並べる
+- JSON/JSオブジェクトキーはアルファベット順に並べる
 - 複雑なロジックには必ずテストを追加（日本語で記述）
 
 ## コード品質チェック

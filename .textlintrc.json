@@ -1,0 +1,69 @@
+{
+  "$schema": "https://textlint.github.io/schema/textlintrc.schema.json",
+  "rules": {
+    "ja-no-weak-phrase": false,
+    "preset-ja-spacing": {
+      "ja-nakaguro-or-halfwidth-space-between-katakana": false,
+      "ja-no-space-between-full-width": true,
+      "ja-space-after-exclamation": false,
+      "ja-space-after-question": false,
+      "ja-space-around-code": {
+        "after": true,
+        "before": true
+      },
+      "ja-space-around-link": {
+        "after": true,
+        "before": true
+      },
+      "ja-space-between-half-and-full-width": {
+        "exceptPunctuation": true,
+        "space": "never"
+      }
+    },
+    "preset-ja-technical-writing": {
+      "arabic-kanji-numbers": true,
+      "ja-no-mixed-period": false,
+      "ja-no-redundant-expression": true,
+      "ja-no-successive-word": false,
+      "ja-no-weak-phrase": false,
+      "ja-unnatural-alphabet": true,
+      "max-comma": {
+        "max": 4
+      },
+      "max-kanji-continuous-len": {
+        "max": 7
+      },
+      "max-ten": {
+        "max": 4
+      },
+      "no-doubled-joshi": {
+        "allow": ["か", "に"],
+        "strict": false
+      },
+      "no-mix-dearu-desumasu": false,
+      "sentence-length": {
+        "max": 150
+      }
+    },
+    "prh": {
+      "rulePaths": ["./prh.yml"]
+    },
+    "terminology": {
+      "defaultTerms": true,
+      "skip": ["Blockquote", "Code", "CodeBlock"],
+      "terms": [
+        "Bingify",
+        "GitHub",
+        "Google",
+        "Next.js",
+        "Node.js",
+        "OAuth",
+        "PostgreSQL",
+        "React",
+        "Tailwind CSS",
+        "Twitch",
+        "YouTube"
+      ]
+    }
+  }
+}

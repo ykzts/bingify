@@ -90,9 +90,9 @@
 
 **カテゴリ:**
 
-- **組織名・サービス名:** GitHub, Supabase, Twitch, Google, YouTube, Facebook
-- **技術名・ブランド:** React, Next.js, OAuth, API, Cookie (HTTPクッキーとして), Node.js, PostgreSQL
-- **業界標準の略語:** URL, HTTP, JSON, UUID, SQL, RLS, JWT
+- **組織名・サービス名:** Supabase, Twitch, Google, YouTube
+- **技術名・ブランド:** Next.js, OAuth, Cookie (HTTPクッキーとして), PostgreSQL
+- **業界標準の略語:** JSON, UUID, RLS, JWT
 
 **理由:**
 
@@ -142,7 +142,7 @@
 
 ### 4. カタカナの長音符
 
-**ルール:** 語末の -er/-or/-ar には長音符「ー」をつける
+**ルール:** 語末の -er/-or/-arには長音符「ー」をつける
 
 **根拠:** 内閣告示「外来語の表記」に準拠
 
@@ -153,7 +153,7 @@
 
 **詳細:**
 
-- 3音以上の語で語末が -er/-or/-ar で終わる場合、長音符をつける
+- 3音以上の語で語末が -er/-or/-arで終わる場合、長音符をつける
 - 2音以下の語や慣用的に長音符なしで定着している語は例外とする
 - 一般的な表現から大きくずれないよう配慮
 
@@ -161,12 +161,12 @@
 
 | ❌ 誤り      | ✅ 正しい      |
 | ------------ | -------------- |
-| ユーザ       | ユーザー       |
-| サーバ       | サーバー       |
+| ユーザー       | ユーザー       |
+| サーバー       | サーバー       |
 | エラー       | エラー         |
-| ブラウザ     | ブラウザー     |
-| コンピュータ | コンピューター |
-| プロバイダ   | プロバイダー   |
+| ブラウザー     | ブラウザー     |
+| コンピューター | コンピューター |
+| プロバイダー   | プロバイダー   |
 | メンバー     | メンバー       |
 
 **例外 (長音符なし):**
@@ -185,7 +185,7 @@
 **詳細:**
 
 - 常用漢字表に掲載されていない漢字は使用しない
-- ひらがなにした方が違和感のある場合は例外とする
+- ひらがなにすると違和感がある場合は例外とする
 - 専門用語で一般的に漢字表記される場合は例外とする
 
 **例:**
@@ -204,7 +204,7 @@
 
 ### 1. シリアルコンマ (Oxford Comma)
 
-**ルール:** リスト内の項目を区切る際は Oxford comma を使用する
+**ルール:** リスト内の項目を区切る際はOxford commaを使用する
 
 **定義:** 3つ以上の項目を列挙する際、最後の接続詞 (and/or) の前にコンマを入れる
 
@@ -225,13 +225,13 @@
 
 - 曖昧さの排除
 - 技術文書での明確性
-- Microsoft/Google スタイルガイドとの一致
+- Microsoft/Googleスタイルガイドとの一致
 
 ---
 
 ### 2. 見出しの大文字表記
 
-**ルール:** 技術ドキュメントでは sentence case を使用する
+**ルール:** 技術ドキュメントではsentence caseを使用する
 
 **Sentence case の定義:**
 
@@ -262,7 +262,7 @@
 
 - 現代的なウェブUIの慣例
 - 読みやすさの向上
-- Microsoft/Google スタイルガイドの推奨
+- Microsoft/Googleスタイルガイドの推奨
 
 ---
 
@@ -278,7 +278,7 @@
 | 文脈                 | 短縮形                      | 完全形       |
 | -------------------- | --------------------------- | ------------ |
 | エラーメッセージ     | You can't access this space | (短縮形OK)   |
-| ボタンラベル         | Don't have an account?      | (短縮形OK)   |
+| ボタンラベル         | Don't have an account       | (短縮形OK)   |
 | 利用規約             | The Service shall not...    | (完全形のみ) |
 | プライバシーポリシー | We will not share...        | (完全形のみ) |
 
@@ -406,12 +406,84 @@ GLOSSARY.mdの「UI表示における用語統一ルール」を参照してく�
 
 - [Microsoft Writing Style Guide](https://learn.microsoft.com/en-us/style-guide/welcome/)
 - [Google Developer Documentation Style Guide](https://developers.google.com/style)
-- [The Chicago Manual of Style](https://www.chicagomanualofstyle.org/) (Oxford comma に関して)
+- [The Chicago Manual of Style](https://www.chicagomanualofstyle.org/) (Oxford commaに関して)
+
+---
+
+## 自動チェック (textlint)
+
+このスタイルガイドのルールは、textlintを使用して自動的にチェックされます。
+
+### コマンド
+
+```bash
+# ドキュメントをチェック
+pnpm lint:docs
+
+# 自動修正を適用
+pnpm lint:docs:fix
+
+# 特定のファイルのみチェック
+pnpm textlint path/to/file.md
+```
+
+### 自動修正されるルール
+
+以下のルールは `pnpm lint:docs:fix` で自動修正されます:
+
+- ✅ 半角括弧と全角文字の間の不要なスペース削除
+- ✅ カタカナ長音符の統一
+- ✅ 技術用語の表記統一
+
+### 手動修正が必要なルール
+
+以下のルールは警告のみで、手動での修正が必要です:
+
+- ⚠️ 長すぎる文 (150文字超)
+- ⚠️ コンマが多い文 (4個超)
+- ⚠️ 連続する助詞
+- ⚠️ 冗長な表現
+
+### トラブルシューティング
+
+**エラーが多すぎる場合:**
+
+1. 自動修正: `pnpm lint:docs:fix`
+2. 残ったエラーを確認: `pnpm lint:docs`
+3. 重要度の高いエラーから手動で修正
+
+**特定のルールを無効化したい場合:**
+
+```markdown
+<!-- textlint-disable -->
+この部分はチェックされません
+<!-- textlint-enable -->
+```
+
+特定のルールのみ無効化:
+
+```markdown
+<!-- textlint-disable ja-technical-writing/sentence-length -->
+長い文章でもエラーになりません
+<!-- textlint-enable ja-technical-writing/sentence-length -->
+```
+
+**設定ファイル:**
+
+- `.textlintrc.json`: textlintのルール設定
+- `prh.yml`: 表記ゆれ辞書
+- `.textlintignore`: チェック対象外ファイルの指定
+
+**参考:**
+
+- [textlint 公式ドキュメント](https://textlint.github.io/)
+- [textlint-rule-preset-ja-technical-writing](https://github.com/textlint-ja/textlint-rule-preset-ja-technical-writing)
 
 ---
 
 ## 更新履歴
 
-| 日付       | 変更内容 | 変更者         |
-| ---------- | -------- | -------------- |
-| 2026-01-11 | 初版作成 | GitHub Copilot |
+| 日付       | 変更内容                   | 変更者         |
+| ---------- | -------------------------- | -------------- |
+| 2026-01-11 | 初版作成                   | GitHub Copilot |
+| 2026-01-17 | textlint自動チェック追加   | GitHub Copilot |

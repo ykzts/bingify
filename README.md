@@ -23,7 +23,7 @@ Bingifyは **Supabase Auth** を使用した認証システムを実装してい
 - **認証不要の機能**:
 - 表示専用画面 (`/screen/[token]`) - ストリーミング配信用
 
-OAuthプロバイダーの設定は、Supabase Dashboardの Authentication > Providersから行います。
+OAuthプロバイダーの設定は、Supabase DashboardのAuthentication > Providersから行います。
 
 ## セットアップ手順
 
@@ -110,24 +110,24 @@ pnpm local:stop
 
 ## デプロイ
 
-Bingify は複数のデプロイ方法をサポートしています。
+Bingifyは複数のデプロイ方法をサポートしています。
 
 ### Vercel (推奨)
 
-Vercel は Next.js アプリケーションに最適化されたホスティングプラットフォームです。自動スケーリング、グローバルCDN、プレビューデプロイなど、強力な機能を提供します。
+VercelはNext.jsアプリケーションに最適化されたホスティングプラットフォームです。自動スケーリング、グローバルCDN、プレビューデプロイなど、強力な機能を提供します。
 
 **詳細なデプロイガイド**: [docs/VERCEL_DEPLOY.md](docs/VERCEL_DEPLOY.md)
 
 **クイックスタート**:
 
-1. [Bingify GitHubリポジトリ](https://github.com/ykzts/bingify)をフォーク
+1. [Bingify GitHubリポジトリ](https://github.com/ykzts/bingify) をフォーク
 2. [Vercel Dashboard](https://vercel.com/dashboard) でリポジトリをインポート
 3. 環境変数を設定
 4. デプロイを実行
 
 ### Docker
 
-Docker コンテナでのデプロイもサポートしています。
+Dockerコンテナでのデプロイもサポートしています。
 
 ### イメージのビルド
 
@@ -170,9 +170,9 @@ docker run -d \
 
 最低限必要な環境変数：
 
-- `NEXT_PUBLIC_SUPABASE_URL`: Supabase プロジェクトの URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase の匿名キー
-- `SUPABASE_SERVICE_ROLE_KEY`: Supabase のサービスロールキー
+- `NEXT_PUBLIC_SUPABASE_URL`: SupabaseプロジェクトのURL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabaseの匿名キー
+- `SUPABASE_SERVICE_ROLE_KEY`: Supabaseのサービスロールキー
 
 その他のオプション環境変数については、`.env.example` を参照してください。
 
@@ -189,8 +189,8 @@ docker run -d \
 
 - 公開URL: `/@<share_key>`
 - **認証必須**: アクセスには認証が必要
-- Supabaseの `share_key` で UUIDを検索
-- `/spaces/<uuid>` に内部 rewrite (URLは `/@<share_key>` のまま表示)
+- Supabaseの `share_key` でUUIDを検索
+- `/spaces/<uuid>` に内部rewrite (URLは `/@<share_key>` のまま表示)
 
 ### 3. 管理画面
 
@@ -254,8 +254,9 @@ lib/
 - `pnpm local:setup` — Supabaseローカルインスタンス起動
 - `pnpm local:stop` — Supabaseローカルインスタンス停止
 - `pnpm supabase:test` — データベーステスト実行 (PgTAP)
-- `pnpm supabase:typegen` — Supabaseの型定義を生成 (DB 変更後に実行)
+- `pnpm supabase:typegen` — Supabaseの型定義を生成 (DB変更後に実行)
 - `pnpm lint` — コードチェック (Ultracite)
+- `pnpm lint:docs` — ドキュメントチェック (textlint) - [詳細](./docs/STYLE_GUIDE.md#自動チェック-textlint)
 - `pnpm test` — フロントエンドテスト実行 (Vitest)
 
 ## データベーステスト
@@ -285,13 +286,13 @@ pnpm supabase:test
 
 ## 環境変数
 
-ローカル開発時は `.env.example` に記載されている値を参照してください。本番環境では Supabase Cloudを使用します。
+ローカル開発時は `.env.example` に記載されている値を参照してください。本番環境ではSupabase Cloudを使用します。
 
 ## データベースマイグレーション
 
 ### 自動デプロイ
 
-`supabase/migrations` ディレクトリ配下の `.sql` マイグレーションファイルは、`main` ブランチへのマージ時に自動的に Cloud Supabaseへデプロイされます。
+`supabase/migrations` ディレクトリ配下の `.sql` マイグレーションファイルは、`main` ブランチへのマージ時に自動的にCloud Supabaseへデプロイされます。
 
 **⚠️ 重要な運用ルール:**
 
@@ -303,16 +304,16 @@ pnpm supabase:test
 
 **動作フロー:**
 
-1. `supabase/migrations/**/*.sql` に変更を含む PRを作成
+1. `supabase/migrations/**/*.sql` に変更を含むPRを作成
 2. PRがレビュー・承認される
 3. `main` ブランチへマージ
-4. GitHub Actionsが自動的にマイグレーションを Cloud Supabaseに適用
+4. GitHub Actionsが自動的にマイグレーションをCloud Supabaseに適用
 5. デプロイ前後の検証ステップで安全性を確保
 
 **必要な GitHub Secrets:**
 
-- `SUPABASE_ACCESS_TOKEN` — Supabaseの Personal Access Token ([Settings > Access Tokens](https://supabase.com/dashboard/account/tokens) から取得)
-- `SUPABASE_PROJECT_ID` — Supabaseプロジェクトの Project Reference ID (プロジェクト設定から確認可能)
+- `SUPABASE_ACCESS_TOKEN` — SupabaseのPersonal Access Token ([Settings > Access Tokens](https://supabase.com/dashboard/account/tokens) から取得)
+- `SUPABASE_PROJECT_ID` — SupabaseプロジェクトのProject Reference ID (プロジェクト設定から確認可能)
 
 ### 手動デプロイ
 
@@ -337,7 +338,7 @@ supabase migration new <migration_name>
 **マイグレーションが失敗した場合:**
 
 1. GitHub Actionsのログで詳細なエラーメッセージを確認
-2. マイグレーションファイルの SQL 構文を確認
+2. マイグレーションファイルのSQL構文を確認
 3. Supabase Dashboardで現在のデータベーススキーマを確認
 4. 必要に応じて、手動でロールバックSQLを実行
 
@@ -345,13 +346,13 @@ supabase migration new <migration_name>
 
 マイグレーションの自動ロールバックは実装されていません。問題が発生した場合は、以下の手順で手動対応してください：
 
-1. Supabase Dashboardの SQL Editorを開く
-2. 問題のあるマイグレーションを元に戻す SQLを実行
+1. Supabase DashboardのSQL Editorを開く
+2. 問題のあるマイグレーションを元に戻すSQLを実行
 3. 修正内容を**新しい**マイグレーションファイルとして作成し、PRを作成 (⚠️ 既存ファイルは編集しない)
 
 ## 型定義の生成
 
-Supabaseのデータベーススキーマから TypeScriptの型定義を自動生成できます。
+SupabaseのデータベーススキーマからTypeScriptの型定義を自動生成できます。
 
 ### 型定義の更新手順
 
@@ -365,8 +366,8 @@ pnpm supabase:typegen
 
 **重要:**
 
-- ローカルの Supabaseインスタンスが起動している必要があります (`pnpm local:setup`)
-- 生成された型定義ファイルは Git 管理対象となります
+- ローカルのSupabaseインスタンスが起動している必要があります (`pnpm local:setup`)
+- 生成された型定義ファイルはGit管理対象となります
 - DBスキーマ変更後は必ず型定義を更新し、コミットに含めてください
 
 ### 型定義の使用例

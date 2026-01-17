@@ -57,4 +57,4 @@ pnpm test -- --coverage
 
 - [Vitest公式ドキュメント](https://vitest.dev/)
 - [Biomejs公式ドキュメント](https://biomejs.dev/)
-- [github-workflow スキル](../github-workflow/SKILL.md) - CI/CD チェックの詳細
+- [github-workflow スキル](../github-workflow/SKILL.md) - CI/CDチェックの詳細

@@ -12,7 +12,7 @@ metadata:
 
 ## 概要
 
-BingifyはSupabaseAuth (メールOTP/Magic Link、OAuth) を使用し、認証は[proxy.ts](../../../proxy.ts)およびミドルウェア（[lib/middleware/auth-handlers.ts](../../../lib/middleware/auth-handlers.ts)）で保護されます。
+BingifyはSupabaseAuth (メールOTP/Magic Link、OAuth) を使用し、認証は [proxy.ts](../../../proxy.ts) およびミドルウェア ([lib/middleware/auth-handlers.ts](../../../lib/middleware/auth-handlers.ts)) で保護されます。
 
 ## ログインフロー
 
@@ -21,10 +21,10 @@ BingifyはSupabaseAuth (メールOTP/Magic Link、OAuth) を使用し、認証�
 [app/[locale]/login/page.tsx](../../../app/%5Blocale%5D/login/page.tsx) で以下を処理：
 
 - ユーザーがメールアドレスを入力
-- OAuthプロバイダー（Google、Twitch など）のボタンをクリック
+- OAuthプロバイダー (Google、Twitchなど) のボタンをクリック
 - `redirect` クエリパラメータで認証後の遷移先を指定
 
-### 2. OAuthフロー（例：Google OAuth）
+### 2. OAuthフロー (例：Google OAuth)
 
 ```tsx
 // 実装例: app/[locale]/login/_components/login-form.tsx
@@ -46,30 +46,30 @@ export function LoginForm() {
 
 **実装詳細**:
 
-- `signInWithGoogle()` などのServer Actions は [app/[locale]/login/\_actions/](../../../app/%5Blocale%5D/login/_actions/) に配置
+- `signInWithGoogle()` などのServer Actionsは [app/[locale]/login/\_actions/](../../../app/%5Blocale%5D/login/_actions/) に配置
 - `supabase.auth.signInWithOAuth()` でプロバイダーのログインページにリダイレクト
 - ユーザー認可後、`redirectTo` で指定したコールバックURLへリダイレクト
   - 例: `https://example.com/auth/google/callback`
 
-### 3. コールバック処理（コード→セッション交換）
+### 3. コールバック処理 (コード→セッション交換)
 
 - プロバイダーからリダイレクトされた `/auth/[provider]/callback` で `code` パラメータを受け取ります
 - [app/auth/[provider]/callback/route.ts](../../../app/auth/%5Bprovider%5D/callback/route.ts) が処理：
-  1. **リトライロジック**: `exchangeCodeForSession()` を最大2回まで実行（ネットワークエラー時は再試行）
+  1. **リトライロジック**: `exchangeCodeForSession()` を最大2回まで実行(ネットワークエラー時は再試行)
   2. **セッション取得**: 交換後に `getSession()` でセッション情報を取得
-  3. **トークン保存**: OAuth トークン（`provider_token`, `provider_refresh_token`）を RPC 関数 `upsert_oauth_token` / `get_oauth_token` 経由で保存。暗号化・復号は Supabase Vault 側（RPC 層）で自動的に処理される
+  3. **トークン保存**: OAuthトークン(`provider_token`, `provider_refresh_token`)をRPC関数 `upsert_oauth_token` / `get_oauth_token` 経由で保存。暗号化・復号はSupabase Vault側(RPC層)で自動的に処理される
   4. **メタデータ設定**: 言語情報を `user_metadata.language` に設定
-  5. **リダイレクト**: 認証成功後、`redirect` パラメータで指定した遷移先（またはダッシュボード）へリダイレクト
+  5. **リダイレクト**: 認証成功後、`redirect` パラメータで指定した遷移先(またはダッシュボード)へリダイレクト
 
 **エラーハンドリング**:
 
-- OAuth トークン交換失敗時: `/login?error=auth_failed` へリダイレクト
+- OAuthトークン交換失敗時: `/login?error=auth_failed` へリダイレクト
 - セッション取得失敗時: `/login?error=auth_failed` へリダイレクト
 
 **参考実装**:
 
-- [app/auth/[provider]/callback/route.ts](../../../app/auth/%5Bprovider%5D/callback/route.ts) - OAuth コールバック処理
-- [app/auth/callback/route.ts](../../../app/auth/callback/route.ts) - メール OTP コールバック処理
+- [app/auth/[provider]/callback/route.ts](../../../app/auth/%5Bprovider%5D/callback/route.ts) - OAuthコールバック処理
+- [app/auth/callback/route.ts](../../../app/auth/callback/route.ts) - メールOTPコールバック処理
 
 ## ミドルウェア保護
 
@@ -83,20 +83,20 @@ export function LoginForm() {
 **ダッシュボード保護** (`/dashboard/*`):
 
 - `handleAuthenticatedRoute()` で認証ユーザーのみ許可
-- 未認証の場合、`/login` へリダイレクト（`redirect` パラメータで元のパスを指定）
+- 未認証の場合、`/login` へリダイレクト(`redirect` パラメータで元のパスを指定)
 
 **管理画面保護** (`/admin/*`):
 
-- `handleAdminAuth()` で Admin ロールのみ許可
+- `handleAdminAuth()` でAdminロールのみ許可
 - 未認証の場合、`/login` へリダイレクト
-- 認証済みだが Admin ロールがない場合、ホームへリダイレクト
+- 認証済みだがAdminロールがない場合、ホームへリダイレクト
 
 ### 実装例
 
 ```typescript
 // proxy.ts から抽出
 export function proxy(request: NextRequest) {
-  // 1. Basic Auth チェック（最優先）
+  // 1. Basic Auth チェック(最優先)
   const authResponse = checkBasicAuth(request);
   if (authResponse) {
     return authResponse;
@@ -123,14 +123,14 @@ export function proxy(request: NextRequest) {
 
 開発環境でのログイン動作確認は以下のいずれかで行えます。
 
-#### 方法 1: Magic Link（メール OTP）を使用
+#### 方法 1: Magic Link (メール OTP) を使用
 
-メール OTP によるログインは Mailpit を使用して確認できます。
+メールOTPによるログインはMailpitを使用して確認できます。
 
 **前提条件**:
 
-- Supabase が起動している: `pnpm run local:setup`
-- Mailpit が起動している（Supabase の一部）
+- Supabaseが起動している: `pnpm run local:setup`
+- Mailpitが起動している(Supabaseの一部)
 
 **ステップ**:
 
@@ -139,7 +139,7 @@ export function proxy(request: NextRequest) {
 3. Mailpit UI ([http://localhost:54324](http://localhost:54324)) でメールを確認
 4. メール内のマジックリンクをクリックでログイン完了
 
-**ブラウザ自動化での実装例**:
+**ブラウザー自動化での実装例**:
 
 ```typescript
 // テストでのシミュレーション
@@ -155,16 +155,16 @@ await browser.click('button[type="submit"]');
 
 #### 方法 2: OAuth プロバイダーをモック
 
-OAuth フローのテストは、Supabase のテスト設定やスタブ化を使用します。
+OAuthフローのテストは、Supabaseのテスト設定やスタブ化を使用します。
 
 **参考**:
 
-- [app/auth/[provider]/callback/**tests**/route.test.ts](../../../app/auth/%5Bprovider%5D/callback/__tests__/route.test.ts) - OAuth コールバックテスト例
-- OAuth トークン交換のリトライロジック、エラーハンドリングをカバー
+- [app/auth/[provider]/callback/**tests**/route.test.ts](../../../app/auth/%5Bprovider%5D/callback/__tests__/route.test.ts) - OAuthコールバックテスト例
+- OAuthトークン交換のリトライロジック、エラーハンドリングをカバー
 
 #### 方法 3: データベースダイレクトアクセス
 
-開発環境では `supabase` CLI でデータベースに直接アクセス可能：
+開発環境では `supabase` CLIでデータベースに直接アクセス可能：
 
 ```bash
 pnpm exec supabase db push  # マイグレーション実行
@@ -187,7 +187,7 @@ if (user) {
   console.log("Logged in as:", user.email);
 }
 
-// サーバー側（Server Actions）
+// サーバー側(Server Actions)
 const supabase = await createClient();
 const {
   data: { user },
@@ -197,7 +197,7 @@ const {
 
 ### デバッグ方法
 
-1. **ブラウザ開発者ツール**: Application タブの Cookies セクションまたは Network タブで Supabase セッションクッキー（例: `sb-<project-ref>-auth-token`）を確認。このリポジトリは `@supabase/ssr` の `createServerClient` とクッキーアダプターを使用したクッキーベースのセッション管理を採用（[lib/supabase/server.ts](../../../lib/supabase/server.ts) 参照）
+1. **ブラウザー開発者ツール**: ApplicationタブのCookiesセクションまたはNetworkタブでSupabaseセッションクッキー(例: `sb-<project-ref>-auth-token`)を確認。このリポジトリは `@supabase/ssr` の `createServerClient` とクッキーアダプターを使用したクッキーベースのセッション管理を採用([lib/supabase/server.ts](../../../lib/supabase/server.ts) 参照)
 2. **Supabase ダッシュボード**: [console.supabase.com](https://console.supabase.com) で認証状態を確認
 3. **Server Actions ログ**: `pnpm dev` の出力でサーバー側エラーを確認
 

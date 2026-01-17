@@ -23,10 +23,10 @@
 
 ### 最小要件
 
-- **Node.js**: 24.x 以上 (LTS推奨)
-- **pnpm**: 10.27.0 以上
-- **メモリ**: 最小 512MB RAM (推奨 1GB以上)
-- **ストレージ**: 最小 500MB (依存関係とビルド成果物用)
+- **Node.js**: 24.x以上 (LTS推奨)
+- **pnpm**: 10.27.0以上
+- **メモリ**: 最小512MB RAM (推奨1GB以上)
+- **ストレージ**: 最小500MB (依存関係とビルド成果物用)
 - **データベース**: PostgreSQL 15以上 (Supabase推奨)
 
 ### 推奨要件
@@ -35,7 +35,7 @@
 - **pnpm**: 最新版
 - **メモリ**: 2GB RAM以上
 - **ストレージ**: 1GB以上
-- **データベース**: Supabase Cloud または Supabase OSS版
+- **データベース**: Supabase CloudまたはSupabase OSS版
 
 ### 対応プラットフォーム
 
@@ -49,11 +49,11 @@
 
 ### Vercelでのデプロイ (推奨)
 
-Bingify は Vercel でのホストを強く推奨します。Vercel は Next.js アプリケーションの最適なパフォーマンスとシームレスな統合を提供します。
+BingifyはVercelでのホストを強く推奨します。VercelはNext.jsアプリケーションの最適なパフォーマンスとシームレスな統合を提供します。
 
 **詳細なVercelデプロイガイド**: [VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md)
 
-Vercel デプロイガイドには、以下の詳細情報が含まれています:
+Vercelデプロイガイドには、以下の詳細情報が含まれています:
 
 - クイックスタートガイド
 - 詳細なセットアップ手順 (Supabase連携、環境変数設定)
@@ -67,7 +67,7 @@ Vercel デプロイガイドには、以下の詳細情報が含まれていま�
 
 **クイックスタート** (詳細は [VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md) を参照):
 
-1. [Bingify GitHubリポジトリ](https://github.com/ykzts/bingify)をフォーク
+1. [Bingify GitHubリポジトリ](https://github.com/ykzts/bingify) をフォーク
 2. [Vercel Dashboard](https://vercel.com/dashboard) でリポジトリをインポート
 3. 環境変数を設定 (最低限: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL`, `CRON_SECRET`)
 4. デプロイを実行
@@ -368,7 +368,7 @@ systemdを使用してBingifyをバックグラウンドサービスとして実
 
 #### PM2を使用したプロセス管理 (代替案)
 
-systemdの代わりにPM2を使用することもできます。
+systemdの代わりにPM2を使用できます。
 
 1. **PM2をインストール**
 
@@ -458,10 +458,10 @@ GoogleとTwitchのOAuth認証を有効にする場合に設定します。
 **OAuth設定手順**:
 
 1. 各プロバイダーのコンソールでOAuthアプリケーションを作成
-2. リダイレクトURI を設定: `https://your-domain.com/auth/callback`
+2. リダイレクトURIを設定: `https://your-domain.com/auth/callback`
 3. クライアントIDとシークレットを取得
 4. 環境変数に設定
-5. Supabase Dashboard の Authentication > Providers で各プロバイダーを有効化
+5. Supabase DashboardのAuthentication > Providersで各プロバイダーを有効化
 
 ### アクセス制御 (オプション)
 
@@ -485,7 +485,7 @@ Basic認証は公開前の制限やステージング環境の保護に使用で
 
 ## データベースの設定
 
-Bingifyは Supabaseを使用します。Supabase Cloud (推奨) またはSupabase OSS版を使用してください。
+BingifyはSupabaseを使用します。Supabase Cloud (推奨) またはSupabase OSS版を使用してください。
 
 ### Supabase Cloud (推奨)
 
@@ -498,7 +498,7 @@ Supabase Cloudは最も簡単で推奨される方法です。
    [Supabase Dashboard](https://supabase.com/dashboard) にアクセスし、新しいプロジェクトを作成します。
 
 2. **接続情報を取得**
-   - Dashboard の "Settings" → "API" で以下の情報を取得：
+   - Dashboardの "Settings" → "API" で以下の情報を取得：
      - Project URL (`NEXT_PUBLIC_SUPABASE_URL`)
      - anon/public key (`NEXT_PUBLIC_SUPABASE_ANON_KEY`)
      - service_role key (`SUPABASE_SERVICE_ROLE_KEY`)
@@ -521,22 +521,22 @@ Supabase Cloudは最も簡単で推奨される方法です。
    supabase db push
    ```
 
-   または、Supabase Dashboard の "SQL Editor" から `supabase/migrations/*.sql` ファイルの内容を手動で実行します。
+   または、Supabase Dashboardの "SQL Editor" から `supabase/migrations/*.sql` ファイルの内容を手動で実行します。
 
 4. **Row Level Security (RLS) を確認**
 
-   マイグレーションによりRLSポリシーが自動的に設定されます。Dashboard の "Authentication" → "Policies" で確認してください。
+   マイグレーションによりRLSポリシーが自動的に設定されます。Dashboardの "Authentication" → "Policies" で確認してください。
 
 5. **Realtime機能を有効化**
 
-   Dashboard の "Database" → "Replication" で以下のテーブルのRealtimeを有効化：
+   Dashboardの "Database" → "Replication" で以下のテーブルのRealtimeを有効化：
    - `spaces`
    - `bingo_cards`
    - `called_numbers`
 
 6. **OAuth プロバイダーを設定 (オプション)**
 
-   Dashboard の "Authentication" → "Providers" でGoogleとTwitchを有効化し、各プロバイダーのクライアントIDとシークレットを設定します。
+   Dashboardの "Authentication" → "Providers" でGoogleとTwitchを有効化し、各プロバイダーのクライアントIDとシークレットを設定します。
 
 #### Supabase Cloudの利点
 
@@ -551,9 +551,9 @@ Supabase Cloudは最も簡単で推奨される方法です。
 
 ### Supabase OSS版
 
-Supabaseのオープンソース版を自分でホストすることも可能です。
+Supabaseのオープンソース版を自分でホスト可能です。
 
-詳細なセットアップ手順については、[Supabase公式ドキュメント](https://supabase.com/docs/guides/self-hosting)を参照してください。
+詳細なセットアップ手順については、[Supabase公式ドキュメント](https://supabase.com/docs/guides/self-hosting) を参照してください。
 
 **重要なポイント**:
 
@@ -819,7 +819,7 @@ Error: relation "spaces" already exists
 
 **解決方法**:
 
-1. Supabase Dashboard で Replication が有効か確認
+1. Supabase DashboardでReplicationが有効か確認
 2. 該当テーブル (`spaces`, `bingo_cards`, `called_numbers`) がReplication対象に含まれているか確認
 3. ブラウザーのコンソールでWebSocket接続エラーを確認
 4. ネットワークがWebSocketをブロックしていないか確認
@@ -834,7 +834,7 @@ Error: relation "spaces" already exists
 
 **解決方法**:
 
-1. OAuth プロバイダーのリダイレクトURIを確認：
+1. OAuthプロバイダーのリダイレクトURIを確認：
    - 正しいURL: `https://your-domain.com/auth/callback`
    - 誤ったURL: `http://your-domain.com/auth/callback` (HTTPは不可)
 
@@ -845,9 +845,9 @@ Error: relation "spaces" already exists
    echo $SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET
    ```
 
-3. Supabase Dashboard の Authentication > Providers 設定を確認
+3. Supabase DashboardのAuthentication > Providers設定を確認
 
-4. OAuth プロバイダーのコンソールでアプリケーションが有効化されているか確認
+4. OAuthプロバイダーのコンソールでアプリケーションが有効化されているか確認
 
 #### **問題**: セッションが維持されない
 
@@ -879,7 +879,7 @@ Error: relation "spaces" already exists
 
 3. 画像最適化を確認 (`next/image` を使用)
 
-4. データベースクエリを最適化 (インデックス、RLS ポリシー)
+4. データベースクエリを最適化 (インデックス、RLSポリシー)
 
 5. サーバーリソース (CPU、メモリ) を確認：
 
@@ -906,7 +906,7 @@ FATAL ERROR: Reached heap limit Allocation failed
 
 2. サーバーのメモリを増やす (最低1GB、推奨2GB以上)
 
-3. Docker のメモリ制限を確認：
+3. Dockerのメモリ制限を確認：
 
    ```bash
    docker stats
@@ -945,7 +945,7 @@ FATAL ERROR: Reached heap limit Allocation failed
      -H "Authorization: Bearer YOUR_CRON_SECRET"
    ```
 
-4. Vercelの場合、Dashboard の "Cron Jobs" で実行履歴を確認
+4. Vercelの場合、Dashboardの "Cron Jobs" で実行履歴を確認
 
 ---
 
@@ -1005,7 +1005,7 @@ FATAL ERROR: Reached heap limit Allocation failed
 問題が解決しない場合は、以下のリソースを参照してください：
 
 - **GitHub Issues**: [https://github.com/ykzts/bingify/issues](https://github.com/ykzts/bingify/issues)
-- **README**: [https://github.com/ykzts/bingify/blob/main/README.md](https://github.com/ykzts/bingify/blob/main/README.md)
+- **Readme**: [https://github.com/ykzts/bingify/blob/main/README.md](https://github.com/ykzts/bingify/blob/main/README.md)
 - **CONTRIBUTING**: [https://github.com/ykzts/bingify/blob/main/CONTRIBUTING.md](https://github.com/ykzts/bingify/blob/main/CONTRIBUTING.md)
 
 ---

@@ -44,6 +44,9 @@ jobs:
       - name: Run Ultracite checks
         run: pnpm check:ci --reporter=github
 
+      - name: Lint documentation
+        run: pnpm lint:docs
+
       - name: Type check
         run: pnpm type-check
 
