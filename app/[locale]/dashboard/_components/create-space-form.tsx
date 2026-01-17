@@ -88,6 +88,7 @@ export function CreateSpaceForm() {
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState<boolean | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const dateSuffix = formatDateSuffix();
 
@@ -150,6 +151,7 @@ export function CreateSpaceForm() {
       | { success?: boolean; spaceId?: string }
       | undefined;
     if (meta?.success && meta?.spaceId) {
+      setIsNavigating(true);
       router.push(`/dashboard/spaces/${meta.spaceId}`);
     }
   }, [state, router]);
@@ -206,7 +208,7 @@ export function CreateSpaceForm() {
                 </InputGroupAddon>
                 <InputGroupInput
                   className="rounded-none border-x-0 pr-10 font-mono"
-                  disabled={isSubmitting || isPending}
+                  disabled={isSubmitting || isPending || isNavigating}
                   maxLength={30}
                   minLength={3}
                   name={field.name}
@@ -225,7 +227,7 @@ export function CreateSpaceForm() {
                 <InputGroupAddon align="inline-end">
                   <InputGroupButton
                     aria-label={t("generateRandomButtonAriaLabel")}
-                    disabled={isSubmitting || isPending}
+                    disabled={isSubmitting || isPending || isNavigating}
                     onClick={handleGenerateRandomKey}
                     size="icon-xs"
                     title={t("generateRandomButton")}
@@ -353,14 +355,17 @@ export function CreateSpaceForm() {
           !canSubmit ||
           isSubmitting ||
           isPending ||
+          isNavigating ||
           checking ||
           available === false ||
           shareKey.length < 3
         }
         type="submit"
       >
-        {(isSubmitting || isPending) && <Spinner />}
-        {isSubmitting || isPending ? t("creatingButton") : t("createButton")}
+        {(isSubmitting || isPending || isNavigating) && <Spinner />}
+        {isSubmitting || isPending || isNavigating
+          ? t("creatingButton")
+          : t("createButton")}
       </Button>
 
       <p className="text-center text-gray-500 text-sm dark:text-gray-400">
