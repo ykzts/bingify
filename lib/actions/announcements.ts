@@ -83,6 +83,7 @@ async function checkAdminPermission(): Promise<boolean> {
 /**
  * IDでお知らせを取得する
  * 公開中で日付範囲内のお知らせのみ返す
+ * 認証不要（未認証ユーザーも利用可能）
  *
  * @param id - お知らせID
  * @returns お知らせ
@@ -92,19 +93,6 @@ export async function getAnnouncementById(
 ): Promise<GetAnnouncementResult> {
   try {
     const supabase = await createClient();
-
-    // 認証チェック
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return {
-        error: "認証が必要です",
-        success: false,
-      };
-    }
 
     // お知らせを取得（published=true AND 日付範囲内）
     const now = new Date().toISOString();
@@ -141,6 +129,7 @@ export async function getAnnouncementById(
 /**
  * 公開中で日付範囲内のお知らせを取得する
  * 優先度順（error > warning > info）、作成日時降順でソート
+ * 認証不要（未認証ユーザーも利用可能）
  *
  * @returns 有効なお知らせ一覧
  */
@@ -149,19 +138,6 @@ export async function getActiveAnnouncements(): Promise<GetAnnouncementsResult> 
 
   try {
     const supabase = await createClient();
-
-    // 認証チェック
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return {
-        error: t("errorUnauthorized"),
-        success: false,
-      };
-    }
 
     // published=true AND 日付範囲内のお知らせを取得
     const now = new Date().toISOString();

@@ -28,29 +28,44 @@ export function AnnouncementBanner() {
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [canDismiss, setCanDismiss] = useState(false);
 
   useEffect(() => {
     const loadAnnouncement = async () => {
       setIsLoading(true);
       try {
         // アクティブなお知らせと非表示済みお知らせを並行取得
-        const [activeResult, dismissedResult] = await Promise.all([
+        const [activeResult, dismissedResult] = await Promise.allSettled([
           getActiveAnnouncements(),
           getDismissedAnnouncements(),
         ]);
 
         // エラーハンドリング
-        if (!(activeResult.success && activeResult.data)) {
+        if (
+          activeResult.status === "rejected" ||
+          !(activeResult.value.success && activeResult.value.data)
+        ) {
           setIsLoading(false);
           return;
         }
 
-        // 非表示済みお知らせIDのセット
-        const dismissedIds = new Set(dismissedResult.data || []);
+        // 非表示済みお知らせIDのセット（認証ユーザーのみ）
+        const dismissedIds = new Set(
+          dismissedResult.status === "fulfilled" &&
+            dismissedResult.value.success
+            ? dismissedResult.value.data || []
+            : []
+        );
+
+        // ユーザーが認証されているかどうかを判定（getDismissedAnnouncementsが成功した場合のみ）
+        const userCanDismiss =
+          dismissedResult.status === "fulfilled" &&
+          dismissedResult.value.success;
+        setCanDismiss(userCanDismiss);
 
         // 非表示済みを除外し、最高優先度のお知らせを取得
         // getActiveAnnouncements は既に優先度順にソート済み
-        const visibleAnnouncement = activeResult.data.find(
+        const visibleAnnouncement = activeResult.value.data.find(
           (a) => !dismissedIds.has(a.id)
         );
 
@@ -133,7 +148,7 @@ export function AnnouncementBanner() {
             <ChevronRight className="size-4" />
           </Link>
         </AlertDescription>
-        {announcement.dismissible && (
+        {announcement.dismissible && canDismiss && (
           <Button
             aria-label="お知らせを閉じる"
             className="absolute top-2 right-2 h-6 w-6 rounded-sm opacity-70 transition-opacity hover:opacity-100"

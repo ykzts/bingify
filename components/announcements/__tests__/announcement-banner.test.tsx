@@ -386,4 +386,50 @@ describe("AnnouncementBanner", () => {
       expect(container.firstChild).toBeNull();
     });
   });
+
+  it("未認証ユーザーには閉じるボタンが表示されない", async () => {
+    vi.mocked(getActiveAnnouncements).mockResolvedValue({
+      data: [mockAnnouncements[0]],
+      success: true,
+    });
+    // 未認証ユーザーをシミュレート（getDismissedAnnouncementsが失敗）
+    vi.mocked(getDismissedAnnouncements).mockResolvedValue({
+      error: "認証が必要です",
+      success: false,
+    });
+
+    render(<AnnouncementBanner />);
+
+    await waitFor(() => {
+      expect(screen.getByText("エラー通知")).toBeInTheDocument();
+    });
+
+    // 閉じるボタンが表示されていないことを確認
+    expect(
+      screen.queryByRole("button", { name: "お知らせを閉じる" })
+    ).not.toBeInTheDocument();
+  });
+
+  it("認証ユーザーには閉じるボタンが表示される", async () => {
+    vi.mocked(getActiveAnnouncements).mockResolvedValue({
+      data: [mockAnnouncements[0]],
+      success: true,
+    });
+    // 認証ユーザーをシミュレート（getDismissedAnnouncementsが成功）
+    vi.mocked(getDismissedAnnouncements).mockResolvedValue({
+      data: [],
+      success: true,
+    });
+
+    render(<AnnouncementBanner />);
+
+    await waitFor(() => {
+      expect(screen.getByText("エラー通知")).toBeInTheDocument();
+    });
+
+    // 閉じるボタンが表示されていることを確認
+    expect(
+      screen.getByRole("button", { name: "お知らせを閉じる" })
+    ).toBeInTheDocument();
+  });
 });
