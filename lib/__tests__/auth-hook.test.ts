@@ -1,120 +1,216 @@
 import { describe, expect, it } from "vitest";
-import { normalizeAuthHookPayload } from "@/lib/schemas/auth-hook";
+import { AuthHookPayloadSchema } from "@/lib/schemas/auth-hook";
 
-describe("Auth Hook Payload Normalization", () => {
-  describe("normalizeAuthHookPayload", () => {
-    it("無効なペイロード構造の場合は null を返す", () => {
+describe("Auth Hook Payload", () => {
+  describe("AuthHookPayloadSchema validation", () => {
+    it("メール送信用の完全なペイロードを検証する", () => {
       const payload = {
-        invalid: true,
-      };
-
-      const result = normalizeAuthHookPayload(payload);
-
-      expect(result).toBeNull();
-    });
-
-    it("confirmation タイプのペイロードを処理する", () => {
-      const payload = {
-        data: {
+        email_data: {
           email_action_type: "signup",
+          factor_type: "",
+          old_email: "",
+          old_phone: "",
+          provider: "",
+          redirect_to: "https://example.com",
+          site_url: "https://example.com",
           token: "token123",
-          token_hash: "hash123",
+          token_hash: "hash123456789012345678901234",
+          token_hash_new: "",
+          token_new: "",
         },
-        type: "user.confirmation",
+        user: {
+          app_metadata: {},
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
+          email: "user@example.com",
+          id: "user-id",
+          identities: [],
+          is_anonymous: false,
+          phone: "+1234567890",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {},
+        },
       };
 
-      const result = normalizeAuthHookPayload(payload);
+      const result = AuthHookPayloadSchema.safeParse(payload);
 
-      expect(result).toBeDefined();
-      if (result) {
-        expect(result.email.confirmation_token).toBe("token123");
-        expect(result.email.confirmation_hash).toBe("hash123");
+      expect(result.success).toBe(true);
+      if (result.success && result.data.email_data) {
+        expect(result.data.email_data.email_action_type).toBe("signup");
+        expect(result.data.email_data.token).toBe("token123");
       }
     });
 
-    it("recovery タイプのペイロードを処理する", () => {
+    it("recovery タイプのペイロードを検証する", () => {
       const payload = {
-        data: {
+        email_data: {
           email_action_type: "recovery",
+          factor_type: "",
+          old_email: "",
+          old_phone: "",
+          provider: "",
+          redirect_to: "https://example.com",
+          site_url: "https://example.com",
           token: "recovery_token",
           token_hash: "recovery_hash",
+          token_hash_new: "",
+          token_new: "",
         },
-        type: "user.recovery",
+        user: {
+          app_metadata: {},
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
+          email: "user@example.com",
+          id: "user-id",
+          identities: [],
+          is_anonymous: false,
+          phone: "",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {},
+        },
       };
 
-      const result = normalizeAuthHookPayload(payload);
+      const result = AuthHookPayloadSchema.safeParse(payload);
 
-      expect(result).toBeDefined();
-      if (result) {
-        expect(result.email.recovery_token).toBe("recovery_token");
-        expect(result.email.recovery_token_hash).toBe("recovery_hash");
+      expect(result.success).toBe(true);
+      if (result.success && result.data.email_data) {
+        expect(result.data.email_data.email_action_type).toBe("recovery");
+        expect(result.data.email_data.token).toBe("recovery_token");
       }
     });
 
-    it("email_change タイプのペイロードを処理する", () => {
+    it("email_change タイプのペイロードを検証する", () => {
       const payload = {
-        data: {
+        email_data: {
           email_action_type: "email_change",
+          factor_type: "",
           old_email: "oldemail@example.com",
+          old_phone: "",
+          provider: "",
+          redirect_to: "https://example.com",
+          site_url: "https://example.com",
           token: "token",
-          token_hash: "hash",
+          token_hash: "old_hash",
           token_hash_new: "new_hash",
           token_new: "new_token",
         },
-        type: "user.email_change",
+        user: {
+          app_metadata: {},
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
+          email: "user@example.com",
+          id: "user-id",
+          identities: [],
+          is_anonymous: false,
+          phone: "",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {},
+        },
       };
 
-      const result = normalizeAuthHookPayload(payload);
+      const result = AuthHookPayloadSchema.safeParse(payload);
 
-      expect(result).toBeDefined();
-      if (result) {
-        expect(result.email.change_email_old_new).toBe("oldemail@example.com");
-        // 旧メールアドレス用トークン（token + token_hash_new）
-        expect(result.email.change_email_old_token).toBe("token");
-        expect(result.email.change_email_old_token_hash).toBe("new_hash");
-        // 新メールアドレス用トークン（token_new + token_hash）
-        expect(result.email.change_email_new_token_new).toBe("new_token");
-        expect(result.email.change_email_new_token_new_hash).toBe("hash");
+      expect(result.success).toBe(true);
+      if (result.success && result.data.email_data) {
+        expect(result.data.email_data.email_action_type).toBe("email_change");
+        expect(result.data.email_data.old_email).toBe("oldemail@example.com");
+        expect(result.data.email_data.token_new).toBe("new_token");
       }
     });
 
-    it("invite タイプのペイロードを処理する", () => {
+    it("invite タイプのペイロードを検証する", () => {
       const payload = {
-        data: {
+        email_data: {
           email_action_type: "invite",
+          factor_type: "",
+          old_email: "",
+          old_phone: "",
+          provider: "",
+          redirect_to: "https://example.com",
+          site_url: "https://example.com",
           token: "invite_token",
           token_hash: "invite_hash",
+          token_hash_new: "",
+          token_new: "",
         },
-        type: "user.invite",
+        user: {
+          app_metadata: {},
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
+          email: "user@example.com",
+          id: "user-id",
+          identities: [],
+          is_anonymous: false,
+          phone: "",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {},
+        },
       };
 
-      const result = normalizeAuthHookPayload(payload);
+      const result = AuthHookPayloadSchema.safeParse(payload);
 
-      expect(result).toBeDefined();
-      if (result) {
-        expect(result.email.invite_token).toBe("invite_token");
-        expect(result.email.invite_token_hash).toBe("invite_hash");
+      expect(result.success).toBe(true);
+      if (result.success && result.data.email_data) {
+        expect(result.data.email_data.email_action_type).toBe("invite");
+        expect(result.data.email_data.token).toBe("invite_token");
       }
     });
 
-    it("site_url を正規化する", () => {
+    it("カスタムmetadataフィールドを受け入れる", () => {
       const payload = {
-        data: {
+        email_data: {
           email_action_type: "signup",
-          site_url: "http://localhost:3000/path/to/page?query=value",
+          factor_type: "",
+          old_email: "",
+          old_phone: "",
+          provider: "",
+          redirect_to: "https://example.com",
+          site_url: "https://example.com",
           token: "token",
           token_hash: "hash",
+          token_hash_new: "",
+          token_new: "",
         },
-        type: "user.confirmation",
+        user: {
+          app_metadata: {
+            language: "ja",
+            provider: "email",
+          },
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
+          email: "user@example.com",
+          id: "user-id",
+          identities: [],
+          is_anonymous: false,
+          phone: "",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {
+            email: "user@example.com",
+            language: "ja",
+          },
+        },
       };
 
-      const result = normalizeAuthHookPayload(payload);
+      const result = AuthHookPayloadSchema.safeParse(payload);
 
-      expect(result).toBeDefined();
-      if (result) {
-        // サイト URL は origin に正規化されます
-        expect(result.siteUrlOverride).toBe("http://localhost:3000");
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.user?.app_metadata?.language).toBe("ja");
+        expect(result.data.user?.user_metadata?.language).toBe("ja");
       }
+    });
+
+    it("空のペイロードを受け入れる（すべてoptional）", () => {
+      const payload = {};
+
+      const result = AuthHookPayloadSchema.safeParse(payload);
+
+      expect(result.success).toBe(true);
     });
   });
 });

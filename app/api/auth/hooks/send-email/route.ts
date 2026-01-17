@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { normalizeAuthHookPayload } from "@/lib/schemas/auth-hook";
+import { AuthHookPayloadSchema } from "@/lib/schemas/auth-hook";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import {
   handleEmailAction,
@@ -60,40 +60,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Zodを使用してペイロードを正規化
-    const normalized = normalizeAuthHookPayload(payload);
+    // Zodを使用してペイロードを検証
+    const result = AuthHookPayloadSchema.safeParse(payload);
 
-    if (!normalized) {
+    if (!result.success) {
       return NextResponse.json(
         { error: "Invalid payload structure" },
         { status: 400 }
       );
     }
 
-    const { email, user, siteUrlOverride } = normalized;
+    const { email_data, user } = result.data;
 
-    if (!(email && user?.email)) {
+    if (!(email_data && user?.email)) {
       return NextResponse.json(
-        { error: "Invalid payload: missing email or user" },
+        { error: "Invalid payload: missing email_data or user" },
         { status: 400 }
       );
     }
 
-    const { email_action_type } = email;
+    const { email_action_type, redirect_to } = email_data;
     const userEmail = user.email;
     const language =
       user.app_metadata?.language || user.user_metadata?.language;
     const locale = language === "ja" ? "ja" : "en";
-    // 既定は getAbsoluteUrl() に委譲し、オーバーライドがあれば優先
-    const siteUrl = siteUrlOverride || getAbsoluteUrl();
+    // redirect_to はフロント計算済みの完全パスをそのまま使い、なければローカルの /auth/callback を使う
+    const redirectTo = redirect_to ?? getAbsoluteUrl("/auth/callback");
 
     // メールハンドラーにルーティング
     const emailSent = await handleEmailAction(
-      email_action_type,
-      email,
+      email_action_type || "",
+      email_data,
       userEmail,
       locale,
-      siteUrl
+      redirectTo
     );
 
     // 不明なアクションタイプを処理
@@ -110,6 +110,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    console.error("[Auth Hook] Error:", error);
     return NextResponse.json(
       {
         error: "Failed to send email",
