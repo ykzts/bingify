@@ -28,6 +28,7 @@ export function AnnouncementBanner() {
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [canDismiss, setCanDismiss] = useState(false);
 
   useEffect(() => {
     const loadAnnouncement = async () => {
@@ -55,6 +56,12 @@ export function AnnouncementBanner() {
             ? dismissedResult.value.data || []
             : []
         );
+
+        // ユーザーが認証されているかどうかを判定（getDismissedAnnouncementsが成功した場合のみ）
+        const userCanDismiss =
+          dismissedResult.status === "fulfilled" &&
+          dismissedResult.value.success;
+        setCanDismiss(userCanDismiss);
 
         // 非表示済みを除外し、最高優先度のお知らせを取得
         // getActiveAnnouncements は既に優先度順にソート済み
@@ -141,7 +148,7 @@ export function AnnouncementBanner() {
             <ChevronRight className="size-4" />
           </Link>
         </AlertDescription>
-        {announcement.dismissible && (
+        {announcement.dismissible && canDismiss && (
           <Button
             aria-label="お知らせを閉じる"
             className="absolute top-2 right-2 h-6 w-6 rounded-sm opacity-70 transition-opacity hover:opacity-100"
