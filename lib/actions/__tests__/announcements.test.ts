@@ -71,6 +71,7 @@ describe("getAnnouncementById", () => {
       dismissible: true,
       ends_at: null,
       id: "ann-1",
+      parent_id: null,
       priority: "info",
       published: true,
       starts_at: null,
@@ -150,6 +151,58 @@ describe("getAnnouncementById", () => {
 
     expect(result.success).toBe(false);
     expect(result.error).toBe("お知らせが見つかりません");
+  });
+
+  it("翻訳版（parent_id != null）の場合は404エラーを返す", async () => {
+    const mockTranslationAnnouncement = {
+      content: "Test content",
+      created_at: "2024-01-01T00:00:00Z",
+      dismissible: true,
+      ends_at: null,
+      id: "child-456",
+      locale: "en",
+      parent_id: "parent-123",
+      priority: "info",
+      published: true,
+      starts_at: null,
+      title: "Test Announcement",
+    };
+
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: null },
+      error: new Error("Not authenticated"),
+    });
+
+    const mockSingleChain = {
+      single: vi.fn().mockResolvedValue({
+        data: mockTranslationAnnouncement,
+        error: null,
+      }),
+    };
+
+    const mockOrChain = {
+      or: vi.fn().mockReturnValue(mockSingleChain),
+    };
+
+    const mockEqChain2 = {
+      eq: vi.fn().mockReturnValue(mockOrChain),
+    };
+
+    const mockEqChain1 = {
+      eq: vi.fn().mockReturnValue(mockEqChain2),
+    };
+
+    const mockQuery = {
+      select: vi.fn().mockReturnValue(mockEqChain1),
+    };
+
+    mockSupabase.from.mockReturnValue(mockQuery);
+
+    const result = await getAnnouncementById("child-456", "ja");
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe("お知らせが見つかりません");
+    expect(result.data).toBeUndefined();
   });
 });
 
