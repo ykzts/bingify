@@ -11,7 +11,7 @@ import {
 import { AlertCircle, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect, useEffectEvent } from "react";
+import { useActionState, useEffect, useEffectEvent, useRef } from "react";
 import { toast } from "sonner";
 import { FieldErrors } from "@/components/field-errors";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -61,6 +61,9 @@ export function EmailChangeForm({ currentEmail }: EmailChangeFormProps) {
   );
   const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
+  // Track if we've already handled the current success state to prevent infinite loops
+  const lastSuccessStateRef = useRef<typeof state>(null);
+
   // Use useEffectEvent to handle success without including functions in deps
   const handleSuccess = useEffectEvent(() => {
     toast.success(t("confirmationEmailSent"));
@@ -73,7 +76,9 @@ export function EmailChangeForm({ currentEmail }: EmailChangeFormProps) {
     const meta = (state as Record<string, unknown>)?.meta as
       | { success?: boolean }
       | undefined;
-    if (meta?.success) {
+    // Only handle success if we haven't already handled this state
+    if (meta?.success && state !== lastSuccessStateRef.current) {
+      lastSuccessStateRef.current = state;
       handleSuccess();
     }
   }, [state]);
