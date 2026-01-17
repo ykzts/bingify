@@ -28,7 +28,7 @@ export async function EmailChangedNotificationEmail({
       <Preview>{t("subject")}</Preview>
       <Body style={bodyStyle}>
         <EmailContainer>
-          <EmailHeader title="Email Change Confirmed" />
+          <EmailHeader title={t("subject")} />
 
           <Section style={contentStyle}>
             <Text style={greetingStyle}>{t("greeting")}</Text>
@@ -42,9 +42,12 @@ export async function EmailChangedNotificationEmail({
 
             <InfoBox>
               <Text style={infoTitleStyle}>{t("accountSecurityLabel")}</Text>
-              <Text style={listItemStyle}>• {t("checklistItem1")}</Text>
-              <Text style={listItemStyle}>• {t("checklistItem2")}</Text>
-              <Text style={listItemStyle}>• {t("checklistItem3")}</Text>
+              <Text style={listItemStyle}>• {t("checklistItem1")}
+              </Text>
+              <Text style={listItemStyle}>• {t("checklistItem2")}
+              </Text>
+              <Text style={listItemStyle}>• {t("checklistItem3")}
+              </Text>
             </InfoBox>
           </Section>
 
