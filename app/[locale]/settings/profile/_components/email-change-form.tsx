@@ -62,7 +62,7 @@ export function EmailChangeForm({ currentEmail }: EmailChangeFormProps) {
   const canSubmit = useStore(form.store, (formState) => formState.canSubmit);
 
   // Track if we've already handled the current success state to prevent infinite loops
-  const lastSuccessStateRef = useRef<unknown>(null);
+  const lastSuccessStateRef = useRef<typeof state>(null);
 
   // Use useEffectEvent to handle success without including functions in deps
   const handleSuccess = useEffectEvent(() => {
