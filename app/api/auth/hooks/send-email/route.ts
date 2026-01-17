@@ -84,9 +84,8 @@ export async function POST(request: NextRequest) {
     const language =
       user.app_metadata?.language || user.user_metadata?.language;
     const locale = language === "ja" ? "ja" : "en";
-    // redirect_to (フロントで計算済みの完全パス) を優先して使用
-    // 無い場合はフォールバックとして /auth/callback を現在ホストで生成
-    const redirectTo = redirect_to || getAbsoluteUrl("/auth/callback");
+    // redirect_to はフロント計算済みの完全パスをそのまま使い、なければローカルの /auth/callback を使う
+    const redirectTo = redirect_to ?? getAbsoluteUrl("/auth/callback");
 
     // メールハンドラーにルーティング
     const emailSent = await handleEmailAction(

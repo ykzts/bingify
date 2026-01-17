@@ -72,7 +72,9 @@ export function buildVerifyUrl(params: {
     return `${supabaseUrl}/auth/v1/verify?type=${params.type}&token=${encodedVerificationToken}&redirect_to=${redirectTo}`;
   }
 
-  return getAbsoluteUrl(`/auth/callback?token=${encodedVerificationToken}`);
+  return getAbsoluteUrl(
+    `/auth/callback?token=${encodedVerificationToken}&redirect=${redirectTo}`
+  );
 }
 
 /**

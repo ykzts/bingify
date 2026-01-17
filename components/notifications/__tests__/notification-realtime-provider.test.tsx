@@ -6,14 +6,11 @@ import { NotificationRealtimeProvider } from "../notification-realtime-provider"
 
 // Supabase clientのモック
 const mockUnsubscribe = vi.fn();
-const mockOn = vi.fn(
-  // biome-ignore lint/suspicious/noExplicitAny: テスト用のモック
-  (_event?: any, _config?: any, _callback?: any) => ({
-    subscribe: vi.fn(() => ({
-      unsubscribe: mockUnsubscribe,
-    })),
-  })
-);
+const mockOn = vi.fn((_event?: any, _config?: any, _callback?: any) => ({
+  subscribe: vi.fn(() => ({
+    unsubscribe: mockUnsubscribe,
+  })),
+}));
 const mockChannel = vi.fn(() => ({
   on: mockOn,
 }));
@@ -122,17 +119,14 @@ describe("NotificationRealtimeProvider", () => {
 
     // モックの設定: コールバック関数を取得して実行
     let callback: (() => void) | undefined;
-    mockOn.mockImplementation(
-      // biome-ignore lint/suspicious/noExplicitAny: テスト用のモック
-      (_event: any, _config: any, cb: any) => {
-        callback = cb;
-        return {
-          subscribe: vi.fn(() => ({
-            unsubscribe: mockUnsubscribe,
-          })),
-        };
-      }
-    );
+    mockOn.mockImplementation((_event: any, _config: any, cb: any) => {
+      callback = cb;
+      return {
+        subscribe: vi.fn(() => ({
+          unsubscribe: mockUnsubscribe,
+        })),
+      };
+    });
 
     render(
       <NotificationRealtimeProvider userId="user-123">
@@ -157,17 +151,14 @@ describe("NotificationRealtimeProvider", () => {
 
     // モックの設定: コールバック関数を取得して実行
     let callback: (() => void) | undefined;
-    mockOn.mockImplementation(
-      // biome-ignore lint/suspicious/noExplicitAny: テスト用のモック
-      (_event: any, _config: any, cb: any) => {
-        callback = cb;
-        return {
-          subscribe: vi.fn(() => ({
-            unsubscribe: mockUnsubscribe,
-          })),
-        };
-      }
-    );
+    mockOn.mockImplementation((_event: any, _config: any, cb: any) => {
+      callback = cb;
+      return {
+        subscribe: vi.fn(() => ({
+          unsubscribe: mockUnsubscribe,
+        })),
+      };
+    });
 
     render(
       <NotificationRealtimeProvider userId="user-123">
@@ -192,17 +183,14 @@ describe("NotificationRealtimeProvider", () => {
 
     // モックの設定: コールバック関数を取得して実行
     let callback: (() => void) | undefined;
-    mockOn.mockImplementation(
-      // biome-ignore lint/suspicious/noExplicitAny: テスト用のモック
-      (_event: any, _config: any, cb: any) => {
-        callback = cb;
-        return {
-          subscribe: vi.fn(() => ({
-            unsubscribe: mockUnsubscribe,
-          })),
-        };
-      }
-    );
+    mockOn.mockImplementation((_event: any, _config: any, cb: any) => {
+      callback = cb;
+      return {
+        subscribe: vi.fn(() => ({
+          unsubscribe: mockUnsubscribe,
+        })),
+      };
+    });
 
     render(
       <NotificationRealtimeProvider userId="user-123">
