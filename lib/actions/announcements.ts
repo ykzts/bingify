@@ -120,15 +120,15 @@ export async function getAnnouncementById(
       // 親IDを特定（現在のお知らせが親の場合はそのID、翻訳版の場合は親のID）
       const parentId = announcement.parent_id || announcement.id;
 
-      // 指定されたロケールの翻訳版を検索
+      // 指定されたロケールの翻訳版または親お知らせを検索
       const { data: translation } = await supabase
         .from("announcements")
         .select("*")
-        .eq("parent_id", parentId)
         .eq("locale", locale)
         .eq("published", true)
         .or(`starts_at.is.null,starts_at.lte.${now}`)
         .or(`ends_at.is.null,ends_at.gt.${now}`)
+        .or(`parent_id.eq.${parentId},and(id.eq.${parentId},parent_id.is.null)`)
         .single();
 
       // 翻訳版が見つかった場合はそれを返す
