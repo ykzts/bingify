@@ -1,10 +1,35 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { AuthHookPayloadSchema } from "@/lib/schemas/auth-hook";
+import { createClient } from "@/lib/supabase/server";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import {
   handleEmailAction,
   verifyWebhookSignature,
 } from "./_lib/email-handler";
+
+/**
+ * Get the email hook secret from database or environment variable
+ * Priority: Database (Vault) > Environment Variable
+ */
+async function getEmailHookSecret(): Promise<string | null> {
+  try {
+    // Try to get secret from database first
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("get_auth_hook_secret");
+
+    if (!error && data?.success && data.data?.secret) {
+      return data.data.secret;
+    }
+  } catch (error) {
+    // Fall through to environment variable
+    console.error("[Auth Hook] Failed to fetch secret from database:", error);
+  }
+
+  // Fallback to environment variable (supports both old and new naming)
+  return (
+    process.env.SEND_EMAIL_HOOK_SECRET || process.env.SEND_EMAIL_HOOK_SECRETS
+  );
+}
 
 /**
  * Supabaseの認証フックでメール送信リクエストを処理
@@ -18,7 +43,7 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get("webhook-signature");
     const timestamp = request.headers.get("webhook-timestamp");
     const id = request.headers.get("webhook-id");
-    const secret = process.env.SEND_EMAIL_HOOK_SECRETS;
+    const secret = await getEmailHookSecret();
 
     // 必須ヘッダーとシークレットが存在するか検証
     if (!(signature && timestamp && id && secret)) {
