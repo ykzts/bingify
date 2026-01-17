@@ -46,7 +46,9 @@ export async function getAllAnnouncements(
   page = 1,
   perPage = 50
 ): Promise<{
-  announcements?: Tables<"announcements">[];
+  announcements?: (Tables<"announcements"> & {
+    translations?: { locale: string }[];
+  })[];
   error?: string;
   hasMore?: boolean;
 }> {
@@ -62,22 +64,63 @@ export async function getAllAnnouncements(
     const from = (page - 1) * perPage;
     const to = from + perPage;
 
-    const { data, error } = await adminClient
+    // First, get parent announcements (parent_id IS NULL)
+    const { data: parentAnnouncements, error: parentError } = await adminClient
       .from("announcements")
       .select("*", { count: "exact" })
+      .is("parent_id", null)
       .order("created_at", { ascending: false })
       .range(from, to - 1);
 
-    if (error) {
-      console.error("Failed to fetch announcements:", error);
+    if (parentError) {
+      console.error("Failed to fetch announcements:", parentError);
       return {
         error: "errorGeneric",
       };
     }
 
+    if (!parentAnnouncements || parentAnnouncements.length === 0) {
+      return {
+        announcements: [],
+        hasMore: false,
+      };
+    }
+
+    // Get all parent IDs
+    const parentIds = parentAnnouncements.map((a) => a.id);
+
+    // Fetch translations for all parent announcements
+    const { data: translations } = await adminClient
+      .from("announcements")
+      .select("parent_id, locale")
+      .in("parent_id", parentIds);
+
+    // Group translations by parent_id
+    const translationsByParent = new Map<string, { locale: string }[]>();
+    if (translations) {
+      for (const translation of translations) {
+        if (translation.parent_id) {
+          if (!translationsByParent.has(translation.parent_id)) {
+            translationsByParent.set(translation.parent_id, []);
+          }
+          translationsByParent
+            .get(translation.parent_id)
+            ?.push({ locale: translation.locale });
+        }
+      }
+    }
+
+    // Combine parent announcements with their translations
+    const announcementsWithTranslations = parentAnnouncements.map(
+      (announcement) => ({
+        ...announcement,
+        translations: translationsByParent.get(announcement.id) || [],
+      })
+    );
+
     return {
-      announcements: data || [],
-      hasMore: (data?.length || 0) === perPage,
+      announcements: announcementsWithTranslations,
+      hasMore: parentAnnouncements.length === perPage,
     };
   } catch (error) {
     console.error("Error in getAllAnnouncements:", error);
