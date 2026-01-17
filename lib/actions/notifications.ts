@@ -232,7 +232,7 @@ export async function markNotificationRead(
 
     // キャッシュ再検証
     revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/dashboard", "page");
+    revalidatePath("/[locale]/notifications", "page");
 
     return {
       success: true,
@@ -287,7 +287,7 @@ export async function markAllNotificationsRead(): Promise<NotificationActionResu
 
     // キャッシュ再検証
     revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/dashboard", "page");
+    revalidatePath("/[locale]/notifications", "page");
 
     return {
       success: true,
@@ -366,7 +366,7 @@ export async function deleteNotification(
 
     // キャッシュ再検証
     revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/dashboard", "page");
+    revalidatePath("/[locale]/notifications", "page");
 
     return {
       success: true,

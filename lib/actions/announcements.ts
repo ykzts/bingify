@@ -368,7 +368,7 @@ export async function createAnnouncement(
 
     // キャッシュ再検証
     revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/dashboard", "page");
+    revalidatePath("/[locale]/admin/announcements", "page");
 
     return {
       success: true,
@@ -455,7 +455,7 @@ export async function updateAnnouncement(
 
     // キャッシュ再検証
     revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/dashboard", "page");
+    revalidatePath("/[locale]/admin/announcements", "page");
     revalidatePath(`/[locale]/announcements/${id}`, "page");
 
     return {
@@ -522,7 +522,7 @@ export async function deleteAnnouncement(
 
     // キャッシュ再検証
     revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/dashboard", "page");
+    revalidatePath("/[locale]/admin/announcements", "page");
     revalidatePath(`/[locale]/announcements/${id}`, "page");
 
     return {
@@ -606,7 +606,6 @@ export async function dismissAnnouncement(
 
     // キャッシュ再検証
     revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/dashboard", "page");
 
     return {
       success: true,
