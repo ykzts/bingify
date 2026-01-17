@@ -1,14 +1,19 @@
 import type Mail from "nodemailer/lib/mailer";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+export interface AdminEmailInfo {
+  address: string | Mail.Address;
+  locale: string;
+}
+
 export interface GetAdminEmailsResult {
-  data?: Array<string | Mail.Address>;
+  data?: AdminEmailInfo[];
   error?: string;
 }
 
 /**
- * profiles テーブルから role = 'admin' のユーザーのメールアドレスを取得
- * @returns 管理者のメールアドレス配列、またはエラー
+ * profiles テーブルから role = 'admin' のユーザーのメールアドレスとロケール情報を取得
+ * @returns 管理者のメールアドレスとロケールの配列、またはエラー
  */
 export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
   try {
@@ -16,7 +21,7 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
 
     const { data, error } = await adminClient
       .from("profiles")
-      .select("email, full_name")
+      .select("email, full_name, locale")
       .eq("role", "admin");
 
     if (error) {
@@ -26,21 +31,28 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
       };
     }
 
-    // メールアドレスが null でないものだけを抽出し、Address オブジェクトまたは文字列に変換
+    // メールアドレスが null でないものだけを抽出し、AdminEmailInfo 型に変換
     const emails = data
       .filter(
-        (profile): profile is { email: string; full_name: string | null } =>
-          profile.email !== null
+        (
+          profile
+        ): profile is {
+          email: string;
+          full_name: string | null;
+          locale: string | null;
+        } => profile.email !== null
       )
-      .map((profile): string | Mail.Address => {
-        if (profile.full_name) {
-          return {
-            address: profile.email,
-            name: profile.full_name,
-          };
-        }
-        return profile.email;
-      });
+      .map(
+        (profile): AdminEmailInfo => ({
+          address: profile.full_name
+            ? {
+                address: profile.email,
+                name: profile.full_name,
+              }
+            : profile.email,
+          locale: profile.locale || "ja", // デフォルトは日本語
+        })
+      );
 
     if (emails.length === 0) {
       console.error("No admin users found with valid email addresses");

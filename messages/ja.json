@@ -573,6 +573,14 @@
       "title": "Bingifyへようこそ",
       "welcomeText": "Bingifyへのご登録ありがとうございます。以下のボタンをクリックして、メールアドレスを確認してください。"
     },
+    "contactForm": {
+      "emailLabel": "メールアドレス:",
+      "messageLabel": "本文:",
+      "nameLabel": "名前:",
+      "preview": "{name}様からお問い合わせがありました",
+      "subject": "【お問い合わせ】{name}様より",
+      "title": "お問い合わせ"
+    },
     "emailChange": {
       "buttonText": "メールアドレス変更を確認",
       "greeting": "こんにちは、",
