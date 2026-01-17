@@ -90,16 +90,12 @@ describe("getAnnouncementById", () => {
       }),
     };
 
-    const mockOrChain2 = {
+    const mockOrChain = {
       or: vi.fn().mockReturnValue(mockSingleChain),
     };
 
-    const mockOrChain1 = {
-      or: vi.fn().mockReturnValue(mockOrChain2),
-    };
-
     const mockEqChain2 = {
-      eq: vi.fn().mockReturnValue(mockOrChain1),
+      eq: vi.fn().mockReturnValue(mockOrChain),
     };
 
     const mockEqChain1 = {
@@ -132,16 +128,12 @@ describe("getAnnouncementById", () => {
       }),
     };
 
-    const mockOrChain2 = {
+    const mockOrChain = {
       or: vi.fn().mockReturnValue(mockSingleChain),
     };
 
-    const mockOrChain1 = {
-      or: vi.fn().mockReturnValue(mockOrChain2),
-    };
-
     const mockEqChain2 = {
-      eq: vi.fn().mockReturnValue(mockOrChain1),
+      eq: vi.fn().mockReturnValue(mockOrChain),
     };
 
     const mockEqChain1 = {
@@ -187,19 +179,15 @@ describe("getActiveAnnouncements", () => {
       error: new Error("Not authenticated"),
     });
 
-    const mockOrChain2 = {
+    const mockOrChain = {
       or: vi.fn().mockResolvedValue({
         data: mockAnnouncements,
         error: null,
       }),
     };
 
-    const mockOrChain1 = {
-      or: vi.fn().mockReturnValue(mockOrChain2),
-    };
-
     const mockQuery = {
-      eq: vi.fn().mockReturnValue(mockOrChain1),
+      eq: vi.fn().mockReturnValue(mockOrChain),
       select: vi.fn().mockReturnThis(),
     };
 
@@ -254,19 +242,15 @@ describe("getActiveAnnouncements", () => {
       error: new Error("Not authenticated"),
     });
 
-    const mockOrChain2 = {
+    const mockOrChain = {
       or: vi.fn().mockResolvedValue({
         data: mockAnnouncements,
         error: null,
       }),
     };
 
-    const mockOrChain1 = {
-      or: vi.fn().mockReturnValue(mockOrChain2),
-    };
-
     const mockQuery = {
-      eq: vi.fn().mockReturnValue(mockOrChain1),
+      eq: vi.fn().mockReturnValue(mockOrChain),
       select: vi.fn().mockReturnThis(),
     };
 
@@ -325,19 +309,15 @@ describe("getActiveAnnouncements", () => {
       error: new Error("Not authenticated"),
     });
 
-    const mockOrChain2 = {
+    const mockOrChain = {
       or: vi.fn().mockResolvedValue({
         data: mockAnnouncements,
         error: null,
       }),
     };
 
-    const mockOrChain1 = {
-      or: vi.fn().mockReturnValue(mockOrChain2),
-    };
-
     const mockQuery = {
-      eq: vi.fn().mockReturnValue(mockOrChain1),
+      eq: vi.fn().mockReturnValue(mockOrChain),
       select: vi.fn().mockReturnThis(),
     };
 

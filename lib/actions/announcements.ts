@@ -122,15 +122,15 @@ export async function getAnnouncementById(
       const parentId = announcement.parent_id || announcement.id;
 
       // 指定されたロケールの翻訳版または親お知らせを検索
+      // 日付条件(4パターン) × parent_id条件(2パターン) = 8つの組み合わせ
       const { data: translation } = await supabase
         .from("announcements")
         .select("*")
         .eq("locale", locale)
         .eq("published", true)
         .or(
-          `and(starts_at.is.null,ends_at.is.null),and(starts_at.is.null,ends_at.gt.${now}),and(starts_at.lte.${now},ends_at.is.null),and(starts_at.lte.${now},ends_at.gt.${now})`
+          `and(starts_at.is.null,ends_at.is.null,parent_id.eq.${parentId}),and(starts_at.is.null,ends_at.is.null,id.eq.${parentId},parent_id.is.null),and(starts_at.is.null,ends_at.gt.${now},parent_id.eq.${parentId}),and(starts_at.is.null,ends_at.gt.${now},id.eq.${parentId},parent_id.is.null),and(starts_at.lte.${now},ends_at.is.null,parent_id.eq.${parentId}),and(starts_at.lte.${now},ends_at.is.null,id.eq.${parentId},parent_id.is.null),and(starts_at.lte.${now},ends_at.gt.${now},parent_id.eq.${parentId}),and(starts_at.lte.${now},ends_at.gt.${now},id.eq.${parentId},parent_id.is.null)`
         )
-        .or(`parent_id.eq.${parentId},and(id.eq.${parentId},parent_id.is.null)`)
         .single();
 
       // 翻訳版が見つかった場合はそれを返す
