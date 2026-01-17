@@ -39,11 +39,10 @@ const UserSchema = z
     updated_at: z.string(),
     user_metadata: z.record(z.string(), z.unknown()),
   })
-  .partial()
   .loose();
 
 // Supabase EmailData
-// 参考: https://github.com/supabase/auth/blob/v2.185.0/internal/mailer/mailer.go#L22-L33
+// 参考: https://github.com/supabase/auth/blob/v2.185.0/internal/mailer/mailer.go
 // すべてのフィールドは常に存在し、不使用時は空文字列で送信される
 const EMAIL_ACTION_TYPES = [
   "signup",
@@ -76,16 +75,13 @@ const EmailDataSchema = z
     token_hash_new: z.string(),
     token_new: z.string(),
   })
-  .partial()
   .loose();
 
 // Auth Hook Webhook ペイロード
-export const AuthHookPayloadSchema = z
-  .object({
-    email_data: EmailDataSchema.optional(),
-    user: UserSchema.optional(),
-  })
-  .partial();
+export const AuthHookPayloadSchema = z.object({
+  email_data: EmailDataSchema.optional(),
+  user: UserSchema.optional(),
+});
 
 export type AuthHookPayload = z.infer<typeof AuthHookPayloadSchema>;
 export type EmailData = z.infer<typeof EmailDataSchema>;

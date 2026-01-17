@@ -19,14 +19,17 @@ describe("Auth Hook Payload", () => {
           token_new: "",
         },
         user: {
+          app_metadata: {},
           aud: "authenticated",
           created_at: "2024-01-01T00:00:00Z",
           email: "user@example.com",
           id: "user-id",
+          identities: [],
           is_anonymous: false,
           phone: "+1234567890",
           role: "authenticated",
           updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {},
         },
       };
 
@@ -55,7 +58,17 @@ describe("Auth Hook Payload", () => {
           token_new: "",
         },
         user: {
+          app_metadata: {},
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
           email: "user@example.com",
+          id: "user-id",
+          identities: [],
+          is_anonymous: false,
+          phone: "",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {},
         },
       };
 
@@ -84,7 +97,17 @@ describe("Auth Hook Payload", () => {
           token_new: "new_token",
         },
         user: {
+          app_metadata: {},
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
           email: "user@example.com",
+          id: "user-id",
+          identities: [],
+          is_anonymous: false,
+          phone: "",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {},
         },
       };
 
@@ -114,7 +137,17 @@ describe("Auth Hook Payload", () => {
           token_new: "",
         },
         user: {
+          app_metadata: {},
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
           email: "user@example.com",
+          id: "user-id",
+          identities: [],
+          is_anonymous: false,
+          phone: "",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {},
         },
       };
 
@@ -147,7 +180,15 @@ describe("Auth Hook Payload", () => {
             language: "ja",
             provider: "email",
           },
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
           email: "user@example.com",
+          id: "user-id",
+          identities: [],
+          is_anonymous: false,
+          phone: "",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
           user_metadata: {
             email: "user@example.com",
             language: "ja",

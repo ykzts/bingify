@@ -19,14 +19,17 @@ describe("Auth Hook Schema", () => {
           token_new: "newtoken12345678901234567890",
         },
         user: {
+          app_metadata: {},
           aud: "authenticated",
           created_at: "2024-01-01T00:00:00Z",
           email: "user@example.com",
           id: "user-id",
+          identities: [],
           is_anonymous: false,
           phone: "+1234567890",
           role: "authenticated",
           updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {},
         },
       };
 
@@ -117,7 +120,17 @@ describe("Auth Hook Schema", () => {
           token_new: "",
         },
         user: {
+          app_metadata: {},
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
           email: "user@example.com",
+          id: "user-id",
+          identities: [],
+          is_anonymous: false,
+          phone: "",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {},
         },
       };
 
@@ -150,7 +163,16 @@ describe("Auth Hook Schema", () => {
             language: "ja",
             provider: "email",
           },
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
           email: "user@example.com",
+          id: "user-id",
+          identities: [],
+          is_anonymous: false,
+          phone: "",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {},
         },
       };
 
@@ -178,7 +200,16 @@ describe("Auth Hook Schema", () => {
           token_new: "",
         },
         user: {
+          app_metadata: {},
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
           email: "user@example.com",
+          id: "user-id",
+          identities: [],
+          is_anonymous: false,
+          phone: "",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
           user_metadata: {
             email: "user@example.com",
             language: "en",
@@ -218,6 +249,9 @@ describe("Auth Hook Schema", () => {
           token_new: "",
         },
         user: {
+          app_metadata: {},
+          aud: "authenticated",
+          created_at: "2024-01-01T00:00:00Z",
           email: "user@example.com",
           id: "user-id",
           identities: [
@@ -237,6 +271,11 @@ describe("Auth Hook Schema", () => {
               user_id: "user-id",
             },
           ],
+          is_anonymous: false,
+          phone: "",
+          role: "authenticated",
+          updated_at: "2024-01-01T00:00:00Z",
+          user_metadata: {},
         },
       };
 
