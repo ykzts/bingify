@@ -53,10 +53,18 @@ describe("announcementContentSchema", () => {
     expect(announcementContentSchema.parse("テストコンテンツ")).toBe(
       "テストコンテンツ"
     );
-    expect(announcementContentSchema.parse("")).toBe("");
+    expect(announcementContentSchema.parse("a")).toBe("a");
     expect(announcementContentSchema.parse("a".repeat(5000))).toBe(
       "a".repeat(5000)
     );
+  });
+
+  it("空のコンテンツを拒否する", () => {
+    const result = announcementContentSchema.safeParse("");
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toContain("1文字以上");
+    }
   });
 
   it("5000文字を超えるコンテンツを拒否する", () => {
