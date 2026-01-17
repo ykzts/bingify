@@ -33,24 +33,32 @@ export function AnnouncementBanner() {
     const loadAnnouncement = async () => {
       setIsLoading(true);
       try {
-        // アクティブなお知らせを取得
-        const activeResult = await getActiveAnnouncements();
+        // アクティブなお知らせと非表示済みお知らせを並行取得
+        const [activeResult, dismissedResult] = await Promise.allSettled([
+          getActiveAnnouncements(),
+          getDismissedAnnouncements(),
+        ]);
 
         // エラーハンドリング
-        if (!(activeResult.success && activeResult.data)) {
+        if (
+          activeResult.status === "rejected" ||
+          !(activeResult.value.success && activeResult.value.data)
+        ) {
           setIsLoading(false);
           return;
         }
 
-        // 非表示済みお知らせを取得（認証ユーザーのみ）
-        const dismissedResult = await getDismissedAnnouncements();
+        // 非表示済みお知らせIDのセット（認証ユーザーのみ）
         const dismissedIds = new Set(
-          dismissedResult.success ? dismissedResult.data || [] : []
+          dismissedResult.status === "fulfilled" &&
+            dismissedResult.value.success
+            ? dismissedResult.value.data || []
+            : []
         );
 
         // 非表示済みを除外し、最高優先度のお知らせを取得
         // getActiveAnnouncements は既に優先度順にソート済み
-        const visibleAnnouncement = activeResult.data.find(
+        const visibleAnnouncement = activeResult.value.data.find(
           (a) => !dismissedIds.has(a.id)
         );
 
