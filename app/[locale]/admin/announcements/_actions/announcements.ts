@@ -415,8 +415,8 @@ async function updateOrCreateLanguageAnnouncement(
 ): Promise<string | null> {
   const t = await getTranslations("Admin");
 
+  // Update the current announcement if it's the parent for this locale
   if (currentAnnouncement.locale === locale && !currentAnnouncement.parent_id) {
-    // Update the current announcement as it's the parent for this locale
     const { error } = await adminClient
       .from("announcements")
       .update({
@@ -431,6 +431,31 @@ async function updateOrCreateLanguageAnnouncement(
       return t("errorUpdateFailed");
     }
     return null;
+  }
+
+  // If editing a translation, check if we need to update the parent directly
+  if (currentAnnouncement.parent_id) {
+    const { data: parent, error: parentError } = await adminClient
+      .from("announcements")
+      .select("id, locale")
+      .eq("id", parentId)
+      .single();
+
+    if (!parentError && parent && parent.locale === locale) {
+      const { error } = await adminClient
+        .from("announcements")
+        .update({
+          ...commonData,
+          ...languageData,
+        })
+        .eq("id", parent.id);
+
+      if (error) {
+        console.error(`Failed to update ${locale} parent:`, error);
+        return t("errorUpdateFailed");
+      }
+      return null;
+    }
   }
 
   // Find or create translation for this locale
@@ -457,6 +482,7 @@ async function updateOrCreateLanguageAnnouncement(
     return null;
   }
 
+  // Create new translation
   const { error } = await adminClient.from("announcements").insert({
     ...commonData,
     ...languageData,
