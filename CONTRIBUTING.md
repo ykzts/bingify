@@ -94,6 +94,60 @@ optional detailed explanation
 ### コミット前のチェック
 
 - 小さな粒度でコミット（1つの機能や修正 = 1コミット）。
-- `pnpm lint` を実行してエラーがないことを確認。
-- `pnpm format:check` でフォーマット違反がないことを確認。
+- `pnpm check` を実行してリント・フォーマットエラーがないことを確認。
+- `pnpm type-check` で型チェックエラーがないことを確認。
+- `pnpm test` でテストが通ることを確認。
 - 必要に応じて動作確認スクリーンショットを PR に記載。
+
+## サンプルドメインの使用
+
+コード例やドキュメント内でサンプルURLやメールアドレスを使用する際は、**RFC 2606** で定義された予約済みドメイン名を使用してください。
+
+**使用すべきドメイン:**
+
+- `example.com`
+- `example.org`
+- `example.net`
+
+**適用箇所:**
+
+- コード例（テスト、ドキュメント内のコードブロック）
+- メールアドレスの例示
+- URLの例示
+- API リクエスト/レスポンスの例
+
+**例:**
+
+```typescript
+// ✅ 正しい
+const email = "user@example.com";
+const url = "https://example.com/callback";
+
+// ❌ 誤り
+const email = "user@mysite.com";
+const url = "https://mycompany.com/callback";
+```
+
+## ドキュメント
+
+### 記載すべきドキュメント
+
+- `README.md` - プロジェクト概要とセットアップ手順
+- `docs/STYLE_GUIDE.md` - 日本語・英語の表記統一ルール
+- `docs/GLOSSARY.md` - プロジェクト固有の用語定義
+- `docs/MIGRATIONS.md` - データベースマイグレーション運用ガイド
+- `.github/skills/*/SKILL.md` - タスク別の詳細ガイド
+
+### 記載すべきでないドキュメント
+
+- **実装ログ**: コードが真実の情報源（Single Source of Truth）
+- **未実装機能**: ドキュメント・コード乖離を生む
+- **API リファレンスの重複**: 公式ドキュメントへリンクで十分
+- **一時的な手順書**: README か `.env.example` で対応
+
+### メンテナンス原則
+
+1. **コード・ドキュメント同期**: 機能追加時にドキュメントも同じ PR で更新
+2. **Single Source of Truth**: 同じ情報を複数箇所に記載しない
+3. **定期的な見直し**: 四半期ごとにドキュメント妥当性を確認
+4. **簡潔さ**: 必要最小限の情報のみ記載

@@ -18,9 +18,13 @@ BingifyはSupabaseをバックエンドデータベースとして使用しま�
 
 ### Supabaseの起動
 
+ローカル開発環境の完全なセットアップ：
+
 ```bash
 pnpm local:setup
 ```
+
+詳細は [development スキル](../development/SKILL.md) を参照してください。
 
 ### Supabase Studioへのアクセス
 
@@ -86,15 +90,7 @@ supabase seed run
 
 シードスクリプト: `supabase/seed.sql`
 
-## ドキュメントのフォーマット
-
-SKILL.mdを編集した場合は、以下でフォーマットしてください：
-
-```bash
-pnpm format:docs
-```
-
 ## 参考
 
 - [docs/MIGRATIONS.md](../../../docs/MIGRATIONS.md) - マイグレーション運用ガイド
-- [supabase-setup を参照](../../../docs/MIGRATIONS.md)
+- [development スキル](../development/SKILL.md) - セットアップ全体の流れ

@@ -12,13 +12,13 @@ metadata:
 
 ## 概要
 
-Bingifyはnextintlを使用して、英語 (en) と日本語 (ja) をサポートしています。
+Bingifyはnext-intlを使用して、英語 (en) と日本語 (ja) をサポートしています。
 
 ## ロケール別ルート
 
 ```text
-/en/                # 英語版ホーム
-/en/dashboard       # 英語版ダッシュボード
+/                   # 英語版ホーム
+/dashboard          # 英語版ダッシュボード
 /ja/                # 日本語版ホーム
 /ja/dashboard       # 日本語版ダッシュボード
 ```
@@ -79,16 +79,8 @@ export function LanguageSwitcher() {
 }
 ```
 
-## ドキュメントのフォーマット
-
-SKILL.mdを編集した場合は、以下でフォーマットしてください：
-
-```bash
-pnpm format:docs
-```
-
 ## 参考
 
-- [next-intl公式ドキュメント](https://next-intl-docs.vercel.app/)
+- [next-intl公式ドキュメント](https://next-intl.dev/)
 - [STYLE_GUIDE.md](../../../docs/STYLE_GUIDE.md)
 - [GLOSSARY.md](../../../docs/GLOSSARY.md)

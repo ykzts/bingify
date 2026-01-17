@@ -68,11 +68,11 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 ### 1.4 Guest (ゲスト)
 
 - **定義**: 閲覧のみ可能な、認証不要でアクセス可能なユーザー
-- **権限範囲**: スペースの閲覧のみ (`view_token` を使用した `/screen/[token]` ルート)
+- **権限範囲**: スペースの閲覧のみ（表示専用画面）
 - **英語**: Guest
 - **日本語**: ゲスト
-- **コード上の命名**: Public access via `view_token`
-- **備考**: `/screen/[token]` ルートのみ認証不要でアクセス可能 (表示専用画面)
+- **実装**: 閲覧トークンにより認証なしアクセスを提供
+- **備考**: ストリーミング配信などで利用される表示専用画面
 
 ---
 
@@ -142,19 +142,26 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 ### 2.6 View Token (閲覧トークン)
 
-- **定義**: 特定のスペースを閲覧するための一時的なトークン (将来実装予定)
+- **定義**: 特定のスペースを認証なしで閲覧するための認証トークン
 - **英語**: View Token
 - **日本語**: 閲覧トークン
-- **コード上の命名**: 未実装
-- **用途**: 限定公開スペースへのアクセス制御
+- **実装状況**: 実装済み（`spaces.view_token`）
+- **形式**: 高エントロピーの安全なトークン（256-bit）
+- **用途**: 表示専用画面、限定公開スペースへのアクセス
+- **再生成**: スペース所有者により随時再生成可能
 
 ### 2.7 Gatekeeper (ゲートキーパー)
 
-- **定義**: アクセス制御を行う機能 (将来実装予定)
+- **定義**: スペース参加時のアクセス制御機能
 - **英語**: Gatekeeper
 - **日本語**: ゲートキーパー
-- **コード上の命名**: 未実装
-- **用途**: 参加者の制限、パスワード保護など
+- **実装タイプ**:
+  - `none`: 制限なし
+  - `email`: メールアドレスまたはドメインによる許可リスト（例: `user@example.com`, `@example.com`, `example.com`）
+  - `social`: ソーシャルプラットフォーム連携
+    - YouTube: 購読者（subscriber）またはメンバー（member）
+    - Twitch: フォロワー（follower）または購読者（subscriber）
+- **管理**: スペース所有者のみ設定・変更可能（管理者は変更不可）
 
 ---
 
@@ -172,21 +179,21 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 ### 3.2 Magic Link (マジックリンク)
 
-- **定義**: パスワードなしでログインできる、メールで送信される一時的なリンク (将来実装予定)
+- **定義**: パスワードなしでログインできる、メールで送信される一時的なリンク
 - **英語**: Magic Link
 - **日本語**: マジックリンク
-- **コード上の命名**: 未実装
-- **関連技術**: Supabase Auth
+- **有効期限**: 1時間
+- **関連技術**: Supabase Auth（OTPベースのパスワードレス認証）
+- **開発環境テスト**: メール受信環境で確認可能
 
 ### 3.3 Identity Linking (アイデンティティ連携)
 
 - **定義**: 複数の認証プロバイダー (Google, Twitch など) を同一ユーザーに紐付ける機能
 - **英語**: Identity Linking
 - **日本語**: アイデンティティ連携
-- **コード上の命名**:
-- ファイルパス: `app/[locale]/settings/account/_components/account-linking-form.tsx`
-- サーバーアクション: `unlinkIdentity` in `app/[locale]/settings/account/actions.ts`
-- Supabase 関数: `supabase.auth.linkIdentity ()`, `supabase.auth.unlinkIdentity ()`
+- **実装場所**: ユーザー設定の接続管理ページ
+- **対応プロバイダー**: Google, Twitch
+- **制限**: 最低1つのプロバイダーを保持する必要がある（全削除不可）
 - **関連技術**: Supabase Auth
 
 ### 3.4 Server Functions / Server Actions
@@ -273,17 +280,23 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **主キー**: `id` (UUID)
 - **フィールド**:
 - `share_key` (TEXT, UNIQUE): 共有キー
-- `settings` (JSONB): スペース設定
+- `owner_id` (UUID): スペース所有者
 - `status` (TEXT): ステータス
-- `draft`: 準備中 (非公開)
-- `active`: 進行中 (公開)
-- `closed`: 終了 (閲覧のみ)- 手動終了と自動終了 (48時間経過) の両方を含む
+  - `draft`: 準備中（非公開・未公開）
+  - `active`: 進行中（公開）
+  - `closed`: 終了（閲覧のみ）- 手動終了と自動終了の両方を含む
+- `view_token` (TEXT, UNIQUE): 認証不要アクセス用トークン
+- `gatekeeper_rules` (JSONB): アクセス制御ルール（メール・YouTube・Twitch）
+- `settings` (JSONB): スペース設定
+- `title`, `description`: スペースメタデータ
 - `created_at`, `updated_at` (TIMESTAMP)
 
-**備考**:
+**ライフサイクル**:
 
-- `closed` スペースは一定期間 (デフォルト168時間 = 7日、システム設定画面の `archive_retention_hours` で設定可能) 経過後、自動的に削除され `spaces_archive` テーブルに移動します
-- `spaces_archive` テーブル内のレコードは一定期間 (デフォルト2160時間 = 90日、システム設定画面の `spaces_archive_retention_hours` で設定可能) 後にさらに削除されます
+1. アクティブ期間: `active` ステータスで運用
+2. 自動終了: 作成から一定期間後に `closed` に自動変更（管理画面の設定で期間変更可）
+3. アーカイブ移動: `closed` スペースは一定期間（デフォルト168時間 = 7日）経過後に `spaces_archive` に移動
+4. 完全削除: `spaces_archive` のレコードは一定期間（デフォルト2160時間 = 90日）経過後に完全削除（いずれも管理者設定で変更可能）
 
 ### 5.2 bingo_cardsテーブル
 
