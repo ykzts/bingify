@@ -618,7 +618,7 @@
     "passwordChangedNotification": {
       "greeting": "こんにちは、",
       "passwordSecurityLabel": "パスワードセキュリティのコツ",
-      "securityTip1": "強力なパスワードを使用（8文字以上、大文字と小文字、数字、記号を含める）",
+      "securityTip1": "強力なパスワードを使用(8文字以上、大文字と小文字、数字、記号を含める)",
       "securityTip2": "パスワードを誰とも共有しない",
       "securityTip3": "セキュリティを強化するために二要素認証を有効にする",
       "subject": "パスワードが変更されました",
