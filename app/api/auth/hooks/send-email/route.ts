@@ -87,6 +87,12 @@ export async function POST(request: NextRequest) {
     // redirect_to はフロント計算済みの完全パスをそのまま使い、なければローカルの /auth/callback を使う
     const redirectTo = redirect_to ?? getAbsoluteUrl("/auth/callback");
 
+    // email_change イベント時、旧メールアドレスを email_data に追加
+    // handleEmailChange で2段階確認（旧メール宛通知 + 新メール宛確認リンク）を処理する
+    if (email_action_type === "email_change" && !email_data.old_email) {
+      email_data.old_email = user.email;
+    }
+
     // メールハンドラーにルーティング
     const emailSent = await handleEmailAction(
       email_action_type || "",

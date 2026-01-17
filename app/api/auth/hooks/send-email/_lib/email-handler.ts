@@ -65,21 +65,28 @@ export function buildVerifyUrl(params: {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const verificationToken = params.tokenHash || params.token || "";
   const encodedVerificationToken = encodeURIComponent(verificationToken);
-  const redirectTo = encodeURIComponent(params.redirectTo);
+  const encodedRedirectTo = encodeURIComponent(params.redirectTo);
 
   if (supabaseUrl) {
     // Supabase /auth/v1/verify は token_hash を期待します
-    return `${supabaseUrl}/auth/v1/verify?type=${params.type}&token=${encodedVerificationToken}&redirect_to=${redirectTo}`;
+    return `${supabaseUrl}/auth/v1/verify?type=${params.type}&token=${encodedVerificationToken}&redirect_to=${encodedRedirectTo}`;
   }
 
   return getAbsoluteUrl(
-    `/auth/callback?token=${encodedVerificationToken}&redirect=${redirectTo}`
+    `/auth/callback?token=${encodedVerificationToken}&redirect=${encodedRedirectTo}`
   );
 }
 
 /**
  * メールアドレス変更確認メールを送信
- * 新旧両方のメールアドレスに確認メールを送信する（double_confirm_changes 有効時）
+ * Supabase double_confirm_changes: 旧メールと新メール両方の確認が必須
+ *
+ * Flow:
+ * 1. 新メール宛：確認リンク付き確認メール (token_new + token_hash_new)
+ *    ユーザーが新メールを確認してアクティベーション
+ * 2. 旧メール宛：確認リンク付き確認メール (token + token_hash)
+ *    ユーザーが変更を許可することを確認
+ *    メッセージ: "email_change_pending" → 2つ目の確認が必要なことを通知
  */
 async function handleEmailChange(
   emailData: EmailData,
@@ -87,7 +94,8 @@ async function handleEmailChange(
   locale: string,
   redirectTo: string
 ): Promise<void> {
-  // token_new + token_hash_new → 新メールアドレス用
+  // 新メールアドレス宛：確認リンク付き確認メール (token_new)
+  // 新メール確認時は message パラメータなし (確認完了時のメッセージは別途表示)
   const newToken = emailData.token_new || "";
   const newConfirmationUrl = buildVerifyUrl({
     redirectTo,
@@ -109,9 +117,10 @@ async function handleEmailChange(
     }),
   });
 
-  // token + token_hash → 旧メールアドレス用（古いAPI互換性）
-  if (emailData.old_email && emailData.token && emailData.token_hash) {
-    const oldToken = emailData.token;
+  // 旧メールアドレス宛：確認リンク付き確認メール (token)
+  // double_confirm_changes: 旧メールでも確認が必須
+  if (emailData.old_email && (emailData.token_hash || emailData.token)) {
+    const oldToken = emailData.token || "";
     const oldConfirmationUrl = buildVerifyUrl({
       redirectTo,
       token: emailData.token,
