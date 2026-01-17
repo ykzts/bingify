@@ -33,11 +33,8 @@ export function AnnouncementBanner() {
     const loadAnnouncement = async () => {
       setIsLoading(true);
       try {
-        // アクティブなお知らせと非表示済みお知らせを並行取得
-        const [activeResult, dismissedResult] = await Promise.all([
-          getActiveAnnouncements(),
-          getDismissedAnnouncements(),
-        ]);
+        // アクティブなお知らせを取得
+        const activeResult = await getActiveAnnouncements();
 
         // エラーハンドリング
         if (!(activeResult.success && activeResult.data)) {
@@ -45,8 +42,11 @@ export function AnnouncementBanner() {
           return;
         }
 
-        // 非表示済みお知らせIDのセット
-        const dismissedIds = new Set(dismissedResult.data || []);
+        // 非表示済みお知らせを取得（認証ユーザーのみ）
+        const dismissedResult = await getDismissedAnnouncements();
+        const dismissedIds = new Set(
+          dismissedResult.success ? dismissedResult.data || [] : []
+        );
 
         // 非表示済みを除外し、最高優先度のお知らせを取得
         // getActiveAnnouncements は既に優先度順にソート済み

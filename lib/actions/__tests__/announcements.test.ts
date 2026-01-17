@@ -5,6 +5,7 @@ import {
   dismissAnnouncement,
   getActiveAnnouncements,
   getAllAnnouncements,
+  getAnnouncementById,
   getDismissedAnnouncements,
   updateAnnouncement,
 } from "../announcements";
@@ -58,25 +59,160 @@ function createSequentialFromMock(...mocks: unknown[]) {
   };
 }
 
-describe("getActiveAnnouncements", () => {
+describe("getAnnouncementById", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("認証されていない場合はエラーを返す", async () => {
+  it("未認証ユーザーでもお知らせを取得できる", async () => {
+    const mockAnnouncement = {
+      content: "情報お知らせ",
+      created_at: "2024-01-01T00:00:00Z",
+      dismissible: true,
+      ends_at: null,
+      id: "ann-1",
+      priority: "info",
+      published: true,
+      starts_at: null,
+      title: "お知らせ1",
+    };
+
+    // 未認証状態をモック
     mockSupabase.auth.getUser.mockResolvedValue({
       data: { user: null },
       error: new Error("Not authenticated"),
     });
 
-    const result = await getActiveAnnouncements();
+    const mockSingleChain = {
+      single: vi.fn().mockResolvedValue({
+        data: mockAnnouncement,
+        error: null,
+      }),
+    };
+
+    const mockOrChain2 = {
+      or: vi.fn().mockReturnValue(mockSingleChain),
+    };
+
+    const mockOrChain1 = {
+      or: vi.fn().mockReturnValue(mockOrChain2),
+    };
+
+    const mockEqChain2 = {
+      eq: vi.fn().mockReturnValue(mockOrChain1),
+    };
+
+    const mockEqChain1 = {
+      eq: vi.fn().mockReturnValue(mockEqChain2),
+    };
+
+    const mockQuery = {
+      select: vi.fn().mockReturnValue(mockEqChain1),
+    };
+
+    mockSupabase.from.mockReturnValue(mockQuery);
+
+    const result = await getAnnouncementById("ann-1");
+
+    expect(result.success).toBe(true);
+    expect(result.data).toBeDefined();
+    expect(result.data?.id).toBe("ann-1");
+  });
+
+  it("お知らせが見つからない場合はエラーを返す", async () => {
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: null },
+      error: new Error("Not authenticated"),
+    });
+
+    const mockSingleChain = {
+      single: vi.fn().mockResolvedValue({
+        data: null,
+        error: { code: "PGRST116", message: "Not found" },
+      }),
+    };
+
+    const mockOrChain2 = {
+      or: vi.fn().mockReturnValue(mockSingleChain),
+    };
+
+    const mockOrChain1 = {
+      or: vi.fn().mockReturnValue(mockOrChain2),
+    };
+
+    const mockEqChain2 = {
+      eq: vi.fn().mockReturnValue(mockOrChain1),
+    };
+
+    const mockEqChain1 = {
+      eq: vi.fn().mockReturnValue(mockEqChain2),
+    };
+
+    const mockQuery = {
+      select: vi.fn().mockReturnValue(mockEqChain1),
+    };
+
+    mockSupabase.from.mockReturnValue(mockQuery);
+
+    const result = await getAnnouncementById("non-existent-id");
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe("認証が必要です");
+    expect(result.error).toBe("お知らせが見つかりません");
+  });
+});
+
+describe("getActiveAnnouncements", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("未認証ユーザーでもお知らせを取得できる", async () => {
+    const mockAnnouncements = [
+      {
+        content: "情報お知らせ",
+        created_at: "2024-01-01T00:00:00Z",
+        dismissible: true,
+        ends_at: null,
+        id: "ann-1",
+        priority: "info",
+        published: true,
+        starts_at: null,
+        title: "お知らせ1",
+      },
+    ];
+
+    // 未認証状態をモック
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: null },
+      error: new Error("Not authenticated"),
+    });
+
+    const mockOrChain2 = {
+      or: vi.fn().mockResolvedValue({
+        data: mockAnnouncements,
+        error: null,
+      }),
+    };
+
+    const mockOrChain1 = {
+      or: vi.fn().mockReturnValue(mockOrChain2),
+    };
+
+    const mockQuery = {
+      eq: vi.fn().mockReturnValue(mockOrChain1),
+      select: vi.fn().mockReturnThis(),
+    };
+
+    mockSupabase.from.mockReturnValue(mockQuery);
+
+    const result = await getActiveAnnouncements();
+
+    expect(result.success).toBe(true);
+    expect(result.data).toBeDefined();
+    expect(result.data?.length).toBe(1);
   });
 
   it("公開中で日付範囲内のお知らせを優先度順で取得できる", async () => {
-    const mockUser = { id: "user-123" };
     const mockAnnouncements = [
       {
         content: "情報お知らせ",
@@ -114,8 +250,8 @@ describe("getActiveAnnouncements", () => {
     ];
 
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
+      data: { user: null },
+      error: new Error("Not authenticated"),
     });
 
     const mockOrChain2 = {
@@ -148,7 +284,6 @@ describe("getActiveAnnouncements", () => {
   });
 
   it("同じ優先度の場合は作成日時降順でソートされる", async () => {
-    const mockUser = { id: "user-123" };
     const mockAnnouncements = [
       {
         content: "お知らせ1",
@@ -186,8 +321,8 @@ describe("getActiveAnnouncements", () => {
     ];
 
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
+      data: { user: null },
+      error: new Error("Not authenticated"),
     });
 
     const mockOrChain2 = {
