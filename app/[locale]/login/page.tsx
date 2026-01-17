@@ -11,7 +11,7 @@ export const runtime = "edge";
 
 interface LoginPageProps {
   params: { locale: string };
-  searchParams: Promise<Record<string, string>>;
+  searchParams?: Record<string, string | string[] | undefined>;
 }
 
 export default async function LoginPage({
@@ -24,8 +24,8 @@ export default async function LoginPage({
   // edge runtime では cookies から直接読み取れないためサーバー側で判定
   // cf. https://nextjs.org/docs/app/api-reference/functions/redirect#edge-runtime
   if (process.env.__AUTH_REDIRECT__) {
-    const query = await searchParams;
-    const redirectParam = query?.redirect;
+    const query = searchParams ?? {};
+    const redirectParam = query.redirect;
     const redirectPath =
       typeof redirectParam === "string"
         ? validateRedirectPath(redirectParam, `/${locale}`)
