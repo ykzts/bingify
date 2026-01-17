@@ -83,6 +83,7 @@ export function AnnouncementList({
 
     if (result.error) {
       toast.error(result.error);
+      setEditingTranslation(null);
     } else if (result.translation) {
       setEditingTranslation(result.translation);
     } else {

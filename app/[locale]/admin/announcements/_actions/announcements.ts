@@ -415,15 +415,8 @@ async function updateOrCreateLanguageAnnouncement(
 ): Promise<string | null> {
   const t = await getTranslations("Admin");
 
-  console.log(`updateOrCreateLanguageAnnouncement (${locale}):`, {
-    currentAnnouncement,
-    languageData,
-    parentId,
-  });
-
   if (currentAnnouncement.locale === locale && !currentAnnouncement.parent_id) {
     // Update the current announcement as it's the parent for this locale
-    console.log(`Updating ${locale} parent:`, currentAnnouncement.id);
     const { error } = await adminClient
       .from("announcements")
       .update({
@@ -448,10 +441,7 @@ async function updateOrCreateLanguageAnnouncement(
     .eq("locale", locale)
     .maybeSingle();
 
-  console.log(`Found existing ${locale} translation:`, existingTranslation);
-
   if (existingTranslation) {
-    console.log(`Updating ${locale} translation:`, existingTranslation.id);
     const { error } = await adminClient
       .from("announcements")
       .update({
@@ -467,7 +457,6 @@ async function updateOrCreateLanguageAnnouncement(
     return null;
   }
 
-  console.log(`Creating new ${locale} translation`);
   const { error } = await adminClient.from("announcements").insert({
     ...commonData,
     ...languageData,
@@ -546,8 +535,6 @@ function extractLanguageData(formData: FormData): LanguageData {
       }
     }
   }
-
-  console.log("extractLanguageData:", languages);
 
   return languages;
 }
