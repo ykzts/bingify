@@ -78,7 +78,7 @@ function getFormDefaultValues(
       content: isJapanese ? announcement.content : translation?.content || "",
       title: isJapanese ? announcement.title : translation?.title || "",
     },
-    priority: announcement.priority,
+    priority: announcement.priority as "error" | "info" | "warning",
     published: announcement.published,
     starts_at: announcement.starts_at
       ? new Date(announcement.starts_at).toISOString().slice(0, 16)

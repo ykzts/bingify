@@ -4,6 +4,7 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
+import { getTranslations } from "next-intl/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
@@ -416,7 +417,8 @@ async function updateOrCreateJapaneseAnnouncement(
   currentAnnouncement: { id: string; locale: string; parent_id: string | null },
   parentId: string,
   commonData: CommonAnnouncementData,
-  jaData: AnnouncementData
+  jaData: AnnouncementData,
+  t: Awaited<ReturnType<typeof getTranslations>>
 ): Promise<string | null> {
   if (currentAnnouncement.locale === "ja" && !currentAnnouncement.parent_id) {
     // Update the current announcement as it's the Japanese parent
@@ -429,7 +431,7 @@ async function updateOrCreateJapaneseAnnouncement(
       })
       .eq("id", currentAnnouncement.id);
 
-    return error ? "errorUpdateJapaneseFailed" : null;
+    return error ? t("errorUpdateJapaneseFailed") : null;
   }
 
   // Find or create Japanese translation
@@ -449,7 +451,7 @@ async function updateOrCreateJapaneseAnnouncement(
       })
       .eq("id", existingJa.id);
 
-    return error ? "errorUpdateJapaneseTranslationFailed" : null;
+    return error ? t("errorUpdateJapaneseTranslationFailed") : null;
   }
 
   const { error } = await adminClient.from("announcements").insert({
@@ -460,7 +462,7 @@ async function updateOrCreateJapaneseAnnouncement(
     parent_id: parentId,
   });
 
-  return error ? "errorCreateJapaneseTranslationFailed" : null;
+  return error ? t("errorCreateJapaneseTranslationFailed") : null;
 }
 
 async function updateOrCreateEnglishAnnouncement(
@@ -469,7 +471,8 @@ async function updateOrCreateEnglishAnnouncement(
   currentAnnouncement: { id: string; locale: string; parent_id: string | null },
   parentId: string,
   commonData: CommonAnnouncementData,
-  enData: AnnouncementData
+  enData: AnnouncementData,
+  t: Awaited<ReturnType<typeof getTranslations>>
 ): Promise<string | null> {
   if (currentAnnouncement.locale === "en" && !currentAnnouncement.parent_id) {
     // Update the current announcement as it's the English parent
@@ -482,7 +485,7 @@ async function updateOrCreateEnglishAnnouncement(
       })
       .eq("id", currentAnnouncement.id);
 
-    return error ? "errorUpdateEnglishFailed" : null;
+    return error ? t("errorUpdateEnglishFailed") : null;
   }
 
   // Find or create English translation
@@ -502,7 +505,7 @@ async function updateOrCreateEnglishAnnouncement(
       })
       .eq("id", existingEn.id);
 
-    return error ? "errorUpdateEnglishTranslationFailed" : null;
+    return error ? t("errorUpdateEnglishTranslationFailed") : null;
   }
 
   const { error } = await adminClient.from("announcements").insert({
@@ -513,7 +516,7 @@ async function updateOrCreateEnglishAnnouncement(
     parent_id: parentId,
   });
 
-  return error ? "errorCreateEnglishTranslationFailed" : null;
+  return error ? t("errorCreateEnglishTranslationFailed") : null;
 }
 
 function extractCommonData(formData: FormData): CommonAnnouncementData {
@@ -552,7 +555,8 @@ async function processAnnouncementUpdates(
   currentAnnouncement: { id: string; locale: string; parent_id: string | null },
   commonData: CommonAnnouncementData,
   jaData: AnnouncementData | null,
-  enData: AnnouncementData | null
+  enData: AnnouncementData | null,
+  t: Awaited<ReturnType<typeof getTranslations>>
 ): Promise<string[]> {
   const warnings: string[] = [];
   const parentId = currentAnnouncement.parent_id || currentAnnouncement.id;
@@ -565,7 +569,8 @@ async function processAnnouncementUpdates(
       currentAnnouncement,
       parentId,
       commonData,
-      jaData
+      jaData,
+      t
     );
     if (warning) {
       console.error(warning);
@@ -581,7 +586,8 @@ async function processAnnouncementUpdates(
       currentAnnouncement,
       parentId,
       commonData,
-      enData
+      enData,
+      t
     );
     if (warning) {
       console.error(warning);
@@ -617,6 +623,7 @@ export async function updateAnnouncementAction(
   try {
     await updateAnnouncementValidate(formData);
 
+    const t = await getTranslations("Admin");
     const adminClient = createAdminClient();
 
     // Get the current announcement to check if it's a parent or translation
@@ -656,7 +663,8 @@ export async function updateAnnouncementAction(
       currentAnnouncement,
       commonData,
       jaData,
-      enData
+      enData,
+      t
     );
 
     return {
