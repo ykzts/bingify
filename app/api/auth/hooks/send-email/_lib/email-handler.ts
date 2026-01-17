@@ -8,7 +8,7 @@ import { MagicLinkEmail } from "@/emails/auth/magic-link-email";
 import { PasswordChangedNotificationEmail } from "@/emails/auth/password-changed-notification-email";
 import { RecoveryEmail } from "@/emails/auth/recovery-email";
 import { sendAuthEmail } from "@/lib/mail";
-import type { NormalizedEmail } from "@/lib/schemas/auth-hook";
+import type { EmailData } from "@/lib/schemas/auth-hook";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 
 // ウェブフックシークレットを分割するための正規表現（例：「v1,whsec_xxx」→ 「v1」、「whsec_xxx」）
@@ -52,47 +52,120 @@ function resolveSecret(secret: string): string {
 }
 
 /**
- * Supabaseの認証アクションタイプに基づいて適切なメールを送信
+ * 認証確認URLを構築
+ * Supabase認証では token_hash が検証用の主キーです
+ * token は表示用のOTPコード (6桁など) として使用されます
  */
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 認証アクションの種類ごとに分岐が必要なため
+export function buildVerifyUrl(params: {
+  token?: string;
+  tokenHash?: string;
+  type: string;
+  siteUrl: string;
+}): string {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const verificationToken = params.tokenHash || params.token || "";
+  const encodedVerificationToken = encodeURIComponent(verificationToken);
+  const redirectTo = encodeURIComponent(`${params.siteUrl}/auth/callback`);
+
+  if (supabaseUrl) {
+    // Supabase /auth/v1/verify は token_hash を期待します
+    return `${supabaseUrl}/auth/v1/verify?type=${params.type}&token=${encodedVerificationToken}&redirect_to=${redirectTo}`;
+  }
+
+  return getAbsoluteUrl(`/auth/callback?token=${encodedVerificationToken}`);
+}
+
+/**
+ * メールアドレス変更確認メールを送信
+ * 新旧両方のメールアドレスに確認メールを送信する（double_confirm_changes 有効時）
+ */
+async function handleEmailChange(
+  emailData: EmailData,
+  userEmail: string,
+  locale: string,
+  siteUrl: string
+): Promise<void> {
+  // token_new + token_hash_new → 新メールアドレス用
+  const newToken = emailData.token_new || "";
+  const newConfirmationUrl = buildVerifyUrl({
+    siteUrl,
+    token: emailData.token_new,
+    tokenHash: emailData.token_hash_new,
+    type: "email_change",
+  });
+
+  await sendAuthEmail({
+    recipient: userEmail,
+    subject:
+      locale === "ja"
+        ? "メールアドレス変更の確認"
+        : "Confirm Your Email Change",
+    template: React.createElement(EmailChangeEmail, {
+      confirmationUrl: newConfirmationUrl,
+      locale,
+      token: newToken,
+    }),
+  });
+
+  // token + token_hash → 旧メールアドレス用（古いAPI互換性）
+  if (emailData.old_email && emailData.token && emailData.token_hash) {
+    const oldToken = emailData.token;
+    const oldConfirmationUrl = buildVerifyUrl({
+      siteUrl,
+      token: emailData.token,
+      tokenHash: emailData.token_hash,
+      type: "email_change",
+    });
+
+    await sendAuthEmail({
+      recipient: emailData.old_email,
+      subject:
+        locale === "ja"
+          ? "メールアドレス変更の確認"
+          : "Confirm Your Email Change",
+      template: React.createElement(EmailChangeEmail, {
+        confirmationUrl: oldConfirmationUrl,
+        locale,
+        token: oldToken,
+      }),
+    });
+  }
+}
+
+/**
+ * Supabaseの認証アクションタイプに基づいて適切なメールを送信
+ *
+ * Supabase Authから送信される email_data は以下の構造です:
+ * {
+ *   "token": "OTPコード (6桁)",
+ *   "token_hash": "トークンハッシュ (検証用)",
+ *   "token_new": "新トークン (email_change の場合)",
+ *   "token_hash_new": "新トークンハッシュ (email_change の場合)",
+ *   "redirect_to": "クライアントリダイレクトURL",
+ *   "site_url": "サイトURL",
+ *   "email_action_type": "signup" | "magiclink" | "recovery" | "email_change" | "invite",
+ *   "old_email": "変更前のメールアドレス",
+ *   "old_phone": "変更前の電話番号",
+ *   "provider": "認証プロバイダー",
+ *   "factor_type": "MFAファクタータイプ"
+ * }
+ *
+ * 参考: https://github.com/supabase/auth/blob/v2.185.0/internal/mailer/mailer.go
+ */
 export async function handleEmailAction(
   emailActionType: string,
-  email: NormalizedEmail,
+  emailData: EmailData,
   userEmail: string,
   locale: string,
   siteUrl: string
 ): Promise<boolean> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
-  const buildVerifyUrl = (params: {
-    token?: string;
-    tokenHash?: string;
-    type: string;
-  }) => {
-    // Magic Linkによるメール確認では、Supabaseは token_hash（長いハッシュ値）が必須
-    // confirmation_token（OTPコード）ではなく、ハッシュ値がデータベースに保存されています。
-    // 参考: https://supabase.com/docs/guides/auth/auth-magic-link (PKCE フロー)
-    const verificationToken = params.tokenHash || params.token || "";
-    const encodedVerificationToken = encodeURIComponent(verificationToken);
-    const redirectTo = encodeURIComponent(siteUrl);
-
-    if (supabaseUrl) {
-      // Magic Link フローでのメール確認には token_hash パラメータを使用
-      // 注意: パラメータ名は「token」ですが、Supabase /auth/v1/verify はハッシュ値を期待します
-      const url = `${supabaseUrl}/auth/v1/verify?type=${params.type}&token=${encodedVerificationToken}&redirect_to=${redirectTo}`;
-      return url;
-    }
-
-    // アプリルートへのフォールバック（ルートがない場合は404かもしれませんが、空のリンクを避けます）
-    return getAbsoluteUrl(`/auth/confirm?token=${encodedVerificationToken}`);
-  };
-
   switch (emailActionType) {
-    case "confirmation": {
-      const token = email.confirmation_token || email.confirmation_hash || "";
+    case "signup": {
+      const token = emailData.token || "";
       const confirmationUrl = buildVerifyUrl({
-        token: email.confirmation_token,
-        tokenHash: email.confirmation_hash,
+        siteUrl,
+        token: emailData.token,
+        tokenHash: emailData.token_hash,
         type: "signup",
       });
 
@@ -110,10 +183,11 @@ export async function handleEmailAction(
     }
 
     case "invite": {
-      const token = email.invite_token || email.invite_token_hash || "";
+      const token = emailData.token || "";
       const confirmationUrl = buildVerifyUrl({
-        token: email.invite_token,
-        tokenHash: email.invite_token_hash,
+        siteUrl,
+        token: emailData.token,
+        tokenHash: emailData.token_hash,
         type: "invite",
       });
 
@@ -131,10 +205,11 @@ export async function handleEmailAction(
     }
 
     case "recovery": {
-      const token = email.recovery_token || email.recovery_token_hash || "";
+      const token = emailData.token || "";
       const confirmationUrl = buildVerifyUrl({
-        token: email.recovery_token,
-        tokenHash: email.recovery_token_hash,
+        siteUrl,
+        token: emailData.token,
+        tokenHash: emailData.token_hash,
         type: "recovery",
       });
 
@@ -152,10 +227,11 @@ export async function handleEmailAction(
     }
 
     case "magiclink": {
-      const token = email.recovery_token || email.recovery_token_hash || "";
+      const token = emailData.token || "";
       const confirmationUrl = buildVerifyUrl({
-        token: email.recovery_token,
-        tokenHash: email.recovery_token_hash,
+        siteUrl,
+        token: emailData.token,
+        tokenHash: emailData.token_hash,
         type: "magiclink",
       });
 
@@ -172,63 +248,7 @@ export async function handleEmailAction(
     }
 
     case "email_change": {
-      // Supabase の double_confirm_changes = true の場合、
-      // 新旧両方のメールアドレスに確認メールを送信する必要がある。
-      // トークンマッピング（後方互換性のため命名が逆転している）:
-      // - token_new + token_hash → 新メールアドレス用
-      // - token + token_hash_new → 旧メールアドレス用
-
-      const oldEmail = email.change_email_old_new;
-
-      // 新メールアドレスへの確認メール送信
-      // メールテンプレートの OTP 表示用にトークンを取得（通常は6桁の数字）
-      const newToken = email.change_email_new_token_new || "";
-      const newConfirmationUrl = buildVerifyUrl({
-        token: email.change_email_new_token_new,
-        tokenHash: email.change_email_new_token_new_hash,
-        type: "email_change",
-      });
-
-      await sendAuthEmail({
-        recipient: userEmail,
-        subject:
-          locale === "ja"
-            ? "メールアドレス変更の確認"
-            : "Confirm Your Email Change",
-        template: React.createElement(EmailChangeEmail, {
-          confirmationUrl: newConfirmationUrl,
-          locale,
-          token: newToken,
-        }),
-      });
-
-      // 旧メールアドレスへの確認メール送信（double_confirm_changes 有効時）
-      if (
-        oldEmail &&
-        email.change_email_old_token &&
-        email.change_email_old_token_hash
-      ) {
-        const oldToken = email.change_email_old_token;
-        const oldConfirmationUrl = buildVerifyUrl({
-          token: email.change_email_old_token,
-          tokenHash: email.change_email_old_token_hash,
-          type: "email_change",
-        });
-
-        await sendAuthEmail({
-          recipient: oldEmail,
-          subject:
-            locale === "ja"
-              ? "メールアドレス変更の確認"
-              : "Confirm Your Email Change",
-          template: React.createElement(EmailChangeEmail, {
-            confirmationUrl: oldConfirmationUrl,
-            locale,
-            token: oldToken,
-          }),
-        });
-      }
-
+      await handleEmailChange(emailData, userEmail, locale, siteUrl);
       return true;
     }
 
