@@ -417,9 +417,10 @@ async function updateOrCreateJapaneseAnnouncement(
   currentAnnouncement: { id: string; locale: string; parent_id: string | null },
   parentId: string,
   commonData: CommonAnnouncementData,
-  jaData: AnnouncementData,
-  t: Awaited<ReturnType<typeof getTranslations>>
+  jaData: AnnouncementData
 ): Promise<string | null> {
+  const t = await getTranslations("Admin");
+
   if (currentAnnouncement.locale === "ja" && !currentAnnouncement.parent_id) {
     // Update the current announcement as it's the Japanese parent
     const { error } = await adminClient
@@ -471,9 +472,10 @@ async function updateOrCreateEnglishAnnouncement(
   currentAnnouncement: { id: string; locale: string; parent_id: string | null },
   parentId: string,
   commonData: CommonAnnouncementData,
-  enData: AnnouncementData,
-  t: Awaited<ReturnType<typeof getTranslations>>
+  enData: AnnouncementData
 ): Promise<string | null> {
+  const t = await getTranslations("Admin");
+
   if (currentAnnouncement.locale === "en" && !currentAnnouncement.parent_id) {
     // Update the current announcement as it's the English parent
     const { error } = await adminClient
@@ -555,8 +557,7 @@ async function processAnnouncementUpdates(
   currentAnnouncement: { id: string; locale: string; parent_id: string | null },
   commonData: CommonAnnouncementData,
   jaData: AnnouncementData | null,
-  enData: AnnouncementData | null,
-  t: Awaited<ReturnType<typeof getTranslations>>
+  enData: AnnouncementData | null
 ): Promise<string[]> {
   const warnings: string[] = [];
   const parentId = currentAnnouncement.parent_id || currentAnnouncement.id;
@@ -569,8 +570,7 @@ async function processAnnouncementUpdates(
       currentAnnouncement,
       parentId,
       commonData,
-      jaData,
-      t
+      jaData
     );
     if (warning) {
       console.error(warning);
@@ -586,8 +586,7 @@ async function processAnnouncementUpdates(
       currentAnnouncement,
       parentId,
       commonData,
-      enData,
-      t
+      enData
     );
     if (warning) {
       console.error(warning);
@@ -623,7 +622,6 @@ export async function updateAnnouncementAction(
   try {
     await updateAnnouncementValidate(formData);
 
-    const t = await getTranslations("Admin");
     const adminClient = createAdminClient();
 
     // Get the current announcement to check if it's a parent or translation
@@ -663,8 +661,7 @@ export async function updateAnnouncementAction(
       currentAnnouncement,
       commonData,
       jaData,
-      enData,
-      t
+      enData
     );
 
     return {
