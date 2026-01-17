@@ -1055,7 +1055,7 @@
     "recentCalledNumbers": "Recently Called Numbers",
     "spaceId": "Space ID",
     "spaceSubtitle": "Bingo Space",
-    "twitchAccountLinkRequired": "To join this space, please link your Twitch account in account settings.",
+    "twitchAccountLinkRequired": "To join this space, please link your Twitch account in Account Settings.",
     "twitchAccountLinkRequiredButton": "Go to Account Settings",
     "verifyAndJoinButton": "Verify & Join",
     "verifyingAndJoining": "Verifying...",
@@ -1064,7 +1064,7 @@
     "verifyTwitchButton": "Verify Twitch Account",
     "verifyYouTubeButton": "Verify YouTube Account",
     "yourFinalResultTitle": "Your Final Result",
-    "youTubeAccountLinkRequired": "To join this space, please link your YouTube account in account settings.",
+    "youTubeAccountLinkRequired": "To join this space, please link your YouTube account in Account Settings.",
     "youTubeAccountLinkRequiredButton": "Go to Account Settings"
   }
 }

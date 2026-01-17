@@ -140,14 +140,24 @@ export function SpaceParticipation({
     const checkTokens = async () => {
       // Check YouTube token if required
       if (requiresYouTube) {
-        const result = await checkOAuthTokenAvailability("google");
-        setHasYouTubeToken(result.available);
+        try {
+          const result = await checkOAuthTokenAvailability("google");
+          setHasYouTubeToken(result.available);
+        } catch (error) {
+          console.error("Error checking YouTube token availability:", error);
+          setHasYouTubeToken(false);
+        }
       }
 
       // Check Twitch token if required
       if (requiresTwitch) {
-        const result = await checkOAuthTokenAvailability("twitch");
-        setHasTwitchToken(result.available);
+        try {
+          const result = await checkOAuthTokenAvailability("twitch");
+          setHasTwitchToken(result.available);
+        } catch (error) {
+          console.error("Error checking Twitch token availability:", error);
+          setHasTwitchToken(false);
+        }
       }
     };
 
