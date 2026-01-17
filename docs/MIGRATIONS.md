@@ -131,7 +131,7 @@ supabase migration new add_field_to_spaces_archive
 ALTER TABLE spaces_archive ADD COLUMN IF NOT EXISTS new_field TEXT;
 ```
 
-この方法であれば、既存環境にも新規環境にも同じ変更が確実に適用されます。
+この方法により、既存環境と新規環境の両方に同じ変更を確実に適用できます。
 
 #### レビュー時の確認項目
 

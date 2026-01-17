@@ -172,7 +172,7 @@ supabase link --project-ref your-project-ref
 supabase db push
 ```
 
-**代替方法**: Supabase Dashboardの "SQL Editor" から `supabase/migrations/\*.sql` ファイルの内容を手動で実行することもできます。
+**代替方法**: Supabase Dashboardの "SQL Editor" から `supabase/migrations/\*.sql` ファイルの内容を手動で実行できます。
 
 #### 1.4 Realtime機能の有効化
 
@@ -316,7 +316,7 @@ MAIL_FROM=noreply@example.com
 
 #### 5.2 デプロイの確認
 
-デプロイが完了すると、Vercelが自動生成したURLが表示されます:
+デプロイが完了すると、Vercel自動生成のURLが表示されます:
 
 ```
 https://your-project.vercel.app
@@ -383,7 +383,7 @@ Bingifyの動作に必要な環境変数の完全なリストです。
 
 ### オプションの環境変数
 
-以下は必須ではありませんが、機能を有効にする場合に設定します。
+以下の環境変数は必須ではありません。機能の有効化時のみ設定してください。
 
 **OAuth認証設定**:
 

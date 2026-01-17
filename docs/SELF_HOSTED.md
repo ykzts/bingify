@@ -368,7 +368,7 @@ systemdを使用してBingifyをバックグラウンドサービスとして実
 
 #### PM2を使用したプロセス管理 (代替案)
 
-systemdの代わりにPM2を使用することもできます。
+systemdの代わりにPM2を使用できます。
 
 1. **PM2をインストール**
 
@@ -551,7 +551,7 @@ Supabase Cloudは最も簡単で推奨される方法です。
 
 ### Supabase OSS版
 
-Supabaseのオープンソース版を自分でホストすることも可能です。
+Supabaseのオープンソース版を自分でホスト可能です。
 
 詳細なセットアップ手順については、[Supabase公式ドキュメント](https://supabase.com/docs/guides/self-hosting) を参照してください。
 
