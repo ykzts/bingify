@@ -42,7 +42,7 @@ function UserList({ users }: { users: User[] }) {
 
 **Browser support (fallback for older browsers):**
 
-`.toSorted()` is available in all modern browsers (Chrome 110+, Safari 16+, Firefox 115+, Node.js 20+). For older environments, use spread syntax:
+`.toSorted()` is available in all modern browsers (Chrome 110+, Safari 16+, Firefox 115+, Node.js 20+). For older environments, use spread operator:
 
 ```typescript
 // Fallback for older browsers

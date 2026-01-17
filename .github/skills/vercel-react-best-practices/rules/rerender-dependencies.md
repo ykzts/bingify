@@ -17,7 +17,7 @@ useEffect(() => {
 }, [user]);
 ```
 
-**Correct (re-runs only when ID changes):**
+**Correct (re-runs only when id changes):**
 
 ```tsx
 useEffect(() => {

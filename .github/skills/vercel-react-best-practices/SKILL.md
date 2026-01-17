@@ -95,7 +95,7 @@ Reference these guidelines when:
 - `js-combine-iterations` - Combine multiple filter/map into one loop
 - `js-length-check-first` - Check array length before expensive comparison
 - `js-early-exit` - Return early from functions
-- `js-hoist-regexp` - Hoist regular expression creation outside loops
+- `js-hoist-regexp` - Hoist RegExp creation outside loops
 - `js-min-max-loop` - Use loop for min/max instead of sort
 - `js-set-map-lookups` - Use Set/Map for O(1) lookups
 - `js-tosorted-immutable` - Use toSorted() for immutability

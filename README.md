@@ -256,7 +256,7 @@ lib/
 - `pnpm supabase:test` — データベーステスト実行 (PgTAP)
 - `pnpm supabase:typegen` — Supabaseの型定義を生成 (DB変更後に実行)
 - `pnpm lint` — コードチェック (Ultracite)
-- `pnpm lint:docs` — ドキュメントチェック (textlint) - [使用方法](./docs/TEXTLINT.md)
+- `pnpm lint:docs` — ドキュメントチェック (textlint) - [詳細](./docs/STYLE_GUIDE.md#自動チェック-textlint)
 - `pnpm test` — フロントエンドテスト実行 (Vitest)
 
 ## データベーステスト

@@ -68,7 +68,7 @@ Comprehensive performance optimization guide for React and Next.js applications,
    - 7.6 [Combine Multiple Array Iterations](#76-combine-multiple-array-iterations)
    - 7.7 [Early Length Check for Array Comparisons](#77-early-length-check-for-array-comparisons)
    - 7.8 [Early Return from Functions](#78-early-return-from-functions)
-   - 7.9 [Hoist regular expression Creation](#79-hoist-regexp-creation)
+   - 7.9 [Hoist RegExp Creation](#79-hoist-regexp-creation)
    - 7.10 [Use Loop for Min/Max Instead of Sort](#710-use-loop-for-minmax-instead-of-sort)
    - 7.11 [Use Set/Map for O(1) Lookups](#711-use-setmap-for-o1-lookups)
    - 7.12 [Use toSorted() Instead of sort() for Immutability](#712-use-tosorted-instead-of-sort-for-immutability)
@@ -361,11 +361,11 @@ Reducing initial bundle size improves Time to Interactive and Largest Contentful
 
 **Impact: CRITICAL (200-800ms import cost, slow builds)**
 
-Import directly from source files instead of barrel files to avoid loading thousands of unused modules. **Barrel files** are entry points that reexport multiple modules (e.g., `index.js` that does `export * from './module'`).
+Import directly from source files instead of barrel files to avoid loading thousands of unused modules. **Barrel files** are entry points that re-export multiple modules (e.g., `index.js` that does `export * from './module'`).
 
-Popular icon and component libraries can have **up to 10,000 reexports** in their entry file. For many React packages, **it takes 200-800ms just to import them**, affecting both development speed and production cold starts.
+Popular icon and component libraries can have **up to 10,000 re-exports** in their entry file. For many React packages, **it takes 200-800ms just to import them**, affecting both development speed and production cold starts.
 
-**Why tree shaking doesn't help:** When a library is marked as external (not bundled), the bundler can't optimize it. If you bundle it to enable tree shaking, builds become substantially slower analyzing the entire module graph.
+**Why tree-shaking doesn't help:** When a library is marked as external (not bundled), the bundler can't optimize it. If you bundle it to enable tree-shaking, builds become substantially slower analyzing the entire module graph.
 
 **Incorrect: imports entire library**
 
@@ -418,7 +418,7 @@ Reference: [https://vercel.com/blog/how-we-optimized-package-imports-in-next-js]
 
 Load large data or modules only when a feature is activated.
 
-**Example: lazy load animation frames**
+**Example: lazy-load animation frames**
 
 ```tsx
 function AnimationPlayer({
@@ -494,7 +494,7 @@ export default function RootLayout({ children }) {
 
 **Impact: CRITICAL (directly affects TTI and LCP)**
 
-Use `next/dynamic` to lazy load large components not needed on initial render.
+Use `next/dynamic` to lazy-load large components not needed on initial render.
 
 **Incorrect: Monaco bundles with main chunk ~300KB**
 
@@ -1210,7 +1210,7 @@ useEffect(() => {
 }, [user]);
 ```
 
-**Correct: re-runs only when ID changes**
+**Correct: re-runs only when id changes**
 
 ```tsx
 useEffect(() => {
@@ -1393,7 +1393,7 @@ function UserProfile() {
 }
 ```
 
-Use lazy initialization when computing initial values from localStorage/sessionStorage, building data structures (indices, maps), reading from the DOM, or performing heavy transformations.
+Use lazy initialization when computing initial values from localStorage/sessionStorage, building data structures (indexes, maps), reading from the DOM, or performing heavy transformations.
 
 For simple primitives (`useState(0)`), direct references (`useState(props.value)`), or cheap literals (`useState({})`), the function form is unnecessary.
 
@@ -1569,7 +1569,7 @@ npx svgo --precision=1 --multipass icon.svg
 
 **Impact: MEDIUM (avoids visual flicker and hydration errors)**
 
-When rendering content that depends on client-side storage (localStorage, Cookies), avoid both SSR breakage and post-hydration flickering by injecting a synchronous script that updates the DOM before React hydrates.
+When rendering content that depends on client-side storage (localStorage, cookies), avoid both SSR breakage and post-hydration flickering by injecting a synchronous script that updates the DOM before React hydrates.
 
 **Incorrect: breaks SSR**
 
@@ -1963,7 +1963,7 @@ document.addEventListener("visibilitychange", () => {
 });
 ```
 
-If storage can change externally (another tab, server-set Cookies), invalidate cache:
+If storage can change externally (another tab, server-set cookies), invalidate cache:
 
 ### 7.6 Combine Multiple Array Iterations
 
@@ -2088,13 +2088,13 @@ function validateUsers(users: User[]) {
 }
 ```
 
-### 7.9 Hoist regular expression Creation
+### 7.9 Hoist RegExp Creation
 
 **Impact: LOW-MEDIUM (avoids recreation)**
 
-Don't create regular expression inside render. Hoist to module scope or memoize with `useMemo()`.
+Don't create RegExp inside render. Hoist to module scope or memoize with `useMemo()`.
 
-**Incorrect: new regular expression every render**
+**Incorrect: new RegExp every render**
 
 ```tsx
 function Highlighter({ text, query }: Props) {
@@ -2119,7 +2119,7 @@ function Highlighter({ text, query }: Props) {
 }
 ```
 
-**Warning: global regular expression has mutable state**
+**Warning: global regex has mutable state**
 
 ```typescript
 const regex = /foo/g;
@@ -2127,7 +2127,7 @@ regex.test("foo"); // true, lastIndex = 3
 regex.test("foo"); // false, lastIndex = 0
 ```
 
-Global regular expression (`/g`) has mutable `lastIndex` state:
+Global regex (`/g`) has mutable `lastIndex` state:
 
 ### 7.10 Use Loop for Min/Max Instead of Sort
 
@@ -2205,7 +2205,7 @@ const min = Math.min(...numbers);
 const max = Math.max(...numbers);
 ```
 
-This works for small arrays but can be slower for very large arrays due to spread syntax limitations. Use the loop approach for reliability.
+This works for small arrays but can be slower for very large arrays due to spread operator limitations. Use the loop approach for reliability.
 
 ### 7.11 Use Set/Map for O(1) Lookups
 
@@ -2272,7 +2272,7 @@ function UserList({ users }: { users: User[] }) {
 const sorted = [...items].sort((a, b) => a.value - b.value);
 ```
 
-`.toSorted()` is available in all modern browsers (Chrome 110+, Safari 16+, Firefox 115+, Node.js 20+). For older environments, use spread syntax:
+`.toSorted()` is available in all modern browsers (Chrome 110+, Safari 16+, Firefox 115+, Node.js 20+). For older environments, use spread operator:
 
 **Other immutable array methods:**
 

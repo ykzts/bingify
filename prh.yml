@@ -28,11 +28,6 @@ rules:
       - /YOUTUBE/
     specs: []
   
-  - expected: Supabase
-    patterns:
-      - /supabase/
-    specs: []
-  
   - expected: PostgreSQL
     patterns:
       - /Postgresql/

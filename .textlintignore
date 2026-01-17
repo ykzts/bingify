@@ -18,8 +18,7 @@ package-lock.json
 .env*
 !.env.example
 
-# Skills and agent documentation (internal)
-.github/skills/**/*.md
+# Skills and agent documentation (internal) - machine-generated files
 .github/skills/
 
 # Auto-generated documentation

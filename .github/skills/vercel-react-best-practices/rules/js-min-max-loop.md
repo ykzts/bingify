@@ -79,4 +79,4 @@ const min = Math.min(...numbers);
 const max = Math.max(...numbers);
 ```
 
-This works for small arrays but can be slower for very large arrays due to spread syntax limitations. Use the loop approach for reliability.
+This works for small arrays but can be slower for very large arrays due to spread operator limitations. Use the loop approach for reliability.

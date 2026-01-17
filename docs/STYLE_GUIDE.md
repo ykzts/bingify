@@ -142,7 +142,7 @@
 
 ### 4. カタカナの長音符
 
-**ルール:** 語末の -er/-or/-arには長音符「ー」をつける
+**ルール:** 語末の -er/-or/-ar には長音符「ー」をつける
 
 **根拠:** 内閣告示「外来語の表記」に準拠
 
@@ -153,7 +153,7 @@
 
 **詳細:**
 
-- 3音以上の語で語末が -er/-or/-arで終わる場合、長音符をつける
+- 3音以上の語で語末が -er/-or/-ar で終わる場合、長音符をつける
 - 2音以下の語や慣用的に長音符なしで定着している語は例外とする
 - 一般的な表現から大きくずれないよう配慮
 
@@ -161,12 +161,12 @@
 
 | ❌ 誤り      | ✅ 正しい      |
 | ------------ | -------------- |
-| ユーザー       | ユーザー       |
-| サーバー       | サーバー       |
+| ユーザ       | ユーザー       |
+| サーバ       | サーバー       |
 | エラー       | エラー         |
-| ブラウザー     | ブラウザー     |
-| コンピューター | コンピューター |
-| プロバイダー   | プロバイダー   |
+| ブラウザ     | ブラウザー     |
+| コンピュータ | コンピューター |
+| プロバイダ   | プロバイダー   |
 | メンバー     | メンバー       |
 
 **例外 (長音符なし):**
@@ -204,7 +204,7 @@
 
 ### 1. シリアルコンマ (Oxford Comma)
 
-**ルール:** リスト内の項目を区切る際はOxford commaを使用する
+**ルール:** リスト内の項目を区切る際は Oxford comma を使用する
 
 **定義:** 3つ以上の項目を列挙する際、最後の接続詞 (and/or) の前にコンマを入れる
 
@@ -225,13 +225,13 @@
 
 - 曖昧さの排除
 - 技術文書での明確性
-- Microsoft/Googleスタイルガイドとの一致
+- Microsoft/Google スタイルガイドとの一致
 
 ---
 
 ### 2. 見出しの大文字表記
 
-**ルール:** 技術ドキュメントではsentence caseを使用する
+**ルール:** 技術ドキュメントでは sentence case を使用する
 
 **Sentence case の定義:**
 
@@ -262,7 +262,7 @@
 
 - 現代的なウェブUIの慣例
 - 読みやすさの向上
-- Microsoft/Googleスタイルガイドの推奨
+- Microsoft/Google スタイルガイドの推奨
 
 ---
 
@@ -407,6 +407,77 @@ GLOSSARY.mdの「UI表示における用語統一ルール」を参照してく�
 - [Microsoft Writing Style Guide](https://learn.microsoft.com/en-us/style-guide/welcome/)
 - [Google Developer Documentation Style Guide](https://developers.google.com/style)
 - [The Chicago Manual of Style](https://www.chicagomanualofstyle.org/) (Oxford commaに関して)
+
+---
+
+## 自動チェック (textlint)
+
+このスタイルガイドのルールは、textlintを使用して自動的にチェックされます。
+
+### コマンド
+
+```bash
+# ドキュメントをチェック
+pnpm lint:docs
+
+# 自動修正を適用
+pnpm lint:docs:fix
+
+# 特定のファイルのみチェック
+pnpm textlint path/to/file.md
+```
+
+### 自動修正されるルール
+
+以下のルールは `pnpm lint:docs:fix` で自動修正されます:
+
+- ✅ 半角括弧と全角文字の間の不要なスペース削除
+- ✅ カタカナ長音符の統一
+- ✅ 技術用語の表記統一
+
+### 手動修正が必要なルール
+
+以下のルールは警告のみで、手動での修正が必要です:
+
+- ⚠️ 長すぎる文 (150文字超)
+- ⚠️ コンマが多い文 (4個超)
+- ⚠️ 連続する助詞
+- ⚠️ 冗長な表現
+
+### トラブルシューティング
+
+**エラーが多すぎる場合:**
+
+1. 自動修正: `pnpm lint:docs:fix`
+2. 残ったエラーを確認: `pnpm lint:docs`
+3. 重要度の高いエラーから手動で修正
+
+**特定のルールを無効化したい場合:**
+
+```markdown
+<!-- textlint-disable -->
+この部分はチェックされません
+<!-- textlint-enable -->
+```
+
+特定のルールのみ無効化:
+
+```markdown
+<!-- textlint-disable ja-technical-writing/sentence-length -->
+長い文章でもエラーになりません
+<!-- textlint-enable ja-technical-writing/sentence-length -->
+```
+
+**設定ファイル:**
+
+- `.textlintrc.json`: textlintのルール設定
+- `prh.yml`: 表記ゆれ辞書
+- `.textlintignore`: チェック対象外ファイルの指定
+
+**参考:**
+
+- [textlint 公式ドキュメント](https://textlint.github.io/)
+- [textlint-rule-preset-ja-technical-writing](https://github.com/textlint-ja/textlint-rule-preset-ja-technical-writing)
 
 ---
 

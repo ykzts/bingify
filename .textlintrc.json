@@ -6,7 +6,7 @@
     },
     "terminology": {
       "defaultTerms": true,
-      "skip": ["Blockquote"],
+      "skip": ["Blockquote", "Code", "CodeBlock"],
       "terms": [
         "Bingify",
         "GitHub",
@@ -16,7 +16,6 @@
         "OAuth",
         "PostgreSQL",
         "React",
-        "Supabase",
         "Tailwind CSS",
         "Twitch",
         "YouTube"

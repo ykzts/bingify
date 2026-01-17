@@ -9,7 +9,7 @@ tags: bundle, conditional-loading, lazy-loading
 
 Load large data or modules only when a feature is activated.
 
-**Example (lazy load animation frames):**
+**Example (lazy-load animation frames):**
 
 ```tsx
 function AnimationPlayer({

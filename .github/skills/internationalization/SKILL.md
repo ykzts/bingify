@@ -25,7 +25,7 @@ Bingifyはnext-intlを使用して、英語 (en) と日本語 (ja) をサポー�
 
 ## メッセージファイル
 
-### messages/ja.JSON
+### messages/ja.json
 
 ```json
 {
