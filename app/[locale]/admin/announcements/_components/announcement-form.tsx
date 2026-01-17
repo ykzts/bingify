@@ -128,9 +128,15 @@ export function AnnouncementForm({
 
   useEffect(() => {
     const meta = (state as Record<string, unknown>)?.meta as
-      | { success?: boolean }
+      | { success?: boolean; warnings?: string[] }
       | undefined;
     if (meta?.success) {
+      // Show warnings if any
+      if (meta.warnings && meta.warnings.length > 0) {
+        for (const warning of meta.warnings) {
+          toast.warning(warning);
+        }
+      }
       handleSuccess();
     }
   }, [state]);
@@ -261,7 +267,13 @@ export function AnnouncementForm({
             <FieldGroup>
               {/* Language Tabs for Title and Content */}
               <div className="space-y-4">
-                <FieldLabel>{t("announcementLocaleLabel")}</FieldLabel>
+                <div>
+                  <FieldLabel>{t("announcementLocaleLabel")}</FieldLabel>
+                  <FieldDescription>
+                    At least one language must be provided. Both Japanese and
+                    English are optional.
+                  </FieldDescription>
+                </div>
                 <Tabs
                   onValueChange={(value) =>
                     setActiveLanguageTab(value as "ja" | "en")

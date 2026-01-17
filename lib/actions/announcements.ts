@@ -103,8 +103,9 @@ export async function getAnnouncementById(
       .select("*")
       .eq("id", id)
       .eq("published", true)
-      .or(`starts_at.is.null,starts_at.lte.${now}`)
-      .or(`ends_at.is.null,ends_at.gt.${now}`)
+      .or(
+        `and(starts_at.is.null,ends_at.is.null),and(starts_at.is.null,ends_at.gt.${now}),and(starts_at.lte.${now},ends_at.is.null),and(starts_at.lte.${now},ends_at.gt.${now})`
+      )
       .single();
 
     if (error) {
@@ -126,8 +127,9 @@ export async function getAnnouncementById(
         .select("*")
         .eq("locale", locale)
         .eq("published", true)
-        .or(`starts_at.is.null,starts_at.lte.${now}`)
-        .or(`ends_at.is.null,ends_at.gt.${now}`)
+        .or(
+          `and(starts_at.is.null,ends_at.is.null),and(starts_at.is.null,ends_at.gt.${now}),and(starts_at.lte.${now},ends_at.is.null),and(starts_at.lte.${now},ends_at.gt.${now})`
+        )
         .or(`parent_id.eq.${parentId},and(id.eq.${parentId},parent_id.is.null)`)
         .single();
 
@@ -175,8 +177,9 @@ export async function getActiveAnnouncements(
       .from("announcements")
       .select("*")
       .eq("published", true)
-      .or(`starts_at.is.null,starts_at.lte.${now}`)
-      .or(`ends_at.is.null,ends_at.gt.${now}`);
+      .or(
+        `and(starts_at.is.null,ends_at.is.null),and(starts_at.is.null,ends_at.gt.${now}),and(starts_at.lte.${now},ends_at.is.null),and(starts_at.lte.${now},ends_at.gt.${now})`
+      );
 
     // ロケールが指定されている場合はフィルタリング
     if (locale) {
