@@ -116,6 +116,14 @@ export async function getAnnouncementById(
       };
     }
 
+    // 翻訳版（parent_id != null）の場合は404を返す
+    if (announcement.parent_id !== null) {
+      return {
+        error: "お知らせが見つかりません",
+        success: false,
+      };
+    }
+
     // ロケールが指定されており、取得したお知らせのロケールと異なる場合は翻訳版を探す
     if (locale && announcement.locale !== locale) {
       // 親IDを特定（現在のお知らせが親の場合はそのID、翻訳版の場合は親のID）
