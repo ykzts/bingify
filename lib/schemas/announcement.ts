@@ -1,6 +1,11 @@
 import { z } from "zod";
 
 /**
+ * アナウンスメントのロケールスキーマ
+ */
+export const localeSchema = z.enum(["en", "ja"]);
+
+/**
  * アナウンスメントの優先度スキーマ
  */
 export const announcementPrioritySchema = z.enum(["info", "warning", "error"]);
@@ -29,6 +34,8 @@ export const createAnnouncementSchema = z.object({
   content: announcementContentSchema,
   dismissible: z.boolean().default(true),
   ends_at: z.string().datetime().optional().nullable(),
+  locale: localeSchema,
+  parent_id: z.string().uuid().optional().nullable(),
   priority: announcementPrioritySchema,
   published: z.boolean().default(false),
   starts_at: z.string().datetime().optional().nullable(),

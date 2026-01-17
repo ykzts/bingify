@@ -40,8 +40,8 @@ export default async function AnnouncementDetailPage({
 
   const t = await getTranslations("Announcements");
 
-  // お知らせを取得
-  const result = await getAnnouncementById(id);
+  // お知らせを取得（ロケールベースのフォールバック付き）
+  const result = await getAnnouncementById(id, locale);
 
   // お知らせが見つからない場合は404
   if (!(result.success && result.data)) {
