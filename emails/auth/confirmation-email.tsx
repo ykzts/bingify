@@ -1,4 +1,5 @@
 import { Body, Html, Preview, Section, Text } from "@react-email/components";
+import { getTranslations } from "next-intl/server";
 import { OtpSection } from "../components/alert-box";
 import { EmailButton } from "../components/email-button";
 import { EmailContainer } from "../components/email-container";
@@ -15,41 +16,32 @@ export interface ConfirmationEmailProps {
  * Confirmation email template for email address verification
  * Sent when a user signs up to verify their email address
  */
-export function ConfirmationEmail({
+export async function ConfirmationEmail({
   confirmationUrl,
   locale = "en",
   token,
 }: ConfirmationEmailProps) {
-  const isJa = locale === "ja";
-
-  const subject = isJa ? "メールアドレスの確認" : "Confirm Your Email";
-  const greeting = isJa ? "こんにちは！" : "Hello!";
-  const welcomeText = isJa
-    ? "Bingifyへのご登録ありがとうございます。以下のボタンをクリックして、メールアドレスを確認してください。"
-    : "Thank you for signing up for Bingify. Please click the button below to confirm your email address.";
-  const buttonText = isJa ? "メールアドレスを確認" : "Confirm Email";
-  const ignoredMessage = isJa
-    ? "このメールに心当たりがない場合は、無視していただいて構いません。"
-    : "If you didn't request this email, you can safely ignore it.";
+  const t = await getTranslations({
+    locale,
+    namespace: "EmailTemplates.confirmation",
+  });
 
   return (
-    <Html lang={isJa ? "ja" : "en"}>
-      <Preview>{subject}</Preview>
+    <Html lang={locale}>
+      <Preview>{t("subject")}</Preview>
       <Body style={bodyStyle}>
         <EmailContainer>
-          <EmailHeader
-            title={isJa ? "Bingifyへようこそ" : "Welcome to Bingify"}
-          />
+          <EmailHeader title={t("title")} />
 
           <Section style={contentStyle}>
-            <Text style={greetingStyle}>{greeting}</Text>
-            <Text style={textStyle}>{welcomeText}</Text>
+            <Text style={greetingStyle}>{t("greeting")}</Text>
+            <Text style={textStyle}>{t("welcomeText")}</Text>
 
-            <EmailButton href={confirmationUrl} text={buttonText} />
+            <EmailButton href={confirmationUrl} text={t("buttonText")} />
 
             <OtpSection code={token} locale={locale} />
 
-            <Text style={footerTextStyle}>{ignoredMessage}</Text>
+            <Text style={footerTextStyle}>{t("ignoredMessage")}</Text>
           </Section>
 
           <EmailFooter companyName="Bingify" locale={locale} />

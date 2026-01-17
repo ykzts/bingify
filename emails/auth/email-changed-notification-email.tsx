@@ -1,4 +1,5 @@
 import { Body, Html, Preview, Section, Text } from "@react-email/components";
+import { getTranslations } from "next-intl/server";
 import { InfoBox, SuccessBox } from "../components/alert-box";
 import { EmailContainer } from "../components/email-container";
 import { EmailFooter } from "../components/email-footer";
@@ -13,61 +14,37 @@ export interface EmailChangedNotificationEmailProps {
  * Email changed notification email template
  * Sent to confirm that the email address has been successfully changed
  */
-export function EmailChangedNotificationEmail({
+export async function EmailChangedNotificationEmail({
   locale = "en",
   newEmail,
 }: EmailChangedNotificationEmailProps) {
-  const isJa = locale === "ja";
-
-  const subject = isJa
-    ? "メールアドレスが変更されました"
-    : "Email Address Changed";
-  const greeting = isJa ? "こんにちは、" : "Hello,";
-  const successMessage = isJa
-    ? "メールアドレスが正常に変更されました。新しいメールアドレスを使用してサインインできるようになりました。"
-    : "Your email address has been successfully changed. You can now use your new email to sign in.";
-  const newEmailMessage = isJa
-    ? `新しいメールアドレス：${newEmail}`
-    : `Your new email address is: ${newEmail}`;
-  const accountSecurityLabel = isJa
-    ? "アカウントセキュリティ"
-    : "Account Security";
-  const checklistItem1 = isJa
-    ? "アカウント設定で二要素認証を有効にする"
-    : "Enable two-factor authentication in your account settings";
-  const checklistItem2 = isJa
-    ? "最近のログイン履歴を確認する"
-    : "Review your recent login activity";
-  const checklistItem3 = isJa
-    ? "セキュリティ設定を更新する"
-    : "Update your security settings";
+  const t = await getTranslations({
+    locale,
+    namespace: "EmailTemplates.emailChangedNotification",
+  });
 
   return (
-    <Html lang={isJa ? "ja" : "en"}>
-      <Preview>{subject}</Preview>
+    <Html lang={locale}>
+      <Preview>{t("subject")}</Preview>
       <Body style={bodyStyle}>
         <EmailContainer>
-          <EmailHeader
-            title={
-              isJa
-                ? "メールアドレス変更が確認されました"
-                : "Email Change Confirmed"
-            }
-          />
+          <EmailHeader title="Email Change Confirmed" />
 
           <Section style={contentStyle}>
-            <Text style={greetingStyle}>{greeting}</Text>
+            <Text style={greetingStyle}>{t("greeting")}</Text>
 
             <SuccessBox>
-              <Text style={successTextStyle}>{successMessage}</Text>
-              <Text style={newEmailTextStyle}>{newEmailMessage}</Text>
+              <Text style={successTextStyle}>{t("successMessage")}</Text>
+              <Text style={newEmailTextStyle}>
+                {t("newEmailMessage", { newEmail })}
+              </Text>
             </SuccessBox>
 
             <InfoBox>
-              <Text style={infoTitleStyle}>{accountSecurityLabel}</Text>
-              <Text style={listItemStyle}>• {checklistItem1}</Text>
-              <Text style={listItemStyle}>• {checklistItem2}</Text>
-              <Text style={listItemStyle}>• {checklistItem3}</Text>
+              <Text style={infoTitleStyle}>{t("accountSecurityLabel")}</Text>
+              <Text style={listItemStyle}>• {t("checklistItem1")}</Text>
+              <Text style={listItemStyle}>• {t("checklistItem2")}</Text>
+              <Text style={listItemStyle}>• {t("checklistItem3")}</Text>
             </InfoBox>
           </Section>
 

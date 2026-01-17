@@ -1,4 +1,5 @@
 import { Section, Text } from "@react-email/components";
+import { getTranslations } from "next-intl/server";
 
 interface EmailFooterProps {
   companyName?: string;
@@ -10,23 +11,22 @@ interface EmailFooterProps {
  * Email footer component with Bingify branding
  * Includes copyright text and company information
  */
-export function EmailFooter({
+export async function EmailFooter({
   companyName = "Bingify",
   copyrightYear = new Date().getFullYear(),
   locale = "en",
 }: EmailFooterProps) {
-  const isJa = locale === "ja";
-  const description = isJa
-    ? "Bingifyは友人や家族とビンゴゲームを共有できるサービスです。"
-    : "Bingify is a service for sharing bingo games with friends and family.";
-  const rights = isJa ? "すべての権利を保有します" : "All rights reserved";
+  const t = await getTranslations({
+    locale,
+    namespace: "EmailTemplates.footer",
+  });
 
   return (
     <Section style={footerStyle}>
       <Text style={footerText}>
-        © {copyrightYear} {companyName}. {rights}.
+        © {copyrightYear} {companyName}. {t("rights")}.
       </Text>
-      <Text style={footerLinkText}>{description}</Text>
+      <Text style={footerLinkText}>{t("description")}</Text>
     </Section>
   );
 }

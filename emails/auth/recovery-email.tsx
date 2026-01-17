@@ -1,4 +1,5 @@
 import { Body, Html, Preview, Section, Text } from "@react-email/components";
+import { getTranslations } from "next-intl/server";
 import { OtpSection, WarningBox } from "../components/alert-box";
 import { EmailButton } from "../components/email-button";
 import { EmailContainer } from "../components/email-container";
@@ -15,52 +16,39 @@ export interface RecoveryEmailProps {
  * Recovery email template for password reset
  * Sent when a user requests to reset their password
  */
-export function RecoveryEmail({
+export async function RecoveryEmail({
   confirmationUrl,
   locale = "en",
   token,
 }: RecoveryEmailProps) {
-  const isJa = locale === "ja";
-
-  const subject = isJa ? "パスワードのリセット" : "Reset Your Password";
-  const greeting = isJa ? "こんにちは、" : "Hello,";
-  const text = isJa
-    ? "パスワードのリセットリクエストを受け付けました。以下のボタンをクリックして、新しいパスワードを設定してください。"
-    : "We received a request to reset your password. Click the button below to set a new password.";
-  const buttonText = isJa ? "パスワードをリセット" : "Reset Password";
-  const securityNoticeTitle = isJa
-    ? "セキュリティのお知らせ"
-    : "Security Notice";
-  const securityWarning = isJa
-    ? "このリクエストに心当たりがない場合は、誰かがあなたのアカウントにアクセスしようとしている可能性があります。このメールを無視し、パスワードを変更することをお勧めします。"
-    : "If you didn't request this password reset, someone may be trying to access your account. Please ignore this email and consider changing your password.";
-  const expirationNote = isJa
-    ? "このリンクは1時間後に有効期限が切れます。期限切れの場合は、再度パスワードリセットをリクエストしてください。"
-    : "This link will expire in 1 hour. If it has expired, please request a new password reset.";
+  const t = await getTranslations({
+    locale,
+    namespace: "EmailTemplates.recovery",
+  });
 
   return (
-    <Html lang={isJa ? "ja" : "en"}>
-      <Preview>{subject}</Preview>
+    <Html lang={locale}>
+      <Preview>{t("subject")}</Preview>
       <Body style={bodyStyle}>
         <EmailContainer>
-          <EmailHeader title={subject} />
+          <EmailHeader title={t("subject")} />
 
           <Section style={contentStyle}>
-            <Text style={greetingStyle}>{greeting}</Text>
-            <Text style={textStyle}>{text}</Text>
+            <Text style={greetingStyle}>{t("greeting")}</Text>
+            <Text style={textStyle}>{t("text")}</Text>
 
-            <EmailButton href={confirmationUrl} text={buttonText} />
+            <EmailButton href={confirmationUrl} text={t("buttonText")} />
 
             <OtpSection code={token} locale={locale} />
 
             <WarningBox>
               <Text style={warningTitleStyle}>
-                <strong>{securityNoticeTitle}</strong>
+                <strong>{t("securityNoticeTitle")}</strong>
               </Text>
-              <Text style={warningTextStyle}>{securityWarning}</Text>
+              <Text style={warningTextStyle}>{t("securityWarning")}</Text>
             </WarningBox>
 
-            <Text style={footerTextStyle}>{expirationNote}</Text>
+            <Text style={footerTextStyle}>{t("expirationNote")}</Text>
           </Section>
 
           <EmailFooter companyName="Bingify" locale={locale} />
