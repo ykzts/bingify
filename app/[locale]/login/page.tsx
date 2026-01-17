@@ -1,31 +1,44 @@
-import { Suspense } from "react";
-import { setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { getEnabledAuthProviders } from "@/lib/supabase/auth/providers";
-import { getSystemSettings } from "@/lib/supabase/server/system";
-import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/constants/system";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
+import { getEnabledAuthProviders } from "@/lib/data/auth-providers";
+import { getSystemSettings } from "@/lib/data/system-settings";
+import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
+import { createClient } from "@/lib/supabase/server";
 import { validateRedirectPath } from "@/lib/utils/url";
 import { LoginForm } from "./_components/login-form";
 
-export const runtime = "edge";
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/login">): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Login" });
 
-interface LoginPageProps {
-  params: { locale: string };
-  searchParams?: Record<string, string | string[] | undefined>;
+  return {
+    description: t("metaDescription"),
+    openGraph: {
+      description: t("metaDescription"),
+      title: t("metaTitle"),
+    },
+    title: t("metaTitle"),
+  };
 }
 
 export default async function LoginPage({
   params,
   searchParams,
-}: LoginPageProps) {
-  const { locale } = params;
+}: PageProps<"/[locale]/login">) {
+  const { locale } = await params;
 
-  // 既にセッションがある場合はリダイレクト
-  // edge runtime では cookies から直接読み取れないためサーバー側で判定
-  // cf. https://nextjs.org/docs/app/api-reference/functions/redirect#edge-runtime
-  if (process.env.__AUTH_REDIRECT__) {
-    const query = searchParams ?? {};
-    const redirectParam = query.redirect;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    const query = await searchParams;
+    const redirectParam = query?.redirect;
     const redirectPath =
       typeof redirectParam === "string"
         ? validateRedirectPath(redirectParam, `/${locale}`)
@@ -41,7 +54,7 @@ export default async function LoginPage({
     systemSettingsResult.settings || DEFAULT_SYSTEM_SETTINGS;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-red-100 via-amber-50 to-sky-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-red-100 via-amber-50 to-sky-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Suspense
         fallback={
           <div className="flex items-center justify-center">

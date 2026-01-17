@@ -119,7 +119,7 @@ async function handleEmailChange(
 
   // 旧メールアドレス宛：確認リンク付き確認メール (token)
   // double_confirm_changes: 旧メールでも確認が必須
-  if (emailData.old_email) {
+  if (emailData.old_email && (emailData.token_hash || emailData.token)) {
     const oldToken = emailData.token || "";
     const oldConfirmationUrl = buildVerifyUrl({
       redirectTo,

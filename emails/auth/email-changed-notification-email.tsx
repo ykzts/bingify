@@ -42,12 +42,9 @@ export async function EmailChangedNotificationEmail({
 
             <InfoBox>
               <Text style={infoTitleStyle}>{t("accountSecurityLabel")}</Text>
-              <Text style={listItemStyle}>• {t("checklistItem1")}
-              </Text>
-              <Text style={listItemStyle}>• {t("checklistItem2")}
-              </Text>
-              <Text style={listItemStyle}>• {t("checklistItem3")}
-              </Text>
+              <Text style={listItemStyle}>• {t("checklistItem1")}</Text>
+              <Text style={listItemStyle}>• {t("checklistItem2")}</Text>
+              <Text style={listItemStyle}>• {t("checklistItem3")}</Text>
             </InfoBox>
           </Section>
 
