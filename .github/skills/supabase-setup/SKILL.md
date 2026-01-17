@@ -12,7 +12,7 @@ metadata:
 
 ## 概要
 
-BingifyはSupabaseをバックエンドデータベースとして使用します。ローカル開発では Supabase CLI で完全なPostgSQL環境を提供します。
+BingifyはSupabaseをバックエンドデータベースとして使用します。ローカル開発ではSupabase CLIで完全なPostgSQL環境を提供します。
 
 ## ローカルセットアップ
 
@@ -36,9 +36,9 @@ http://localhost:54323
 
 - Host: localhost
 - Port: 5432
-- User: postgres
-- Password: postgres
-- Database: postgres
+- User: PostgreSQL
+- Password: PostgreSQL
+- Database: PostgreSQL
 
 ## マイグレーション管理
 

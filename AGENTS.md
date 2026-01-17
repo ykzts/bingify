@@ -1,6 +1,6 @@
 # AGENTS
 
-AI エージェント向けプロジェクトガイド。詳細な技術情報は各ドキュメントを参照してください。
+AIエージェント向けプロジェクトガイド。詳細な技術情報は各ドキュメントを参照してください。
 
 ## WHAT（プロジェクト構成）
 
@@ -15,10 +15,10 @@ AI エージェント向けプロジェクトガイド。詳細な技術情報�
 
 ## WHY（設計方針）
 
-- **AppRouter 優先**: Next.js の最新パターンに従う
+- **AppRouter 優先**: Next.jsの最新パターンに従う
 - **Server Actions**: フォーム処理・データ操作はサーバーサイド
-- **型安全性**: TypeScript + Zod スキーマから型推論
-- **UI 一貫性**: shadcn/ui でブランドカラー（Purple）統一
+- **型安全性**: TypeScript + Zodスキーマから型推論
+- **UI 一貫性**: shadcn/uiでブランドカラー（Purple）統一
 - **多言語対応**: メッセージ管理は `messages/en.json`, `messages/ja.json`
 
 ## HOW（開発コマンド）
@@ -38,11 +38,11 @@ pnpm format:docs       # Markdown フォーマット
 
 - `app/[locale]/` - ページ・レイアウト（i18n対応）
 - `components/` - カスタムコンポーネント
-- `components/ui/` - shadcn/ui コンポーネント（自動生成）
+- `components/ui/` - shadcn/uiコンポーネント（自動生成）
 - `lib/` - ユーティリティ・API・スキーマ
-- `lib/supabase/` - Supabase クライアント
+- `lib/supabase/` - Supabaseクライアント
 - `lib/middleware/` - 認証・ルーティングミドルウェア
-- `messages/` - i18n メッセージ
+- `messages/` - i18nメッセージ
 - `docs/` - ドキュメント
 
 ## 詳細ドキュメント
@@ -95,10 +95,10 @@ pnpm format:docs       # Markdown フォーマット
 
 ## 実行ポリシー（エージェント必須）
 
-- **新規パッケージ**: npm registry 確認 → `pnpm add <pkg>@latest`
-- **ライブラリ ドキュメント**: Context7 MCP を自動的に使用
-- **リンター**: 自動ツール（Biome）に任せる。LLM に Style Guide を判定させない
-- **自動生成**: AGENTS.md は手動作成。`/init` コマンド不使用
+- **新規パッケージ**: npm registry確認 → `pnpm add <pkg>@latest`
+- **ライブラリ ドキュメント**: Context7 MCPを自動的に使用
+- **リンター**: 自動ツール（Biome）に任せる。LLMにStyle Guideを判定させない
+- **自動生成**: AGENTS.mdは手動作成。`/init` コマンド不使用
 
 ## File-scoped コマンド優先
 

@@ -29,7 +29,7 @@
 **重要**:
 
 - 内部実装 (変数名、関数名、DBカラム名、スキーマフィールド等) では `shareKey` や `share_key` を使用
-- ユーザーの目に触れる翻訳ファイル (`ja.json`) や UIコンポーネントのラベルでは必ず上記の日本語表記を使用すること
+- ユーザーの目に触れる翻訳ファイル (`ja.json`) やUIコンポーネントのラベルでは必ず上記の日本語表記を使用すること
 - 特に「共有キー」の内部実装では `slug` は使用せず、`shareKey` または `share_key` に統一すること
 
 ---
@@ -103,8 +103,8 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **形式**: `<user-input>-<YYYYMMDD>` (例: `my-party-20251224`)
 - **制約**: 小文字の英数字とハイフンのみ、3〜30文字
 - **UI表示ルール**:
-- ✅ 正しい表記: 「共有キー」
-- ❌ 使用禁止: 「シェアキー」「スラッグ」「slug」「Share key」 (日本語環境下)
+- ✅ 正しい表記:「共有キー」
+- ❌ 使用禁止:「シェアキー」「スラッグ」「slug」「Share key」(日本語環境下)
 - コード内部 (変数名、関数名、DBカラム名、スキーマ) では `shareKey` または `share_key` を使用
 - ユーザーの目に触れる翻訳ファイルやUIラベルでは必ず「共有キー」を使用すること
 - **備考**: 将来的に日付サフィックスは有料オプションなどで省略可能となる可能性がある
@@ -173,7 +173,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **英語**: Realtime Sync / Real-time Synchronization
 - **日本語**: リアルタイム同期
 - **コード上の命名**:
-- Supabase 機能: `supabase_realtime` publication
+- Supabase機能: `supabase_realtime` publication
 - 対象テーブル: `spaces`, `bingo_cards`, `called_numbers`
 - **用途**: 抽選番号の同期、カードの更新など
 
@@ -188,7 +188,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 ### 3.3 Identity Linking (アイデンティティ連携)
 
-- **定義**: 複数の認証プロバイダー (Google, Twitch など) を同一ユーザーに紐付ける機能
+- **定義**: 複数の認証プロバイダー (Google, Twitchなど) を同一ユーザーに紐付ける機能
 - **英語**: Identity Linking
 - **日本語**: アイデンティティ連携
 - **実装場所**: ユーザー設定の接続管理ページ
@@ -198,7 +198,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 ### 3.4 Server Functions / Server Actions
 
-- **定義**: Next.jsの Server Actions。サーバーサイドで実行される関数で、フォーム送信やデータ処理に使用される
+- **定義**: Next.jsのServer Actions。サーバーサイドで実行される関数で、フォーム送信やデータ処理に使用される
 - **英語**: Server Functions / Server Actions
 - **日本語**: サーバー関数 / サーバーアクション
 - **コード上の命名**:
@@ -220,7 +220,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 
 ### 3.6 Proxy (プロキシ)
 
-- **定義**: Next.jsの Proxy (旧 Middleware)。リクエストを処理し、URL書き換えやアクセス制御を行う
+- **定義**: Next.jsのProxy (旧Middleware)。リクエストを処理し、URL書き換えやアクセス制御を行う
 - **英語**: Proxy
 - **日本語**: プロキシ
 - **コード上の命名**:
@@ -322,7 +322,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 ### 6.1 Supabase 接続
 
 - `NEXT_PUBLIC_SUPABASE_URL`: SupabaseプロジェクトURL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase 匿名キー
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase匿名キー
 - `SUPABASE_SERVICE_ROLE_KEY`: Supabaseサービスロールキー
 
 ### 6.2 アプリケーション設定
@@ -358,7 +358,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 ### 7.2 Tailwind CSS
 
 - **定義**: ユーティリティファーストCSSフレームワーク
-- **設定**: CSS-first 構成 (`tailwind.config.ts` 不要)
+- **設定**: CSS-first構成 (`tailwind.config.ts` 不要)
 
 ### 7.3 next-intl
 

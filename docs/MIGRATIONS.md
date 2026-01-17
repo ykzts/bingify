@@ -4,7 +4,7 @@
 
 ## 概要
 
-このプロジェクトでは、`supabase/migrations` ディレクトリに配置されたマイグレーションファイルを自動的に Cloud Supabaseに適用する GitHub Actionsワークフローを使用しています。
+このプロジェクトでは、`supabase/migrations` ディレクトリに配置されたマイグレーションファイルを自動的にCloud Supabaseに適用するGitHub Actionsワークフローを使用しています。
 
 **重要な注意事項:**
 
@@ -21,11 +21,11 @@
 
 ### 1. GitHub Secretsの設定
 
-リポジトリの Settings > Secrets and variables > Actionsから以下のシークレットを設定してください。
+リポジトリのSettings > Secrets and variables > Actionsから以下のシークレットを設定してください。
 
-#### SUPABASE_ACCESS_TOKEN
+#### Supabase_ACCESS_TOKEN
 
-Supabaseの Personal Access Tokenです。
+SupabaseのPersonal Access Tokenです。
 
 **取得方法:**
 
@@ -35,23 +35,23 @@ Supabaseの Personal Access Tokenです。
 4. **Generate new token** をクリック
 5. トークン名を入力 (例: `bingify-github-actions`)
 6. 生成されたトークンをコピー (一度しか表示されません)
-7. GitHubリポジトリの Secretsに `SUPABASE_ACCESS_TOKEN` として保存
+7. GitHubリポジトリのSecretsに `SUPABASE_ACCESS_TOKEN` として保存
 
 **注意事項:**
 
 - このトークンはプロジェクトの管理権限を持つため、厳重に管理してください
-- トークンが漏洩した場合は、すぐに Supabase Dashboardから無効化してください
+- トークンが漏洩した場合は、すぐにSupabase Dashboardから無効化してください
 
-#### SUPABASE_PROJECT_ID
+#### Supabase_PROJECT_ID
 
-Supabaseプロジェクトの Project Reference IDです。
+SupabaseプロジェクトのProject Reference IDです。
 
 **取得方法:**
 
 1. [Supabase Dashboard](https://supabase.com/dashboard) でプロジェクトを開く
 2. Settings > Generalを選択
 3. **Reference ID** をコピー (例: `abcdefghijklmnop`)
-4. GitHubリポジトリの Secretsに `SUPABASE_PROJECT_ID` として保存
+4. GitHubリポジトリのSecretsに `SUPABASE_PROJECT_ID` として保存
 
 ### 2. 環境の設定 (オプション)
 
@@ -59,10 +59,10 @@ Supabaseプロジェクトの Project Reference IDです。
 
 **設定方法:**
 
-1. リポジトリの Settings > Environmentsを開く
+1. リポジトリのSettings > Environmentsを開く
 2. **New environment** をクリック
 3. 環境名を入力 (`production` または `staging`)
-4. 必要に応じて Protection rulesを設定
+4. 必要に応じてProtection rulesを設定
 
 - Required reviewers: 本番環境へのデプロイ前に承認を必須にする
 - Wait timer: デプロイ前に待機時間を設定する
@@ -137,7 +137,7 @@ ALTER TABLE spaces_archive ADD COLUMN IF NOT EXISTS new_field TEXT;
 
 PRレビュー時には、以下を確認してください：
 
-- [ ] 既存のマイグレーションファイル (既に mainブランチに存在するファイル) が変更されていないか
+- [ ] 既存のマイグレーションファイル (既にmainブランチに存在するファイル) が変更されていないか
 - [ ] スキーマ変更は新しいマイグレーションファイルとして追加されているか
 - [ ] 新しいマイグレーションファイルのタイムスタンプが最新のものより新しいか
 
@@ -149,7 +149,7 @@ PRレビュー時には、以下を確認してください：
 2. 修正には `IF NOT EXISTS`/`IF EXISTS` を使用し、既に適用された環境でも安全に実行できるようにする
 3. PRに明確な説明と、なぜ既存ファイルを編集する必要があるのかの理由を記載する
 
-**例:** マイグレーションが SQL 構文エラーで失敗し、どの環境も作成できない場合
+**例:** マイグレーションがSQL構文エラーで失敗し、どの環境も作成できない場合
 
 ```sql
 -- バグのある状態
@@ -171,7 +171,7 @@ supabase migration new add_user_profiles_table
 
 ### 2. マイグレーションの記述
 
-生成されたファイルに SQLを記述します。
+生成されたファイルにSQLを記述します。
 
 **ベストプラクティス:**
 
@@ -286,7 +286,7 @@ supabase link --project-ref <YOUR_PROJECT_ID>
 supabase db push --include-all
 ```
 
-**注意:** この方法は GitHub Actionsの実行履歴に記録されないため、通常は使用しないでください。
+**注意:** この方法はGitHub Actionsの実行履歴に記録されないため、通常は使用しないでください。
 
 ## トラブルシューティング
 
@@ -331,7 +331,7 @@ Actionsタブ > Deploy Migrations > 失敗したワークフロー > Deploy migr
 
 1. Supabase Dashboardを開く
 2. SQL Editorタブを選択
-3. ロールバック用の SQLを実行
+3. ロールバック用のSQLを実行
 
 ```sql
 -- 例: テーブル削除
@@ -342,7 +342,7 @@ ALTER TABLE spaces DROP COLUMN IF EXISTS new_column;
 ```
 
 4. ロールバックが完了したら、修正版のマイグレーションファイルを**新しい**マイグレーションファイルとして作成
-5. 新しいマイグレーションファイルで PRを作成 (⚠️ 既存のマイグレーションファイルは編集しないこと)
+5. 新しいマイグレーションファイルでPRを作成 (⚠️ 既存のマイグレーションファイルは編集しないこと)
 
 ### 接続エラーが発生した場合
 
@@ -383,7 +383,7 @@ ALTER TABLE spaces DROP COLUMN IF EXISTS new_column;
 
 ### 2. 本番環境の保護
 
-- GitHub Environmentsの Protection rulesを有効化
+- GitHub EnvironmentsのProtection rulesを有効化
 - 本番環境へのデプロイには必ずレビューを必須にする
 - デプロイ前に待機時間を設定 (誤操作防止)
 
@@ -393,7 +393,7 @@ ALTER TABLE spaces DROP COLUMN IF EXISTS new_column;
 
 - [ ] **⚠️ 既存のマイグレーションファイル (既に mainブランチに存在するファイル) が編集されていない**
 - [ ] 変更は新しいマイグレーションファイルとして追加されている
-- [ ] SQL 構文が正しい
+- [ ] SQL構文が正しい
 - [ ] 冪等性が確保されている (`IF EXISTS` / `IF NOT EXISTS`)
 - [ ] データ損失のリスクがない
 - [ ] インデックスが適切に設定されている

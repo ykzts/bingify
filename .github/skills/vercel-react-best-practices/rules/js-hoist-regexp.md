@@ -5,11 +5,11 @@ impactDescription: avoids recreation
 tags: javascript, regexp, optimization, memoization
 ---
 
-## Hoist RegExp Creation
+## Hoist regular expression Creation
 
-Don't create RegExp inside render. Hoist to module scope or memoize with `useMemo()`.
+Don't create regular expression inside render. Hoist to module scope or memoize with `useMemo()`.
 
-**Incorrect (new RegExp every render):**
+**Incorrect (new regular expression every render):**
 
 ```tsx
 function Highlighter({ text, query }: Props) {
@@ -34,9 +34,9 @@ function Highlighter({ text, query }: Props) {
 }
 ```
 
-**Warning (global regex has mutable state):**
+**Warning (global regular expression has mutable state):**
 
-Global regex (`/g`) has mutable `lastIndex` state:
+Global regular expression (`/g`) has mutable `lastIndex` state:
 
 ```typescript
 const regex = /foo/g;
