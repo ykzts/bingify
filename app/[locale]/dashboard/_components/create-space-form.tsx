@@ -8,13 +8,7 @@ import {
   useStore,
   useTransform,
 } from "@tanstack/react-form-nextjs";
-import {
-  AlertCircle,
-  AlertTriangle,
-  Check,
-  Dices,
-  Loader2,
-} from "lucide-react";
+import { AlertCircle, AlertTriangle, Check, Dices } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
@@ -30,6 +24,7 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/input-group";
+import { Spinner } from "@/components/ui/spinner";
 import { formatDateSuffix } from "@/lib/utils/date-format";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { generateRandomKey } from "@/lib/utils/random-key";
@@ -268,7 +263,7 @@ export function CreateSpaceForm() {
                 <div className="mt-2 flex items-center gap-2">
                   {checking && (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin text-gray-400 dark:text-gray-500" />
+                      <Spinner className="text-gray-400 dark:text-gray-500" />
                       <span className="text-gray-500 text-sm dark:text-gray-400">
                         確認中...
                       </span>
@@ -364,9 +359,7 @@ export function CreateSpaceForm() {
         }
         type="submit"
       >
-        {(isSubmitting || isPending) && (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        )}
+        {(isSubmitting || isPending) && <Spinner />}
         {isSubmitting || isPending ? t("creatingButton") : t("createButton")}
       </Button>
 
