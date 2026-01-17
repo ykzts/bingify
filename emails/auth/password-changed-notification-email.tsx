@@ -1,4 +1,5 @@
 import { Body, Html, Preview, Section, Text } from "@react-email/components";
+import { getTranslations } from "next-intl/server";
 import { InfoBox, SuccessBox } from "../components/alert-box";
 import { EmailContainer } from "../components/email-container";
 import { EmailFooter } from "../components/email-footer";
@@ -12,50 +13,33 @@ export interface PasswordChangedNotificationEmailProps {
  * Password changed notification email template
  * Sent to confirm that the password has been successfully changed
  */
-export function PasswordChangedNotificationEmail({
+export async function PasswordChangedNotificationEmail({
   locale = "en",
 }: PasswordChangedNotificationEmailProps) {
-  const isJa = locale === "ja";
-
-  const subject = isJa
-    ? "パスワードが変更されました"
-    : "Your Password Has Been Changed";
-  const greeting = isJa ? "こんにちは、" : "Hello,";
-  const successMessage = isJa
-    ? "パスワードが正常に変更されました。新しいパスワードでサインインできるようになりました。"
-    : "Your password has been successfully changed. You can now sign in with your new password.";
-  const passwordSecurityLabel = isJa
-    ? "パスワードセキュリティのコツ"
-    : "Password Security Tips";
-  const securityTip1 = isJa
-    ? "強力なパスワードを使用（8文字以上、大文字と小文字、数字、記号を含める）"
-    : "Use a strong password (8+ characters, mixed case, numbers, and symbols)";
-  const securityTip2 = isJa
-    ? "パスワードを誰とも共有しない"
-    : "Never share your password with anyone";
-  const securityTip3 = isJa
-    ? "セキュリティを強化するために二要素認証を有効にする"
-    : "Enable two-factor authentication for extra security";
+  const t = await getTranslations({
+    locale,
+    namespace: "EmailTemplates.passwordChangedNotification",
+  });
 
   return (
-    <Html lang={isJa ? "ja" : "en"}>
-      <Preview>{subject}</Preview>
+    <Html lang={locale}>
+      <Preview>{t("subject")}</Preview>
       <Body style={bodyStyle}>
         <EmailContainer>
-          <EmailHeader title={subject} />
+          <EmailHeader title={t("subject")} />
 
           <Section style={contentStyle}>
-            <Text style={greetingStyle}>{greeting}</Text>
+            <Text style={greetingStyle}>{t("greeting")}</Text>
 
             <SuccessBox>
-              <Text style={successTextStyle}>{successMessage}</Text>
+              <Text style={successTextStyle}>{t("successMessage")}</Text>
             </SuccessBox>
 
             <InfoBox>
-              <Text style={infoTitleStyle}>{passwordSecurityLabel}</Text>
-              <Text style={listItemStyle}>• {securityTip1}</Text>
-              <Text style={listItemStyle}>• {securityTip2}</Text>
-              <Text style={listItemStyle}>• {securityTip3}</Text>
+              <Text style={infoTitleStyle}>{t("passwordSecurityLabel")}</Text>
+              <Text style={listItemStyle}>• {t("securityTip1")}</Text>
+              <Text style={listItemStyle}>• {t("securityTip2")}</Text>
+              <Text style={listItemStyle}>• {t("securityTip3")}</Text>
             </InfoBox>
           </Section>
 

@@ -1,4 +1,5 @@
 import { Body, Html, Preview, Section, Text } from "@react-email/components";
+import { getTranslations } from "next-intl/server";
 import { OtpSection } from "../components/alert-box";
 import { EmailButton } from "../components/email-button";
 import { EmailContainer } from "../components/email-container";
@@ -15,43 +16,33 @@ export interface MagicLinkEmailProps {
  * Magic link email template for passwordless authentication
  * Sent when a user requests to sign in using a magic link
  */
-export function MagicLinkEmail({
+export async function MagicLinkEmail({
   confirmationUrl,
   locale = "en",
   token,
 }: MagicLinkEmailProps) {
-  const isJa = locale === "ja";
-
-  const subject = isJa ? "Bingifyにログイン" : "Sign In to Bingify";
-  const greeting = isJa ? "こんにちは、" : "Hello,";
-  const text = isJa
-    ? "ログインリクエストを受け付けました。以下のボタンをクリックしてログインしてください。"
-    : "We received a request to sign in to your account. Click the button below to sign in.";
-  const buttonText = isJa ? "ログイン" : "Sign In";
-  const securityNote = isJa
-    ? "このリクエストに心当たりがない場合は、このメールを無視してください。"
-    : "If you didn't request this sign-in link, you can safely ignore this email.";
-  const expirationNote = isJa
-    ? "このリンクは1時間後に有効期限が切れます。期限切れの場合は、再度ログインをリクエストしてください。"
-    : "This link will expire in 1 hour. If it has expired, please request a new sign-in link.";
+  const t = await getTranslations({
+    locale,
+    namespace: "EmailTemplates.magicLink",
+  });
 
   return (
-    <Html lang={isJa ? "ja" : "en"}>
-      <Preview>{subject}</Preview>
+    <Html lang={locale}>
+      <Preview>{t("subject")}</Preview>
       <Body style={bodyStyle}>
         <EmailContainer>
-          <EmailHeader title={subject} />
+          <EmailHeader title={t("subject")} />
 
           <Section style={contentStyle}>
-            <Text style={greetingStyle}>{greeting}</Text>
-            <Text style={textStyle}>{text}</Text>
+            <Text style={greetingStyle}>{t("greeting")}</Text>
+            <Text style={textStyle}>{t("text")}</Text>
 
-            <EmailButton href={confirmationUrl} text={buttonText} />
+            <EmailButton href={confirmationUrl} text={t("buttonText")} />
 
             <OtpSection code={token} locale={locale} />
 
-            <Text style={footerTextStyle}>{securityNote}</Text>
-            <Text style={footerTextStyle}>{expirationNote}</Text>
+            <Text style={footerTextStyle}>{t("securityNote")}</Text>
+            <Text style={footerTextStyle}>{t("expirationNote")}</Text>
           </Section>
 
           <EmailFooter companyName="Bingify" locale={locale} />
