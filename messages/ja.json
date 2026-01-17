@@ -564,6 +564,77 @@
     "noEmailRegistered": "メールアドレスが登録されていません",
     "title": "メールアドレス設定"
   },
+  "EmailTemplates": {
+    "confirmation": {
+      "buttonText": "メールアドレスを確認",
+      "greeting": "こんにちは！",
+      "ignoredMessage": "このメールに心当たりがない場合は、無視していただいて構いません。",
+      "subject": "メールアドレスの確認",
+      "title": "Bingifyへようこそ",
+      "welcomeText": "Bingifyへのご登録ありがとうございます。以下のボタンをクリックして、メールアドレスを確認してください。"
+    },
+    "emailChange": {
+      "buttonText": "メールアドレス変更を確認",
+      "greeting": "こんにちは、",
+      "ignoredMessage": "このメールに心当たりがない場合は、無視していただいて構いません。",
+      "securityWarning": "Bingifyアカウントに関連付けられたメールアドレスを変更するリクエストが検出されました。これに心当たりがない場合は、すぐにアカウントを保護してください。",
+      "subject": "メールアドレス変更の確認",
+      "warningTitle": "メールアドレス変更リクエスト"
+    },
+    "emailChangedNotification": {
+      "accountSecurityLabel": "アカウントセキュリティ",
+      "checklistItem1": "アカウント設定で二要素認証を有効にする",
+      "checklistItem2": "最近のログイン履歴を確認する",
+      "checklistItem3": "セキュリティ設定を更新する",
+      "greeting": "こんにちは、",
+      "newEmailMessage": "新しいメールアドレス：{newEmail}",
+      "subject": "メールアドレスが変更されました",
+      "successMessage": "メールアドレスが正常に変更されました。新しいメールアドレスを使用してサインインできるようになりました。"
+    },
+    "footer": {
+      "description": "Bingifyは友人や家族とビンゴゲームを共有できるサービスです。",
+      "rights": "All rights reserved"
+    },
+    "invite": {
+      "buttonText": "Bingifyに参加する",
+      "feature1": "リアルタイムでビンゴゲームを作成して共有",
+      "feature2": "配信者とコミュニティに最適",
+      "feature3": "美しく直感的なインターフェース",
+      "featuresTitle": "Bingifyの機能",
+      "greeting": "こんにちは！",
+      "ignoredMessage": "このメールに心当たりがない場合は、無視していただいて構いません。",
+      "joinMessage": "Bingifyへのご招待をお受けいただきました。以下のボタンをクリックして、ご招待をお受け入れいただき、アカウントを作成してください。",
+      "subject": "Bingifyへのご招待",
+      "title": "Bingifyへのご招待"
+    },
+    "magicLink": {
+      "buttonText": "ログイン",
+      "expirationNote": "このリンクは1時間後に有効期限が切れます。期限切れの場合は、再度ログインをリクエストしてください。",
+      "greeting": "こんにちは、",
+      "securityNote": "このリクエストに心当たりがない場合は、このメールを無視してください。",
+      "subject": "Bingifyにログイン",
+      "text": "ログインリクエストを受け付けました。以下のボタンをクリックしてログインしてください。"
+    },
+    "otpCodeLabel": "ボタンが機能しない場合は、このコードを使用してください：",
+    "passwordChangedNotification": {
+      "greeting": "こんにちは、",
+      "passwordSecurityLabel": "パスワードセキュリティのコツ",
+      "securityTip1": "強力なパスワードを使用(8文字以上、大文字と小文字、数字、記号を含める)",
+      "securityTip2": "パスワードを誰とも共有しない",
+      "securityTip3": "セキュリティを強化するために二要素認証を有効にする",
+      "subject": "パスワードが変更されました",
+      "successMessage": "パスワードが正常に変更されました。新しいパスワードでサインインできるようになりました。"
+    },
+    "recovery": {
+      "buttonText": "パスワードをリセット",
+      "expirationNote": "このリンクは1時間後に有効期限が切れます。期限切れの場合は、再度パスワードリセットをリクエストしてください。",
+      "greeting": "こんにちは、",
+      "securityNoticeTitle": "セキュリティのお知らせ",
+      "securityWarning": "このリクエストに心当たりがない場合は、誰かがあなたのアカウントにアクセスしようとしている可能性があります。このメールを無視し、パスワードを変更することをお勧めします。",
+      "subject": "パスワードのリセット",
+      "text": "パスワードのリセットリクエストを受け付けました。以下のボタンをクリックして、新しいパスワードを設定してください。"
+    }
+  },
   "Errors": {
     "authRequired": "認証が必要です",
     "failedToCountSpaces": "スペース数の確認に失敗しました",
@@ -679,6 +750,7 @@
     "errorEmailInvalid": "有効なメールアドレスを入力してください",
     "errorMessage": "ログイン中にエラーが発生しました。もう一度お試しください。",
     "googleButton": "Googleでログイン",
+    "loginSuccess": "ログインに成功しました。おかえりなさい！",
     "metaDescription": "Bingifyにログインして、ビンゴスペースの作成、イベントの主催、アカウントの管理を行いましょう。",
     "metaTitle": "ログイン",
     "orDivider": "または",

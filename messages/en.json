@@ -564,6 +564,77 @@
     "noEmailRegistered": "No email address registered",
     "title": "Email Settings"
   },
+  "EmailTemplates": {
+    "confirmation": {
+      "buttonText": "Confirm Email",
+      "greeting": "Hello!",
+      "ignoredMessage": "If you didn't request this email, you can safely ignore it.",
+      "subject": "Confirm Your Email",
+      "title": "Welcome to Bingify",
+      "welcomeText": "Thank you for signing up for Bingify. Please click the button below to confirm your email address."
+    },
+    "emailChange": {
+      "buttonText": "Confirm Email Change",
+      "greeting": "Hello,",
+      "ignoredMessage": "If you didn't request this change, please ignore this email.",
+      "securityWarning": "We noticed a request to change the email address associated with your Bingify account. If this wasn't you, please secure your account immediately.",
+      "subject": "Confirm Your Email Change",
+      "warningTitle": "Email Change Request"
+    },
+    "emailChangedNotification": {
+      "accountSecurityLabel": "Account Security",
+      "checklistItem1": "Enable two-factor authentication in your account settings",
+      "checklistItem2": "Review your recent login activity",
+      "checklistItem3": "Update your security settings",
+      "greeting": "Hello,",
+      "newEmailMessage": "Your new email address is: {newEmail}",
+      "subject": "Email Address Changed",
+      "successMessage": "Your email address has been successfully changed. You can now use your new email to sign in."
+    },
+    "footer": {
+      "description": "Bingify is a service for sharing bingo games with friends and family.",
+      "rights": "All rights reserved"
+    },
+    "invite": {
+      "buttonText": "Join Bingify",
+      "feature1": "Create and share bingo games in real-time",
+      "feature2": "Perfect for streamers and communities",
+      "feature3": "Beautiful, intuitive interface",
+      "featuresTitle": "Features of Bingify",
+      "greeting": "Hello!",
+      "ignoredMessage": "If you didn't request this invitation, you can safely ignore it.",
+      "joinMessage": "You have been invited to join Bingify! Click the button below to accept the invitation and create your account.",
+      "subject": "You're Invited to Bingify",
+      "title": "You're Invited"
+    },
+    "magicLink": {
+      "buttonText": "Sign In",
+      "expirationNote": "This link will expire in 1 hour. If it has expired, please request a new sign-in link.",
+      "greeting": "Hello,",
+      "securityNote": "If you didn't request this sign-in link, you can safely ignore this email.",
+      "subject": "Sign In to Bingify",
+      "text": "We received a request to sign in to your account. Click the button below to sign in."
+    },
+    "otpCodeLabel": "If the button doesn't work, use this code:",
+    "passwordChangedNotification": {
+      "greeting": "Hello,",
+      "passwordSecurityLabel": "Password Security Tips",
+      "securityTip1": "Use a strong password (8+ characters, mixed case, numbers, and symbols)",
+      "securityTip2": "Never share your password with anyone",
+      "securityTip3": "Enable two-factor authentication for extra security",
+      "subject": "Your Password Has Been Changed",
+      "successMessage": "Your password has been successfully changed. You can now sign in with your new password."
+    },
+    "recovery": {
+      "buttonText": "Reset Password",
+      "expirationNote": "This link will expire in 1 hour. If it has expired, please request a new password reset.",
+      "greeting": "Hello,",
+      "securityNoticeTitle": "Security Notice",
+      "securityWarning": "If you didn't request this password reset, someone may be trying to access your account. Please ignore this email and consider changing your password.",
+      "subject": "Reset Your Password",
+      "text": "We received a request to reset your password. Click the button below to set a new password."
+    }
+  },
   "Errors": {
     "authRequired": "Authentication required",
     "failedToCountSpaces": "Failed to verify space count",
@@ -679,6 +750,7 @@
     "errorEmailInvalid": "Please enter a valid email address",
     "errorMessage": "An error occurred during sign-in. Please try again.",
     "googleButton": "Sign in with Google",
+    "loginSuccess": "Welcome back! You've successfully signed in.",
     "metaDescription": "Sign in to Bingify to create bingo spaces, host events, and manage your account.",
     "metaTitle": "Sign in",
     "orDivider": "or",

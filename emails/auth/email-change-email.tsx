@@ -1,4 +1,5 @@
 import { Body, Html, Preview, Section, Text } from "@react-email/components";
+import { getTranslations } from "next-intl/server";
 import { OtpSection, WarningBox } from "../components/alert-box";
 import { EmailButton } from "../components/email-button";
 import { EmailContainer } from "../components/email-container";
@@ -15,50 +16,38 @@ export interface EmailChangeEmailProps {
  * Email change email template for secure email address change
  * Sent when a user requests to change their email address
  */
-export function EmailChangeEmail({
+export async function EmailChangeEmail({
   confirmationUrl,
   locale = "en",
   token,
 }: EmailChangeEmailProps) {
-  const isJa = locale === "ja";
-
-  const subject = isJa
-    ? "メールアドレス変更の確認"
-    : "Confirm Your Email Change";
-  const greeting = isJa ? "こんにちは、" : "Hello,";
-  const warningTitle = isJa
-    ? "メールアドレス変更リクエスト"
-    : "Email Change Request";
-  const securityWarning = isJa
-    ? "Bingifyアカウントに関連付けられたメールアドレスを変更するリクエストが検出されました。これに心当たりがない場合は、すぐにアカウントを保護してください。"
-    : "We noticed a request to change the email address associated with your Bingify account. If this wasn't you, please secure your account immediately.";
-  const buttonText = isJa ? "メールアドレス変更を確認" : "Confirm Email Change";
-  const ignoredMessage = isJa
-    ? "このメールに心当たりがない場合は、無視していただいて構いません。"
-    : "If you didn't request this change, please ignore this email.";
+  const t = await getTranslations({
+    locale,
+    namespace: "EmailTemplates.emailChange",
+  });
 
   return (
-    <Html lang={isJa ? "ja" : "en"}>
-      <Preview>{subject}</Preview>
+    <Html lang={locale}>
+      <Preview>{t("subject")}</Preview>
       <Body style={bodyStyle}>
         <EmailContainer>
-          <EmailHeader title={subject} />
+          <EmailHeader title={t("subject")} />
 
           <Section style={contentStyle}>
-            <Text style={greetingStyle}>{greeting}</Text>
+            <Text style={greetingStyle}>{t("greeting")}</Text>
 
             <WarningBox>
               <Text style={warningTitleStyle}>
-                <strong>{warningTitle}</strong>
+                <strong>{t("warningTitle")}</strong>
               </Text>
-              <Text style={warningTextStyle}>{securityWarning}</Text>
+              <Text style={warningTextStyle}>{t("securityWarning")}</Text>
             </WarningBox>
 
-            <EmailButton href={confirmationUrl} text={buttonText} />
+            <EmailButton href={confirmationUrl} text={t("buttonText")} />
 
             <OtpSection code={token} locale={locale} />
 
-            <Text style={footerTextStyle}>{ignoredMessage}</Text>
+            <Text style={footerTextStyle}>{t("ignoredMessage")}</Text>
           </Section>
 
           <EmailFooter companyName="Bingify" locale={locale} />

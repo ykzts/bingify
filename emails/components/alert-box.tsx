@@ -1,4 +1,5 @@
 import { Section, Text } from "@react-email/components";
+import { getTranslations } from "next-intl/server";
 
 interface AlertBoxProps {
   children: React.ReactNode;
@@ -32,17 +33,15 @@ export function InfoBox({ children }: AlertBoxProps) {
  * OTP display section component
  * Used to highlight one-time passwords in monospace font
  */
-export function OtpSection({
+export async function OtpSection({
   code,
   locale = "en",
 }: {
   code: string;
   locale?: string;
 }) {
-  const isJa = locale === "ja";
-  const label = isJa
-    ? "ボタンが機能しない場合は、このコードを使用してください："
-    : "If the button doesn't work, use this code:";
+  const t = await getTranslations({ locale, namespace: "EmailTemplates" });
+  const label = t("otpCodeLabel");
 
   return (
     <Section style={otpSectionStyle}>
