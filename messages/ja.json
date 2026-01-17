@@ -749,6 +749,7 @@
     "errorEmailInvalid": "有効なメールアドレスを入力してください",
     "errorMessage": "ログイン中にエラーが発生しました。もう一度お試しください。",
     "googleButton": "Googleでログイン",
+    "loginSuccess": "ログインに成功しました。おかえりなさい！",
     "metaDescription": "Bingifyにログインして、ビンゴスペースの作成、イベントの主催、アカウントの管理を行いましょう。",
     "metaTitle": "ログイン",
     "orDivider": "または",
