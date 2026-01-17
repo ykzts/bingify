@@ -351,7 +351,7 @@ export async function createAnnouncementAction(
     if (!(jaData || enData)) {
       return {
         ...initialFormState,
-        errors: ["At least one language must be provided"],
+        errors: ["errorAtLeastOneLanguageRequired"],
         meta: { success: false },
       };
     }
@@ -429,9 +429,7 @@ async function updateOrCreateJapaneseAnnouncement(
       })
       .eq("id", currentAnnouncement.id);
 
-    return error
-      ? `Japanese announcement update failed: ${error.message}`
-      : null;
+    return error ? "errorUpdateJapaneseFailed" : null;
   }
 
   // Find or create Japanese translation
@@ -451,7 +449,7 @@ async function updateOrCreateJapaneseAnnouncement(
       })
       .eq("id", existingJa.id);
 
-    return error ? "Japanese translation failed to update" : null;
+    return error ? "errorUpdateJapaneseTranslationFailed" : null;
   }
 
   const { error } = await adminClient.from("announcements").insert({
@@ -462,7 +460,7 @@ async function updateOrCreateJapaneseAnnouncement(
     parent_id: parentId,
   });
 
-  return error ? "Japanese translation failed to create" : null;
+  return error ? "errorCreateJapaneseTranslationFailed" : null;
 }
 
 async function updateOrCreateEnglishAnnouncement(
@@ -484,9 +482,7 @@ async function updateOrCreateEnglishAnnouncement(
       })
       .eq("id", currentAnnouncement.id);
 
-    return error
-      ? `English announcement update failed: ${error.message}`
-      : null;
+    return error ? "errorUpdateEnglishFailed" : null;
   }
 
   // Find or create English translation
@@ -506,7 +502,7 @@ async function updateOrCreateEnglishAnnouncement(
       })
       .eq("id", existingEn.id);
 
-    return error ? "English translation failed to update" : null;
+    return error ? "errorUpdateEnglishTranslationFailed" : null;
   }
 
   const { error } = await adminClient.from("announcements").insert({
@@ -517,7 +513,7 @@ async function updateOrCreateEnglishAnnouncement(
     parent_id: parentId,
   });
 
-  return error ? "English translation failed to create" : null;
+  return error ? "errorCreateEnglishTranslationFailed" : null;
 }
 
 function extractCommonData(formData: FormData): CommonAnnouncementData {
@@ -649,7 +645,7 @@ export async function updateAnnouncementAction(
     if (!(jaData || enData)) {
       return {
         ...initialFormState,
-        errors: ["At least one language must be provided"],
+        errors: ["errorAtLeastOneLanguageRequired"],
         meta: { success: false },
       };
     }

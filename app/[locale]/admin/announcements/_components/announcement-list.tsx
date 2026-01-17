@@ -18,7 +18,10 @@ import {
 } from "@/components/ui/pagination";
 import { formatDate } from "@/lib/utils/date-format";
 import type { Tables } from "@/types/supabase";
-import { deleteAnnouncementAction } from "../_actions/announcements";
+import {
+  deleteAnnouncementAction,
+  getAnnouncementWithTranslations,
+} from "../_actions/announcements";
 import { AnnouncementForm } from "./announcement-form";
 
 interface AnnouncementListProps {
@@ -76,9 +79,6 @@ export function AnnouncementList({
     setEditDialogId(announcement.id);
 
     // Fetch translation data
-    const { getAnnouncementWithTranslations } = await import(
-      "../_actions/announcements"
-    );
     const result = await getAnnouncementWithTranslations(announcement.id);
 
     if (result.translation) {
