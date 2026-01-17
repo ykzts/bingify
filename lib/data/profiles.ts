@@ -39,7 +39,7 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
         ): profile is {
           email: string;
           full_name: string | null;
-          locale: string | null;
+          locale: string;
         } => profile.email !== null
       )
       .map(
@@ -50,7 +50,7 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
                 name: profile.full_name,
               }
             : profile.email,
-          locale: profile.locale || "ja", // デフォルトは日本語
+          locale: profile.locale, // Already NOT NULL in database
         })
       );
 
