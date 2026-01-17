@@ -1,0 +1,173 @@
+version: 1
+
+rules:
+  # サービス名・ブランド名
+  - expected: GitHub
+    patterns:
+      - /Github/
+      - /github/
+      - /GITHUB/
+    specs: []
+  
+  - expected: Google
+    patterns:
+      - /google/
+      - /GOOGLE/
+    specs: []
+  
+  - expected: Twitch
+    patterns:
+      - /twitch/
+      - /TWITCH/
+    specs: []
+  
+  - expected: YouTube
+    patterns:
+      - /Youtube/
+      - /youtube/
+      - /YOUTUBE/
+    specs: []
+  
+  - expected: Supabase
+    patterns:
+      - /supabase/
+      - /SUPABASE/
+    specs: []
+  
+  - expected: PostgreSQL
+    patterns:
+      - /Postgresql/
+      - /postgresql/
+      - /postgres/
+      - /POSTGRESQL/
+    specs: []
+  
+  # フレームワーク・ライブラリ
+  - expected: Next.js
+    patterns:
+      - /Next\.JS/
+      - /NextJS/
+      - /nextjs/
+      - /Nextjs/
+    specs: []
+  
+  - expected: React
+    patterns:
+      - /react/
+      - /REACT/
+    specs: []
+  
+  - expected: Node.js
+    patterns:
+      - /Node\.JS/
+      - /NodeJS/
+      - /nodejs/
+      - /Nodejs/
+    specs: []
+  
+  - expected: Tailwind CSS
+    patterns:
+      - /TailwindCSS/
+      - /tailwindcss/
+      - /Tailwind css/
+    specs: []
+  
+  # 技術用語
+  - expected: OAuth
+    patterns:
+      - /oauth/
+      - /OAUTH/
+      - /Oauth/
+    specs: []
+  
+  - expected: API
+    patterns:
+      - /api/i
+    specs:
+      - from: API
+        to: API
+  
+  - expected: JSON
+    patterns:
+      - /json/
+      - /Json/
+    specs: []
+  
+  - expected: URL
+    patterns:
+      - /url/
+      - /Url/
+    specs: []
+  
+  - expected: HTTP
+    patterns:
+      - /http/
+      - /Http/
+    specs: []
+  
+  - expected: Cookie
+    pattern: /cookie/
+    specs:
+      - from: Cookie
+        to: Cookie
+  
+  - expected: UUID
+    patterns:
+      - /uuid/
+      - /Uuid/
+    specs: []
+  
+  - expected: SQL
+    patterns:
+      - /sql/
+      - /Sql/
+    specs: []
+  
+  - expected: JWT
+    patterns:
+      - /jwt/
+      - /Jwt/
+    specs: []
+  
+  # カタカナ長音符ルール
+  - expected: ユーザー
+    patterns:
+      - ユーザ
+    specs: []
+  
+  - expected: サーバー
+    patterns:
+      - サーバ
+    specs: []
+  
+  - expected: ブラウザー
+    patterns:
+      - ブラウザ
+    specs: []
+  
+  - expected: コンピューター
+    patterns:
+      - コンピュータ
+    specs: []
+  
+  - expected: プロバイダー
+    patterns:
+      - プロバイダ
+    specs: []
+  
+  - expected: メンバー
+    patterns:
+      - メンバ
+    specs: []
+  
+  - expected: エラー
+    patterns:
+      - エラ
+    specs: []
+  
+  # プロジェクト固有の用語
+  - expected: Bingify
+    patterns:
+      - /bingify/
+      - /BINGIFY/
+    specs: []
