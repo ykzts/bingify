@@ -115,10 +115,13 @@ export function AnnouncementList({
   };
 
   const getLocaleDisplay = (announcement: (typeof announcements)[0]) => {
-    const parentLocale =
-      announcement.locale === "ja"
+    const getLocaleName = (localeCode: string) => {
+      return localeCode === "ja"
         ? t("announcementLocaleJa")
         : t("announcementLocaleEn");
+    };
+
+    const parentLocale = getLocaleName(announcement.locale);
 
     const translations = announcement.translations || [];
     if (translations.length === 0) {
@@ -126,7 +129,7 @@ export function AnnouncementList({
     }
 
     const translationLocales = translations
-      .map((t) => (t.locale === "ja" ? "日本語" : "英語"))
+      .map((translation) => getLocaleName(translation.locale))
       .join(", ");
 
     return `${parentLocale} + ${translationLocales}`;
