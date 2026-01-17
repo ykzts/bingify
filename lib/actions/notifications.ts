@@ -6,11 +6,6 @@ import { createClient } from "@/lib/supabase/server";
 import type { Notification } from "@/lib/types/notification";
 
 /**
- * 通知関連のキャッシュ再検証パス
- */
-const NOTIFICATION_REVALIDATE_PATH = "/[locale]/dashboard";
-
-/**
  * 通知取得結果の型
  */
 export interface GetNotificationsResult {
@@ -236,7 +231,8 @@ export async function markNotificationRead(
     }
 
     // キャッシュ再検証
-    revalidatePath(NOTIFICATION_REVALIDATE_PATH, "page");
+    revalidatePath("/[locale]", "layout");
+    revalidatePath("/[locale]/notifications", "page");
 
     return {
       success: true,
@@ -290,7 +286,8 @@ export async function markAllNotificationsRead(): Promise<NotificationActionResu
     }
 
     // キャッシュ再検証
-    revalidatePath(NOTIFICATION_REVALIDATE_PATH, "page");
+    revalidatePath("/[locale]", "layout");
+    revalidatePath("/[locale]/notifications", "page");
 
     return {
       success: true,
@@ -368,7 +365,8 @@ export async function deleteNotification(
     }
 
     // キャッシュ再検証
-    revalidatePath(NOTIFICATION_REVALIDATE_PATH, "page");
+    revalidatePath("/[locale]", "layout");
+    revalidatePath("/[locale]/notifications", "page");
 
     return {
       success: true,
