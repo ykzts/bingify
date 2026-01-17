@@ -1056,12 +1056,16 @@
     "recentCalledNumbers": "最近呼ばれた番号",
     "spaceId": "スペースID",
     "spaceSubtitle": "ビンゴスペース",
+    "twitchAccountLinkRequired": "このスペースに参加するには、アカウント設定でTwitchアカウントを連携してください。",
+    "twitchAccountLinkRequiredButton": "アカウント設定に移動",
     "verifyAndJoinButton": "YouTubeを確認して参加",
     "verifyingAndJoining": "確認中...",
     "verifyingTwitch": "確認中...",
     "verifyingYouTube": "確認中...",
     "verifyTwitchButton": "Twitchアカウントを確認する",
     "verifyYouTubeButton": "YouTubeアカウントを確認する",
-    "yourFinalResultTitle": "あなたの最終結果"
+    "yourFinalResultTitle": "あなたの最終結果",
+    "youTubeAccountLinkRequired": "このスペースに参加するには、アカウント設定でYouTubeアカウントを連携してください。",
+    "youTubeAccountLinkRequiredButton": "アカウント設定に移動"
   }
 }
