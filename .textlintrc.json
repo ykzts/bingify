@@ -28,7 +28,8 @@
       "ignore": [
         "http://localhost*",
         "https://bingify.space*",
-        "https://vercel.com/*"
+        "https://vercel.com/*",
+        "https://www.bunka.go.jp/*"
       ],
       "ignoreRedirects": false,
       "retry": 1,
@@ -48,12 +49,7 @@
         "max": 7
       },
       "arabic-kanji-numbers": true,
-      "no-mix-dearu-desumasu": {
-        "preferInHeader": "",
-        "preferInBody": "ですます",
-        "preferInList": "である",
-        "strict": false
-      },
+      "no-mix-dearu-desumasu": false,
       "ja-no-mixed-period": {
         "allowPeriodMarks": [],
         "forceAppendPeriod": false

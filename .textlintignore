@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.next/
+dist/
+out/
+
+# Generated files
+pnpm-lock.yaml
+package-lock.json
+
+# Logs
+*.log
+
+# Environment files
+.env*
+!.env.example
+
+# Skills and agent documentation (internal)
+.github/skills/
+
+# Auto-generated documentation
+types/

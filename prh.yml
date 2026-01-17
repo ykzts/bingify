@@ -131,38 +131,31 @@ rules:
   
   # カタカナ長音符ルール
   - expected: ユーザー
-    patterns:
-      - ユーザ
+    pattern: /ユーザ(?!ー)/
     specs: []
   
   - expected: サーバー
-    patterns:
-      - サーバ
+    pattern: /サーバ(?!ー)/
     specs: []
   
   - expected: ブラウザー
-    patterns:
-      - ブラウザ
+    pattern: /ブラウザ(?!ー)/
     specs: []
   
   - expected: コンピューター
-    patterns:
-      - コンピュータ
+    pattern: /コンピュータ(?!ー)/
     specs: []
   
   - expected: プロバイダー
-    patterns:
-      - プロバイダ
+    pattern: /プロバイダ(?!ー)/
     specs: []
   
   - expected: メンバー
-    patterns:
-      - メンバ
+    pattern: /メンバ(?!ー)/
     specs: []
   
   - expected: エラー
-    patterns:
-      - エラ
+    pattern: /エラ(?!ー)/
     specs: []
   
   # プロジェクト固有の用語

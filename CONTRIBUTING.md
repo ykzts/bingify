@@ -13,16 +13,16 @@ pnpm dev
 
 ## スクリプト
 
-- `pnpm local:setup` / `pnpm local:stop` — Supabase 起動/停止
+- `pnpm local:setup` / `pnpm local:stop` — Supabase起動/停止
 - `pnpm dev` — 開発サーバー起動
 - `pnpm build` — 本番ビルド
-- `pnpm lint` — ESLint 実行
+- `pnpm lint` — ESLint実行
 
 ## コーディング指針
 
 - **Server Functions**: バリデーション・DB操作をサーバーサイド実装（"use server"）。
-- **フォーム処理**: `useActionState` で Server Function を呼び出し、エラーメッセージを状態管理。
-- **Zod**: スキーマ定義 → 型推論 → Server Functions 内で `safeParse()` でバリデーション。
+- **フォーム処理**: `useActionState` でServer Functionを呼び出し、エラーメッセージを状態管理。
+- **Zod**: スキーマ定義 → 型推論 → Server Functions内で `safeParse()` でバリデーション。
 - **スタイリング**: Tailwind CSS（CSS-first、`tailwind.config.ts` 不要）。
 - **型安全**: `z.infer<typeof schema>` で型を推論し、手動定義を避ける。
 
@@ -50,7 +50,7 @@ supabase migration new fix_archive_table_schema
 
 ### Conventional Commits に準拠
 
-コミットメッセージと Pull Request は以下の形式に従ってください。GitHub Web UI でも見やすいようにシンプルで簡潔な英文を使用します。
+コミットメッセージとPull Requestは以下の形式に従ってください。GitHub Web UIでも見やすいようにシンプルで簡潔な英文を使用します。
 
 **形式:**
 
@@ -76,7 +76,7 @@ optional detailed explanation
 - `dashboard`: ダッシュボード機能
 - `space`: スペース関連
 - `auth`: 認証処理
-- `db`: Supabase スキーマ
+- `db`: Supabaseスキーマ
 
 **例:**
 
@@ -87,9 +87,9 @@ optional detailed explanation
 
 **Pull Request との対応:**
 
-- PR タイトル = `type(scope): subject`
+- PRタイトル = `type(scope): subject`
 - PR description = 詳細説明（body）
-- マージ時のコミットメッセージ = PR タイトル + description
+- マージ時のコミットメッセージ = PRタイトル + description
 
 ### コミット前のチェック
 
@@ -97,7 +97,7 @@ optional detailed explanation
 - `pnpm check` を実行してリント・フォーマットエラーがないことを確認。
 - `pnpm type-check` で型チェックエラーがないことを確認。
 - `pnpm test` でテストが通ることを確認。
-- 必要に応じて動作確認スクリーンショットを PR に記載。
+- 必要に応じて動作確認スクリーンショットをPRに記載。
 
 ## サンプルドメインの使用
 
@@ -114,7 +114,7 @@ optional detailed explanation
 - コード例（テスト、ドキュメント内のコードブロック）
 - メールアドレスの例示
 - URLの例示
-- API リクエスト/レスポンスの例
+- APIリクエスト/レスポンスの例
 
 **例:**
 
@@ -143,11 +143,11 @@ const url = "https://mycompany.com/callback";
 - **実装ログ**: コードが真実の情報源（Single Source of Truth）
 - **未実装機能**: ドキュメント・コード乖離を生む
 - **API リファレンスの重複**: 公式ドキュメントへリンクで十分
-- **一時的な手順書**: README か `.env.example` で対応
+- **一時的な手順書**: READMEか `.env.example` で対応
 
 ### メンテナンス原則
 
-1. **コード・ドキュメント同期**: 機能追加時にドキュメントも同じ PR で更新
+1. **コード・ドキュメント同期**: 機能追加時にドキュメントも同じPRで更新
 2. **Single Source of Truth**: 同じ情報を複数箇所に記載しない
 3. **定期的な見直し**: 四半期ごとにドキュメント妥当性を確認
 4. **簡潔さ**: 必要最小限の情報のみ記載
