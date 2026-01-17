@@ -4,33 +4,42 @@ import {
   announcementContentSchema,
   announcementPrioritySchema,
   announcementTitleSchema,
-  localeSchema,
 } from "@/lib/schemas/announcement";
 
-export const announcementFormSchema = z.object({
+// スキーマ: 各言語のコンテンツ
+const languageContentSchema = z.object({
   content: announcementContentSchema,
+  title: announcementTitleSchema,
+});
+
+export const announcementFormSchema = z.object({
   dismissible: z.boolean(),
+  // 日本語版（必須）
+  en: languageContentSchema.optional(),
   ends_at: z.string().optional(),
-  locale: localeSchema,
-  parent_id: z.string().uuid().optional().nullable(),
+  // 英語版（任意）
+  ja: languageContentSchema,
   priority: announcementPrioritySchema,
   published: z.boolean(),
   starts_at: z.string().optional(),
-  title: announcementTitleSchema,
 });
 
 export type AnnouncementFormValues = z.infer<typeof announcementFormSchema>;
 
 export const announcementFormOpts = formOptions({
   defaultValues: {
-    content: "",
     dismissible: true,
+    en: {
+      content: "",
+      title: "",
+    },
     ends_at: "",
-    locale: "ja" as const,
-    parent_id: null,
+    ja: {
+      content: "",
+      title: "",
+    },
     priority: "info" as const,
     published: false,
     starts_at: "",
-    title: "",
   } as AnnouncementFormValues,
 });

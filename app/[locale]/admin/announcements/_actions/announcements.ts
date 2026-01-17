@@ -90,6 +90,65 @@ const createAnnouncementValidate = createServerValidate({
   onServerValidate: () => undefined,
 });
 
+async function createParentAnnouncement(
+  adminClient: ReturnType<typeof createAdminClient>,
+  userId: string,
+  formData: {
+    content: string;
+    dismissible: boolean;
+    ends_at: string | null;
+    priority: "info" | "warning" | "error";
+    published: boolean;
+    starts_at: string | null;
+    title: string;
+  }
+) {
+  return await adminClient
+    .from("announcements")
+    .insert({
+      content: formData.content,
+      created_by: userId,
+      dismissible: formData.dismissible,
+      ends_at: formData.ends_at,
+      locale: "ja",
+      parent_id: null,
+      priority: formData.priority,
+      published: formData.published,
+      starts_at: formData.starts_at,
+      title: formData.title,
+    })
+    .select()
+    .single();
+}
+
+async function createTranslationAnnouncement(
+  adminClient: ReturnType<typeof createAdminClient>,
+  userId: string,
+  parentId: string,
+  formData: {
+    content: string;
+    dismissible: boolean;
+    ends_at: string | null;
+    priority: "info" | "warning" | "error";
+    published: boolean;
+    starts_at: string | null;
+    title: string;
+  }
+) {
+  return await adminClient.from("announcements").insert({
+    content: formData.content,
+    created_by: userId,
+    dismissible: formData.dismissible,
+    ends_at: formData.ends_at,
+    locale: "en",
+    parent_id: parentId,
+    priority: formData.priority,
+    published: formData.published,
+    starts_at: formData.starts_at,
+    title: formData.title,
+  });
+}
+
 export async function createAnnouncementAction(
   _prevState: unknown,
   formData: FormData
@@ -106,38 +165,62 @@ export async function createAnnouncementAction(
   try {
     await createAnnouncementValidate(formData);
 
-    const title = (formData.get("title") as string) || "";
-    const content = (formData.get("content") as string) || "";
-    const priority = (formData.get("priority") as string) || "info";
-    const locale = (formData.get("locale") as string) || "ja";
-    const parent_id = (formData.get("parent_id") as string) || null;
-    const starts_at = (formData.get("starts_at") as string) || "";
-    const ends_at = (formData.get("ends_at") as string) || "";
-    const dismissible = formData.has("dismissible");
-    const published = formData.has("published");
+    // 共通フィールド
+    const commonData = {
+      dismissible: formData.has("dismissible"),
+      ends_at: (formData.get("ends_at") as string) || null,
+      priority: ((formData.get("priority") as string) || "info") as
+        | "info"
+        | "warning"
+        | "error",
+      published: formData.has("published"),
+      starts_at: (formData.get("starts_at") as string) || null,
+    };
+
+    // 日本語版
+    const jaData = {
+      ...commonData,
+      content: (formData.get("ja.content") as string) || "",
+      title: (formData.get("ja.title") as string) || "",
+    };
+
+    // 英語版（任意）
+    const enTitle = (formData.get("en.title") as string) || "";
+    const enContent = (formData.get("en.content") as string) || "";
 
     const adminClient = createAdminClient();
 
-    const { error } = await adminClient.from("announcements").insert({
-      content,
-      created_by: userId,
-      dismissible,
-      ends_at: ends_at || null,
-      locale: locale as "en" | "ja",
-      parent_id: parent_id || null,
-      priority: priority as "info" | "warning" | "error",
-      published,
-      starts_at: starts_at || null,
-      title,
-    });
+    // 日本語版を親として作成
+    const { data: parentAnnouncement, error: parentError } =
+      await createParentAnnouncement(adminClient, userId, jaData);
 
-    if (error) {
-      console.error("Failed to create announcement:", error);
+    if (parentError || !parentAnnouncement) {
+      console.error("Failed to create Japanese announcement:", parentError);
       return {
         ...initialFormState,
         errors: ["errorCreateFailed"],
         meta: { success: false },
       };
+    }
+
+    // 英語版が入力されている場合は翻訳版として作成
+    if (enTitle && enContent) {
+      const enData = {
+        ...commonData,
+        content: enContent,
+        title: enTitle,
+      };
+
+      const { error: enError } = await createTranslationAnnouncement(
+        adminClient,
+        userId,
+        parentAnnouncement.id,
+        enData
+      );
+
+      if (enError) {
+        console.error("Failed to create English announcement:", enError);
+      }
     }
 
     return {
@@ -150,7 +233,6 @@ export async function createAnnouncementAction(
       return (e as { formState: unknown }).formState;
     }
 
-    // Some other error occurred
     console.error("Error in createAnnouncementAction:", e);
     return {
       ...initialFormState,
