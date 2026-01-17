@@ -17,7 +17,6 @@ import { ConditionalHeader } from "./_components/conditional-header";
 import { Footer } from "./_components/footer";
 import { HeaderMenuWrapper } from "./_components/header-menu-wrapper";
 import { MobileFooterNavWrapper } from "./_components/mobile-footer-nav-wrapper";
-import { PreReleaseBanner } from "./_components/pre-release-banner";
 
 const nunito = Nunito({
   display: "swap",
@@ -61,7 +60,6 @@ export default async function LocaleLayout({
           <NextIntlClientProvider locale={locale} messages={messages}>
             <ConfirmProvider>
               <div className="flex min-h-screen flex-col">
-                <PreReleaseBanner />
                 <Suspense fallback={null}>
                   <AnnouncementBanner />
                 </Suspense>
