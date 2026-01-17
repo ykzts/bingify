@@ -90,10 +90,17 @@ export async function getAllAnnouncements(
     const parentIds = parentAnnouncements.map((a) => a.id);
 
     // Fetch translations for all parent announcements
-    const { data: translations } = await adminClient
+    const { data: translations, error: translationsError } = await adminClient
       .from("announcements")
       .select("parent_id, locale")
       .in("parent_id", parentIds);
+
+    if (translationsError) {
+      console.error("Failed to fetch translations:", translationsError);
+      return {
+        error: "errorGeneric",
+      };
+    }
 
     // Group translations by parent_id
     const translationsByParent = new Map<string, { locale: string }[]>();

@@ -132,7 +132,10 @@ export function AnnouncementList({
       .map((translation) => getLocaleName(translation.locale))
       .join(", ");
 
-    return `${parentLocale} + ${translationLocales}`;
+    return t("announcementLocaleWithTranslations", {
+      locale: parentLocale,
+      translations: translationLocales,
+    });
   };
 
   const hasPrevious = currentPage > 1;
