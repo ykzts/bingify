@@ -3,6 +3,10 @@
 import { initialFormState } from "@tanstack/react-form-nextjs";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
+import {
+  announcementContentSchema,
+  announcementTitleSchema,
+} from "@/lib/schemas/announcement";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
@@ -582,11 +586,11 @@ function extractLanguageData(formData: FormData): LanguageData {
     const content = (formData.get(`${locale}.content`) as string) || "";
 
     if (title && content) {
-      // Validate using Zod
+      // Validate using Zod with the same schemas used in the form
       const result = z
         .object({
-          content: z.string().min(1),
-          title: z.string().min(1),
+          content: announcementContentSchema,
+          title: announcementTitleSchema,
         })
         .safeParse({ content, title });
 
