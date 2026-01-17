@@ -72,6 +72,7 @@ describe("announcementContentSchema", () => {
 describe("createAnnouncementSchema", () => {
   const validAnnouncement = {
     content: "テストコンテンツ",
+    locale: "ja" as const,
     priority: "info" as const,
     title: "テストタイトル",
   };

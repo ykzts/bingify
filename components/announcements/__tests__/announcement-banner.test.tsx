@@ -18,6 +18,7 @@ vi.mock("@/lib/actions/announcements", () => ({
 
 // next-intlのモック
 vi.mock("next-intl", () => ({
+  useLocale: () => "ja",
   useTranslations: () => (key: string) => {
     const translations: Record<string, string> = {
       viewDetails: "詳細を見る",
