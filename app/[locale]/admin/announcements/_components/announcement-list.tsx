@@ -81,7 +81,9 @@ export function AnnouncementList({
     // Fetch translation data
     const result = await getAnnouncementWithTranslations(announcement.id);
 
-    if (result.translation) {
+    if (result.error) {
+      toast.error(t(result.error));
+    } else if (result.translation) {
       setEditingTranslation(result.translation);
     } else {
       setEditingTranslation(null);
