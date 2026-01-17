@@ -423,8 +423,15 @@ async function updateOrCreateJapaneseAnnouncement(
 ): Promise<string | null> {
   const t = await getTranslations("Admin");
 
+  console.log("updateOrCreateJapaneseAnnouncement:", {
+    currentAnnouncement,
+    parentId,
+    jaData,
+  });
+
   if (currentAnnouncement.locale === "ja" && !currentAnnouncement.parent_id) {
     // Update the current announcement as it's the Japanese parent
+    console.log("Updating Japanese parent:", currentAnnouncement.id);
     const { error } = await adminClient
       .from("announcements")
       .update({
@@ -445,7 +452,10 @@ async function updateOrCreateJapaneseAnnouncement(
     .eq("locale", "ja")
     .maybeSingle();
 
+  console.log("Found existing Japanese translation:", existingJa);
+
   if (existingJa) {
+    console.log("Updating Japanese translation:", existingJa.id);
     const { error } = await adminClient
       .from("announcements")
       .update({
@@ -457,6 +467,7 @@ async function updateOrCreateJapaneseAnnouncement(
     return error ? t("errorUpdateJapaneseTranslationFailed") : null;
   }
 
+  console.log("Creating new Japanese translation");
   const { error } = await adminClient.from("announcements").insert({
     ...commonData,
     ...jaData,
@@ -549,6 +560,15 @@ function extractLanguageData(formData: FormData): {
   const enContent = (formData.get("en.content") as string) || "";
   const enData =
     enTitle && enContent ? { content: enContent, title: enTitle } : null;
+
+  console.log("extractLanguageData:", {
+    jaTitle,
+    jaContent,
+    jaData,
+    enTitle,
+    enContent,
+    enData,
+  });
 
   return { enData, jaData };
 }
