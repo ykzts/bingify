@@ -5,6 +5,7 @@ import {
   initialFormState,
 } from "@tanstack/react-form-nextjs";
 import { getTranslations } from "next-intl/server";
+import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
@@ -144,8 +145,9 @@ export async function getAnnouncementWithTranslations(
     };
   } catch (error) {
     console.error("Error in getAnnouncementWithTranslations:", error);
+    const t = await getTranslations("Admin");
     return {
-      error: "errorGeneric",
+      error: t("errorGeneric"),
     };
   }
 }
@@ -314,11 +316,13 @@ export async function createAnnouncementAction(
   _prevState: unknown,
   formData: FormData
 ) {
+  const t = await getTranslations("Admin");
+
   const { isAdmin, userId } = await verifyAdminRole();
   if (!(isAdmin && userId)) {
     return {
       ...initialFormState,
-      errors: ["errorNoPermission"],
+      errors: [t("errorNoPermission")],
       meta: { success: false },
     };
   }
@@ -326,40 +330,27 @@ export async function createAnnouncementAction(
   try {
     await createAnnouncementValidate(formData);
 
-    // 共通フィールド
-    const commonData = {
-      dismissible: formData.has("dismissible"),
-      ends_at: (formData.get("ends_at") as string) || null,
-      priority: ((formData.get("priority") as string) || "info") as
-        | "info"
-        | "warning"
-        | "error",
-      published: formData.has("published"),
-      starts_at: (formData.get("starts_at") as string) || null,
-    };
+    // Extract common fields
+    const commonData = extractCommonData(formData);
 
-    // 日本語版
-    const jaTitle = (formData.get("ja.title") as string) || "";
-    const jaContent = (formData.get("ja.content") as string) || "";
-    const jaData =
-      jaTitle && jaContent ? { content: jaContent, title: jaTitle } : null;
+    // Extract language-specific data
+    const languageData = extractLanguageData(formData);
 
-    // 英語版
-    const enTitle = (formData.get("en.title") as string) || "";
-    const enContent = (formData.get("en.content") as string) || "";
-    const enData =
-      enTitle && enContent ? { content: enContent, title: enTitle } : null;
-
-    // 少なくとも1つの言語が必要
-    if (!(jaData || enData)) {
+    // At least one language must be provided
+    if (Object.keys(languageData).length === 0) {
       return {
         ...initialFormState,
-        errors: ["errorAtLeastOneLanguageRequired"],
+        errors: [t("errorAtLeastOneLanguageRequired")],
         meta: { success: false },
       };
     }
 
     const adminClient = createAdminClient();
+
+    // For backward compatibility, extract ja and en specifically
+    const jaData = languageData.ja || null;
+    const enData = languageData.en || null;
+
     const result = await createAnnouncementsWithTranslations(
       adminClient,
       userId,
@@ -413,164 +404,152 @@ interface CommonAnnouncementData {
   starts_at: string | null;
 }
 
-async function updateOrCreateJapaneseAnnouncement(
+async function updateOrCreateLanguageAnnouncement(
   adminClient: ReturnType<typeof createAdminClient>,
   userId: string,
   currentAnnouncement: { id: string; locale: string; parent_id: string | null },
   parentId: string,
   commonData: CommonAnnouncementData,
-  jaData: AnnouncementData
+  locale: string,
+  languageData: AnnouncementData
 ): Promise<string | null> {
   const t = await getTranslations("Admin");
 
-  console.log("updateOrCreateJapaneseAnnouncement:", {
+  console.log(`updateOrCreateLanguageAnnouncement (${locale}):`, {
     currentAnnouncement,
+    languageData,
     parentId,
-    jaData,
   });
 
-  if (currentAnnouncement.locale === "ja" && !currentAnnouncement.parent_id) {
-    // Update the current announcement as it's the Japanese parent
-    console.log("Updating Japanese parent:", currentAnnouncement.id);
+  if (currentAnnouncement.locale === locale && !currentAnnouncement.parent_id) {
+    // Update the current announcement as it's the parent for this locale
+    console.log(`Updating ${locale} parent:`, currentAnnouncement.id);
     const { error } = await adminClient
       .from("announcements")
       .update({
         ...commonData,
-        ...jaData,
-        locale: "ja",
+        ...languageData,
+        locale,
       })
       .eq("id", currentAnnouncement.id);
 
-    return error ? t("errorUpdateJapaneseFailed") : null;
+    if (error) {
+      console.error(`Failed to update ${locale} parent:`, error);
+      return t("errorUpdateFailed");
+    }
+    return null;
   }
 
-  // Find or create Japanese translation
-  const { data: existingJa } = await adminClient
+  // Find or create translation for this locale
+  const { data: existingTranslation } = await adminClient
     .from("announcements")
     .select("id")
     .eq("parent_id", parentId)
-    .eq("locale", "ja")
+    .eq("locale", locale)
     .maybeSingle();
 
-  console.log("Found existing Japanese translation:", existingJa);
+  console.log(`Found existing ${locale} translation:`, existingTranslation);
 
-  if (existingJa) {
-    console.log("Updating Japanese translation:", existingJa.id);
+  if (existingTranslation) {
+    console.log(`Updating ${locale} translation:`, existingTranslation.id);
     const { error } = await adminClient
       .from("announcements")
       .update({
         ...commonData,
-        ...jaData,
+        ...languageData,
       })
-      .eq("id", existingJa.id);
+      .eq("id", existingTranslation.id);
 
-    return error ? t("errorUpdateJapaneseTranslationFailed") : null;
+    if (error) {
+      console.error(`Failed to update ${locale} translation:`, error);
+      return t("errorUpdateFailed");
+    }
+    return null;
   }
 
-  console.log("Creating new Japanese translation");
+  console.log(`Creating new ${locale} translation`);
   const { error } = await adminClient.from("announcements").insert({
     ...commonData,
-    ...jaData,
+    ...languageData,
     created_by: userId,
-    locale: "ja",
+    locale,
     parent_id: parentId,
   });
 
-  return error ? t("errorCreateJapaneseTranslationFailed") : null;
-}
-
-async function updateOrCreateEnglishAnnouncement(
-  adminClient: ReturnType<typeof createAdminClient>,
-  userId: string,
-  currentAnnouncement: { id: string; locale: string; parent_id: string | null },
-  parentId: string,
-  commonData: CommonAnnouncementData,
-  enData: AnnouncementData
-): Promise<string | null> {
-  const t = await getTranslations("Admin");
-
-  if (currentAnnouncement.locale === "en" && !currentAnnouncement.parent_id) {
-    // Update the current announcement as it's the English parent
-    const { error } = await adminClient
-      .from("announcements")
-      .update({
-        ...commonData,
-        ...enData,
-        locale: "en",
-      })
-      .eq("id", currentAnnouncement.id);
-
-    return error ? t("errorUpdateEnglishFailed") : null;
+  if (error) {
+    console.error(`Failed to create ${locale} translation:`, error);
+    return t("errorCreateFailed");
   }
-
-  // Find or create English translation
-  const { data: existingEn } = await adminClient
-    .from("announcements")
-    .select("id")
-    .eq("parent_id", parentId)
-    .eq("locale", "en")
-    .maybeSingle();
-
-  if (existingEn) {
-    const { error } = await adminClient
-      .from("announcements")
-      .update({
-        ...commonData,
-        ...enData,
-      })
-      .eq("id", existingEn.id);
-
-    return error ? t("errorUpdateEnglishTranslationFailed") : null;
-  }
-
-  const { error } = await adminClient.from("announcements").insert({
-    ...commonData,
-    ...enData,
-    created_by: userId,
-    locale: "en",
-    parent_id: parentId,
-  });
-
-  return error ? t("errorCreateEnglishTranslationFailed") : null;
+  return null;
 }
 
 function extractCommonData(formData: FormData): CommonAnnouncementData {
-  return {
-    dismissible: formData.has("dismissible"),
-    ends_at: (formData.get("ends_at") as string) || null,
-    priority: ((formData.get("priority") as string) || "info") as
-      | "info"
-      | "warning"
-      | "error",
-    published: formData.has("published"),
-    starts_at: (formData.get("starts_at") as string) || null,
-  };
+  const dismissible = formData.has("dismissible");
+  const ends_at = (formData.get("ends_at") as string) || null;
+  const priority = ((formData.get("priority") as string) || "info") as
+    | "info"
+    | "warning"
+    | "error";
+  const published = formData.has("published");
+  const starts_at = (formData.get("starts_at") as string) || null;
+
+  // Validate using Zod
+  const result = z
+    .object({
+      dismissible: z.boolean(),
+      ends_at: z.string().nullable(),
+      priority: z.enum(["info", "warning", "error"]),
+      published: z.boolean(),
+      starts_at: z.string().nullable(),
+    })
+    .safeParse({
+      dismissible,
+      ends_at,
+      priority,
+      published,
+      starts_at,
+    });
+
+  if (!result.success) {
+    console.error("Common data validation failed:", result.error);
+    throw new Error("Invalid common data");
+  }
+
+  return result.data;
 }
 
-function extractLanguageData(formData: FormData): {
-  jaData: AnnouncementData | null;
-  enData: AnnouncementData | null;
-} {
-  const jaTitle = (formData.get("ja.title") as string) || "";
-  const jaContent = (formData.get("ja.content") as string) || "";
-  const jaData =
-    jaTitle && jaContent ? { content: jaContent, title: jaTitle } : null;
+type LanguageData = Record<
+  string,
+  { title: string; content: string } | undefined
+>;
 
-  const enTitle = (formData.get("en.title") as string) || "";
-  const enContent = (formData.get("en.content") as string) || "";
-  const enData =
-    enTitle && enContent ? { content: enContent, title: enTitle } : null;
+function extractLanguageData(formData: FormData): LanguageData {
+  const languages: LanguageData = {};
 
-  console.log("extractLanguageData:", {
-    jaTitle,
-    jaContent,
-    jaData,
-    enTitle,
-    enContent,
-    enData,
-  });
+  // Extract all language data dynamically
+  const locales = ["ja", "en"]; // This could be made configurable
+  for (const locale of locales) {
+    const title = (formData.get(`${locale}.title`) as string) || "";
+    const content = (formData.get(`${locale}.content`) as string) || "";
 
-  return { enData, jaData };
+    if (title && content) {
+      // Validate using Zod
+      const result = z
+        .object({
+          content: z.string().min(1),
+          title: z.string().min(1),
+        })
+        .safeParse({ content, title });
+
+      if (result.success) {
+        languages[locale] = result.data;
+      }
+    }
+  }
+
+  console.log("extractLanguageData:", languages);
+
+  return languages;
 }
 
 async function processAnnouncementUpdates(
@@ -578,41 +557,27 @@ async function processAnnouncementUpdates(
   userId: string,
   currentAnnouncement: { id: string; locale: string; parent_id: string | null },
   commonData: CommonAnnouncementData,
-  jaData: AnnouncementData | null,
-  enData: AnnouncementData | null
+  languageData: LanguageData
 ): Promise<string[]> {
   const warnings: string[] = [];
   const parentId = currentAnnouncement.parent_id || currentAnnouncement.id;
 
-  // Update Japanese announcement
-  if (jaData) {
-    const warning = await updateOrCreateJapaneseAnnouncement(
-      adminClient,
-      userId,
-      currentAnnouncement,
-      parentId,
-      commonData,
-      jaData
-    );
-    if (warning) {
-      console.error(warning);
-      warnings.push(warning);
-    }
-  }
-
-  // Update English announcement
-  if (enData) {
-    const warning = await updateOrCreateEnglishAnnouncement(
-      adminClient,
-      userId,
-      currentAnnouncement,
-      parentId,
-      commonData,
-      enData
-    );
-    if (warning) {
-      console.error(warning);
-      warnings.push(warning);
+  // Update all language versions
+  for (const [locale, data] of Object.entries(languageData)) {
+    if (data) {
+      const warning = await updateOrCreateLanguageAnnouncement(
+        adminClient,
+        userId,
+        currentAnnouncement,
+        parentId,
+        commonData,
+        locale,
+        data
+      );
+      if (warning) {
+        console.error(warning);
+        warnings.push(warning);
+      }
     }
   }
 
@@ -624,10 +589,12 @@ export async function updateAnnouncementAction(
   _prevState: unknown,
   formData: FormData
 ) {
+  const t = await getTranslations("Admin");
+
   if (!isValidUUID(announcementId)) {
     return {
       ...initialFormState,
-      errors: ["errorInvalidUuid"],
+      errors: [t("errorInvalidUuid")],
       meta: { success: false },
     };
   }
@@ -636,7 +603,7 @@ export async function updateAnnouncementAction(
   if (!(isAdmin && userId)) {
     return {
       ...initialFormState,
-      errors: ["errorNoPermission"],
+      errors: [t("errorNoPermission")],
       meta: { success: false },
     };
   }
@@ -657,7 +624,7 @@ export async function updateAnnouncementAction(
       console.error("Failed to fetch announcement:", fetchError);
       return {
         ...initialFormState,
-        errors: ["errorUpdateFailed"],
+        errors: [t("errorUpdateFailed")],
         meta: { success: false },
       };
     }
@@ -666,13 +633,13 @@ export async function updateAnnouncementAction(
     const commonData = extractCommonData(formData);
 
     // Extract language-specific data
-    const { jaData, enData } = extractLanguageData(formData);
+    const languageData = extractLanguageData(formData);
 
     // At least one language must be provided
-    if (!(jaData || enData)) {
+    if (Object.keys(languageData).length === 0) {
       return {
         ...initialFormState,
-        errors: ["errorAtLeastOneLanguageRequired"],
+        errors: [t("errorAtLeastOneLanguageRequired")],
         meta: { success: false },
       };
     }
@@ -682,8 +649,7 @@ export async function updateAnnouncementAction(
       userId,
       currentAnnouncement,
       commonData,
-      jaData,
-      enData
+      languageData
     );
 
     return {
