@@ -79,13 +79,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email_action_type, site_url, redirect_to } = email_data;
+    const { email_action_type, redirect_to } = email_data;
     const userEmail = user.email;
     const language =
       user.app_metadata?.language || user.user_metadata?.language;
     const locale = language === "ja" ? "ja" : "en";
-    // redirect_to > site_url > getAbsoluteUrl() の優先度で選択
-    const siteUrl = redirect_to || site_url || getAbsoluteUrl();
+    // redirect_to (フロントで計算済みの完全パス) を優先して使用
+    // 無い場合はフォールバックとして /auth/callback を現在ホストで生成
+    const redirectTo = redirect_to || getAbsoluteUrl("/auth/callback");
 
     // メールハンドラーにルーティング
     const emailSent = await handleEmailAction(
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
       email_data,
       userEmail,
       locale,
-      siteUrl
+      redirectTo
     );
 
     // 不明なアクションタイプを処理

@@ -8,7 +8,7 @@ import { MagicLinkEmail } from "@/emails/auth/magic-link-email";
 import { PasswordChangedNotificationEmail } from "@/emails/auth/password-changed-notification-email";
 import { RecoveryEmail } from "@/emails/auth/recovery-email";
 import { sendAuthEmail } from "@/lib/mail";
-import type { EmailData } from "@/lib/schemas/auth-hook";
+import type { EmailData, NormalizedEmail } from "@/lib/schemas/auth-hook";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 
 // ウェブフックシークレットを分割するための正規表現（例：「v1,whsec_xxx」→ 「v1」、「whsec_xxx」）
@@ -60,12 +60,12 @@ export function buildVerifyUrl(params: {
   token?: string;
   tokenHash?: string;
   type: string;
-  siteUrl: string;
+  redirectTo: string;
 }): string {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const verificationToken = params.tokenHash || params.token || "";
   const encodedVerificationToken = encodeURIComponent(verificationToken);
-  const redirectTo = encodeURIComponent(`${params.siteUrl}/auth/callback`);
+  const redirectTo = encodeURIComponent(params.redirectTo);
 
   if (supabaseUrl) {
     // Supabase /auth/v1/verify は token_hash を期待します
@@ -83,12 +83,12 @@ async function handleEmailChange(
   emailData: EmailData,
   userEmail: string,
   locale: string,
-  siteUrl: string
+  redirectTo: string
 ): Promise<void> {
   // token_new + token_hash_new → 新メールアドレス用
   const newToken = emailData.token_new || "";
   const newConfirmationUrl = buildVerifyUrl({
-    siteUrl,
+    redirectTo,
     token: emailData.token_new,
     tokenHash: emailData.token_hash_new,
     type: "email_change",
@@ -111,7 +111,7 @@ async function handleEmailChange(
   if (emailData.old_email && emailData.token && emailData.token_hash) {
     const oldToken = emailData.token;
     const oldConfirmationUrl = buildVerifyUrl({
-      siteUrl,
+      redirectTo,
       token: emailData.token,
       tokenHash: emailData.token_hash,
       type: "email_change",
@@ -154,16 +154,68 @@ async function handleEmailChange(
  */
 export async function handleEmailAction(
   emailActionType: string,
-  emailData: EmailData,
+  email: NormalizedEmail,
   userEmail: string,
   locale: string,
   siteUrl: string
+): Promise<boolean>;
+export async function handleEmailAction(
+  emailActionType: string,
+  emailData: EmailData,
+  userEmail: string,
+  locale: string,
+  redirectTo: string
+): Promise<boolean>;
+export async function handleEmailAction(
+  emailActionType: string,
+  emailOrData: NormalizedEmail | EmailData,
+  userEmail: string,
+  locale: string,
+  siteOrRedirect: string
 ): Promise<boolean> {
+  const isNormalized =
+    (emailOrData as NormalizedEmail).confirmation_token !== undefined ||
+    (emailOrData as NormalizedEmail).change_email_new_token_new !== undefined ||
+    (emailOrData as NormalizedEmail).invite_token !== undefined ||
+    (emailOrData as NormalizedEmail).recovery_token !== undefined;
+
+  const redirectTo = isNormalized
+    ? `${siteOrRedirect}/auth/callback`
+    : siteOrRedirect;
+
+  const emailData: EmailData = isNormalized
+    ? {
+        email_action_type: (emailOrData as NormalizedEmail).email_action_type,
+        factor_type: "",
+        old_email:
+          (emailOrData as NormalizedEmail).change_email_old_new || "",
+        old_phone: "",
+        provider: "",
+        redirect_to: redirectTo,
+        site_url: siteOrRedirect,
+        token:
+          (emailOrData as NormalizedEmail).confirmation_token ||
+          (emailOrData as NormalizedEmail).invite_token ||
+          (emailOrData as NormalizedEmail).recovery_token ||
+          (emailOrData as NormalizedEmail).change_email_old_token ||
+          "",
+        token_hash:
+          (emailOrData as NormalizedEmail).confirmation_hash ||
+          (emailOrData as NormalizedEmail).invite_token_hash ||
+          (emailOrData as NormalizedEmail).recovery_token_hash ||
+          (emailOrData as NormalizedEmail).change_email_new_token_new_hash ||
+          "",
+        token_hash_new:
+          (emailOrData as NormalizedEmail).change_email_old_token_hash || "",
+        token_new:
+          (emailOrData as NormalizedEmail).change_email_new_token_new || "",
+      }
+    : (emailOrData as EmailData);
   switch (emailActionType) {
     case "signup": {
       const token = emailData.token || "";
       const confirmationUrl = buildVerifyUrl({
-        siteUrl,
+        redirectTo,
         token: emailData.token,
         tokenHash: emailData.token_hash,
         type: "signup",
@@ -185,7 +237,7 @@ export async function handleEmailAction(
     case "invite": {
       const token = emailData.token || "";
       const confirmationUrl = buildVerifyUrl({
-        siteUrl,
+        redirectTo,
         token: emailData.token,
         tokenHash: emailData.token_hash,
         type: "invite",
@@ -207,7 +259,7 @@ export async function handleEmailAction(
     case "recovery": {
       const token = emailData.token || "";
       const confirmationUrl = buildVerifyUrl({
-        siteUrl,
+        redirectTo,
         token: emailData.token,
         tokenHash: emailData.token_hash,
         type: "recovery",
@@ -229,7 +281,7 @@ export async function handleEmailAction(
     case "magiclink": {
       const token = emailData.token || "";
       const confirmationUrl = buildVerifyUrl({
-        siteUrl,
+        redirectTo,
         token: emailData.token,
         tokenHash: emailData.token_hash,
         type: "magiclink",
@@ -248,7 +300,7 @@ export async function handleEmailAction(
     }
 
     case "email_change": {
-      await handleEmailChange(emailData, userEmail, locale, siteUrl);
+      await handleEmailChange(emailData, userEmail, locale, redirectTo);
       return true;
     }
 
