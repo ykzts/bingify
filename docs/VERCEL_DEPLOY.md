@@ -1,6 +1,6 @@
 # Vercelデプロイガイド (Vercel Deployment Guide)
 
-このドキュメントは、Bingify を Vercel でデプロイするための包括的なガイドです。Vercel は Next.js アプリケーションの最適なパフォーマンスとシームレスな統合を提供するため、**推奨されるデプロイ方法**です。
+このドキュメントは、BingifyをVercelでデプロイするための包括的なガイドです。VercelはNext.jsアプリケーションの最適なパフォーマンスとシームレスな統合を提供するため、**推奨されるデプロイ方法**です。
 
 ## 目次
 
@@ -50,11 +50,11 @@
 
 ## Vercelを選ぶ理由
 
-Vercel は Next.js の開発元が提供するホスティングプラットフォームで、Next.js アプリケーションに最適化されています。
+VercelはNext.jsの開発元が提供するホスティングプラットフォームで、Next.jsアプリケーションに最適化されています。
 
 ### 主な利点
 
-- **ゼロコンフィグデプロイ**: Next.js に最適化された自動設定で、複雑な設定は不要
+- **ゼロコンフィグデプロイ**: Next.jsに最適化された自動設定で、複雑な設定は不要
 - **自動スケーリング**: トラフィックに応じた自動スケールで、手動での容量管理が不要
 - **グローバルCDN**: 世界中で高速なコンテンツ配信を実現
 - **自動HTTPS**: 無料のSSL証明書とHTTPS対応を自動設定
@@ -66,7 +66,7 @@ Vercel は Next.js の開発元が提供するホスティングプラットフ�
 
 ### Next.jsとの深い統合
 
-Vercel は Next.js の開発元であるため、以下の機能が完全にサポートされています:
+VercelはNext.jsの開発元であるため、以下の機能が完全にサポートされています:
 
 - Server Components
 - App Router
@@ -84,7 +84,7 @@ Vercel は Next.js の開発元であるため、以下の機能が完全にサ�
 
 - **GitHubアカウント**: リポジトリ管理用
 - **Vercelアカウント**: 無料プランで開始可能 ([vercel.com](https://vercel.com/))
-- **Supabaseプロジェクト**: Cloud版または OSS版 ([supabase.com](https://supabase.com/))
+- **Supabaseプロジェクト**: Cloud版またはOSS版 ([supabase.com](https://supabase.com/))
 - **基本的な知識**: Git、環境変数、DNSの基礎知識
 
 ---
@@ -96,7 +96,7 @@ Vercel は Next.js の開発元であるため、以下の機能が完全にサ�
 1. **リポジトリをフォーク**
 
    \`\`\`
-   https://github.com/ykzts/bingify
+   https://github.com/ykzts/Bingify
    \`\`\`
 
 2. **Vercelにインポート**
@@ -107,7 +107,7 @@ Vercel は Next.js の開発元であるため、以下の機能が完全にサ�
 
    最低限必要な環境変数を設定:
 
-   \`\`\`bash
+   \`\`\`Bash
    NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
@@ -125,7 +125,7 @@ Vercel は Next.js の開発元であるため、以下の機能が完全にサ�
 
 ### 1. Supabaseプロジェクトの準備
 
-Vercel デプロイの前に、Supabase プロジェクトをセットアップします。
+Vercelデプロイの前に、Supabaseプロジェクトをセットアップします。
 
 #### 1.1 Supabase Cloudプロジェクトの作成
 
@@ -137,11 +137,11 @@ Vercel デプロイの前に、Supabase プロジェクトをセットアップ�
 **推奨設定**:
 
 - **リージョン**: ユーザーの地理的位置に近いリージョンを選択 (例: Tokyo for Asia, Frankfurt for Europe)
-- **プラン**: 無料プラン (Hobby) で開始可能、本番環境では Pro プラン以上を推奨
+- **プラン**: 無料プラン (Hobby) で開始可能、本番環境ではProプラン以上を推奨
 
 #### 1.2 接続情報の取得
 
-Supabase Dashboard の "Settings" → "API" で以下の情報を取得:
+Supabase Dashboardの "Settings" → "API" で以下の情報を取得:
 
 - **Project URL**: \`https://xxxxxxxxxxxxx.supabase.co\`
 - **anon/public key**: 公開用の匿名キー
@@ -153,7 +153,7 @@ Supabase Dashboard の "Settings" → "API" で以下の情報を取得:
 
 ローカル環境でSupabase CLIを使用してマイグレーションを適用します。
 
-\`\`\`bash
+\`\`\`Bash
 
 # Supabase CLIをインストール (未インストールの場合)
 
@@ -172,11 +172,11 @@ supabase link --project-ref your-project-ref
 supabase db push
 \`\`\`
 
-**代替方法**: Supabase Dashboard の "SQL Editor" から \`supabase/migrations/\*.sql\` ファイルの内容を手動で実行することもできます。
+**代替方法**: Supabase Dashboardの "SQL Editor" から \`supabase/migrations/\*.SQL\` ファイルの内容を手動で実行することもできます。
 
 #### 1.4 Realtime機能の有効化
 
-Supabase Dashboard の "Database" → "Replication" で以下のテーブルのRealtimeを有効化:
+Supabase Dashboardの "Database" → "Replication" で以下のテーブルのRealtimeを有効化:
 
 - \`spaces\`
 - \`bingo_cards\`
@@ -190,7 +190,7 @@ Supabase Dashboard の "Database" → "Replication" で以下のテーブルのR
 
 #### 2.1 リポジトリのフォーク
 
-1. [Bingify GitHub リポジトリ](https://github.com/ykzts/bingify)にアクセス
+1. [Bingify GitHub リポジトリ](https://github.com/ykzts/bingify) にアクセス
 2. 右上の "Fork" ボタンをクリック
 3. フォーク先のアカウント/組織を選択
 4. "Create fork" をクリック
@@ -199,9 +199,9 @@ Supabase Dashboard の "Database" → "Replication" で以下のテーブルのR
 
 ローカルで環境変数を事前に確認したい場合:
 
-\`\`\`bash
-git clone https://github.com/your-username/bingify.git
-cd bingify
+\`\`\`Bash
+Git clone https://github.com/your-username/bingify.git
+cd Bingify
 \`\`\`
 
 \`.env.local.example\` を参考に、必要な環境変数をリストアップします。
@@ -222,7 +222,7 @@ cd bingify
 
 **Configure Project** 画面で以下を設定:
 
-- **Project Name**: プロジェクト名 (例: \`bingify\`)
+- **Project Name**: プロジェクト名 (例: \`Bingify\`)
 - **Framework Preset**: Next.js (自動検出されます)
 - **Root Directory**: \`./\` (変更不要)
 - **Build Command**: \`pnpm build\` (自動設定されます)
@@ -235,7 +235,7 @@ cd bingify
 
 ### 4. 環境変数の設定
 
-Vercel プロジェクト設定画面で環境変数を追加します。
+Vercelプロジェクト設定画面で環境変数を追加します。
 
 #### 4.1 環境変数の追加方法
 
@@ -253,7 +253,7 @@ Vercel プロジェクト設定画面で環境変数を追加します。
 
 以下の環境変数は必須です:
 
-\`\`\`bash
+\`\`\`Bash
 
 # Supabase接続
 
@@ -274,15 +274,15 @@ CRON_SECRET=your-random-secret-string
 
 ターミナルで以下のコマンドを実行して安全なランダム文字列を生成:
 
-\`\`\`bash
-openssl rand -base64 32
+\`\`\`Bash
+OpenSSL rand -base64 32
 \`\`\`
 
 #### 4.3 推奨の環境変数を設定
 
 本番環境では以下も設定することを推奨します:
 
-\`\`\`bash
+\`\`\`Bash
 
 # ベータ版バナーの非表示 (正式リリース時)
 
@@ -298,7 +298,7 @@ SMTP_SECURE=false
 MAIL_FROM=noreply@example.com
 \`\`\`
 
-完全な環境変数のリストは、[環境変数リファレンス](#環境変数リファレンス)を参照してください。
+完全な環境変数のリストは、[環境変数リファレンス](#環境変数リファレンス) を参照してください。
 
 ---
 
@@ -311,12 +311,12 @@ MAIL_FROM=noreply@example.com
 デプロイプロセス:
 
 1. **Installing Dependencies**: 依存関係のインストール (約1-2分)
-2. **Building**: Next.js アプリケーションのビルド (約2-3分)
+2. **Building**: Next.jsアプリケーションのビルド (約2-3分)
 3. **Deploying**: グローバルCDNへのデプロイ (約30秒)
 
 #### 5.2 デプロイの確認
 
-デプロイが完了すると、Vercel が自動生成したURLが表示されます:
+デプロイが完了すると、Vercelが自動生成したURLが表示されます:
 
 \`\`\`
 https://your-project.vercel.app
@@ -330,7 +330,7 @@ https://your-project.vercel.app
 
 問題が発生した場合は、デプロイログを確認:
 
-1. Vercel Dashboard の "Deployments" タブを開く
+1. Vercel Dashboardの "Deployments" タブを開く
 2. 該当するデプロイをクリック
 3. "Building" または "Deploying" セクションでログを確認
 4. エラーメッセージがある場合は、環境変数や設定を見直す
@@ -339,7 +339,7 @@ https://your-project.vercel.app
 
 ## 環境変数リファレンス
 
-Bingify の動作に必要な環境変数の完全なリストです。
+Bingifyの動作に必要な環境変数の完全なリストです。
 
 ### 必須の環境変数
 
@@ -351,7 +351,7 @@ Bingify の動作に必要な環境変数の完全なリストです。
 | \`NEXT_PUBLIC_SUPABASE_ANON_KEY\` | Supabase匿名キー (公開用)               | \`eyJhbGciOiJIUzI1NiIsInR5cCI6...\` | Supabase Dashboard → Settings → API         |
 | \`SUPABASE_SERVICE_ROLE_KEY\`     | Supabaseサービスロールキー (⚠️秘密情報) | \`eyJhbGciOiJIUzI1NiIsInR5cCI6...\` | Supabase Dashboard → Settings → API         |
 | \`NEXT_PUBLIC_SITE_URL\`          | サイトURL (OAuth リダイレクト用)        | \`https://example.com\`             | Vercel のデプロイURL またはカスタムドメイン |
-| \`CRON_SECRET\`                   | Cronジョブ認証用シークレット            | \`your-random-secret-string\`       | \`openssl rand -base64 32\` で生成          |
+| \`CRON_SECRET\`                   | Cronジョブ認証用シークレット            | \`your-random-secret-string\`       | \`OpenSSL rand -base64 32\` で生成          |
 
 **重要**:
 
@@ -389,10 +389,10 @@ Bingify の動作に必要な環境変数の完全なリストです。
 
 | 変数名                                      | 説明                        | 取得方法                                                       |
 | :------------------------------------------ | :-------------------------- | :------------------------------------------------------------- |
-| \`SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID\` | Google OAuth クライアントID | [Google Cloud Console](https://console.cloud.google.com/)      |
-| \`SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET\`    | Google OAuth シークレット   | Google Cloud Console                                           |
-| \`SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID\` | Twitch OAuth クライアントID | [Twitch Developer Console](https://dev.twitch.tv/console/apps) |
-| \`SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET\`    | Twitch OAuth シークレット   | Twitch Developer Console                                       |
+| \`SUPABASE_AUTH_EXTERNAL_Google_CLIENT_ID\` | Google OAuth クライアントID | [Google Cloud Console](https://console.cloud.google.com/)      |
+| \`SUPABASE_AUTH_EXTERNAL_Google_SECRET\`    | Google OAuth シークレット   | Google Cloud Console                                           |
+| \`SUPABASE_AUTH_EXTERNAL_Twitch_CLIENT_ID\` | Twitch OAuth クライアントID | [Twitch Developer Console](https://dev.twitch.tv/console/apps) |
+| \`SUPABASE_AUTH_EXTERNAL_Twitch_SECRET\`    | Twitch OAuth シークレット   | Twitch Developer Console                                       |
 
 **アクセス制御**:
 
@@ -416,32 +416,32 @@ Basic認証は公開前の制限やステージング環境の保護に使用で
 
 ## Supabase連携
 
-Vercel と Supabase の連携における詳細な設定方法です。
+VercelとSupabaseの連携における詳細な設定方法です。
 
 ### データベースマイグレーション
 
 #### 自動デプロイ (推奨)
 
-\`supabase/migrations\` ディレクトリ配下の \`.sql\` マイグレーションファイルは、\`main\` ブランチへのマージ時に自動的に Cloud Supabase へデプロイされます。
+\`supabase/migrations\` ディレクトリ配下の \`.SQL\` マイグレーションファイルは、\`main\` ブランチへのマージ時に自動的にCloud Supabaseへデプロイされます。
 
 **GitHub Actions による自動マイグレーション**:
 
-1. PRを作成し、\`supabase/migrations/\*_/_.sql\` に変更を含める
+1. PRを作成し、\`supabase/migrations/\*_/_.SQL\` に変更を含める
 2. PRがレビュー・承認される
 3. \`main\` ブランチへマージ
-4. GitHub Actionsが自動的にマイグレーションを Cloud Supabaseに適用
+4. GitHub Actionsが自動的にマイグレーションをCloud Supabaseに適用
 5. デプロイ前後の検証ステップで安全性を確保
 
 **必要な GitHub Secrets**:
 
-- \`SUPABASE_ACCESS_TOKEN\`: Supabaseの Personal Access Token ([Settings > Access Tokens](https://supabase.com/dashboard/account/tokens) から取得)
-- \`SUPABASE_PROJECT_ID\`: Supabaseプロジェクトの Project Reference ID (プロジェクト設定から確認可能)
+- \`SUPABASE_ACCESS_TOKEN\`: SupabaseのPersonal Access Token ([Settings > Access Tokens](https://supabase.com/dashboard/account/tokens) から取得)
+- \`SUPABASE_PROJECT_ID\`: SupabaseプロジェクトのProject Reference ID (プロジェクト設定から確認可能)
 
 #### 手動マイグレーション
 
 緊急時や初回セットアップでは、手動でマイグレーションを実行できます:
 
-\`\`\`bash
+\`\`\`Bash
 
 # Supabaseにログイン
 
@@ -466,11 +466,11 @@ supabase db push
 
 ### Row Level Security (RLS)
 
-Supabase の Row Level Security (RLS) は、データベースレベルでのアクセス制御を提供します。
+SupabaseのRow Level Security (RLS) は、データベースレベルでのアクセス制御を提供します。
 
 **RLSポリシーの確認**:
 
-1. Supabase Dashboard の "Authentication" → "Policies" にアクセス
+1. Supabase Dashboardの "Authentication" → "Policies" にアクセス
 2. 各テーブルのポリシーが正しく設定されているか確認
 
 **主要なRLSポリシー**:
@@ -479,29 +479,29 @@ Supabase の Row Level Security (RLS) は、データベースレベルでのア
 - \`bingo_cards\`: 認証済みユーザーはカードを作成・表示可能
 - \`called_numbers\`: スペース所有者のみ番号を呼び出し可能
 
-RLSポリシーはマイグレーションで自動的に設定されます (\`supabase/migrations/\*.sql\`)。
+RLSポリシーはマイグレーションで自動的に設定されます (\`supabase/migrations/\*.SQL\`)。
 
 ### Realtime機能の設定
 
-ビンゴゲームのリアルタイム同期には、Supabase Realtime が必要です。
+ビンゴゲームのリアルタイム同期には、Supabase Realtimeが必要です。
 
 **設定手順**:
 
-1. Supabase Dashboard の "Database" → "Replication" にアクセス
-2. 以下のテーブルで Replication を有効化:
+1. Supabase Dashboardの "Database" → "Replication" にアクセス
+2. 以下のテーブルでReplicationを有効化:
    - \`spaces\`
    - \`bingo_cards\`
    - \`called_numbers\`
 
 **動作確認**:
 
-1. Vercel にデプロイしたアプリケーションでスペースを作成
+1. Vercelにデプロイしたアプリケーションでスペースを作成
 2. 別のブラウザーまたはシークレットモードで同じスペースを開く
 3. 管理画面から番号を呼び出し、リアルタイムで反映されることを確認
 
 ### OAuth設定
 
-Google および Twitch の OAuth 認証を有効にする手順です。
+GoogleおよびTwitchのOAuth認証を有効にする手順です。
 
 #### Google OAuth
 
@@ -518,14 +518,14 @@ Google および Twitch の OAuth 認証を有効にする手順です。
 
 3. **Vercelに環境変数を設定**
 
-   \`\`\`bash
-   SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=your-client-id
-   SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=your-secret
+   \`\`\`Bash
+   SUPABASE_AUTH_EXTERNAL_Google_CLIENT_ID=your-client-id
+   SUPABASE_AUTH_EXTERNAL_Google_SECRET=your-secret
    \`\`\`
 
 4. **Supabase Dashboard でプロバイダーを有効化**
 
-   Supabase Dashboard の "Authentication" → "Providers" で Google を有効化し、クライアントIDとシークレットを設定
+   Supabase Dashboardの "Authentication" → "Providers" でGoogleを有効化し、クライアントIDとシークレットを設定
 
 #### Twitch OAuth
 
@@ -534,7 +534,7 @@ Google および Twitch の OAuth 認証を有効にする手順です。
    [Twitch Developer Console](https://dev.twitch.tv/console/apps) にアクセス:
    - "Register Your Application" をクリック
    - OAuth Redirect URL: \`https://your-project.supabase.co/auth/v1/callback\`
-   - Category: "Website Integration"
+   - Category: "site Integration"
 
 2. **クライアントIDとシークレットを取得**
 
@@ -542,46 +542,46 @@ Google および Twitch の OAuth 認証を有効にする手順です。
 
 3. **Vercelに環境変数を設定**
 
-   \`\`\`bash
-   SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID=your-client-id
-   SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET=your-secret
+   \`\`\`Bash
+   SUPABASE_AUTH_EXTERNAL_Twitch_CLIENT_ID=your-client-id
+   SUPABASE_AUTH_EXTERNAL_Twitch_SECRET=your-secret
    \`\`\`
 
 4. **Supabase Dashboard でプロバイダーを有効化**
 
-   Supabase Dashboard の "Authentication" → "Providers" で Twitch を有効化し、クライアントIDとシークレットを設定
+   Supabase Dashboardの "Authentication" → "Providers" でTwitchを有効化し、クライアントIDとシークレットを設定
 
-**重要**: OAuth のリダイレクトURIは、Supabaseプロジェクトの認証コールバックURLを使用します。カスタムドメインを使用する場合は、Supabase Dashboard の "Authentication" → "URL Configuration" で "Site URL" を更新してください。
+**重要**: OAuthのリダイレクトURIは、Supabaseプロジェクトの認証コールバックURLを使用します。カスタムドメインを使用する場合は、Supabase Dashboardの "Authentication" → "URL Configuration" で "Site URL" を更新してください。
 
 ---
 
 ## カスタムドメインの設定
 
-Vercel のデフォルトURL (\`your-project.vercel.app\`) ではなく、独自ドメインを使用する手順です。
+VercelのデフォルトURL (\`your-project.vercel.app\`) ではなく、独自ドメインを使用する手順です。
 
 ### ドメインの追加
 
 #### 1. Vercel Dashboard でドメインを追加
 
-1. Vercel Dashboard の該当プロジェクトを開く
+1. Vercel Dashboardの該当プロジェクトを開く
 2. "Settings" → "Domains" に移動
 3. "Add" ボタンをクリック
-4. ドメイン名を入力 (例: \`bingify.example.com\` または \`example.com\`)
+4. ドメイン名を入力 (例: \`Bingify.example.com\` または \`example.com\`)
 5. "Add" をクリック
 
 #### 2. ドメインタイプの選択
 
-Vercel は以下のドメインタイプをサポートします:
+Vercelは以下のドメインタイプをサポートします:
 
 - **Apex Domain** (例: \`example.com\`): ルートドメイン
-- **Subdomain** (例: \`bingify.example.com\`): サブドメイン
-- **Wildcard** (例: \`\*.example.com\`): ワイルドカードドメイン (Pro プラン以上)
+- **Subdomain** (例: \`Bingify.example.com\`): サブドメイン
+- **Wildcard** (例: \`\*.example.com\`): ワイルドカードドメイン (Proプラン以上)
 
-**推奨**: サブドメインを使用すると、DNS設定が簡単です (CNAME レコードのみ)。
+**推奨**: サブドメインを使用すると、DNS設定が簡単です (CNAMEレコードのみ)。
 
 ### DNS設定
 
-ドメインを追加すると、Vercel が DNS設定手順を表示します。
+ドメインを追加すると、VercelがDNS設定手順を表示します。
 
 #### サブドメインの場合 (推奨)
 
@@ -589,9 +589,9 @@ Vercel は以下のドメインタイプをサポートします:
 
 | Type  | Name        | Value                     |
 | :---- | :---------- | :------------------------ |
-| CNAME | \`bingify\` | \`cname.vercel-dns.com.\` |
+| CNAME | \`Bingify\` | \`cname.vercel-dns.com.\` |
 
-ドメインレジストラー (例: Cloudflare, GoDaddy, Namecheap) の DNS管理画面で上記のレコードを追加します。
+ドメインレジストラー (例: Cloudflare, GoDaddy, Namecheap) のDNS管理画面で上記のレコードを追加します。
 
 #### Apex ドメインの場合
 
@@ -601,7 +601,7 @@ Vercel は以下のドメインタイプをサポートします:
 | :--- | :---- | :-------------- |
 | A    | \`@\` | \`76.76.21.21\` |
 
-**注意**: 一部のDNSプロバイダーは CNAME Flattening または ANAME/ALIAS レコードをサポートしています。詳細は Vercel のドキュメントを参照してください。
+**注意**: 一部のDNSプロバイダーはCNAME FlatteningまたはANAME/ALIASレコードをサポートしています。詳細はVercelのドキュメントを参照してください。
 
 #### DNS伝播の確認
 
@@ -609,67 +609,67 @@ DNS設定後、変更が伝播するまで数分から48時間かかる場合が
 
 **伝播を確認**:
 
-\`\`\`bash
+\`\`\`Bash
 
 # サブドメインの場合
 
-nslookup bingify.example.com
+nslookup Bingify.example.com
 
 # Apexドメインの場合
 
 nslookup example.com
 \`\`\`
 
-Vercel のIPアドレスが返ってくれば、DNS設定は正しく伝播しています。
+VercelのIPアドレスが返ってくれば、DNS設定は正しく伝播しています。
 
 ### SSL証明書
 
-Vercel は Let's Encrypt を使用して、自動的にSSL証明書を発行・更新します。
+VercelはLet's Encryptを使用して、自動的にSSL証明書を発行・更新します。
 
 **SSL証明書の発行プロセス**:
 
 1. DNS設定が完了し、伝播が確認される
-2. Vercel が自動的にSSL証明書を発行 (約5-10分)
+2. Vercelが自動的にSSL証明書を発行 (約5-10分)
 3. "Valid Configuration" と表示されたら完了
 
 **トラブルシューティング**:
 
 - DNS伝播が完了していない場合は待つ
-- CAA レコードがある場合は、Let's Encrypt を許可する設定を追加
-- 問題が解決しない場合は、Vercel の "Remove" → "Re-add" でドメインを再追加
+- CAAレコードがある場合は、Let's Encryptを許可する設定を追加
+- 問題が解決しない場合は、Vercelの "Remove" → "Re-add" でドメインを再追加
 
 **環境変数の更新**:
 
 カスタムドメインを追加したら、\`NEXT_PUBLIC_SITE_URL\` を更新:
 
-\`\`\`bash
+\`\`\`Bash
 NEXT_PUBLIC_SITE_URL=https://bingify.example.com
 \`\`\`
 
-Vercel Dashboard の "Settings" → "Environment Variables" で更新し、再デプロイします。
+Vercel Dashboardの "Settings" → "Environment Variables" で更新し、再デプロイします。
 
 ---
 
 ## CI/CD統合 (GitHub連携)
 
-Vercel は GitHub と深く統合されており、自動デプロイとプレビュー環境を提供します。
+VercelはGitHubと深く統合されており、自動デプロイとプレビュー環境を提供します。
 
 ### 自動デプロイの仕組み
 
 **Vercel とGitHubの連携**:
 
-1. GitHubリポジトリを Vercel にインポートすると、自動的に GitHub App がインストールされる
-2. 以降、リポジトリへのプッシュやPR作成時に Vercel が自動的にトリガーされる
+1. GitHubリポジトリをVercelにインポートすると、自動的にGitHub Appがインストールされる
+2. 以降、リポジトリへのプッシュやPR作成時にVercelが自動的にトリガーされる
 3. ビルドとデプロイが自動実行される
 
 **自動デプロイのトリガー**:
 
 - **本番デプロイ**: \`main\` ブランチへのプッシュまたはマージ
-- **プレビューデプロイ**: Pull Request の作成または更新
+- **プレビューデプロイ**: Pull Requestの作成または更新
 
 ### プレビューデプロイ
 
-プレビューデプロイは、Pull Request ごとに独立した環境を提供します。
+プレビューデプロイは、Pull Requestごとに独立した環境を提供します。
 
 **プレビューデプロイの利点**:
 
@@ -680,9 +680,9 @@ Vercel は GitHub と深く統合されており、自動デプロイとプレ�
 
 **プレビューデプロイの使い方**:
 
-1. Pull Request を作成
-2. Vercel が自動的にプレビューデプロイを作成
-3. GitHub の PR 画面に Vercel Bot がコメントを投稿し、プレビューURLを通知
+1. Pull Requestを作成
+2. Vercelが自動的にプレビューデプロイを作成
+3. GitHubのPR画面にVercel Botがコメントを投稿し、プレビューURLを通知
 4. URLをクリックして変更内容を確認
 
 **環境変数の扱い**:
@@ -701,17 +701,17 @@ Vercel は GitHub と深く統合されており、自動デプロイとプレ�
 
 **本番デプロイのフロー**:
 
-1. Pull Request がレビュー・承認される
+1. Pull Requestがレビュー・承認される
 2. \`main\` ブランチへマージ
-3. Vercel が自動的にビルドを開始
+3. Vercelが自動的にビルドを開始
 4. ビルドが成功すると、本番環境にデプロイ
-5. Vercel が自動的に以前のデプロイからロールオーバー
+5. Vercelが自動的に以前のデプロイからロールオーバー
 
 **ロールバック**:
 
-問題が発生した場合は、Vercel Dashboard からワンクリックでロールバック可能:
+問題が発生した場合は、Vercel Dashboardからワンクリックでロールバック可能:
 
-1. Vercel Dashboard の "Deployments" タブを開く
+1. Vercel Dashboardの "Deployments" タブを開く
 2. ロールバックしたいデプロイを見つける
 3. "..." メニューから "Promote to Production" を選択
 
@@ -721,18 +721,18 @@ Vercel は GitHub と深く統合されており、自動デプロイとプレ�
 
 **デプロイフックの作成**:
 
-1. Vercel Dashboard の "Settings" → "Git" に移動
+1. Vercel Dashboardの "Settings" → "Git" に移動
 2. "Deploy Hooks" セクションで "Create Hook" をクリック
 3. フック名とトリガーするブランチを設定
 4. URLをコピー
 
 **デプロイフックの使用例**:
 
-\`\`\`bash
+\`\`\`Bash
 
 # cURL でデプロイをトリガー
 
-curl -X POST https://api.vercel.com/v1/integrations/deploy/xxxxx/xxxxx
+cURL -X POST https://api.vercel.com/v1/integrations/deploy/xxxxx/xxxxx
 \`\`\`
 
 **用途**:
@@ -745,55 +745,55 @@ curl -X POST https://api.vercel.com/v1/integrations/deploy/xxxxx/xxxxx
 
 ## パフォーマンス最適化
 
-Vercel での Bingify のパフォーマンスを最大化するためのベストプラクティスです。
+VercelでのBingifyのパフォーマンスを最大化するためのベストプラクティスです。
 
 ### Edge Network最適化
 
-Vercel は世界中のエッジロケーションにアプリケーションをデプロイします。
+Vercelは世界中のエッジロケーションにアプリケーションをデプロイします。
 
 **自動最適化**:
 
 - **グローバルCDN**: 静的アセットは最寄りのエッジロケーションから配信
-- **Edge Middleware**: Middleware は Edge Runtime で実行され、低レイテンシーを実現
+- **Edge Middleware**: MiddlewareはEdge Runtimeで実行され、低レイテンシーを実現
 - **Smart Routing**: ユーザーの地理的位置に基づいて最適なルーティング
 
 **追加の最適化**:
 
 - **Supabaseリージョンの選択**: ユーザーベースに近いリージョンを選択
 - **画像最適化の活用**: \`next/image\` を使用して画像を最適化
-- **Static Generation**: 可能な限り Static Generation を使用
+- **Static Generation**: 可能な限りStatic Generationを使用
 
 ### 画像最適化
 
-Next.js の Image Optimization は Vercel で自動的に有効化されます。
+Next.jsのImage OptimizationはVercelで自動的に有効化されます。
 
 **Bingify での画像最適化**:
 
-- **アバター画像**: OAuth プロバイダーから取得した画像を自動最適化
+- **アバター画像**: OAuthプロバイダーから取得した画像を自動最適化
 - **ビンゴカード画像**: ユーザーがアップロードした画像を最適化
-- **OGP画像**: Open Graph 画像を最適化
+- **OGP画像**: Open Graph画像を最適化
 
 **Best practices**:
 
 - \`next/image\` コンポーネントを常に使用
 - 適切な \`width\` と \`height\` を指定
-- \`priority\` 属性を重要な画像に使用 (LCP 改善)
-- WebP/AVIF フォーマットへの自動変換を活用 (Vercel が自動処理)
+- \`priority\` 属性を重要な画像に使用 (LCP改善)
+- WebP/AVIFフォーマットへの自動変換を活用 (Vercelが自動処理)
 
 **設定の確認**:
 
 \`next.config.ts\` で以下の設定が有効になっていることを確認:
 
-\`\`\`typescript
+\`\`\`TypeScript
 images: {
-remotePatterns: [
+remotePatterns:[
 {
 hostname: "*.googleusercontent.com",
 protocol: "https",
 },
 {
 hostname: "*.supabase.co",
-protocol: "https",
+protocol: "HTTPs",
 },
 ],
 },
@@ -801,12 +801,12 @@ protocol: "https",
 
 ### キャッシング戦略
 
-Vercel は Next.js の標準的なキャッシング戦略をサポートします。
+VercelはNext.jsの標準的なキャッシング戦略をサポートします。
 
 **キャッシングレベル**:
 
 1. **Browser Cache**: ブラウザーレベルのキャッシュ
-2. **CDN Cache**: Vercel のグローバルCDNキャッシュ
+2. **CDN Cache**: VercelのグローバルCDNキャッシュ
 3. **ISR (Incremental Static Regeneration)**: サーバーサイドキャッシュ
 
 **Bingify のキャッシング**:
@@ -817,23 +817,23 @@ Vercel は Next.js の標準的なキャッシング戦略をサポートしま�
 
 **キャッシュの無効化**:
 
-Vercel Dashboard の "Deployments" → "..." → "Redeploy" でキャッシュをクリア可能。
+Vercel Dashboardの "Deployments" → "..." → "Redeploy" でキャッシュをクリア可能。
 
 ### バンドルサイズの最適化
 
-Vercel は自動的にバンドルサイズを最適化しますが、追加の最適化も可能です。
+Vercelは自動的にバンドルサイズを最適化しますが、追加の最適化も可能です。
 
 **自動最適化**:
 
 - **Tree Shaking**: 未使用のコードを自動削除
 - **Code Splitting**: ページごとに最適なバンドルを生成
-- **Minification**: JavaScript と CSS を自動で圧縮
+- **Minification**: JavaScriptとCSSを自動で圧縮
 
 **手動最適化**:
 
 - **動的インポート**: 大きなコンポーネントは動的インポートを使用
 
-  \`\`\`typescript
+  \`\`\`TypeScript
   const HeavyComponent = dynamic(() => import("./HeavyComponent"), {
   loading: () => <p>Loading...</p>,
   });
@@ -844,26 +844,26 @@ Vercel は自動的にバンドルサイズを最適化しますが、追加の�
 
 **バンドルサイズの確認**:
 
-Vercel Dashboard の "Analytics" → "Web Vitals" でバンドルサイズとパフォーマンスメトリクスを確認できます。
+Vercel Dashboardの "Analytics" → "Web Vitals" でバンドルサイズとパフォーマンスメトリクスを確認できます。
 
 ---
 
 ## モニタリングとデバッグ
 
-Vercel は強力なモニタリングとデバッグツールを提供します。
+Vercelは強力なモニタリングとデバッグツールを提供します。
 
 ### リアルタイムログ
 
 **ログの確認方法**:
 
-1. Vercel Dashboard の該当プロジェクトを開く
+1. Vercel Dashboardの該当プロジェクトを開く
 2. "Logs" タブをクリック
 3. リアルタイムでログが表示される
 
 **ログのフィルタリング**:
 
-- **Environment**: Production、Preview、Development でフィルター
-- **Function**: 特定の Serverless Function のログのみ表示
+- **Environment**: Production、Preview、Developmentでフィルター
+- **Function**: 特定のServerless Functionのログのみ表示
 - **Status Code**: HTTPステータスコードでフィルター
 - **Search**: キーワード検索
 
@@ -875,13 +875,13 @@ Vercel は強力なモニタリングとデバッグツールを提供します�
 
 ### Analytics
 
-Vercel Analytics は Web Vitals とユーザー体験メトリクスを提供します。
+Vercel AnalyticsはWeb Vitalsとユーザー体験メトリクスを提供します。
 
 **有効化方法**:
 
-1. Vercel Dashboard の "Analytics" タブを開く
+1. Vercel Dashboardの "Analytics" タブを開く
 2. "Enable Analytics" をクリック
-3. 課金プランに応じて有効化される (Pro プラン以上で全機能利用可能)
+3. 課金プランに応じて有効化される (Proプラン以上で全機能利用可能)
 
 **主要メトリクス**:
 
@@ -892,57 +892,57 @@ Vercel Analytics は Web Vitals とユーザー体験メトリクスを提供し
 
 ### Speed Insights
 
-Vercel Speed Insights は、実際のユーザーデータに基づくパフォーマンス分析を提供します。
+Vercel Speed Insightsは、実際のユーザーデータに基づくパフォーマンス分析を提供します。
 
 **有効化方法**:
 
-Speed Insights は Pro プラン以上で自動的に有効化されます。
+Speed InsightsはProプラン以上で自動的に有効化されます。
 
 **確認方法**:
 
-1. Vercel Dashboard の "Speed Insights" タブを開く
-2. Web Vitals スコアとページごとのパフォーマンスを確認
+1. Vercel Dashboardの "Speed Insights" タブを開く
+2. Web Vitalsスコアとページごとのパフォーマンスを確認
 3. 改善が必要な箇所を特定
 
 ### エラートラッキング
 
 **サーバーエラーの確認**:
 
-1. Vercel Dashboard の "Logs" タブで 500エラーをフィルター
+1. Vercel Dashboardの "Logs" タブで500エラーをフィルター
 2. エラースタックトレースを確認
 3. 該当するコードを修正
 
 **クライアントエラーの確認**:
 
-クライアント側のエラーは、ブラウザーの開発者ツールで確認できます。より詳細なエラートラッキングが必要な場合は、Sentry などの外部サービスを統合することを推奨します。
+クライアント側のエラーは、ブラウザーの開発者ツールで確認できます。より詳細なエラートラッキングが必要な場合は、Sentryなどの外部サービスを統合することを推奨します。
 
 **Sentryの統合 (オプション)**:
 
 1. [Sentry](https://sentry.io/) でプロジェクトを作成
-2. \`@sentry/nextjs\` をインストール
+2. \`@sentry/Next.js\` をインストール
 
-   \`\`\`bash
-   pnpm add @sentry/nextjs
+   \`\`\`Bash
+   pnpm add @sentry/Next.js
    \`\`\`
 
 3. \`sentry.client.config.ts\` と \`sentry.server.config.ts\` を設定
-4. Vercel に Sentry の環境変数を追加
+4. VercelにSentryの環境変数を追加
 
 ---
 
 ## Cronジョブの設定
 
-Vercel は \`vercel.json\` で定義された Cron ジョブを自動実行します。
+Vercelは \`vercel.json\` で定義されたCronジョブを自動実行します。
 
 ### 設定内容の確認
 
-Bingify には以下の Cron ジョブが設定されています (\`vercel.json\`):
+Bingifyには以下のCronジョブが設定されています (\`vercel.json\`):
 
-\`\`\`json
+\`\`\`JSON
 {
-"crons": [
+"crons":[
 {
-"path": "/api/cron/cleanup",
+"path": "/API/cron/cleanup",
 "schedule": "0 18 * * *"
 },
 {
@@ -955,29 +955,29 @@ Bingify には以下の Cron ジョブが設定されています (\`vercel.json
 
 **ジョブの詳細**:
 
-- **cleanup**: 毎日18:00 UTC に実行され、古いデータをクリーンアップ
+- **cleanup**: 毎日18:00 UTCに実行され、古いデータをクリーンアップ
 - **token-refresh**: 5分ごとに実行され、トークンをリフレッシュ
 
 ### Cronジョブの動作確認
 
 **Vercel Dashboard での確認**:
 
-1. Vercel Dashboard の該当プロジェクトを開く
-2. "Cron Jobs" タブをクリック (Pro プラン以上)
+1. Vercel Dashboardの該当プロジェクトを開く
+2. "Cron Jobs" タブをクリック (Proプラン以上)
 3. 実行履歴とステータスを確認
 
 **手動実行によるテスト**:
 
-\`\`\`bash
+\`\`\`Bash
 
 # cleanup ジョブをテスト
 
-curl -X POST https://your-domain.vercel.app/api/cron/cleanup \
+cURL -X POST https://your-domain.vercel.app/api/cron/cleanup \
  -H "Authorization: Bearer YOUR_CRON_SECRET"
 
 # token-refresh ジョブをテスト
 
-curl -X POST https://your-domain.vercel.app/api/cron/token-refresh \
+cURL -X POST https://your-domain.vercel.app/api/cron/token-refresh \
  -H "Authorization: Bearer YOUR_CRON_SECRET"
 \`\`\`
 
@@ -985,17 +985,17 @@ curl -X POST https://your-domain.vercel.app/api/cron/token-refresh \
 
 ### Cronジョブの制限事項
 
-- **Hobby プラン**: Cron ジョブは利用不可 (Pro プラン以上が必要)
-- **実行時間制限**: 最大10秒 (Pro プラン)、60秒 (Enterprise プラン)
-- **タイムゾーン**: すべてのスケジュールは UTC
+- **Hobby プラン**: Cronジョブは利用不可 (Proプラン以上が必要)
+- **実行時間制限**: 最大10秒 (Proプラン)、60秒 (Enterpriseプラン)
+- **タイムゾーン**: すべてのスケジュールはUTC
 
 **Hobby プランの代替案**:
 
-Hobby プランを使用している場合は、以下の代替案を検討してください:
+Hobbyプランを使用している場合は、以下の代替案を検討してください:
 
-- **GitHub Actions**: GitHub Actions で Cron ジョブを実行し、Vercel の API を呼び出す
+- **GitHub Actions**: GitHub ActionsでCronジョブを実行し、VercelのAPIを呼び出す
 - **外部 Cron サービス**: [cron-job.org](https://cron-job.org/) などの外部サービスを使用
-- **Supabase Edge Functions**: Supabase の Edge Functions で定期実行
+- **Supabase Edge Functions**: SupabaseのEdge Functionsで定期実行
 
 ---
 
@@ -1015,12 +1015,12 @@ Error: Cannot find module 'next'
 
 **解決方法**:
 
-1. \`package.json\` が正しくコミットされているか確認
-2. Vercel の "Settings" → "General" → "Build & Development Settings" で以下を確認:
+1. \`package.JSON\` が正しくコミットされているか確認
+2. Vercelの "Settings" → "General" → "Build & Development Settings" で以下を確認:
    - **Build Command**: \`pnpm build\`
    - **Install Command**: \`pnpm install\`
-3. Node.js バージョンを確認 (24.x が必要):
-   - \`package.json\` に \`"engines": { "node": "24.x" }\` を追加
+3. Node.jsバージョンを確認 (24.xが必要):
+   - \`package.JSON\` に \`"engines": { "node": "24.x" }\` を追加
 
 #### **問題**: 環境変数が反映されない
 
@@ -1028,13 +1028,13 @@ Error: Cannot find module 'next'
 
 **解決方法**:
 
-1. Vercel Dashboard の "Settings" → "Environment Variables" で設定を確認
+1. Vercel Dashboardの "Settings" → "Environment Variables" で設定を確認
 2. 環境 (Production、Preview、Development) が正しく選択されているか確認
 3. \`NEXT*PUBLIC*\` プレフィックスの有無を確認
    - クライアント側で使用する変数には \`NEXT*PUBLIC*\` が必要
    - サーバー側のみで使用する変数には不要
 4. 環境変数を更新した後は、**必ず再デプロイ**を実行
-   - Vercel Dashboard の "Deployments" → "..." → "Redeploy"
+   - Vercel Dashboardの "Deployments" → "..." → "Redeploy"
 
 ### データベース接続エラー
 
@@ -1048,15 +1048,15 @@ Error: connect ECONNREFUSED
 
 **解決方法**:
 
-1. Supabase プロジェクトが起動しているか確認
+1. Supabaseプロジェクトが起動しているか確認
 2. 環境変数 \`NEXT_PUBLIC_SUPABASE_URL\` が正しく設定されているか確認
 3. ネットワーク接続を確認:
 
-   \`\`\`bash
-   curl $NEXT_PUBLIC_SUPABASE_URL
+   \`\`\`Bash
+   cURL $NEXT_PUBLIC_SUPABASE_URL
    \`\`\`
 
-4. Supabase Dashboard で "Paused" 状態になっていないか確認 (無料プランは非アクティブ時に自動停止)
+4. Supabase Dashboardで "Paused" 状態になっていないか確認 (無料プランは非アクティブ時に自動停止)
 
 #### **問題**: Realtime機能が動作しない
 
@@ -1064,12 +1064,12 @@ Error: connect ECONNREFUSED
 
 **解決方法**:
 
-1. Supabase Dashboard の "Database" → "Replication" で以下のテーブルがReplication対象か確認:
+1. Supabase Dashboardの "Database" → "Replication" で以下のテーブルがReplication対象か確認:
    - \`spaces\`
    - \`bingo_cards\`
    - \`called_numbers\`
-2. ブラウザーのコンソールで WebSocket 接続エラーを確認
-3. Vercel のネットワーク設定を確認 (通常は設定不要)
+2. ブラウザーのコンソールでWebSocket接続エラーを確認
+3. Vercelのネットワーク設定を確認 (通常は設定不要)
 
 ### OAuth認証エラー
 
@@ -1079,15 +1079,15 @@ Error: connect ECONNREFUSED
 
 **解決方法**:
 
-1. OAuth プロバイダーのリダイレクトURIを確認:
+1. OAuthプロバイダーのリダイレクトURIを確認:
    - 正しいURL: \`https://your-project.supabase.co/auth/v1/callback\`
-   - 誤ったURL: \`http://your-project.supabase.co/auth/v1/callback\` (HTTP は不可)
-   - 誤ったURL: \`https://your-domain.vercel.app/auth/callback\` (Vercel URL は不可)
+   - 誤ったURL: \`http://your-project.supabase.co/auth/v1/callback\` (HTTPは不可)
+   - 誤ったURL: \`https://your-domain.vercel.app/auth/callback\` (Vercel URLは不可)
 2. 環境変数を確認:
-   - \`SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID\`
-   - \`SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET\`
-3. Supabase Dashboard の "Authentication" → "Providers" で設定を確認
-4. OAuth プロバイダーのコンソールでアプリケーションが有効化されているか確認
+   - \`SUPABASE_AUTH_EXTERNAL_Google_CLIENT_ID\`
+   - \`SUPABASE_AUTH_EXTERNAL_Google_SECRET\`
+3. Supabase Dashboardの "Authentication" → "Providers" で設定を確認
+4. OAuthプロバイダーのコンソールでアプリケーションが有効化されているか確認
 
 ### パフォーマンス問題
 
@@ -1097,7 +1097,7 @@ Error: connect ECONNREFUSED
 
 **解決方法**:
 
-1. Vercel Analytics でボトルネックを特定
+1. Vercel Analyticsでボトルネックを特定
 2. 画像最適化を確認:
    - \`next/image\` コンポーネントを使用しているか
    - 画像サイズが適切か (大きすぎる画像は避ける)
@@ -1112,13 +1112,13 @@ Error: connect ECONNREFUSED
 
 **解決方法**:
 
-1. Vercel のプランを確認 (Hobby プランでは Cron ジョブは利用不可)
+1. Vercelのプランを確認 (HobbyプランではCronジョブは利用不可)
 2. \`CRON_SECRET\` が設定されているか確認
-3. Vercel Dashboard の "Cron Jobs" で実行履歴を確認 (Pro プラン以上)
-4. 手動で Cron エンドポイントを実行してテスト:
+3. Vercel Dashboardの "Cron Jobs" で実行履歴を確認 (Proプラン以上)
+4. 手動でCronエンドポイントを実行してテスト:
 
-   \`\`\`bash
-   curl -X POST https://your-domain.vercel.app/api/cron/cleanup \
+   \`\`\`Bash
+   cURL -X POST https://your-domain.vercel.app/api/cron/cleanup \
     -H "Authorization: Bearer YOUR_CRON_SECRET"
    \`\`\`
 
@@ -1126,7 +1126,7 @@ Error: connect ECONNREFUSED
 
 ## コスト管理
 
-Vercel の料金プランとコスト管理のポイントです。
+Vercelの料金プランとコスト管理のポイントです。
 
 ### 料金プラン
 
@@ -1140,14 +1140,14 @@ Vercel の料金プランとコスト管理のポイントです。
 
 ### Bingify に推奨されるプラン
 
-- **開発・テスト**: Hobby プラン (無料)
-- **本番環境 (小規模)**: Pro プラン ($20/月)
-- **本番環境 (大規模)**: Enterprise プラン
+- **開発・テスト**: Hobbyプラン (無料)
+- **本番環境 (小規模)**: Proプラン ($20/月)
+- **本番環境 (大規模)**: Enterpriseプラン
 
 **Pro プランが必要な理由**:
 
-- Cron ジョブが必須 (cleanup と token-refresh)
-- Analytics と Speed Insights でパフォーマンス監視
+- Cronジョブが必須 (cleanupとtoken-refresh)
+- AnalyticsとSpeed Insightsでパフォーマンス監視
 - 商用利用のライセンス要件
 
 ### コスト最適化のヒント
@@ -1155,8 +1155,8 @@ Vercel の料金プランとコスト管理のポイントです。
 1. **画像最適化**: \`next/image\` を使用して帯域幅を削減
 2. **キャッシング**: 静的コンテンツは積極的にキャッシュ
 3. **Serverless Function 実行時間**: 不要な処理を削減
-4. **Supabase 無料プラン**: 小規模プロジェクトでは Supabase の無料プランで開始
-5. **帯域幅監視**: Vercel Dashboard で帯域幅使用量を定期的に確認
+4. **Supabase 無料プラン**: 小規模プロジェクトではSupabaseの無料プランで開始
+5. **帯域幅監視**: Vercel Dashboardで帯域幅使用量を定期的に確認
 
 ---
 
@@ -1170,9 +1170,9 @@ Vercel の料金プランとコスト管理のポイントです。
 
 ### Bingify のリソース
 
-- **GitHub リポジトリ**: [https://github.com/ykzts/bingify](https://github.com/ykzts/bingify)
+- **GitHub リポジトリ**: [https://github.com/ykzts/Bingify](https://github.com/ykzts/bingify)
 - **Issue トラッカー**: [https://github.com/ykzts/bingify/issues](https://github.com/ykzts/bingify/issues)
-- **README**: [README.md](../README.md)
+- **Readme**: [README.md](../README.md)
 - **コントリビューションガイド**: [CONTRIBUTING.md](../CONTRIBUTING.md)
 - **セルフホスティングガイド**: [SELF_HOSTED.md](./SELF_HOSTED.md)
 
@@ -1187,27 +1187,27 @@ Vercel の料金プランとコスト管理のポイントです。
 
 ## まとめ
 
-このガイドでは、Vercel での Bingify のデプロイ方法を詳しく説明しました。
+このガイドでは、VercelでのBingifyのデプロイ方法を詳しく説明しました。
 
 **主要なステップの要約**:
 
-1. Supabase プロジェクトを作成し、接続情報を取得
-2. GitHub リポジトリをフォーク
-3. Vercel にリポジトリをインポート
+1. Supabaseプロジェクトを作成し、接続情報を取得
+2. GitHubリポジトリをフォーク
+3. Vercelにリポジトリをインポート
 4. 環境変数を設定 (特に \`CRON_SECRET\` を忘れずに)
 5. デプロイを実行
 6. カスタムドメインを設定 (オプション)
-7. OAuth を設定 (Google、Twitch)
+7. OAuthを設定 (Google、Twitch)
 8. モニタリングとパフォーマンス最適化
 
 **次のステップ**:
 
 - アプリケーションをカスタマイズ
 - ユーザーを招待してテスト
-- Analytics でパフォーマンスを監視
+- Analyticsでパフォーマンスを監視
 - コミュニティにフィードバックを提供
 
-Vercel でのデプロイにより、Bingify は高速で信頼性の高いホスティング環境で動作します。何か問題が発生した場合は、[トラブルシューティング](#トラブルシューティング)セクションまたは GitHub Issues を参照してください。
+Vercelでのデプロイにより、Bingifyは高速で信頼性の高いホスティング環境で動作します。何か問題が発生した場合は、[トラブルシューティング](#トラブルシューティング) セクションまたはGitHub Issuesを参照してください。
 
 ---
 

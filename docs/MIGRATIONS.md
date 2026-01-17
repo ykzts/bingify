@@ -23,7 +23,7 @@
 
 リポジトリのSettings > Secrets and variables > Actionsから以下のシークレットを設定してください。
 
-#### Supabase_ACCESS_TOKEN
+#### SUPABASE_ACCESS_TOKEN
 
 SupabaseのPersonal Access Tokenです。
 
@@ -42,7 +42,7 @@ SupabaseのPersonal Access Tokenです。
 - このトークンはプロジェクトの管理権限を持つため、厳重に管理してください
 - トークンが漏洩した場合は、すぐにSupabase Dashboardから無効化してください
 
-#### Supabase_PROJECT_ID
+#### SUPABASE_PROJECT_ID
 
 SupabaseプロジェクトのProject Reference IDです。
 

@@ -45,11 +45,11 @@ Supabaseへのアクセス情報や設定詳細は [supabase-setup スキル](..
 
 ### UIコンポーネント
 
-- Shadcn/uiコンポーネントは `@/components/ui` に配置（自動生成、手動編集禁止）
+- shadcn/uiコンポーネントは `@/components/ui` に配置 (自動生成、手動編集禁止)
 - カスタムコンポーネントは `@/components` に配置
-- `cn` ユーティリティ（`lib/utils.ts`）でクラス結合
+- `cn` ユーティリティ (`lib/utils.ts`) でクラス結合
 
-**Shadcn/ui 管理**:
+**shadcn/ui 管理**:
 
 ```bash
 # 新規追加

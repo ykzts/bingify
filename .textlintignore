@@ -19,7 +19,7 @@ package-lock.json
 !.env.example
 
 # Skills and agent documentation (internal) - machine-generated files
-.github/skills/
+.github/skills/vercel-react-best-practices/
 
 # Auto-generated documentation
 types/
