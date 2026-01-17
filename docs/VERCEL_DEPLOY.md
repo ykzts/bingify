@@ -59,7 +59,7 @@ VercelはNext.jsの開発元が提供するホスティングプラットフォ�
 - **グローバルCDN**: 世界中で高速なコンテンツ配信を実現
 - **自動HTTPS**: 無料のSSL証明書とHTTPS対応を自動設定
 - **プレビューデプロイ**: PRごとの自動プレビュー環境で、レビューが容易
-- **組み込みCron**: \`vercel.json\` で定義されたCronジョブの自動実行
+- **組み込みCron**: `vercel.json` で定義されたCronジョブの自動実行
 - **エッジネットワーク**: 世界中のエッジロケーションで高速レスポンス
 - **簡単なロールバック**: ワンクリックで以前のデプロイに戻せる
 - **統合Analytics**: ビルトインのパフォーマンス監視とアナリティクス
@@ -107,13 +107,13 @@ VercelはNext.jsの開発元であるため、以下の機能が完全にサポ�
 
    最低限必要な環境変数を設定:
 
-   \`\`\`Bash
+   ```bash
    NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
    NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
    CRON_SECRET=your-random-secret
-   \`\`\`
+   ```
 
 4. **デプロイ**
 
@@ -143,17 +143,17 @@ Vercelデプロイの前に、Supabaseプロジェクトをセットアップし
 
 Supabase Dashboardの "Settings" → "API" で以下の情報を取得:
 
-- **Project URL**: \`https://xxxxxxxxxxxxx.supabase.co\`
+- **Project URL**: `https://xxxxxxxxxxxxx.supabase.co`
 - **anon/public key**: 公開用の匿名キー
 - **service_role key**: 管理者権限を持つサービスロールキー (⚠️ 秘密情報)
 
-**重要**: \`service_role key\` は秘密情報です。絶対にコードにハードコードしたり、公開リポジトリにコミットしないでください。
+**重要**: `service_role key` は秘密情報です。絶対にコードにハードコードしたり、公開リポジトリにコミットしないでください。
 
 #### 1.3 データベースマイグレーションの適用
 
 ローカル環境でSupabase CLIを使用してマイグレーションを適用します。
 
-\`\`\`Bash
+```bash
 
 # Supabase CLIをインストール (未インストールの場合)
 
@@ -170,17 +170,17 @@ supabase link --project-ref your-project-ref
 # マイグレーションを適用
 
 supabase db push
-\`\`\`
+```
 
-**代替方法**: Supabase Dashboardの "SQL Editor" から \`supabase/migrations/\*.SQL\` ファイルの内容を手動で実行することもできます。
+**代替方法**: Supabase Dashboardの "SQL Editor" から `supabase/migrations/\*.SQL` ファイルの内容を手動で実行することもできます。
 
 #### 1.4 Realtime機能の有効化
 
 Supabase Dashboardの "Database" → "Replication" で以下のテーブルのRealtimeを有効化:
 
-- \`spaces\`
-- \`bingo_cards\`
-- \`called_numbers\`
+- `spaces`
+- `bingo_cards`
+- `called_numbers`
 
 これにより、リアルタイムでのビンゴゲームの同期が可能になります。
 
@@ -199,12 +199,12 @@ Supabase Dashboardの "Database" → "Replication" で以下のテーブルのRe
 
 ローカルで環境変数を事前に確認したい場合:
 
-\`\`\`Bash
+```bash
 Git clone https://github.com/your-username/bingify.git
 cd Bingify
-\`\`\`
+```
 
-\`.env.local.example\` を参考に、必要な環境変数をリストアップします。
+`.env.local.example` を参考に、必要な環境変数をリストアップします。
 
 ---
 
@@ -222,12 +222,12 @@ cd Bingify
 
 **Configure Project** 画面で以下を設定:
 
-- **Project Name**: プロジェクト名 (例: \`Bingify\`)
+- **Project Name**: プロジェクト名 (例: `Bingify`)
 - **Framework Preset**: Next.js (自動検出されます)
-- **Root Directory**: \`./\` (変更不要)
-- **Build Command**: \`pnpm build\` (自動設定されます)
-- **Output Directory**: \`.next\` (自動設定されます)
-- **Install Command**: \`pnpm install\` (自動設定されます)
+- **Root Directory**: `./` (変更不要)
+- **Build Command**: `pnpm build` (自動設定されます)
+- **Output Directory**: `.next` (自動設定されます)
+- **Install Command**: `pnpm install` (自動設定されます)
 
 **注意**: これらの設定は通常、自動検出されるため変更の必要はありません。
 
@@ -253,7 +253,7 @@ Vercelプロジェクト設定画面で環境変数を追加します。
 
 以下の環境変数は必須です:
 
-\`\`\`Bash
+```bash
 
 # Supabase接続
 
@@ -268,21 +268,21 @@ NEXT_PUBLIC_SITE_URL=https://your-project.vercel.app
 # Cronジョブ認証用シークレット (必須)
 
 CRON_SECRET=your-random-secret-string
-\`\`\`
+```
 
-**\`CRON_SECRET\` の生成**:
+**`CRON_SECRET` の生成**:
 
 ターミナルで以下のコマンドを実行して安全なランダム文字列を生成:
 
-\`\`\`Bash
+```bash
 OpenSSL rand -base64 32
-\`\`\`
+```
 
 #### 4.3 推奨の環境変数を設定
 
 本番環境では以下も設定することを推奨します:
 
-\`\`\`Bash
+```bash
 
 # ベータ版バナーの非表示 (正式リリース時)
 
@@ -296,7 +296,7 @@ SMTP_USER=user
 SMTP_PASS=password
 SMTP_SECURE=false
 MAIL_FROM=noreply@example.com
-\`\`\`
+```
 
 完全な環境変数のリストは、[環境変数リファレンス](#環境変数リファレンス) を参照してください。
 
@@ -318,9 +318,9 @@ MAIL_FROM=noreply@example.com
 
 デプロイが完了すると、Vercelが自動生成したURLが表示されます:
 
-\`\`\`
+```
 https://your-project.vercel.app
-\`\`\`
+```
 
 1. URLをクリックしてアプリケーションにアクセス
 2. ログイン機能が動作するか確認
@@ -347,17 +347,17 @@ Bingifyの動作に必要な環境変数の完全なリストです。
 
 | 変数名                            | 説明                                    | 例                                  | 取得方法                                    |
 | :-------------------------------- | :-------------------------------------- | :---------------------------------- | :------------------------------------------ |
-| \`NEXT_PUBLIC_SUPABASE_URL\`      | SupabaseプロジェクトURL                 | \`https://xxx.supabase.co\`         | Supabase Dashboard → Settings → API         |
-| \`NEXT_PUBLIC_SUPABASE_ANON_KEY\` | Supabase匿名キー (公開用)               | \`eyJhbGciOiJIUzI1NiIsInR5cCI6...\` | Supabase Dashboard → Settings → API         |
-| \`SUPABASE_SERVICE_ROLE_KEY\`     | Supabaseサービスロールキー (⚠️秘密情報) | \`eyJhbGciOiJIUzI1NiIsInR5cCI6...\` | Supabase Dashboard → Settings → API         |
-| \`NEXT_PUBLIC_SITE_URL\`          | サイトURL (OAuth リダイレクト用)        | \`https://example.com\`             | Vercel のデプロイURL またはカスタムドメイン |
-| \`CRON_SECRET\`                   | Cronジョブ認証用シークレット            | \`your-random-secret-string\`       | \`OpenSSL rand -base64 32\` で生成          |
+| `NEXT_PUBLIC_SUPABASE_URL`      | SupabaseプロジェクトURL                 | `https://xxx.supabase.co`         | Supabase Dashboard → Settings → API         |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase匿名キー (公開用)               | `eyJhbGciOiJIUzI1NiIsInR5cCI6...` | Supabase Dashboard → Settings → API         |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Supabaseサービスロールキー (⚠️秘密情報) | `eyJhbGciOiJIUzI1NiIsInR5cCI6...` | Supabase Dashboard → Settings → API         |
+| `NEXT_PUBLIC_SITE_URL`          | サイトURL (OAuth リダイレクト用)        | `https://example.com`             | Vercel のデプロイURL またはカスタムドメイン |
+| `CRON_SECRET`                   | Cronジョブ認証用シークレット            | `your-random-secret-string`       | `OpenSSL rand -base64 32` で生成          |
 
 **重要**:
 
-- \`NEXT*PUBLIC*\` プレフィックスがある変数はクライアント側で使用されます
-- \`SUPABASE_SERVICE_ROLE_KEY\` は管理者権限を持つため、絶対に公開しないでください
-- \`CRON_SECRET\` を設定しないと、不正なCronジョブの実行を防げません
+- `NEXT*PUBLIC*` プレフィックスがある変数はクライアント側で使用されます
+- `SUPABASE_SERVICE_ROLE_KEY` は管理者権限を持つため、絶対に公開しないでください
+- `CRON_SECRET` を設定しないと、不正なCronジョブの実行を防げません
 
 ### 推奨の環境変数
 
@@ -365,21 +365,21 @@ Bingifyの動作に必要な環境変数の完全なリストです。
 
 | 変数名                           | 説明                       | デフォルト | 例                  |
 | :------------------------------- | :------------------------- | :--------- | :------------------ |
-| \`NEXT_PUBLIC_SHOW_BETA_BANNER\` | ベータ版バナーの表示制御   | \`true\`   | \`false\`           |
-| \`SEND_EMAIL_HOOK_SECRETS\`      | Supabase Auth Hook署名検証 | -          | \`v1,whsec_xxx...\` |
+| `NEXT_PUBLIC_SHOW_BETA_BANNER` | ベータ版バナーの表示制御   | `true`   | `false`           |
+| `SEND_EMAIL_HOOK_SECRETS`      | Supabase Auth Hook署名検証 | -          | `v1,whsec_xxx...` |
 
 **SMTP設定 (お問い合わせフォーム)**:
 
 | 変数名          | 説明                 | 例                      |
 | :-------------- | :------------------- | :---------------------- |
-| \`SMTP_HOST\`   | SMTPサーバーホスト   | \`smtp.example.com\`    |
-| \`SMTP_PORT\`   | SMTPポート           | \`587\`                 |
-| \`SMTP_USER\`   | SMTPユーザー名       | \`user\`                |
-| \`SMTP_PASS\`   | SMTPパスワード       | \`password\`            |
-| \`SMTP_SECURE\` | TLS使用フラグ        | \`false\`               |
-| \`MAIL_FROM\`   | 送信元メールアドレス | \`noreply@example.com\` |
+| `SMTP_HOST`   | SMTPサーバーホスト   | `smtp.example.com`    |
+| `SMTP_PORT`   | SMTPポート           | `587`                 |
+| `SMTP_USER`   | SMTPユーザー名       | `user`                |
+| `SMTP_PASS`   | SMTPパスワード       | `password`            |
+| `SMTP_SECURE` | TLS使用フラグ        | `false`               |
+| `MAIL_FROM`   | 送信元メールアドレス | `noreply@example.com` |
 
-送信先は \`profiles\` テーブルの \`role = 'admin'\` のユーザーに自動送信されます。
+送信先は `profiles` テーブルの `role = 'admin'` のユーザーに自動送信されます。
 
 ### オプションの環境変数
 
@@ -389,18 +389,18 @@ Bingifyの動作に必要な環境変数の完全なリストです。
 
 | 変数名                                      | 説明                        | 取得方法                                                       |
 | :------------------------------------------ | :-------------------------- | :------------------------------------------------------------- |
-| \`SUPABASE_AUTH_EXTERNAL_Google_CLIENT_ID\` | Google OAuth クライアントID | [Google Cloud Console](https://console.cloud.google.com/)      |
-| \`SUPABASE_AUTH_EXTERNAL_Google_SECRET\`    | Google OAuth シークレット   | Google Cloud Console                                           |
-| \`SUPABASE_AUTH_EXTERNAL_Twitch_CLIENT_ID\` | Twitch OAuth クライアントID | [Twitch Developer Console](https://dev.twitch.tv/console/apps) |
-| \`SUPABASE_AUTH_EXTERNAL_Twitch_SECRET\`    | Twitch OAuth シークレット   | Twitch Developer Console                                       |
+| `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` | Google OAuth クライアントID | [Google Cloud Console](https://console.cloud.google.com/)      |
+| `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET`    | Google OAuth シークレット   | Google Cloud Console                                           |
+| `SUPABASE_AUTH_EXTERNAL_Twitch_CLIENT_ID` | Twitch OAuth クライアントID | [Twitch Developer Console](https://dev.twitch.tv/console/apps) |
+| `SUPABASE_AUTH_EXTERNAL_Twitch_SECRET`    | Twitch OAuth シークレット   | Twitch Developer Console                                       |
 
 **アクセス制御**:
 
 | 変数名                  | 説明                    | デフォルト | 例           |
 | :---------------------- | :---------------------- | :--------- | :----------- |
-| \`ENABLE_BASIC_AUTH\`   | Basic認証の有効化フラグ | \`false\`  | \`true\`     |
-| \`BASIC_AUTH_USER\`     | Basic認証ユーザー名     | -          | \`admin\`    |
-| \`BASIC_AUTH_PASSWORD\` | Basic認証パスワード     | -          | \`password\` |
+| `ENABLE_BASIC_AUTH`   | Basic認証の有効化フラグ | `false`  | `true`     |
+| `BASIC_AUTH_USER`     | Basic認証ユーザー名     | -          | `admin`    |
+| `BASIC_AUTH_PASSWORD` | Basic認証パスワード     | -          | `password` |
 
 Basic認証は公開前の制限やステージング環境の保護に使用できます。
 
@@ -408,9 +408,9 @@ Basic認証は公開前の制限やステージング環境の保護に使用で
 
 | 変数名                             | 説明                             | 取得方法                                             |
 | :--------------------------------- | :------------------------------- | :--------------------------------------------------- |
-| \`NEXT_PUBLIC_TURNSTILE_SITE_KEY\` | Cloudflare Turnstileサイトキー   | [Cloudflare Dashboard](https://dash.cloudflare.com/) |
-| \`TURNSTILE_SECRET_KEY\`           | Cloudflare Turnstileシークレット | Cloudflare Dashboard                                 |
-| \`NEXT_PUBLIC_GA_MEASUREMENT_ID\`  | Google Analytics測定ID           | [Google Analytics](https://analytics.google.com/)    |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstileサイトキー   | [Cloudflare Dashboard](https://dash.cloudflare.com/) |
+| `TURNSTILE_SECRET_KEY`           | Cloudflare Turnstileシークレット | Cloudflare Dashboard                                 |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | Google Analytics測定ID           | [Google Analytics](https://analytics.google.com/)    |
 
 ---
 
@@ -422,26 +422,26 @@ VercelとSupabaseの連携における詳細な設定方法です。
 
 #### 自動デプロイ (推奨)
 
-\`supabase/migrations\` ディレクトリ配下の \`.SQL\` マイグレーションファイルは、\`main\` ブランチへのマージ時に自動的にCloud Supabaseへデプロイされます。
+`supabase/migrations` ディレクトリ配下の `.SQL` マイグレーションファイルは、`main` ブランチへのマージ時に自動的にCloud Supabaseへデプロイされます。
 
 **GitHub Actions による自動マイグレーション**:
 
-1. PRを作成し、\`supabase/migrations/\*_/_.SQL\` に変更を含める
+1. PRを作成し、`supabase/migrations/\*_/_.SQL` に変更を含める
 2. PRがレビュー・承認される
-3. \`main\` ブランチへマージ
+3. `main` ブランチへマージ
 4. GitHub Actionsが自動的にマイグレーションをCloud Supabaseに適用
 5. デプロイ前後の検証ステップで安全性を確保
 
 **必要な GitHub Secrets**:
 
-- \`SUPABASE_ACCESS_TOKEN\`: SupabaseのPersonal Access Token ([Settings > Access Tokens](https://supabase.com/dashboard/account/tokens) から取得)
-- \`SUPABASE_PROJECT_ID\`: SupabaseプロジェクトのProject Reference ID (プロジェクト設定から確認可能)
+- `SUPABASE_ACCESS_TOKEN`: SupabaseのPersonal Access Token ([Settings > Access Tokens](https://supabase.com/dashboard/account/tokens) から取得)
+- `SUPABASE_PROJECT_ID`: SupabaseプロジェクトのProject Reference ID (プロジェクト設定から確認可能)
 
 #### 手動マイグレーション
 
 緊急時や初回セットアップでは、手動でマイグレーションを実行できます:
 
-\`\`\`Bash
+```bash
 
 # Supabaseにログイン
 
@@ -454,7 +454,7 @@ supabase link --project-ref your-project-ref
 # マイグレーションを適用
 
 supabase db push
-\`\`\`
+```
 
 **⚠️ 重要な運用ルール**:
 
@@ -462,7 +462,7 @@ supabase db push
 - Supabaseは一度適用されたマイグレーションを再実行しないため、既存ファイルの編集は新規環境にのみ反映され、環境間の不整合を引き起こします
 - 変更が必要な場合は、必ず新しいマイグレーションファイルを作成してください
 
-詳細は [\`docs/MIGRATIONS.md\`](./MIGRATIONS.md) を参照してください。
+詳細は [`docs/MIGRATIONS.md`](./MIGRATIONS.md) を参照してください。
 
 ### Row Level Security (RLS)
 
@@ -475,11 +475,11 @@ SupabaseのRow Level Security (RLS) は、データベースレベルでのア�
 
 **主要なRLSポリシー**:
 
-- \`spaces\`: ユーザーは自分が作成したスペースのみ編集可能
-- \`bingo_cards\`: 認証済みユーザーはカードを作成・表示可能
-- \`called_numbers\`: スペース所有者のみ番号を呼び出し可能
+- `spaces`: ユーザーは自分が作成したスペースのみ編集可能
+- `bingo_cards`: 認証済みユーザーはカードを作成・表示可能
+- `called_numbers`: スペース所有者のみ番号を呼び出し可能
 
-RLSポリシーはマイグレーションで自動的に設定されます (\`supabase/migrations/\*.SQL\`)。
+RLSポリシーはマイグレーションで自動的に設定されます (`supabase/migrations/\*.SQL`)。
 
 ### Realtime機能の設定
 
@@ -489,9 +489,9 @@ RLSポリシーはマイグレーションで自動的に設定されます (\`s
 
 1. Supabase Dashboardの "Database" → "Replication" にアクセス
 2. 以下のテーブルでReplicationを有効化:
-   - \`spaces\`
-   - \`bingo_cards\`
-   - \`called_numbers\`
+   - `spaces`
+   - `bingo_cards`
+   - `called_numbers`
 
 **動作確認**:
 
@@ -510,7 +510,7 @@ GoogleおよびTwitchのOAuth認証を有効にする手順です。
    [Google Cloud Console](https://console.cloud.google.com/) にアクセス:
    - "APIs & Services" → "Credentials" → "Create Credentials" → "OAuth 2.0 Client ID" を選択
    - Application type: "Web application"
-   - Authorized redirect URIs: \`https://your-project.supabase.co/auth/v1/callback\`
+   - Authorized redirect URIs: `https://your-project.supabase.co/auth/v1/callback`
 
 2. **クライアントIDとシークレットを取得**
 
@@ -518,10 +518,10 @@ GoogleおよびTwitchのOAuth認証を有効にする手順です。
 
 3. **Vercelに環境変数を設定**
 
-   \`\`\`Bash
-   SUPABASE_AUTH_EXTERNAL_Google_CLIENT_ID=your-client-id
-   SUPABASE_AUTH_EXTERNAL_Google_SECRET=your-secret
-   \`\`\`
+   ```bash
+   SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=your-client-id
+   SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=your-secret
+   ```
 
 4. **Supabase Dashboard でプロバイダーを有効化**
 
@@ -533,7 +533,7 @@ GoogleおよびTwitchのOAuth認証を有効にする手順です。
 
    [Twitch Developer Console](https://dev.twitch.tv/console/apps) にアクセス:
    - "Register Your Application" をクリック
-   - OAuth Redirect URL: \`https://your-project.supabase.co/auth/v1/callback\`
+   - OAuth Redirect URL: `https://your-project.supabase.co/auth/v1/callback`
    - Category: "site Integration"
 
 2. **クライアントIDとシークレットを取得**
@@ -542,10 +542,10 @@ GoogleおよびTwitchのOAuth認証を有効にする手順です。
 
 3. **Vercelに環境変数を設定**
 
-   \`\`\`Bash
+   ```bash
    SUPABASE_AUTH_EXTERNAL_Twitch_CLIENT_ID=your-client-id
    SUPABASE_AUTH_EXTERNAL_Twitch_SECRET=your-secret
-   \`\`\`
+   ```
 
 4. **Supabase Dashboard でプロバイダーを有効化**
 
@@ -557,7 +557,7 @@ GoogleおよびTwitchのOAuth認証を有効にする手順です。
 
 ## カスタムドメインの設定
 
-VercelのデフォルトURL (\`your-project.vercel.app\`) ではなく、独自ドメインを使用する手順です。
+VercelのデフォルトURL (`your-project.vercel.app`) ではなく、独自ドメインを使用する手順です。
 
 ### ドメインの追加
 
@@ -566,16 +566,16 @@ VercelのデフォルトURL (\`your-project.vercel.app\`) ではなく、独自�
 1. Vercel Dashboardの該当プロジェクトを開く
 2. "Settings" → "Domains" に移動
 3. "Add" ボタンをクリック
-4. ドメイン名を入力 (例: \`Bingify.example.com\` または \`example.com\`)
+4. ドメイン名を入力 (例: `Bingify.example.com` または `example.com`)
 5. "Add" をクリック
 
 #### 2. ドメインタイプの選択
 
 Vercelは以下のドメインタイプをサポートします:
 
-- **Apex Domain** (例: \`example.com\`): ルートドメイン
-- **Subdomain** (例: \`Bingify.example.com\`): サブドメイン
-- **Wildcard** (例: \`\*.example.com\`): ワイルドカードドメイン (Proプラン以上)
+- **Apex Domain** (例: `example.com`): ルートドメイン
+- **Subdomain** (例: `Bingify.example.com`): サブドメイン
+- **Wildcard** (例: `\*.example.com`): ワイルドカードドメイン (Proプラン以上)
 
 **推奨**: サブドメインを使用すると、DNS設定が簡単です (CNAMEレコードのみ)。
 
@@ -589,7 +589,7 @@ Vercelは以下のドメインタイプをサポートします:
 
 | Type  | Name        | Value                     |
 | :---- | :---------- | :------------------------ |
-| CNAME | \`Bingify\` | \`cname.vercel-dns.com.\` |
+| CNAME | `Bingify` | `cname.vercel-dns.com.` |
 
 ドメインレジストラー (例: Cloudflare, GoDaddy, Namecheap) のDNS管理画面で上記のレコードを追加します。
 
@@ -599,7 +599,7 @@ Vercelは以下のドメインタイプをサポートします:
 
 | Type | Name  | Value           |
 | :--- | :---- | :-------------- |
-| A    | \`@\` | \`76.76.21.21\` |
+| A    | `@` | `76.76.21.21` |
 
 **注意**: 一部のDNSプロバイダーはCNAME FlatteningまたはANAME/ALIASレコードをサポートしています。詳細はVercelのドキュメントを参照してください。
 
@@ -609,7 +609,7 @@ DNS設定後、変更が伝播するまで数分から48時間かかる場合が
 
 **伝播を確認**:
 
-\`\`\`Bash
+```bash
 
 # サブドメインの場合
 
@@ -618,7 +618,7 @@ nslookup Bingify.example.com
 # Apexドメインの場合
 
 nslookup example.com
-\`\`\`
+```
 
 VercelのIPアドレスが返ってくれば、DNS設定は正しく伝播しています。
 
@@ -640,11 +640,11 @@ VercelはLet's Encryptを使用して、自動的にSSL証明書を発行・更�
 
 **環境変数の更新**:
 
-カスタムドメインを追加したら、\`NEXT_PUBLIC_SITE_URL\` を更新:
+カスタムドメインを追加したら、`NEXT_PUBLIC_SITE_URL` を更新:
 
-\`\`\`Bash
+```bash
 NEXT_PUBLIC_SITE_URL=https://bingify.example.com
-\`\`\`
+```
 
 Vercel Dashboardの "Settings" → "Environment Variables" で更新し、再デプロイします。
 
@@ -664,7 +664,7 @@ VercelはGitHubと深く統合されており、自動デプロイとプレビ�
 
 **自動デプロイのトリガー**:
 
-- **本番デプロイ**: \`main\` ブランチへのプッシュまたはマージ
+- **本番デプロイ**: `main` ブランチへのプッシュまたはマージ
 - **プレビューデプロイ**: Pull Requestの作成または更新
 
 ### プレビューデプロイ
@@ -692,17 +692,17 @@ VercelはGitHubと深く統合されており、自動デプロイとプレビ�
 
 **例**: プレビュー環境でベータ版バナーを表示する場合:
 
-- Production: \`NEXT_PUBLIC_SHOW_BETA_BANNER=false\`
-- Preview: \`NEXT_PUBLIC_SHOW_BETA_BANNER=true\`
+- Production: `NEXT_PUBLIC_SHOW_BETA_BANNER=false`
+- Preview: `NEXT_PUBLIC_SHOW_BETA_BANNER=true`
 
 ### 本番デプロイ
 
-\`main\` ブランチへのマージで自動的に本番デプロイが実行されます。
+`main` ブランチへのマージで自動的に本番デプロイが実行されます。
 
 **本番デプロイのフロー**:
 
 1. Pull Requestがレビュー・承認される
-2. \`main\` ブランチへマージ
+2. `main` ブランチへマージ
 3. Vercelが自動的にビルドを開始
 4. ビルドが成功すると、本番環境にデプロイ
 5. Vercelが自動的に以前のデプロイからロールオーバー
@@ -728,12 +728,12 @@ VercelはGitHubと深く統合されており、自動デプロイとプレビ�
 
 **デプロイフックの使用例**:
 
-\`\`\`Bash
+```bash
 
 # cURL でデプロイをトリガー
 
 cURL -X POST https://api.vercel.com/v1/integrations/deploy/xxxxx/xxxxx
-\`\`\`
+```
 
 **用途**:
 
@@ -760,7 +760,7 @@ Vercelは世界中のエッジロケーションにアプリケーションを�
 **追加の最適化**:
 
 - **Supabaseリージョンの選択**: ユーザーベースに近いリージョンを選択
-- **画像最適化の活用**: \`next/image\` を使用して画像を最適化
+- **画像最適化の活用**: `next/image` を使用して画像を最適化
 - **Static Generation**: 可能な限りStatic Generationを使用
 
 ### 画像最適化
@@ -775,16 +775,16 @@ Next.jsのImage OptimizationはVercelで自動的に有効化されます。
 
 **Best practices**:
 
-- \`next/image\` コンポーネントを常に使用
-- 適切な \`width\` と \`height\` を指定
-- \`priority\` 属性を重要な画像に使用 (LCP改善)
+- `next/image` コンポーネントを常に使用
+- 適切な `width` と `height` を指定
+- `priority` 属性を重要な画像に使用 (LCP改善)
 - WebP/AVIFフォーマットへの自動変換を活用 (Vercelが自動処理)
 
 **設定の確認**:
 
-\`next.config.ts\` で以下の設定が有効になっていることを確認:
+`next.config.ts` で以下の設定が有効になっていることを確認:
 
-\`\`\`TypeScript
+```typescript
 images: {
 remotePatterns:[
 {
@@ -797,7 +797,7 @@ protocol: "HTTPs",
 },
 ],
 },
-\`\`\`
+```
 
 ### キャッシング戦略
 
@@ -813,7 +813,7 @@ VercelはNext.jsの標準的なキャッシング戦略をサポートします�
 
 - **静的ページ**: 利用規約、プライバシーポリシーなど
 - **動的ページ**: ビンゴスペースはリアルタイム性が重要なため、キャッシュは最小限
-- **API Routes**: 必要に応じて \`revalidate\` を設定
+- **API Routes**: 必要に応じて `revalidate` を設定
 
 **キャッシュの無効化**:
 
@@ -833,11 +833,11 @@ Vercelは自動的にバンドルサイズを最適化しますが、追加の�
 
 - **動的インポート**: 大きなコンポーネントは動的インポートを使用
 
-  \`\`\`TypeScript
+  ```typescript
   const HeavyComponent = dynamic(() => import("./HeavyComponent"), {
   loading: () => <p>Loading...</p>,
   });
-  \`\`\`
+  ```
 
 - **依存関係の見直し**: 不要な依存関係を削除
 - **バンドルアナライザー**: バンドルサイズを分析して最適化
@@ -919,26 +919,26 @@ Speed InsightsはProプラン以上で自動的に有効化されます。
 **Sentryの統合 (オプション)**:
 
 1. [Sentry](https://sentry.io/) でプロジェクトを作成
-2. \`@sentry/Next.js\` をインストール
+2. `@sentry/Next.js` をインストール
 
-   \`\`\`Bash
+   ```bash
    pnpm add @sentry/Next.js
-   \`\`\`
+   ```
 
-3. \`sentry.client.config.ts\` と \`sentry.server.config.ts\` を設定
+3. `sentry.client.config.ts` と `sentry.server.config.ts` を設定
 4. VercelにSentryの環境変数を追加
 
 ---
 
 ## Cronジョブの設定
 
-Vercelは \`vercel.json\` で定義されたCronジョブを自動実行します。
+Vercelは `vercel.json` で定義されたCronジョブを自動実行します。
 
 ### 設定内容の確認
 
-Bingifyには以下のCronジョブが設定されています (\`vercel.json\`):
+Bingifyには以下のCronジョブが設定されています (`vercel.json`):
 
-\`\`\`JSON
+```json
 {
 "crons":[
 {
@@ -951,7 +951,7 @@ Bingifyには以下のCronジョブが設定されています (\`vercel.json\`)
 }
 ]
 }
-\`\`\`
+```
 
 **ジョブの詳細**:
 
@@ -968,7 +968,7 @@ Bingifyには以下のCronジョブが設定されています (\`vercel.json\`)
 
 **手動実行によるテスト**:
 
-\`\`\`Bash
+```bash
 
 # cleanup ジョブをテスト
 
@@ -979,9 +979,9 @@ cURL -X POST https://your-domain.vercel.app/api/cron/cleanup \
 
 cURL -X POST https://your-domain.vercel.app/api/cron/token-refresh \
  -H "Authorization: Bearer YOUR_CRON_SECRET"
-\`\`\`
+```
 
-\`YOUR_CRON_SECRET\` は環境変数の \`CRON_SECRET\` と同じ値を使用します。
+`YOUR_CRON_SECRET` は環境変数の `CRON_SECRET` と同じ値を使用します。
 
 ### Cronジョブの制限事項
 
@@ -1009,18 +1009,18 @@ Hobbyプランを使用している場合は、以下の代替案を検討して
 
 **症状**:
 
-\`\`\`
+```
 Error: Cannot find module 'next'
-\`\`\`
+```
 
 **解決方法**:
 
-1. \`package.JSON\` が正しくコミットされているか確認
+1. `package.JSON` が正しくコミットされているか確認
 2. Vercelの "Settings" → "General" → "Build & Development Settings" で以下を確認:
-   - **Build Command**: \`pnpm build\`
-   - **Install Command**: \`pnpm install\`
+   - **Build Command**: `pnpm build`
+   - **Install Command**: `pnpm install`
 3. Node.jsバージョンを確認 (24.xが必要):
-   - \`package.JSON\` に \`"engines": { "node": "24.x" }\` を追加
+   - `package.JSON` に `"engines": { "node": "24.x" }` を追加
 
 #### **問題**: 環境変数が反映されない
 
@@ -1030,8 +1030,8 @@ Error: Cannot find module 'next'
 
 1. Vercel Dashboardの "Settings" → "Environment Variables" で設定を確認
 2. 環境 (Production、Preview、Development) が正しく選択されているか確認
-3. \`NEXT*PUBLIC*\` プレフィックスの有無を確認
-   - クライアント側で使用する変数には \`NEXT*PUBLIC*\` が必要
+3. `NEXT*PUBLIC*` プレフィックスの有無を確認
+   - クライアント側で使用する変数には `NEXT*PUBLIC*` が必要
    - サーバー側のみで使用する変数には不要
 4. 環境変数を更新した後は、**必ず再デプロイ**を実行
    - Vercel Dashboardの "Deployments" → "..." → "Redeploy"
@@ -1042,19 +1042,19 @@ Error: Cannot find module 'next'
 
 **症状**:
 
-\`\`\`
+```
 Error: connect ECONNREFUSED
-\`\`\`
+```
 
 **解決方法**:
 
 1. Supabaseプロジェクトが起動しているか確認
-2. 環境変数 \`NEXT_PUBLIC_SUPABASE_URL\` が正しく設定されているか確認
+2. 環境変数 `NEXT_PUBLIC_SUPABASE_URL` が正しく設定されているか確認
 3. ネットワーク接続を確認:
 
-   \`\`\`Bash
+   ```bash
    cURL $NEXT_PUBLIC_SUPABASE_URL
-   \`\`\`
+   ```
 
 4. Supabase Dashboardで "Paused" 状態になっていないか確認 (無料プランは非アクティブ時に自動停止)
 
@@ -1065,9 +1065,9 @@ Error: connect ECONNREFUSED
 **解決方法**:
 
 1. Supabase Dashboardの "Database" → "Replication" で以下のテーブルがReplication対象か確認:
-   - \`spaces\`
-   - \`bingo_cards\`
-   - \`called_numbers\`
+   - `spaces`
+   - `bingo_cards`
+   - `called_numbers`
 2. ブラウザーのコンソールでWebSocket接続エラーを確認
 3. Vercelのネットワーク設定を確認 (通常は設定不要)
 
@@ -1080,12 +1080,12 @@ Error: connect ECONNREFUSED
 **解決方法**:
 
 1. OAuthプロバイダーのリダイレクトURIを確認:
-   - 正しいURL: \`https://your-project.supabase.co/auth/v1/callback\`
-   - 誤ったURL: \`http://your-project.supabase.co/auth/v1/callback\` (HTTPは不可)
-   - 誤ったURL: \`https://your-domain.vercel.app/auth/callback\` (Vercel URLは不可)
+   - 正しいURL: `https://your-project.supabase.co/auth/v1/callback`
+   - 誤ったURL: `http://your-project.supabase.co/auth/v1/callback` (HTTPは不可)
+   - 誤ったURL: `https://your-domain.vercel.app/auth/callback` (Vercel URLは不可)
 2. 環境変数を確認:
-   - \`SUPABASE_AUTH_EXTERNAL_Google_CLIENT_ID\`
-   - \`SUPABASE_AUTH_EXTERNAL_Google_SECRET\`
+   - `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID`
+   - `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET`
 3. Supabase Dashboardの "Authentication" → "Providers" で設定を確認
 4. OAuthプロバイダーのコンソールでアプリケーションが有効化されているか確認
 
@@ -1099,7 +1099,7 @@ Error: connect ECONNREFUSED
 
 1. Vercel Analyticsでボトルネックを特定
 2. 画像最適化を確認:
-   - \`next/image\` コンポーネントを使用しているか
+   - `next/image` コンポーネントを使用しているか
    - 画像サイズが適切か (大きすぎる画像は避ける)
 3. データベースクエリを最適化:
    - 不要なデータを取得していないか
@@ -1113,14 +1113,14 @@ Error: connect ECONNREFUSED
 **解決方法**:
 
 1. Vercelのプランを確認 (HobbyプランではCronジョブは利用不可)
-2. \`CRON_SECRET\` が設定されているか確認
+2. `CRON_SECRET` が設定されているか確認
 3. Vercel Dashboardの "Cron Jobs" で実行履歴を確認 (Proプラン以上)
 4. 手動でCronエンドポイントを実行してテスト:
 
-   \`\`\`Bash
+   ```bash
    cURL -X POST https://your-domain.vercel.app/api/cron/cleanup \
     -H "Authorization: Bearer YOUR_CRON_SECRET"
-   \`\`\`
+   ```
 
 ---
 
@@ -1152,7 +1152,7 @@ Vercelの料金プランとコスト管理のポイントです。
 
 ### コスト最適化のヒント
 
-1. **画像最適化**: \`next/image\` を使用して帯域幅を削減
+1. **画像最適化**: `next/image` を使用して帯域幅を削減
 2. **キャッシング**: 静的コンテンツは積極的にキャッシュ
 3. **Serverless Function 実行時間**: 不要な処理を削減
 4. **Supabase 無料プラン**: 小規模プロジェクトではSupabaseの無料プランで開始
@@ -1194,7 +1194,7 @@ Vercelの料金プランとコスト管理のポイントです。
 1. Supabaseプロジェクトを作成し、接続情報を取得
 2. GitHubリポジトリをフォーク
 3. Vercelにリポジトリをインポート
-4. 環境変数を設定 (特に \`CRON_SECRET\` を忘れずに)
+4. 環境変数を設定 (特に `CRON_SECRET` を忘れずに)
 5. デプロイを実行
 6. カスタムドメインを設定 (オプション)
 7. OAuthを設定 (Google、Twitch)

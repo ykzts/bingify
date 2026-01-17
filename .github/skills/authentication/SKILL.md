@@ -21,10 +21,10 @@ BingifyはSupabaseAuth (メールOTP/Magic Link、OAuth) を使用し、認証�
 [app/[locale]/login/page.tsx](../../../app/%5Blocale%5D/login/page.tsx) で以下を処理：
 
 - ユーザーがメールアドレスを入力
-- OAuthプロバイダー(Google、Twitchなど)のボタンをクリック
+- OAuthプロバイダー (Google、Twitchなど) のボタンをクリック
 - `redirect` クエリパラメータで認証後の遷移先を指定
 
-### 2. OAuthフロー(例：Google OAuth)
+### 2. OAuthフロー (例：Google OAuth)
 
 ```tsx
 // 実装例: app/[locale]/login/_components/login-form.tsx
