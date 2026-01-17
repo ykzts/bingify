@@ -278,7 +278,7 @@
 | 文脈                 | 短縮形                      | 完全形       |
 | -------------------- | --------------------------- | ------------ |
 | エラーメッセージ     | You can't access this space | (短縮形OK)   |
-| ボタンラベル         | Don't have an account?      | (短縮形OK)   |
+| ボタンラベル         | Don't have an account       | (短縮形OK)   |
 | 利用規約             | The Service shall not...    | (完全形のみ) |
 | プライバシーポリシー | We will not share...        | (完全形のみ) |
 
