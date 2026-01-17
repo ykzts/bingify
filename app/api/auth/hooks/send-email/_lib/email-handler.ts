@@ -8,7 +8,7 @@ import { MagicLinkEmail } from "@/emails/auth/magic-link-email";
 import { PasswordChangedNotificationEmail } from "@/emails/auth/password-changed-notification-email";
 import { RecoveryEmail } from "@/emails/auth/recovery-email";
 import { sendAuthEmail } from "@/lib/mail";
-import type { EmailData, NormalizedEmail } from "@/lib/schemas/auth-hook";
+import type { EmailData } from "@/lib/schemas/auth-hook";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 
 // ウェブフックシークレットを分割するための正規表現（例：「v1,whsec_xxx」→ 「v1」、「whsec_xxx」）
@@ -154,63 +154,11 @@ async function handleEmailChange(
  */
 export async function handleEmailAction(
   emailActionType: string,
-  email: NormalizedEmail,
-  userEmail: string,
-  locale: string,
-  siteUrl: string
-): Promise<boolean>;
-export async function handleEmailAction(
-  emailActionType: string,
   emailData: EmailData,
   userEmail: string,
   locale: string,
   redirectTo: string
-): Promise<boolean>;
-export async function handleEmailAction(
-  emailActionType: string,
-  emailOrData: NormalizedEmail | EmailData,
-  userEmail: string,
-  locale: string,
-  siteOrRedirect: string
 ): Promise<boolean> {
-  const isNormalized =
-    (emailOrData as NormalizedEmail).confirmation_token !== undefined ||
-    (emailOrData as NormalizedEmail).change_email_new_token_new !== undefined ||
-    (emailOrData as NormalizedEmail).invite_token !== undefined ||
-    (emailOrData as NormalizedEmail).recovery_token !== undefined;
-
-  const redirectTo = isNormalized
-    ? `${siteOrRedirect}/auth/callback`
-    : siteOrRedirect;
-
-  const emailData: EmailData = isNormalized
-    ? {
-        email_action_type: (emailOrData as NormalizedEmail).email_action_type,
-        factor_type: "",
-        old_email:
-          (emailOrData as NormalizedEmail).change_email_old_new || "",
-        old_phone: "",
-        provider: "",
-        redirect_to: redirectTo,
-        site_url: siteOrRedirect,
-        token:
-          (emailOrData as NormalizedEmail).confirmation_token ||
-          (emailOrData as NormalizedEmail).invite_token ||
-          (emailOrData as NormalizedEmail).recovery_token ||
-          (emailOrData as NormalizedEmail).change_email_old_token ||
-          "",
-        token_hash:
-          (emailOrData as NormalizedEmail).confirmation_hash ||
-          (emailOrData as NormalizedEmail).invite_token_hash ||
-          (emailOrData as NormalizedEmail).recovery_token_hash ||
-          (emailOrData as NormalizedEmail).change_email_new_token_new_hash ||
-          "",
-        token_hash_new:
-          (emailOrData as NormalizedEmail).change_email_old_token_hash || "",
-        token_new:
-          (emailOrData as NormalizedEmail).change_email_new_token_new || "",
-      }
-    : (emailOrData as EmailData);
   switch (emailActionType) {
     case "signup": {
       const token = emailData.token || "";

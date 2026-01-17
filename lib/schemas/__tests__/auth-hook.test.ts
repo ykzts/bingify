@@ -7,6 +7,10 @@ describe("Auth Hook Schema", () => {
       const payload = {
         email_data: {
           email_action_type: "signup",
+          factor_type: "",
+          old_email: "",
+          old_phone: "",
+          provider: "",
           redirect_to: "https://example.com",
           site_url: "https://example.com",
           token: "123456",
@@ -29,34 +33,9 @@ describe("Auth Hook Schema", () => {
       const result = AuthHookPayloadSchema.safeParse(payload);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect((result.data.email_data as any)?.email_action_type).toBe(
-          "signup"
-        );
-        expect((result.data.user as any)?.email).toBe("user@example.com");
-      }
-    });
-
-    it("レガシー形式（email）のペイロードを検証する", () => {
-      const payload = {
-        email: {
-          confirmation_hash: "hash123",
-          confirmation_token: "token123",
-          email_action_type: "confirmation",
-        },
-        user: {
-          email: "user@example.com",
-        },
-      };
-
-      const result = AuthHookPayloadSchema.safeParse(payload);
-
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect((result.data.email as any)?.email_action_type).toBe(
-          "confirmation"
-        );
-        expect((result.data.user as any)?.email).toBe("user@example.com");
+      if (result.success && result.data.email_data) {
+        expect(result.data.email_data.email_action_type).toBe("signup");
+        expect(result.data.user?.email).toBe("user@example.com");
       }
     });
 
@@ -82,6 +61,16 @@ describe("Auth Hook Schema", () => {
         const payload = {
           email_data: {
             email_action_type: type,
+            factor_type: "",
+            old_email: "",
+            old_phone: "",
+            provider: "",
+            redirect_to: "",
+            site_url: "",
+            token: "",
+            token_hash: "",
+            token_hash_new: "",
+            token_new: "",
           },
         };
 
@@ -94,6 +83,16 @@ describe("Auth Hook Schema", () => {
       const payload = {
         email_data: {
           email_action_type: "invalid_type",
+          factor_type: "",
+          old_email: "",
+          old_phone: "",
+          provider: "",
+          redirect_to: "",
+          site_url: "",
+          token: "",
+          token_hash: "",
+          token_hash_new: "",
+          token_new: "",
         },
       };
 
@@ -106,7 +105,16 @@ describe("Auth Hook Schema", () => {
       const payload = {
         email_data: {
           email_action_type: "recovery",
+          factor_type: "",
+          old_email: "",
+          old_phone: "",
+          provider: "",
+          redirect_to: "https://example.com",
+          site_url: "https://example.com",
           token: "token123",
+          token_hash: "",
+          token_hash_new: "",
+          token_new: "",
         },
         user: {
           email: "user@example.com",
@@ -117,8 +125,8 @@ describe("Auth Hook Schema", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect((result.data.email_data as any)?.token).toBe("token123");
-        expect((result.data.email_data as any)?.token_hash).toBeUndefined();
+        expect(result.data.email_data?.token).toBe("token123");
+        expect(result.data.email_data?.token_hash).toBe("");
       }
     });
 
@@ -126,6 +134,16 @@ describe("Auth Hook Schema", () => {
       const payload = {
         email_data: {
           email_action_type: "signup",
+          factor_type: "",
+          old_email: "",
+          old_phone: "",
+          provider: "",
+          redirect_to: "",
+          site_url: "",
+          token: "",
+          token_hash: "",
+          token_hash_new: "",
+          token_new: "",
         },
         user: {
           app_metadata: {
@@ -140,7 +158,7 @@ describe("Auth Hook Schema", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect((result.data.user as any)?.app_metadata?.language).toBe("ja");
+        expect(result.data.user?.app_metadata?.language).toBe("ja");
       }
     });
 
@@ -148,6 +166,16 @@ describe("Auth Hook Schema", () => {
       const payload = {
         email_data: {
           email_action_type: "signup",
+          factor_type: "",
+          old_email: "",
+          old_phone: "",
+          provider: "",
+          redirect_to: "",
+          site_url: "",
+          token: "",
+          token_hash: "",
+          token_hash_new: "",
+          token_new: "",
         },
         user: {
           email: "user@example.com",
@@ -162,7 +190,7 @@ describe("Auth Hook Schema", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect((result.data.user as any)?.user_metadata?.language).toBe("en");
+        expect(result.data.user?.user_metadata?.language).toBe("en");
       }
     });
 
@@ -178,6 +206,16 @@ describe("Auth Hook Schema", () => {
       const payload = {
         email_data: {
           email_action_type: "signup",
+          factor_type: "",
+          old_email: "",
+          old_phone: "",
+          provider: "",
+          redirect_to: "",
+          site_url: "",
+          token: "",
+          token_hash: "",
+          token_hash_new: "",
+          token_new: "",
         },
         user: {
           email: "user@example.com",
@@ -206,10 +244,8 @@ describe("Auth Hook Schema", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect((result.data.user as any)?.identities).toHaveLength(1);
-        expect((result.data.user as any)?.identities?.[0]?.provider).toBe(
-          "email"
-        );
+        expect(result.data.user?.identities).toHaveLength(1);
+        expect(result.data.user?.identities?.[0]?.provider).toBe("email");
       }
     });
   });
