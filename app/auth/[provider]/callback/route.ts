@@ -163,5 +163,9 @@ export async function GET(
       ? redirectPath
       : buildPath(redirectPath, locale);
 
-  return NextResponse.redirect(`${origin}${finalPath}`);
+  // Add login_success parameter to trigger toast notification
+  const finalUrl = new URL(`${origin}${finalPath}`);
+  finalUrl.searchParams.set("login_success", "true");
+
+  return NextResponse.redirect(finalUrl.toString());
 }

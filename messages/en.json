@@ -678,6 +678,7 @@
     "errorEmailInvalid": "Please enter a valid email address",
     "errorMessage": "An error occurred during sign-in. Please try again.",
     "googleButton": "Sign in with Google",
+    "loginSuccess": "Welcome back! You've successfully signed in.",
     "metaDescription": "Sign in to Bingify to create bingo spaces, host events, and manage your account.",
     "metaTitle": "Sign in",
     "orDivider": "or",

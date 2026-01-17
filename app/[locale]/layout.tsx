@@ -8,6 +8,7 @@ import {
 } from "next-intl/server";
 import { Suspense } from "react";
 import { AnnouncementBanner } from "@/components/announcements/announcement-banner";
+import { LoginSuccessToast } from "@/components/login-success-toast";
 import { ConfirmProvider } from "@/components/providers/confirm-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -77,6 +78,9 @@ export default async function LocaleLayout({
                 </Suspense>
               </div>
               <Toaster />
+              <Suspense fallback={null}>
+                <LoginSuccessToast />
+              </Suspense>
             </ConfirmProvider>
           </NextIntlClientProvider>
         </ThemeProvider>
