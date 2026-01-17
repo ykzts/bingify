@@ -34,10 +34,7 @@ export default async function AdminEmailHookPage({
         <p className="mt-2 text-gray-600">{t("description")}</p>
       </div>
 
-      <EmailHookSecretManagement
-        initialSecret={secret}
-        updatedAt={updatedAt}
-      />
+      <EmailHookSecretManagement initialSecret={secret} updatedAt={updatedAt} />
     </div>
   );
 }

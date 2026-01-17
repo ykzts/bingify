@@ -4,6 +4,7 @@ import { AlertCircle, Eye, EyeOff, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useConfirm } from "@/components/providers/confirm-provider";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,11 +19,9 @@ interface Props {
   updatedAt?: string;
 }
 
-export function EmailHookSecretManagement({
-  initialSecret,
-  updatedAt,
-}: Props) {
+export function EmailHookSecretManagement({ initialSecret, updatedAt }: Props) {
   const t = useTranslations("AdminEmailHook");
+  const confirm = useConfirm();
   const [secret, setSecret] = useState(initialSecret || "");
   const [showSecret, setShowSecret] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -47,7 +46,12 @@ export function EmailHookSecretManagement({
       return;
     }
 
-    if (!confirm(t("deleteConfirm"))) {
+    if (
+      !(await confirm({
+        actionButton: t("deleteButton"),
+        title: t("deleteConfirm"),
+      }))
+    ) {
       return;
     }
 
@@ -141,9 +145,7 @@ export function EmailHookSecretManagement({
         <div className="flex gap-3">
           <Button
             disabled={
-              !secret ||
-              !isSecretValid ||
-              !hasChanges ||
+              !(secret && isSecretValid && hasChanges) ||
               isUpdating ||
               isDeleting
             }
