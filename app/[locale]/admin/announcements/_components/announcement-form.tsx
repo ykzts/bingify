@@ -77,6 +77,8 @@ export function AnnouncementForm({
           ends_at: announcement.ends_at
             ? new Date(announcement.ends_at).toISOString().slice(0, 16)
             : "",
+          locale: announcement.locale || "ja",
+          parent_id: announcement.parent_id || null,
           priority: announcement.priority,
           published: announcement.published,
           starts_at: announcement.starts_at
@@ -256,6 +258,43 @@ export function AnnouncementForm({
                       />
                       <FieldDescription>
                         {t("announcementContentHelp")}
+                      </FieldDescription>
+                      {field.state.meta.errors.length > 0 && (
+                        <InlineFieldError>
+                          {getErrorMessage(field.state.meta.errors[0])}
+                        </InlineFieldError>
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              </form.Field>
+
+              <form.Field name="locale">
+                {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+                {(field: any) => (
+                  <Field>
+                    <FieldContent>
+                      <FieldLabel>{t("announcementLocaleLabel")}</FieldLabel>
+                      <Select
+                        disabled={isSubmitting}
+                        name={field.name}
+                        onValueChange={(value) => field.handleChange(value)}
+                        value={field.state.value as string}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ja">
+                            {t("announcementLocaleJa")}
+                          </SelectItem>
+                          <SelectItem value="en">
+                            {t("announcementLocaleEn")}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FieldDescription>
+                        {t("announcementLocaleHelp")}
                       </FieldDescription>
                       {field.state.meta.errors.length > 0 && (
                         <InlineFieldError>

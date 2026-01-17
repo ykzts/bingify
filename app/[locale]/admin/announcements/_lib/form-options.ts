@@ -4,12 +4,15 @@ import {
   announcementContentSchema,
   announcementPrioritySchema,
   announcementTitleSchema,
+  localeSchema,
 } from "@/lib/schemas/announcement";
 
 export const announcementFormSchema = z.object({
   content: announcementContentSchema,
   dismissible: z.boolean(),
   ends_at: z.string().optional(),
+  locale: localeSchema,
+  parent_id: z.string().uuid().optional().nullable(),
   priority: announcementPrioritySchema,
   published: z.boolean(),
   starts_at: z.string().optional(),
@@ -23,6 +26,8 @@ export const announcementFormOpts = formOptions({
     content: "",
     dismissible: true,
     ends_at: "",
+    locale: "ja" as const,
+    parent_id: null,
     priority: "info" as const,
     published: false,
     starts_at: "",

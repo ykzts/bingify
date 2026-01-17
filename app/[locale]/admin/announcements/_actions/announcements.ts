@@ -109,6 +109,8 @@ export async function createAnnouncementAction(
     const title = (formData.get("title") as string) || "";
     const content = (formData.get("content") as string) || "";
     const priority = (formData.get("priority") as string) || "info";
+    const locale = (formData.get("locale") as string) || "ja";
+    const parent_id = (formData.get("parent_id") as string) || null;
     const starts_at = (formData.get("starts_at") as string) || "";
     const ends_at = (formData.get("ends_at") as string) || "";
     const dismissible = formData.has("dismissible");
@@ -121,6 +123,8 @@ export async function createAnnouncementAction(
       created_by: userId,
       dismissible,
       ends_at: ends_at || null,
+      locale: locale as "en" | "ja",
+      parent_id: parent_id || null,
       priority: priority as "info" | "warning" | "error",
       published,
       starts_at: starts_at || null,
@@ -189,6 +193,7 @@ export async function updateAnnouncementAction(
     const title = (formData.get("title") as string) || "";
     const content = (formData.get("content") as string) || "";
     const priority = (formData.get("priority") as string) || "info";
+    const locale = (formData.get("locale") as string) || "ja";
     const starts_at = (formData.get("starts_at") as string) || "";
     const ends_at = (formData.get("ends_at") as string) || "";
     const dismissible = formData.has("dismissible");
@@ -202,6 +207,7 @@ export async function updateAnnouncementAction(
         content,
         dismissible,
         ends_at: ends_at || null,
+        locale: locale as "en" | "ja",
         priority: priority as "info" | "warning" | "error",
         published,
         starts_at: starts_at || null,
