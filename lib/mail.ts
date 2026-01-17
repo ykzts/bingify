@@ -1,6 +1,5 @@
 import { render, toPlainText } from "@react-email/render";
 import nodemailer from "nodemailer";
-import type Mail from "nodemailer/lib/mailer";
 import type { ReactNode } from "react";
 import React from "react";
 import { ContactFormEmail } from "@/emails/contact-form-email";

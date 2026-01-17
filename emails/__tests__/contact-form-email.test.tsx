@@ -214,7 +214,9 @@ describe("ContactFormEmail", () => {
       const html = await render(await ContactFormEmail(englishProps));
 
       // プレビューテキストが含まれていることを確認
-      expect(html).toContain(`You have received an inquiry from ${englishProps.name}`);
+      expect(html).toContain(
+        `You have received an inquiry from ${englishProps.name}`
+      );
     });
   });
 
