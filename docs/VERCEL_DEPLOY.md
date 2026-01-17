@@ -1170,7 +1170,7 @@ Vercelの料金プランとコスト管理のポイントです。
 
 ### Bingify のリソース
 
-- **GitHub リポジトリ**: [https://github.com/ykzts/bingify](https://github.com/ykzts/bingify)
+- **GitHub リポジトリ**: [https://github.com/ykzts/Bingify](https://github.com/ykzts/bingify)
 - **Issue トラッカー**: [https://github.com/ykzts/bingify/issues](https://github.com/ykzts/bingify/issues)
 - **Readme**: [README.md](../README.md)
 - **コントリビューションガイド**: [CONTRIBUTING.md](../CONTRIBUTING.md)
