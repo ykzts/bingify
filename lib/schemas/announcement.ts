@@ -21,10 +21,11 @@ export const announcementTitleSchema = z
 
 /**
  * アナウンスメントのコンテンツスキーマ
- * 最大5000文字
+ * 1文字以上5000文字以内
  */
 export const announcementContentSchema = z
   .string()
+  .min(1, "コンテンツは1文字以上入力してください")
   .max(5000, "コンテンツは5000文字以内で入力してください");
 
 /**
