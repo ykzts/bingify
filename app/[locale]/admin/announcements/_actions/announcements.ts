@@ -94,16 +94,18 @@ export async function getAnnouncementWithTranslations(
   translation?: Tables<"announcements">;
 }> {
   try {
+    const t = await getTranslations("Admin");
+
     if (!isValidUUID(announcementId)) {
       return {
-        error: "errorInvalidUuid",
+        error: t("errorInvalidUuid"),
       };
     }
 
     const { isAdmin } = await verifyAdminRole();
     if (!isAdmin) {
       return {
-        error: "errorNoPermission",
+        error: t("errorNoPermission"),
       };
     }
 
@@ -119,7 +121,7 @@ export async function getAnnouncementWithTranslations(
     if (announcementError || !announcement) {
       console.error("Failed to fetch announcement:", announcementError);
       return {
-        error: "errorGeneric",
+        error: t("errorGeneric"),
       };
     }
 

@@ -82,7 +82,7 @@ export function AnnouncementList({
     const result = await getAnnouncementWithTranslations(announcement.id);
 
     if (result.error) {
-      toast.error(t(result.error));
+      toast.error(result.error);
     } else if (result.translation) {
       setEditingTranslation(result.translation);
     } else {
