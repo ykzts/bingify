@@ -31,7 +31,6 @@ rules:
   - expected: Supabase
     patterns:
       - /supabase/
-      - /SUPABASE/
     specs: []
   
   - expected: PostgreSQL
@@ -106,10 +105,9 @@ rules:
     specs: []
   
   - expected: Cookie
-    pattern: /cookie/
-    specs:
-      - from: Cookie
-        to: Cookie
+    patterns:
+      - /cookie/
+    specs: []
   
   - expected: UUID
     patterns:

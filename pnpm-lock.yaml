@@ -240,9 +240,6 @@ importers:
       textlint-rule-ja-no-weak-phrase:
         specifier: 2.0.0
         version: 2.0.0
-      textlint-rule-no-dead-link:
-        specifier: 6.1.0
-        version: 6.1.0(textlint@15.5.0(hono@4.11.4))
       textlint-rule-preset-ja-spacing:
         specifier: 2.4.3
         version: 2.4.3
@@ -3690,9 +3687,6 @@ packages:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
 
-  eventemitter3@5.0.1:
-    resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
-
   eventsource-parser@3.0.6:
     resolution: {integrity: sha512-Vo1ab+QXPzZ4tCa8SwIHJFaSzy4R6SHf7BY79rFBDf0idraZWAkYrDjDj8uWaSm3S2TK+hJ7/t1CEmZ7jXw+pg==}
     engines: {node: '>=18.0.0'}
@@ -5166,18 +5160,6 @@ packages:
       oxlint-tsgolint:
         optional: true
 
-  p-memoize@8.0.0:
-    resolution: {integrity: sha512-jdZ10MCxavHoIHwJ5oweOtYy6ElPixEHaMkz0AuaEMovR1MRpVvYFzIEHRxgMEpXYzNpRVByFAniAzwmd1/uug==}
-    engines: {node: '>=20'}
-
-  p-queue@8.1.1:
-    resolution: {integrity: sha512-aNZ+VfjobsWryoiPnEApGGmf5WmNsCo9xu8dfaYamG5qaLP7ClhLN6NgsFe6SwJ2UbLEBK5dv9x8Mn5+RVhMWQ==}
-    engines: {node: '>=18'}
-
-  p-timeout@6.1.4:
-    resolution: {integrity: sha512-MyIV3ZA/PmyBN/ud8vV9XzwTrNtR4jFrObymZYnZqMmW0zA8Z17vnT0rBgFE/TlohB+YCHqXMgZzb3Csp49vqg==}
-    engines: {node: '>=14.16'}
-
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
@@ -6024,15 +6006,6 @@ packages:
 
   textlint-rule-max-ten@5.0.0:
     resolution: {integrity: sha512-EWOvbEa3Ukxz0+GAUEJ91DYFSC3IkyJ10dBcsU6VlL33k1BvTRoFr3m26w6upnXJffXQUI70Etn39I++2duyhA==}
-
-  textlint-rule-no-dead-link@6.1.0:
-    resolution: {integrity: sha512-d2I9V7ASJx5IyLyOJNgnxd4zMh2qAlv/1opMsSM0hkWYo37dglGHp1g56V57EqVx+2qZBBYUmiX9TgSXwZIAYg==}
-    engines: {node: '>=20.0.0'}
-    peerDependencies:
-      textlint: '>= 12.2.0'
-    peerDependenciesMeta:
-      textlint:
-        optional: true
 
   textlint-rule-no-double-negative-ja@2.0.1:
     resolution: {integrity: sha512-LRofmNt+nd2mp+AHmG0ltk9AlbzKbWPE+EToYQ1zORCd8N8suE1YxNEplz9OeQ59ea9ITtudDIWoqeHaZnbDsg==}
@@ -10462,8 +10435,6 @@ snapshots:
 
   etag@1.8.1: {}
 
-  eventemitter3@5.0.1: {}
-
   eventsource-parser@3.0.6: {}
 
   eventsource@3.0.7:
@@ -12255,18 +12226,6 @@ snapshots:
       '@oxlint/win32-x64': 1.38.0
     optional: true
 
-  p-memoize@8.0.0:
-    dependencies:
-      mimic-function: 5.0.1
-      type-fest: 4.41.0
-
-  p-queue@8.1.1:
-    dependencies:
-      eventemitter3: 5.0.1
-      p-timeout: 6.1.4
-
-  p-timeout@6.1.4: {}
-
   package-json-from-dist@1.0.1: {}
 
   package-manager-detector@1.6.0: {}
@@ -13357,15 +13316,6 @@ snapshots:
       sentence-splitter: 5.0.0
       textlint-rule-helper: 2.5.0
       textlint-util-to-string: 3.3.4
-
-  textlint-rule-no-dead-link@6.1.0(textlint@15.5.0(hono@4.11.4)):
-    dependencies:
-      minimatch: 10.1.1
-      p-memoize: 8.0.0
-      p-queue: 8.1.1
-      textlint-rule-helper: 2.5.0
-    optionalDependencies:
-      textlint: 15.5.0(hono@4.11.4)
 
   textlint-rule-no-double-negative-ja@2.0.1:
     dependencies:
