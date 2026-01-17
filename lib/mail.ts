@@ -1,4 +1,5 @@
 import { render, toPlainText } from "@react-email/render";
+import { getTranslations } from "next-intl/server";
 import nodemailer from "nodemailer";
 import type { ReactNode } from "react";
 import React from "react";
@@ -36,13 +37,17 @@ export interface AuthEmailOptions {
 }
 
 /**
- * Get localized subject for contact email
+ * Get localized subject for contact email using translation system
  */
-function getLocalizedSubject(name: string, locale: string): string {
-  if (locale === "en") {
-    return `[Contact Form] From ${name}`;
-  }
-  return `【お問い合わせ】${name}様より`;
+async function getLocalizedSubject(
+  name: string,
+  locale: string
+): Promise<string> {
+  const t = await getTranslations({
+    locale,
+    namespace: "EmailTemplates.contactForm",
+  });
+  return t("subject", { name });
 }
 
 /**
@@ -81,12 +86,13 @@ export async function sendContactEmail(options: ContactEmailOptions) {
       );
 
       const emailText = toPlainText(emailHtml);
+      const subject = await getLocalizedSubject(name, locale);
 
       const mailOptions = {
         from: mailFrom,
         html: emailHtml,
         replyTo: email,
-        subject: getLocalizedSubject(name, locale),
+        subject,
         text: emailText,
         to: address,
       };

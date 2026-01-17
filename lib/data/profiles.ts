@@ -50,7 +50,7 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
                 name: profile.full_name,
               }
             : profile.email,
-          locale: profile.locale, // Already NOT NULL in database
+          locale: profile.locale, // NOT NULL in database schema with default 'ja'
         })
       );
 
