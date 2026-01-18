@@ -726,6 +726,7 @@ export type Database = {
         }[]
       }
       delete_auth_hook_secret: { Args: { p_hook_name: string }; Returns: Json }
+      delete_cron_secret: { Args: never; Returns: Json }
       delete_oauth_provider_config: {
         Args: { p_provider: string }
         Returns: Json
@@ -736,6 +737,7 @@ export type Database = {
         Returns: Json
       }
       get_auth_hook_secret: { Args: { p_hook_name: string }; Returns: Json }
+      get_cron_secret: { Args: never; Returns: Json }
       get_expired_oauth_tokens: {
         Args: never
         Returns: {
@@ -773,6 +775,7 @@ export type Database = {
         Args: { p_hook_name: string; p_secret: string }
         Returns: Json
       }
+      upsert_cron_secret: { Args: { p_secret: string }; Returns: Json }
       upsert_oauth_provider_config: {
         Args: {
           p_client_id: string

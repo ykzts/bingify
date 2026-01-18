@@ -2,11 +2,11 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Get the cron secret for authenticating cron job endpoints
- * 
+ *
  * Priority:
  * 1. Environment variable (CRON_SECRET) - for backwards compatibility
  * 2. Database (Supabase Vault) - new preferred method
- * 
+ *
  * @returns The cron secret or null if not configured
  */
 export async function getCronSecretForAuth(): Promise<string | null> {
@@ -21,7 +21,7 @@ export async function getCronSecretForAuth(): Promise<string | null> {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!supabaseUrl || !supabaseServiceKey) {
+    if (!(supabaseUrl && supabaseServiceKey)) {
       return null;
     }
 

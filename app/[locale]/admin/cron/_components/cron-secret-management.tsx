@@ -9,10 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  deleteCronSecret,
-  upsertCronSecret,
-} from "../_actions/cron-secret";
+import { deleteCronSecret, upsertCronSecret } from "../_actions/cron-secret";
 
 interface Props {
   hasSecret?: boolean;
@@ -110,7 +107,9 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
               id="secret"
               onChange={(e) => setSecret(e.target.value)}
               placeholder={
-                hasSecret ? t("secretPlaceholderReplace") : t("secretPlaceholder")
+                hasSecret
+                  ? t("secretPlaceholderReplace")
+                  : t("secretPlaceholder")
               }
               type={showSecret ? "text" : "password"}
               value={secret}
@@ -155,11 +154,7 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
         {/* Action Buttons */}
         <div className="flex gap-3">
           <Button
-            disabled={
-              !hasChanges ||
-              isUpdating ||
-              isDeleting
-            }
+            disabled={!hasChanges || isUpdating || isDeleting}
             onClick={handleSave}
             type="button"
           >

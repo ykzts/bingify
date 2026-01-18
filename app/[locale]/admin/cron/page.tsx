@@ -32,10 +32,7 @@ export default async function AdminCronPage({
         <p className="mt-2 text-gray-600">{t("description")}</p>
       </div>
 
-      <CronSecretManagement
-        hasSecret={hasSecret}
-        updatedAt={updatedAt}
-      />
+      <CronSecretManagement hasSecret={hasSecret} updatedAt={updatedAt} />
     </div>
   );
 }
