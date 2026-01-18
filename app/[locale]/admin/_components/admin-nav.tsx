@@ -40,7 +40,6 @@ export function AdminNav({ locale }: Props) {
       href: `/${locale}/admin/resource-limits`,
       label: t("navResourceLimits"),
     },
-    { href: `/${locale}/admin/gatekeeper`, label: t("navGatekeeper") },
   ];
 
   const isActive = (href: string) => {

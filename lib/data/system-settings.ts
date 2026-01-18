@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import {
   DEFAULT_SYSTEM_SETTINGS,
   type SystemSettings,
@@ -30,14 +31,16 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
 
     if (error) {
       console.error("Error fetching system settings:", error);
+      const t = await getTranslations("AdminAuthProviders");
       return {
-        error: "errorFetchFailed",
+        error: t("errorFetchFailed"),
       };
     }
 
     if (!data) {
+      const t = await getTranslations("AdminAuthProviders");
       return {
-        error: "errorNoData",
+        error: t("errorNoData"),
       };
     }
 
@@ -88,13 +91,15 @@ export async function getSystemSettings(): Promise<GetSystemSettingsResult> {
       "System settings validation failed for non-features fields:",
       settingsValidation.error
     );
+    const t = await getTranslations("AdminAuthProviders");
     return {
-      error: "errorInvalidData",
+      error: t("errorInvalidData"),
     };
   } catch (error) {
     console.error("Error in getSystemSettings:", error);
+    const t = await getTranslations("AdminAuthProviders");
     return {
-      error: "errorGeneric",
+      error: t("errorGeneric"),
     };
   }
 }

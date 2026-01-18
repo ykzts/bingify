@@ -1,6 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getSystemSettings } from "../system-settings";
 
+// Mock next-intl/server
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(() => {
+    const translations: Record<string, string> = {
+      errorFetchFailed: "Failed to fetch settings",
+      errorGeneric: "An error occurred",
+      errorInvalidData: "Invalid data",
+      errorNoData: "No data found",
+    };
+    return (key: string) => translations[key] || key;
+  }),
+}));
+
 // Mock Supabase client
 const mockSupabase = {
   auth: {
@@ -98,7 +111,7 @@ describe("getSystemSettings", () => {
 
     const result = await getSystemSettings();
 
-    expect(result.error).toBe("errorFetchFailed");
+    expect(result.error).toBe("Failed to fetch settings");
     expect(result.settings).toBeUndefined();
   });
 
@@ -185,7 +198,7 @@ describe("getSystemSettings", () => {
     const result = await getSystemSettings();
 
     // Should return error since non-features fields are invalid
-    expect(result.error).toBe("errorInvalidData");
+    expect(result.error).toBe("Invalid data");
     expect(result.settings).toBeUndefined();
   });
 
@@ -196,7 +209,7 @@ describe("getSystemSettings", () => {
 
     const result = await getSystemSettings();
 
-    expect(result.error).toBe("errorGeneric");
+    expect(result.error).toBe("An error occurred");
     expect(result.settings).toBeUndefined();
   });
 });

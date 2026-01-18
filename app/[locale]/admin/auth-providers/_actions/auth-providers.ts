@@ -70,13 +70,15 @@ export async function getAuthProviders(): Promise<GetAuthProvidersResult> {
 
     if (error) {
       console.error("Error fetching auth providers:", error);
-      return { error: "errorFetchFailed" };
+      const t = await getTranslations("AdminAuthProviders");
+      return { error: t("errorFetchFailed") };
     }
 
     return { providers: data || [] };
   } catch (error) {
     console.error("Error in getAuthProviders:", error);
-    return { error: "errorGeneric" };
+    const t = await getTranslations("AdminAuthProviders");
+    return { error: t("errorGeneric") };
   }
 }
 
