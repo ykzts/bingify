@@ -144,7 +144,15 @@ export async function getProviderOAuthConfig(provider: string): Promise<{
     if (!(result.success && result.data)) {
       // Translate error key if it looks like a key, otherwise use as-is
       const errorKey = result.error || "errorFetchFailed";
-      const translatedError = errorKey.startsWith("error") ? t(errorKey as any) : errorKey;
+      const translatedError = errorKey.startsWith("error")
+        ? t(
+            errorKey as
+              | "errorFetchFailed"
+              | "errorMigrationNotApplied"
+              | "errorRpcNotAvailable"
+              | "errorInvalidResponse"
+          )
+        : errorKey;
       return { error: translatedError };
     }
 
@@ -187,7 +195,15 @@ export async function updateProviderOAuthConfig(
     if (!result.success) {
       // Translate error key if it looks like a key, otherwise use as-is
       const errorKey = result.error || "errorUpdateFailed";
-      const translatedError = errorKey.startsWith("error") ? t(errorKey as any) : errorKey;
+      const translatedError = errorKey.startsWith("error")
+        ? t(
+            errorKey as
+              | "errorSaveFailed"
+              | "errorMigrationNotApplied"
+              | "errorRpcNotAvailable"
+              | "errorInvalidResponse"
+          )
+        : errorKey;
       return { error: translatedError };
     }
 

@@ -83,7 +83,7 @@ export async function getOAuthProviderConfig(
     };
 
     // If no config in database, return success with null data (will fallback to env vars)
-    if (!typedResult.success || !typedResult.data) {
+    if (!(typedResult.success && typedResult.data)) {
       return {
         data: undefined,
         success: true,
