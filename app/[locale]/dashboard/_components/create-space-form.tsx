@@ -91,7 +91,7 @@ export function CreateSpaceForm() {
 
   // Use TanStack Query for share key availability check
   const { data: availabilityData, isPending: isCheckingKey } = useQuery({
-    enabled: Boolean(debouncedShareKey) && debouncedShareKey.length >= 3,
+    enabled: debouncedShareKey.length >= 3,
     queryFn: () => checkShareKeyAvailability(debouncedShareKey),
     queryKey: ["share-key-availability", debouncedShareKey],
     retry: false,
