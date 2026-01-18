@@ -220,7 +220,7 @@ describe("systemSettingsFormSchema", () => {
       expect(result.success).toBe(false);
     });
 
-    it("9999時間を超える時間を拒否する", () => {
+    it("23時間を超える時間を拒否する", () => {
       const result = systemSettingsFormSchema.safeParse({
         archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
@@ -244,14 +244,14 @@ describe("systemSettingsFormSchema", () => {
         max_total_spaces: 1000,
         space_expiration: {
           days: 2,
-          hours: 10_000,
+          hours: 24,
         },
         spaces_archive_retention: { days: 90, hours: 0 },
       });
       expect(result.success).toBe(false);
     });
 
-    it("最大値 (9999日9999時間) を受け入れる", () => {
+    it("最大値 (9999日23時間) を受け入れる", () => {
       const result = systemSettingsFormSchema.safeParse({
         archive_retention: { days: 7, hours: 0 },
         default_user_role: "organizer",
@@ -275,7 +275,7 @@ describe("systemSettingsFormSchema", () => {
         max_total_spaces: 1000,
         space_expiration: {
           days: 9999,
-          hours: 9999,
+          hours: 23,
         },
         spaces_archive_retention: { days: 90, hours: 0 },
       });
