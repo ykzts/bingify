@@ -74,11 +74,6 @@ export function AuthProvidersManagement({ providers }: Props) {
                     <div className="mt-1 text-gray-600 text-sm">
                       {t("providerIdLabel")}: {provider.provider}
                     </div>
-                    {provider.client_id && (
-                      <div className="mt-1 text-gray-600 text-xs">
-                        {t("clientIdConfigured")}
-                      </div>
-                    )}
                   </div>
                   <div className="flex items-center gap-3">
                     <Label

@@ -9,7 +9,6 @@ import {
 import { createClient } from "@/lib/supabase/server";
 
 export interface AuthProviderRow {
-  client_id: string | null;
   created_at: string | null;
   is_enabled: boolean;
   label: string | null;
@@ -65,7 +64,7 @@ export async function getAuthProviders(): Promise<GetAuthProvidersResult> {
 
     const { data, error } = await supabase
       .from("system_auth_providers")
-      .select("provider, label, is_enabled, client_id, created_at, updated_at")
+      .select("provider, label, is_enabled, created_at, updated_at")
       .order("provider", { ascending: true });
 
     if (error) {
