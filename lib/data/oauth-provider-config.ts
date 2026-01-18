@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getTranslations } from "next-intl/server";
 import type { Database } from "@/types/supabase";
 
 /**
@@ -25,17 +24,16 @@ export interface OAuthProviderConfigResult {
 /**
  * Get OAuth provider configuration from database with Vault decryption
  * Falls back to environment variables if database config is not set
+ * Returns translation keys for errors (to be translated at Server Action boundary)
  *
  * @param supabase - Supabase client (must have admin privileges)
  * @param provider - OAuth provider name (e.g., "google", "twitch")
- * @returns OAuth provider configuration
+ * @returns OAuth provider configuration with translation keys for errors
  */
 export async function getOAuthProviderConfig(
   supabase: SupabaseClient<Database>,
   provider: string
 ): Promise<OAuthProviderConfigResult> {
-  const t = await getTranslations("AdminAuthProviders");
-
   try {
     const result = await supabase.rpc("get_oauth_provider_config", {
       p_provider: provider,
@@ -44,7 +42,7 @@ export async function getOAuthProviderConfig(
     // Handle undefined or null result (happens in tests when RPC is not mocked)
     if (!result || result === undefined) {
       return {
-        error: t("errorRpcNotAvailable"),
+        error: "errorRpcNotAvailable",
         success: false,
       };
     }
@@ -61,20 +59,20 @@ export async function getOAuthProviderConfig(
           error.message?.includes("does not exist"))
       ) {
         return {
-          error: t("errorMigrationNotApplied"),
+          error: "errorMigrationNotApplied",
           success: false,
         };
       }
 
       return {
-        error: t("errorFetchFailed"),
+        error: "errorFetchFailed",
         success: false,
       };
     }
 
     if (!data || typeof data !== "object") {
       return {
-        error: t("errorInvalidResponse"),
+        error: "errorInvalidResponse",
         success: false,
       };
     }
@@ -106,13 +104,13 @@ export async function getOAuthProviderConfig(
       (errorMsg.includes("function") && errorMsg.includes("does not exist"))
     ) {
       return {
-        error: t("errorMigrationNotApplied"),
+        error: "errorMigrationNotApplied",
         success: false,
       };
     }
 
     return {
-      error: t("errorGeneric"),
+      error: "errorGeneric",
       success: false,
     };
   }
