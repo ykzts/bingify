@@ -1,13 +1,11 @@
-"use client";
-
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Link } from "@/i18n/navigation";
 
-export function Footer() {
-  const t = useTranslations("Footer");
+export async function Footer() {
+  const t = await getTranslations("Footer");
 
   return (
     <footer className="border-border border-t bg-background py-8">
