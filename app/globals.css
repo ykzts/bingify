@@ -220,9 +220,22 @@
     opacity: 0;
     animation-play-state: paused !important;
   }
+  .animation-paused * {
+    animation-play-state: paused !important;
+  }
 
   /* Running state: play animation */
   .animation-running {
     animation-play-state: running !important;
+  }
+  .animation-running * {
+    animation-play-state: running !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animation-paused *,
+    .animation-running * {
+      animation: none !important;
+    }
   }
 }

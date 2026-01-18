@@ -1,8 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { AnimateOnScroll } from "@/components/animate-on-scroll";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 
 interface HeroProps {
   badge1: string;
@@ -63,7 +63,7 @@ export function Hero({
             <Link href="/dashboard">
               <span className="inline-flex items-center gap-2">
                 {ctaButton}
-                <span className="inline-block animate-arrow-bounce">
+                <span className="inline-block animate-arrow-bounce motion-reduce:animate-none">
                   <ArrowRight className="h-5 w-5" />
                 </span>
               </span>
