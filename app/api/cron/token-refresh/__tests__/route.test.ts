@@ -1,11 +1,18 @@
 import { createClient } from "@supabase/supabase-js";
 import type { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { clearCredentialsCache } from "@/lib/oauth-credentials";
 import { GET } from "../route";
 
 // Supabase クライアントのモック
 vi.mock("@supabase/supabase-js", () => ({
   createClient: vi.fn(),
+}));
+
+// Admin client のモック (OAuth credentials 取得用)
+let mockAdminClient: ReturnType<typeof vi.fn>;
+vi.mock("@/lib/supabase/admin", () => ({
+  createAdminClient: () => mockAdminClient(),
 }));
 
 // fetchのモック
@@ -28,6 +35,7 @@ function createMockRequest(authHeader?: string): NextRequest {
 describe("Token Refresh Cron Endpoint", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearCredentialsCache();
     // 環境変数を設定
     process.env.CRON_SECRET = "test-cron-secret";
     process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
@@ -98,6 +106,17 @@ describe("Token Refresh Cron Endpoint", () => {
           error: null,
         }),
     };
+
+    // Mock admin client for OAuth credentials
+    mockAdminClient = vi.fn().mockReturnValue({
+      rpc: vi.fn().mockResolvedValueOnce({
+        // get_oauth_provider_config - no config in DB, will use env vars
+        data: {
+          success: false,
+        },
+        error: null,
+      }),
+    });
 
     vi.mocked(createClient).mockReturnValue(mockSupabase as never);
 

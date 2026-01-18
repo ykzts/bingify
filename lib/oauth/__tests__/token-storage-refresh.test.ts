@@ -295,10 +295,19 @@ describe("Token Storage with Auto-Refresh", () => {
       const expiredTime = new Date(Date.now() - 10 * 60 * 1000).toISOString();
       const newExpiresAt = new Date(Date.now() + 7200 * 1000).toISOString();
 
-      // 1回目: 期限切れトークンを返す
-      // 2回目: upsert成功
-      // 3回目: リフレッシュ後の新しいトークンを返す
+      // RPC calls in order:
+      // 1. get_oauth_provider_config (for getTwitchCredentials) - return empty config
+      // 2. get_oauth_token_for_user - return expired token
+      // 3. upsert_oauth_token_for_user - return success
+      // 4. get_oauth_token_for_user - return refreshed token
       vi.mocked(mockAdminClient.rpc)
+        .mockResolvedValueOnce({
+          // get_oauth_provider_config - no config in DB, will fall back to env vars
+          data: {
+            success: false,
+          },
+          error: null,
+        })
         .mockResolvedValueOnce({
           data: {
             data: {
