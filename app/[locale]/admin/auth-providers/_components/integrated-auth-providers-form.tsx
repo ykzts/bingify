@@ -126,7 +126,12 @@ export function IntegratedAuthProvidersForm({
   const emailEnabled = getProviderStatus("email");
 
   return (
-    <div className="space-y-6">
+    <form
+      action={action}
+      className="space-y-6"
+      noValidate
+      onSubmit={() => form.handleSubmit()}
+    >
       <FormErrors errors={formErrors} variant="with-icon" />
 
       {/* YouTube Provider */}
@@ -153,73 +158,65 @@ export function IntegratedAuthProvidersForm({
           </div>
         </div>
 
-        <form action={action} noValidate onSubmit={() => form.handleSubmit()}>
-          <div className="space-y-4 border-gray-200 border-t pt-4">
-            <h4 className="font-medium text-sm">
-              {t("gatekeeperRequirementsTitle")}
-            </h4>
+        <div className="space-y-4 border-gray-200 border-t pt-4">
+          <h4 className="font-medium text-sm">
+            {t("gatekeeperRequirementsTitle")}
+          </h4>
 
-            <form.Field name="features.gatekeeper.youtube.member.enabled">
-              {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
-              {(field: any) => (
-                <div className="flex items-center justify-between">
-                  <Label
-                    className={
-                      youtubeEnabled
-                        ? "cursor-pointer"
-                        : "cursor-not-allowed text-gray-400"
-                    }
-                    htmlFor="youtube-member"
-                  >
-                    {tSettings("youtubeMemberLabel")}
-                  </Label>
-                  <Switch
-                    checked={field.state.value as boolean}
-                    disabled={!youtubeEnabled || isSubmitting}
-                    id="youtube-member"
-                    name={field.name}
-                    onCheckedChange={(checked) =>
-                      field.handleChange(checked === true)
-                    }
-                  />
-                </div>
-              )}
-            </form.Field>
+          <form.Field name="features.gatekeeper.youtube.member.enabled">
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
+              <div className="flex items-center justify-between">
+                <Label
+                  className={
+                    youtubeEnabled
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed text-gray-400"
+                  }
+                  htmlFor="youtube-member"
+                >
+                  {tSettings("youtubeMemberLabel")}
+                </Label>
+                <Switch
+                  checked={field.state.value as boolean}
+                  disabled={!youtubeEnabled || isSubmitting}
+                  id="youtube-member"
+                  name={field.name}
+                  onCheckedChange={(checked) =>
+                    field.handleChange(checked === true)
+                  }
+                />
+              </div>
+            )}
+          </form.Field>
 
-            <form.Field name="features.gatekeeper.youtube.subscriber.enabled">
-              {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
-              {(field: any) => (
-                <div className="flex items-center justify-between">
-                  <Label
-                    className={
-                      youtubeEnabled
-                        ? "cursor-pointer"
-                        : "cursor-not-allowed text-gray-400"
-                    }
-                    htmlFor="youtube-subscriber"
-                  >
-                    {tSettings("youtubeSubscriberLabel")}
-                  </Label>
-                  <Switch
-                    checked={field.state.value as boolean}
-                    disabled={!youtubeEnabled || isSubmitting}
-                    id="youtube-subscriber"
-                    name={field.name}
-                    onCheckedChange={(checked) =>
-                      field.handleChange(checked === true)
-                    }
-                  />
-                </div>
-              )}
-            </form.Field>
-          </div>
-
-          <div className="mt-4 flex justify-end border-gray-200 border-t pt-4">
-            <Button disabled={!canSubmit || isSubmitting} type="submit">
-              {isSubmitting ? tSettings("saving") : tSettings("saveButton")}
-            </Button>
-          </div>
-        </form>
+          <form.Field name="features.gatekeeper.youtube.subscriber.enabled">
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
+              <div className="flex items-center justify-between">
+                <Label
+                  className={
+                    youtubeEnabled
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed text-gray-400"
+                  }
+                  htmlFor="youtube-subscriber"
+                >
+                  {tSettings("youtubeSubscriberLabel")}
+                </Label>
+                <Switch
+                  checked={field.state.value as boolean}
+                  disabled={!youtubeEnabled || isSubmitting}
+                  id="youtube-subscriber"
+                  name={field.name}
+                  onCheckedChange={(checked) =>
+                    field.handleChange(checked === true)
+                  }
+                />
+              </div>
+            )}
+          </form.Field>
+        </div>
       </div>
 
       {/* Twitch Provider */}
@@ -246,73 +243,65 @@ export function IntegratedAuthProvidersForm({
           </div>
         </div>
 
-        <form action={action} noValidate onSubmit={() => form.handleSubmit()}>
-          <div className="space-y-4 border-gray-200 border-t pt-4">
-            <h4 className="font-medium text-sm">
-              {t("gatekeeperRequirementsTitle")}
-            </h4>
+        <div className="space-y-4 border-gray-200 border-t pt-4">
+          <h4 className="font-medium text-sm">
+            {t("gatekeeperRequirementsTitle")}
+          </h4>
 
-            <form.Field name="features.gatekeeper.twitch.follower.enabled">
-              {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
-              {(field: any) => (
-                <div className="flex items-center justify-between">
-                  <Label
-                    className={
-                      twitchEnabled
-                        ? "cursor-pointer"
-                        : "cursor-not-allowed text-gray-400"
-                    }
-                    htmlFor="twitch-follower"
-                  >
-                    {tSettings("twitchFollowerLabel")}
-                  </Label>
-                  <Switch
-                    checked={field.state.value as boolean}
-                    disabled={!twitchEnabled || isSubmitting}
-                    id="twitch-follower"
-                    name={field.name}
-                    onCheckedChange={(checked) =>
-                      field.handleChange(checked === true)
-                    }
-                  />
-                </div>
-              )}
-            </form.Field>
+          <form.Field name="features.gatekeeper.twitch.follower.enabled">
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
+              <div className="flex items-center justify-between">
+                <Label
+                  className={
+                    twitchEnabled
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed text-gray-400"
+                  }
+                  htmlFor="twitch-follower"
+                >
+                  {tSettings("twitchFollowerLabel")}
+                </Label>
+                <Switch
+                  checked={field.state.value as boolean}
+                  disabled={!twitchEnabled || isSubmitting}
+                  id="twitch-follower"
+                  name={field.name}
+                  onCheckedChange={(checked) =>
+                    field.handleChange(checked === true)
+                  }
+                />
+              </div>
+            )}
+          </form.Field>
 
-            <form.Field name="features.gatekeeper.twitch.subscriber.enabled">
-              {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
-              {(field: any) => (
-                <div className="flex items-center justify-between">
-                  <Label
-                    className={
-                      twitchEnabled
-                        ? "cursor-pointer"
-                        : "cursor-not-allowed text-gray-400"
-                    }
-                    htmlFor="twitch-subscriber"
-                  >
-                    {tSettings("twitchSubscriberLabel")}
-                  </Label>
-                  <Switch
-                    checked={field.state.value as boolean}
-                    disabled={!twitchEnabled || isSubmitting}
-                    id="twitch-subscriber"
-                    name={field.name}
-                    onCheckedChange={(checked) =>
-                      field.handleChange(checked === true)
-                    }
-                  />
-                </div>
-              )}
-            </form.Field>
-          </div>
-
-          <div className="mt-4 flex justify-end border-gray-200 border-t pt-4">
-            <Button disabled={!canSubmit || isSubmitting} type="submit">
-              {isSubmitting ? tSettings("saving") : tSettings("saveButton")}
-            </Button>
-          </div>
-        </form>
+          <form.Field name="features.gatekeeper.twitch.subscriber.enabled">
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
+              <div className="flex items-center justify-between">
+                <Label
+                  className={
+                    twitchEnabled
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed text-gray-400"
+                  }
+                  htmlFor="twitch-subscriber"
+                >
+                  {tSettings("twitchSubscriberLabel")}
+                </Label>
+                <Switch
+                  checked={field.state.value as boolean}
+                  disabled={!twitchEnabled || isSubmitting}
+                  id="twitch-subscriber"
+                  name={field.name}
+                  onCheckedChange={(checked) =>
+                    field.handleChange(checked === true)
+                  }
+                />
+              </div>
+            )}
+          </form.Field>
+        </div>
       </div>
 
       {/* Email Provider */}
@@ -339,6 +328,12 @@ export function IntegratedAuthProvidersForm({
           </div>
         </div>
       </div>
-    </div>
+
+      <div className="flex justify-end border-gray-200 border-t pt-6">
+        <Button disabled={!canSubmit || isSubmitting} type="submit">
+          {isSubmitting ? tSettings("saving") : tSettings("saveButton")}
+        </Button>
+      </div>
+    </form>
   );
 }
