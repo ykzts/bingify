@@ -28,25 +28,6 @@ const simpleCreateSpaceSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "小文字の英数字とハイフンのみ使用できます"),
 });
 
-export async function checkShareKeyAvailability(shareKey: string) {
-  try {
-    const dateSuffix = formatDateSuffix();
-    const fullShareKey = `${shareKey}-${dateSuffix}`;
-
-    const supabase = await createClient();
-    const { data } = await supabase
-      .from("spaces")
-      .select("id")
-      .eq("share_key", fullShareKey)
-      .single();
-
-    return { available: !data };
-  } catch (error) {
-    console.error("Share key check error:", error);
-    return { available: false };
-  }
-}
-
 async function findAvailableShareKey(
   baseShareKey: string,
   dateSuffix: string,
@@ -618,70 +599,6 @@ export async function getUserSpaces(): Promise<UserSpacesResult> {
       closedParticipatedSpaces: [],
       draftHostedSpaces: [],
       error: "An unexpected error occurred",
-    };
-  }
-}
-
-export interface DeleteSpaceResult {
-  error?: string;
-  success: boolean;
-}
-
-export async function deleteSpace(spaceId: string): Promise<DeleteSpaceResult> {
-  try {
-    const supabase = await createClient();
-
-    // Get current user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return {
-        error: "Authentication required",
-        success: false,
-      };
-    }
-
-    // TODO: 通知統合 - スペースが削除された際の通知作成
-    // 実装時: 削除前に以下の情報を取得する必要がある
-    // 1. スペース情報（title, share_key）の取得
-    //    const { data: spaceInfo } = await supabase.from("spaces")
-    //      .select("title, share_key").eq("id", spaceId).single();
-    // 2. 全参加者のuser_id一覧を取得
-    //    const { data: participants } = await supabase.from("participants")
-    //      .select("user_id").eq("space_id", spaceId);
-    // 3. 全管理者のuser_id一覧を取得
-    //    const { data: admins } = await supabase.from("space_roles")
-    //      .select("user_id").eq("space_id", spaceId);
-    // 4. スペース削除後、各ユーザーに通知を送信
-    //    for (const userId of [...participantIds, ...adminIds]) {
-    //      await createNotification(userId, 'space_deleted', ...);
-    //    }
-
-    // Delete the space (RLS policy ensures only owner can delete)
-    const { error } = await supabase
-      .from("spaces")
-      .delete()
-      .eq("id", spaceId)
-      .eq("owner_id", user.id);
-
-    if (error) {
-      console.error("Database error:", error);
-      return {
-        error: "Failed to delete space",
-        success: false,
-      };
-    }
-
-    return {
-      success: true,
-    };
-  } catch (error) {
-    console.error("Error deleting space:", error);
-    return {
-      error: "An unexpected error occurred",
-      success: false,
     };
   }
 }
