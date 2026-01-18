@@ -37,16 +37,16 @@ async function ensureAdminOrError(): Promise<AdminCheckResult> {
   return { user };
 }
 
-export interface GetEmailHookSecretResult {
+export interface GetSendEmailHookSecretResult {
   error?: string;
   secret?: string;
   updatedAt?: string;
 }
 
 /**
- * Get the email hook secret from the database (admin only)
+ * Get the send email hook secret from the database (admin only)
  */
-export async function getEmailHookSecret(): Promise<GetEmailHookSecretResult> {
+export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretResult> {
   try {
     // Admin check required
     const adminCheck = await ensureAdminOrError();
@@ -86,17 +86,17 @@ export async function getEmailHookSecret(): Promise<GetEmailHookSecretResult> {
   }
 }
 
-export interface UpsertEmailHookSecretResult {
+export interface UpsertSendEmailHookSecretResult {
   error?: string;
   success?: boolean;
 }
 
 /**
- * Upsert (create or update) the email hook secret (admin only)
+ * Upsert (create or update) the send email hook secret (admin only)
  */
-export async function upsertEmailHookSecret(
+export async function upsertSendEmailHookSecret(
   secret: string
-): Promise<UpsertEmailHookSecretResult> {
+): Promise<UpsertSendEmailHookSecretResult> {
   try {
     // Admin check required
     const adminCheck = await ensureAdminOrError();
@@ -134,7 +134,7 @@ export async function upsertEmailHookSecret(
     }
 
     // Revalidate the email hook page
-    revalidatePath("/[locale]/admin/email-hook", "page");
+    revalidatePath("/[locale]/admin/auth-hooks", "page");
 
     return { success: true };
   } catch (error) {
@@ -143,15 +143,15 @@ export async function upsertEmailHookSecret(
   }
 }
 
-export interface DeleteEmailHookSecretResult {
+export interface DeleteSendEmailHookSecretResult {
   error?: string;
   success?: boolean;
 }
 
 /**
- * Delete the email hook secret (admin only)
+ * Delete the send email hook secret (admin only)
  */
-export async function deleteEmailHookSecret(): Promise<DeleteEmailHookSecretResult> {
+export async function deleteSendEmailHookSecret(): Promise<DeleteSendEmailHookSecretResult> {
   try {
     // Admin check required
     const adminCheck = await ensureAdminOrError();
@@ -176,7 +176,7 @@ export async function deleteEmailHookSecret(): Promise<DeleteEmailHookSecretResu
     }
 
     // Revalidate the email hook page
-    revalidatePath("/[locale]/admin/email-hook", "page");
+    revalidatePath("/[locale]/admin/auth-hooks", "page");
 
     return { success: true };
   } catch (error) {

@@ -10,17 +10,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  deleteEmailHookSecret,
-  upsertEmailHookSecret,
-} from "../_actions/email-hook-secret";
+  deleteSendEmailHookSecret,
+  upsertSendEmailHookSecret,
+} from "../_actions/send-email-hook-secret";
 
 interface Props {
   initialSecret?: string;
   updatedAt?: string;
 }
 
-export function EmailHookSecretManagement({ initialSecret, updatedAt }: Props) {
-  const t = useTranslations("AdminEmailHook");
+export function SendEmailHookSecretManagement({
+  initialSecret,
+  updatedAt,
+}: Props) {
+  const t = useTranslations("AdminAuthHooks");
   const confirm = useConfirm();
   const [secret, setSecret] = useState(initialSecret || "");
   const [showSecret, setShowSecret] = useState(false);
@@ -30,7 +33,7 @@ export function EmailHookSecretManagement({ initialSecret, updatedAt }: Props) {
   const handleSave = async () => {
     setIsUpdating(true);
 
-    const result = await upsertEmailHookSecret(secret);
+    const result = await upsertSendEmailHookSecret(secret);
 
     if (result.error) {
       toast.error(t(result.error, { default: t("errorGeneric") }));
@@ -58,7 +61,7 @@ export function EmailHookSecretManagement({ initialSecret, updatedAt }: Props) {
 
     setIsDeleting(true);
 
-    const result = await deleteEmailHookSecret();
+    const result = await deleteSendEmailHookSecret();
 
     if (result.error) {
       toast.error(t(result.error, { default: t("errorGeneric") }));

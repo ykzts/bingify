@@ -1,20 +1,20 @@
 import { AlertCircle } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { getEmailHookSecret } from "./_actions/email-hook-secret";
-import { EmailHookSecretManagement } from "./_components/email-hook-secret-management";
+import { getSendEmailHookSecret } from "./_actions/send-email-hook-secret";
+import { SendEmailHookSecretManagement } from "./_components/send-email-hook-secret-management";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminEmailHookPage({
+export default async function AdminAuthHooksPage({
   params,
-}: PageProps<"/[locale]/admin/email-hook">) {
+}: PageProps<"/[locale]/admin/auth-hooks">) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const t = await getTranslations("AdminEmailHook");
+  const t = await getTranslations("AdminAuthHooks");
 
-  const { secret, updatedAt, error } = await getEmailHookSecret();
+  const { secret, updatedAt, error } = await getSendEmailHookSecret();
 
   if (error) {
     return (
@@ -34,7 +34,10 @@ export default async function AdminEmailHookPage({
         <p className="mt-2 text-gray-600">{t("description")}</p>
       </div>
 
-      <EmailHookSecretManagement initialSecret={secret} updatedAt={updatedAt} />
+      <SendEmailHookSecretManagement
+        initialSecret={secret}
+        updatedAt={updatedAt}
+      />
     </div>
   );
 }
