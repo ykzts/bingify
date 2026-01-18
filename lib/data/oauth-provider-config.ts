@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getTranslations } from "next-intl/server";
 import type { Database } from "@/types/supabase";
 
 /**
@@ -33,6 +34,8 @@ export async function getOAuthProviderConfig(
   supabase: SupabaseClient<Database>,
   provider: string
 ): Promise<OAuthProviderConfigResult> {
+  const t = await getTranslations("AdminAuthProviders");
+
   try {
     const result = await supabase.rpc("get_oauth_provider_config", {
       p_provider: provider,
@@ -41,7 +44,7 @@ export async function getOAuthProviderConfig(
     // Handle undefined or null result (happens in tests when RPC is not mocked)
     if (!result || result === undefined) {
       return {
-        error: "errorRpcNotAvailable",
+        error: t("errorRpcNotAvailable"),
         success: false,
       };
     }
@@ -58,20 +61,20 @@ export async function getOAuthProviderConfig(
           error.message?.includes("does not exist"))
       ) {
         return {
-          error: "errorMigrationNotApplied",
+          error: t("errorMigrationNotApplied"),
           success: false,
         };
       }
 
       return {
-        error: "errorFetchFailed",
+        error: t("errorFetchFailed"),
         success: false,
       };
     }
 
     if (!data || typeof data !== "object") {
       return {
-        error: "errorInvalidResponse",
+        error: t("errorInvalidResponse"),
         success: false,
       };
     }
@@ -83,7 +86,7 @@ export async function getOAuthProviderConfig(
 
     if (!(typedResult.success && typedResult.data)) {
       return {
-        error: "errorFetchFailed",
+        error: t("errorFetchFailed"),
         success: false,
       };
     }
@@ -102,13 +105,13 @@ export async function getOAuthProviderConfig(
       (errorMsg.includes("function") && errorMsg.includes("does not exist"))
     ) {
       return {
-        error: "errorMigrationNotApplied",
+        error: t("errorMigrationNotApplied"),
         success: false,
       };
     }
 
     return {
-      error: "errorGeneric",
+      error: t("errorGeneric"),
       success: false,
     };
   }
@@ -179,6 +182,8 @@ export async function upsertOAuthProviderConfig(
   clientId: string,
   clientSecret?: string
 ): Promise<{ error?: string; success: boolean }> {
+  const t = await getTranslations("AdminAuthProviders");
+
   try {
     const { data, error } = await supabase.rpc("upsert_oauth_provider_config", {
       p_client_id: clientId,
@@ -196,7 +201,7 @@ export async function upsertOAuthProviderConfig(
 
     if (!data || typeof data !== "object") {
       return {
-        error: "Invalid response from server",
+        error: t("errorInvalidResponse"),
         success: false,
       };
     }
@@ -205,7 +210,7 @@ export async function upsertOAuthProviderConfig(
 
     if (!result.success) {
       return {
-        error: result.error || "Failed to save OAuth provider configuration",
+        error: result.error || t("errorSaveFailed"),
         success: false,
       };
     }
@@ -216,7 +221,7 @@ export async function upsertOAuthProviderConfig(
   } catch (err) {
     console.error("Error in upsertOAuthProviderConfig:", err);
     return {
-      error: err instanceof Error ? err.message : "Unknown error",
+      error: err instanceof Error ? err.message : t("errorGeneric"),
       success: false,
     };
   }
@@ -233,6 +238,8 @@ export async function deleteOAuthProviderConfig(
   supabase: SupabaseClient<Database>,
   provider: string
 ): Promise<{ error?: string; success: boolean }> {
+  const t = await getTranslations("AdminAuthProviders");
+
   try {
     const { data, error } = await supabase.rpc("delete_oauth_provider_config", {
       p_provider: provider,
@@ -248,7 +255,7 @@ export async function deleteOAuthProviderConfig(
 
     if (!data || typeof data !== "object") {
       return {
-        error: "Invalid response from server",
+        error: t("errorInvalidResponse"),
         success: false,
       };
     }
@@ -257,7 +264,7 @@ export async function deleteOAuthProviderConfig(
 
     if (!result.success) {
       return {
-        error: result.error || "Failed to delete OAuth provider configuration",
+        error: result.error || t("errorDeleteFailed"),
         success: false,
       };
     }
@@ -268,7 +275,7 @@ export async function deleteOAuthProviderConfig(
   } catch (err) {
     console.error("Error in deleteOAuthProviderConfig:", err);
     return {
-      error: err instanceof Error ? err.message : "Unknown error",
+      error: err instanceof Error ? err.message : t("errorGeneric"),
       success: false,
     };
   }

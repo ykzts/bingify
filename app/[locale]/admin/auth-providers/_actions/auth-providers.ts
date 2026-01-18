@@ -2,6 +2,7 @@
 
 import type { User } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import {
   getOAuthProviderConfig,
   upsertOAuthProviderConfig,
@@ -129,6 +130,8 @@ export async function getProviderOAuthConfig(provider: string): Promise<{
   hasSecret?: boolean;
 }> {
   try {
+    const t = await getTranslations("AdminAuthProviders");
+
     // Admin check required
     const adminCheck = await ensureAdminOrError();
     if (adminCheck.error) {
@@ -139,7 +142,7 @@ export async function getProviderOAuthConfig(provider: string): Promise<{
     const result = await getOAuthProviderConfig(supabase, provider);
 
     if (!(result.success && result.data)) {
-      return { error: result.error || "errorFetchFailed" };
+      return { error: result.error || t("errorFetchFailed") };
     }
 
     return {
@@ -148,7 +151,8 @@ export async function getProviderOAuthConfig(provider: string): Promise<{
     };
   } catch (error) {
     console.error("Error in getProviderOAuthConfig:", error);
-    return { error: "errorGeneric" };
+    const t = await getTranslations("AdminAuthProviders");
+    return { error: t("errorGeneric") };
   }
 }
 

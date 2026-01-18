@@ -33,12 +33,15 @@ export function OAuthConfigForm({ provider }: Props) {
 
       if (result.error) {
         // Special handling for migration not applied - don't show as error toast
-        if (result.error === "errorMigrationNotApplied") {
+        if (
+          result.error.includes("migration") ||
+          result.error.includes("マイグレーション")
+        ) {
           // Silently fail - the UI will show a message that OAuth config is not available
           setIsLoading(false);
           return;
         }
-        toast.error(t(result.error));
+        toast.error(result.error);
       } else {
         setClientId(result.clientId || "");
         setHasExistingSecret(!!result.hasSecret);
@@ -48,7 +51,7 @@ export function OAuthConfigForm({ provider }: Props) {
     }
 
     loadConfig();
-  }, [provider, t]);
+  }, [provider]);
 
   const handleSave = async () => {
     if (!clientId.trim()) {
