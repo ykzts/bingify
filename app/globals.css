@@ -67,6 +67,66 @@
   --color-google-hover: #357ae8;
   --color-twitch: #9146ff;
   --color-twitch-hover: #7d3be6;
+
+  /* Animation duration and timing */
+  --duration-fade-in-up: 0.8s;
+  --duration-fade-in-scale: 0.6s;
+  --duration-arrow-bounce: 1.5s;
+  --duration-rotate-icon: 0.6s;
+  --timing-ease-out: ease-out;
+  --timing-ease-in-out: ease-in-out;
+
+  /* Tailwind animate-* utilities */
+  --animate-fade-in-up: fade-in-up var(--duration-fade-in-up)
+    var(--timing-ease-out) forwards;
+  --animate-fade-in-scale: fade-in-scale var(--duration-fade-in-scale)
+    var(--timing-ease-out) forwards;
+  --animate-arrow-bounce: arrow-bounce var(--duration-arrow-bounce)
+    var(--timing-ease-in-out) infinite;
+  --animate-rotate-icon: rotate-icon var(--duration-rotate-icon)
+    var(--timing-ease-out);
+
+  /* Keyframe animations for landing page */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-scale {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes arrow-bounce {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(4px);
+    }
+  }
+
+  @keyframes rotate-icon {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }
 
 :root {
@@ -102,6 +162,9 @@
   --sidebar-accent-foreground: oklch(0.25 0.06 280);
   --sidebar-border: oklch(0.9 0.02 280);
   --sidebar-ring: oklch(0.5 0.16 280);
+
+  /* Animation delay for sequential animations */
+  --animation-delay: 0ms;
 }
 
 .dark {
@@ -136,6 +199,9 @@
   --sidebar-accent-foreground: oklch(0.98 0.01 280);
   --sidebar-border: oklch(0.2 0.02 280);
   --sidebar-ring: oklch(0.6 0.16 280);
+
+  /* Animation delay for sequential animations */
+  --animation-delay: 0ms;
 }
 
 @layer base {
@@ -145,5 +211,31 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Paused state: keep hidden */
+  .animation-paused {
+    opacity: 0;
+    animation-play-state: paused !important;
+  }
+  .animation-paused * {
+    animation-play-state: paused !important;
+  }
+
+  /* Running state: play animation */
+  .animation-running {
+    animation-play-state: running !important;
+  }
+  .animation-running * {
+    animation-play-state: running !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animation-paused *,
+    .animation-running * {
+      animation: none !important;
+    }
   }
 }

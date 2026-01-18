@@ -1,10 +1,8 @@
-"use client";
-
 import { ArrowRight } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
-import Link from "next/link";
+import { AnimateOnScroll } from "@/components/animate-on-scroll";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 
 interface HeroProps {
   badge1: string;
@@ -27,106 +25,53 @@ export function Hero({
   title,
   titleHighlight,
 }: HeroProps) {
-  const shouldReduceMotion = useReducedMotion();
-
   return (
     <section className="relative flex min-h-[80vh] flex-col items-center justify-center px-6 py-20 text-center">
-      <motion.div
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl"
-        initial={{ opacity: 0, y: 20 }}
-        transition={{ delay: 0.2, duration: 0.8 }}
-      >
-        <motion.div
-          animate={{ opacity: 1, scale: 1 }}
-          className="mb-8 flex justify-center"
-          initial={{ opacity: 0, scale: 0.9 }}
-          transition={{
-            delay: 0.1,
-            duration: 0.5,
-            type: "spring",
-          }}
-        >
+      <AnimateOnScroll className="max-w-4xl animate-fade-in-up [animation-delay:200ms]">
+        <AnimateOnScroll className="mb-8 flex animate-fade-in-scale justify-center [animation-delay:100ms]">
           <Image
             alt="Bingify"
             className="h-16 w-auto sm:h-20"
             fetchPriority="high"
             height={80}
             loading="eager"
-            preload
             src="/logo.svg"
             width={304}
           />
-        </motion.div>
+        </AnimateOnScroll>
 
-        <motion.h1
-          animate={{ opacity: 1, scale: 1 }}
-          className="mb-6 font-bold text-4xl text-text-main sm:text-5xl md:text-6xl"
-          initial={{ opacity: 0, scale: 0.9 }}
-          transition={{
-            delay: 0.3,
-            duration: 0.5,
-            type: "spring",
-          }}
-        >
-          {title}
-          <br />
-          <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
-            {titleHighlight}
-          </span>
-        </motion.h1>
+        <AnimateOnScroll className="animate-fade-in-up [animation-delay:300ms]">
+          <h1 className="mb-6 font-bold text-4xl text-text-main sm:text-5xl md:text-6xl">
+            {title}
+            <br />
+            <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+              {titleHighlight}
+            </span>
+          </h1>
+        </AnimateOnScroll>
 
-        <motion.p
-          animate={{ opacity: 1 }}
-          className="mb-10 text-lg text-text-muted sm:text-xl"
-          initial={{ opacity: 0 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
-        >
-          {description}
-          <br />
-          {descriptionLine2}
-        </motion.p>
+        <AnimateOnScroll className="mb-10 animate-fade-in-up [animation-delay:500ms]">
+          <p className="text-lg text-text-muted sm:text-xl">
+            {description}
+            <br />
+            {descriptionLine2}
+          </p>
+        </AnimateOnScroll>
 
-        <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          initial={{ opacity: 0, y: 20 }}
-          transition={{ delay: 0.7, duration: 0.6 }}
-        >
+        <AnimateOnScroll className="animate-fade-in-up [animation-delay:700ms]">
           <Button asChild className="rounded-full px-8 py-4 text-lg" size="lg">
             <Link href="/dashboard">
-              <motion.span
-                className="inline-flex items-center gap-2"
-                transition={{
-                  damping: 10,
-                  stiffness: 300,
-                  type: "spring",
-                }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+              <span className="inline-flex items-center gap-2">
                 {ctaButton}
-                <motion.span
-                  animate={shouldReduceMotion ? {} : { x: [0, 4, 0] }}
-                  className="inline-block"
-                  transition={{
-                    duration: 1.5,
-                    ease: "easeInOut",
-                    repeat: Number.POSITIVE_INFINITY,
-                  }}
-                >
+                <span className="inline-block animate-arrow-bounce motion-reduce:animate-none">
                   <ArrowRight className="h-5 w-5" />
-                </motion.span>
-              </motion.span>
+                </span>
+              </span>
             </Link>
           </Button>
-        </motion.div>
+        </AnimateOnScroll>
 
-        <motion.div
-          animate={{ opacity: 1 }}
-          className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-text-muted"
-          initial={{ opacity: 0 }}
-          transition={{ delay: 0.9, duration: 0.8 }}
-        >
+        <AnimateOnScroll className="mt-8 flex animate-fade-in-up flex-wrap items-center justify-center gap-4 text-sm text-text-muted [animation-delay:900ms]">
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 rounded-full bg-accent" />
             {badge1}
@@ -139,8 +84,8 @@ export function Hero({
             <span className="inline-block h-2 w-2 rounded-full bg-primary" />
             {badge3}
           </span>
-        </motion.div>
-      </motion.div>
+        </AnimateOnScroll>
+      </AnimateOnScroll>
     </section>
   );
 }

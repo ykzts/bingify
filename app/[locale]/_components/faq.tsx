@@ -1,7 +1,5 @@
-"use client";
-
-import { motion } from "motion/react";
 import type { ReactNode } from "react";
+import { AnimateOnScroll } from "@/components/animate-on-scroll";
 
 interface FaqProps {
   answer1: string;
@@ -61,35 +59,32 @@ export function Faq({
   return (
     <section className="px-6 py-20">
       <div className="mx-auto max-w-4xl">
-        <motion.div
-          className="mb-12 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          whileInView={{ opacity: 1, y: 0 }}
-        >
+        <AnimateOnScroll className="mb-12 animate-fade-in-up text-center">
           <h2 className="mb-4 font-bold text-3xl text-foreground sm:text-4xl">
             {heading}
           </h2>
-        </motion.div>
+        </AnimateOnScroll>
 
         <div className="space-y-6">
           {faqs.map((faq, index) => (
-            <motion.div
-              className="overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm"
-              initial={{ opacity: 0, y: 20 }}
+            <AnimateOnScroll
+              className="animate-fade-in-up"
               key={faq.id}
-              transition={{ delay: index * 0.1, duration: 0.6 }}
-              viewport={{ once: true }}
-              whileInView={{ opacity: 1, y: 0 }}
+              style={
+                {
+                  "--animation-delay": `${index * 100}ms`,
+                } as React.CSSProperties
+              }
             >
-              <h3 className="mb-3 font-bold text-card-foreground text-lg">
-                {faq.question}
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {faq.answer}
-              </p>
-            </motion.div>
+              <div className="overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm">
+                <h3 className="mb-3 font-bold text-card-foreground text-lg">
+                  {faq.question}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {faq.answer}
+                </p>
+              </div>
+            </AnimateOnScroll>
           ))}
         </div>
       </div>
