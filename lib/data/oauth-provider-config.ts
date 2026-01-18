@@ -168,12 +168,13 @@ export async function getOAuthCredentials(
 
 /**
  * Upsert OAuth provider configuration with Vault encryption
+ * Returns translation keys for errors (to be translated at Server Action boundary)
  *
  * @param supabase - Supabase client (must have admin privileges)
  * @param provider - OAuth provider name
  * @param clientId - OAuth Client ID
  * @param clientSecret - OAuth Client Secret (optional, only update if provided)
- * @returns Operation result
+ * @returns Operation result with translation keys for errors
  */
 export async function upsertOAuthProviderConfig(
   supabase: SupabaseClient<Database>,
@@ -181,8 +182,6 @@ export async function upsertOAuthProviderConfig(
   clientId: string,
   clientSecret?: string
 ): Promise<{ error?: string; success: boolean }> {
-  const t = await getTranslations("AdminAuthProviders");
-
   try {
     const { data, error } = await supabase.rpc("upsert_oauth_provider_config", {
       p_client_id: clientId,
@@ -200,7 +199,7 @@ export async function upsertOAuthProviderConfig(
 
     if (!data || typeof data !== "object") {
       return {
-        error: t("errorInvalidResponse"),
+        error: "errorInvalidResponse",
         success: false,
       };
     }
@@ -209,7 +208,7 @@ export async function upsertOAuthProviderConfig(
 
     if (!result.success) {
       return {
-        error: result.error || t("errorSaveFailed"),
+        error: result.error || "errorSaveFailed",
         success: false,
       };
     }
@@ -220,7 +219,7 @@ export async function upsertOAuthProviderConfig(
   } catch (err) {
     console.error("Error in upsertOAuthProviderConfig:", err);
     return {
-      error: err instanceof Error ? err.message : t("errorGeneric"),
+      error: err instanceof Error ? err.message : "errorGeneric",
       success: false,
     };
   }
@@ -228,17 +227,16 @@ export async function upsertOAuthProviderConfig(
 
 /**
  * Delete OAuth provider configuration and clean up Vault
+ * Returns translation keys for errors (to be translated at Server Action boundary)
  *
  * @param supabase - Supabase client (must have admin privileges)
  * @param provider - OAuth provider name
- * @returns Operation result
+ * @returns Operation result with translation keys for errors
  */
 export async function deleteOAuthProviderConfig(
   supabase: SupabaseClient<Database>,
   provider: string
 ): Promise<{ error?: string; success: boolean }> {
-  const t = await getTranslations("AdminAuthProviders");
-
   try {
     const { data, error } = await supabase.rpc("delete_oauth_provider_config", {
       p_provider: provider,
@@ -254,7 +252,7 @@ export async function deleteOAuthProviderConfig(
 
     if (!data || typeof data !== "object") {
       return {
-        error: t("errorInvalidResponse"),
+        error: "errorInvalidResponse",
         success: false,
       };
     }
@@ -263,7 +261,7 @@ export async function deleteOAuthProviderConfig(
 
     if (!result.success) {
       return {
-        error: result.error || t("errorDeleteFailed"),
+        error: result.error || "errorDeleteFailed",
         success: false,
       };
     }
@@ -274,7 +272,7 @@ export async function deleteOAuthProviderConfig(
   } catch (err) {
     console.error("Error in deleteOAuthProviderConfig:", err);
     return {
-      error: err instanceof Error ? err.message : t("errorGeneric"),
+      error: err instanceof Error ? err.message : "errorGeneric",
       success: false,
     };
   }

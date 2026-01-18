@@ -142,7 +142,10 @@ export async function getProviderOAuthConfig(provider: string): Promise<{
     const result = await getOAuthProviderConfig(supabase, provider);
 
     if (!(result.success && result.data)) {
-      return { error: result.error || t("errorFetchFailed") };
+      // Translate error key if it looks like a key, otherwise use as-is
+      const errorKey = result.error || "errorFetchFailed";
+      const translatedError = errorKey.startsWith("error") ? t(errorKey as any) : errorKey;
+      return { error: translatedError };
     }
 
     return {
@@ -165,6 +168,8 @@ export async function updateProviderOAuthConfig(
   clientSecret?: string
 ): Promise<UpdateAuthProviderResult> {
   try {
+    const t = await getTranslations("AdminAuthProviders");
+
     // Admin check required for mutations
     const adminCheck = await ensureAdminOrError();
     if (adminCheck.error) {
@@ -180,7 +185,10 @@ export async function updateProviderOAuthConfig(
     );
 
     if (!result.success) {
-      return { error: result.error || "errorUpdateFailed" };
+      // Translate error key if it looks like a key, otherwise use as-is
+      const errorKey = result.error || "errorUpdateFailed";
+      const translatedError = errorKey.startsWith("error") ? t(errorKey as any) : errorKey;
+      return { error: translatedError };
     }
 
     // Revalidate admin page to reflect changes
@@ -189,6 +197,7 @@ export async function updateProviderOAuthConfig(
     return { success: true };
   } catch (error) {
     console.error("Error in updateProviderOAuthConfig:", error);
-    return { error: "errorGeneric" };
+    const t = await getTranslations("AdminAuthProviders");
+    return { error: t("errorGeneric") };
   }
 }
