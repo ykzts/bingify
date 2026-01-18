@@ -1,89 +1,8 @@
--- Create auth_hook_secrets table in private schema with Vault encryption
--- This table stores secrets for various Supabase Auth hooks
+-- Allow service_role to access auth hook secret RPC functions
+-- This migration fixes the authentication checks in RPC functions to allow
+-- both service_role (for webhooks) and authenticated admin users (for admin UI)
 
--- Create auth_hook_secrets table in private schema
-CREATE TABLE IF NOT EXISTS private.auth_hook_secrets (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  -- Hook name (e.g., 'send-email-hook', 'before-user-created-hook')
-  hook_name TEXT NOT NULL UNIQUE,
-  -- Store Vault secret ID instead of plaintext secret
-  -- The actual secret is encrypted in Supabase Vault and only UUID reference is stored here
-  secret_id UUID NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Enable Row Level Security
-ALTER TABLE private.auth_hook_secrets ENABLE ROW LEVEL SECURITY;
-
--- RLS Policy: Only admins can access auth hook secrets
-CREATE POLICY auth_hook_secrets_admin_policy
-ON private.auth_hook_secrets
-FOR ALL
-TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE profiles.id = auth.uid()
-      AND profiles.role = 'admin'
-  )
-)
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE profiles.id = auth.uid()
-      AND profiles.role = 'admin'
-  )
-);
-
--- RLS Policy: service_role has full access for admin operations
-CREATE POLICY auth_hook_secrets_service_role_policy
-ON private.auth_hook_secrets
-FOR ALL
-TO service_role
-USING (true)
-WITH CHECK (true);
-
--- Create trigger function to update updated_at timestamp
-CREATE OR REPLACE FUNCTION private.update_auth_hook_secrets_updated_at()
-RETURNS TRIGGER
-SET search_path = private, pg_temp
-AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Create trigger
-CREATE TRIGGER update_auth_hook_secrets_updated_at_trigger
-BEFORE UPDATE ON private.auth_hook_secrets
-FOR EACH ROW
-EXECUTE FUNCTION private.update_auth_hook_secrets_updated_at();
-
--- Grant table permissions (RLS policies control actual access)
-GRANT SELECT, INSERT, UPDATE, DELETE ON private.auth_hook_secrets TO authenticated, service_role;
-
--- ============================================================================
--- SECURITY NOTE: Disabling PostgreSQL Statement Logging
--- ============================================================================
--- The RPC functions below handle plaintext secrets before encrypting them
--- with Vault. To prevent these secrets from being logged in PostgreSQL logs,
--- you MUST disable statement logging at the database role level.
---
--- Steps to secure your Supabase project:
--- 1. Go to Supabase Dashboard → Project Settings → Database
--- 2. Add this configuration to your database settings:
---    ALTER ROLE postgres SET log_statement TO 'none';
---    ALTER ROLE authenticator SET log_statement TO 'none';
--- 3. Perform a "Fast database reboot" from the Dashboard to apply changes
--- 4. Verify with: SHOW log_statement; (should return 'none')
---
--- Without this setting, plaintext secrets may be recorded in database logs,
--- defeating the purpose of Vault encryption.
--- ============================================================================
-
--- Create RPC function to upsert auth hook secret with Vault encryption
+-- Update upsert_auth_hook_secret to allow service_role
 CREATE OR REPLACE FUNCTION public.upsert_auth_hook_secret(
   p_hook_name TEXT,
   p_secret TEXT
@@ -97,18 +16,22 @@ DECLARE
   v_existing_secret_id UUID;
   v_created_secret BOOLEAN := FALSE;
 BEGIN
-  -- Check authentication and admin role
+  -- Check authentication: allow service_role OR authenticated admin users
   v_user_id := auth.uid();
-  IF v_user_id IS NULL THEN
+  
+  -- Allow service_role without user authentication (for webhooks)
+  IF v_user_id IS NULL AND auth.role() != 'service_role' THEN
     RETURN jsonb_build_object('success', false, 'error', 'Not authenticated');
   END IF;
 
-  -- Verify admin role
-  IF NOT EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = v_user_id AND role = 'admin'
-  ) THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
+  -- For authenticated users, verify admin role
+  IF v_user_id IS NOT NULL THEN
+    IF NOT EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = v_user_id AND role = 'admin'
+    ) THEN
+      RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
+    END IF;
   END IF;
 
   -- Validate hook name
@@ -183,7 +106,7 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql;
 
--- Create RPC function to get auth hook secret with Vault decryption
+-- Update get_auth_hook_secret to allow service_role
 CREATE OR REPLACE FUNCTION public.get_auth_hook_secret(
   p_hook_name TEXT
 ) RETURNS JSONB
@@ -195,18 +118,22 @@ DECLARE
   v_secret_record RECORD;
   v_secret TEXT;
 BEGIN
-  -- Check authentication and admin role
+  -- Check authentication: allow service_role OR authenticated admin users
   v_user_id := auth.uid();
-  IF v_user_id IS NULL THEN
+  
+  -- Allow service_role without user authentication (for webhooks)
+  IF v_user_id IS NULL AND auth.role() != 'service_role' THEN
     RETURN jsonb_build_object('success', false, 'error', 'Not authenticated');
   END IF;
 
-  -- Verify admin role
-  IF NOT EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = v_user_id AND role = 'admin'
-  ) THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
+  -- For authenticated users, verify admin role
+  IF v_user_id IS NOT NULL THEN
+    IF NOT EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = v_user_id AND role = 'admin'
+    ) THEN
+      RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
+    END IF;
   END IF;
 
   -- Validate hook name
@@ -242,7 +169,7 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql;
 
--- Create RPC function to delete auth hook secret and clean up Vault
+-- Update delete_auth_hook_secret to allow service_role
 CREATE OR REPLACE FUNCTION public.delete_auth_hook_secret(
   p_hook_name TEXT
 )
@@ -254,18 +181,22 @@ DECLARE
   v_user_id UUID;
   v_secret_id UUID;
 BEGIN
-  -- Check authentication and admin role
+  -- Check authentication: allow service_role OR authenticated admin users
   v_user_id := auth.uid();
-  IF v_user_id IS NULL THEN
+  
+  -- Allow service_role without user authentication (for webhooks)
+  IF v_user_id IS NULL AND auth.role() != 'service_role' THEN
     RETURN jsonb_build_object('success', false, 'error', 'Not authenticated');
   END IF;
 
-  -- Verify admin role
-  IF NOT EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = v_user_id AND role = 'admin'
-  ) THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
+  -- For authenticated users, verify admin role
+  IF v_user_id IS NOT NULL THEN
+    IF NOT EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = v_user_id AND role = 'admin'
+    ) THEN
+      RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
+    END IF;
   END IF;
 
   -- Validate hook name
@@ -298,8 +229,3 @@ EXCEPTION
     RETURN jsonb_build_object('success', false, 'error', SQLERRM);
 END;
 $$ LANGUAGE plpgsql;
-
--- Grant execute permissions on RPC functions
-GRANT EXECUTE ON FUNCTION public.upsert_auth_hook_secret(TEXT, TEXT) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.get_auth_hook_secret(TEXT) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.delete_auth_hook_secret(TEXT) TO authenticated;
