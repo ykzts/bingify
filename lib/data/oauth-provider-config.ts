@@ -53,7 +53,10 @@ export async function getOAuthProviderConfig(
       };
     }
 
-    const result = data as { data?: OAuthProviderConfig; success: boolean };
+    const result = data as unknown as {
+      data?: OAuthProviderConfig;
+      success: boolean;
+    };
 
     if (!result.success || !result.data) {
       return {
@@ -139,7 +142,7 @@ export async function upsertOAuthProviderConfig(
   try {
     const { data, error } = await supabase.rpc("upsert_oauth_provider_config", {
       p_client_id: clientId,
-      p_client_secret: clientSecret || null,
+      p_client_secret: clientSecret,
       p_provider: provider,
     });
 
