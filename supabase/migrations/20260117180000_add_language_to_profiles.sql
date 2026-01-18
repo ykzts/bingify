@@ -14,20 +14,33 @@ COMMENT ON COLUMN public.profiles.language IS 'User language preference (en: Eng
 -- Update handle_new_user function to sync language from user metadata
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  user_language TEXT;
 BEGIN
+  -- Extract language from metadata and validate it
+  user_language := NEW.raw_user_meta_data->>'language';
+  
+  -- Ensure language is valid, default to 'ja' if NULL or invalid
+  IF user_language IS NULL OR user_language NOT IN ('en', 'ja') THEN
+    user_language := 'ja';
+  END IF;
+
   INSERT INTO public.profiles (id, email, full_name, avatar_url, language)
   VALUES (
     NEW.id,
     NEW.email,
     NEW.raw_user_meta_data->>'full_name',
     NEW.raw_user_meta_data->>'avatar_url',
-    COALESCE(NEW.raw_user_meta_data->>'language', 'ja')
+    user_language
   )
   ON CONFLICT (id) DO UPDATE
     SET email = EXCLUDED.email,
         full_name = EXCLUDED.full_name,
         avatar_url = EXCLUDED.avatar_url,
-        language = COALESCE(EXCLUDED.language, profiles.language),
+        language = CASE 
+          WHEN EXCLUDED.language IN ('en', 'ja') THEN EXCLUDED.language 
+          ELSE profiles.language 
+        END,
         updated_at = NOW();
   RETURN NEW;
 END;
