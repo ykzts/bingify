@@ -81,7 +81,7 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
       updatedAt: result.data?.updated_at,
     };
   } catch (error) {
-    console.error("Error in getEmailHookSecret:", error);
+    console.error("Error in getSendEmailHookSecret:", error);
     return { error: "errorGeneric" };
   }
 }
@@ -138,7 +138,7 @@ export async function upsertSendEmailHookSecret(
 
     return { success: true };
   } catch (error) {
-    console.error("Error in upsertEmailHookSecret:", error);
+    console.error("Error in upsertSendEmailHookSecret:", error);
     return { error: "errorGeneric" };
   }
 }
@@ -180,7 +180,7 @@ export async function deleteSendEmailHookSecret(): Promise<DeleteSendEmailHookSe
 
     return { success: true };
   } catch (error) {
-    console.error("Error in deleteEmailHookSecret:", error);
+    console.error("Error in deleteSendEmailHookSecret:", error);
     return { error: "errorGeneric" };
   }
 }
