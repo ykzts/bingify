@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AnimateOnScroll } from "@/components/animate-on-scroll";
 
 interface FaqProps {
   answer1: string;
@@ -58,25 +59,32 @@ export function Faq({
   return (
     <section className="px-6 py-20">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-12 text-center">
+        <AnimateOnScroll className="mb-12 animate-fade-in-up text-center">
           <h2 className="mb-4 font-bold text-3xl text-foreground sm:text-4xl">
             {heading}
           </h2>
-        </div>
+        </AnimateOnScroll>
 
         <div className="space-y-6">
-          {faqs.map((faq) => (
-            <div
-              className="overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm"
+          {faqs.map((faq, index) => (
+            <AnimateOnScroll
+              className="animate-fade-in-up"
               key={faq.id}
+              style={
+                {
+                  "--animation-delay": `${index * 100}ms`,
+                } as React.CSSProperties
+              }
             >
-              <h3 className="mb-3 font-bold text-card-foreground text-lg">
-                {faq.question}
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {faq.answer}
-              </p>
-            </div>
+              <div className="overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm">
+                <h3 className="mb-3 font-bold text-card-foreground text-lg">
+                  {faq.question}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {faq.answer}
+                </p>
+              </div>
+            </AnimateOnScroll>
           ))}
         </div>
       </div>
