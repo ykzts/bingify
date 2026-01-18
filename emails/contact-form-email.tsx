@@ -8,9 +8,11 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import { getTranslations } from "next-intl/server";
 
 export interface ContactFormEmailProps {
   email: string;
+  locale?: string;
   message: string;
   name: string;
 }
@@ -19,36 +21,42 @@ export interface ContactFormEmailProps {
  * Contact form email template
  * Renders email notifications sent to administrators when users submit the contact form
  */
-export function ContactFormEmail({
+export async function ContactFormEmail({
   email,
+  locale = "ja",
   message,
   name,
 }: ContactFormEmailProps) {
+  const t = await getTranslations({
+    locale,
+    namespace: "EmailTemplates.contactForm",
+  });
+
   // プレビューテキスト: メールクライアントのプレビューに表示される
-  const previewText = `${name}様からお問い合わせがありました`;
+  const previewText = t("preview", { name });
 
   return (
-    <Html lang="ja">
+    <Html lang={locale}>
       <Head />
       <Preview>{previewText}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={h1}>お問い合わせ</Heading>
+          <Heading style={h1}>{t("title")}</Heading>
           <Section style={section}>
             <Text style={label}>
-              <strong>名前:</strong>
+              <strong>{t("nameLabel")}</strong>
             </Text>
             <Text style={text}>{name}</Text>
           </Section>
           <Section style={section}>
             <Text style={label}>
-              <strong>メールアドレス:</strong>
+              <strong>{t("emailLabel")}</strong>
             </Text>
             <Text style={text}>{email}</Text>
           </Section>
           <Section style={section}>
             <Text style={label}>
-              <strong>本文:</strong>
+              <strong>{t("messageLabel")}</strong>
             </Text>
             <Text style={text}>{message}</Text>
           </Section>

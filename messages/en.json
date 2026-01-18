@@ -608,6 +608,14 @@
       "title": "Welcome to Bingify",
       "welcomeText": "Thank you for signing up for Bingify. Please click the button below to confirm your email address."
     },
+    "contactForm": {
+      "emailLabel": "Email Address:",
+      "messageLabel": "Message:",
+      "nameLabel": "Name:",
+      "preview": "You have received an inquiry from {name}",
+      "subject": "[Contact Form] From {name}",
+      "title": "Contact Form"
+    },
     "emailChange": {
       "buttonText": "Confirm Email Change",
       "greeting": "Hello,",

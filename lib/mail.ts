@@ -1,8 +1,10 @@
 import { render, toPlainText } from "@react-email/render";
+import { getTranslations } from "next-intl/server";
 import nodemailer from "nodemailer";
-import type Mail from "nodemailer/lib/mailer";
 import type { ReactNode } from "react";
+import React from "react";
 import { ContactFormEmail } from "@/emails/contact-form-email";
+import type { AdminEmailInfo } from "@/lib/data/profiles";
 
 /**
  * Create SMTP transporter for sending emails
@@ -25,7 +27,7 @@ export interface ContactEmailOptions {
   email: string;
   message: string;
   name: string;
-  recipients: Array<string | Mail.Address>;
+  recipients: AdminEmailInfo[];
 }
 
 export interface AuthEmailOptions {
@@ -35,8 +37,23 @@ export interface AuthEmailOptions {
 }
 
 /**
+ * Get localized subject for contact email using translation system
+ */
+async function getLocalizedSubject(
+  name: string,
+  locale: string
+): Promise<string> {
+  const t = await getTranslations({
+    locale,
+    namespace: "EmailTemplates.contactForm",
+  });
+  return t("subject", { name });
+}
+
+/**
  * Send contact form email to administrators
  * User's email is set in Reply-To header for easy replies
+ * Sends localized emails based on each admin's locale preference
  */
 export async function sendContactEmail(options: ContactEmailOptions) {
   const { email, message, name, recipients } = options;
@@ -53,27 +70,36 @@ export async function sendContactEmail(options: ContactEmailOptions) {
 
   const transporter = createTransporter();
 
-  // React Emailを使用してHTMLとテキスト版を自動生成
-  const emailHtml = await render(
-    ContactFormEmail({
-      email,
-      message,
-      name,
+  // Send personalized emails to each admin based on their locale
+  await Promise.all(
+    recipients.map(async (recipient) => {
+      const { address, locale } = recipient;
+
+      // React Emailを使用してHTMLとテキスト版を自動生成
+      const emailHtml = await render(
+        React.createElement(ContactFormEmail, {
+          email,
+          locale,
+          message,
+          name,
+        })
+      );
+
+      const emailText = toPlainText(emailHtml);
+      const subject = await getLocalizedSubject(name, locale);
+
+      const mailOptions = {
+        from: mailFrom,
+        html: emailHtml,
+        replyTo: email,
+        subject,
+        text: emailText,
+        to: address,
+      };
+
+      await transporter.sendMail(mailOptions);
     })
   );
-
-  const emailText = toPlainText(emailHtml);
-
-  const mailOptions = {
-    from: mailFrom,
-    html: emailHtml,
-    replyTo: email,
-    subject: `【お問い合わせ】${name}様より`,
-    text: emailText,
-    to: recipients,
-  };
-
-  await transporter.sendMail(mailOptions);
 }
 
 /**
