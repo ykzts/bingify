@@ -305,19 +305,11 @@ describe("Token Storage with Auto-Refresh", () => {
       const newExpiresAt = new Date(Date.now() + 7200 * 1000).toISOString();
 
       // RPC calls in order:
-      // 1. get_oauth_provider_config (for getTwitchCredentials) - return empty config
-      // 2. get_oauth_token_for_user - return expired token
-      // 3. get_oauth_provider_config (for refreshOAuthToken getTwitchCredentials) - return empty config
-      // 4. upsert_oauth_token_for_user - return success
-      // 5. get_oauth_token_for_user - return refreshed token
+      // 1. get_oauth_token_for_user - return expired token
+      // 2. get_oauth_provider_config (for refreshTwitchToken getTwitchCredentials) - return empty config
+      // 3. upsert_oauth_token_for_user - return success
+      // 4. get_oauth_token_for_user - return refreshed token
       vi.mocked(mockAdminClient.rpc)
-        .mockResolvedValueOnce({
-          // get_oauth_provider_config - no config in DB, will fall back to env vars
-          data: {
-            success: false,
-          },
-          error: null,
-        })
         .mockResolvedValueOnce({
           data: {
             data: {
