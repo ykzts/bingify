@@ -124,7 +124,9 @@ describe("IdentityUnlinkedNotificationEmail", () => {
         provider: testProps.provider,
       };
       const html = await render(
-        await IdentityUnlinkedNotificationEmail(propsWithoutLocale as typeof testProps)
+        await IdentityUnlinkedNotificationEmail(
+          propsWithoutLocale as typeof testProps
+        )
       );
 
       // 英語版のコンテンツが含まれていることを確認

@@ -125,7 +125,9 @@ describe("MfaUnenrolledNotificationEmail", () => {
         factorType: testProps.factorType,
       };
       const html = await render(
-        await MfaUnenrolledNotificationEmail(propsWithoutLocale as typeof testProps)
+        await MfaUnenrolledNotificationEmail(
+          propsWithoutLocale as typeof testProps
+        )
       );
 
       // 英語版のコンテンツが含まれていることを確認

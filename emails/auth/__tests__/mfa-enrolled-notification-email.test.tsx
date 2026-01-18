@@ -13,9 +13,7 @@ describe("MfaEnrolledNotificationEmail", () => {
     // NOTE: getTranslations は Server-only function です。
     // テスト環境では実行できないため、Integration Tests で検証してください。
     it("英語版を正しくレンダリングする", async () => {
-      const html = await render(
-        await MfaEnrolledNotificationEmail(testProps)
-      );
+      const html = await render(await MfaEnrolledNotificationEmail(testProps));
 
       // HTML構造の確認
       expect(html).toContain("<!DOCTYPE html");
@@ -48,9 +46,7 @@ describe("MfaEnrolledNotificationEmail", () => {
     });
 
     it("セキュリティに関する注意事項を含む", async () => {
-      const html = await render(
-        await MfaEnrolledNotificationEmail(testProps)
-      );
+      const html = await render(await MfaEnrolledNotificationEmail(testProps));
 
       // セキュリティノートが含まれていることを確認
       expect(html).toContain("Security Notice");
@@ -60,9 +56,7 @@ describe("MfaEnrolledNotificationEmail", () => {
     });
 
     it("セキュリティ情報を含む", async () => {
-      const html = await render(
-        await MfaEnrolledNotificationEmail(testProps)
-      );
+      const html = await render(await MfaEnrolledNotificationEmail(testProps));
 
       // セキュリティ情報が含まれていることを確認
       expect(html).toContain("Enhanced Security");
@@ -93,9 +87,7 @@ describe("MfaEnrolledNotificationEmail", () => {
     // NOTE: getTranslations は Server-only function です。
     // テスト環境では実行できないため、Integration Tests で検証してください。
     it("英語版のプレーンテキストを正しくレンダリングする", async () => {
-      const html = await render(
-        await MfaEnrolledNotificationEmail(testProps)
-      );
+      const html = await render(await MfaEnrolledNotificationEmail(testProps));
       const text = toPlainText(html);
 
       // テキスト版の内容確認
@@ -106,9 +98,7 @@ describe("MfaEnrolledNotificationEmail", () => {
     });
 
     it("HTMLタグを含まない", async () => {
-      const html = await render(
-        await MfaEnrolledNotificationEmail(testProps)
-      );
+      const html = await render(await MfaEnrolledNotificationEmail(testProps));
       const text = toPlainText(html);
 
       // HTMLタグが含まれていないことを確認
@@ -128,7 +118,9 @@ describe("MfaEnrolledNotificationEmail", () => {
         factorType: testProps.factorType,
       };
       const html = await render(
-        await MfaEnrolledNotificationEmail(propsWithoutLocale as typeof testProps)
+        await MfaEnrolledNotificationEmail(
+          propsWithoutLocale as typeof testProps
+        )
       );
 
       // 英語版のコンテンツが含まれていることを確認

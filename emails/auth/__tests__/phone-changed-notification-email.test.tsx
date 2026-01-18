@@ -14,9 +14,7 @@ describe("PhoneChangedNotificationEmail", () => {
     // NOTE: getTranslations は Server-only function です。
     // テスト環境では実行できないため、Integration Tests で検証してください。
     it("英語版を正しくレンダリングする", async () => {
-      const html = await render(
-        await PhoneChangedNotificationEmail(testProps)
-      );
+      const html = await render(await PhoneChangedNotificationEmail(testProps));
 
       // HTML構造の確認
       expect(html).toContain("<!DOCTYPE html");
@@ -25,9 +23,7 @@ describe("PhoneChangedNotificationEmail", () => {
       // コンテンツの確認
       expect(html).toContain("Phone Number Changed");
       expect(html).toContain("Hello,");
-      expect(html).toContain(
-        "Your phone number has been successfully changed"
-      );
+      expect(html).toContain("Your phone number has been successfully changed");
       expect(html).toContain(testProps.newPhone);
       expect(html).toContain(testProps.oldPhone);
     });
@@ -50,9 +46,7 @@ describe("PhoneChangedNotificationEmail", () => {
     });
 
     it("セキュリティに関する注意事項を含む", async () => {
-      const html = await render(
-        await PhoneChangedNotificationEmail(testProps)
-      );
+      const html = await render(await PhoneChangedNotificationEmail(testProps));
 
       // セキュリティノートが含まれていることを確認
       expect(html).toContain("Security Notice");
@@ -81,9 +75,7 @@ describe("PhoneChangedNotificationEmail", () => {
     // NOTE: getTranslations は Server-only function です。
     // テスト環境では実行できないため、Integration Tests で検証してください。
     it("英語版のプレーンテキストを正しくレンダリングする", async () => {
-      const html = await render(
-        await PhoneChangedNotificationEmail(testProps)
-      );
+      const html = await render(await PhoneChangedNotificationEmail(testProps));
       const text = toPlainText(html);
 
       // テキスト版の内容確認
@@ -94,9 +86,7 @@ describe("PhoneChangedNotificationEmail", () => {
     });
 
     it("HTMLタグを含まない", async () => {
-      const html = await render(
-        await PhoneChangedNotificationEmail(testProps)
-      );
+      const html = await render(await PhoneChangedNotificationEmail(testProps));
       const text = toPlainText(html);
 
       // HTMLタグが含まれていないことを確認
@@ -117,7 +107,9 @@ describe("PhoneChangedNotificationEmail", () => {
         oldPhone: testProps.oldPhone,
       };
       const html = await render(
-        await PhoneChangedNotificationEmail(propsWithoutLocale as typeof testProps)
+        await PhoneChangedNotificationEmail(
+          propsWithoutLocale as typeof testProps
+        )
       );
 
       // 英語版のコンテンツが含まれていることを確認

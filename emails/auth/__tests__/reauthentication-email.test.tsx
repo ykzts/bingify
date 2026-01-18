@@ -46,9 +46,7 @@ describe("ReauthenticationEmail", () => {
       const html = await render(await ReauthenticationEmail(testProps));
 
       // セキュリティノートが含まれていることを確認（HTML エスケープされる）
-      expect(html).toContain(
-        "If you didn&#x27;t request this verification"
-      );
+      expect(html).toContain("If you didn&#x27;t request this verification");
     });
 
     it("有効期限に関する注意事項を含む", async () => {

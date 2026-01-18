@@ -169,6 +169,7 @@ async function handleEmailChange(
  *
  * 参考: https://github.com/supabase/auth/blob/v2.185.0/internal/mailer/mailer.go
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Simple switch statement for routing 13 email action types
 export async function handleEmailAction(
   emailActionType: string,
   emailData: EmailData,
@@ -303,7 +304,8 @@ export async function handleEmailAction(
 
       await sendAuthEmail({
         recipient: userEmail,
-        subject: locale === "ja" ? "本人確認が必要です" : "Verify Your Identity",
+        subject:
+          locale === "ja" ? "本人確認が必要です" : "Verify Your Identity",
         template: React.createElement(ReauthenticationEmail, {
           locale,
           token,
@@ -316,9 +318,7 @@ export async function handleEmailAction(
       await sendAuthEmail({
         recipient: userEmail,
         subject:
-          locale === "ja"
-            ? "電話番号が変更されました"
-            : "Phone Number Changed",
+          locale === "ja" ? "電話番号が変更されました" : "Phone Number Changed",
         template: React.createElement(PhoneChangedNotificationEmail, {
           locale,
           newPhone: userEmail,

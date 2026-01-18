@@ -657,6 +657,27 @@
       "description": "Bingifyは友人や家族とビンゴゲームを共有できるサービスです。",
       "rights": "All rights reserved"
     },
+    "identityLinkedNotification": {
+      "greeting": "こんにちは、",
+      "nextStep1": "このプロバイダーを使用してサインインできるようになりました",
+      "nextStep2": "アカウント設定でリンク済みプロバイダーを管理できます",
+      "nextStep3": "必要に応じていつでもこのプロバイダーのリンクを解除できます",
+      "nextStepsTitle": "できること",
+      "providerLabel": "プロバイダー：",
+      "securityNoticeTitle": "セキュリティのお知らせ",
+      "securityWarning": "このプロバイダーのリンクに心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
+      "subject": "外部プロバイダーがリンクされました",
+      "successMessage": "外部認証プロバイダーがアカウントにリンクされました。"
+    },
+    "identityUnlinkedNotification": {
+      "accountAccessInfo": "引き続きメールアドレスとパスワード、または他のリンク済みプロバイダーを使用してサインインできます。",
+      "greeting": "こんにちは、",
+      "providerLabel": "プロバイダー：",
+      "securityNoticeTitle": "セキュリティのお知らせ",
+      "securityWarning": "このプロバイダーのリンク解除に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
+      "subject": "外部プロバイダーのリンクが解除されました",
+      "successMessage": "外部認証プロバイダーがアカウントからリンク解除されました。"
+    },
     "invite": {
       "buttonText": "Bingifyに参加する",
       "feature1": "リアルタイムでビンゴゲームを作成して共有",
@@ -677,6 +698,28 @@
       "subject": "Bingifyにログイン",
       "text": "ログインリクエストを受け付けました。以下のボタンをクリックしてログインしてください。"
     },
+    "mfaEnrolledNotification": {
+      "factorTypeLabel": "ファクタータイプ：",
+      "greeting": "こんにちは、",
+      "securityInfoTitle": "セキュリティの強化",
+      "securityNoticeTitle": "セキュリティのお知らせ",
+      "securityTip1": "アカウントに追加のセキュリティレイヤーが適用されました",
+      "securityTip2": "サインイン時に確認コードの入力が求められます",
+      "securityTip3": "認証デバイスまたはバックアップコードを安全な場所に保管してください",
+      "securityWarning": "MFAの有効化に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
+      "subject": "多要素認証が有効になりました",
+      "successMessage": "アカウントで多要素認証（MFA）が正常に有効化されました。"
+    },
+    "mfaUnenrolledNotification": {
+      "factorTypeLabel": "ファクタータイプ：",
+      "greeting": "こんにちは、",
+      "recommendation": "アカウントセキュリティを強化するため、MFAを有効にしておくことを強くお勧めします。アカウント設定でいつでも再度有効にできます。",
+      "recommendationTitle": "セキュリティ推奨事項",
+      "securityNoticeTitle": "セキュリティのお知らせ",
+      "securityWarning": "MFAの無効化に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
+      "subject": "多要素認証が無効になりました",
+      "warningMessage": "アカウントで多要素認証（MFA）が無効化されました。"
+    },
     "otpCodeLabel": "ボタンが機能しない場合は、このコードを使用してください：",
     "passwordChangedNotification": {
       "greeting": "こんにちは、",
@@ -687,6 +730,23 @@
       "subject": "パスワードが変更されました",
       "successMessage": "パスワードが正常に変更されました。新しいパスワードでサインインできるようになりました。"
     },
+    "phoneChangedNotification": {
+      "greeting": "こんにちは、",
+      "newPhoneLabel": "新しい電話番号：",
+      "oldPhoneLabel": "変更前の電話番号：",
+      "securityNoticeTitle": "セキュリティのお知らせ",
+      "securityWarning": "この変更に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
+      "subject": "電話番号が変更されました",
+      "successMessage": "電話番号が正常に変更されました。"
+    },
+    "reauthentication": {
+      "expirationNote": "このコードは5分後に有効期限が切れます。",
+      "greeting": "こんにちは、",
+      "securityWarning": "このリクエストに心当たりがない場合は、誰かがあなたのアカウントにアクセスしようとしている可能性があります。このメールを無視し、パスワードを変更することをお勧めします。",
+      "subject": "本人確認が必要です",
+      "text": "本人確認が必要な操作のリクエストを受け付けました。続行するには、以下の確認コードをご使用ください。",
+      "title": "再認証が必要です"
+    },
     "recovery": {
       "buttonText": "パスワードをリセット",
       "expirationNote": "このリンクは1時間後に有効期限が切れます。期限切れの場合は、再度パスワードリセットをリクエストしてください。",
@@ -695,66 +755,6 @@
       "securityWarning": "このリクエストに心当たりがない場合は、誰かがあなたのアカウントにアクセスしようとしている可能性があります。このメールを無視し、パスワードを変更することをお勧めします。",
       "subject": "パスワードのリセット",
       "text": "パスワードのリセットリクエストを受け付けました。以下のボタンをクリックして、新しいパスワードを設定してください。"
-    },
-    "reauthentication": {
-      "greeting": "こんにちは、",
-      "subject": "本人確認が必要です",
-      "title": "再認証が必要です",
-      "text": "本人確認が必要な操作のリクエストを受け付けました。続行するには、以下の確認コードをご使用ください。",
-      "expirationNote": "このコードは5分後に有効期限が切れます。",
-      "securityWarning": "このリクエストに心当たりがない場合は、誰かがあなたのアカウントにアクセスしようとしている可能性があります。このメールを無視し、パスワードを変更することをお勧めします。"
-    },
-    "phoneChangedNotification": {
-      "greeting": "こんにちは、",
-      "subject": "電話番号が変更されました",
-      "successMessage": "電話番号が正常に変更されました。",
-      "oldPhoneLabel": "変更前の電話番号：",
-      "newPhoneLabel": "新しい電話番号：",
-      "securityNoticeTitle": "セキュリティのお知らせ",
-      "securityWarning": "この変更に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。"
-    },
-    "identityLinkedNotification": {
-      "greeting": "こんにちは、",
-      "subject": "外部プロバイダーがリンクされました",
-      "successMessage": "外部認証プロバイダーがアカウントにリンクされました。",
-      "providerLabel": "プロバイダー：",
-      "securityNoticeTitle": "セキュリティのお知らせ",
-      "securityWarning": "このプロバイダーのリンクに心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
-      "nextStepsTitle": "できること",
-      "nextStep1": "このプロバイダーを使用してサインインできるようになりました",
-      "nextStep2": "アカウント設定でリンク済みプロバイダーを管理できます",
-      "nextStep3": "必要に応じていつでもこのプロバイダーのリンクを解除できます"
-    },
-    "identityUnlinkedNotification": {
-      "greeting": "こんにちは、",
-      "subject": "外部プロバイダーのリンクが解除されました",
-      "successMessage": "外部認証プロバイダーがアカウントからリンク解除されました。",
-      "providerLabel": "プロバイダー：",
-      "securityNoticeTitle": "セキュリティのお知らせ",
-      "securityWarning": "このプロバイダーのリンク解除に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
-      "accountAccessInfo": "引き続きメールアドレスとパスワード、または他のリンク済みプロバイダーを使用してサインインできます。"
-    },
-    "mfaEnrolledNotification": {
-      "greeting": "こんにちは、",
-      "subject": "多要素認証が有効になりました",
-      "successMessage": "アカウントで多要素認証（MFA）が正常に有効化されました。",
-      "factorTypeLabel": "ファクタータイプ：",
-      "securityInfoTitle": "セキュリティの強化",
-      "securityTip1": "アカウントに追加のセキュリティレイヤーが適用されました",
-      "securityTip2": "サインイン時に確認コードの入力が求められます",
-      "securityTip3": "認証デバイスまたはバックアップコードを安全な場所に保管してください",
-      "securityNoticeTitle": "セキュリティのお知らせ",
-      "securityWarning": "MFAの有効化に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。"
-    },
-    "mfaUnenrolledNotification": {
-      "greeting": "こんにちは、",
-      "subject": "多要素認証が無効になりました",
-      "warningMessage": "アカウントで多要素認証（MFA）が無効化されました。",
-      "factorTypeLabel": "ファクタータイプ：",
-      "securityNoticeTitle": "セキュリティのお知らせ",
-      "securityWarning": "MFAの無効化に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
-      "recommendationTitle": "セキュリティ推奨事項",
-      "recommendation": "アカウントセキュリティを強化するため、MFAを有効にしておくことを強くお勧めします。アカウント設定でいつでも再度有効にできます。"
     }
   },
   "Errors": {
