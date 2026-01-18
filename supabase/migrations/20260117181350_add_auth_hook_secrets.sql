@@ -97,18 +97,22 @@ DECLARE
   v_existing_secret_id UUID;
   v_created_secret BOOLEAN := FALSE;
 BEGIN
-  -- Check authentication and admin role
+  -- Check authentication: allow service_role OR authenticated admin users
   v_user_id := auth.uid();
-  IF v_user_id IS NULL THEN
+  
+  -- Allow service_role without user authentication (for webhooks)
+  IF v_user_id IS NULL AND auth.role() != 'service_role' THEN
     RETURN jsonb_build_object('success', false, 'error', 'Not authenticated');
   END IF;
 
-  -- Verify admin role
-  IF NOT EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = v_user_id AND role = 'admin'
-  ) THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
+  -- For authenticated users, verify admin role
+  IF v_user_id IS NOT NULL THEN
+    IF NOT EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = v_user_id AND role = 'admin'
+    ) THEN
+      RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
+    END IF;
   END IF;
 
   -- Validate hook name
@@ -195,18 +199,22 @@ DECLARE
   v_secret_record RECORD;
   v_secret TEXT;
 BEGIN
-  -- Check authentication and admin role
+  -- Check authentication: allow service_role OR authenticated admin users
   v_user_id := auth.uid();
-  IF v_user_id IS NULL THEN
+  
+  -- Allow service_role without user authentication (for webhooks)
+  IF v_user_id IS NULL AND auth.role() != 'service_role' THEN
     RETURN jsonb_build_object('success', false, 'error', 'Not authenticated');
   END IF;
 
-  -- Verify admin role
-  IF NOT EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = v_user_id AND role = 'admin'
-  ) THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
+  -- For authenticated users, verify admin role
+  IF v_user_id IS NOT NULL THEN
+    IF NOT EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = v_user_id AND role = 'admin'
+    ) THEN
+      RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
+    END IF;
   END IF;
 
   -- Validate hook name
@@ -254,18 +262,22 @@ DECLARE
   v_user_id UUID;
   v_secret_id UUID;
 BEGIN
-  -- Check authentication and admin role
+  -- Check authentication: allow service_role OR authenticated admin users
   v_user_id := auth.uid();
-  IF v_user_id IS NULL THEN
+  
+  -- Allow service_role without user authentication (for webhooks)
+  IF v_user_id IS NULL AND auth.role() != 'service_role' THEN
     RETURN jsonb_build_object('success', false, 'error', 'Not authenticated');
   END IF;
 
-  -- Verify admin role
-  IF NOT EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = v_user_id AND role = 'admin'
-  ) THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
+  -- For authenticated users, verify admin role
+  IF v_user_id IS NOT NULL THEN
+    IF NOT EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = v_user_id AND role = 'admin'
+    ) THEN
+      RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
+    END IF;
   END IF;
 
   -- Validate hook name
