@@ -695,6 +695,66 @@
       "securityWarning": "If you didn't request this password reset, someone may be trying to access your account. Please ignore this email and consider changing your password.",
       "subject": "Reset Your Password",
       "text": "We received a request to reset your password. Click the button below to set a new password."
+    },
+    "reauthentication": {
+      "greeting": "Hello,",
+      "subject": "Verify Your Identity",
+      "title": "Reauthentication Required",
+      "text": "We received a request that requires you to verify your identity. Please use the verification code below to proceed.",
+      "expirationNote": "This code will expire in 5 minutes.",
+      "securityWarning": "If you didn't request this verification, someone may be trying to access your account. Please ignore this email and consider changing your password."
+    },
+    "phoneChangedNotification": {
+      "greeting": "Hello,",
+      "subject": "Phone Number Changed",
+      "successMessage": "Your phone number has been successfully changed.",
+      "oldPhoneLabel": "Previous Phone Number:",
+      "newPhoneLabel": "New Phone Number:",
+      "securityNoticeTitle": "Security Notice",
+      "securityWarning": "If you didn't make this change, please contact our support team immediately to secure your account."
+    },
+    "identityLinkedNotification": {
+      "greeting": "Hello,",
+      "subject": "External Provider Linked",
+      "successMessage": "An external authentication provider has been linked to your account.",
+      "providerLabel": "Provider:",
+      "securityNoticeTitle": "Security Notice",
+      "securityWarning": "If you didn't link this provider, please contact our support team immediately to secure your account.",
+      "nextStepsTitle": "What You Can Do Now",
+      "nextStep1": "You can now sign in using this provider",
+      "nextStep2": "Manage your linked providers in account settings",
+      "nextStep3": "Unlink this provider at any time if needed"
+    },
+    "identityUnlinkedNotification": {
+      "greeting": "Hello,",
+      "subject": "External Provider Unlinked",
+      "successMessage": "An external authentication provider has been unlinked from your account.",
+      "providerLabel": "Provider:",
+      "securityNoticeTitle": "Security Notice",
+      "securityWarning": "If you didn't unlink this provider, please contact our support team immediately to secure your account.",
+      "accountAccessInfo": "You can still sign in using your email and password or other linked providers."
+    },
+    "mfaEnrolledNotification": {
+      "greeting": "Hello,",
+      "subject": "Multi-Factor Authentication Enabled",
+      "successMessage": "Multi-factor authentication (MFA) has been successfully enabled on your account.",
+      "factorTypeLabel": "Factor Type:",
+      "securityInfoTitle": "Enhanced Security",
+      "securityTip1": "Your account is now protected with an additional layer of security",
+      "securityTip2": "You'll be asked to provide a verification code when signing in",
+      "securityTip3": "Keep your authentication device or backup codes in a safe place",
+      "securityNoticeTitle": "Security Notice",
+      "securityWarning": "If you didn't enable MFA, please contact our support team immediately to secure your account."
+    },
+    "mfaUnenrolledNotification": {
+      "greeting": "Hello,",
+      "subject": "Multi-Factor Authentication Disabled",
+      "warningMessage": "Multi-factor authentication (MFA) has been disabled on your account.",
+      "factorTypeLabel": "Factor Type:",
+      "securityNoticeTitle": "Security Notice",
+      "securityWarning": "If you didn't disable MFA, please contact our support team immediately to secure your account.",
+      "recommendationTitle": "Security Recommendation",
+      "recommendation": "We strongly recommend keeping MFA enabled for enhanced account security. You can re-enable it at any time in your account settings."
     }
   },
   "Errors": {

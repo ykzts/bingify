@@ -3,9 +3,15 @@ import { Webhook } from "standardwebhooks";
 import { ConfirmationEmail } from "@/emails/auth/confirmation-email";
 import { EmailChangeEmail } from "@/emails/auth/email-change-email";
 import { EmailChangedNotificationEmail } from "@/emails/auth/email-changed-notification-email";
+import { IdentityLinkedNotificationEmail } from "@/emails/auth/identity-linked-notification-email";
+import { IdentityUnlinkedNotificationEmail } from "@/emails/auth/identity-unlinked-notification-email";
 import { InviteEmail } from "@/emails/auth/invite-email";
 import { MagicLinkEmail } from "@/emails/auth/magic-link-email";
+import { MfaEnrolledNotificationEmail } from "@/emails/auth/mfa-enrolled-notification-email";
+import { MfaUnenrolledNotificationEmail } from "@/emails/auth/mfa-unenrolled-notification-email";
 import { PasswordChangedNotificationEmail } from "@/emails/auth/password-changed-notification-email";
+import { PhoneChangedNotificationEmail } from "@/emails/auth/phone-changed-notification-email";
+import { ReauthenticationEmail } from "@/emails/auth/reauthentication-email";
 import { RecoveryEmail } from "@/emails/auth/recovery-email";
 import { sendAuthEmail } from "@/lib/mail";
 import type { EmailData } from "@/lib/schemas/auth-hook";
@@ -286,6 +292,96 @@ export async function handleEmailAction(
             ? "パスワードが変更されました"
             : "Your Password Has Been Changed",
         template: React.createElement(PasswordChangedNotificationEmail, {
+          locale,
+        }),
+      });
+      return true;
+    }
+
+    case "reauthentication": {
+      const token = emailData.token || "";
+
+      await sendAuthEmail({
+        recipient: userEmail,
+        subject: locale === "ja" ? "本人確認が必要です" : "Verify Your Identity",
+        template: React.createElement(ReauthenticationEmail, {
+          locale,
+          token,
+        }),
+      });
+      return true;
+    }
+
+    case "phone_changed_notification": {
+      await sendAuthEmail({
+        recipient: userEmail,
+        subject:
+          locale === "ja"
+            ? "電話番号が変更されました"
+            : "Phone Number Changed",
+        template: React.createElement(PhoneChangedNotificationEmail, {
+          locale,
+          newPhone: userEmail,
+          oldPhone: emailData.old_phone,
+        }),
+      });
+      return true;
+    }
+
+    case "identity_linked_notification": {
+      await sendAuthEmail({
+        recipient: userEmail,
+        subject:
+          locale === "ja"
+            ? "外部プロバイダーがリンクされました"
+            : "External Provider Linked",
+        template: React.createElement(IdentityLinkedNotificationEmail, {
+          locale,
+          provider: emailData.provider,
+        }),
+      });
+      return true;
+    }
+
+    case "identity_unlinked_notification": {
+      await sendAuthEmail({
+        recipient: userEmail,
+        subject:
+          locale === "ja"
+            ? "外部プロバイダーのリンクが解除されました"
+            : "External Provider Unlinked",
+        template: React.createElement(IdentityUnlinkedNotificationEmail, {
+          locale,
+          provider: emailData.provider,
+        }),
+      });
+      return true;
+    }
+
+    case "mfa_factor_enrolled_notification": {
+      await sendAuthEmail({
+        recipient: userEmail,
+        subject:
+          locale === "ja"
+            ? "多要素認証が有効になりました"
+            : "Multi-Factor Authentication Enabled",
+        template: React.createElement(MfaEnrolledNotificationEmail, {
+          factorType: emailData.factor_type,
+          locale,
+        }),
+      });
+      return true;
+    }
+
+    case "mfa_factor_unenrolled_notification": {
+      await sendAuthEmail({
+        recipient: userEmail,
+        subject:
+          locale === "ja"
+            ? "多要素認証が無効になりました"
+            : "Multi-Factor Authentication Disabled",
+        template: React.createElement(MfaUnenrolledNotificationEmail, {
+          factorType: emailData.factor_type,
           locale,
         }),
       });
