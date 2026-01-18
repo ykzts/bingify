@@ -4,6 +4,9 @@ import { getAdminEmails } from "../profiles";
 // Mock Supabase admin client
 const mockAdminClient = {
   auth: {
+    admin: {
+      getUserById: vi.fn(),
+    },
     getUser: vi.fn(),
   },
   from: vi.fn(),
@@ -20,9 +23,9 @@ describe("getAdminEmails", () => {
 
   it("管理者のメールアドレス配列を返す", async () => {
     const mockData = [
-      { email: "admin1@example.com", full_name: "Admin One" },
-      { email: "admin2@example.com", full_name: "Admin Two" },
-      { email: "admin3@example.com", full_name: null },
+      { id: "user-1", email: "admin1@example.com", full_name: "Admin One" },
+      { id: "user-2", email: "admin2@example.com", full_name: "Admin Two" },
+      { id: "user-3", email: "admin3@example.com", full_name: null },
     ];
 
     mockAdminClient.from.mockReturnValue({
@@ -34,21 +37,42 @@ describe("getAdminEmails", () => {
       }),
     });
 
+    // Mock getUserById to return user metadata with language
+    mockAdminClient.auth.admin.getUserById
+      .mockResolvedValueOnce({
+        data: { user: { user_metadata: { language: "ja" } } },
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: { user: { user_metadata: { language: "en" } } },
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: { user: { user_metadata: {} } }, // No language set, should default to 'ja'
+        error: null,
+      });
+
     const result = await getAdminEmails();
 
     expect(result.error).toBeUndefined();
     expect(result.data).toEqual([
-      { address: "admin1@example.com", name: "Admin One" },
-      { address: "admin2@example.com", name: "Admin Two" },
-      "admin3@example.com",
+      {
+        address: { address: "admin1@example.com", name: "Admin One" },
+        locale: "ja",
+      },
+      {
+        address: { address: "admin2@example.com", name: "Admin Two" },
+        locale: "en",
+      },
+      { address: "admin3@example.com", locale: "ja" },
     ]);
   });
 
   it("null のメールアドレスを除外する", async () => {
     const mockData = [
-      { email: "admin1@example.com", full_name: "Admin One" },
-      { email: null, full_name: "No Email Admin" },
-      { email: "admin2@example.com", full_name: null },
+      { id: "user-1", email: "admin1@example.com", full_name: "Admin One" },
+      { id: "user-2", email: null, full_name: "No Email Admin" },
+      { id: "user-3", email: "admin2@example.com", full_name: null },
     ];
 
     mockAdminClient.from.mockReturnValue({
@@ -60,12 +84,26 @@ describe("getAdminEmails", () => {
       }),
     });
 
+    // Mock getUserById for users with valid emails only
+    mockAdminClient.auth.admin.getUserById
+      .mockResolvedValueOnce({
+        data: { user: { user_metadata: { language: "ja" } } },
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: { user: { user_metadata: { language: "en" } } },
+        error: null,
+      });
+
     const result = await getAdminEmails();
 
     expect(result.error).toBeUndefined();
     expect(result.data).toEqual([
-      { address: "admin1@example.com", name: "Admin One" },
-      "admin2@example.com",
+      {
+        address: { address: "admin1@example.com", name: "Admin One" },
+        locale: "ja",
+      },
+      { address: "admin2@example.com", locale: "en" },
     ]);
   });
 
@@ -135,10 +173,18 @@ describe("getAdminEmails", () => {
 
   it("特殊文字を含む表示名を持つ管理者のメールアドレスを返す", async () => {
     const mockData = [
-      { email: "admin1@example.com", full_name: 'John "Johnny" Doe' },
-      { email: "admin2@example.com", full_name: "Path\\User" },
-      { email: "admin3@example.com", full_name: 'Quote" and Slash\\' },
-      { email: "admin4@example.com", full_name: "Normal Name" },
+      {
+        id: "user-1",
+        email: "admin1@example.com",
+        full_name: 'John "Johnny" Doe',
+      },
+      { id: "user-2", email: "admin2@example.com", full_name: "Path\\User" },
+      {
+        id: "user-3",
+        email: "admin3@example.com",
+        full_name: 'Quote" and Slash\\',
+      },
+      { id: "user-4", email: "admin4@example.com", full_name: "Normal Name" },
     ];
 
     mockAdminClient.from.mockReturnValue({
@@ -150,22 +196,60 @@ describe("getAdminEmails", () => {
       }),
     });
 
+    // Mock getUserById for all users
+    mockAdminClient.auth.admin.getUserById
+      .mockResolvedValueOnce({
+        data: { user: { user_metadata: { language: "en" } } },
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: { user: { user_metadata: { language: "ja" } } },
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: { user: { user_metadata: { language: "en" } } },
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: { user: { user_metadata: {} } },
+        error: null,
+      });
+
     const result = await getAdminEmails();
 
     expect(result.error).toBeUndefined();
     expect(result.data).toEqual([
-      { address: "admin1@example.com", name: 'John "Johnny" Doe' },
-      { address: "admin2@example.com", name: "Path\\User" },
-      { address: "admin3@example.com", name: 'Quote" and Slash\\' },
-      { address: "admin4@example.com", name: "Normal Name" },
+      {
+        address: { address: "admin1@example.com", name: 'John "Johnny" Doe' },
+        locale: "en",
+      },
+      {
+        address: { address: "admin2@example.com", name: "Path\\User" },
+        locale: "ja",
+      },
+      {
+        address: {
+          address: "admin3@example.com",
+          name: 'Quote" and Slash\\',
+        },
+        locale: "en",
+      },
+      {
+        address: { address: "admin4@example.com", name: "Normal Name" },
+        locale: "ja",
+      },
     ]);
   });
 
   it("制御文字を含む表示名を持つ管理者のメールアドレスを返す", async () => {
     const mockData = [
-      { email: "admin1@example.com", full_name: "Name\x00With\x1FControl" },
-      { email: "admin2@example.com", full_name: "Tab\tName" },
-      { email: "admin3@example.com", full_name: "Newline\nName" },
+      {
+        id: "user-1",
+        email: "admin1@example.com",
+        full_name: "Name\x00With\x1FControl",
+      },
+      { id: "user-2", email: "admin2@example.com", full_name: "Tab\tName" },
+      { id: "user-3", email: "admin3@example.com", full_name: "Newline\nName" },
     ];
 
     mockAdminClient.from.mockReturnValue({
@@ -177,13 +261,40 @@ describe("getAdminEmails", () => {
       }),
     });
 
+    // Mock getUserById for all users
+    mockAdminClient.auth.admin.getUserById
+      .mockResolvedValueOnce({
+        data: { user: { user_metadata: { language: "en" } } },
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: { user: { user_metadata: { language: "ja" } } },
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: { user: { user_metadata: {} } },
+        error: null,
+      });
+
     const result = await getAdminEmails();
 
     expect(result.error).toBeUndefined();
     expect(result.data).toEqual([
-      { address: "admin1@example.com", name: "Name\x00With\x1FControl" },
-      { address: "admin2@example.com", name: "Tab\tName" },
-      { address: "admin3@example.com", name: "Newline\nName" },
+      {
+        address: {
+          address: "admin1@example.com",
+          name: "Name\x00With\x1FControl",
+        },
+        locale: "en",
+      },
+      {
+        address: { address: "admin2@example.com", name: "Tab\tName" },
+        locale: "ja",
+      },
+      {
+        address: { address: "admin3@example.com", name: "Newline\nName" },
+        locale: "ja",
+      },
     ]);
   });
 });
