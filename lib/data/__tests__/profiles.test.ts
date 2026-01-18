@@ -23,9 +23,9 @@ describe("getAdminEmails", () => {
 
   it("管理者のメールアドレス配列を返す", async () => {
     const mockData = [
-      { id: "user-1", email: "admin1@example.com", full_name: "Admin One" },
-      { id: "user-2", email: "admin2@example.com", full_name: "Admin Two" },
-      { id: "user-3", email: "admin3@example.com", full_name: null },
+      { email: "admin1@example.com", full_name: "Admin One", id: "user-1" },
+      { email: "admin2@example.com", full_name: "Admin Two", id: "user-2" },
+      { email: "admin3@example.com", full_name: null, id: "user-3" },
     ];
 
     mockAdminClient.from.mockReturnValue({
@@ -70,9 +70,9 @@ describe("getAdminEmails", () => {
 
   it("null のメールアドレスを除外する", async () => {
     const mockData = [
-      { id: "user-1", email: "admin1@example.com", full_name: "Admin One" },
-      { id: "user-2", email: null, full_name: "No Email Admin" },
-      { id: "user-3", email: "admin2@example.com", full_name: null },
+      { email: "admin1@example.com", full_name: "Admin One", id: "user-1" },
+      { email: null, full_name: "No Email Admin", id: "user-2" },
+      { email: "admin2@example.com", full_name: null, id: "user-3" },
     ];
 
     mockAdminClient.from.mockReturnValue({
@@ -174,17 +174,17 @@ describe("getAdminEmails", () => {
   it("特殊文字を含む表示名を持つ管理者のメールアドレスを返す", async () => {
     const mockData = [
       {
-        id: "user-1",
         email: "admin1@example.com",
         full_name: 'John "Johnny" Doe',
+        id: "user-1",
       },
-      { id: "user-2", email: "admin2@example.com", full_name: "Path\\User" },
+      { email: "admin2@example.com", full_name: "Path\\User", id: "user-2" },
       {
-        id: "user-3",
         email: "admin3@example.com",
         full_name: 'Quote" and Slash\\',
+        id: "user-3",
       },
-      { id: "user-4", email: "admin4@example.com", full_name: "Normal Name" },
+      { email: "admin4@example.com", full_name: "Normal Name", id: "user-4" },
     ];
 
     mockAdminClient.from.mockReturnValue({
@@ -244,12 +244,12 @@ describe("getAdminEmails", () => {
   it("制御文字を含む表示名を持つ管理者のメールアドレスを返す", async () => {
     const mockData = [
       {
-        id: "user-1",
         email: "admin1@example.com",
         full_name: "Name\x00With\x1FControl",
+        id: "user-1",
       },
-      { id: "user-2", email: "admin2@example.com", full_name: "Tab\tName" },
-      { id: "user-3", email: "admin3@example.com", full_name: "Newline\nName" },
+      { email: "admin2@example.com", full_name: "Tab\tName", id: "user-2" },
+      { email: "admin3@example.com", full_name: "Newline\nName", id: "user-3" },
     ];
 
     mockAdminClient.from.mockReturnValue({
