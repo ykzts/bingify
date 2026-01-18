@@ -48,13 +48,18 @@ function getNotificationIcon(type: string): LucideIcon {
 }
 
 /**
+ * スケルトンローディング用の静的配列
+ * レンダリングごとの配列生成を回避
+ */
+const SKELETON_ITEMS = Array.from({ length: 5 }, (_, i) => i);
+
+/**
  * ローディングスケルトン
  */
 function LoadingSkeleton() {
   return (
     <div className="space-y-1 p-2">
-      {[...new Array(5)].map((_, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: スケルトンローディング用
+      {SKELETON_ITEMS.map((i) => (
         <div className="flex gap-3 p-2" key={i}>
           <div className="size-8 animate-pulse rounded-full bg-gray-200" />
           <div className="flex-1 space-y-2">
