@@ -11,24 +11,6 @@ interface FeaturesProps {
   subheading: string;
 }
 
-const features = [
-  {
-    description: "realtimeDescription",
-    icon: Zap,
-    title: "realtimeTitle",
-  },
-  {
-    description: "communityDescription",
-    icon: Users,
-    title: "communityTitle",
-  },
-  {
-    description: "noAppDescription",
-    icon: Globe,
-    title: "noAppTitle",
-  },
-];
-
 export function Features({
   communityDescription,
   communityTitle,
@@ -72,9 +54,9 @@ export function Features({
             const Icon = feature.icon;
             return (
               <article
-                key={feature.title}
                 aria-labelledby={`feature-title-${index}`}
                 className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:-translate-y-1 hover:scale-105 hover:shadow-xl"
+                key={feature.title}
               >
                 <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 transition-transform duration-600 group-hover:rotate-360">
                   <Icon className="h-7 w-7 text-primary" />

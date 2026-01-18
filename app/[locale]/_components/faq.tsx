@@ -67,8 +67,8 @@ export function Faq({
         <div className="space-y-6">
           {faqs.map((faq) => (
             <div
-              key={faq.id}
               className="overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm"
+              key={faq.id}
             >
               <h3 className="mb-3 font-bold text-card-foreground text-lg">
                 {faq.question}

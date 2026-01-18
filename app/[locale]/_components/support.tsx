@@ -24,11 +24,7 @@ export function Support({ description, heading, sponsorButton }: SupportProps) {
             {description}
           </p>
 
-          <Button
-            asChild
-            className="rounded-full px-8 py-4 text-lg"
-            size="lg"
-          >
+          <Button asChild className="rounded-full px-8 py-4 text-lg" size="lg">
             <a
               aria-label={`${sponsorButton} (opens in a new window)`}
               href="https://github.com/sponsors/ykzts"
