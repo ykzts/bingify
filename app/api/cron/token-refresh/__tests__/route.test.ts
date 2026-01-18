@@ -10,9 +10,9 @@ vi.mock("@supabase/supabase-js", () => ({
 }));
 
 // Admin client のモック (OAuth credentials 取得用)
-let mockAdminClient: ReturnType<typeof vi.fn>;
+const mockAdminClient = vi.fn();
 vi.mock("@/lib/supabase/admin", () => ({
-  createAdminClient: () => mockAdminClient(),
+  createAdminClient: () => mockAdminClient,
 }));
 
 // fetchのモック
@@ -108,7 +108,7 @@ describe("Token Refresh Cron Endpoint", () => {
     };
 
     // Mock admin client for OAuth credentials
-    mockAdminClient = vi.fn().mockReturnValue({
+    mockAdminClient.mockReturnValue({
       rpc: vi.fn().mockResolvedValueOnce({
         // get_oauth_provider_config - no config in DB, will use env vars
         data: {

@@ -62,6 +62,11 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
   END IF;
 
+  -- Validate client_id is provided
+  IF p_client_id IS NULL OR p_client_id = '' THEN
+    RETURN jsonb_build_object('success', false, 'error', 'Client ID is required');
+  END IF;
+
   -- Validate provider exists
   IF NOT EXISTS (
     SELECT 1 FROM public.system_auth_providers
