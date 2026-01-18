@@ -66,8 +66,6 @@ export async function ContactFormEmail({
   );
 }
 
-export default ContactFormEmail;
-
 // スタイル定義
 const main = {
   backgroundColor: "#f6f9fc",
