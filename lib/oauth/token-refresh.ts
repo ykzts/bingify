@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/supabase";
+import { getGoogleCredentials, getTwitchCredentials } from "@/lib/oauth-credentials";
 import { handleOAuthError } from "./token-error-handler";
 import type { OAuthProvider } from "./token-storage";
 import {
@@ -43,16 +44,15 @@ export interface RefreshResult {
 export async function refreshGoogleToken(
   refreshToken: string
 ): Promise<RefreshTokenResponse> {
-  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET;
+  const credentials = await getGoogleCredentials();
 
-  if (!(clientId && clientSecret)) {
+  if (!(credentials.clientId && credentials.clientSecret)) {
     throw new Error("Google OAuth credentials not configured");
   }
 
   const params = new URLSearchParams({
-    client_id: clientId,
-    client_secret: clientSecret,
+    client_id: credentials.clientId,
+    client_secret: credentials.clientSecret,
     grant_type: "refresh_token",
     refresh_token: refreshToken,
   });
@@ -84,10 +84,9 @@ export async function refreshGoogleToken(
 export async function refreshTwitchToken(
   refreshToken: string
 ): Promise<RefreshTokenResponse> {
-  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
-  const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET;
+  const credentials = await getTwitchCredentials();
 
-  if (!(clientId && clientSecret)) {
+  if (!(credentials.clientId && credentials.clientSecret)) {
     throw new Error("Twitch OAuth credentials not configured");
   }
 
@@ -96,8 +95,8 @@ export async function refreshTwitchToken(
   // not one-off token refresh operations
   const response = await fetch("https://id.twitch.tv/oauth2/token", {
     body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
+      client_id: credentials.clientId,
+      client_secret: credentials.clientSecret,
       grant_type: "refresh_token",
       refresh_token: refreshToken,
     }).toString(),

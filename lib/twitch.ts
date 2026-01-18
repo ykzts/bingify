@@ -1,5 +1,6 @@
 import { ApiClient } from "@twurple/api";
 import { getAppToken, getTokenInfo, StaticAuthProvider } from "@twurple/auth";
+import { getTwitchCredentials } from "@/lib/oauth-credentials";
 
 // Regex patterns for parsing Twitch input
 export const TWITCH_ID_REGEX = /^\d+$/;
@@ -41,11 +42,11 @@ export interface ParsedTwitchInput {
 /**
  * Validate common parameters for Twitch API calls
  */
-function validateTwitchParameters(
+async function validateTwitchParameters(
   userAccessToken: string,
   userId: string,
   broadcasterId: string
-): { error?: string; valid: boolean } {
+): Promise<{ error?: string; valid: boolean }> {
   if (!userAccessToken) {
     return { error: "Missing required parameters", valid: false };
   }
@@ -58,8 +59,8 @@ function validateTwitchParameters(
     return { error: "Missing required parameters", valid: false };
   }
 
-  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
-  if (!clientId) {
+  const credentials = await getTwitchCredentials();
+  if (!credentials.clientId) {
     return { error: "Twitch client ID not configured", valid: false };
   }
 
@@ -69,26 +70,32 @@ function validateTwitchParameters(
 /**
  * Create Twurple API client with user access token
  */
-function createApiClient(userAccessToken: string): ApiClient {
-  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
-  if (!clientId) {
+async function createApiClient(userAccessToken: string): Promise<ApiClient> {
+  const credentials = await getTwitchCredentials();
+  if (!credentials.clientId) {
     throw new Error("Twitch client ID not configured");
   }
 
-  const authProvider = new StaticAuthProvider(clientId, userAccessToken);
+  const authProvider = new StaticAuthProvider(
+    credentials.clientId,
+    userAccessToken
+  );
   return new ApiClient({ authProvider });
 }
 
 /**
  * Create Twurple API client with app access token for server-side operations
  */
-function createAppApiClient(appAccessToken: string): ApiClient {
-  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
-  if (!clientId) {
+async function createAppApiClient(appAccessToken: string): Promise<ApiClient> {
+  const credentials = await getTwitchCredentials();
+  if (!credentials.clientId) {
     throw new Error("Twitch client ID not configured");
   }
 
-  const authProvider = new StaticAuthProvider(clientId, appAccessToken);
+  const authProvider = new StaticAuthProvider(
+    credentials.clientId,
+    appAccessToken
+  );
   return new ApiClient({ authProvider });
 }
 
@@ -109,14 +116,17 @@ export async function getUserTwitchId(
       };
     }
 
-    const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
-    if (!clientId) {
+    const credentials = await getTwitchCredentials();
+    if (!credentials.clientId) {
       return {
         error: "Twitch client ID not configured",
       };
     }
 
-    const tokenInfo = await getTokenInfo(userAccessToken, clientId);
+    const tokenInfo = await getTokenInfo(
+      userAccessToken,
+      credentials.clientId
+    );
 
     if (tokenInfo.userId) {
       return { userId: tokenInfo.userId };
@@ -138,10 +148,9 @@ export async function getUserTwitchId(
  * @returns Promise with access token or null if failed
  */
 export async function getAppAccessToken(): Promise<string | null> {
-  const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
-  const clientSecret = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET;
+  const credentials = await getTwitchCredentials();
 
-  if (!(clientId && clientSecret)) {
+  if (!(credentials.clientId && credentials.clientSecret)) {
     return null;
   }
 
@@ -152,7 +161,10 @@ export async function getAppAccessToken(): Promise<string | null> {
   }
 
   try {
-    const token = await getAppToken(clientId, clientSecret);
+    const token = await getAppToken(
+      credentials.clientId,
+      credentials.clientSecret
+    );
 
     // Cache the token with expiration
     // Expire 5 minutes before actual expiration for safety margin
@@ -222,12 +234,12 @@ export async function getBroadcasterIdFromUsername(
       return { error: "App access token is required" };
     }
 
-    const clientId = process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID;
-    if (!clientId) {
+    const credentials = await getTwitchCredentials();
+    if (!credentials.clientId) {
       return { error: "Twitch client ID not configured" };
     }
 
-    const apiClient = createAppApiClient(appAccessToken);
+    const apiClient = await createAppApiClient(appAccessToken);
     const users = await apiClient.users.getUsersByNames([username]);
 
     if (users.length === 0) {
@@ -320,7 +332,7 @@ export async function checkFollowStatus(
   broadcasterId: string
 ): Promise<TwitchFollowCheckResult> {
   try {
-    const validation = validateTwitchParameters(
+    const validation = await validateTwitchParameters(
       userAccessToken,
       userId,
       broadcasterId
@@ -332,7 +344,7 @@ export async function checkFollowStatus(
       };
     }
 
-    const apiClient = createApiClient(userAccessToken);
+    const apiClient = await createApiClient(userAccessToken);
     const follow = await apiClient.channels.getChannelFollowers(
       broadcasterId,
       userId
@@ -385,7 +397,7 @@ export async function checkFollowWithAdminToken(
     }
 
     // 2. 管理者（配信者）のトークンでフォロー状態をチェック
-    const apiClient = createApiClient(adminAccessToken);
+    const apiClient = await createApiClient(adminAccessToken);
     const follow = await apiClient.channels.getChannelFollowers(
       broadcasterId,
       participantIdResult.userId
@@ -415,7 +427,7 @@ export async function checkSubStatus(
   broadcasterId: string
 ): Promise<TwitchSubCheckResult> {
   try {
-    const validation = validateTwitchParameters(
+    const validation = await validateTwitchParameters(
       userAccessToken,
       userId,
       broadcasterId
@@ -427,7 +439,7 @@ export async function checkSubStatus(
       };
     }
 
-    const apiClient = createApiClient(userAccessToken);
+    const apiClient = await createApiClient(userAccessToken);
     const subscription = await apiClient.subscriptions.checkUserSubscription(
       userId,
       broadcasterId
@@ -487,7 +499,7 @@ export async function checkSubWithAdminToken(
     }
 
     // 2. 管理者（配信者）のトークンでサブスクリプション状態をチェック
-    const apiClient = createApiClient(adminAccessToken);
+    const apiClient = await createApiClient(adminAccessToken);
     const subscription = await apiClient.subscriptions.checkUserSubscription(
       participantIdResult.userId,
       broadcasterId
