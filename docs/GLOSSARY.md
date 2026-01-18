@@ -97,7 +97,7 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **コード上の命名**:
 - データベースカラム: `spaces.share_key`
 - フォームフィールド: `shareKey`
-- Zodスキーマ: `spaceSchema.shareKey`
+- Zodスキーマ: `createSpaceFormSchema.shareKey`
 - 変数名: `shareKey`
 - 関数名: `checkShareKeyAvailability ()`, `findAvailableShareKey ()`
 - **形式**: `<user-input>-<YYYYMMDD>` (例: `my-party-20251224`)
@@ -238,8 +238,8 @@ Bingifyは**Supabase Authを利用したユーザー認証・ロール管理シ�
 - **日本語**: Zodスキーマ
 - **コード上の命名**:
 - ファイルパス: `lib/schemas/space.ts`
-- スキーマ: `spaceSchema`
-- 型推論: `z.infer<typeof spaceSchema>`
+- スキーマ: `createSpaceFormSchema`, `updateSpaceFormSchema`
+- 型推論: `z.infer<typeof createSpaceFormSchema>`
 - **関連技術**: Server Functions, `useActionState`
 
 ---
