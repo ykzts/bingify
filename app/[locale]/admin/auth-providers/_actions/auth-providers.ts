@@ -124,9 +124,7 @@ export async function updateAuthProvider(
 /**
  * Get OAuth provider configuration (admin only)
  */
-export async function getProviderOAuthConfig(
-  provider: string
-): Promise<{
+export async function getProviderOAuthConfig(provider: string): Promise<{
   clientId?: string | null;
   error?: string;
   hasSecret?: boolean;
@@ -141,7 +139,7 @@ export async function getProviderOAuthConfig(
     const supabase = await createClient();
     const result = await getOAuthProviderConfig(supabase, provider);
 
-    if (!result.success || !result.data) {
+    if (!(result.success && result.data)) {
       return { error: result.error || "errorFetchFailed" };
     }
 

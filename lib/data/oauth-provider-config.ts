@@ -58,7 +58,7 @@ export async function getOAuthProviderConfig(
       success: boolean;
     };
 
-    if (!result.success || !result.data) {
+    if (!(result.success && result.data)) {
       return {
         error: "Failed to get OAuth provider configuration",
         success: false,

@@ -123,10 +123,7 @@ export async function getUserTwitchId(
       };
     }
 
-    const tokenInfo = await getTokenInfo(
-      userAccessToken,
-      credentials.clientId
-    );
+    const tokenInfo = await getTokenInfo(userAccessToken, credentials.clientId);
 
     if (tokenInfo.userId) {
       return { userId: tokenInfo.userId };

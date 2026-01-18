@@ -1,6 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  getGoogleCredentials,
+  getTwitchCredentials,
+} from "@/lib/oauth-credentials";
 import type { Database } from "@/types/supabase";
-import { getGoogleCredentials, getTwitchCredentials } from "@/lib/oauth-credentials";
 import { handleOAuthError } from "./token-error-handler";
 import type { OAuthProvider } from "./token-storage";
 import {

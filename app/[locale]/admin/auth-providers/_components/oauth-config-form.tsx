@@ -14,10 +14,9 @@ import {
 
 interface Props {
   provider: string;
-  providerLabel: string;
 }
 
-export function OAuthConfigForm({ provider, providerLabel }: Props) {
+export function OAuthConfigForm({ provider }: Props) {
   const t = useTranslations("AdminAuthProviders");
   const [clientId, setClientId] = useState("");
   const [clientSecret, setClientSecret] = useState("");

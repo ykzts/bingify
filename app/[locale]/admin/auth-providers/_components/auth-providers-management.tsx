@@ -119,10 +119,7 @@ export function AuthProvidersManagement({ providers }: Props) {
                     <h4 className="mb-3 font-medium text-sm">
                       {t("oauthConfigTitle")}
                     </h4>
-                    <OAuthConfigForm
-                      provider={provider.provider}
-                      providerLabel={provider.label || provider.provider}
-                    />
+                    <OAuthConfigForm provider={provider.provider} />
                   </div>
                 )}
             </div>
