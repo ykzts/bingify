@@ -122,7 +122,7 @@ export async function getOAuthCredentials(
         };
       }
     }
-  } catch (error) {
+  } catch (_error) {
     // Database unavailable or RPC doesn't exist - fall through to env vars
   }
 

@@ -48,7 +48,7 @@ export async function getTwitchCredentials(): Promise<{
     });
 
     return result;
-  } catch (error) {
+  } catch (_error) {
     // Silent fallback to environment variables
     // This happens when:
     // - createAdminClient() fails (missing env vars in tests)
@@ -102,7 +102,7 @@ export async function getGoogleCredentials(): Promise<{
     });
 
     return result;
-  } catch (error) {
+  } catch (_error) {
     // Silent fallback to environment variables
     // This happens when:
     // - createAdminClient() fails (missing env vars in tests)
