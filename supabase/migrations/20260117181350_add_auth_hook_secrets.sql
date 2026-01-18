@@ -1,10 +1,11 @@
 -- Create auth_hook_secrets table in private schema with Vault encryption
--- This table stores the send_email hook secret for Supabase Auth webhook signature verification
+-- This table stores secrets for various Supabase Auth hooks
 
 -- Create auth_hook_secrets table in private schema
--- This is a singleton table (only one row allowed)
 CREATE TABLE IF NOT EXISTS private.auth_hook_secrets (
-  id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  -- Hook name (e.g., 'send-email-hook', 'before-user-created-hook')
+  hook_name TEXT NOT NULL UNIQUE,
   -- Store Vault secret ID instead of plaintext secret
   -- The actual secret is encrypted in Supabase Vault and only UUID reference is stored here
   secret_id UUID NOT NULL,
@@ -84,6 +85,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON private.auth_hook_secrets TO authenticat
 
 -- Create RPC function to upsert auth hook secret with Vault encryption
 CREATE OR REPLACE FUNCTION public.upsert_auth_hook_secret(
+  p_hook_name TEXT,
   p_secret TEXT
 ) RETURNS JSONB
 SECURITY DEFINER
@@ -109,6 +111,11 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
   END IF;
 
+  -- Validate hook name
+  IF p_hook_name IS NULL OR p_hook_name = '' THEN
+    RETURN jsonb_build_object('success', false, 'error', 'Hook name cannot be empty');
+  END IF;
+
   -- Validate secret format (must start with v1,whsec_)
   IF p_secret IS NULL OR p_secret = '' THEN
     RETURN jsonb_build_object('success', false, 'error', 'Secret cannot be empty');
@@ -122,7 +129,7 @@ BEGIN
   SELECT secret_id
   INTO v_existing_secret_id
   FROM private.auth_hook_secrets
-  WHERE id = 1;
+  WHERE hook_name = p_hook_name;
 
   -- Update or create secret in Vault
   IF v_existing_secret_id IS NOT NULL THEN
@@ -151,10 +158,10 @@ BEGIN
     END IF;
   END IF;
 
-  -- Upsert the secret record (singleton)
-  INSERT INTO private.auth_hook_secrets (id, secret_id)
-  VALUES (1, v_secret_id)
-  ON CONFLICT (id)
+  -- Upsert the secret record
+  INSERT INTO private.auth_hook_secrets (hook_name, secret_id)
+  VALUES (p_hook_name, v_secret_id)
+  ON CONFLICT (hook_name)
   DO UPDATE SET
     secret_id = EXCLUDED.secret_id,
     updated_at = NOW();
@@ -177,8 +184,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create RPC function to get auth hook secret with Vault decryption
-CREATE OR REPLACE FUNCTION public.get_auth_hook_secret()
-RETURNS JSONB
+CREATE OR REPLACE FUNCTION public.get_auth_hook_secret(
+  p_hook_name TEXT
+) RETURNS JSONB
 SECURITY DEFINER
 SET search_path = public, private, vault, pg_temp
 AS $$
@@ -201,10 +209,15 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
   END IF;
 
+  -- Validate hook name
+  IF p_hook_name IS NULL OR p_hook_name = '' THEN
+    RETURN jsonb_build_object('success', false, 'error', 'Hook name cannot be empty');
+  END IF;
+
   -- Get secret record
   SELECT * INTO v_secret_record
   FROM private.auth_hook_secrets
-  WHERE id = 1;
+  WHERE hook_name = p_hook_name;
 
   IF NOT FOUND THEN
     RETURN jsonb_build_object('success', false, 'error', 'Secret not found');
@@ -230,7 +243,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create RPC function to delete auth hook secret and clean up Vault
-CREATE OR REPLACE FUNCTION public.delete_auth_hook_secret()
+CREATE OR REPLACE FUNCTION public.delete_auth_hook_secret(
+  p_hook_name TEXT
+)
 RETURNS JSONB
 SECURITY DEFINER
 SET search_path = public, private, vault, pg_temp
@@ -253,11 +268,16 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
   END IF;
 
+  -- Validate hook name
+  IF p_hook_name IS NULL OR p_hook_name = '' THEN
+    RETURN jsonb_build_object('success', false, 'error', 'Hook name cannot be empty');
+  END IF;
+
   -- Get secret ID before deletion
   SELECT secret_id
   INTO v_secret_id
   FROM private.auth_hook_secrets
-  WHERE id = 1;
+  WHERE hook_name = p_hook_name;
 
   IF NOT FOUND THEN
     RETURN jsonb_build_object('success', false, 'error', 'Secret not found');
@@ -265,7 +285,7 @@ BEGIN
 
   -- Delete the secret record
   DELETE FROM private.auth_hook_secrets
-  WHERE id = 1;
+  WHERE hook_name = p_hook_name;
 
   -- Clean up Vault secret
   IF v_secret_id IS NOT NULL THEN
@@ -280,6 +300,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Grant execute permissions on RPC functions
-GRANT EXECUTE ON FUNCTION public.upsert_auth_hook_secret(TEXT) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.get_auth_hook_secret() TO authenticated;
-GRANT EXECUTE ON FUNCTION public.delete_auth_hook_secret() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.upsert_auth_hook_secret(TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_auth_hook_secret(TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.delete_auth_hook_secret(TEXT) TO authenticated;

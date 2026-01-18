@@ -15,17 +15,14 @@ import {
 } from "../_actions/send-email-hook-secret";
 
 interface Props {
-  initialSecret?: string;
+  hasSecret?: boolean;
   updatedAt?: string;
 }
 
-export function SendEmailHookSecretManagement({
-  initialSecret,
-  updatedAt,
-}: Props) {
+export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
   const t = useTranslations("AdminAuthHooks");
   const confirm = useConfirm();
-  const [secret, setSecret] = useState(initialSecret || "");
+  const [secret, setSecret] = useState("");
   const [showSecret, setShowSecret] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -45,7 +42,7 @@ export function SendEmailHookSecretManagement({
   };
 
   const handleDelete = async () => {
-    if (!initialSecret) {
+    if (!hasSecret) {
       return;
     }
 
@@ -74,7 +71,17 @@ export function SendEmailHookSecretManagement({
   };
 
   const isSecretValid = secret.trim().startsWith("v1,whsec_");
-  const hasChanges = secret !== (initialSecret || "");
+  const hasChanges = secret.trim() !== "";
+
+  const getButtonLabel = () => {
+    if (isUpdating) {
+      return t("saving");
+    }
+    if (hasSecret) {
+      return t("replaceButton");
+    }
+    return t("saveButton");
+  };
 
   return (
     <div className="space-y-6">
@@ -103,7 +110,9 @@ export function SendEmailHookSecretManagement({
               disabled={isUpdating || isDeleting}
               id="secret"
               onChange={(e) => setSecret(e.target.value)}
-              placeholder="v1,whsec_..."
+              placeholder={
+                hasSecret ? t("secretPlaceholderReplace") : "v1,whsec_..."
+              }
               type={showSecret ? "text" : "password"}
               value={secret}
             />
@@ -125,7 +134,9 @@ export function SendEmailHookSecretManagement({
               </span>
             </Button>
           </div>
-          <p className="text-gray-600 text-sm">{t("secretHelp")}</p>
+          <p className="text-gray-600 text-sm">
+            {hasSecret ? t("secretHelpReplace") : t("secretHelp")}
+          </p>
         </div>
 
         {/* Validation Error */}
@@ -136,12 +147,17 @@ export function SendEmailHookSecretManagement({
           </Alert>
         )}
 
-        {/* Last Updated Info */}
-        {updatedAt && initialSecret && (
-          <div className="text-gray-600 text-sm">
-            {t("lastUpdated", {
-              date: new Date(updatedAt).toLocaleString(),
-            })}
+        {/* Secret Status */}
+        {hasSecret && updatedAt && (
+          <div className="rounded-lg bg-green-50 p-3">
+            <p className="font-medium text-green-800 text-sm">
+              {t("secretConfigured")}
+            </p>
+            <p className="mt-1 text-green-700 text-xs">
+              {t("lastUpdated", {
+                date: new Date(updatedAt).toLocaleString(),
+              })}
+            </p>
           </div>
         )}
 
@@ -156,10 +172,10 @@ export function SendEmailHookSecretManagement({
             onClick={handleSave}
             type="button"
           >
-            {isUpdating ? t("saving") : t("saveButton")}
+            {getButtonLabel()}
           </Button>
 
-          {initialSecret && (
+          {hasSecret && (
             <Button
               disabled={isUpdating || isDeleting}
               onClick={handleDelete}

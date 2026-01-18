@@ -14,7 +14,7 @@ export default async function AdminAuthHooksPage({
 
   const t = await getTranslations("AdminAuthHooks");
 
-  const { secret, updatedAt, error } = await getSendEmailHookSecret();
+  const { hasSecret, updatedAt, error } = await getSendEmailHookSecret();
 
   if (error) {
     return (
@@ -35,7 +35,7 @@ export default async function AdminAuthHooksPage({
       </div>
 
       <SendEmailHookSecretManagement
-        initialSecret={secret}
+        hasSecret={hasSecret}
         updatedAt={updatedAt}
       />
     </div>

@@ -39,12 +39,13 @@ async function ensureAdminOrError(): Promise<AdminCheckResult> {
 
 export interface GetSendEmailHookSecretResult {
   error?: string;
-  secret?: string;
+  hasSecret?: boolean;
   updatedAt?: string;
 }
 
 /**
  * Get the send email hook secret from the database (admin only)
+ * Note: Secret value is not returned for security - only existence and metadata
  */
 export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretResult> {
   try {
@@ -56,10 +57,12 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
 
     const supabase = await createClient();
 
-    const { data, error } = await supabase.rpc("get_auth_hook_secret");
+    const { data, error } = await supabase.rpc("get_auth_hook_secret", {
+      p_hook_name: "send-email-hook",
+    });
 
     if (error) {
-      console.error("Error fetching email hook secret:", error);
+      console.error("Error fetching send email hook secret:", error);
       return { error: "errorFetchFailed" };
     }
 
@@ -71,13 +74,13 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
     if (!result?.success) {
       // Secret not found is not an error - it just means it hasn't been set yet
       if (result?.error === "Secret not found") {
-        return { secret: undefined };
+        return { hasSecret: false };
       }
       return { error: result?.error || "errorFetchFailed" };
     }
 
     return {
-      secret: result.data?.secret,
+      hasSecret: true,
       updatedAt: result.data?.updated_at,
     };
   } catch (error) {
@@ -118,6 +121,7 @@ export async function upsertSendEmailHookSecret(
     const supabase = await createClient();
 
     const { data, error } = await supabase.rpc("upsert_auth_hook_secret", {
+      p_hook_name: "send-email-hook",
       p_secret: trimmedSecret,
     });
 
@@ -161,7 +165,9 @@ export async function deleteSendEmailHookSecret(): Promise<DeleteSendEmailHookSe
 
     const supabase = await createClient();
 
-    const { data, error } = await supabase.rpc("delete_auth_hook_secret");
+    const { data, error } = await supabase.rpc("delete_auth_hook_secret", {
+      p_hook_name: "send-email-hook",
+    });
 
     if (error) {
       console.error("Error deleting email hook secret:", error);
