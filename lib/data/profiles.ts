@@ -12,8 +12,8 @@ export interface GetAdminEmailsResult {
 }
 
 /**
- * profiles テーブルから role = 'admin' のユーザーのメールアドレスとロケール情報を取得
- * @returns 管理者のメールアドレスとロケールの配列、またはエラー
+ * profiles テーブルから role = 'admin' のユーザーのメールアドレスと言語設定を取得
+ * @returns 管理者のメールアドレスと言語設定の配列、またはエラー
  */
 export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
   try {
@@ -21,7 +21,7 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
 
     const { data, error } = await adminClient
       .from("profiles")
-      .select("email, full_name, locale")
+      .select("email, full_name, language")
       .eq("role", "admin");
 
     if (error) {
@@ -39,7 +39,7 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
         ): profile is {
           email: string;
           full_name: string | null;
-          locale: string;
+          language: string;
         } => profile.email !== null
       )
       .map(
@@ -50,7 +50,7 @@ export async function getAdminEmails(): Promise<GetAdminEmailsResult> {
                 name: profile.full_name,
               }
             : profile.email,
-          locale: profile.locale, // NOT NULL in database schema with default 'ja'
+          locale: profile.language, // NOT NULL in database schema with default 'ja', synced from user_metadata
         })
       );
 
