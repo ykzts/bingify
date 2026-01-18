@@ -7,6 +7,7 @@ import {
   useStore,
   useTransform,
 } from "@tanstack/react-form-nextjs";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useEffectEvent, useState } from "react";
@@ -23,6 +24,7 @@ import {
 } from "../../_lib/form-options";
 import type { AuthProviderRow } from "../_actions/auth-providers";
 import { updateAuthProvider } from "../_actions/auth-providers";
+import { OAuthConfigForm } from "./oauth-config-form";
 
 interface Props {
   providers: AuthProviderRow[];
@@ -41,6 +43,7 @@ export function IntegratedAuthProvidersForm({
   const [isUpdatingProvider, setIsUpdatingProvider] = useState<string | null>(
     null
   );
+  const [expandedProvider, setExpandedProvider] = useState<string | null>(null);
 
   const form = useForm({
     ...systemSettingsFormOpts,
@@ -115,6 +118,15 @@ export function IntegratedAuthProvidersForm({
     setIsUpdatingProvider(null);
   };
 
+  const toggleExpand = (provider: string) => {
+    setExpandedProvider((prev) => (prev === provider ? null : provider));
+  };
+
+  // Only show OAuth config for google and twitch
+  const hasOAuthConfig = (provider: string) => {
+    return provider === "google" || provider === "twitch";
+  };
+
   // Get provider status from providers array
   const getProviderStatus = (providerName: string): boolean => {
     const provider = providers.find((p) => p.provider === providerName);
@@ -123,7 +135,6 @@ export function IntegratedAuthProvidersForm({
 
   const youtubeEnabled = getProviderStatus("google");
   const twitchEnabled = getProviderStatus("twitch");
-  const emailEnabled = getProviderStatus("email");
 
   return (
     <form
@@ -135,9 +146,9 @@ export function IntegratedAuthProvidersForm({
       <FormErrors errors={formErrors} variant="with-icon" />
 
       {/* YouTube Provider */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between p-6">
+          <div className="flex-1">
             <h3 className="font-semibold text-lg">YouTube</h3>
             <p className="mt-1 text-gray-600 text-sm">
               {t("youtubeProviderDescription")}
@@ -156,9 +167,33 @@ export function IntegratedAuthProvidersForm({
               }
             />
           </div>
+          {hasOAuthConfig("google") && (
+            <Button
+              className="ml-4"
+              onClick={() => toggleExpand("google")}
+              size="sm"
+              type="button"
+              variant="ghost"
+            >
+              {expandedProvider === "google" ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
+          )}
         </div>
 
-        <div className="space-y-4 border-gray-200 border-t pt-4">
+        {hasOAuthConfig("google") && expandedProvider === "google" && (
+          <div className="border-gray-200 border-t bg-gray-50 p-4">
+            <h4 className="mb-3 font-medium text-sm">
+              {t("oauthConfigTitle")}
+            </h4>
+            <OAuthConfigForm provider="google" />
+          </div>
+        )}
+
+        <div className="space-y-4 border-gray-200 border-t p-6 pt-4">
           <h4 className="font-medium text-sm">
             {t("gatekeeperRequirementsTitle")}
           </h4>
@@ -220,9 +255,9 @@ export function IntegratedAuthProvidersForm({
       </div>
 
       {/* Twitch Provider */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between p-6">
+          <div className="flex-1">
             <h3 className="font-semibold text-lg">Twitch</h3>
             <p className="mt-1 text-gray-600 text-sm">
               {t("twitchProviderDescription")}
@@ -241,9 +276,33 @@ export function IntegratedAuthProvidersForm({
               }
             />
           </div>
+          {hasOAuthConfig("twitch") && (
+            <Button
+              className="ml-4"
+              onClick={() => toggleExpand("twitch")}
+              size="sm"
+              type="button"
+              variant="ghost"
+            >
+              {expandedProvider === "twitch" ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
+          )}
         </div>
 
-        <div className="space-y-4 border-gray-200 border-t pt-4">
+        {hasOAuthConfig("twitch") && expandedProvider === "twitch" && (
+          <div className="border-gray-200 border-t bg-gray-50 p-4">
+            <h4 className="mb-3 font-medium text-sm">
+              {t("oauthConfigTitle")}
+            </h4>
+            <OAuthConfigForm provider="twitch" />
+          </div>
+        )}
+
+        <div className="space-y-4 border-gray-200 border-t p-6 pt-4">
           <h4 className="font-medium text-sm">
             {t("gatekeeperRequirementsTitle")}
           </h4>
@@ -307,24 +366,15 @@ export function IntegratedAuthProvidersForm({
       {/* Email Provider */}
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex-1">
             <h3 className="font-semibold text-lg">Email</h3>
             <p className="mt-1 text-gray-600 text-sm">
               {t("emailProviderDescription")}
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Label className="text-sm" htmlFor="provider-email">
-              {emailEnabled ? t("enabled") : t("disabled")}
-            </Label>
-            <Switch
-              checked={emailEnabled}
-              disabled={isUpdatingProvider === "email"}
-              id="provider-email"
-              onCheckedChange={() =>
-                handleProviderToggle("email", emailEnabled)
-              }
-            />
+            <Label className="text-sm">{t("enabled")}</Label>
+            <Switch checked={true} disabled={true} id="provider-email" />
           </div>
         </div>
       </div>
