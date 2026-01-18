@@ -732,7 +732,6 @@
     },
     "phoneChangedNotification": {
       "greeting": "Hello,",
-      "newPhoneLabel": "New Phone Number:",
       "oldPhoneLabel": "Previous Phone Number:",
       "securityNoticeTitle": "Security Notice",
       "securityWarning": "If you didn't make this change, please contact our support team immediately to secure your account.",

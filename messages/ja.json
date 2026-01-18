@@ -708,7 +708,7 @@
       "securityTip3": "認証デバイスまたはバックアップコードを安全な場所に保管してください",
       "securityWarning": "MFAの有効化に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
       "subject": "多要素認証が有効になりました",
-      "successMessage": "アカウントで多要素認証（MFA）が正常に有効化されました。"
+      "successMessage": "アカウントで多要素認証(MFA)が正常に有効化されました。"
     },
     "mfaUnenrolledNotification": {
       "factorTypeLabel": "ファクタータイプ：",
@@ -718,7 +718,7 @@
       "securityNoticeTitle": "セキュリティのお知らせ",
       "securityWarning": "MFAの無効化に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
       "subject": "多要素認証が無効になりました",
-      "warningMessage": "アカウントで多要素認証（MFA）が無効化されました。"
+      "warningMessage": "アカウントで多要素認証(MFA)が無効化されました。"
     },
     "otpCodeLabel": "ボタンが機能しない場合は、このコードを使用してください：",
     "passwordChangedNotification": {
@@ -732,7 +732,6 @@
     },
     "phoneChangedNotification": {
       "greeting": "こんにちは、",
-      "newPhoneLabel": "新しい電話番号：",
       "oldPhoneLabel": "変更前の電話番号：",
       "securityNoticeTitle": "セキュリティのお知らせ",
       "securityWarning": "この変更に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",

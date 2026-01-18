@@ -7,7 +7,6 @@ import { EmailHeader } from "../components/email-header";
 
 export interface PhoneChangedNotificationEmailProps {
   locale?: string;
-  newPhone?: string;
   oldPhone?: string;
 }
 
@@ -17,7 +16,6 @@ export interface PhoneChangedNotificationEmailProps {
  */
 export async function PhoneChangedNotificationEmail({
   locale = "en",
-  newPhone = "",
   oldPhone = "",
 }: PhoneChangedNotificationEmailProps) {
   const t = await getTranslations({
@@ -42,11 +40,6 @@ export async function PhoneChangedNotificationEmail({
             {oldPhone && (
               <Text style={phoneInfoStyle}>
                 {t("oldPhoneLabel")} {oldPhone}
-              </Text>
-            )}
-            {newPhone && (
-              <Text style={phoneInfoStyle}>
-                {t("newPhoneLabel")} {newPhone}
               </Text>
             )}
 

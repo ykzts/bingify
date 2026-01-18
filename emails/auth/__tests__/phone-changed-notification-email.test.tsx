@@ -5,7 +5,6 @@ import { PhoneChangedNotificationEmail } from "../phone-changed-notification-ema
 describe("PhoneChangedNotificationEmail", () => {
   const testProps = {
     locale: "en",
-    newPhone: "+81-90-1234-5678",
     oldPhone: "+81-80-8765-4321",
   };
 
@@ -24,7 +23,6 @@ describe("PhoneChangedNotificationEmail", () => {
       expect(html).toContain("Phone Number Changed");
       expect(html).toContain("Hello,");
       expect(html).toContain("Your phone number has been successfully changed");
-      expect(html).toContain(testProps.newPhone);
       expect(html).toContain(testProps.oldPhone);
     });
 
@@ -41,7 +39,6 @@ describe("PhoneChangedNotificationEmail", () => {
       // コンテンツの確認
       expect(html).toContain("電話番号が変更されました");
       expect(html).toContain("こんにちは、");
-      expect(html).toContain(testProps.newPhone);
       expect(html).toContain(testProps.oldPhone);
     });
 
@@ -64,8 +61,7 @@ describe("PhoneChangedNotificationEmail", () => {
         await PhoneChangedNotificationEmail(propsWithoutOldPhone)
       );
 
-      // 新電話番号のみ表示されていることを確認
-      expect(html).toContain(testProps.newPhone);
+      // 旧電話番号が表示されていないことを確認
       expect(html).not.toContain("Previous Phone Number:");
     });
   });
@@ -103,7 +99,6 @@ describe("PhoneChangedNotificationEmail", () => {
     // テスト環境では実行できないため、Integration Tests で検証してください。
     it("localeが指定されない場合は英語版を表示する", async () => {
       const propsWithoutLocale = {
-        newPhone: testProps.newPhone,
         oldPhone: testProps.oldPhone,
       };
       const html = await render(
