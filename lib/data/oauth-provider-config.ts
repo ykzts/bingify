@@ -41,7 +41,7 @@ export async function getOAuthProviderConfig(
     // Handle undefined or null result (happens in tests when RPC is not mocked)
     if (!result || result === undefined) {
       return {
-        error: "RPC not available",
+        error: "errorRpcNotAvailable",
         success: false,
       };
     }
@@ -50,15 +50,28 @@ export async function getOAuthProviderConfig(
 
     if (error) {
       console.error("Error fetching OAuth provider config:", error);
+
+      // Check if the error is due to missing function (migration not applied)
+      if (
+        error.message?.includes("Could not find the function") ||
+        (error.message?.includes("function") &&
+          error.message?.includes("does not exist"))
+      ) {
+        return {
+          error: "errorMigrationNotApplied",
+          success: false,
+        };
+      }
+
       return {
-        error: error.message,
+        error: "errorFetchFailed",
         success: false,
       };
     }
 
     if (!data || typeof data !== "object") {
       return {
-        error: "Invalid response from server",
+        error: "errorInvalidResponse",
         success: false,
       };
     }
@@ -70,7 +83,7 @@ export async function getOAuthProviderConfig(
 
     if (!(typedResult.success && typedResult.data)) {
       return {
-        error: "Failed to get OAuth provider configuration",
+        error: "errorFetchFailed",
         success: false,
       };
     }
@@ -81,8 +94,21 @@ export async function getOAuthProviderConfig(
     };
   } catch (err) {
     console.error("Error in getOAuthProviderConfig:", err);
+
+    // Check if the error is due to missing function
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    if (
+      errorMsg.includes("Could not find the function") ||
+      (errorMsg.includes("function") && errorMsg.includes("does not exist"))
+    ) {
+      return {
+        error: "errorMigrationNotApplied",
+        success: false,
+      };
+    }
+
     return {
-      error: err instanceof Error ? err.message : "Unknown error",
+      error: "errorGeneric",
       success: false,
     };
   }
