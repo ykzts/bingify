@@ -8,6 +8,7 @@ import {
   useStore,
   useTransform,
 } from "@tanstack/react-form-nextjs";
+import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, AlertTriangle, Check, Dices } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -85,10 +86,22 @@ export function CreateSpaceForm() {
   const t = useTranslations("CreateSpace");
   const [shareKey, setShareKey] = useState("");
   const [debouncedShareKey] = useDebounce(shareKey, 500);
-  const [checking, setChecking] = useState(false);
-  const [available, setAvailable] = useState<boolean | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
+
+  // Use TanStack Query for share key availability check
+  const { data: availabilityData, isPending: isCheckingKey } = useQuery({
+    enabled: debouncedShareKey.length >= 3,
+    queryFn: () => checkShareKeyAvailability(debouncedShareKey),
+    queryKey: ["share-key-availability", debouncedShareKey],
+    retry: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes cache
+  });
+
+  // Detect debouncing state to prevent showing stale availability
+  const isDebouncing = shareKey !== debouncedShareKey && shareKey.length >= 3;
+  const isChecking = isCheckingKey || isDebouncing;
+  const available = isDebouncing ? null : (availabilityData?.available ?? null);
 
   const dateSuffix = formatDateSuffix();
 
@@ -120,30 +133,7 @@ export function CreateSpaceForm() {
 
   const handleShareKeyChange = (normalizedKey: string) => {
     setShareKey(normalizedKey);
-
-    // Reset validation state when shareKey changes and is too short
-    if (!normalizedKey || normalizedKey.length < 3) {
-      setAvailable(null);
-    }
   };
-
-  useEffect(() => {
-    if (!debouncedShareKey || debouncedShareKey.length < 3) {
-      return;
-    }
-
-    const check = async () => {
-      setChecking(true);
-      try {
-        const result = await checkShareKeyAvailability(debouncedShareKey);
-        setAvailable(result.available);
-      } finally {
-        setChecking(false);
-      }
-    };
-
-    check();
-  }, [debouncedShareKey]);
 
   useEffect(() => {
     // Check for successful space creation
@@ -195,7 +185,6 @@ export function CreateSpaceForm() {
             const randomKey = generateRandomKey();
             setShareKey(randomKey);
             field.handleChange(randomKey);
-            setAvailable(null);
           };
 
           return (
@@ -263,7 +252,7 @@ export function CreateSpaceForm() {
               {/* Status indicator */}
               {field.state.value.length >= 3 && (
                 <div className="mt-2 flex items-center gap-2">
-                  {checking && (
+                  {isChecking && (
                     <>
                       <Spinner className="text-gray-400 dark:text-gray-500" />
                       <span className="text-gray-500 text-sm dark:text-gray-400">
@@ -272,7 +261,7 @@ export function CreateSpaceForm() {
                     </>
                   )}
 
-                  {!checking && available === true && (
+                  {!isChecking && available === true && (
                     <>
                       <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
                       <span className="text-green-600 text-sm dark:text-green-400">
@@ -281,7 +270,7 @@ export function CreateSpaceForm() {
                     </>
                   )}
 
-                  {!checking && available === false && (
+                  {!isChecking && available === false && (
                     <>
                       <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                       <span className="text-amber-600 text-sm dark:text-amber-400">
@@ -332,7 +321,6 @@ export function CreateSpaceForm() {
                 );
                 setShareKey(suggestionWithoutDate);
                 form.setFieldValue("share_key", suggestionWithoutDate);
-                setAvailable(null);
               }
             }
           }
@@ -356,7 +344,7 @@ export function CreateSpaceForm() {
           isSubmitting ||
           isPending ||
           isNavigating ||
-          checking ||
+          isChecking ||
           available === false ||
           shareKey.length < 3
         }
