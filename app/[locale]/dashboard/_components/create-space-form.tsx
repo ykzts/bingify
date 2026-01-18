@@ -8,10 +8,11 @@ import {
   useStore,
   useTransform,
 } from "@tanstack/react-form-nextjs";
+import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, AlertTriangle, Check, Dices } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { FormErrors } from "@/components/form-errors";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -85,10 +86,19 @@ export function CreateSpaceForm() {
   const t = useTranslations("CreateSpace");
   const [shareKey, setShareKey] = useState("");
   const [debouncedShareKey] = useDebounce(shareKey, 500);
-  const [isCheckingKey, startTransition] = useTransition();
-  const [available, setAvailable] = useState<boolean | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
+
+  // Use TanStack Query for share key availability check
+  const { data: availabilityData, isPending: isCheckingKey } = useQuery({
+    enabled: Boolean(debouncedShareKey) && debouncedShareKey.length >= 3,
+    queryFn: () => checkShareKeyAvailability(debouncedShareKey),
+    queryKey: ["share-key-availability", debouncedShareKey],
+    retry: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes cache
+  });
+
+  const available = availabilityData?.available ?? null;
 
   const dateSuffix = formatDateSuffix();
 
@@ -120,27 +130,7 @@ export function CreateSpaceForm() {
 
   const handleShareKeyChange = (normalizedKey: string) => {
     setShareKey(normalizedKey);
-
-    // Reset validation state when shareKey changes and is too short
-    if (!normalizedKey || normalizedKey.length < 3) {
-      setAvailable(null);
-    }
   };
-
-  useEffect(() => {
-    if (!debouncedShareKey || debouncedShareKey.length < 3) {
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        const result = await checkShareKeyAvailability(debouncedShareKey);
-        setAvailable(result.available);
-      } catch (error) {
-        console.error("Failed to check share key availability:", error);
-      }
-    });
-  }, [debouncedShareKey]);
 
   useEffect(() => {
     // Check for successful space creation
@@ -192,7 +182,6 @@ export function CreateSpaceForm() {
             const randomKey = generateRandomKey();
             setShareKey(randomKey);
             field.handleChange(randomKey);
-            setAvailable(null);
           };
 
           return (
@@ -329,7 +318,6 @@ export function CreateSpaceForm() {
                 );
                 setShareKey(suggestionWithoutDate);
                 form.setFieldValue("share_key", suggestionWithoutDate);
-                setAvailable(null);
               }
             }
           }
