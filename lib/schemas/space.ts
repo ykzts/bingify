@@ -69,74 +69,6 @@ export function checkEmailAllowed(
   return false;
 }
 
-export const spaceSchema = z.object({
-  shareKey: z
-    .string()
-    .min(3, "3文字以上入力してください")
-    .max(30, "30文字以内で入力してください")
-    .regex(/^[a-z0-9-]+$/, "小文字の英数字とハイフンのみ使用できます"),
-});
-
-// Max participants validation
-export const maxParticipantsSchema = z
-  .number()
-  .int("整数を入力してください")
-  .min(1, "1人以上を指定してください")
-  .max(1000, "最大1000人までです")
-  .default(50);
-
-export const youtubeChannelIdSchema = z
-  .string()
-  .trim()
-  .optional()
-  .refine(
-    (value) =>
-      value === undefined ||
-      value === "" ||
-      YOUTUBE_CHANNEL_ID_REGEX.test(value),
-    {
-      message:
-        "YouTubeチャンネルIDの形式が正しくありません。'UC'で始まる24文字である必要があります。",
-    }
-  );
-
-// Twitch broadcaster ID validation (numeric string)
-export const twitchBroadcasterIdSchema = z
-  .string()
-  .trim()
-  .optional()
-  .refine(
-    (value) =>
-      value === undefined ||
-      value === "" ||
-      TWITCH_BROADCASTER_ID_REGEX.test(value),
-    {
-      message:
-        "Twitch配信者IDの形式が正しくありません。数字のみで入力してください。",
-    }
-  );
-
-// YouTube requirement levels
-export const youtubeRequirementSchema = z.enum([
-  "none",
-  "subscriber",
-  "member",
-]);
-
-// Twitch requirement levels
-export const twitchRequirementSchema = z.enum([
-  "none",
-  "follower",
-  "subscriber",
-]);
-
-export type SpaceFormData = z.infer<typeof spaceSchema>;
-
-// Space status enum
-export const spaceStatusSchema = z.enum(["draft", "active", "closed"]);
-
-export type SpaceStatus = z.infer<typeof spaceStatusSchema>;
-
 // Gatekeeper mode enum
 export const gatekeeperModeSchema = z.enum(["none", "social", "email"]);
 export type GatekeeperMode = z.infer<typeof gatekeeperModeSchema>;
@@ -414,19 +346,3 @@ export const emailAllowlistSchema = z
         "メールアドレスまたはドメインの形式が正しくありません。例: @example.com, user@example.com, example.com",
     }
   );
-
-// Schema for inviting admin by email
-export const inviteAdminSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .email("有効なメールアドレスを入力してください")
-    .transform((email) => email.toLowerCase()),
-});
-
-export type InviteAdminFormData = z.infer<typeof inviteAdminSchema>;
-
-// Schema for removing admin
-export const removeAdminSchema = z.object({
-  adminUserId: z.string().uuid("無効なユーザーIDです"),
-});

@@ -48,20 +48,6 @@ export const TWITCH_FOLLOWER_SCOPE = "user:read:follows";
 export const TWITCH_SUBSCRIPTION_SCOPE = "user:read:subscriptions";
 
 /**
- * Default OAuth scopes for Google authentication (all YouTube features)
- * Used for account linking and scenarios where all scopes are needed
- * Includes both subscription and membership verification scopes
- */
-export const GOOGLE_OAUTH_SCOPES = `${YOUTUBE_SUBSCRIPTION_SCOPE} ${YOUTUBE_MEMBERSHIP_SCOPE}`;
-
-/**
- * Default OAuth scopes for Twitch authentication (all features)
- * Used for account linking and scenarios where all scopes are needed
- * Includes both follower and subscription verification scopes
- */
-export const TWITCH_OAUTH_SCOPES = `${TWITCH_FOLLOWER_SCOPE} ${TWITCH_SUBSCRIPTION_SCOPE}`;
-
-/**
  * Generates OAuth scopes for Google authentication based on system settings
  * Only requests scopes for enabled features
  * @param settings - System settings containing feature flags
