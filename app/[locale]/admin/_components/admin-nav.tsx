@@ -34,6 +34,7 @@ export function AdminNav({ locale }: Props) {
       href: `/${locale}/admin/auth-providers`,
       label: t("navAuthProviders"),
     },
+    { href: `/${locale}/admin/auth-hooks`, label: t("navAuthHooks") },
     { href: `/${locale}/admin/general`, label: t("navGeneral") },
     {
       href: `/${locale}/admin/resource-limits`,
