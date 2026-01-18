@@ -98,7 +98,10 @@ export function CreateSpaceForm() {
     staleTime: 1000 * 60 * 5, // 5 minutes cache
   });
 
-  const available = availabilityData?.available ?? null;
+  // Detect debouncing state to prevent showing stale availability
+  const isDebouncing = shareKey !== debouncedShareKey && shareKey.length >= 3;
+  const isChecking = isCheckingKey || isDebouncing;
+  const available = isDebouncing ? null : (availabilityData?.available ?? null);
 
   const dateSuffix = formatDateSuffix();
 
@@ -249,7 +252,7 @@ export function CreateSpaceForm() {
               {/* Status indicator */}
               {field.state.value.length >= 3 && (
                 <div className="mt-2 flex items-center gap-2">
-                  {isCheckingKey && (
+                  {isChecking && (
                     <>
                       <Spinner className="text-gray-400 dark:text-gray-500" />
                       <span className="text-gray-500 text-sm dark:text-gray-400">
@@ -258,7 +261,7 @@ export function CreateSpaceForm() {
                     </>
                   )}
 
-                  {!isCheckingKey && available === true && (
+                  {!isChecking && available === true && (
                     <>
                       <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
                       <span className="text-green-600 text-sm dark:text-green-400">
@@ -267,7 +270,7 @@ export function CreateSpaceForm() {
                     </>
                   )}
 
-                  {!isCheckingKey && available === false && (
+                  {!isChecking && available === false && (
                     <>
                       <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                       <span className="text-amber-600 text-sm dark:text-amber-400">
@@ -341,7 +344,7 @@ export function CreateSpaceForm() {
           isSubmitting ||
           isPending ||
           isNavigating ||
-          isCheckingKey ||
+          isChecking ||
           available === false ||
           shareKey.length < 3
         }
