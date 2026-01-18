@@ -1,7 +1,5 @@
-"use client";
-
 import { Globe, Users, Zap } from "lucide-react";
-import { motion } from "motion/react";
+import { AnimateOnScroll } from "@/components/animate-on-scroll";
 
 interface FeaturesProps {
   communityDescription: string;
@@ -45,63 +43,47 @@ export function Features({
   return (
     <section className="px-6 py-20">
       <div className="mx-auto max-w-6xl">
-        <motion.div
-          className="mb-12 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          whileInView={{ opacity: 1, y: 0 }}
-        >
+        <AnimateOnScroll className="mb-12 animate-fade-in-up text-center">
           <h2 className="mb-4 font-bold text-3xl text-foreground sm:text-4xl">
             {heading}
           </h2>
           <p className="text-lg text-muted-foreground">{subheading}</p>
-        </motion.div>
+        </AnimateOnScroll>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <motion.div
-                aria-labelledby={`feature-title-${index}`}
-                className="group relative overflow-hidden rounded-2xl border border-border bg-card p-8 shadow-sm transition-shadow hover:shadow-xl"
-                initial={{ opacity: 0, y: 20 }}
+              <AnimateOnScroll
+                className="h-full animate-fade-in-up"
                 key={feature.title}
-                role="article"
-                transition={{ delay: index * 0.2, duration: 0.6 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.05, y: -5 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                style={
+                  {
+                    "--animation-delay": `${index * 200}ms`,
+                  } as React.CSSProperties
+                }
               >
-                <motion.div
-                  className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/10"
-                  transition={{
-                    duration: 0.6,
-                    type: "spring",
-                  }}
-                  whileHover={{ rotate: 360 }}
+                <article
+                  aria-labelledby={`feature-title-${index}`}
+                  className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:-translate-y-1 hover:scale-105 hover:shadow-xl"
                 >
-                  <Icon className="h-7 w-7 text-primary" />
-                </motion.div>
+                  <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 transition-transform duration-600 group-hover:rotate-360">
+                    <Icon className="h-7 w-7 text-primary" />
+                  </div>
 
-                <h3
-                  className="mb-3 font-bold text-card-foreground text-xl"
-                  id={`feature-title-${index}`}
-                >
-                  {feature.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
+                  <h3
+                    className="mb-3 font-bold text-card-foreground text-xl"
+                    id={`feature-title-${index}`}
+                  >
+                    {feature.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
 
-                <motion.div
-                  className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-secondary/10"
-                  initial={{ scale: 0 }}
-                  transition={{ delay: index * 0.2 + 0.3, duration: 0.6 }}
-                  viewport={{ once: true }}
-                  whileInView={{ scale: 1 }}
-                />
-              </motion.div>
+                  <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-secondary/10" />
+                </article>
+              </AnimateOnScroll>
             );
           })}
         </div>
