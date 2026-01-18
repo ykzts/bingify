@@ -1,12 +1,13 @@
 import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
+import { getCronSecretForAuth } from "@/lib/cron/get-secret";
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: クリーンアップ処理は複数のステップを含むため複雑度が高い
 export async function GET(request: NextRequest) {
   try {
     // Cron秘密鍵による認証を検証
     const authHeader = request.headers.get("authorization");
-    const cronSecret = process.env.CRON_SECRET;
+    const cronSecret = await getCronSecretForAuth();
 
     if (!cronSecret) {
       if (process.env.NODE_ENV !== "development") {
