@@ -40,10 +40,6 @@ export function AdminNav({ locale }: Props) {
       href: `/${locale}/admin/resource-limits`,
       label: t("navResourceLimits"),
     },
-    {
-      href: `/${locale}/admin/expiration-archive`,
-      label: t("navExpirationArchive"),
-    },
     { href: `/${locale}/admin/gatekeeper`, label: t("navGatekeeper") },
   ];
 
