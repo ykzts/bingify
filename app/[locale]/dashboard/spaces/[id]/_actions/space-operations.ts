@@ -1,6 +1,5 @@
 "use server";
 
-import type { CalledNumber } from "@/hooks/use-called-numbers";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
 
@@ -94,34 +93,6 @@ export async function callNumber(
       error: "An error occurred",
       success: false,
     };
-  }
-}
-
-export async function getCalledNumbers(
-  spaceId: string
-): Promise<CalledNumber[]> {
-  try {
-    if (!isValidUUID(spaceId)) {
-      return [];
-    }
-
-    const supabase = await createClient();
-
-    const { data, error } = await supabase
-      .from("called_numbers")
-      .select("id, space_id, value, called_at")
-      .eq("space_id", spaceId)
-      .order("called_at", { ascending: true });
-
-    if (error) {
-      console.error("Error fetching called numbers:", error);
-      return [];
-    }
-
-    return data || [];
-  } catch (error) {
-    console.error("Error getting called numbers:", error);
-    return [];
   }
 }
 
