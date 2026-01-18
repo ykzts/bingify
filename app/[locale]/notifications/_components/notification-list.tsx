@@ -34,13 +34,18 @@ interface NotificationListProps {
 }
 
 /**
+ * スケルトンローディング用の静的配列
+ * レンダリングごとの配列生成を回避
+ */
+const SKELETON_ITEMS = Array.from({ length: 5 }, (_, i) => i);
+
+/**
  * ローディングスケルトン
  */
 function LoadingSkeleton() {
   return (
     <div className="space-y-4">
-      {[...new Array(5)].map((_, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: スケルトンローディング用
+      {SKELETON_ITEMS.map((i) => (
         <div className="flex gap-4 rounded-lg border p-4" key={i}>
           <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200" />
           <div className="flex-1 space-y-2">
