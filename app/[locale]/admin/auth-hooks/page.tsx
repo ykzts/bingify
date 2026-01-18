@@ -20,9 +20,7 @@ export default async function AdminAuthHooksPage({
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          {t(error, { default: t("errorGeneric") })}
-        </AlertDescription>
+        <AlertDescription>{error}</AlertDescription>
       </Alert>
     );
   }

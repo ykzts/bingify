@@ -33,7 +33,7 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
     const result = await upsertSendEmailHookSecret(secret);
 
     if (result.error) {
-      toast.error(t(result.error, { default: t("errorGeneric") }));
+      toast.error(result.error);
     } else {
       toast.success(t("saveSuccess"));
     }
@@ -61,7 +61,7 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
     const result = await deleteSendEmailHookSecret();
 
     if (result.error) {
-      toast.error(t(result.error, { default: t("errorGeneric") }));
+      toast.error(result.error);
     } else {
       toast.success(t("deleteSuccess"));
       setSecret("");

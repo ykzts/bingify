@@ -15,7 +15,9 @@ async function getEmailHookSecret(): Promise<string | null> {
   try {
     // Try to get secret from database first
     const supabase = await createClient();
-    const { data, error } = await supabase.rpc("get_auth_hook_secret");
+    const { data, error } = await supabase.rpc("get_auth_hook_secret", {
+      p_hook_name: "send-email-hook",
+    });
 
     if (!error && data) {
       // Type assertion for the RPC result

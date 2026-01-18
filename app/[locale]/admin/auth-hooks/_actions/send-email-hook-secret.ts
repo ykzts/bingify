@@ -2,10 +2,14 @@
 
 import type { User } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 
+// Constant for "Secret not found" error message from RPC
+const AUTH_HOOK_SECRET_NOT_FOUND = "Secret not found";
+
 interface AdminCheckResult {
-  error?: "errorUnauthorized" | "errorNoPermission";
+  error?: string;
   user?: User;
 }
 
@@ -14,6 +18,7 @@ interface AdminCheckResult {
  * @returns Object with either user or error
  */
 async function ensureAdminOrError(): Promise<AdminCheckResult> {
+  const t = await getTranslations("AdminAuthHooks");
   const supabase = await createClient();
 
   const {
@@ -21,7 +26,7 @@ async function ensureAdminOrError(): Promise<AdminCheckResult> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "errorUnauthorized" };
+    return { error: t("errorUnauthorized") };
   }
 
   const { data: profile } = await supabase
@@ -31,7 +36,7 @@ async function ensureAdminOrError(): Promise<AdminCheckResult> {
     .single();
 
   if (profile?.role !== "admin") {
-    return { error: "errorNoPermission" };
+    return { error: t("errorNoPermission") };
   }
 
   return { user };
@@ -48,6 +53,8 @@ export interface GetSendEmailHookSecretResult {
  * Note: Secret value is not returned for security - only existence and metadata
  */
 export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretResult> {
+  const t = await getTranslations("AdminAuthHooks");
+
   try {
     // Admin check required
     const adminCheck = await ensureAdminOrError();
@@ -63,7 +70,7 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
 
     if (error) {
       console.error("Error fetching send email hook secret:", error);
-      return { error: "errorFetchFailed" };
+      return { error: t("errorFetchFailed") };
     }
 
     // Type assertion for the RPC result
@@ -73,10 +80,10 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
 
     if (!result?.success) {
       // Secret not found is not an error - it just means it hasn't been set yet
-      if (result?.error === "Secret not found") {
+      if (result?.error === AUTH_HOOK_SECRET_NOT_FOUND) {
         return { hasSecret: false };
       }
-      return { error: result?.error || "errorFetchFailed" };
+      return { error: result?.error || t("errorFetchFailed") };
     }
 
     return {
@@ -85,7 +92,7 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
     };
   } catch (error) {
     console.error("Error in getSendEmailHookSecret:", error);
-    return { error: "errorGeneric" };
+    return { error: t("errorGeneric") };
   }
 }
 
@@ -100,6 +107,8 @@ export interface UpsertSendEmailHookSecretResult {
 export async function upsertSendEmailHookSecret(
   secret: string
 ): Promise<UpsertSendEmailHookSecretResult> {
+  const t = await getTranslations("AdminAuthHooks");
+
   try {
     // Admin check required
     const adminCheck = await ensureAdminOrError();
@@ -109,13 +118,13 @@ export async function upsertSendEmailHookSecret(
 
     // Validate secret format on the server side
     if (!secret || secret.trim() === "") {
-      return { error: "errorEmptySecret" };
+      return { error: t("errorEmptySecret") };
     }
 
     const trimmedSecret = secret.trim();
 
     if (!trimmedSecret.startsWith("v1,whsec_")) {
-      return { error: "errorInvalidFormat" };
+      return { error: t("errorInvalidFormat") };
     }
 
     const supabase = await createClient();
@@ -127,14 +136,14 @@ export async function upsertSendEmailHookSecret(
 
     if (error) {
       console.error("Error upserting email hook secret:", error);
-      return { error: "errorUpsertFailed" };
+      return { error: t("errorUpsertFailed") };
     }
 
     // Type assertion for the RPC result
     const result = data as { success: boolean; error?: string };
 
     if (!result?.success) {
-      return { error: result?.error || "errorUpsertFailed" };
+      return { error: result?.error || t("errorUpsertFailed") };
     }
 
     // Revalidate the email hook page
@@ -143,7 +152,7 @@ export async function upsertSendEmailHookSecret(
     return { success: true };
   } catch (error) {
     console.error("Error in upsertSendEmailHookSecret:", error);
-    return { error: "errorGeneric" };
+    return { error: t("errorGeneric") };
   }
 }
 
@@ -156,6 +165,8 @@ export interface DeleteSendEmailHookSecretResult {
  * Delete the send email hook secret (admin only)
  */
 export async function deleteSendEmailHookSecret(): Promise<DeleteSendEmailHookSecretResult> {
+  const t = await getTranslations("AdminAuthHooks");
+
   try {
     // Admin check required
     const adminCheck = await ensureAdminOrError();
@@ -171,14 +182,14 @@ export async function deleteSendEmailHookSecret(): Promise<DeleteSendEmailHookSe
 
     if (error) {
       console.error("Error deleting email hook secret:", error);
-      return { error: "errorDeleteFailed" };
+      return { error: t("errorDeleteFailed") };
     }
 
     // Type assertion for the RPC result
     const result = data as { success: boolean; error?: string };
 
     if (!result?.success) {
-      return { error: result?.error || "errorDeleteFailed" };
+      return { error: result?.error || t("errorDeleteFailed") };
     }
 
     // Revalidate the email hook page
@@ -187,6 +198,6 @@ export async function deleteSendEmailHookSecret(): Promise<DeleteSendEmailHookSe
     return { success: true };
   } catch (error) {
     console.error("Error in deleteSendEmailHookSecret:", error);
-    return { error: "errorGeneric" };
+    return { error: t("errorGeneric") };
   }
 }
