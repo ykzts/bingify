@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { AuthHookPayloadSchema } from "@/lib/schemas/auth-hook";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getAbsoluteUrl } from "@/lib/utils/url";
 import {
   handleEmailAction,
@@ -13,8 +13,10 @@ import {
  */
 async function getEmailHookSecret(): Promise<string | null> {
   try {
-    // Try to get secret from database first
-    const supabase = await createClient();
+    // Try to get secret from database first using service role client
+    // We use service role here because this webhook is called by Supabase Auth
+    // without user authentication
+    const supabase = createAdminClient();
     const { data, error } = await supabase.rpc("get_auth_hook_secret", {
       p_hook_name: "send-email-hook",
     });
