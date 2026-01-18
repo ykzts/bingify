@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>OAuth Config UI Preview</title>
+    <style>
+    body {
+      font-family: system-ui;
+      padding: 20px;
+      background: #f9fafb;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      color: #111827;
+      margin-bottom: 16px;
+    }
+    .provider-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .provider-header {
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .provider-content {
+      padding: 16px;
+      background: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+    }
+    input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+    }
+    .description {
+      color: #6b7280;
+      font-size: 0.875rem;
+      margin-top: 4px;
+    }
+    button {
+      background: #7c3aed;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .switch {
+      width: 44px;
+      height: 24px;
+      background: #d1d5db;
+      border-radius: 12px;
+      position: relative;
+    }
+    .switch.on {
+      background: #7c3aed;
+    }
+    .switch::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: 0.3s;
+    }
+    .switch.on::after {
+      left: 22px;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Authentication Providers</h2>
+      <p class="description">
+        Manage which authentication providers are available on the login page
+      </p>
+
+      <div style="margin-top: 24px;">
+        <h3 style="margin-bottom: 16px;">Available Authentication Providers</h3>
+
+        <div class="provider-card">
+          <div class="provider-header">
+            <div>
+              <div style="font-weight: 500;">Google</div>
+              <div class="description">Provider ID: google</div>
+              <div class="description" style="margin-top: 4px;">
+                Client ID configured
+              </div>
+            </div>
+            <div class="toggle">
+              <span>Enabled</span>
+              <div class="switch on"></div>
+            </div>
+          </div>
+          <div class="provider-content">
+            <h4
+              style="margin-bottom: 12px; font-size: 0.875rem; font-weight: 500;"
+            >
+              OAuth Configuration
+            </h4>
+
+            <div class="form-group">
+              <label>Client ID</label>
+              <input
+                type="text"
+                placeholder="Enter OAuth Client ID"
+                value="123456789.apps.googleusercontent.com"
+              >
+              <div class="description">
+                OAuth Client ID from the provider's developer console
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Client Secret</label>
+              <input
+                type="password"
+                placeholder="Enter new secret to update (leave empty to keep existing)"
+                value="••••••••"
+              >
+              <div class="description">
+                Leave empty to keep existing secret, or enter new secret to
+                update
+              </div>
+            </div>
+
+            <button>💾 Save Configuration</button>
+          </div>
+        </div>
+
+        <div class="provider-card">
+          <div class="provider-header">
+            <div>
+              <div style="font-weight: 500;">Twitch</div>
+              <div class="description">Provider ID: twitch</div>
+            </div>
+            <div class="toggle">
+              <span>Enabled</span>
+              <div class="switch on"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

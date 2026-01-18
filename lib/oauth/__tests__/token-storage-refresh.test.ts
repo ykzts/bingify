@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { clearCredentialsCache } from "@/lib/oauth-credentials";
 import type { Database } from "@/types/supabase";
 import {
   getOAuthTokenForUserWithRefresh,
@@ -29,6 +30,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 describe("Token Storage with Auto-Refresh", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearCredentialsCache();
     mockAdminClient = createMockSupabase();
     // 環境変数のモック
     process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID = "google-client-id";
@@ -87,6 +89,15 @@ describe("Token Storage with Auto-Refresh", () => {
         },
         error: null,
       });
+
+      // mockAdminClient.rpc用のモック (for get_oauth_provider_config)
+      vi.mocked(mockAdminClient.rpc).mockResolvedValueOnce({
+        // get_oauth_provider_config - no config in DB, will fall back to env vars
+        data: {
+          success: false,
+        },
+        error: null,
+      } as never);
 
       // RPC呼び出しを順番にモック
       let rpcCallCount = 0;
@@ -293,9 +304,11 @@ describe("Token Storage with Auto-Refresh", () => {
       const expiredTime = new Date(Date.now() - 10 * 60 * 1000).toISOString();
       const newExpiresAt = new Date(Date.now() + 7200 * 1000).toISOString();
 
-      // 1回目: 期限切れトークンを返す
-      // 2回目: upsert成功
-      // 3回目: リフレッシュ後の新しいトークンを返す
+      // RPC calls in order:
+      // 1. get_oauth_token_for_user - return expired token
+      // 2. get_oauth_provider_config (for refreshTwitchToken getTwitchCredentials) - return empty config
+      // 3. upsert_oauth_token_for_user - return success
+      // 4. get_oauth_token_for_user - return refreshed token
       vi.mocked(mockAdminClient.rpc)
         .mockResolvedValueOnce({
           data: {
@@ -306,6 +319,13 @@ describe("Token Storage with Auto-Refresh", () => {
               refresh_token: "refresh_token",
             },
             success: true,
+          },
+          error: null,
+        })
+        .mockResolvedValueOnce({
+          // get_oauth_provider_config (2nd call during refresh) - no config in DB
+          data: {
+            success: false,
           },
           error: null,
         })
@@ -343,6 +363,7 @@ describe("Token Storage with Auto-Refresh", () => {
         "twitch"
       );
 
+      console.log("Test result:", JSON.stringify(result, null, 2));
       expect(result.success).toBe(true);
       expect(result.access_token).toBe("new_token");
       expect(global.fetch).toHaveBeenCalledWith(

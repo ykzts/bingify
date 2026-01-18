@@ -291,7 +291,6 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
-          language: string
           role: string
           updated_at: string | null
         }
@@ -302,7 +301,6 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
-          language?: string
           role?: string
           updated_at?: string | null
         }
@@ -313,7 +311,6 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
-          language?: string
           role?: string
           updated_at?: string | null
         }
@@ -529,6 +526,8 @@ export type Database = {
       }
       system_auth_providers: {
         Row: {
+          client_id: string | null
+          client_secret_id: string | null
           created_at: string | null
           is_enabled: boolean
           label: string | null
@@ -536,6 +535,8 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          client_id?: string | null
+          client_secret_id?: string | null
           created_at?: string | null
           is_enabled?: boolean
           label?: string | null
@@ -543,6 +544,8 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          client_id?: string | null
+          client_secret_id?: string | null
           created_at?: string | null
           is_enabled?: boolean
           label?: string | null
@@ -723,6 +726,10 @@ export type Database = {
         }[]
       }
       delete_auth_hook_secret: { Args: { p_hook_name: string }; Returns: Json }
+      delete_oauth_provider_config: {
+        Args: { p_provider: string }
+        Returns: Json
+      }
       delete_oauth_token: { Args: { p_provider: string }; Returns: Json }
       delete_oauth_token_for_user: {
         Args: { p_provider: string; p_user_id: string }
@@ -739,6 +746,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_oauth_provider_config: { Args: { p_provider: string }; Returns: Json }
       get_oauth_token: { Args: { p_provider: string }; Returns: Json }
       get_oauth_token_for_user: {
         Args: { p_provider: string; p_user_id: string }
@@ -763,6 +771,14 @@ export type Database = {
       }
       upsert_auth_hook_secret: {
         Args: { p_hook_name: string; p_secret: string }
+        Returns: Json
+      }
+      upsert_oauth_provider_config: {
+        Args: {
+          p_client_id: string
+          p_client_secret?: string
+          p_provider: string
+        }
         Returns: Json
       }
       upsert_oauth_token: {
