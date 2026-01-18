@@ -6,9 +6,9 @@ vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(() => {
     const translations: Record<string, string> = {
       errorFetchFailed: "Failed to fetch settings",
-      errorNoData: "No data found",
-      errorInvalidData: "Invalid data",
       errorGeneric: "An error occurred",
+      errorInvalidData: "Invalid data",
+      errorNoData: "No data found",
     };
     return (key: string) => translations[key] || key;
   }),
