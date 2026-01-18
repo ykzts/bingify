@@ -321,7 +321,6 @@ export async function handleEmailAction(
           locale === "ja" ? "電話番号が変更されました" : "Phone Number Changed",
         template: React.createElement(PhoneChangedNotificationEmail, {
           locale,
-          newPhone: userEmail,
           oldPhone: emailData.old_phone,
         }),
       });
