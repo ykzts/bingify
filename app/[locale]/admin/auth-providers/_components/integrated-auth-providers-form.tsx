@@ -364,8 +364,8 @@ export function IntegratedAuthProvidersForm({
       </div>
 
       {/* Email Provider */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between p-6">
           <div className="flex-1">
             <h3 className="font-semibold text-lg">Email</h3>
             <p className="mt-1 text-gray-600 text-sm">
@@ -376,6 +376,32 @@ export function IntegratedAuthProvidersForm({
             <Label className="text-sm">{t("enabled")}</Label>
             <Switch checked={true} disabled={true} id="provider-email" />
           </div>
+        </div>
+
+        <div className="space-y-4 border-gray-200 border-t p-6 pt-4">
+          <h4 className="font-medium text-sm">
+            {t("gatekeeperRequirementsTitle")}
+          </h4>
+
+          <form.Field name="features.gatekeeper.email.enabled">
+            {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
+            {(field: any) => (
+              <div className="flex items-center justify-between">
+                <Label className="cursor-pointer" htmlFor="email-gatekeeper">
+                  {tSettings("gatekeeperEmailLabel")}
+                </Label>
+                <Switch
+                  checked={field.state.value as boolean}
+                  disabled={isSubmitting}
+                  id="email-gatekeeper"
+                  name={field.name}
+                  onCheckedChange={(checked) =>
+                    field.handleChange(checked === true)
+                  }
+                />
+              </div>
+            )}
+          </form.Field>
         </div>
       </div>
 
