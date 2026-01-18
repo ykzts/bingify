@@ -115,6 +115,7 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
               value={secret}
             />
             <Button
+              aria-pressed={showSecret}
               className="absolute top-1/2 right-2 -translate-y-1/2"
               disabled={isUpdating || isDeleting}
               onClick={() => setShowSecret(!showSecret)}

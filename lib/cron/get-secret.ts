@@ -22,6 +22,9 @@ export async function getCronSecretForAuth(): Promise<string | null> {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!(supabaseUrl && supabaseServiceKey)) {
+      console.warn(
+        "getCronSecretForAuth: Missing Supabase configuration (NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY). Cannot fetch cron secret from database."
+      );
       return null;
     }
 
