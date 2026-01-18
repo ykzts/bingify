@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { clearCredentialsCache } from "@/lib/oauth-credentials";
 import type { Database } from "@/types/supabase";
 // biome-ignore lint/performance/noNamespaceImport: Used in test mocks for clarity
 import * as errorHandler from "../token-error-handler";
@@ -39,6 +40,7 @@ global.fetch = vi.fn();
 describe("Token Refresh", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearCredentialsCache();
     // 環境変数のモック
     process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID = "google-client-id";
     process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET = "google-client-secret";

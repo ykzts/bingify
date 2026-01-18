@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { clearCredentialsCache } from "../oauth-credentials";
 import {
   checkFollowStatus,
   checkSubStatus,
@@ -39,6 +40,8 @@ describe("getUserTwitchId", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    clearCredentialsCache();
+    clearCredentialsCache();
     process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "test_client_id";
   });
 
@@ -118,6 +121,7 @@ describe("checkFollowStatus", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    clearCredentialsCache();
     process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "test_client_id";
   });
 
@@ -217,6 +221,7 @@ describe("checkSubStatus", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    clearCredentialsCache();
     process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "test_client_id";
   });
 
@@ -409,6 +414,7 @@ describe("getBroadcasterIdFromUsername", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    clearCredentialsCache();
     process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID = "test_client_id";
   });
 

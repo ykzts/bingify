@@ -34,9 +34,19 @@ export async function getOAuthProviderConfig(
   provider: string
 ): Promise<OAuthProviderConfigResult> {
   try {
-    const { data, error } = await supabase.rpc("get_oauth_provider_config", {
+    const result = await supabase.rpc("get_oauth_provider_config", {
       p_provider: provider,
     });
+
+    // Handle undefined or null result (happens in tests when RPC is not mocked)
+    if (!result || result === undefined) {
+      return {
+        error: "RPC not available",
+        success: false,
+      };
+    }
+
+    const { data, error } = result;
 
     if (error) {
       console.error("Error fetching OAuth provider config:", error);
@@ -53,12 +63,12 @@ export async function getOAuthProviderConfig(
       };
     }
 
-    const result = data as unknown as {
+    const typedResult = data as unknown as {
       data?: OAuthProviderConfig;
       success: boolean;
     };
 
-    if (!(result.success && result.data)) {
+    if (!(typedResult.success && typedResult.data)) {
       return {
         error: "Failed to get OAuth provider configuration",
         success: false,
@@ -66,7 +76,7 @@ export async function getOAuthProviderConfig(
     }
 
     return {
-      data: result.data,
+      data: typedResult.data,
       success: true,
     };
   } catch (err) {
@@ -97,19 +107,23 @@ export async function getOAuthCredentials(
   clientId: string | null;
   clientSecret: string | null;
 }> {
-  // Try to get from database first
-  const configResult = await getOAuthProviderConfig(supabase, provider);
+  try {
+    // Try to get from database first
+    const configResult = await getOAuthProviderConfig(supabase, provider);
 
-  if (configResult.success && configResult.data) {
-    const { client_id, client_secret } = configResult.data;
+    if (configResult.success && configResult.data) {
+      const { client_id, client_secret } = configResult.data;
 
-    // If both are set in database, use them
-    if (client_id && client_secret) {
-      return {
-        clientId: client_id,
-        clientSecret: client_secret,
-      };
+      // If both are set in database, use them
+      if (client_id && client_secret) {
+        return {
+          clientId: client_id,
+          clientSecret: client_secret,
+        };
+      }
     }
+  } catch (error) {
+    // Database unavailable or RPC doesn't exist - fall through to env vars
   }
 
   // Fallback to environment variables

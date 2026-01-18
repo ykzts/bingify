@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { clearCredentialsCache } from "@/lib/oauth-credentials";
 import type { Database } from "@/types/supabase";
 import {
   getOAuthTokenForUserWithRefresh,
@@ -29,6 +30,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 describe("Token Storage with Auto-Refresh", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearCredentialsCache();
     mockAdminClient = createMockSupabase();
     // 環境変数のモック
     process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID = "google-client-id";

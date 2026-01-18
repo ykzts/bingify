@@ -35,6 +35,7 @@ export async function getTwitchCredentials(): Promise<{
     };
   }
 
+  // Try database first, but fallback to env vars if anything fails
   try {
     const supabase = createAdminClient();
     const result = await getOAuthCredentials(supabase, "twitch");
@@ -48,12 +49,23 @@ export async function getTwitchCredentials(): Promise<{
 
     return result;
   } catch (error) {
-    console.error("Error fetching Twitch credentials:", error);
-    // Fallback to environment variables only
-    return {
+    // Silent fallback to environment variables
+    // This happens when:
+    // - createAdminClient() fails (missing env vars in tests)
+    // - Database is unavailable
+    // - RPC function doesn't exist
+    const fallback = {
       clientId: process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID || null,
       clientSecret: process.env.SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET || null,
     };
+
+    // Cache the fallback result too
+    credentialsCache.set(cacheKey, {
+      ...fallback,
+      expiresAt: Date.now() + CACHE_TTL,
+    });
+
+    return fallback;
   }
 }
 
@@ -77,6 +89,7 @@ export async function getGoogleCredentials(): Promise<{
     };
   }
 
+  // Try database first, but fallback to env vars if anything fails
   try {
     const supabase = createAdminClient();
     const result = await getOAuthCredentials(supabase, "google");
@@ -90,12 +103,23 @@ export async function getGoogleCredentials(): Promise<{
 
     return result;
   } catch (error) {
-    console.error("Error fetching Google credentials:", error);
-    // Fallback to environment variables only
-    return {
+    // Silent fallback to environment variables
+    // This happens when:
+    // - createAdminClient() fails (missing env vars in tests)
+    // - Database is unavailable
+    // - RPC function doesn't exist
+    const fallback = {
       clientId: process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID || null,
       clientSecret: process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET || null,
     };
+
+    // Cache the fallback result too
+    credentialsCache.set(cacheKey, {
+      ...fallback,
+      expiresAt: Date.now() + CACHE_TTL,
+    });
+
+    return fallback;
   }
 }
 
