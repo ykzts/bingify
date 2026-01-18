@@ -84,10 +84,11 @@ export async function getOAuthProviderConfig(
       success: boolean;
     };
 
-    if (!(typedResult.success && typedResult.data)) {
+    // If no config in database, return success with null data (will fallback to env vars)
+    if (!typedResult.success || !typedResult.data) {
       return {
-        error: t("errorFetchFailed"),
-        success: false,
+        data: undefined,
+        success: true,
       };
     }
 

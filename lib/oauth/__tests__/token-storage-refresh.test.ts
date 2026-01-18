@@ -90,6 +90,15 @@ describe("Token Storage with Auto-Refresh", () => {
         error: null,
       });
 
+      // mockAdminClient.rpc用のモック (for get_oauth_provider_config)
+      vi.mocked(mockAdminClient.rpc).mockResolvedValueOnce({
+        // get_oauth_provider_config - no config in DB, will fall back to env vars
+        data: {
+          success: false,
+        },
+        error: null,
+      } as never);
+
       // RPC呼び出しを順番にモック
       let rpcCallCount = 0;
       vi.mocked(mockSupabase.rpc).mockImplementation(
@@ -298,8 +307,9 @@ describe("Token Storage with Auto-Refresh", () => {
       // RPC calls in order:
       // 1. get_oauth_provider_config (for getTwitchCredentials) - return empty config
       // 2. get_oauth_token_for_user - return expired token
-      // 3. upsert_oauth_token_for_user - return success
-      // 4. get_oauth_token_for_user - return refreshed token
+      // 3. get_oauth_provider_config (for refreshOAuthToken getTwitchCredentials) - return empty config
+      // 4. upsert_oauth_token_for_user - return success
+      // 5. get_oauth_token_for_user - return refreshed token
       vi.mocked(mockAdminClient.rpc)
         .mockResolvedValueOnce({
           // get_oauth_provider_config - no config in DB, will fall back to env vars
@@ -317,6 +327,13 @@ describe("Token Storage with Auto-Refresh", () => {
               refresh_token: "refresh_token",
             },
             success: true,
+          },
+          error: null,
+        })
+        .mockResolvedValueOnce({
+          // get_oauth_provider_config (2nd call during refresh) - no config in DB
+          data: {
+            success: false,
           },
           error: null,
         })
@@ -354,6 +371,7 @@ describe("Token Storage with Auto-Refresh", () => {
         "twitch"
       );
 
+      console.log("Test result:", JSON.stringify(result, null, 2));
       expect(result.success).toBe(true);
       expect(result.access_token).toBe("new_token");
       expect(global.fetch).toHaveBeenCalledWith(
