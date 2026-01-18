@@ -11,7 +11,7 @@ import {
 import { AlertCircle, AlertTriangle, Check, Dices } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { useDebounce } from "use-debounce";
 import { FormErrors } from "@/components/form-errors";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -85,7 +85,7 @@ export function CreateSpaceForm() {
   const t = useTranslations("CreateSpace");
   const [shareKey, setShareKey] = useState("");
   const [debouncedShareKey] = useDebounce(shareKey, 500);
-  const [checking, setChecking] = useState(false);
+  const [isCheckingKey, startTransition] = useTransition();
   const [available, setAvailable] = useState<boolean | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
@@ -132,17 +132,14 @@ export function CreateSpaceForm() {
       return;
     }
 
-    const check = async () => {
-      setChecking(true);
+    startTransition(async () => {
       try {
         const result = await checkShareKeyAvailability(debouncedShareKey);
         setAvailable(result.available);
-      } finally {
-        setChecking(false);
+      } catch (error) {
+        console.error("Failed to check share key availability:", error);
       }
-    };
-
-    check();
+    });
   }, [debouncedShareKey]);
 
   useEffect(() => {
@@ -263,7 +260,7 @@ export function CreateSpaceForm() {
               {/* Status indicator */}
               {field.state.value.length >= 3 && (
                 <div className="mt-2 flex items-center gap-2">
-                  {checking && (
+                  {isCheckingKey && (
                     <>
                       <Spinner className="text-gray-400 dark:text-gray-500" />
                       <span className="text-gray-500 text-sm dark:text-gray-400">
@@ -272,7 +269,7 @@ export function CreateSpaceForm() {
                     </>
                   )}
 
-                  {!checking && available === true && (
+                  {!isCheckingKey && available === true && (
                     <>
                       <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
                       <span className="text-green-600 text-sm dark:text-green-400">
@@ -281,7 +278,7 @@ export function CreateSpaceForm() {
                     </>
                   )}
 
-                  {!checking && available === false && (
+                  {!isCheckingKey && available === false && (
                     <>
                       <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                       <span className="text-amber-600 text-sm dark:text-amber-400">
@@ -356,7 +353,7 @@ export function CreateSpaceForm() {
           isSubmitting ||
           isPending ||
           isNavigating ||
-          checking ||
+          isCheckingKey ||
           available === false ||
           shareKey.length < 3
         }
