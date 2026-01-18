@@ -240,7 +240,7 @@ export function ResourceLimitsForm({ initialSettings }: Props) {
                     <InputGroupInput
                       className="w-[4.5rem]"
                       disabled={isSubmitting}
-                      max={9999}
+                      max={23}
                       min={0}
                       name="space_expiration_hours"
                       onChange={(e) => {
@@ -299,7 +299,7 @@ export function ResourceLimitsForm({ initialSettings }: Props) {
                     <InputGroupInput
                       className="w-[4.5rem]"
                       disabled={isSubmitting}
-                      max={9999}
+                      max={23}
                       min={0}
                       name="archive_retention_hours"
                       onChange={(e) => {
@@ -362,7 +362,7 @@ export function ResourceLimitsForm({ initialSettings }: Props) {
                     <InputGroupInput
                       className="w-[4.5rem]"
                       disabled={isSubmitting}
-                      max={9999}
+                      max={23}
                       min={0}
                       name="spaces_archive_retention_hours"
                       onChange={(e) => {

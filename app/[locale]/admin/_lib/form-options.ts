@@ -12,7 +12,7 @@ export const systemSettingsFormSchema = z.object({
       .number()
       .int("整数を入力してください")
       .min(0, "0時間以上を指定してください")
-      .max(9999, "最大9999時間までです"),
+      .max(23, "最大23時間までです"),
   }),
   default_user_role: z.enum(["organizer", "user"]),
   features: z.object({
@@ -65,7 +65,7 @@ export const systemSettingsFormSchema = z.object({
       .number()
       .int("整数を入力してください")
       .min(0, "0時間以上を指定してください")
-      .max(9999, "最大9999時間までです"),
+      .max(23, "最大23時間までです"),
   }),
   spaces_archive_retention: z.object({
     days: z
@@ -77,7 +77,7 @@ export const systemSettingsFormSchema = z.object({
       .number()
       .int("整数を入力してください")
       .min(0, "0時間以上を指定してください")
-      .max(9999, "最大9999時間までです"),
+      .max(23, "最大23時間までです"),
   }),
 });
 
