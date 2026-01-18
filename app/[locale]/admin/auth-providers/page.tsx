@@ -1,8 +1,9 @@
 import { AlertCircle } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { getSystemSettings } from "@/lib/data/system-settings";
 import { getAuthProviders } from "./_actions/auth-providers";
-import { AuthProvidersManagement } from "./_components/auth-providers-management";
+import { IntegratedAuthProvidersForm } from "./_components/integrated-auth-providers-form";
 
 export const dynamic = "force-dynamic";
 
@@ -14,14 +15,30 @@ export default async function AdminAuthProvidersPage({
 
   const t = await getTranslations("AdminAuthProviders");
 
-  const { providers, error } = await getAuthProviders();
+  const { providers, error: providersError } = await getAuthProviders();
+  const {
+    settings,
+    error: settingsError,
+    warnings,
+  } = await getSystemSettings();
 
-  if (error) {
+  if (providersError) {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          {t(error, { default: t("errorGeneric") })}
+          {t(providersError, { default: t("errorGeneric") })}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (settingsError) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          {t(settingsError, { default: t("errorGeneric") })}
         </AlertDescription>
       </Alert>
     );
@@ -34,10 +51,23 @@ export default async function AdminAuthProvidersPage({
         <p className="mt-2 text-gray-600">{t("description")}</p>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h3 className="mb-4 font-semibold text-lg">{t("managementTitle")}</h3>
-        <AuthProvidersManagement providers={providers || []} />
-      </div>
+      {warnings && warnings.length > 0 && (
+        <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+          <p className="font-medium text-yellow-800">
+            {t("warningInvalidFields")}
+          </p>
+          <p className="mt-1 text-sm text-yellow-700">
+            {t("warningInvalidFieldsDescription", {
+              fields: warnings.join(", "),
+            })}
+          </p>
+        </div>
+      )}
+
+      <IntegratedAuthProvidersForm
+        initialSettings={settings}
+        providers={providers || []}
+      />
     </div>
   );
 }

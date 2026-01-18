@@ -212,6 +212,7 @@
     "clientSecretPlaceholderExisting": "Enter new secret to update (leave empty to keep existing)",
     "description": "Manage which authentication providers are available on the login page",
     "disabled": "Disabled",
+    "emailProviderDescription": "Email-based authentication for users",
     "enabled": "Enabled",
     "errorClientIdRequired": "Client ID is required",
     "errorDeleteFailed": "Failed to delete OAuth provider configuration",
@@ -224,6 +225,7 @@
     "errorSaveFailed": "Failed to save OAuth provider configuration",
     "errorUnauthorized": "Authentication required",
     "errorUpdateFailed": "Failed to update authentication provider",
+    "gatekeeperRequirementsTitle": "Access Requirements",
     "loading": "Loading...",
     "managementTitle": "Available Authentication Providers",
     "noProviders": "No authentication providers configured",
@@ -233,7 +235,11 @@
     "saveOAuthConfig": "Save Configuration",
     "saving": "Saving...",
     "title": "Authentication Providers",
-    "updateSuccess": "Authentication provider updated successfully"
+    "twitchProviderDescription": "Twitch OAuth authentication with gatekeeper requirements",
+    "updateSuccess": "Authentication provider updated successfully",
+    "warningInvalidFields": "Warning: Some settings have invalid values",
+    "warningInvalidFieldsDescription": "The following fields have invalid values and defaults were applied: {fields}",
+    "youtubeProviderDescription": "YouTube (Google) OAuth authentication with gatekeeper requirements"
   },
   "AdminSettings": {
     "archiveRetentionDays": "days",

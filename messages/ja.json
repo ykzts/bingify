@@ -212,6 +212,7 @@
     "clientSecretPlaceholderExisting": "更新する場合は新しいシークレットを入力(既存を保持する場合は空欄)",
     "description": "ログインページで利用可能な認証プロバイダーを管理します",
     "disabled": "無効",
+    "emailProviderDescription": "メールベース認証",
     "enabled": "有効",
     "errorClientIdRequired": "Client IDは必須です",
     "errorDeleteFailed": "OAuthプロバイダー設定の削除に失敗しました",
@@ -224,6 +225,7 @@
     "errorSaveFailed": "OAuthプロバイダー設定の保存に失敗しました",
     "errorUnauthorized": "認証が必要です",
     "errorUpdateFailed": "認証プロバイダーの更新に失敗しました",
+    "gatekeeperRequirementsTitle": "アクセス要件",
     "loading": "読み込み中...",
     "managementTitle": "利用可能な認証プロバイダー",
     "noProviders": "認証プロバイダーが設定されていません",
@@ -233,7 +235,11 @@
     "saveOAuthConfig": "設定を保存",
     "saving": "保存中...",
     "title": "認証プロバイダー",
-    "updateSuccess": "認証プロバイダーを更新しました"
+    "twitchProviderDescription": "Twitch OAuth認証とゲートキーパー要件",
+    "updateSuccess": "認証プロバイダーを更新しました",
+    "warningInvalidFields": "警告: 一部の設定に無効な値があります",
+    "warningInvalidFieldsDescription": "以下のフィールドに無効な値があり、デフォルトが適用されました: {fields}",
+    "youtubeProviderDescription": "YouTube (Google) OAuth認証とゲートキーパー要件"
   },
   "AdminSettings": {
     "archiveRetentionDays": "日",
