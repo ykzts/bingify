@@ -23,23 +23,49 @@ export default async function AdminAuthProvidersPage({
   } = await getSystemSettings();
 
   if (providersError) {
+    let errorMessage: string;
+    switch (providersError) {
+      case "errorFetchFailed":
+        errorMessage = t("errorFetchFailed");
+        break;
+      case "errorGeneric":
+        errorMessage = t("errorGeneric");
+        break;
+      default:
+        errorMessage = t("errorGeneric");
+    }
+
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          {t(providersError, { default: t("errorGeneric") })}
-        </AlertDescription>
+        <AlertDescription>{errorMessage}</AlertDescription>
       </Alert>
     );
   }
 
   if (settingsError) {
+    let errorMessage: string;
+    switch (settingsError) {
+      case "errorFetchFailed":
+        errorMessage = t("errorFetchFailed");
+        break;
+      case "errorNoData":
+        errorMessage = t("errorNoData");
+        break;
+      case "errorInvalidData":
+        errorMessage = t("errorInvalidData");
+        break;
+      case "errorGeneric":
+        errorMessage = t("errorGeneric");
+        break;
+      default:
+        errorMessage = t("errorGeneric");
+    }
+
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          {t(settingsError, { default: t("errorGeneric") })}
-        </AlertDescription>
+        <AlertDescription>{errorMessage}</AlertDescription>
       </Alert>
     );
   }
