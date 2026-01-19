@@ -4,6 +4,7 @@ import { Eye, EyeOff, Loader2, Save } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +25,8 @@ export function OAuthConfigForm({ provider }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hasExistingSecret, setHasExistingSecret] = useState(false);
+  const [isClientIdSetInEnv, setIsClientIdSetInEnv] = useState(false);
+  const [isClientSecretSetInEnv, setIsClientSecretSetInEnv] = useState(false);
 
   // Load existing configuration
   useEffect(() => {
@@ -45,6 +48,8 @@ export function OAuthConfigForm({ provider }: Props) {
       } else {
         setClientId(result.clientId || "");
         setHasExistingSecret(!!result.hasSecret);
+        setIsClientIdSetInEnv(!!result.isClientIdSetInEnv);
+        setIsClientSecretSetInEnv(!!result.isClientSecretSetInEnv);
       }
 
       setIsLoading(false);
@@ -96,35 +101,58 @@ export function OAuthConfigForm({ provider }: Props) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor={`${provider}-client-id`}>{t("clientIdLabel")}</Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor={`${provider}-client-id`}>{t("clientIdLabel")}</Label>
+          {isClientIdSetInEnv && (
+            <Badge variant="secondary">{t("oauthEnvVarBadge")}</Badge>
+          )}
+        </div>
         <Input
+          disabled={isClientIdSetInEnv}
           id={`${provider}-client-id`}
           onChange={(e) => setClientId(e.target.value)}
-          placeholder={t("clientIdPlaceholder")}
+          placeholder={
+            isClientIdSetInEnv
+              ? t("clientIdPlaceholderEnvSet")
+              : t("clientIdPlaceholder")
+          }
           type="text"
           value={clientId}
         />
-        <p className="text-gray-600 text-xs">{t("clientIdDescription")}</p>
+        <p className="text-gray-600 text-xs">
+          {isClientIdSetInEnv
+            ? t("clientIdDescriptionEnvSet")
+            : t("clientIdDescription")}
+        </p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`${provider}-client-secret`}>
-          {t("clientSecretLabel")}
-        </Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor={`${provider}-client-secret`}>
+            {t("clientSecretLabel")}
+          </Label>
+          {isClientSecretSetInEnv && (
+            <Badge variant="secondary">{t("oauthEnvVarBadge")}</Badge>
+          )}
+        </div>
         <div className="relative">
           <Input
+            disabled={isClientSecretSetInEnv}
             id={`${provider}-client-secret`}
             onChange={(e) => setClientSecret(e.target.value)}
             placeholder={
-              hasExistingSecret
-                ? t("clientSecretPlaceholderExisting")
-                : t("clientSecretPlaceholder")
+              isClientSecretSetInEnv
+                ? t("clientSecretPlaceholderEnvSet")
+                : hasExistingSecret
+                  ? t("clientSecretPlaceholderExisting")
+                  : t("clientSecretPlaceholder")
             }
             type={showSecret ? "text" : "password"}
             value={clientSecret}
           />
           <Button
             className="absolute top-0 right-0 h-full px-3"
+            disabled={isClientSecretSetInEnv}
             onClick={() => setShowSecret(!showSecret)}
             size="sm"
             type="button"
@@ -138,14 +166,19 @@ export function OAuthConfigForm({ provider }: Props) {
           </Button>
         </div>
         <p className="text-gray-600 text-xs">
-          {hasExistingSecret
-            ? t("clientSecretDescriptionExisting")
-            : t("clientSecretDescription")}
+          {isClientSecretSetInEnv
+            ? t("clientSecretDescriptionEnvSet")
+            : hasExistingSecret
+              ? t("clientSecretDescriptionExisting")
+              : t("clientSecretDescription")}
         </p>
       </div>
 
       <div className="flex justify-end">
-        <Button disabled={isSaving} onClick={handleSave}>
+        <Button
+          disabled={isSaving || (isClientIdSetInEnv && isClientSecretSetInEnv)}
+          onClick={handleSave}
+        >
           {isSaving ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

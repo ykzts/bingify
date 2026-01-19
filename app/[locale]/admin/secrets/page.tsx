@@ -45,6 +45,7 @@ export default async function AdminSecretsPage({
           ) : (
             <SendEmailHookSecretManagement
               hasSecret={authHookData.hasSecret}
+              isSetInEnv={authHookData.isSetInEnv}
               updatedAt={authHookData.updatedAt}
             />
           )}
@@ -65,6 +66,7 @@ export default async function AdminSecretsPage({
           ) : (
             <CronSecretManagement
               hasSecret={cronData.hasSecret}
+              isSetInEnv={cronData.isSetInEnv}
               updatedAt={cronData.updatedAt}
             />
           )}

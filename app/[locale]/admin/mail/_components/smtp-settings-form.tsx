@@ -14,6 +14,7 @@ import { useActionState, useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
 import { InlineFieldError } from "@/components/field-errors";
 import { FormErrors } from "@/components/form-errors";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -39,9 +40,23 @@ import {
 
 interface Props {
   initialSettings?: SmtpSettingsData | null;
+  isMailFromSetInEnv?: boolean;
+  isSmtpHostSetInEnv?: boolean;
+  isSmtpPasswordSetInEnv?: boolean;
+  isSmtpPortSetInEnv?: boolean;
+  isSmtpSecureSetInEnv?: boolean;
+  isSmtpUserSetInEnv?: boolean;
 }
 
-export function SmtpSettingsForm({ initialSettings }: Props) {
+export function SmtpSettingsForm({
+  initialSettings,
+  isSmtpHostSetInEnv,
+  isSmtpPortSetInEnv,
+  isSmtpSecureSetInEnv,
+  isSmtpUserSetInEnv,
+  isSmtpPasswordSetInEnv,
+  isMailFromSetInEnv,
+}: Props) {
   const router = useRouter();
   const t = useTranslations("AdminSmtp");
   const [state, action] = useActionState(updateSmtpSettingsAction, undefined);
@@ -135,17 +150,32 @@ export function SmtpSettingsForm({ initialSettings }: Props) {
               {(field: any) => (
                 <Field>
                   <FieldContent>
-                    <FieldLabel>{t("smtpHostLabel")}</FieldLabel>
+                    <div className="flex items-center gap-2">
+                      <FieldLabel>{t("smtpHostLabel")}</FieldLabel>
+                      {isSmtpHostSetInEnv && (
+                        <Badge variant="secondary">
+                          {t("smtpEnvVarBadge")}
+                        </Badge>
+                      )}
+                    </div>
                     <Input
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isSmtpHostSetInEnv}
                       name={field.name}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="smtp.gmail.com"
+                      placeholder={
+                        isSmtpHostSetInEnv
+                          ? t("smtpHostPlaceholderEnvSet")
+                          : "smtp.gmail.com"
+                      }
                       type="text"
                       value={field.state.value as string}
                     />
-                    <FieldDescription>{t("smtpHostHelp")}</FieldDescription>
+                    <FieldDescription>
+                      {isSmtpHostSetInEnv
+                        ? t("smtpHostHelpEnvSet")
+                        : t("smtpHostHelp")}
+                    </FieldDescription>
                     {field.state.meta.errors.length > 0 && (
                       <InlineFieldError>
                         {getErrorMessage(field.state.meta.errors[0])}
@@ -161,19 +191,34 @@ export function SmtpSettingsForm({ initialSettings }: Props) {
               {(field: any) => (
                 <Field>
                   <FieldContent>
-                    <FieldLabel>{t("smtpPortLabel")}</FieldLabel>
+                    <div className="flex items-center gap-2">
+                      <FieldLabel>{t("smtpPortLabel")}</FieldLabel>
+                      {isSmtpPortSetInEnv && (
+                        <Badge variant="secondary">
+                          {t("smtpEnvVarBadge")}
+                        </Badge>
+                      )}
+                    </div>
                     <Input
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isSmtpPortSetInEnv}
                       name={field.name}
                       onBlur={field.handleBlur}
                       onChange={(e) =>
                         field.handleChange(Number(e.target.value))
                       }
-                      placeholder="587"
+                      placeholder={
+                        isSmtpPortSetInEnv
+                          ? t("smtpPortPlaceholderEnvSet")
+                          : "587"
+                      }
                       type="number"
                       value={field.state.value as number}
                     />
-                    <FieldDescription>{t("smtpPortHelp")}</FieldDescription>
+                    <FieldDescription>
+                      {isSmtpPortSetInEnv
+                        ? t("smtpPortHelpEnvSet")
+                        : t("smtpPortHelp")}
+                    </FieldDescription>
                     {field.state.meta.errors.length > 0 && (
                       <InlineFieldError>
                         {getErrorMessage(field.state.meta.errors[0])}
@@ -192,7 +237,7 @@ export function SmtpSettingsForm({ initialSettings }: Props) {
                     <div className="flex items-center gap-2">
                       <Checkbox
                         checked={field.state.value as boolean}
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isSmtpSecureSetInEnv}
                         id={field.name}
                         name={field.name}
                         onCheckedChange={(checked) =>
@@ -202,8 +247,17 @@ export function SmtpSettingsForm({ initialSettings }: Props) {
                       <FieldLabel htmlFor={field.name}>
                         {t("smtpSecureLabel")}
                       </FieldLabel>
+                      {isSmtpSecureSetInEnv && (
+                        <Badge variant="secondary">
+                          {t("smtpEnvVarBadge")}
+                        </Badge>
+                      )}
                     </div>
-                    <FieldDescription>{t("smtpSecureHelp")}</FieldDescription>
+                    <FieldDescription>
+                      {isSmtpSecureSetInEnv
+                        ? t("smtpSecureHelpEnvSet")
+                        : t("smtpSecureHelp")}
+                    </FieldDescription>
                     {field.state.meta.errors.length > 0 && (
                       <InlineFieldError>
                         {getErrorMessage(field.state.meta.errors[0])}
@@ -224,18 +278,33 @@ export function SmtpSettingsForm({ initialSettings }: Props) {
               {(field: any) => (
                 <Field>
                   <FieldContent>
-                    <FieldLabel>{t("smtpUserLabel")}</FieldLabel>
+                    <div className="flex items-center gap-2">
+                      <FieldLabel>{t("smtpUserLabel")}</FieldLabel>
+                      {isSmtpUserSetInEnv && (
+                        <Badge variant="secondary">
+                          {t("smtpEnvVarBadge")}
+                        </Badge>
+                      )}
+                    </div>
                     <Input
                       autoComplete="username"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isSmtpUserSetInEnv}
                       name={field.name}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="user@example.com"
+                      placeholder={
+                        isSmtpUserSetInEnv
+                          ? t("smtpUserPlaceholderEnvSet")
+                          : "user@example.com"
+                      }
                       type="text"
                       value={field.state.value as string}
                     />
-                    <FieldDescription>{t("smtpUserHelp")}</FieldDescription>
+                    <FieldDescription>
+                      {isSmtpUserSetInEnv
+                        ? t("smtpUserHelpEnvSet")
+                        : t("smtpUserHelp")}
+                    </FieldDescription>
                     {field.state.meta.errors.length > 0 && (
                       <InlineFieldError>
                         {getErrorMessage(field.state.meta.errors[0])}
@@ -251,20 +320,35 @@ export function SmtpSettingsForm({ initialSettings }: Props) {
               {(field: any) => (
                 <Field>
                   <FieldContent>
-                    <FieldLabel>{t("smtpPasswordLabel")}</FieldLabel>
+                    <div className="flex items-center gap-2">
+                      <FieldLabel>{t("smtpPasswordLabel")}</FieldLabel>
+                      {isSmtpPasswordSetInEnv && (
+                        <Badge variant="secondary">
+                          {t("smtpEnvVarBadge")}
+                        </Badge>
+                      )}
+                    </div>
                     <Input
                       autoComplete="new-password"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isSmtpPasswordSetInEnv}
                       name={field.name}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       placeholder={
-                        initialSettings ? t("passwordPlaceholder") : ""
+                        isSmtpPasswordSetInEnv
+                          ? t("smtpPasswordPlaceholderEnvSet")
+                          : initialSettings
+                            ? t("passwordPlaceholder")
+                            : ""
                       }
                       type="password"
                       value={field.state.value as string}
                     />
-                    <FieldDescription>{t("smtpPasswordHelp")}</FieldDescription>
+                    <FieldDescription>
+                      {isSmtpPasswordSetInEnv
+                        ? t("smtpPasswordHelpEnvSet")
+                        : t("smtpPasswordHelp")}
+                    </FieldDescription>
                     {field.state.meta.errors.length > 0 && (
                       <InlineFieldError>
                         {getErrorMessage(field.state.meta.errors[0])}
@@ -285,17 +369,32 @@ export function SmtpSettingsForm({ initialSettings }: Props) {
               {(field: any) => (
                 <Field>
                   <FieldContent>
-                    <FieldLabel>{t("mailFromLabel")}</FieldLabel>
+                    <div className="flex items-center gap-2">
+                      <FieldLabel>{t("mailFromLabel")}</FieldLabel>
+                      {isMailFromSetInEnv && (
+                        <Badge variant="secondary">
+                          {t("smtpEnvVarBadge")}
+                        </Badge>
+                      )}
+                    </div>
                     <Input
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isMailFromSetInEnv}
                       name={field.name}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="noreply@your-domain.com"
+                      placeholder={
+                        isMailFromSetInEnv
+                          ? t("mailFromPlaceholderEnvSet")
+                          : "noreply@your-domain.com"
+                      }
                       type="email"
                       value={field.state.value as string}
                     />
-                    <FieldDescription>{t("mailFromHelp")}</FieldDescription>
+                    <FieldDescription>
+                      {isMailFromSetInEnv
+                        ? t("mailFromHelpEnvSet")
+                        : t("mailFromHelp")}
+                    </FieldDescription>
                     {field.state.meta.errors.length > 0 && (
                       <InlineFieldError>
                         {getErrorMessage(field.state.meta.errors[0])}

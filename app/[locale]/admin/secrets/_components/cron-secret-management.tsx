@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,10 +14,15 @@ import { deleteCronSecret, upsertCronSecret } from "../_actions/cron-secret";
 
 interface Props {
   hasSecret?: boolean;
+  isSetInEnv?: boolean;
   updatedAt?: string;
 }
 
-export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
+export function CronSecretManagement({
+  hasSecret,
+  isSetInEnv,
+  updatedAt,
+}: Props) {
   const t = useTranslations("AdminSecrets");
   const confirm = useConfirm();
   const [secret, setSecret] = useState("");
@@ -103,17 +109,24 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
       {/* Secret Input Form */}
       <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <div className="space-y-2">
-          <Label htmlFor="secret">{t("cronSecretLabel")}</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="secret">{t("cronSecretLabel")}</Label>
+            {isSetInEnv && (
+              <Badge variant="secondary">{t("cronEnvVarBadge")}</Badge>
+            )}
+          </div>
           <div className="relative">
             <Input
               className="pr-10 font-mono text-sm"
-              disabled={isUpdating || isDeleting}
+              disabled={isUpdating || isDeleting || isSetInEnv}
               id="secret"
               onChange={(e) => setSecret(e.target.value)}
               placeholder={
-                hasSecret
-                  ? t("cronSecretPlaceholderReplace")
-                  : t("cronSecretPlaceholder")
+                isSetInEnv
+                  ? t("cronSecretPlaceholderEnvSet")
+                  : hasSecret
+                    ? t("cronSecretPlaceholderReplace")
+                    : t("cronSecretPlaceholder")
               }
               type={showSecret ? "text" : "password"}
               value={secret}
@@ -121,7 +134,7 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
             <Button
               aria-pressed={showSecret}
               className="absolute top-1/2 right-2 -translate-y-1/2"
-              disabled={isUpdating || isDeleting}
+              disabled={isUpdating || isDeleting || isSetInEnv}
               onClick={() => setShowSecret(!showSecret)}
               size="icon"
               type="button"
@@ -138,7 +151,11 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
             </Button>
           </div>
           <p className="text-gray-600 text-sm">
-            {hasSecret ? t("cronSecretHelpReplace") : t("cronSecretHelp")}
+            {isSetInEnv
+              ? t("cronSecretHelpEnvSet")
+              : hasSecret
+                ? t("cronSecretHelpReplace")
+                : t("cronSecretHelp")}
           </p>
         </div>
 
@@ -159,14 +176,14 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
         {/* Action Buttons */}
         <div className="flex gap-3">
           <Button
-            disabled={!hasChanges || isUpdating || isDeleting}
+            disabled={!hasChanges || isUpdating || isDeleting || isSetInEnv}
             onClick={handleSave}
             type="button"
           >
             {getButtonLabel()}
           </Button>
 
-          {hasSecret && (
+          {hasSecret && !isSetInEnv && (
             <Button
               disabled={isUpdating || isDeleting}
               onClick={handleDelete}
@@ -180,15 +197,17 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
       </div>
 
       {/* Environment Variable Warning */}
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          <div className="space-y-2">
-            <p className="font-semibold">{t("envWarningTitle")}</p>
-            <p>{t("envWarningDescription")}</p>
-          </div>
-        </AlertDescription>
-      </Alert>
+      {isSetInEnv && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <div className="space-y-2">
+              <p className="font-semibold">{t("cronEnvWarningTitle")}</p>
+              <p>{t("cronEnvWarningDescription")}</p>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 }

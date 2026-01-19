@@ -130,6 +130,8 @@ export async function getProviderOAuthConfig(provider: string): Promise<{
   clientId?: string | null;
   error?: string;
   hasSecret?: boolean;
+  isClientIdSetInEnv?: boolean;
+  isClientSecretSetInEnv?: boolean;
 }> {
   try {
     const t = await getTranslations("AdminAuthProviders");
@@ -139,6 +141,21 @@ export async function getProviderOAuthConfig(provider: string): Promise<{
     if (adminCheck.error) {
       return { error: adminCheck.error };
     }
+
+    // Check if environment variables are set for this provider
+    const envPrefix =
+      provider === "google"
+        ? "SUPABASE_AUTH_EXTERNAL_GOOGLE"
+        : provider === "twitch"
+          ? "SUPABASE_AUTH_EXTERNAL_TWITCH"
+          : null;
+
+    const isClientIdSetInEnv = envPrefix
+      ? !!process.env[`${envPrefix}_CLIENT_ID`]
+      : false;
+    const isClientSecretSetInEnv = envPrefix
+      ? !!process.env[`${envPrefix}_SECRET`]
+      : false;
 
     const supabase = await createClient();
     const result = await getOAuthProviderConfig(supabase, provider);
@@ -155,12 +172,18 @@ export async function getProviderOAuthConfig(provider: string): Promise<{
               | "errorInvalidResponse"
           )
         : errorKey;
-      return { error: translatedError };
+      return {
+        error: translatedError,
+        isClientIdSetInEnv,
+        isClientSecretSetInEnv,
+      };
     }
 
     return {
       clientId: result.data.client_id,
       hasSecret: !!result.data.client_secret,
+      isClientIdSetInEnv,
+      isClientSecretSetInEnv,
     };
   } catch (error) {
     console.error("Error in getProviderOAuthConfig:", error);

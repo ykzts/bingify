@@ -206,7 +206,12 @@
     "updateSuccess": "認証プロバイダーを更新しました",
     "warningInvalidFields": "警告: 一部の設定に無効な値があります",
     "warningInvalidFieldsDescription": "以下のフィールドに無効な値があり、デフォルトが適用されました: {fields}",
-    "youtubeProviderDescription": "YouTube (Google) OAuth認証とゲートキーパー要件"
+    "youtubeProviderDescription": "YouTube (Google) OAuth認証とゲートキーパー要件",
+    "oauthEnvVarBadge": "環境変数",
+    "clientIdPlaceholderEnvSet": "環境変数で設定済み",
+    "clientIdDescriptionEnvSet": "この値は環境変数で設定されているため、ここでは変更できません。ダッシュボードから管理するには環境変数を削除してください。",
+    "clientSecretPlaceholderEnvSet": "環境変数で設定済み",
+    "clientSecretDescriptionEnvSet": "この値は環境変数で設定されているため、ここでは変更できません。ダッシュボードから管理するには環境変数を削除してください。"
   },
   "AdminSecrets": {
     "authHooksDeleteButton": "シークレットを削除",
@@ -273,7 +278,13 @@
     "cronShowSecret": "シークレットを表示",
     "cronTitle": "Cronジョブ",
     "description": "認証フックとCronジョブのシークレットを管理します。すべてのシークレットは暗号化されてSupabase Vaultに保存されます。",
-    "title": "シークレット"
+    "title": "シークレット",
+    "authHooksEnvVarBadge": "環境変数",
+    "authHooksSecretPlaceholderEnvSet": "SEND_EMAIL_HOOK_SECRET 環境変数で設定済み",
+    "authHooksSecretHelpEnvSet": "この値は SEND_EMAIL_HOOK_SECRET 環境変数で設定されているため、ここでは変更できません。ダッシュボードから管理するには環境変数を削除してください。",
+    "cronEnvVarBadge": "環境変数",
+    "cronSecretPlaceholderEnvSet": "CRON_SECRET 環境変数で設定済み",
+    "cronSecretHelpEnvSet": "この値は CRON_SECRET 環境変数で設定されているため、ここでは変更できません。ダッシュボードから管理するには環境変数を削除してください。"
   },
   "AdminSettings": {
     "archiveRetentionDays": "日",
@@ -371,7 +382,19 @@
     "testEmailPlaceholder": "your-email@example.com",
     "testEmailSuccess": "テストメールが正常に送信されました！受信トレイを確認してください。",
     "testEmailTitle": "テストメール",
-    "updateSuccess": "SMTP設定が正常に保存されました"
+    "updateSuccess": "SMTP設定が正常に保存されました",
+    "smtpEnvVarBadge": "環境変数",
+    "smtpHostPlaceholderEnvSet": "SMTP_HOST 環境変数で設定済み",
+    "smtpHostHelpEnvSet": "この値は SMTP_HOST 環境変数で設定されているため、ここでは変更できません。",
+    "smtpPortPlaceholderEnvSet": "SMTP_PORT 環境変数で設定済み",
+    "smtpPortHelpEnvSet": "この値は SMTP_PORT 環境変数で設定されているため、ここでは変更できません。",
+    "smtpSecureHelpEnvSet": "この値は SMTP_SECURE 環境変数で設定されているため、ここでは変更できません。",
+    "smtpUserPlaceholderEnvSet": "SMTP_USER 環境変数で設定済み",
+    "smtpUserHelpEnvSet": "この値は SMTP_USER 環境変数で設定されているため、ここでは変更できません。",
+    "smtpPasswordPlaceholderEnvSet": "SMTP_PASS 環境変数で設定済み",
+    "smtpPasswordHelpEnvSet": "この値は SMTP_PASS 環境変数で設定されているため、ここでは変更できません。",
+    "mailFromPlaceholderEnvSet": "MAIL_FROM 環境変数で設定済み",
+    "mailFromHelpEnvSet": "この値は MAIL_FROM 環境変数で設定されているため、ここでは変更できません。"
   },
   "AdminSpace": {
     "allNumbersCalled": "すべての番号が呼ばれました",

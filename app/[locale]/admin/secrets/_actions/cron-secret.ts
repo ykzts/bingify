@@ -45,6 +45,7 @@ async function ensureAdminOrError(): Promise<AdminCheckResult> {
 export interface GetCronSecretResult {
   error?: string;
   hasSecret?: boolean;
+  isSetInEnv?: boolean;
   updatedAt?: string;
 }
 
@@ -62,13 +63,16 @@ export async function getCronSecret(): Promise<GetCronSecretResult> {
       return { error: adminCheck.error };
     }
 
+    // Check if environment variable is set
+    const isSetInEnv = !!process.env.CRON_SECRET;
+
     const supabase = await createClient();
 
     const { data, error } = await supabase.rpc("get_cron_secret");
 
     if (error) {
       console.error("Error fetching cron secret:", error);
-      return { error: t("errorFetchFailed") };
+      return { error: t("errorFetchFailed"), isSetInEnv };
     }
 
     // Type assertion for the RPC result
@@ -79,13 +83,14 @@ export async function getCronSecret(): Promise<GetCronSecretResult> {
     if (!result?.success) {
       // Secret not found is not an error - it just means it hasn't been set yet
       if (result?.error === CRON_SECRET_NOT_FOUND) {
-        return { hasSecret: false };
+        return { hasSecret: false, isSetInEnv };
       }
-      return { error: result?.error || t("errorFetchFailed") };
+      return { error: result?.error || t("errorFetchFailed"), isSetInEnv };
     }
 
     return {
       hasSecret: true,
+      isSetInEnv,
       updatedAt: result.data?.updated_at,
     };
   } catch (error) {

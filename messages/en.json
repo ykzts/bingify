@@ -206,7 +206,12 @@
     "updateSuccess": "Authentication provider updated successfully",
     "warningInvalidFields": "Warning: Some settings have invalid values",
     "warningInvalidFieldsDescription": "The following fields have invalid values and defaults were applied: {fields}",
-    "youtubeProviderDescription": "YouTube (Google) OAuth authentication with gatekeeper requirements"
+    "youtubeProviderDescription": "YouTube (Google) OAuth authentication with gatekeeper requirements",
+    "oauthEnvVarBadge": "Environment Variable",
+    "clientIdPlaceholderEnvSet": "Set via environment variable",
+    "clientIdDescriptionEnvSet": "This value is set via environment variable and cannot be changed here. Remove the environment variable to manage it from the dashboard.",
+    "clientSecretPlaceholderEnvSet": "Set via environment variable",
+    "clientSecretDescriptionEnvSet": "This value is set via environment variable and cannot be changed here. Remove the environment variable to manage it from the dashboard."
   },
   "AdminSecrets": {
     "authHooksDeleteButton": "Delete Secret",
@@ -273,7 +278,13 @@
     "cronShowSecret": "Show secret",
     "cronTitle": "Cron Jobs",
     "description": "Manage secrets for authentication hooks and cron jobs. All secrets are encrypted and stored in Supabase Vault.",
-    "title": "Secrets"
+    "title": "Secrets",
+    "authHooksEnvVarBadge": "Environment Variable",
+    "authHooksSecretPlaceholderEnvSet": "Set via SEND_EMAIL_HOOK_SECRET environment variable",
+    "authHooksSecretHelpEnvSet": "This value is set via the SEND_EMAIL_HOOK_SECRET environment variable and cannot be changed here. Remove the environment variable to manage it from the dashboard.",
+    "cronEnvVarBadge": "Environment Variable",
+    "cronSecretPlaceholderEnvSet": "Set via CRON_SECRET environment variable",
+    "cronSecretHelpEnvSet": "This value is set via the CRON_SECRET environment variable and cannot be changed here. Remove the environment variable to manage it from the dashboard."
   },
   "AdminSettings": {
     "archiveRetentionDays": "days",
@@ -371,7 +382,19 @@
     "testEmailPlaceholder": "your-email@example.com",
     "testEmailSuccess": "Test email sent successfully! Check your inbox.",
     "testEmailTitle": "Test Email",
-    "updateSuccess": "SMTP settings saved successfully"
+    "updateSuccess": "SMTP settings saved successfully",
+    "smtpEnvVarBadge": "Environment Variable",
+    "smtpHostPlaceholderEnvSet": "Set via SMTP_HOST environment variable",
+    "smtpHostHelpEnvSet": "This value is set via the SMTP_HOST environment variable and cannot be changed here.",
+    "smtpPortPlaceholderEnvSet": "Set via SMTP_PORT environment variable",
+    "smtpPortHelpEnvSet": "This value is set via the SMTP_PORT environment variable and cannot be changed here.",
+    "smtpSecureHelpEnvSet": "This value is set via the SMTP_SECURE environment variable and cannot be changed here.",
+    "smtpUserPlaceholderEnvSet": "Set via SMTP_USER environment variable",
+    "smtpUserHelpEnvSet": "This value is set via the SMTP_USER environment variable and cannot be changed here.",
+    "smtpPasswordPlaceholderEnvSet": "Set via SMTP_PASS environment variable",
+    "smtpPasswordHelpEnvSet": "This value is set via the SMTP_PASS environment variable and cannot be changed here.",
+    "mailFromPlaceholderEnvSet": "Set via MAIL_FROM environment variable",
+    "mailFromHelpEnvSet": "This value is set via the MAIL_FROM environment variable and cannot be changed here."
   },
   "AdminSpace": {
     "allNumbersCalled": "All numbers have been called",
