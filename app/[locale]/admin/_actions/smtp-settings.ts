@@ -109,7 +109,7 @@ export async function updateSmtpSettingsAction(
     const { data, error } = await supabase.rpc("upsert_smtp_settings", {
       p_mail_from: validatedData.mail_from,
       p_smtp_host: validatedData.smtp_host,
-      p_smtp_password: validatedData.smtp_password || null,
+      p_smtp_password: validatedData.smtp_password || "",
       p_smtp_port: validatedData.smtp_port,
       p_smtp_secure: validatedData.smtp_secure,
       p_smtp_user: validatedData.smtp_user,
