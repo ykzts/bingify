@@ -13,18 +13,8 @@ import {
   gatekeeperRulesSchema,
   type PublicSpaceInfo,
 } from "@/lib/types/space";
+import { isValidUserName } from "@/lib/utils/user";
 import { isValidUUID } from "@/lib/utils/uuid";
-
-/**
- * ユーザー名が有効かどうかをチェックする
- * @param fullName - チェックする名前
- * @returns 名前が有効かどうか
- */
-function isValidUserName(fullName: string | null | undefined): boolean {
-  return (
-    fullName !== null && fullName !== undefined && fullName.trim() !== ""
-  );
-}
 
 export interface JoinSpaceState {
   error?: string;
@@ -493,11 +483,19 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
     }
 
     // Check if user has set their full_name
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("full_name")
       .eq("id", user.id)
       .single();
+
+    if (profileError) {
+      console.error("Error fetching profile in joinSpace:", profileError);
+      return {
+        error: t("errorGeneric"),
+        success: false,
+      };
+    }
 
     if (!isValidUserName(profile?.full_name)) {
       return {
