@@ -180,9 +180,7 @@ export function SpaceParticipation({
           type="button"
           variant="outline"
         >
-          <Link href="/settings/profile">
-            {t("nameSettingRequiredButton")}
-          </Link>
+          <Link href="/settings/profile">{t("nameSettingRequiredButton")}</Link>
         </Button>
       );
     }
@@ -263,9 +261,7 @@ export function SpaceParticipation({
       {/* Name Requirement Notice - Only show if name is not set */}
       {hasUserName === false && !hasJoined && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <p className="text-amber-800 text-sm">
-            {t("nameSettingRequired")}
-          </p>
+          <p className="text-amber-800 text-sm">{t("nameSettingRequired")}</p>
         </div>
       )}
 
