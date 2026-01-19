@@ -48,7 +48,7 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
 
     if (
       !(await confirm({
-        description: t("deleteConfirm"),
+        description: t("cronDeleteConfirm"),
         title: t("cronDeleteButton"),
         variant: "destructive",
       }))
@@ -64,7 +64,7 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(t("deleteSuccess"));
+        toast.success(t("cronDeleteSuccess"));
         setSecret("");
       }
     } finally {
@@ -76,12 +76,12 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
 
   const getButtonLabel = () => {
     if (isUpdating) {
-      return t("saving");
+      return t("cronSaving");
     }
     if (hasSecret) {
       return t("cronReplaceButton");
     }
-    return t("saveButton");
+    return t("cronSaveButton");
   };
 
   return (
@@ -91,10 +91,10 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
         <Info className="h-4 w-4" />
         <AlertDescription>
           <div className="space-y-2">
-            <p>{t("infoDescription")}</p>
+            <p>{t("cronInfoDescription")}</p>
             <ul className="ml-4 list-disc space-y-1 text-sm">
-              <li>{t("infoVaultEncryption")}</li>
-              <li>{t("infoEnvFallback")}</li>
+              <li>{t("cronInfoVaultEncryption")}</li>
+              <li>{t("cronInfoEnvFallback")}</li>
             </ul>
           </div>
         </AlertDescription>
@@ -103,7 +103,7 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
       {/* Secret Input Form */}
       <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <div className="space-y-2">
-          <Label htmlFor="secret">{t("secretLabel")}</Label>
+          <Label htmlFor="secret">{t("cronSecretLabel")}</Label>
           <div className="relative">
             <Input
               className="pr-10 font-mono text-sm"
@@ -133,12 +133,12 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
                 <Eye className="h-4 w-4" />
               )}
               <span className="sr-only">
-                {showSecret ? t("hideSecret") : t("showSecret")}
+                {showSecret ? t("cronHideSecret") : t("cronShowSecret")}
               </span>
             </Button>
           </div>
           <p className="text-gray-600 text-sm">
-            {hasSecret ? t("secretHelpReplace") : t("secretHelp")}
+            {hasSecret ? t("cronSecretHelpReplace") : t("cronSecretHelp")}
           </p>
         </div>
 
@@ -146,10 +146,10 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
         {hasSecret && updatedAt && (
           <div className="rounded-lg bg-green-50 p-3">
             <p className="font-medium text-green-800 text-sm">
-              {t("secretConfigured")}
+              {t("cronSecretConfigured")}
             </p>
             <p className="mt-1 text-green-700 text-xs">
-              {t("lastUpdated", {
+              {t("cronLastUpdated", {
                 date: new Date(updatedAt).toLocaleString(),
               })}
             </p>
@@ -173,7 +173,7 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
               type="button"
               variant="destructive"
             >
-              {isDeleting ? t("deleting") : t("cronDeleteButton")}
+              {isDeleting ? t("cronDeleting") : t("cronDeleteButton")}
             </Button>
           )}
         </div>

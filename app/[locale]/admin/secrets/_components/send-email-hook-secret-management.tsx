@@ -75,10 +75,10 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
 
   const getButtonLabel = () => {
     if (isUpdating) {
-      return t("saving");
+      return t("authHooksSaving");
     }
     if (hasSecret) {
-      return t("replaceButton");
+      return t("authHooksReplaceButton");
     }
     return t("authHooksSaveButton");
   };
@@ -90,11 +90,11 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
         <Info className="h-4 w-4" />
         <AlertDescription>
           <div className="space-y-2">
-            <p>{t("infoDescription")}</p>
+            <p>{t("authHooksInfoDescription")}</p>
             <ul className="ml-4 list-disc space-y-1 text-sm">
               <li>{t("authHooksInfoVaultEncryption")}</li>
-              <li>{t("infoEnvFallback")}</li>
-              <li>{t("infoFormat")}</li>
+              <li>{t("authHooksInfoEnvFallback")}</li>
+              <li>{t("authHooksInfoFormat")}</li>
             </ul>
           </div>
         </AlertDescription>
@@ -103,7 +103,7 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
       {/* Secret Input Form */}
       <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <div className="space-y-2">
-          <Label htmlFor="secret">{t("secretLabel")}</Label>
+          <Label htmlFor="secret">{t("authHooksSecretLabel")}</Label>
           <div className="relative">
             <Input
               className="pr-10 font-mono text-sm"
@@ -132,12 +132,16 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
                 <Eye className="h-4 w-4" />
               )}
               <span className="sr-only">
-                {showSecret ? t("hideSecret") : t("authHooksShowSecret")}
+                {showSecret
+                  ? t("authHooksHideSecret")
+                  : t("authHooksShowSecret")}
               </span>
             </Button>
           </div>
           <p className="text-gray-600 text-sm">
-            {hasSecret ? t("authHooksSecretHelpReplace") : t("secretHelp")}
+            {hasSecret
+              ? t("authHooksSecretHelpReplace")
+              : t("authHooksSecretHelp")}
           </p>
         </div>
 
@@ -145,7 +149,9 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
         {secret && !isSecretValid && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{t("errorInvalidFormat")}</AlertDescription>
+            <AlertDescription>
+              {t("authHooksErrorInvalidFormat")}
+            </AlertDescription>
           </Alert>
         )}
 
@@ -156,7 +162,7 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
               {t("authHooksSecretConfigured")}
             </p>
             <p className="mt-1 text-green-700 text-xs">
-              {t("lastUpdated", {
+              {t("authHooksLastUpdated", {
                 date: new Date(updatedAt).toLocaleString(),
               })}
             </p>
