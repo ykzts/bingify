@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@googleapis/youtube':
-        specifier: 30.2.0
-        version: 30.2.0
+        specifier: 30.3.0
+        version: 30.3.0
       '@marsidev/react-turnstile':
         specifier: 1.4.1
         version: 1.4.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -893,8 +893,8 @@ packages:
   '@formatjs/intl-localematcher@0.6.2':
     resolution: {integrity: sha512-XOMO2Hupl0wdd172Y06h6kLpBz6Dv+J4okPLl4LPtzbr8f66WbIoy4ev98EBuZ6ZK4h5ydTN6XneT4QVpD7cdA==}
 
-  '@googleapis/youtube@30.2.0':
-    resolution: {integrity: sha512-magOuTRMZegaUHy1oYftZiipmLvJVRuZqZkXD2ls3QPAjWvc/+aILT3yY2HlDHF8Va93GVeow/ZIzMNoVJsQlA==}
+  '@googleapis/youtube@30.3.0':
+    resolution: {integrity: sha512-POrCCTkDVQWpBOq5UOfG4Bk03axgSnG0CnYEnssHKJX3idcWF/P6fK3LrOTdzE+/0pWzWqIWcmxUdgVETfuxIg==}
     engines: {node: '>=12.0.0'}
 
   '@hono/node-server@1.19.9':
@@ -7475,7 +7475,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@googleapis/youtube@30.2.0':
+  '@googleapis/youtube@30.3.0':
     dependencies:
       googleapis-common: 8.0.1
     transitivePeerDependencies:
