@@ -1,10 +1,10 @@
 import { AlertCircle } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { getSendEmailHookSecret } from "../auth-hooks/_actions/send-email-hook-secret";
-import { SendEmailHookSecretManagement } from "../auth-hooks/_components/send-email-hook-secret-management";
-import { getCronSecret } from "../cron/_actions/cron-secret";
-import { CronSecretManagement } from "../cron/_components/cron-secret-management";
+import { getCronSecret } from "./_actions/cron-secret";
+import { getSendEmailHookSecret } from "./_actions/send-email-hook-secret";
+import { CronSecretManagement } from "./_components/cron-secret-management";
+import { SendEmailHookSecretManagement } from "./_components/send-email-hook-secret-management";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +15,8 @@ export default async function AdminSecretsPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("AdminSecrets");
-  const tAuthHooks = await getTranslations("AdminAuthHooks");
-  const tCron = await getTranslations("AdminCron");
+  const tAuthHooks = await getTranslations("AdminSecrets.authHooks");
+  const tCron = await getTranslations("AdminSecrets.cron");
 
   // Fetch both secrets data
   const authHookData = await getSendEmailHookSecret();
