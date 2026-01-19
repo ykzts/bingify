@@ -95,6 +95,55 @@ export async function checkOAuthTokenAvailability(
   }
 }
 
+/**
+ * ユーザーの名前が設定されているかチェックする
+ *
+ * @returns 名前が設定されているかどうか
+ */
+export async function checkUserNameSet(): Promise<{
+  hasName: boolean;
+  error?: string;
+}> {
+  try {
+    const supabase = await createClient();
+
+    // ユーザー認証チェック
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "User not authenticated",
+        hasName: false,
+      };
+    }
+
+    // プロフィールから full_name を取得
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single();
+
+    // full_name が null または空文字列の場合は false
+    const hasName =
+      profile?.full_name !== null &&
+      profile?.full_name !== undefined &&
+      profile.full_name.trim() !== "";
+
+    return {
+      hasName,
+    };
+  } catch (error) {
+    console.error("Error checking user name:", error);
+    return {
+      error: error instanceof Error ? error.message : "Unknown error",
+      hasName: false,
+    };
+  }
+}
+
 export async function getSpaceById(spaceId: string): Promise<SpaceInfo | null> {
   try {
     if (!isValidUUID(spaceId)) {
@@ -423,6 +472,20 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
     if (!userEmail) {
       return {
         error: t("errorUnauthorized"),
+        success: false,
+      };
+    }
+
+    // Check if user has set their full_name
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile?.full_name || profile.full_name.trim() === "") {
+      return {
+        error: t("errorNameRequired"),
         success: false,
       };
     }
