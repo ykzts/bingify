@@ -17,7 +17,7 @@ interface Props {
 }
 
 export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
-  const t = useTranslations("AdminSecrets.cron");
+  const t = useTranslations("AdminSecrets");
   const confirm = useConfirm();
   const [secret, setSecret] = useState("");
   const [showSecret, setShowSecret] = useState(false);
@@ -33,7 +33,7 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(t("saveSuccess"));
+        toast.success(t("cronSaveSuccess"));
         setSecret("");
       }
     } finally {
@@ -49,7 +49,7 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
     if (
       !(await confirm({
         description: t("deleteConfirm"),
-        title: t("deleteButton"),
+        title: t("cronDeleteButton"),
         variant: "destructive",
       }))
     ) {
@@ -79,7 +79,7 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
       return t("saving");
     }
     if (hasSecret) {
-      return t("replaceButton");
+      return t("cronReplaceButton");
     }
     return t("saveButton");
   };
@@ -112,8 +112,8 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
               onChange={(e) => setSecret(e.target.value)}
               placeholder={
                 hasSecret
-                  ? t("secretPlaceholderReplace")
-                  : t("secretPlaceholder")
+                  ? t("cronSecretPlaceholderReplace")
+                  : t("cronSecretPlaceholder")
               }
               type={showSecret ? "text" : "password"}
               value={secret}
@@ -173,7 +173,7 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
               type="button"
               variant="destructive"
             >
-              {isDeleting ? t("deleting") : t("deleteButton")}
+              {isDeleting ? t("deleting") : t("cronDeleteButton")}
             </Button>
           )}
         </div>

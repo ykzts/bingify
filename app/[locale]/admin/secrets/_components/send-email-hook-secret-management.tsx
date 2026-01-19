@@ -20,7 +20,7 @@ interface Props {
 }
 
 export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
-  const t = useTranslations("AdminSecrets.authHooks");
+  const t = useTranslations("AdminSecrets");
   const confirm = useConfirm();
   const [secret, setSecret] = useState("");
   const [showSecret, setShowSecret] = useState(false);
@@ -35,7 +35,7 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
     if (result.error) {
       toast.error(result.error);
     } else {
-      toast.success(t("saveSuccess"));
+      toast.success(t("authHooksSaveSuccess"));
     }
 
     setIsUpdating(false);
@@ -48,8 +48,8 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
 
     if (
       !(await confirm({
-        description: t("deleteConfirm"),
-        title: t("deleteButton"),
+        description: t("authHooksDeleteConfirm"),
+        title: t("authHooksDeleteButton"),
         variant: "destructive",
       }))
     ) {
@@ -63,7 +63,7 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
     if (result.error) {
       toast.error(result.error);
     } else {
-      toast.success(t("deleteSuccess"));
+      toast.success(t("authHooksDeleteSuccess"));
       setSecret("");
     }
 
@@ -80,7 +80,7 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
     if (hasSecret) {
       return t("replaceButton");
     }
-    return t("saveButton");
+    return t("authHooksSaveButton");
   };
 
   return (
@@ -92,7 +92,7 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
           <div className="space-y-2">
             <p>{t("infoDescription")}</p>
             <ul className="ml-4 list-disc space-y-1 text-sm">
-              <li>{t("infoVaultEncryption")}</li>
+              <li>{t("authHooksInfoVaultEncryption")}</li>
               <li>{t("infoEnvFallback")}</li>
               <li>{t("infoFormat")}</li>
             </ul>
@@ -111,7 +111,9 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
               id="secret"
               onChange={(e) => setSecret(e.target.value)}
               placeholder={
-                hasSecret ? t("secretPlaceholderReplace") : "v1,whsec_..."
+                hasSecret
+                  ? t("authHooksSecretPlaceholderReplace")
+                  : "v1,whsec_..."
               }
               type={showSecret ? "text" : "password"}
               value={secret}
@@ -130,12 +132,12 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
                 <Eye className="h-4 w-4" />
               )}
               <span className="sr-only">
-                {showSecret ? t("hideSecret") : t("showSecret")}
+                {showSecret ? t("hideSecret") : t("authHooksShowSecret")}
               </span>
             </Button>
           </div>
           <p className="text-gray-600 text-sm">
-            {hasSecret ? t("secretHelpReplace") : t("secretHelp")}
+            {hasSecret ? t("authHooksSecretHelpReplace") : t("secretHelp")}
           </p>
         </div>
 
@@ -151,7 +153,7 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
         {hasSecret && updatedAt && (
           <div className="rounded-lg bg-green-50 p-3">
             <p className="font-medium text-green-800 text-sm">
-              {t("secretConfigured")}
+              {t("authHooksSecretConfigured")}
             </p>
             <p className="mt-1 text-green-700 text-xs">
               {t("lastUpdated", {
@@ -182,7 +184,7 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
               type="button"
               variant="destructive"
             >
-              {isDeleting ? t("deleting") : t("deleteButton")}
+              {isDeleting ? t("authHooksDeleting") : t("authHooksDeleteButton")}
             </Button>
           )}
         </div>

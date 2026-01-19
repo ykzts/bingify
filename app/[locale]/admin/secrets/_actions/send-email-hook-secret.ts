@@ -36,7 +36,7 @@ async function ensureAdminOrError(): Promise<AdminCheckResult> {
     .single();
 
   if (profile?.role !== "admin") {
-    return { error: t("errorNoPermission") };
+    return { error: t("authHooksErrorNoPermission") };
   }
 
   return { user };
@@ -92,7 +92,7 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
     };
   } catch (error) {
     console.error("Error in getSendEmailHookSecret:", error);
-    return { error: t("errorGeneric") };
+    return { error: t("authHooksErrorGeneric") };
   }
 }
 
@@ -152,7 +152,7 @@ export async function upsertSendEmailHookSecret(
     return { success: true };
   } catch (error) {
     console.error("Error in upsertSendEmailHookSecret:", error);
-    return { error: t("errorGeneric") };
+    return { error: t("authHooksErrorGeneric") };
   }
 }
 
@@ -198,6 +198,6 @@ export async function deleteSendEmailHookSecret(): Promise<DeleteSendEmailHookSe
     return { success: true };
   } catch (error) {
     console.error("Error in deleteSendEmailHookSecret:", error);
-    return { error: t("errorGeneric") };
+    return { error: t("authHooksErrorGeneric") };
   }
 }

@@ -26,7 +26,7 @@ async function ensureAdminOrError(): Promise<AdminCheckResult> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: t("errorUnauthorized") };
+    return { error: t("cronErrorUnauthorized") };
   }
 
   const { data: profile } = await supabase
@@ -90,7 +90,7 @@ export async function getCronSecret(): Promise<GetCronSecretResult> {
     };
   } catch (error) {
     console.error("Error in getCronSecret:", error);
-    return { error: t("errorGeneric") };
+    return { error: t("cronErrorGeneric") };
   }
 }
 
@@ -145,7 +145,7 @@ export async function upsertCronSecret(
     return { success: true };
   } catch (error) {
     console.error("Error in upsertCronSecret:", error);
-    return { error: t("errorGeneric") };
+    return { error: t("cronErrorGeneric") };
   }
 }
 
@@ -189,6 +189,6 @@ export async function deleteCronSecret(): Promise<DeleteCronSecretResult> {
     return { success: true };
   } catch (error) {
     console.error("Error in deleteCronSecret:", error);
-    return { error: t("errorGeneric") };
+    return { error: t("cronErrorGeneric") };
   }
 }
