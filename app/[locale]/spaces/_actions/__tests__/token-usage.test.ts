@@ -26,6 +26,8 @@ vi.mock("next-intl/server", () => ({
       errorInvalidSpace: "無効なスペースIDです",
       errorJoinFailed: "スペースへの参加に失敗しました",
       errorLeaveFailed: "スペースからの退出に失敗しました",
+      errorNameRequired:
+        "このスペースに参加するには、アカウント設定で名前を設定してください",
       errorQuotaReached: "スペースの参加者数が上限に達しています",
       errorSpaceClosed: "このスペースは終了しています",
       errorTwitchNotFollowing:
@@ -117,6 +119,18 @@ describe("OAuth Token Usage in joinSpace", () => {
       });
 
       mockSupabase.from.mockImplementation((table: string) => {
+        if (table === "profiles") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: { full_name: "Test User" },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
         if (table === "spaces") {
           return {
             select: vi.fn().mockReturnValue({
@@ -220,6 +234,18 @@ describe("OAuth Token Usage in joinSpace", () => {
       });
 
       mockSupabase.from.mockImplementation((table: string) => {
+        if (table === "profiles") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: { full_name: "Test User" },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
         if (table === "spaces") {
           return {
             select: vi.fn().mockReturnValue({
@@ -286,6 +312,18 @@ describe("OAuth Token Usage in joinSpace", () => {
       });
 
       mockSupabase.from.mockImplementation((table: string) => {
+        if (table === "profiles") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: { full_name: "Test User" },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
         if (table === "spaces") {
           return {
             select: vi.fn().mockReturnValue({
@@ -404,6 +442,18 @@ describe("OAuth Token Usage in joinSpace", () => {
       });
 
       mockSupabase.from.mockImplementation((table: string) => {
+        if (table === "profiles") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: { full_name: "Test User" },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
         if (table === "spaces") {
           return {
             select: vi.fn().mockReturnValue({
@@ -468,6 +518,18 @@ describe("OAuth Token Usage in joinSpace", () => {
       });
 
       mockSupabase.from.mockImplementation((table: string) => {
+        if (table === "profiles") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: { full_name: "Test User" },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
         if (table === "spaces") {
           return {
             select: vi.fn().mockReturnValue({
@@ -573,6 +635,18 @@ describe("OAuth Token Usage in joinSpace", () => {
       });
 
       mockSupabase.from.mockImplementation((table: string) => {
+        if (table === "profiles") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: { full_name: "Test User" },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
         if (table === "spaces") {
           return {
             select: vi.fn().mockReturnValue({
@@ -636,6 +710,18 @@ describe("OAuth Token Usage in joinSpace", () => {
       });
 
       mockSupabase.from.mockImplementation((table: string) => {
+        if (table === "profiles") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: { full_name: "Test User" },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
         if (table === "spaces") {
           return {
             select: vi.fn().mockReturnValue({

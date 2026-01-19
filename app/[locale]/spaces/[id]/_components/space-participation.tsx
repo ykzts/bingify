@@ -13,6 +13,7 @@ import {
   useParticipantInfo,
   useUserParticipation,
 } from "../_hooks/use-participation";
+import { useUserNameCheck } from "../_hooks/use-user-name-check";
 
 interface SpaceParticipationProps {
   compact?: boolean;
@@ -132,6 +133,10 @@ export function SpaceParticipation({
   const { data: hasTwitchToken = null, isPending: isCheckingTwitchToken } =
     useOAuthTokenCheck("twitch", Boolean(requiresTwitch && !hasJoined));
 
+  // Check if user has set their name
+  const { data: hasUserName = null, isPending: isCheckingUserName } =
+    useUserNameCheck(Boolean(!hasJoined));
+
   const handleJoin = useEffectEvent(async () => {
     setIsJoining(true);
     setError(null);
@@ -166,6 +171,20 @@ export function SpaceParticipation({
 
   // Helper function to render the appropriate join button or account settings link
   const renderJoinButton = (compact?: boolean) => {
+    // Check if user has set their name first (highest priority)
+    if (hasUserName === false) {
+      return (
+        <Button
+          asChild
+          className={compact ? "" : "w-full"}
+          type="button"
+          variant="outline"
+        >
+          <Link href="/settings/profile">{t("nameSettingRequiredButton")}</Link>
+        </Button>
+      );
+    }
+
     // If YouTube token is required but not available, show link to account settings
     if (requiresYouTube && !hasYouTubeToken) {
       return (
@@ -198,7 +217,7 @@ export function SpaceParticipation({
       );
     }
 
-    // All tokens are available, show normal join button
+    // All requirements met, show normal join button
     return (
       <JoinButton
         compact={compact}
@@ -210,7 +229,12 @@ export function SpaceParticipation({
     );
   };
 
-  if (isLoading || isCheckingYouTubeToken || isCheckingTwitchToken) {
+  if (
+    isLoading ||
+    isCheckingYouTubeToken ||
+    isCheckingTwitchToken ||
+    isCheckingUserName
+  ) {
     return (
       <div
         className={`flex items-center justify-center ${compact ? "py-2" : "py-8"}`}
@@ -234,6 +258,13 @@ export function SpaceParticipation({
 
   return (
     <div className="space-y-4">
+      {/* Name Requirement Notice - Only show if name is not set */}
+      {hasUserName === false && !hasJoined && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <p className="text-amber-800 text-sm">{t("nameSettingRequired")}</p>
+        </div>
+      )}
+
       {/* YouTube Requirement Notice - Only show if token is missing */}
       {requiresYouTube && hasYouTubeToken === false && !hasJoined && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">

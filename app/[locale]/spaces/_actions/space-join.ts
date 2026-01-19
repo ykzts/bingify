@@ -13,6 +13,7 @@ import {
   gatekeeperRulesSchema,
   type PublicSpaceInfo,
 } from "@/lib/types/space";
+import { isValidUserName } from "@/lib/utils/user";
 import { isValidUUID } from "@/lib/utils/uuid";
 
 export interface JoinSpaceState {
@@ -91,6 +92,60 @@ export async function checkOAuthTokenAvailability(
     return {
       available: false,
       error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * ユーザーの名前が設定されているかチェックする
+ *
+ * @returns 名前が設定されているかどうか
+ */
+export async function checkUserNameSet(): Promise<{
+  hasName: boolean;
+  error?: string;
+}> {
+  try {
+    const supabase = await createClient();
+
+    // ユーザー認証チェック
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        error: "User not authenticated",
+        hasName: false,
+      };
+    }
+
+    // プロフィールから full_name を取得
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+      return {
+        error: "Failed to fetch profile",
+        hasName: false,
+      };
+    }
+
+    // full_name が有効かチェック
+    const hasName = isValidUserName(profile?.full_name);
+
+    return {
+      hasName,
+    };
+  } catch (error) {
+    console.error("Error checking user name:", error);
+    return {
+      error: error instanceof Error ? error.message : "Unknown error",
+      hasName: false,
     };
   }
 }
@@ -392,6 +447,133 @@ async function verifyGatekeeperRules(
   return null;
 }
 
+/**
+ * ユーザーの認証状態と名前設定を検証する
+ */
+async function validateUserForJoin(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  t: Awaited<ReturnType<typeof getTranslations>>
+): Promise<{ user: { id: string; email: string } } | JoinSpaceState> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      error: t("errorUnauthorized"),
+      success: false,
+    };
+  }
+
+  const userEmail = user.email;
+  if (!userEmail) {
+    return {
+      error: t("errorUnauthorized"),
+      success: false,
+    };
+  }
+
+  // Check if user has set their full_name
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError) {
+    console.error("Error fetching profile in joinSpace:", profileError);
+    return {
+      error: t("errorGeneric"),
+      success: false,
+    };
+  }
+
+  if (!isValidUserName(profile?.full_name)) {
+    return {
+      error: t("errorNameRequired"),
+      success: false,
+    };
+  }
+
+  return { user: { email: userEmail, id: user.id } };
+}
+
+/**
+ * スペースの状態と有効期限を検証する
+ */
+async function validateSpaceStatus(
+  space: { status: string | null; created_at: string | null; id: string },
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  t: Awaited<ReturnType<typeof getTranslations>>
+): Promise<JoinSpaceState | null> {
+  if (space.status !== "active") {
+    return {
+      error: t("errorSpaceClosed"),
+      success: false,
+    };
+  }
+
+  // Check if space has expired based on system settings
+  const { data: systemSettings } = await supabase
+    .from("system_settings")
+    .select("space_expiration_hours")
+    .eq("id", 1)
+    .single();
+
+  if (systemSettings && systemSettings.space_expiration_hours > 0) {
+    if (!space.created_at) {
+      console.error("Space created_at is null:", space.id);
+      return {
+        error: t("errorInvalidSpace"),
+        success: false,
+      };
+    }
+
+    const createdAt = new Date(space.created_at);
+    const expirationDate = new Date(
+      createdAt.getTime() +
+        systemSettings.space_expiration_hours * 60 * 60 * 1000
+    );
+    if (new Date() > expirationDate) {
+      return {
+        error: t("errorSpaceClosed"),
+        success: false,
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * 参加者の挿入エラーを処理する
+ */
+function handleParticipantInsertError(
+  error: { code?: string; message?: string },
+  t: Awaited<ReturnType<typeof getTranslations>>
+): JoinSpaceState {
+  // Check if it's a unique constraint violation (user already joined)
+  if (error.code === "23505") {
+    return {
+      success: true,
+    };
+  }
+
+  // Check if it's a quota error
+  if (error.code === "P0001" || error.message?.includes("limit reached")) {
+    return {
+      error: t("errorQuotaReached"),
+      success: false,
+    };
+  }
+
+  console.error("Database error:", error);
+  return {
+    error: t("errorJoinFailed"),
+    success: false,
+  };
+}
+
 export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
   const t = await getTranslations("UserSpace");
 
@@ -406,26 +588,12 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
 
     const supabase = await createClient();
 
-    // Get the authenticated user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return {
-        error: t("errorUnauthorized"),
-        success: false,
-      };
+    // Validate user authentication and name
+    const userValidation = await validateUserForJoin(supabase, t);
+    if ("success" in userValidation) {
+      return userValidation;
     }
-
-    // Get user email for verification
-    const userEmail = user.email;
-    if (!userEmail) {
-      return {
-        error: t("errorUnauthorized"),
-        success: false,
-      };
-    }
+    const { user } = userValidation;
 
     // Check if space exists and is active (and not expired)
     const { data: space } = await supabase
@@ -441,14 +609,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
       };
     }
 
-    if (space.status !== "active") {
-      return {
-        error: t("errorSpaceClosed"),
-        success: false,
-      };
-    }
-
-    // スペース所有者IDを取得
+    // Validate space owner exists
     if (!space.owner_id) {
       console.error("Space owner_id is null:", space.id);
       return {
@@ -457,42 +618,17 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
       };
     }
 
-    // Check if space has expired based on system settings
-    // This provides race condition protection between cleanup cron runs
-    const { data: systemSettings } = await supabase
-      .from("system_settings")
-      .select("space_expiration_hours")
-      .eq("id", 1)
-      .single();
-
-    if (systemSettings && systemSettings.space_expiration_hours > 0) {
-      // Defensive null check for created_at
-      if (!space.created_at) {
-        console.error("Space created_at is null:", space.id);
-        return {
-          error: t("errorInvalidSpace"),
-          success: false,
-        };
-      }
-
-      const createdAt = new Date(space.created_at);
-      const expirationDate = new Date(
-        createdAt.getTime() +
-          systemSettings.space_expiration_hours * 60 * 60 * 1000
-      );
-      if (new Date() > expirationDate) {
-        return {
-          error: t("errorSpaceClosed"),
-          success: false,
-        };
-      }
+    // Validate space status and expiration
+    const statusValidation = await validateSpaceStatus(space, supabase, t);
+    if (statusValidation) {
+      return statusValidation;
     }
 
     // Verify gatekeeper requirements
     const gatekeeperRules = space.gatekeeper_rules as GatekeeperRules | null;
     const verificationResult = await verifyGatekeeperRules(
       gatekeeperRules,
-      userEmail,
+      user.email,
       space.owner_id
     );
     if (verificationResult) {
@@ -506,27 +642,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
     });
 
     if (error) {
-      // Check if it's a unique constraint violation (user already joined)
-      if (error.code === "23505") {
-        // User already joined, treat as success
-        return {
-          success: true,
-        };
-      }
-
-      // Check if it's a quota error
-      if (error.code === "P0001" || error.message.includes("limit reached")) {
-        return {
-          error: t("errorQuotaReached"),
-          success: false,
-        };
-      }
-
-      console.error("Database error:", error);
-      return {
-        error: t("errorJoinFailed"),
-        success: false,
-      };
+      return handleParticipantInsertError(error, t);
     }
 
     return {
