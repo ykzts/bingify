@@ -32,7 +32,7 @@
     "@tailwindcss/typography": "0.5.19",
     "@tanstack/react-form": "1.27.7",
     "@tanstack/react-form-nextjs": "1.27.7",
-    "@tanstack/react-query": "5.90.17",
+    "@tanstack/react-query": "5.90.18",
     "@twurple/api": "8.0.3",
     "@twurple/auth": "8.0.3",
     "canvas-confetti": "1.9.4",
