@@ -34,8 +34,7 @@ export function AdminNav({ locale }: Props) {
       href: `/${locale}/admin/auth-providers`,
       label: t("navAuthProviders"),
     },
-    { href: `/${locale}/admin/auth-hooks`, label: t("navAuthHooks") },
-    { href: `/${locale}/admin/cron`, label: t("navCron") },
+    { href: `/${locale}/admin/secrets`, label: t("navSecrets") },
     { href: `/${locale}/admin/mail`, label: t("navMail") },
     { href: `/${locale}/admin/general`, label: t("navGeneral") },
     {

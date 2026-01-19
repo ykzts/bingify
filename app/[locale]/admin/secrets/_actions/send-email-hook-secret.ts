@@ -18,7 +18,7 @@ interface AdminCheckResult {
  * @returns Object with either user or error
  */
 async function ensureAdminOrError(): Promise<AdminCheckResult> {
-  const t = await getTranslations("AdminAuthHooks");
+  const t = await getTranslations("AdminSecrets.authHooks");
   const supabase = await createClient();
 
   const {
@@ -36,7 +36,7 @@ async function ensureAdminOrError(): Promise<AdminCheckResult> {
     .single();
 
   if (profile?.role !== "admin") {
-    return { error: t("errorNoPermission") };
+    return { error: t("authHooksErrorNoPermission") };
   }
 
   return { user };
@@ -53,7 +53,7 @@ export interface GetSendEmailHookSecretResult {
  * Note: Secret value is not returned for security - only existence and metadata
  */
 export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretResult> {
-  const t = await getTranslations("AdminAuthHooks");
+  const t = await getTranslations("AdminSecrets.authHooks");
 
   try {
     // Admin check required
@@ -92,7 +92,7 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
     };
   } catch (error) {
     console.error("Error in getSendEmailHookSecret:", error);
-    return { error: t("errorGeneric") };
+    return { error: t("authHooksErrorGeneric") };
   }
 }
 
@@ -107,7 +107,7 @@ export interface UpsertSendEmailHookSecretResult {
 export async function upsertSendEmailHookSecret(
   secret: string
 ): Promise<UpsertSendEmailHookSecretResult> {
-  const t = await getTranslations("AdminAuthHooks");
+  const t = await getTranslations("AdminSecrets.authHooks");
 
   try {
     // Admin check required
@@ -146,13 +146,13 @@ export async function upsertSendEmailHookSecret(
       return { error: result?.error || t("errorUpsertFailed") };
     }
 
-    // Revalidate the email hook page
-    revalidatePath("/[locale]/admin/auth-hooks", "page");
+    // Revalidate the secrets page
+    revalidatePath("/[locale]/admin/secrets", "page");
 
     return { success: true };
   } catch (error) {
     console.error("Error in upsertSendEmailHookSecret:", error);
-    return { error: t("errorGeneric") };
+    return { error: t("authHooksErrorGeneric") };
   }
 }
 
@@ -165,7 +165,7 @@ export interface DeleteSendEmailHookSecretResult {
  * Delete the send email hook secret (admin only)
  */
 export async function deleteSendEmailHookSecret(): Promise<DeleteSendEmailHookSecretResult> {
-  const t = await getTranslations("AdminAuthHooks");
+  const t = await getTranslations("AdminSecrets.authHooks");
 
   try {
     // Admin check required
@@ -192,12 +192,12 @@ export async function deleteSendEmailHookSecret(): Promise<DeleteSendEmailHookSe
       return { error: result?.error || t("errorDeleteFailed") };
     }
 
-    // Revalidate the email hook page
-    revalidatePath("/[locale]/admin/auth-hooks", "page");
+    // Revalidate the secrets page
+    revalidatePath("/[locale]/admin/secrets", "page");
 
     return { success: true };
   } catch (error) {
     console.error("Error in deleteSendEmailHookSecret:", error);
-    return { error: t("errorGeneric") };
+    return { error: t("authHooksErrorGeneric") };
   }
 }

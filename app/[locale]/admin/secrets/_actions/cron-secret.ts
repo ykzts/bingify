@@ -18,7 +18,7 @@ interface AdminCheckResult {
  * @returns Object with either user or error
  */
 async function ensureAdminOrError(): Promise<AdminCheckResult> {
-  const t = await getTranslations("AdminCron");
+  const t = await getTranslations("AdminSecrets.cron");
   const supabase = await createClient();
 
   const {
@@ -26,7 +26,7 @@ async function ensureAdminOrError(): Promise<AdminCheckResult> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: t("errorUnauthorized") };
+    return { error: t("cronErrorUnauthorized") };
   }
 
   const { data: profile } = await supabase
@@ -53,7 +53,7 @@ export interface GetCronSecretResult {
  * Note: Secret value is not returned for security - only existence and metadata
  */
 export async function getCronSecret(): Promise<GetCronSecretResult> {
-  const t = await getTranslations("AdminCron");
+  const t = await getTranslations("AdminSecrets.cron");
 
   try {
     // Admin check required
@@ -90,7 +90,7 @@ export async function getCronSecret(): Promise<GetCronSecretResult> {
     };
   } catch (error) {
     console.error("Error in getCronSecret:", error);
-    return { error: t("errorGeneric") };
+    return { error: t("cronErrorGeneric") };
   }
 }
 
@@ -105,7 +105,7 @@ export interface UpsertCronSecretResult {
 export async function upsertCronSecret(
   secret: string
 ): Promise<UpsertCronSecretResult> {
-  const t = await getTranslations("AdminCron");
+  const t = await getTranslations("AdminSecrets.cron");
 
   try {
     // Admin check required
@@ -139,13 +139,13 @@ export async function upsertCronSecret(
       return { error: result?.error || t("errorUpsertFailed") };
     }
 
-    // Revalidate the cron page
-    revalidatePath("/[locale]/admin/cron", "page");
+    // Revalidate the secrets page
+    revalidatePath("/[locale]/admin/secrets", "page");
 
     return { success: true };
   } catch (error) {
     console.error("Error in upsertCronSecret:", error);
-    return { error: t("errorGeneric") };
+    return { error: t("cronErrorGeneric") };
   }
 }
 
@@ -158,7 +158,7 @@ export interface DeleteCronSecretResult {
  * Delete the cron secret (admin only)
  */
 export async function deleteCronSecret(): Promise<DeleteCronSecretResult> {
-  const t = await getTranslations("AdminCron");
+  const t = await getTranslations("AdminSecrets.cron");
 
   try {
     // Admin check required
@@ -183,12 +183,12 @@ export async function deleteCronSecret(): Promise<DeleteCronSecretResult> {
       return { error: result?.error || t("errorDeleteFailed") };
     }
 
-    // Revalidate the cron page
-    revalidatePath("/[locale]/admin/cron", "page");
+    // Revalidate the secrets page
+    revalidatePath("/[locale]/admin/secrets", "page");
 
     return { success: true };
   } catch (error) {
     console.error("Error in deleteCronSecret:", error);
-    return { error: t("errorGeneric") };
+    return { error: t("cronErrorGeneric") };
   }
 }
