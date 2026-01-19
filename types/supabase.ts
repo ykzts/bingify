@@ -736,6 +736,7 @@ export type Database = {
         Args: { p_provider: string; p_user_id: string }
         Returns: Json
       }
+      delete_smtp_settings: { Args: never; Returns: Json }
       get_auth_hook_secret: { Args: { p_hook_name: string }; Returns: Json }
       get_cron_secret: { Args: never; Returns: Json }
       get_expired_oauth_tokens: {
@@ -754,6 +755,7 @@ export type Database = {
         Args: { p_provider: string; p_user_id: string }
         Returns: Json
       }
+      get_smtp_settings: { Args: never; Returns: Json }
       get_system_settings: {
         Args: never
         Returns: {
@@ -800,6 +802,17 @@ export type Database = {
           p_provider: string
           p_refresh_token?: string
           p_user_id: string
+        }
+        Returns: Json
+      }
+      upsert_smtp_settings: {
+        Args: {
+          p_mail_from: string
+          p_smtp_host: string
+          p_smtp_password?: string
+          p_smtp_port: number
+          p_smtp_secure: boolean
+          p_smtp_user: string
         }
         Returns: Json
       }

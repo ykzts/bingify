@@ -1,5 +1,6 @@
 import { formOptions } from "@tanstack/react-form-nextjs";
 import { z } from "zod";
+import { smtpSettingsSchema } from "@/lib/schemas/smtp-settings";
 
 export const systemSettingsFormSchema = z.object({
   archive_retention: z.object({
@@ -117,4 +118,19 @@ export const systemSettingsFormOpts = formOptions({
       hours: 0,
     },
   } as SystemSettingsFormValues,
+});
+
+export const smtpSettingsFormSchema = smtpSettingsSchema;
+
+export type SmtpSettingsFormValues = z.infer<typeof smtpSettingsFormSchema>;
+
+export const smtpSettingsFormOpts = formOptions({
+  defaultValues: {
+    mail_from: "",
+    smtp_host: "",
+    smtp_password: "",
+    smtp_port: 587,
+    smtp_secure: false,
+    smtp_user: "",
+  } as SmtpSettingsFormValues,
 });

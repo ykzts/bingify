@@ -5,22 +5,21 @@ import type { ReactNode } from "react";
 import React from "react";
 import { ContactFormEmail } from "@/emails/contact-form-email";
 import type { AdminEmailInfo } from "@/lib/data/profiles";
+import { getSmtpSettingsOrEnv } from "@/lib/data/smtp-settings";
 
 /**
  * Create SMTP transporter for sending emails
+ * Reads configuration from database with fallback to environment variables
  */
-function createTransporter() {
-  const config = {
-    auth: {
-      pass: process.env.SMTP_PASS,
-      user: process.env.SMTP_USER,
-    },
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_SECURE === "true",
-  };
+async function createTransporter() {
+  const config = await getSmtpSettingsOrEnv();
 
-  return nodemailer.createTransport(config);
+  return nodemailer.createTransport({
+    auth: config.auth,
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+  });
 }
 
 export interface ContactEmailOptions {
@@ -58,7 +57,8 @@ async function getLocalizedSubject(
 export async function sendContactEmail(options: ContactEmailOptions) {
   const { email, message, name, recipients } = options;
 
-  const mailFrom = process.env.MAIL_FROM;
+  const config = await getSmtpSettingsOrEnv();
+  const mailFrom = config.from;
 
   if (!mailFrom) {
     throw new Error("Mail configuration is missing");
@@ -68,7 +68,7 @@ export async function sendContactEmail(options: ContactEmailOptions) {
     throw new Error("No recipients provided");
   }
 
-  const transporter = createTransporter();
+  const transporter = await createTransporter();
 
   // Send personalized emails to each admin based on their locale
   await Promise.all(
@@ -109,13 +109,14 @@ export async function sendContactEmail(options: ContactEmailOptions) {
 export async function sendAuthEmail(options: AuthEmailOptions) {
   const { recipient, subject, template } = options;
 
-  const mailFrom = process.env.MAIL_FROM;
+  const config = await getSmtpSettingsOrEnv();
+  const mailFrom = config.from;
 
   if (!mailFrom) {
     throw new Error("Mail configuration is missing");
   }
 
-  const transporter = createTransporter();
+  const transporter = await createTransporter();
 
   // React Emailを使用してHTMLとテキスト版を自動生成
   const emailHtml = await render(template);
