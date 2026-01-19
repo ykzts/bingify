@@ -143,12 +143,12 @@ export async function getProviderOAuthConfig(provider: string): Promise<{
     }
 
     // Check if environment variables are set for this provider
-    const envPrefix =
-      provider === "google"
-        ? "SUPABASE_AUTH_EXTERNAL_GOOGLE"
-        : provider === "twitch"
-          ? "SUPABASE_AUTH_EXTERNAL_TWITCH"
-          : null;
+    let envPrefix: string | null = null;
+    if (provider === "google") {
+      envPrefix = "SUPABASE_AUTH_EXTERNAL_GOOGLE";
+    } else if (provider === "twitch") {
+      envPrefix = "SUPABASE_AUTH_EXTERNAL_TWITCH";
+    }
 
     const isClientIdSetInEnv = envPrefix
       ? !!process.env[`${envPrefix}_CLIENT_ID`]

@@ -28,6 +28,26 @@ export function OAuthConfigForm({ provider }: Props) {
   const [isClientIdSetInEnv, setIsClientIdSetInEnv] = useState(false);
   const [isClientSecretSetInEnv, setIsClientSecretSetInEnv] = useState(false);
 
+  const getClientSecretPlaceholder = () => {
+    if (isClientSecretSetInEnv) {
+      return t("clientSecretPlaceholderEnvSet");
+    }
+    if (hasExistingSecret) {
+      return t("clientSecretPlaceholderExisting");
+    }
+    return t("clientSecretPlaceholder");
+  };
+
+  const getClientSecretDescription = () => {
+    if (isClientSecretSetInEnv) {
+      return t("clientSecretDescriptionEnvSet");
+    }
+    if (hasExistingSecret) {
+      return t("clientSecretDescriptionExisting");
+    }
+    return t("clientSecretDescription");
+  };
+
   // Load existing configuration
   useEffect(() => {
     async function loadConfig() {
@@ -140,13 +160,7 @@ export function OAuthConfigForm({ provider }: Props) {
             disabled={isClientSecretSetInEnv}
             id={`${provider}-client-secret`}
             onChange={(e) => setClientSecret(e.target.value)}
-            placeholder={
-              isClientSecretSetInEnv
-                ? t("clientSecretPlaceholderEnvSet")
-                : hasExistingSecret
-                  ? t("clientSecretPlaceholderExisting")
-                  : t("clientSecretPlaceholder")
-            }
+            placeholder={getClientSecretPlaceholder()}
             type={showSecret ? "text" : "password"}
             value={clientSecret}
           />
@@ -165,13 +179,7 @@ export function OAuthConfigForm({ provider }: Props) {
             )}
           </Button>
         </div>
-        <p className="text-gray-600 text-xs">
-          {isClientSecretSetInEnv
-            ? t("clientSecretDescriptionEnvSet")
-            : hasExistingSecret
-              ? t("clientSecretDescriptionExisting")
-              : t("clientSecretDescription")}
-        </p>
+        <p className="text-gray-600 text-xs">{getClientSecretDescription()}</p>
       </div>
 
       <div className="flex justify-end">

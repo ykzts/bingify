@@ -86,10 +86,15 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
 
     if (!result?.success) {
       // Secret not found is not an error - it just means it hasn't been set yet
-      if (result?.error === AUTH_HOOK_SECRET_NOT_FOUND) {
+      if ("error" in result && result.error === AUTH_HOOK_SECRET_NOT_FOUND) {
         return { hasSecret: false, isSetInEnv };
       }
-      return { error: result?.error || t("errorFetchFailed"), isSetInEnv };
+      return {
+        error:
+          ("error" in result ? result.error : undefined) ||
+          t("errorFetchFailed"),
+        isSetInEnv,
+      };
     }
 
     return {

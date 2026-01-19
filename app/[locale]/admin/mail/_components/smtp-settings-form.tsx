@@ -63,6 +63,16 @@ export function SmtpSettingsForm({
   const [testEmail, setTestEmail] = useState("");
   const [isSendingTest, setIsSendingTest] = useState(false);
 
+  const getSmtpPasswordPlaceholder = () => {
+    if (isSmtpPasswordSetInEnv) {
+      return t("smtpPasswordPlaceholderEnvSet");
+    }
+    if (initialSettings) {
+      return t("passwordPlaceholder");
+    }
+    return "";
+  };
+
   const form = useForm({
     ...smtpSettingsFormOpts,
     defaultValues: initialSettings
@@ -334,13 +344,7 @@ export function SmtpSettingsForm({
                       name={field.name}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder={
-                        isSmtpPasswordSetInEnv
-                          ? t("smtpPasswordPlaceholderEnvSet")
-                          : initialSettings
-                            ? t("passwordPlaceholder")
-                            : ""
-                      }
+                      placeholder={getSmtpPasswordPlaceholder()}
                       type="password"
                       value={field.state.value as string}
                     />

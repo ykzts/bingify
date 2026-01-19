@@ -33,6 +33,26 @@ export function SendEmailHookSecretManagement({
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const getPlaceholder = () => {
+    if (isSetInEnv) {
+      return t("authHooksSecretPlaceholderEnvSet");
+    }
+    if (hasSecret) {
+      return t("authHooksSecretPlaceholderReplace");
+    }
+    return "v1,whsec_...";
+  };
+
+  const getHelpText = () => {
+    if (isSetInEnv) {
+      return t("authHooksSecretHelpEnvSet");
+    }
+    if (hasSecret) {
+      return t("authHooksSecretHelpReplace");
+    }
+    return t("authHooksSecretHelp");
+  };
+
   const handleSave = async () => {
     setIsUpdating(true);
 
@@ -121,13 +141,7 @@ export function SendEmailHookSecretManagement({
               disabled={isUpdating || isDeleting || isSetInEnv}
               id="secret"
               onChange={(e) => setSecret(e.target.value)}
-              placeholder={
-                isSetInEnv
-                  ? t("authHooksSecretPlaceholderEnvSet")
-                  : hasSecret
-                    ? t("authHooksSecretPlaceholderReplace")
-                    : "v1,whsec_..."
-              }
+              placeholder={getPlaceholder()}
               type={showSecret ? "text" : "password"}
               value={secret}
             />
@@ -151,13 +165,7 @@ export function SendEmailHookSecretManagement({
               </span>
             </Button>
           </div>
-          <p className="text-gray-600 text-sm">
-            {isSetInEnv
-              ? t("authHooksSecretHelpEnvSet")
-              : hasSecret
-                ? t("authHooksSecretHelpReplace")
-                : t("authHooksSecretHelp")}
-          </p>
+          <p className="text-gray-600 text-sm">{getHelpText()}</p>
         </div>
 
         {/* Validation Error */}

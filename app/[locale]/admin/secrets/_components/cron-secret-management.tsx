@@ -30,6 +30,26 @@ export function CronSecretManagement({
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const getPlaceholder = () => {
+    if (isSetInEnv) {
+      return t("cronSecretPlaceholderEnvSet");
+    }
+    if (hasSecret) {
+      return t("cronSecretPlaceholderReplace");
+    }
+    return t("cronSecretPlaceholder");
+  };
+
+  const getHelpText = () => {
+    if (isSetInEnv) {
+      return t("cronSecretHelpEnvSet");
+    }
+    if (hasSecret) {
+      return t("cronSecretHelpReplace");
+    }
+    return t("cronSecretHelp");
+  };
+
   const handleSave = async () => {
     setIsUpdating(true);
 
@@ -121,13 +141,7 @@ export function CronSecretManagement({
               disabled={isUpdating || isDeleting || isSetInEnv}
               id="secret"
               onChange={(e) => setSecret(e.target.value)}
-              placeholder={
-                isSetInEnv
-                  ? t("cronSecretPlaceholderEnvSet")
-                  : hasSecret
-                    ? t("cronSecretPlaceholderReplace")
-                    : t("cronSecretPlaceholder")
-              }
+              placeholder={getPlaceholder()}
               type={showSecret ? "text" : "password"}
               value={secret}
             />
@@ -150,13 +164,7 @@ export function CronSecretManagement({
               </span>
             </Button>
           </div>
-          <p className="text-gray-600 text-sm">
-            {isSetInEnv
-              ? t("cronSecretHelpEnvSet")
-              : hasSecret
-                ? t("cronSecretHelpReplace")
-                : t("cronSecretHelp")}
-          </p>
+          <p className="text-gray-600 text-sm">{getHelpText()}</p>
         </div>
 
         {/* Secret Status */}
