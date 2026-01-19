@@ -124,13 +124,17 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'Admin permission required');
   END IF;
 
-  -- Validate required fields (allow empty password for partial updates)
+  -- Validate required fields
   IF p_smtp_host IS NULL OR p_smtp_host = '' THEN
     RETURN jsonb_build_object('success', false, 'error', 'SMTP host is required');
   END IF;
 
   IF p_smtp_port IS NULL OR p_smtp_port < 1 OR p_smtp_port > 65535 THEN
     RETURN jsonb_build_object('success', false, 'error', 'Invalid SMTP port');
+  END IF;
+
+  IF p_smtp_user IS NULL OR p_smtp_user = '' THEN
+    RETURN jsonb_build_object('success', false, 'error', 'SMTP username is required');
   END IF;
 
   IF p_mail_from IS NULL OR p_mail_from = '' THEN
@@ -143,7 +147,7 @@ BEGIN
   FROM private.smtp_settings
   WHERE id = 1;
 
-  -- Handle password storage in Vault (only if password is provided)
+  -- Handle password storage in Vault (only if password is provided and not empty)
   IF p_smtp_password IS NOT NULL AND p_smtp_password != '' THEN
     IF v_existing_password_id IS NOT NULL THEN
       -- Validate existing password exists before attempting update
@@ -162,9 +166,12 @@ BEGIN
       v_password_id := vault.create_secret(p_smtp_password);
       v_created_password := TRUE;
     END IF;
-  ELSE
-    -- No password provided, keep existing one
+  ELSIF p_smtp_password IS NULL THEN
+    -- NULL password means keep existing one (partial update)
     v_password_id := v_existing_password_id;
+  ELSE
+    -- Empty string password is invalid
+    RETURN jsonb_build_object('success', false, 'error', 'SMTP password cannot be empty');
   END IF;
 
   -- Upsert SMTP settings (singleton pattern)

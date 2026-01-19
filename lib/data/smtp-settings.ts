@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export interface SmtpSettingsData {
@@ -22,6 +24,7 @@ export interface GetSmtpSettingsResult {
  */
 export async function getSmtpSettings(): Promise<GetSmtpSettingsResult> {
   try {
+    const t = await getTranslations("AdminSmtp");
     const supabase = await createClient();
 
     const { data, error } = await supabase.rpc("get_smtp_settings");
@@ -29,13 +32,13 @@ export async function getSmtpSettings(): Promise<GetSmtpSettingsResult> {
     if (error) {
       console.error("Error fetching SMTP settings:", error);
       return {
-        error: "Failed to fetch SMTP settings",
+        error: t("errorFetchFailed"),
       };
     }
 
     if (!data) {
       return {
-        error: "No response from database",
+        error: t("errorGeneric"),
       };
     }
 
@@ -43,7 +46,7 @@ export async function getSmtpSettings(): Promise<GetSmtpSettingsResult> {
     if (typeof data === "object" && "success" in data && !data.success) {
       console.error("RPC error:", data.error);
       return {
-        error: data.error as string,
+        error: t("errorGeneric"),
       };
     }
 
@@ -58,8 +61,9 @@ export async function getSmtpSettings(): Promise<GetSmtpSettingsResult> {
     };
   } catch (error) {
     console.error("Error in getSmtpSettings:", error);
+    const t = await getTranslations("AdminSmtp");
     return {
-      error: "An unexpected error occurred",
+      error: t("errorGeneric"),
     };
   }
 }
@@ -67,6 +71,7 @@ export async function getSmtpSettings(): Promise<GetSmtpSettingsResult> {
 /**
  * Get SMTP settings or fallback to environment variables
  * This is used by the mail sending logic
+ * Uses service role client to bypass RLS for email sending operations
  */
 export async function getSmtpSettingsOrEnv(): Promise<{
   auth: { pass: string | undefined; user: string | undefined };
@@ -75,21 +80,30 @@ export async function getSmtpSettingsOrEnv(): Promise<{
   port: number;
   secure: boolean;
 }> {
-  // Try to get settings from database first
-  const { settings, error } = await getSmtpSettings();
+  // Try to get settings from database first using service role client
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase.rpc("get_smtp_settings");
 
-  // If database settings exist and are valid, use them
-  if (settings && !error) {
-    return {
-      auth: {
-        pass: settings.smtp_password ?? undefined,
-        user: settings.smtp_user,
-      },
-      from: settings.mail_from,
-      host: settings.smtp_host,
-      port: settings.smtp_port,
-      secure: settings.smtp_secure,
-    };
+    // If database settings exist and are valid, use them
+    if (!error && data && typeof data === "object" && "settings" in data) {
+      const settings = data.settings as SmtpSettingsData | null;
+      if (settings) {
+        return {
+          auth: {
+            pass: settings.smtp_password ?? undefined,
+            user: settings.smtp_user,
+          },
+          from: settings.mail_from,
+          host: settings.smtp_host,
+          port: settings.smtp_port,
+          secure: settings.smtp_secure,
+        };
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching SMTP settings from database:", error);
+    // Fall through to environment variables
   }
 
   // Fallback to environment variables

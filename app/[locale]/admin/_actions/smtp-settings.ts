@@ -51,7 +51,7 @@ function parseSmtpSettingsFormData(
   }
 
   const smtpPassword = formData.get("smtp_password");
-  if (smtpPassword && smtpPassword !== "") {
+  if (smtpPassword) {
     data.smtp_password = smtpPassword as string;
   }
 
@@ -109,7 +109,7 @@ export async function updateSmtpSettingsAction(
     const { data, error } = await supabase.rpc("upsert_smtp_settings", {
       p_mail_from: validatedData.mail_from,
       p_smtp_host: validatedData.smtp_host,
-      p_smtp_password: validatedData.smtp_password || "",
+      p_smtp_password: validatedData.smtp_password || null,
       p_smtp_port: validatedData.smtp_port,
       p_smtp_secure: validatedData.smtp_secure,
       p_smtp_user: validatedData.smtp_user,
@@ -216,7 +216,7 @@ export async function deleteSmtpSettingsAction() {
  */
 export async function sendTestEmailAction(testEmailAddress: string) {
   try {
-    if (!testEmailAddress || testEmailAddress === "") {
+    if (!testEmailAddress) {
       return {
         error: "errorNoTestEmail",
         success: false,
@@ -226,7 +226,8 @@ export async function sendTestEmailAction(testEmailAddress: string) {
     const supabase = await createClient();
 
     // Check admin permission
-    const { error: permissionError } = await checkAdminPermission(supabase);
+    const { error: permissionError, user } =
+      await checkAdminPermission(supabase);
     if (permissionError) {
       return {
         error: permissionError,
@@ -276,6 +277,12 @@ export async function sendTestEmailAction(testEmailAddress: string) {
     // Import nodemailer dynamically to avoid bundling issues
     const nodemailer = await import("nodemailer");
 
+    // Get user's locale preference
+    const emailLocale =
+      (user?.user_metadata?.locale as string) ||
+      (user?.user_metadata?.preferred_language as string) ||
+      "en";
+
     // Create test transporter
     const transporter = nodemailer.default.createTransport({
       auth: {
@@ -291,7 +298,7 @@ export async function sendTestEmailAction(testEmailAddress: string) {
     const emailHtml = await render(
       React.createElement(ContactFormEmail, {
         email: testEmailAddress,
-        locale: "en",
+        locale: emailLocale,
         message:
           "This is a test email from your Bingify SMTP configuration. If you received this email, your SMTP settings are working correctly!",
         name: "SMTP Test",

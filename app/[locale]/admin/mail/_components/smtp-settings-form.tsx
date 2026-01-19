@@ -92,10 +92,11 @@ export function SmtpSettingsForm({ initialSettings }: Props) {
     if (meta?.success) {
       handleUpdateSuccess();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   const handleTestEmail = async () => {
-    if (!testEmail || testEmail === "") {
+    if (!testEmail) {
       toast.error(t("errorNoTestEmail"));
       return;
     }

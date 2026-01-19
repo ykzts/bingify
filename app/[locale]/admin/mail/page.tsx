@@ -17,9 +17,7 @@ export default async function MailSettingsPage({
   if (error) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-        <p className="text-red-800">
-          {t(error, { default: t("errorGeneric") })}
-        </p>
+        <p className="text-red-800">{error}</p>
       </div>
     );
   }
