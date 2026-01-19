@@ -15,6 +15,17 @@ import {
 } from "@/lib/types/space";
 import { isValidUUID } from "@/lib/utils/uuid";
 
+/**
+ * ユーザー名が有効かどうかをチェックする
+ * @param fullName - チェックする名前
+ * @returns 名前が有効かどうか
+ */
+function isValidUserName(fullName: string | null | undefined): boolean {
+  return (
+    fullName !== null && fullName !== undefined && fullName.trim() !== ""
+  );
+}
+
 export interface JoinSpaceState {
   error?: string;
   success: boolean;
@@ -120,17 +131,22 @@ export async function checkUserNameSet(): Promise<{
     }
 
     // プロフィールから full_name を取得
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("full_name")
       .eq("id", user.id)
       .single();
 
-    // full_name が null または空文字列の場合は false
-    const hasName =
-      profile?.full_name !== null &&
-      profile?.full_name !== undefined &&
-      profile.full_name.trim() !== "";
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+      return {
+        error: "Failed to fetch profile",
+        hasName: false,
+      };
+    }
+
+    // full_name が有効かチェック
+    const hasName = isValidUserName(profile?.full_name);
 
     return {
       hasName,
@@ -483,7 +499,7 @@ export async function joinSpace(spaceId: string): Promise<JoinSpaceState> {
       .eq("id", user.id)
       .single();
 
-    if (!profile?.full_name || profile.full_name.trim() === "") {
+    if (!isValidUserName(profile?.full_name)) {
       return {
         error: t("errorNameRequired"),
         success: false,
