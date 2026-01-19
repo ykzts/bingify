@@ -220,6 +220,11 @@ BEGIN
   FROM vault.decrypted_secrets
   WHERE id = v_secret_record.secret_id;
 
+  -- Check if secret was found and decrypted
+  IF NOT FOUND OR v_secret IS NULL THEN
+    RETURN jsonb_build_object('success', false, 'error', 'Secret not found');
+  END IF;
+
   RETURN jsonb_build_object(
     'success', true,
     'data', jsonb_build_object(

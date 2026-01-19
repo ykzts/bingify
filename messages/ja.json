@@ -258,7 +258,7 @@
     "errorUnauthorized": "認証が必要です",
     "errorUpsertFailed": "Cronシークレットの保存に失敗しました",
     "hideSecret": "シークレットを非表示",
-    "infoDescription": "Cronシークレットは、Cronジョブエンドポイント（クリーンアップ、トークンリフレッシュなど）へのリクエストを認証するために使用されます。",
+    "infoDescription": "Cronシークレットは、Cronジョブエンドポイント(クリーンアップ、トークンリフレッシュなど)へのリクエストを認証するために使用されます。",
     "infoEnvFallback": "ここで設定されていない場合、システムは CRON_SECRET 環境変数にフォールバックします",
     "infoVaultEncryption": "シークレットはセキュリティのためSupabase Vaultで暗号化されます",
     "lastUpdated": "最終更新: {date}",

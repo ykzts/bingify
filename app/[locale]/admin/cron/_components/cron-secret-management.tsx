@@ -27,16 +27,18 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
   const handleSave = async () => {
     setIsUpdating(true);
 
-    const result = await upsertCronSecret(secret);
+    try {
+      const result = await upsertCronSecret(secret);
 
-    if (result.error) {
-      toast.error(result.error);
-    } else {
-      toast.success(t("saveSuccess"));
-      setSecret("");
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(t("saveSuccess"));
+        setSecret("");
+      }
+    } finally {
+      setIsUpdating(false);
     }
-
-    setIsUpdating(false);
   };
 
   const handleDelete = async () => {
@@ -56,16 +58,18 @@ export function CronSecretManagement({ hasSecret, updatedAt }: Props) {
 
     setIsDeleting(true);
 
-    const result = await deleteCronSecret();
+    try {
+      const result = await deleteCronSecret();
 
-    if (result.error) {
-      toast.error(result.error);
-    } else {
-      toast.success(t("deleteSuccess"));
-      setSecret("");
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(t("deleteSuccess"));
+        setSecret("");
+      }
+    } finally {
+      setIsDeleting(false);
     }
-
-    setIsDeleting(false);
   };
 
   const hasChanges = secret.trim() !== "";
