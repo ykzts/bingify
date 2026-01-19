@@ -809,7 +809,7 @@ export type Database = {
         Args: {
           p_mail_from: string
           p_smtp_host: string
-          p_smtp_password: string
+          p_smtp_password?: string
           p_smtp_port: number
           p_smtp_secure: boolean
           p_smtp_user: string

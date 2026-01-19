@@ -96,9 +96,9 @@ CREATE OR REPLACE FUNCTION public.upsert_smtp_settings(
   p_smtp_host TEXT,
   p_smtp_port INTEGER,
   p_smtp_user TEXT,
-  p_smtp_password TEXT,
   p_smtp_secure BOOLEAN,
-  p_mail_from TEXT
+  p_mail_from TEXT,
+  p_smtp_password TEXT DEFAULT NULL
 ) RETURNS JSONB
 SECURITY DEFINER
 SET search_path = public, private, vault, pg_temp
