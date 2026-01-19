@@ -126,14 +126,13 @@
     "mobileMenuClose": "Close menu",
     "mobileMenuOpen": "Open navigation menu",
     "navAnnouncements": "Announcements",
-    "navAuthHooks": "Auth Hooks",
     "navAuthProviders": "Authentication Providers",
-    "navCron": "Cron jobs",
     "navGatekeeper": "Gatekeeper",
     "navGeneral": "General",
     "navMail": "Mail",
     "navOverview": "Overview",
     "navResourceLimits": "Resource Limits",
+    "navSecrets": "Secrets",
     "navSpaces": "Space Management",
     "navUsers": "User Management",
     "noSpaces": "No spaces",
@@ -275,6 +274,12 @@
     "secretPlaceholderReplace": "Enter new secret to replace...",
     "showSecret": "Show secret",
     "title": "Cron jobs configuration"
+  },
+  "AdminSecrets": {
+    "authHooksTitle": "Authentication Hooks",
+    "cronTitle": "Cron Jobs",
+    "description": "Manage secrets for authentication hooks and cron jobs. All secrets are encrypted and stored in Supabase Vault.",
+    "title": "Secrets"
   },
   "AdminSettings": {
     "archiveRetentionDays": "days",

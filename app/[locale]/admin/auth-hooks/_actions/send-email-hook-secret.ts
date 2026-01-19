@@ -146,8 +146,8 @@ export async function upsertSendEmailHookSecret(
       return { error: result?.error || t("errorUpsertFailed") };
     }
 
-    // Revalidate the email hook page
-    revalidatePath("/[locale]/admin/auth-hooks", "page");
+    // Revalidate the secrets page
+    revalidatePath("/[locale]/admin/secrets", "page");
 
     return { success: true };
   } catch (error) {
@@ -192,8 +192,8 @@ export async function deleteSendEmailHookSecret(): Promise<DeleteSendEmailHookSe
       return { error: result?.error || t("errorDeleteFailed") };
     }
 
-    // Revalidate the email hook page
-    revalidatePath("/[locale]/admin/auth-hooks", "page");
+    // Revalidate the secrets page
+    revalidatePath("/[locale]/admin/secrets", "page");
 
     return { success: true };
   } catch (error) {

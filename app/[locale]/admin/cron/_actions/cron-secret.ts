@@ -139,8 +139,8 @@ export async function upsertCronSecret(
       return { error: result?.error || t("errorUpsertFailed") };
     }
 
-    // Revalidate the cron page
-    revalidatePath("/[locale]/admin/cron", "page");
+    // Revalidate the secrets page
+    revalidatePath("/[locale]/admin/secrets", "page");
 
     return { success: true };
   } catch (error) {
@@ -183,8 +183,8 @@ export async function deleteCronSecret(): Promise<DeleteCronSecretResult> {
       return { error: result?.error || t("errorDeleteFailed") };
     }
 
-    // Revalidate the cron page
-    revalidatePath("/[locale]/admin/cron", "page");
+    // Revalidate the secrets page
+    revalidatePath("/[locale]/admin/secrets", "page");
 
     return { success: true };
   } catch (error) {

@@ -126,14 +126,13 @@
     "mobileMenuClose": "メニューを閉じる",
     "mobileMenuOpen": "ナビゲーションメニューを開く",
     "navAnnouncements": "お知らせ",
-    "navAuthHooks": "認証フック",
     "navAuthProviders": "認証プロバイダー",
-    "navCron": "Cronジョブ",
     "navGatekeeper": "ゲートキーパー",
     "navGeneral": "一般設定",
     "navMail": "メール",
     "navOverview": "概要",
     "navResourceLimits": "リソース制限",
+    "navSecrets": "シークレット",
     "navSpaces": "スペース管理",
     "navUsers": "ユーザー管理",
     "noSpaces": "スペースがありません",
@@ -275,6 +274,12 @@
     "secretPlaceholderReplace": "新しいシークレットを入力して置き換え...",
     "showSecret": "シークレットを表示",
     "title": "Cronジョブ設定"
+  },
+  "AdminSecrets": {
+    "authHooksTitle": "認証フック",
+    "cronTitle": "Cronジョブ",
+    "description": "認証フックとCronジョブのシークレットを管理します。すべてのシークレットは暗号化されてSupabase Vaultに保存されます。",
+    "title": "シークレット"
   },
   "AdminSettings": {
     "archiveRetentionDays": "日",
