@@ -169,7 +169,7 @@ export function SmtpSettingsForm({
                       )}
                     </div>
                     <Input
-                      disabled={isSubmitting || isSmtpHostSetInEnv}
+                      disabled={isSubmitting}
                       name={field.name}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
@@ -178,6 +178,7 @@ export function SmtpSettingsForm({
                           ? t("smtpHostPlaceholderEnvSet")
                           : "smtp.gmail.com"
                       }
+                      readOnly={isSmtpHostSetInEnv}
                       type="text"
                       value={field.state.value as string}
                     />
@@ -210,7 +211,7 @@ export function SmtpSettingsForm({
                       )}
                     </div>
                     <Input
-                      disabled={isSubmitting || isSmtpPortSetInEnv}
+                      disabled={isSubmitting}
                       name={field.name}
                       onBlur={field.handleBlur}
                       onChange={(e) =>
@@ -221,6 +222,7 @@ export function SmtpSettingsForm({
                           ? t("smtpPortPlaceholderEnvSet")
                           : "587"
                       }
+                      readOnly={isSmtpPortSetInEnv}
                       type="number"
                       value={field.state.value as number}
                     />
@@ -298,7 +300,7 @@ export function SmtpSettingsForm({
                     </div>
                     <Input
                       autoComplete="username"
-                      disabled={isSubmitting || isSmtpUserSetInEnv}
+                      disabled={isSubmitting}
                       name={field.name}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
@@ -307,6 +309,7 @@ export function SmtpSettingsForm({
                           ? t("smtpUserPlaceholderEnvSet")
                           : "user@example.com"
                       }
+                      readOnly={isSmtpUserSetInEnv}
                       type="text"
                       value={field.state.value as string}
                     />
@@ -340,11 +343,12 @@ export function SmtpSettingsForm({
                     </div>
                     <Input
                       autoComplete="new-password"
-                      disabled={isSubmitting || isSmtpPasswordSetInEnv}
+                      disabled={isSubmitting}
                       name={field.name}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       placeholder={getSmtpPasswordPlaceholder()}
+                      readOnly={isSmtpPasswordSetInEnv}
                       type="password"
                       value={field.state.value as string}
                     />
@@ -382,7 +386,7 @@ export function SmtpSettingsForm({
                       )}
                     </div>
                     <Input
-                      disabled={isSubmitting || isMailFromSetInEnv}
+                      disabled={isSubmitting}
                       name={field.name}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
@@ -391,6 +395,7 @@ export function SmtpSettingsForm({
                           ? t("mailFromPlaceholderEnvSet")
                           : "noreply@your-domain.com"
                       }
+                      readOnly={isMailFromSetInEnv}
                       type="email"
                       value={field.state.value as string}
                     />

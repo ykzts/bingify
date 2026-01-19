@@ -102,6 +102,12 @@ export async function getSmtpSettings(): Promise<GetSmtpSettingsResult> {
     const t = await getTranslations("AdminSmtp");
     return {
       error: t("errorGeneric"),
+      isMailFromSetInEnv: !!process.env.MAIL_FROM,
+      isSmtpHostSetInEnv: !!process.env.SMTP_HOST,
+      isSmtpPasswordSetInEnv: !!process.env.SMTP_PASS,
+      isSmtpPortSetInEnv: !!process.env.SMTP_PORT,
+      isSmtpSecureSetInEnv: !!process.env.SMTP_SECURE,
+      isSmtpUserSetInEnv: !!process.env.SMTP_USER,
     };
   }
 }

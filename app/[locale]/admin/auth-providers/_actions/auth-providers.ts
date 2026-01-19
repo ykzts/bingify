@@ -188,7 +188,22 @@ export async function getProviderOAuthConfig(provider: string): Promise<{
   } catch (error) {
     console.error("Error in getProviderOAuthConfig:", error);
     const t = await getTranslations("AdminAuthProviders");
-    return { error: t("errorGeneric") };
+    // Re-compute env flags for consistency
+    let envPrefix: string | null = null;
+    if (provider === "google") {
+      envPrefix = "SUPABASE_AUTH_EXTERNAL_GOOGLE";
+    } else if (provider === "twitch") {
+      envPrefix = "SUPABASE_AUTH_EXTERNAL_TWITCH";
+    }
+    return {
+      error: t("errorGeneric"),
+      isClientIdSetInEnv: envPrefix
+        ? !!process.env[`${envPrefix}_CLIENT_ID`]
+        : false,
+      isClientSecretSetInEnv: envPrefix
+        ? !!process.env[`${envPrefix}_SECRET`]
+        : false,
+    };
   }
 }
 

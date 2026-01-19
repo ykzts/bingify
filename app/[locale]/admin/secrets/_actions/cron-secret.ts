@@ -100,7 +100,8 @@ export async function getCronSecret(): Promise<GetCronSecretResult> {
     };
   } catch (error) {
     console.error("Error in getCronSecret:", error);
-    return { error: t("cronErrorGeneric") };
+    const isSetInEnv = !!process.env.CRON_SECRET;
+    return { error: t("cronErrorGeneric"), isSetInEnv };
   }
 }
 

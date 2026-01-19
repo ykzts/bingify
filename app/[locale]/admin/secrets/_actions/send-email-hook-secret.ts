@@ -104,7 +104,10 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
     };
   } catch (error) {
     console.error("Error in getSendEmailHookSecret:", error);
-    return { error: t("authHooksErrorGeneric") };
+    const isSetInEnv = !!(
+      process.env.SEND_EMAIL_HOOK_SECRET || process.env.SEND_EMAIL_HOOK_SECRETS
+    );
+    return { error: t("authHooksErrorGeneric"), isSetInEnv };
   }
 }
 
