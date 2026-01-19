@@ -133,7 +133,7 @@ export const smtpSettingsFormSchema = z.object({
     .number()
     .int("整数を入力してください")
     .min(1, "ポート番号は1以上を指定してください")
-    .max(65535, "ポート番号は65535以下を指定してください"),
+    .max(65_535, "ポート番号は65535以下を指定してください"),
   smtp_secure: z.boolean(),
   smtp_user: z
     .string()

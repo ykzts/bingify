@@ -1,11 +1,11 @@
 "use server";
 
-import { initialFormState } from "@tanstack/react-form-nextjs";
 import { render } from "@react-email/render";
+import { initialFormState } from "@tanstack/react-form-nextjs";
 import React from "react";
+import { ContactFormEmail } from "@/emails/contact-form-email";
 import { smtpSettingsSchema } from "@/lib/schemas/smtp-settings";
 import { createClient } from "@/lib/supabase/server";
-import { ContactFormEmail } from "@/emails/contact-form-email";
 
 async function checkAdminPermission(
   supabase: Awaited<ReturnType<typeof createClient>>
@@ -34,7 +34,9 @@ async function checkAdminPermission(
 /**
  * Parse FormData into properly typed SmtpSettings object
  */
-function parseSmtpSettingsFormData(formData: FormData): Record<string, unknown> {
+function parseSmtpSettingsFormData(
+  formData: FormData
+): Record<string, unknown> {
   const data: Record<string, unknown> = {};
 
   // Parse string fields
@@ -233,9 +235,8 @@ export async function sendTestEmailAction(testEmailAddress: string) {
     }
 
     // Get SMTP settings to use for sending test email
-    const { data: settingsData, error: settingsError } = await supabase.rpc(
-      "get_smtp_settings"
-    );
+    const { data: settingsData, error: settingsError } =
+      await supabase.rpc("get_smtp_settings");
 
     if (settingsError) {
       console.error("Error fetching SMTP settings:", settingsError);

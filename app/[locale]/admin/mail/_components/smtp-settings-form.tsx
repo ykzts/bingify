@@ -263,9 +263,7 @@ export function SmtpSettingsForm({ initialSettings }: Props) {
                       type="password"
                       value={field.state.value as string}
                     />
-                    <FieldDescription>
-                      {t("smtpPasswordHelp")}
-                    </FieldDescription>
+                    <FieldDescription>{t("smtpPasswordHelp")}</FieldDescription>
                     {field.state.meta.errors.length > 0 && (
                       <InlineFieldError>
                         {getErrorMessage(field.state.meta.errors[0])}
