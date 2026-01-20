@@ -78,7 +78,7 @@
     "prettier": "3.8.0",
     "shadcn": "3.7.0",
     "sharp": "0.34.5",
-    "supabase": "2.72.7",
+    "supabase": "2.72.8",
     "tailwindcss": "4.1.18",
     "textlint": "15.5.0",
     "textlint-rule-ja-no-mixed-period": "3.0.2",
