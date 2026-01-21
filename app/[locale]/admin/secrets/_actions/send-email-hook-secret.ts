@@ -64,9 +64,7 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
     }
 
     // Check if environment variable is set
-    const isSetInEnv = !!(
-      process.env.SEND_EMAIL_HOOK_SECRET || process.env.SEND_EMAIL_HOOK_SECRETS
-    );
+    const isSetInEnv = !!process.env.SEND_EMAIL_HOOK_SECRET;
 
     const supabase = await createClient();
 
@@ -104,9 +102,7 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
     };
   } catch (error) {
     console.error("Error in getSendEmailHookSecret:", error);
-    const isSetInEnv = !!(
-      process.env.SEND_EMAIL_HOOK_SECRET || process.env.SEND_EMAIL_HOOK_SECRETS
-    );
+    const isSetInEnv = !!process.env.SEND_EMAIL_HOOK_SECRET;
     return { error: t("authHooksErrorGeneric"), isSetInEnv };
   }
 }

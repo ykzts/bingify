@@ -277,7 +277,7 @@ max_frequency = "5s"
 
 # Auth email hook - Sends authentication emails via Next.js Route Handler
 # Uses HMAC-SHA256 signature verification for security
-# Secret must be set in .env.local as SEND_EMAIL_HOOK_SECRETS
+# Secret must be set in .env.local as SEND_EMAIL_HOOK_SECRET
 # Note: Use host.docker.internal to access the host machine from Docker container
 [auth.hook.send_email]
 enabled = true
@@ -285,7 +285,7 @@ enabled = true
 # In production, replace this with the public URL of your deployed app (for example via an env var such as
 # SEND_EMAIL_HOOK_URL and set `uri = "env(SEND_EMAIL_HOOK_URL)"`).
 uri = "http://host.docker.internal:3000/api/auth/hooks/send-email"
-secrets = "env(SEND_EMAIL_HOOK_SECRETS)"
+secrets = "env(SEND_EMAIL_HOOK_SECRET)"
 
 # Configure one of the supported SMS providers: `twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`.
 [auth.sms.twilio]

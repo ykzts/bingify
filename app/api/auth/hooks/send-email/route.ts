@@ -36,12 +36,8 @@ async function getEmailHookSecret(): Promise<string | null> {
     console.error("[Auth Hook] Failed to fetch secret from database:", error);
   }
 
-  // Fallback to environment variable (supports both old and new naming)
-  return (
-    process.env.SEND_EMAIL_HOOK_SECRET ||
-    process.env.SEND_EMAIL_HOOK_SECRETS ||
-    null
-  );
+  // Fallback to environment variable
+  return process.env.SEND_EMAIL_HOOK_SECRET || null;
 }
 
 /**

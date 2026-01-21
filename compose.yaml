@@ -41,7 +41,7 @@ services:
       # Google Analytics (Optional)
       - NEXT_PUBLIC_GA_MEASUREMENT_ID=${NEXT_PUBLIC_GA_MEASUREMENT_ID}
       # Auth Hooks
-      - SEND_EMAIL_HOOK_SECRETS=${SEND_EMAIL_HOOK_SECRETS}
+      - SEND_EMAIL_HOOK_SECRET=${SEND_EMAIL_HOOK_SECRET}
       # Cron Job Authentication
       - CRON_SECRET=${CRON_SECRET}
       # Basic Auth (Optional)
