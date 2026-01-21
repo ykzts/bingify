@@ -25,10 +25,7 @@ import {
 import type { AuthProvider } from "@/lib/data/auth-providers";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/client";
-import {
-  emailLoginFormOpts,
-  emailLoginFormSchema,
-} from "../_lib/form-options";
+import { emailLoginFormOpts, emailLoginFormSchema } from "../_lib/form-options";
 
 interface Props {
   providers: AuthProvider[];

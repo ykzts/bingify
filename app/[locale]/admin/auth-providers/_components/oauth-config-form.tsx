@@ -87,8 +87,7 @@ export function OAuthConfigForm({ provider }: Props) {
     }
 
     loadConfig();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [provider]);
+  }, [provider, form.setFieldValue]);
 
   const handleSave = async () => {
     // Validate using TanStack Form validators
@@ -183,9 +182,7 @@ export function OAuthConfigForm({ provider }: Props) {
           <Input
             disabled={isClientSecretSetInEnv}
             id={`${provider}-client-secret`}
-            onChange={(e) =>
-              form.setFieldValue("clientSecret", e.target.value)
-            }
+            onChange={(e) => form.setFieldValue("clientSecret", e.target.value)}
             placeholder={getClientSecretPlaceholder()}
             type={showSecret ? "text" : "password"}
             value={clientSecret}
