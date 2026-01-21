@@ -256,6 +256,14 @@ export function SmtpSettingsForm({
                           field.handleChange(checked === true)
                         }
                       />
+                      {/* Hidden input to preserve value in FormData when checkbox is disabled */}
+                      {isSmtpSecureSetInEnv && (
+                        <input
+                          name={field.name}
+                          type="hidden"
+                          value={field.state.value ? "on" : ""}
+                        />
+                      )}
                       <FieldLabel htmlFor={field.name}>
                         {t("smtpSecureLabel")}
                       </FieldLabel>
