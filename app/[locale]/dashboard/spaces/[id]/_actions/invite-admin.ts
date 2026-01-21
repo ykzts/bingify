@@ -118,8 +118,10 @@ export async function inviteAdminAction(
         const supabase = await createClient();
 
         // Check authentication
-        const { error: authError, user } =
-          await checkUserAuthentication(supabase, t);
+        const { error: authError, user } = await checkUserAuthentication(
+          supabase,
+          t
+        );
         if (authError || !user) {
           return { form: authError || t("errorUnauthorized") };
         }

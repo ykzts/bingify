@@ -91,7 +91,10 @@ export async function lookupTwitchBroadcasterIdWithOperatorToken(
 
     return { broadcasterId: data.data[0].id };
   } catch (error) {
-    console.error("Error in lookupTwitchBroadcasterIdWithOperatorToken:", error);
+    console.error(
+      "Error in lookupTwitchBroadcasterIdWithOperatorToken:",
+      error
+    );
     return {
       error: t("errorGeneric"),
     };

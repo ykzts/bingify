@@ -601,6 +601,13 @@
     "submitButton": "送信する",
     "title": "お問い合わせ"
   },
+  "ContactForm": {
+    "errorAdminEmailsFailed": "管理者のメールアドレスが取得できませんでした。しばらくしてからもう一度お試しください。",
+    "errorGeneric": "送信中にエラーが発生しました。しばらくしてからもう一度お試しください。",
+    "errorTurnstileNotConfigured": "Turnstileシークレットキーが設定されていません",
+    "errorTurnstileRequired": "スパム対策の検証が必要です",
+    "errorTurnstileVerificationFailed": "スパム対策の検証に失敗しました。もう一度お試しください"
+  },
   "ContactFormEmail": {
     "emailLabel": "メールアドレス:",
     "messageLabel": "本文:",
@@ -874,6 +881,19 @@
     "title": "画像をトリミング",
     "zoomLabel": "ズーム"
   },
+  "InviteAdmin": {
+    "errorAuthRequired": "認証が必要です。ログインしてください。",
+    "errorGeneric": "予期しないエラーが発生しました",
+    "errorInvalidSpaceId": "無効なスペースIDです",
+    "errorOwnerCannotBeAdmin": "オーナーは管理者として追加できません",
+    "errorPermissionDenied": "権限がありません",
+    "errorSpaceNotFound": "スペースが見つかりませんでした",
+    "errorUnauthorized": "認証が必要です",
+    "errorUserAlreadyAdmin": "このユーザーは既に管理者です",
+    "errorUserInfoFailed": "ユーザー情報の取得に失敗しました",
+    "errorUserNotFound": "ユーザーが見つかりませんでした",
+    "errorUserNotFoundByEmail": "このメールアドレスのユーザーが見つかりませんでした"
+  },
   "InviteEmail": {
     "buttonText": "Bingifyに参加する",
     "feature1": "リアルタイムでビンゴゲームを作成して共有",
@@ -1010,6 +1030,14 @@
     "errorTokenExpired": "OAuthトークンの有効期限が切れているか、取り消されています。アカウントを再接続してください。",
     "errorUnknown": "OAuth確認中に予期しないエラーが発生しました。もう一度お試しください。"
   },
+  "OperatorLookup": {
+    "errorAuthRequired": "認証が必要です",
+    "errorGeneric": "予期しないエラーが発生しました",
+    "errorTwitchApiError": "Twitch APIエラーが発生しました",
+    "errorTwitchNotLinked": "Twitchアカウントが連携されていません。アカウント設定でTwitchアカウントを連携してください。",
+    "errorTwitchTokenExpired": "Twitchトークンの有効期限が切れています。アカウント設定でTwitchアカウントを再連携してください。",
+    "errorTwitchUserNotFound": "Twitchユーザーが見つかりませんでした。ユーザー名またはURLを確認してください。"
+  },
   "PasswordChangedNotificationEmail": {
     "greeting": "こんにちは、",
     "passwordSecurityLabel": "パスワードセキュリティのコツ",
@@ -1047,6 +1075,12 @@
     "securityWarning": "このリクエストに心当たりがない場合は、誰かがあなたのアカウントにアクセスしようとしている可能性があります。このメールを無視し、パスワードを変更することをお勧めします。",
     "subject": "パスワードのリセット",
     "text": "パスワードのリセットリクエストを受け付けました。以下のボタンをクリックして、新しいパスワードを設定してください。"
+  },
+  "RegisterMetadata": {
+    "errorGeneric": "予期しないエラーが発生しました",
+    "errorTwitchTokenNotFound": "Twitch OAuthトークンが見つかりませんでした",
+    "errorUnauthorized": "認証が必要です",
+    "errorYouTubeTokenNotFound": "YouTube OAuthトークンが見つかりませんでした"
   },
   "ScreenSettingsActions": {
     "errorGeneric": "エラーが発生しました",
@@ -1175,6 +1209,27 @@
     "youtubeMemberRequired": "メンバーシップ必須",
     "youtubeRequirement": "YouTube要件",
     "youtubeSubscriberRequired": "チャンネル登録必須"
+  },
+  "SpaceOperations": {
+    "errorAnError": "エラーが発生しました",
+    "errorAuthRequired": "認証が必要です",
+    "errorCannotCallInDraft": "下書き状態では番号を呼ぶことができません",
+    "errorCloseSpaceFailed": "スペースのクローズに失敗しました",
+    "errorGeneric": "予期しないエラーが発生しました",
+    "errorInvalidId": "無効なIDです",
+    "errorInvalidNumber": "番号は1から75の整数である必要があります",
+    "errorInvalidSpaceId": "無効なスペースIDです",
+    "errorNotAuthenticated": "認証されていません",
+    "errorNumberAlreadyCalled": "既に呼ばれた番号です",
+    "errorNumberCallFailed": "番号の呼び出しに失敗しました",
+    "errorParticipantNotFound": "参加者が見つかりませんでした",
+    "errorParticipantRemoveFailed": "参加者の削除に失敗しました",
+    "errorParticipantsFetchFailed": "参加者の取得に失敗しました",
+    "errorPermissionDenied": "権限がありません",
+    "errorResetFailed": "ゲームのリセットに失敗しました",
+    "errorSpaceFetchFailed": "スペース情報の取得に失敗しました",
+    "errorSpaceNotFound": "スペースが見つかりませんでした",
+    "errorSpaceNotFoundOrPermissionDenied": "スペースが見つかりませんでした、または権限がありません"
   },
   "SpaceSettings": {
     "basicInfoTitle": "基本情報",
@@ -1359,60 +1414,5 @@
     "yourFinalResultTitle": "あなたの最終結果",
     "youTubeAccountLinkRequired": "このスペースに参加するには、アカウント設定でYouTubeアカウントを連携してください。",
     "youTubeAccountLinkRequiredButton": "アカウント設定に移動"
-  },
-  "OperatorLookup": {
-    "errorAuthRequired": "認証が必要です",
-    "errorGeneric": "予期しないエラーが発生しました",
-    "errorTwitchApiError": "Twitch APIエラーが発生しました",
-    "errorTwitchNotLinked": "Twitchアカウントが連携されていません。アカウント設定でTwitchアカウントを連携してください。",
-    "errorTwitchTokenExpired": "Twitchトークンの有効期限が切れています。アカウント設定でTwitchアカウントを再連携してください。",
-    "errorTwitchUserNotFound": "Twitchユーザーが見つかりませんでした。ユーザー名またはURLを確認してください。"
-  },
-  "InviteAdmin": {
-    "errorAuthRequired": "認証が必要です。ログインしてください。",
-    "errorGeneric": "予期しないエラーが発生しました",
-    "errorInvalidSpaceId": "無効なスペースIDです",
-    "errorOwnerCannotBeAdmin": "オーナーは管理者として追加できません",
-    "errorPermissionDenied": "権限がありません",
-    "errorSpaceNotFound": "スペースが見つかりませんでした",
-    "errorUnauthorized": "認証が必要です",
-    "errorUserAlreadyAdmin": "このユーザーは既に管理者です",
-    "errorUserInfoFailed": "ユーザー情報の取得に失敗しました",
-    "errorUserNotFound": "ユーザーが見つかりませんでした",
-    "errorUserNotFoundByEmail": "このメールアドレスのユーザーが見つかりませんでした"
-  },
-  "ContactForm": {
-    "errorAdminEmailsFailed": "管理者のメールアドレスが取得できませんでした。しばらくしてからもう一度お試しください。",
-    "errorGeneric": "送信中にエラーが発生しました。しばらくしてからもう一度お試しください。",
-    "errorTurnstileNotConfigured": "Turnstileシークレットキーが設定されていません",
-    "errorTurnstileRequired": "スパム対策の検証が必要です",
-    "errorTurnstileVerificationFailed": "スパム対策の検証に失敗しました。もう一度お試しください"
-  },
-  "SpaceOperations": {
-    "errorAnError": "エラーが発生しました",
-    "errorAuthRequired": "認証が必要です",
-    "errorCannotCallInDraft": "下書き状態では番号を呼ぶことができません",
-    "errorCloseSpaceFailed": "スペースのクローズに失敗しました",
-    "errorGeneric": "予期しないエラーが発生しました",
-    "errorInvalidId": "無効なIDです",
-    "errorInvalidNumber": "番号は1から75の整数である必要があります",
-    "errorInvalidSpaceId": "無効なスペースIDです",
-    "errorNotAuthenticated": "認証されていません",
-    "errorNumberAlreadyCalled": "既に呼ばれた番号です",
-    "errorNumberCallFailed": "番号の呼び出しに失敗しました",
-    "errorParticipantNotFound": "参加者が見つかりませんでした",
-    "errorParticipantRemoveFailed": "参加者の削除に失敗しました",
-    "errorParticipantsFetchFailed": "参加者の取得に失敗しました",
-    "errorPermissionDenied": "権限がありません",
-    "errorResetFailed": "ゲームのリセットに失敗しました",
-    "errorSpaceFetchFailed": "スペース情報の取得に失敗しました",
-    "errorSpaceNotFound": "スペースが見つかりませんでした",
-    "errorSpaceNotFoundOrPermissionDenied": "スペースが見つかりませんでした、または権限がありません"
-  },
-  "RegisterMetadata": {
-    "errorGeneric": "予期しないエラーが発生しました",
-    "errorTwitchTokenNotFound": "Twitch OAuthトークンが見つかりませんでした",
-    "errorUnauthorized": "認証が必要です",
-    "errorYouTubeTokenNotFound": "YouTube OAuthトークンが見つかりませんでした"
   }
 }
