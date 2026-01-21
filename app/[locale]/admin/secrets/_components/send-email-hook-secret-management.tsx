@@ -127,7 +127,7 @@ export function SendEmailHookSecretManagement({
       </Alert>
 
       {/* Secret Input Form */}
-      <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Label htmlFor="secret">{t("authHooksSecretLabel")}</Label>
@@ -165,7 +165,7 @@ export function SendEmailHookSecretManagement({
               </span>
             </Button>
           </div>
-          <p className="text-gray-600 text-sm">{getHelpText()}</p>
+          <p className="text-gray-600 text-sm dark:text-gray-400">{getHelpText()}</p>
         </div>
 
         {/* Validation Error */}
@@ -180,11 +180,11 @@ export function SendEmailHookSecretManagement({
 
         {/* Secret Status */}
         {hasSecret && updatedAt && (
-          <div className="rounded-lg bg-green-50 p-3">
-            <p className="font-medium text-green-800 text-sm">
+          <div className="rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
+            <p className="font-medium text-green-800 text-sm dark:text-green-400">
               {t("authHooksSecretConfigured")}
             </p>
-            <p className="mt-1 text-green-700 text-xs">
+            <p className="mt-1 text-green-700 text-xs dark:text-green-300">
               {t("authHooksLastUpdated", {
                 date: new Date(updatedAt).toLocaleString(),
               })}

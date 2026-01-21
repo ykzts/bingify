@@ -73,7 +73,7 @@ function AdminHeader() {
   return (
     <div className="mb-8">
       <h1 className="font-bold text-3xl">{t("dashboardTitle")}</h1>
-      <p className="mt-2 text-gray-600">{t("subtitle")}</p>
+      <p className="mt-2 text-gray-600 dark:text-gray-400">{t("subtitle")}</p>
     </div>
   );
 }

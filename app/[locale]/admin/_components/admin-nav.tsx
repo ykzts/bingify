@@ -53,7 +53,7 @@ export function AdminNav({ locale }: Props) {
   return (
     <>
       {/* モバイルメニュー (md未満) */}
-      <div className="mb-8 border-gray-200 border-b md:hidden">
+      <div className="mb-8 border-gray-200 border-b md:hidden dark:border-gray-700">
         <Sheet onOpenChange={setOpen} open={open}>
           <SheetTrigger asChild>
             <Button className="mb-4" size="icon" variant="outline">
@@ -72,9 +72,9 @@ export function AdminNav({ locale }: Props) {
                     <SheetClose asChild>
                       <Link
                         className={cn(
-                          "block rounded-xs px-4 py-2 transition-colors hover:bg-gray-100",
+                          "block rounded-xs px-4 py-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700",
                           isActive(item.href) &&
-                            "bg-purple-50 font-semibold text-purple-700"
+                            "bg-purple-50 font-semibold text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
                         )}
                         href={item.href}
                         onClick={() => setOpen(false)}
@@ -91,7 +91,7 @@ export function AdminNav({ locale }: Props) {
       </div>
 
       {/* デスクトップナビゲーション (md以上) */}
-      <nav className="mb-8 hidden border-gray-200 border-b md:block">
+      <nav className="mb-8 hidden border-gray-200 border-b md:block dark:border-gray-700">
         <ul className="flex gap-6">
           {navItems.map((item) => (
             <li key={item.href}>

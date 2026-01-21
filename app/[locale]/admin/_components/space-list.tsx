@@ -64,39 +64,39 @@ export function SpaceList({
   return (
     <div>
       <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-200 bg-white">
-          <thead className="bg-gray-50">
+        <table className="min-w-full border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+          <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
               <th
-                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider dark:text-gray-400"
                 scope="col"
               >
                 {t("shareKey")}
               </th>
               <th
-                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider dark:text-gray-400"
                 scope="col"
               >
                 {t("status")}
               </th>
               <th
-                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider dark:text-gray-400"
                 scope="col"
               >
                 {t("createDate")}
               </th>
               <th
-                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider dark:text-gray-400"
                 scope="col"
               >
                 {t("deleteAction")}
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white">
+          <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
             {spaces.length === 0 ? (
               <tr>
-                <td className="px-6 py-4 text-center text-gray-500" colSpan={4}>
+                <td className="px-6 py-4 text-center text-gray-500 dark:text-gray-400" colSpan={4}>
                   {t("noSpaces")}
                 </td>
               </tr>
@@ -105,7 +105,7 @@ export function SpaceList({
                 <tr key={space.id}>
                   <td className="whitespace-nowrap px-6 py-4">
                     <a
-                      className="text-blue-600 hover:underline"
+                      className="text-blue-600 hover:underline dark:text-blue-400"
                       href={`/@${space.share_key}`}
                       rel="noopener noreferrer"
                       target="_blank"
@@ -117,14 +117,14 @@ export function SpaceList({
                     <span
                       className={`inline-flex rounded-full px-2 font-semibold text-xs leading-5 ${
                         space.status === "active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                          : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
                       }`}
                     >
                       {space.status || "unknown"}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-gray-500 text-sm">
+                  <td className="whitespace-nowrap px-6 py-4 text-gray-500 text-sm dark:text-gray-400">
                     {space.created_at
                       ? formatDate(space.created_at, locale)
                       : "N/A"}

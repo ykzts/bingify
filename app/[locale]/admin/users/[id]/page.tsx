@@ -73,32 +73,32 @@ export default async function AdminUserDetailPage({
       </div>
 
       {/* ユーザー基本情報 */}
-      <div className="rounded-lg border bg-white p-6">
+      <div className="rounded-lg border bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
         <h3 className="mb-4 font-semibold text-lg">{t("basicInfo")}</h3>
         <dl className="space-y-3">
           <div>
-            <dt className="font-medium text-gray-700 text-sm">{t("email")}</dt>
-            <dd className="mt-1 text-gray-900">
+            <dt className="font-medium text-gray-700 text-sm dark:text-gray-300">{t("email")}</dt>
+            <dd className="mt-1 text-gray-900 dark:text-gray-100">
               {profile.email || t("notAvailable")}
             </dd>
           </div>
           <div>
-            <dt className="font-medium text-gray-700 text-sm">
+            <dt className="font-medium text-gray-700 text-sm dark:text-gray-300">
               {t("fullName")}
             </dt>
-            <dd className="mt-1 text-gray-900">
+            <dd className="mt-1 text-gray-900 dark:text-gray-100">
               {profile.full_name || t("notAvailable")}
             </dd>
           </div>
           <div>
-            <dt className="font-medium text-gray-700 text-sm">{t("role")}</dt>
-            <dd className="mt-1 text-gray-900">{profile.role}</dd>
+            <dt className="font-medium text-gray-700 text-sm dark:text-gray-300">{t("role")}</dt>
+            <dd className="mt-1 text-gray-900 dark:text-gray-100">{profile.role}</dd>
           </div>
           <div>
-            <dt className="font-medium text-gray-700 text-sm">
+            <dt className="font-medium text-gray-700 text-sm dark:text-gray-300">
               {t("createDate")}
             </dt>
-            <dd className="mt-1 text-gray-900">
+            <dd className="mt-1 text-gray-900 dark:text-gray-100">
               {profile.created_at
                 ? formatDateTime(profile.created_at, locale)
                 : t("notAvailable")}
