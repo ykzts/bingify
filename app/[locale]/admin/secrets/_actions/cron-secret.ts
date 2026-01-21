@@ -18,7 +18,7 @@ interface AdminCheckResult {
  * @returns Object with either user or error
  */
 async function ensureAdminOrError(): Promise<AdminCheckResult> {
-  const t = await getTranslations("AdminSecrets.cron");
+  const t = await getTranslations("AdminSecretsCron");
   const supabase = await createClient();
 
   const {
@@ -54,7 +54,7 @@ export interface GetCronSecretResult {
  * Note: Secret value is not returned for security - only existence and metadata
  */
 export async function getCronSecret(): Promise<GetCronSecretResult> {
-  const t = await getTranslations("AdminSecrets.cron");
+  const t = await getTranslations("AdminSecretsCron");
 
   try {
     // Admin check required
@@ -116,7 +116,7 @@ export interface UpsertCronSecretResult {
 export async function upsertCronSecret(
   secret: string
 ): Promise<UpsertCronSecretResult> {
-  const t = await getTranslations("AdminSecrets.cron");
+  const t = await getTranslations("AdminSecretsCron");
 
   try {
     // Admin check required
@@ -169,7 +169,7 @@ export interface DeleteCronSecretResult {
  * Delete the cron secret (admin only)
  */
 export async function deleteCronSecret(): Promise<DeleteCronSecretResult> {
-  const t = await getTranslations("AdminSecrets.cron");
+  const t = await getTranslations("AdminSecretsCron");
 
   try {
     // Admin check required
