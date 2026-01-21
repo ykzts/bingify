@@ -54,15 +54,15 @@ export function AuthProvidersManagement({ providers }: Props) {
   return (
     <div className="space-y-4">
       {localProviders.length === 0 ? (
-        <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <AlertCircle className="h-5 w-5 text-gray-600" />
-          <p className="text-gray-600 text-sm">{t("noProviders")}</p>
+        <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
+          <AlertCircle className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          <p className="text-gray-600 text-sm dark:text-gray-400">{t("noProviders")}</p>
         </div>
       ) : (
         <div className="space-y-4">
           {localProviders.map((provider) => (
             <div
-              className="rounded-lg border border-gray-200 bg-white"
+              className="rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
               key={provider.provider}
             >
               <div className="flex items-center justify-between p-4">
@@ -71,7 +71,7 @@ export function AuthProvidersManagement({ providers }: Props) {
                     <div className="font-medium">
                       {provider.label || provider.provider}
                     </div>
-                    <div className="mt-1 text-gray-600 text-sm">
+                    <div className="mt-1 text-gray-600 text-sm dark:text-gray-400">
                       {t("providerIdLabel")}: {provider.provider}
                     </div>
                   </div>
@@ -110,7 +110,7 @@ export function AuthProvidersManagement({ providers }: Props) {
 
               {hasOAuthConfig(provider.provider) &&
                 expandedProvider === provider.provider && (
-                  <div className="border-gray-200 border-t bg-gray-50 p-4">
+                  <div className="border-gray-200 border-t bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
                     <h4 className="mb-3 font-medium text-sm">
                       {t("oauthConfigTitle")}
                     </h4>

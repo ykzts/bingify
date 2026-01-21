@@ -146,11 +146,11 @@ export function IntegratedAuthProvidersForm({
       <FormErrors errors={formErrors} variant="with-icon" />
 
       {/* YouTube Provider */}
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="flex items-center justify-between p-6">
           <div className="flex-1">
             <h3 className="font-semibold text-lg">YouTube</h3>
-            <p className="mt-1 text-gray-600 text-sm">
+            <p className="mt-1 text-gray-600 text-sm dark:text-gray-400">
               {t("youtubeProviderDescription")}
             </p>
           </div>
@@ -185,7 +185,7 @@ export function IntegratedAuthProvidersForm({
         </div>
 
         {hasOAuthConfig("google") && expandedProvider === "google" && (
-          <div className="border-gray-200 border-t bg-gray-50 p-4">
+          <div className="border-gray-200 border-t bg-gray-50 dark:border-gray-700 dark:bg-gray-900 p-4">
             <h4 className="mb-3 font-medium text-sm">
               {t("oauthConfigTitle")}
             </h4>
@@ -193,7 +193,7 @@ export function IntegratedAuthProvidersForm({
           </div>
         )}
 
-        <div className="space-y-4 border-gray-200 border-t p-6 pt-4">
+        <div className="space-y-4 border-gray-200 border-t p-6 dark:border-gray-700 pt-4">
           <h4 className="font-medium text-sm">
             {t("gatekeeperRequirementsTitle")}
           </h4>
@@ -255,11 +255,11 @@ export function IntegratedAuthProvidersForm({
       </div>
 
       {/* Twitch Provider */}
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="flex items-center justify-between p-6">
           <div className="flex-1">
             <h3 className="font-semibold text-lg">Twitch</h3>
-            <p className="mt-1 text-gray-600 text-sm">
+            <p className="mt-1 text-gray-600 text-sm dark:text-gray-400">
               {t("twitchProviderDescription")}
             </p>
           </div>
@@ -294,7 +294,7 @@ export function IntegratedAuthProvidersForm({
         </div>
 
         {hasOAuthConfig("twitch") && expandedProvider === "twitch" && (
-          <div className="border-gray-200 border-t bg-gray-50 p-4">
+          <div className="border-gray-200 border-t bg-gray-50 dark:border-gray-700 dark:bg-gray-900 p-4">
             <h4 className="mb-3 font-medium text-sm">
               {t("oauthConfigTitle")}
             </h4>
@@ -302,7 +302,7 @@ export function IntegratedAuthProvidersForm({
           </div>
         )}
 
-        <div className="space-y-4 border-gray-200 border-t p-6 pt-4">
+        <div className="space-y-4 border-gray-200 border-t p-6 dark:border-gray-700 pt-4">
           <h4 className="font-medium text-sm">
             {t("gatekeeperRequirementsTitle")}
           </h4>
@@ -364,11 +364,11 @@ export function IntegratedAuthProvidersForm({
       </div>
 
       {/* Email Provider */}
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="flex items-center justify-between p-6">
           <div className="flex-1">
             <h3 className="font-semibold text-lg">Email</h3>
-            <p className="mt-1 text-gray-600 text-sm">
+            <p className="mt-1 text-gray-600 text-sm dark:text-gray-400">
               {t("emailProviderDescription")}
             </p>
           </div>
@@ -378,7 +378,7 @@ export function IntegratedAuthProvidersForm({
           </div>
         </div>
 
-        <div className="space-y-4 border-gray-200 border-t p-6 pt-4">
+        <div className="space-y-4 border-gray-200 border-t p-6 dark:border-gray-700 pt-4">
           <h4 className="font-medium text-sm">
             {t("gatekeeperRequirementsTitle")}
           </h4>
