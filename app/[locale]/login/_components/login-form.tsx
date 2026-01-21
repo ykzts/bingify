@@ -1,10 +1,10 @@
 "use client";
 
+import { useForm } from "@tanstack/react-form-nextjs";
 import { AlertCircle, CheckCircle, Mail } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import { z } from "zod";
 import { OAuthButton } from "@/components/oauth-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,10 +25,7 @@ import {
 import type { AuthProvider } from "@/lib/data/auth-providers";
 import type { SystemSettings } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/client";
-
-const emailSchema = z.object({
-  email: z.string().email(),
-});
+import { emailLoginFormOpts, emailLoginFormSchema } from "../_lib/form-options";
 
 interface Props {
   providers: AuthProvider[];
@@ -103,10 +100,16 @@ export function LoginForm({ providers, systemSettings }: Props) {
   const [oauthError, setOauthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState<string | null>(null);
   const [emailSuccess, setEmailSuccess] = useState(false);
   const [isEmailSending, setIsEmailSending] = useState(false);
+
+  // Use TanStack Form for email validation
+  const form = useForm({
+    ...emailLoginFormOpts,
+    validators: {
+      onChange: emailLoginFormSchema,
+    },
+  });
 
   const handleOAuthLogin = async (provider: string) => {
     setOauthError(null);
@@ -140,17 +143,20 @@ export function LoginForm({ providers, systemSettings }: Props) {
 
   const handleMagicLinkLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setEmailError(null);
     setEmailSuccess(false);
 
-    const result = emailSchema.safeParse({ email });
-    if (!result.success) {
-      setEmailError(t("errorEmailInvalid"));
+    // Validate using TanStack Form validators
+    await form.validateAllFields("submit");
+
+    const emailField = form.getFieldMeta("email");
+    if (emailField?.errors && emailField.errors.length > 0) {
       return;
     }
 
     setIsEmailSending(true);
     const supabase = createClient();
+
+    const email = form.getFieldValue("email") as string;
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -167,14 +173,22 @@ export function LoginForm({ providers, systemSettings }: Props) {
 
     if (error) {
       console.error("Magic Link error:", error);
-      setEmailError(error.message);
+      // Set field error
+      form.setFieldMeta("email", (prev) => ({
+        ...prev,
+        errors: [error.message],
+      }));
     } else {
       setEmailSuccess(true);
-      setEmail("");
+      form.reset();
     }
   };
 
   const displayError = error || oauthError;
+
+  // Get email field errors for display
+  const emailField = form.getFieldMeta("email");
+  const emailError = emailField?.errors?.[0] || null;
 
   return (
     <div className="mx-auto max-w-md space-y-6 p-8">
@@ -227,11 +241,11 @@ export function LoginForm({ providers, systemSettings }: Props) {
             <Card>
               <CardContent className="pt-6">
                 <EmailLoginForm
-                  email={email}
+                  email={form.getFieldValue("email") as string}
                   emailError={emailError}
                   emailSuccess={emailSuccess}
                   isEmailSending={isEmailSending}
-                  onEmailChange={setEmail}
+                  onEmailChange={(value) => form.setFieldValue("email", value)}
                   onSubmit={handleMagicLinkLogin}
                   t={t}
                 />
@@ -243,11 +257,11 @@ export function LoginForm({ providers, systemSettings }: Props) {
         <Card>
           <CardContent className="pt-6">
             <EmailLoginForm
-              email={email}
+              email={form.getFieldValue("email") as string}
               emailError={emailError}
               emailSuccess={emailSuccess}
               isEmailSending={isEmailSending}
-              onEmailChange={setEmail}
+              onEmailChange={(value) => form.setFieldValue("email", value)}
               onSubmit={handleMagicLinkLogin}
               t={t}
             />
