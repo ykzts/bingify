@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/utils/uuid";
 
@@ -16,17 +17,19 @@ export async function callNumber(
   spaceId: string,
   number: number
 ): Promise<CallNumberResult> {
+  const t = await getTranslations("SpaceOperations");
+
   try {
     if (!isValidUUID(spaceId)) {
       return {
-        error: "Invalid space ID",
+        error: t("errorInvalidSpaceId"),
         success: false,
       };
     }
 
     if (!Number.isInteger(number) || number < 1 || number > 75) {
       return {
-        error: "Number must be an integer between 1 and 75",
+        error: t("errorInvalidNumber"),
         success: false,
       };
     }
@@ -39,7 +42,7 @@ export async function callNumber(
 
     if (!user) {
       return {
-        error: "Authentication required",
+        error: t("errorAuthRequired"),
         success: false,
       };
     }
@@ -52,7 +55,7 @@ export async function callNumber(
 
     if (!space || space.owner_id !== user.id) {
       return {
-        error: "Permission denied",
+        error: t("errorPermissionDenied"),
         success: false,
       };
     }
@@ -60,7 +63,7 @@ export async function callNumber(
     // Block number calling if space is in draft status
     if (space.status === "draft") {
       return {
-        error: "Cannot call numbers while space is in draft status",
+        error: t("errorCannotCallInDraft"),
         success: false,
       };
     }
@@ -73,13 +76,13 @@ export async function callNumber(
     if (error) {
       if (error.code === "23505") {
         return {
-          error: "Number already called",
+          error: t("errorNumberAlreadyCalled"),
           success: false,
         };
       }
       console.error("Database error:", error);
       return {
-        error: "Failed to call number",
+        error: t("errorNumberCallFailed"),
         success: false,
       };
     }
@@ -90,7 +93,7 @@ export async function callNumber(
   } catch (error) {
     console.error("Error calling number:", error);
     return {
-      error: "An error occurred",
+      error: t("errorAnError"),
       success: false,
     };
   }
@@ -101,10 +104,12 @@ export async function resetGame(
   _prevState: ResetGameState,
   _formData: FormData
 ): Promise<ResetGameState> {
+  const t = await getTranslations("SpaceOperations");
+
   try {
     if (!isValidUUID(spaceId)) {
       return {
-        error: "Invalid space ID",
+        error: t("errorInvalidSpaceId"),
         success: false,
       };
     }
@@ -117,7 +122,7 @@ export async function resetGame(
 
     if (!user) {
       return {
-        error: "Authentication required",
+        error: t("errorAuthRequired"),
         success: false,
       };
     }
@@ -130,7 +135,7 @@ export async function resetGame(
 
     if (!space || space.owner_id !== user.id) {
       return {
-        error: "Permission denied",
+        error: t("errorPermissionDenied"),
         success: false,
       };
     }
@@ -143,7 +148,7 @@ export async function resetGame(
     if (error) {
       console.error("Database error:", error);
       return {
-        error: "Failed to reset game",
+        error: t("errorResetFailed"),
         success: false,
       };
     }
@@ -154,7 +159,7 @@ export async function resetGame(
   } catch (error) {
     console.error("Error resetting game:", error);
     return {
-      error: "An error occurred",
+      error: t("errorAnError"),
       success: false,
     };
   }
@@ -166,10 +171,12 @@ export interface CloseSpaceResult {
 }
 
 export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
+  const t = await getTranslations("SpaceOperations");
+
   try {
     if (!isValidUUID(spaceId)) {
       return {
-        error: "Invalid space ID",
+        error: t("errorInvalidSpaceId"),
         success: false,
       };
     }
@@ -182,7 +189,7 @@ export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
 
     if (!user) {
       return {
-        error: "Authentication required",
+        error: t("errorAuthRequired"),
         success: false,
       };
     }
@@ -196,14 +203,14 @@ export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
     if (error) {
       console.error("Database error:", error);
       return {
-        error: "Failed to close space",
+        error: t("errorCloseSpaceFailed"),
         success: false,
       };
     }
 
     if (count === 0) {
       return {
-        error: "Space not found or permission denied",
+        error: t("errorSpaceNotFoundOrPermissionDenied"),
         success: false,
       };
     }
@@ -219,7 +226,7 @@ export async function closeSpace(spaceId: string): Promise<CloseSpaceResult> {
   } catch (error) {
     console.error("Error closing space:", error);
     return {
-      error: "An error occurred",
+      error: t("errorAnError"),
       success: false,
     };
   }
@@ -244,10 +251,12 @@ export interface GetParticipantsResult {
 export async function getParticipants(
   spaceId: string
 ): Promise<GetParticipantsResult> {
+  const t = await getTranslations("SpaceOperations");
+
   try {
     if (!isValidUUID(spaceId)) {
       console.error("[getParticipants] Invalid UUID:", spaceId);
-      return { data: [], error: "Invalid space ID" };
+      return { data: [], error: t("errorInvalidSpaceId") };
     }
 
     const supabase = await createClient();
@@ -258,7 +267,7 @@ export async function getParticipants(
 
     if (!user) {
       console.error("[getParticipants] No authenticated user");
-      return { data: [], error: "Not authenticated" };
+      return { data: [], error: t("errorNotAuthenticated") };
     }
 
     console.log("[getParticipants] User authenticated:", user.id);
@@ -273,13 +282,13 @@ export async function getParticipants(
       console.error("[getParticipants] Error fetching space:", spaceError);
       return {
         data: [],
-        error: "Failed to fetch space information",
+        error: t("errorSpaceFetchFailed"),
       };
     }
 
     if (!space) {
       console.error("[getParticipants] Space not found:", spaceId);
-      return { data: [], error: "Space not found" };
+      return { data: [], error: t("errorSpaceNotFound") };
     }
 
     if (space.owner_id !== user.id) {
@@ -289,7 +298,7 @@ export async function getParticipants(
         "vs",
         space.owner_id
       );
-      return { data: [], error: "Permission denied" };
+      return { data: [], error: t("errorPermissionDenied") };
     }
 
     console.log("[getParticipants] User is owner, fetching participants...");
@@ -308,7 +317,7 @@ export async function getParticipants(
       );
       return {
         data: [],
-        error: "Failed to fetch participants",
+        error: t("errorParticipantsFetchFailed"),
       };
     }
 
@@ -375,7 +384,7 @@ export async function getParticipants(
     return { data: sortedParticipants };
   } catch (error) {
     console.error("Error getting participants:", error);
-    return { data: [], error: "An unexpected error occurred" };
+    return { data: [], error: t("errorGeneric") };
   }
 }
 
@@ -388,10 +397,12 @@ export async function kickParticipant(
   spaceId: string,
   participantId: string
 ): Promise<KickParticipantResult> {
+  const t = await getTranslations("SpaceOperations");
+
   try {
     if (!(isValidUUID(spaceId) && isValidUUID(participantId))) {
       return {
-        error: "Invalid ID",
+        error: t("errorInvalidId"),
         success: false,
       };
     }
@@ -404,7 +415,7 @@ export async function kickParticipant(
 
     if (!user) {
       return {
-        error: "Authentication required",
+        error: t("errorAuthRequired"),
         success: false,
       };
     }
@@ -417,7 +428,7 @@ export async function kickParticipant(
 
     if (!space || space.owner_id !== user.id) {
       return {
-        error: "Permission denied",
+        error: t("errorPermissionDenied"),
         success: false,
       };
     }
@@ -431,7 +442,7 @@ export async function kickParticipant(
     if (error) {
       console.error("Database error:", error);
       return {
-        error: "Failed to remove participant",
+        error: t("errorParticipantRemoveFailed"),
         success: false,
       };
     }
@@ -446,7 +457,7 @@ export async function kickParticipant(
   } catch (error) {
     console.error("Error kicking participant:", error);
     return {
-      error: "An error occurred",
+      error: t("errorAnError"),
       success: false,
     };
   }
@@ -476,10 +487,12 @@ export async function getParticipantCard(
   spaceId: string,
   participantId: string
 ): Promise<GetParticipantCardResult> {
+  const t = await getTranslations("SpaceOperations");
+
   try {
     if (!(isValidUUID(spaceId) && isValidUUID(participantId))) {
       return {
-        error: "Invalid ID",
+        error: t("errorInvalidId"),
         success: false,
       };
     }
@@ -492,7 +505,7 @@ export async function getParticipantCard(
 
     if (!user) {
       return {
-        error: "Authentication required",
+        error: t("errorAuthRequired"),
         success: false,
       };
     }
@@ -505,7 +518,7 @@ export async function getParticipantCard(
 
     if (!space || space.owner_id !== user.id) {
       return {
-        error: "Permission denied",
+        error: t("errorPermissionDenied"),
         success: false,
       };
     }
@@ -519,7 +532,7 @@ export async function getParticipantCard(
 
     if (!participant) {
       return {
-        error: "Participant not found",
+        error: t("errorParticipantNotFound"),
         success: false,
       };
     }
@@ -533,7 +546,7 @@ export async function getParticipantCard(
 
     if (!card) {
       return {
-        error: "Card not found",
+        error: t("errorGeneric"),
         success: false,
       };
     }
@@ -557,7 +570,7 @@ export async function getParticipantCard(
   } catch (error) {
     console.error("Error getting participant card:", error);
     return {
-      error: "An error occurred",
+      error: t("errorAnError"),
       success: false,
     };
   }

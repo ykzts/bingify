@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import {
   registerTwitchBroadcasterMetadata as registerTwitchMetadata,
   registerYouTubeChannelMetadata as registerYouTubeMetadata,
@@ -11,6 +12,8 @@ import { createClient } from "@/lib/supabase/server";
  * YouTubeチャンネルのメタデータを即座に登録
  */
 export async function registerYouTubeChannelMetadata(channelId: string) {
+  const t = await getTranslations("RegisterMetadata");
+
   try {
     const supabase = await createClient();
 
@@ -18,7 +21,7 @@ export async function registerYouTubeChannelMetadata(channelId: string) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      return { error: "Unauthorized", success: false };
+      return { error: t("errorUnauthorized"), success: false };
     }
 
     // Get operator's YouTube OAuth token using the proper token storage function
@@ -26,7 +29,7 @@ export async function registerYouTubeChannelMetadata(channelId: string) {
 
     if (!(tokenResult.success && tokenResult.access_token)) {
       return {
-        error: "YouTube OAuth token not found",
+        error: t("errorYouTubeTokenNotFound"),
         success: false,
       };
     }
@@ -42,7 +45,7 @@ export async function registerYouTubeChannelMetadata(channelId: string) {
   } catch (error) {
     console.error("Error registering YouTube metadata:", error);
     return {
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: t("errorGeneric"),
       success: false,
     };
   }
@@ -52,6 +55,8 @@ export async function registerYouTubeChannelMetadata(channelId: string) {
  * Twitchブロードキャスターのメタデータを即座に登録
  */
 export async function registerTwitchBroadcasterMetadata(broadcasterId: string) {
+  const t = await getTranslations("RegisterMetadata");
+
   try {
     const supabase = await createClient();
 
@@ -59,7 +64,7 @@ export async function registerTwitchBroadcasterMetadata(broadcasterId: string) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      return { error: "Unauthorized", success: false };
+      return { error: t("errorUnauthorized"), success: false };
     }
 
     // Get operator's Twitch OAuth token
@@ -67,7 +72,7 @@ export async function registerTwitchBroadcasterMetadata(broadcasterId: string) {
 
     if (!(tokenResult.success && tokenResult.access_token)) {
       return {
-        error: "Twitch OAuth token not found",
+        error: t("errorTwitchTokenNotFound"),
         success: false,
       };
     }
@@ -83,7 +88,7 @@ export async function registerTwitchBroadcasterMetadata(broadcasterId: string) {
   } catch (error) {
     console.error("Error registering Twitch metadata:", error);
     return {
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: t("errorGeneric"),
       success: false,
     };
   }

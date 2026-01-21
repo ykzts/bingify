@@ -1358,5 +1358,60 @@
     "yourFinalResultTitle": "Your Final Result",
     "youTubeAccountLinkRequired": "To join this space, please link your YouTube account in Account Settings.",
     "youTubeAccountLinkRequiredButton": "Go to Account Settings"
+  },
+  "OperatorLookup": {
+    "errorAuthRequired": "Authentication required",
+    "errorGeneric": "An unexpected error occurred",
+    "errorTwitchApiError": "Twitch API error occurred",
+    "errorTwitchNotLinked": "Twitch account not linked. Please connect your Twitch account in Account Settings.",
+    "errorTwitchTokenExpired": "Twitch token has expired. Please reconnect your Twitch account in Account Settings.",
+    "errorTwitchUserNotFound": "Twitch user not found. Please check the username or URL."
+  },
+  "InviteAdmin": {
+    "errorAuthRequired": "Authentication required. Please sign in.",
+    "errorGeneric": "An unexpected error occurred",
+    "errorInvalidSpaceId": "Invalid space ID",
+    "errorOwnerCannotBeAdmin": "The owner cannot be added as an administrator",
+    "errorPermissionDenied": "Permission denied",
+    "errorSpaceNotFound": "Space not found",
+    "errorUnauthorized": "Authentication required",
+    "errorUserAlreadyAdmin": "This user is already an administrator",
+    "errorUserInfoFailed": "Failed to retrieve user information",
+    "errorUserNotFound": "User not found",
+    "errorUserNotFoundByEmail": "No user found with this email address"
+  },
+  "ContactForm": {
+    "errorAdminEmailsFailed": "Could not retrieve administrator email addresses. Please try again later.",
+    "errorGeneric": "An error occurred during submission. Please try again later.",
+    "errorTurnstileNotConfigured": "Turnstile secret key is not configured",
+    "errorTurnstileRequired": "Spam verification is required",
+    "errorTurnstileVerificationFailed": "Spam verification failed. Please try again"
+  },
+  "SpaceOperations": {
+    "errorAnError": "An error occurred",
+    "errorAuthRequired": "Authentication required",
+    "errorCannotCallInDraft": "Cannot call numbers while space is in draft status",
+    "errorCloseSpaceFailed": "Failed to close space",
+    "errorGeneric": "An unexpected error occurred",
+    "errorInvalidId": "Invalid ID",
+    "errorInvalidNumber": "Number must be an integer between 1 and 75",
+    "errorInvalidSpaceId": "Invalid space ID",
+    "errorNotAuthenticated": "Not authenticated",
+    "errorNumberAlreadyCalled": "Number already called",
+    "errorNumberCallFailed": "Failed to call number",
+    "errorParticipantNotFound": "Participant not found",
+    "errorParticipantRemoveFailed": "Failed to remove participant",
+    "errorParticipantsFetchFailed": "Failed to fetch participants",
+    "errorPermissionDenied": "Permission denied",
+    "errorResetFailed": "Failed to reset game",
+    "errorSpaceFetchFailed": "Failed to fetch space information",
+    "errorSpaceNotFound": "Space not found",
+    "errorSpaceNotFoundOrPermissionDenied": "Space not found or permission denied"
+  },
+  "RegisterMetadata": {
+    "errorGeneric": "An unexpected error occurred",
+    "errorTwitchTokenNotFound": "Twitch OAuth token not found",
+    "errorUnauthorized": "Unauthorized",
+    "errorYouTubeTokenNotFound": "YouTube OAuth token not found"
   }
 }

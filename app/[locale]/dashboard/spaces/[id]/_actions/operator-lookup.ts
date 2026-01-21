@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { getOAuthToken } from "@/lib/oauth/token-storage";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,6 +17,8 @@ const TWITCH_AT_PREFIX_REGEX = /^@/;
 export async function lookupTwitchBroadcasterIdWithOperatorToken(
   input: string
 ): Promise<{ broadcasterId?: string; error?: string }> {
+  const t = await getTranslations("OperatorLookup");
+
   try {
     // Get authenticated user
     const supabase = await createClient();
@@ -26,7 +29,7 @@ export async function lookupTwitchBroadcasterIdWithOperatorToken(
 
     if (authError || !user) {
       return {
-        error: "errorAuthRequired",
+        error: t("errorAuthRequired"),
       };
     }
 
@@ -35,7 +38,7 @@ export async function lookupTwitchBroadcasterIdWithOperatorToken(
 
     if (!(tokenResult.success && tokenResult.access_token)) {
       return {
-        error: "errorTwitchNotLinked",
+        error: t("errorTwitchNotLinked"),
       };
     }
 
@@ -75,21 +78,22 @@ export async function lookupTwitchBroadcasterIdWithOperatorToken(
 
     if (!response.ok) {
       if (response.status === 401) {
-        return { error: "errorTwitchTokenExpired" };
+        return { error: t("errorTwitchTokenExpired") };
       }
-      return { error: "errorTwitchApiError" };
+      return { error: t("errorTwitchApiError") };
     }
 
     const data = await response.json();
 
     if (!data.data || data.data.length === 0) {
-      return { error: "errorTwitchUserNotFound" };
+      return { error: t("errorTwitchUserNotFound") };
     }
 
     return { broadcasterId: data.data[0].id };
   } catch (error) {
+    console.error("Error in lookupTwitchBroadcasterIdWithOperatorToken:", error);
     return {
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: t("errorGeneric"),
     };
   }
 }
