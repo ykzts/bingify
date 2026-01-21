@@ -3,7 +3,7 @@
 import { useForm } from "@tanstack/react-form-nextjs";
 import { Eye, EyeOff, Loader2, Save } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -59,35 +59,36 @@ export function OAuthConfigForm({ provider }: Props) {
     return t("clientSecretDescription");
   };
 
-  // Load existing configuration
-  useEffect(() => {
-    async function loadConfig() {
-      setIsLoading(true);
-      const result = await getProviderOAuthConfig(provider);
+  // Use useEffectEvent to separate side-effect logic from effect dependencies
+  const loadConfigData = useEffectEvent(async (providerName: string) => {
+    setIsLoading(true);
+    const result = await getProviderOAuthConfig(providerName);
 
-      if (result.error) {
-        // Special handling for migration not applied - don't show as error toast
-        if (
-          result.error.includes("migration") ||
-          result.error.includes("マイグレーション")
-        ) {
-          // Silently fail - the UI will show a message that OAuth config is not available
-          setIsLoading(false);
-          return;
-        }
-        toast.error(result.error);
-      } else {
-        form.setFieldValue("clientId", result.clientId || "");
-        setHasExistingSecret(!!result.hasSecret);
-        setIsClientIdSetInEnv(!!result.isClientIdSetInEnv);
-        setIsClientSecretSetInEnv(!!result.isClientSecretSetInEnv);
+    if (result.error) {
+      // Special handling for migration not applied - don't show as error toast
+      if (
+        result.error.includes("migration") ||
+        result.error.includes("マイグレーション")
+      ) {
+        // Silently fail - the UI will show a message that OAuth config is not available
+        setIsLoading(false);
+        return;
       }
-
-      setIsLoading(false);
+      toast.error(result.error);
+    } else {
+      form.setFieldValue("clientId", result.clientId || "");
+      setHasExistingSecret(!!result.hasSecret);
+      setIsClientIdSetInEnv(!!result.isClientIdSetInEnv);
+      setIsClientSecretSetInEnv(!!result.isClientSecretSetInEnv);
     }
 
-    loadConfig();
-  }, [provider, form.setFieldValue]);
+    setIsLoading(false);
+  });
+
+  // Load existing configuration
+  useEffect(() => {
+    loadConfigData(provider);
+  }, [provider]);
 
   const handleSave = async () => {
     // Validate using TanStack Form validators
