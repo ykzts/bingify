@@ -27,8 +27,7 @@ export function ClaimAdminButton() {
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950">
           <p className="text-red-800 text-sm dark:text-red-200">
             {t(
-              `errors${state.error.charAt(0).toUpperCase()}${state.error.slice(1)}`,
-              { default: t("errorsErrorGeneric") }
+              `errors${state.error.charAt(0).toUpperCase()}${state.error.slice(1)}`
             )}
           </p>
         </div>
