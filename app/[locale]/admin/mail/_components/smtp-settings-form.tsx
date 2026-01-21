@@ -432,9 +432,11 @@ export function SmtpSettingsForm({
       </form>
 
       {initialSettings && (
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-900">
           <h3 className="mb-4 font-semibold text-lg">{t("testEmailTitle")}</h3>
-          <p className="mb-4 text-gray-600 text-sm">{t("testEmailHelp")}</p>
+          <p className="mb-4 text-gray-600 text-sm dark:text-gray-400">
+            {t("testEmailHelp")}
+          </p>
           <div className="flex gap-2">
             <Input
               disabled={isSendingTest}

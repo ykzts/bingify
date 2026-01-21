@@ -117,7 +117,7 @@ export function AvatarManagement({
   };
 
   return (
-    <div className="rounded-lg border bg-white p-6">
+    <div className="rounded-lg border bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
       <h3 className="mb-4 font-semibold text-lg">{t("avatarManagement")}</h3>
 
       {error && (
@@ -154,7 +154,7 @@ export function AvatarManagement({
               </p>
               {userProfile.avatar_source !== "default" &&
                 userProfile.avatar_url && (
-                  <p className="mt-1 text-gray-500 text-xs">
+                  <p className="mt-1 text-gray-500 text-xs dark:text-gray-400">
                     {userProfile.avatar_url}
                   </p>
                 )}
@@ -168,12 +168,12 @@ export function AvatarManagement({
 
           {/* カスタムアップロード画像の削除 */}
           {userProfile.avatar_source === "upload" && (
-            <div className="flex items-start gap-3 rounded-lg border p-4">
+            <div className="flex items-start gap-3 rounded-lg border p-4 dark:border-gray-700">
               <div className="flex-1">
                 <p className="font-medium text-sm">
                   {t("avatarDeleteUploadTitle")}
                 </p>
-                <p className="mt-1 text-gray-600 text-sm">
+                <p className="mt-1 text-gray-600 text-sm dark:text-gray-400">
                   {t("avatarDeleteUploadDescription")}
                 </p>
               </div>
@@ -201,10 +201,10 @@ export function AvatarManagement({
 
           {/* デフォルトに戻す */}
           {userProfile.avatar_source !== "default" && (
-            <div className="flex items-start gap-3 rounded-lg border p-4">
+            <div className="flex items-start gap-3 rounded-lg border p-4 dark:border-gray-700">
               <div className="flex-1">
                 <p className="font-medium text-sm">{t("avatarResetTitle")}</p>
-                <p className="mt-1 text-gray-600 text-sm">
+                <p className="mt-1 text-gray-600 text-sm dark:text-gray-400">
                   {t("avatarResetDescription")}
                 </p>
               </div>
@@ -231,7 +231,9 @@ export function AvatarManagement({
           )}
 
           {userProfile.avatar_source === "default" && (
-            <p className="text-gray-500 text-sm">{t("avatarIsDefault")}</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">
+              {t("avatarIsDefault")}
+            </p>
           )}
         </div>
       </div>

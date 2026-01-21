@@ -113,7 +113,9 @@ export function OAuthConfigForm({ provider }: Props) {
     return (
       <div className="flex items-center gap-2 py-4">
         <Loader2 className="h-4 w-4 animate-spin" />
-        <span className="text-gray-600 text-sm">{t("loading")}</span>
+        <span className="text-gray-600 text-sm dark:text-gray-400">
+          {t("loading")}
+        </span>
       </div>
     );
   }
@@ -139,7 +141,7 @@ export function OAuthConfigForm({ provider }: Props) {
           type="text"
           value={clientId}
         />
-        <p className="text-gray-600 text-xs">
+        <p className="text-gray-600 text-xs dark:text-gray-400">
           {isClientIdSetInEnv
             ? t("clientIdDescriptionEnvSet")
             : t("clientIdDescription")}
@@ -179,7 +181,9 @@ export function OAuthConfigForm({ provider }: Props) {
             )}
           </Button>
         </div>
-        <p className="text-gray-600 text-xs">{getClientSecretDescription()}</p>
+        <p className="text-gray-600 text-xs dark:text-gray-400">
+          {getClientSecretDescription()}
+        </p>
       </div>
 
       <div className="flex justify-end">

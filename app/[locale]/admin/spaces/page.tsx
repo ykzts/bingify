@@ -19,8 +19,8 @@ export default async function AdminSpacesPage({
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-        <p className="text-red-800">{t(error)}</p>
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
+        <p className="text-red-800 dark:text-red-400">{t(error)}</p>
       </div>
     );
   }
@@ -29,7 +29,7 @@ export default async function AdminSpacesPage({
     <div>
       <div className="mb-6">
         <h2 className="font-bold text-2xl">{t("spacesTitle")}</h2>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-gray-600 dark:text-gray-400">
           {t("spacesCount", { count: spaces?.length || 0 })}
         </p>
       </div>
