@@ -4,6 +4,7 @@ import {
   createServerValidate,
   initialFormState,
 } from "@tanstack/react-form-nextjs";
+import { getTranslations } from "next-intl/server";
 import { getAdminEmails } from "@/lib/data/profiles";
 import { sendContactEmail } from "@/lib/mail";
 import { contactFormOpts, contactFormSchema } from "../_lib/form-options";
@@ -12,16 +13,17 @@ import { contactFormOpts, contactFormSchema } from "../_lib/form-options";
  * Verify Cloudflare Turnstile token
  */
 async function verifyTurnstileToken(
-  token: string | undefined
+  token: string | undefined,
+  t: Awaited<ReturnType<typeof getTranslations>>
 ): Promise<{ error?: string; success: boolean }> {
   const secretKey = process.env.TURNSTILE_SECRET_KEY;
 
   if (!secretKey) {
-    return { error: "Turnstile secret key is not configured", success: false };
+    return { error: t("errorTurnstileNotConfigured"), success: false };
   }
 
   if (!token) {
-    return { error: "スパム対策の検証が必要です", success: false };
+    return { error: t("errorTurnstileRequired"), success: false };
   }
 
   try {
@@ -43,7 +45,7 @@ async function verifyTurnstileToken(
 
     if (data.success !== true) {
       return {
-        error: "スパム対策の検証に失敗しました。もう一度お試しください",
+        error: t("errorTurnstileVerificationFailed"),
         success: false,
       };
     }
@@ -52,7 +54,7 @@ async function verifyTurnstileToken(
   } catch (error) {
     console.error("Turnstile verification error:", error);
     return {
-      error: "スパム対策の検証に失敗しました。もう一度お試しください",
+      error: t("errorTurnstileVerificationFailed"),
       success: false,
     };
   }
@@ -67,6 +69,8 @@ export async function submitContactFormAction(
   _prevState: unknown,
   formData: FormData
 ) {
+  const t = await getTranslations("ContactForm");
+
   try {
     // Validate the form data
     const validatedData = await serverValidate(formData);
@@ -83,13 +87,14 @@ export async function submitContactFormAction(
     if (turnstileEnabled) {
       const turnstileToken = formData.get("cf-turnstile-response");
       const verification = await verifyTurnstileToken(
-        turnstileToken ? String(turnstileToken) : undefined
+        turnstileToken ? String(turnstileToken) : undefined,
+        t
       );
 
       if (!verification.success) {
         return {
           ...initialFormState,
-          errors: [verification.error || "スパム対策の検証に失敗しました"],
+          errors: [verification.error || t("errorTurnstileVerificationFailed")],
         };
       }
     }
@@ -104,9 +109,7 @@ export async function submitContactFormAction(
       );
       return {
         ...initialFormState,
-        errors: [
-          "管理者のメールアドレスが取得できませんでした。しばらくしてからもう一度お試しください。",
-        ],
+        errors: [t("errorAdminEmailsFailed")],
       };
     }
 
@@ -137,9 +140,7 @@ export async function submitContactFormAction(
     console.error("Contact form submission error:", e);
     return {
       ...initialFormState,
-      errors: [
-        "送信中にエラーが発生しました。しばらくしてからもう一度お試しください。",
-      ],
+      errors: [t("errorGeneric")],
     };
   }
 }

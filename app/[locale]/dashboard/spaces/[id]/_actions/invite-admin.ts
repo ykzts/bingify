@@ -14,14 +14,15 @@ import {
 } from "../_lib/form-options";
 
 async function checkUserAuthentication(
-  supabase: Awaited<ReturnType<typeof createClient>>
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  t: Awaited<ReturnType<typeof getTranslations>>
 ) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "認証が必要です。ログインしてください。", user: null };
+    return { error: t("errorAuthRequired"), user: null };
   }
 
   return { error: null, user };
@@ -30,7 +31,8 @@ async function checkUserAuthentication(
 async function checkSpaceOwnership(
   supabase: Awaited<ReturnType<typeof createClient>>,
   spaceId: string,
-  userId: string
+  userId: string,
+  t: Awaited<ReturnType<typeof getTranslations>>
 ) {
   const { data: space, error: spaceError } = await supabase
     .from("spaces")
@@ -39,11 +41,11 @@ async function checkSpaceOwnership(
     .single();
 
   if (spaceError || !space) {
-    return { error: "スペースが見つかりませんでした", space: null };
+    return { error: t("errorSpaceNotFound"), space: null };
   }
 
   if (space.owner_id !== userId) {
-    return { error: "オーナーのみが管理者を招待できます", space: null };
+    return { error: t("errorPermissionDenied"), space: null };
   }
 
   return { error: null, space };
@@ -51,7 +53,8 @@ async function checkSpaceOwnership(
 
 async function findUserByEmail(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  email: string
+  email: string,
+  t: Awaited<ReturnType<typeof getTranslations>>
 ) {
   const { data: targetUser, error: userError } = await supabase
     .from("profiles")
@@ -61,7 +64,7 @@ async function findUserByEmail(
 
   if (userError || !targetUser) {
     return {
-      error: "このメールアドレスのユーザーが見つかりませんでした",
+      error: t("errorUserNotFoundByEmail"),
       targetUser: null,
     };
   }
@@ -73,11 +76,12 @@ async function checkExistingAdmin(
   supabase: Awaited<ReturnType<typeof createClient>>,
   spaceId: string,
   userId: string,
-  ownerId: string
+  ownerId: string,
+  t: Awaited<ReturnType<typeof getTranslations>>
 ) {
   // Check if user is already the owner
   if (userId === ownerId) {
-    return { error: "オーナーは管理者として追加できません" };
+    return { error: t("errorOwnerCannotBeAdmin") };
   }
 
   // Check if user is already an admin
@@ -89,7 +93,7 @@ async function checkExistingAdmin(
     .single();
 
   if (existingRole) {
-    return { error: "このユーザーは既に管理者です" };
+    return { error: t("errorUserAlreadyAdmin") };
   }
 
   return { error: null };
@@ -100,41 +104,47 @@ export async function inviteAdminAction(
   _prevState: unknown,
   formData: FormData
 ) {
+  const t = await getTranslations("InviteAdmin");
+
   try {
     // Create the server validation function
     const serverValidate = createServerValidate({
       ...inviteAdminFormOpts,
       onServerValidate: async ({ value }: { value: InviteAdminFormValues }) => {
         if (!isValidUUID(spaceId)) {
-          return { form: "無効なスペースIDです" };
+          return { form: t("errorInvalidSpaceId") };
         }
 
         const supabase = await createClient();
 
         // Check authentication
-        const { error: authError, user } =
-          await checkUserAuthentication(supabase);
+        const { error: authError, user } = await checkUserAuthentication(
+          supabase,
+          t
+        );
         if (authError || !user) {
-          return { form: authError || "認証が必要です。" };
+          return { form: authError || t("errorUnauthorized") };
         }
 
         // Check space ownership
         const { error: ownerError, space } = await checkSpaceOwnership(
           supabase,
           spaceId,
-          user.id
+          user.id,
+          t
         );
         if (ownerError) {
           return { form: ownerError };
         }
         if (!space) {
-          return { form: "権限がありません。" };
+          return { form: t("errorPermissionDenied") };
         }
 
         // Find user by email
         const { error: userError, targetUser } = await findUserByEmail(
           supabase,
-          value.email
+          value.email,
+          t
         );
         if (userError) {
           return {
@@ -146,7 +156,7 @@ export async function inviteAdminAction(
         if (!targetUser) {
           return {
             fields: {
-              email: "ユーザーが見つかりませんでした",
+              email: t("errorUserNotFound"),
             },
           };
         }
@@ -158,7 +168,8 @@ export async function inviteAdminAction(
           spaceId,
           targetUser.id,
           // biome-ignore lint/style/noNonNullAssertion: owner_id is guaranteed by checkSpaceOwnership validation
-          space.owner_id!
+          space.owner_id!,
+          t
         );
         if (adminError) {
           return {
@@ -189,7 +200,7 @@ export async function inviteAdminAction(
       // This should not happen after validation, but handle gracefully
       return {
         ...initialFormState,
-        errors: ["ユーザー情報の取得に失敗しました"],
+        errors: [t("errorUserInfoFailed")],
       };
     }
 
@@ -204,7 +215,7 @@ export async function inviteAdminAction(
       console.error("Database error:", insertError);
       return {
         ...initialFormState,
-        errors: ["管理者の追加に失敗しました"],
+        errors: [t("errorGeneric")],
       };
     }
 
@@ -268,7 +279,7 @@ export async function inviteAdminAction(
     console.error("Error inviting admin:", e);
     return {
       ...initialFormState,
-      errors: ["予期しないエラーが発生しました"],
+      errors: [t("errorGeneric")],
     };
   }
 }
