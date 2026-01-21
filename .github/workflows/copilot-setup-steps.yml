@@ -35,7 +35,7 @@ jobs:
 
       - name: Set dummy environment variables
         run: |
-          echo "SEND_EMAIL_HOOK_SECRETS=v1,whsec_dummysecret1234567890abcdefghijk" >> $GITHUB_ENV
+          echo "SEND_EMAIL_HOOK_SECRET=v1,whsec_dummysecret1234567890abcdefghijk" >> $GITHUB_ENV
           echo "SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=dummy-client-id" >> $GITHUB_ENV
           echo "SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=dummy-secret" >> $GITHUB_ENV
           echo "SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID=dummy-client-id" >> $GITHUB_ENV
