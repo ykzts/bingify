@@ -267,17 +267,19 @@ z.string().min(10, "文字数が足りません");
    - スキーマ: `app/[locale]/admin/announcements/_lib/form-options.ts`
    - コンポーネント: `app/[locale]/admin/announcements/_components/announcement-form.tsx`
 
-### 移行が必要なフォーム
+### 移行済みフォーム（2024年1月完了）
 
-以下のフォームは旧パターンを使用しており、統一が推奨されます：
+以下のフォームは旧パターンから標準パターンへ移行されました：
 
 1. **Login Form** (`app/[locale]/login/_components/login-form.tsx`)
-   - 現状: 手動`safeParse`を使用
-   - 対応: TanStack Form + Zod validatorsパターンへの移行
+   - 移行前: インラインZodスキーマ、手動`safeParse`使用
+   - 移行後: `_lib/form-options.ts`にスキーマ定義、TanStack Form validators使用
+   - PR: 該当PRへのリンク
 
 2. **OAuth Config Form** (`app/[locale]/admin/auth-providers/_components/oauth-config-form.tsx`)
-   - 現状: if文による手動バリデーション
-   - 対応: Zodスキーマとvalidatorsパターンへの移行
+   - 移行前: if文による手動バリデーション
+   - 移行後: `_lib/form-options.ts`にZodスキーマ定義、TanStack Form validators使用
+   - PR: 該当PRへのリンク
 
 ## 特殊なケース
 
@@ -312,12 +314,44 @@ const { getRootProps, getInputProps } = useDropzone({
 
 **理由**: ファイルアップロードは`File`オブジェクトを直接扱うため、Zodスキーマよりもreact-dropzoneの専用バリデーターが適しています。
 
+**結論**: 現状維持が推奨されます。
+
 ### 入力フォームがないケース
 
 以下のようなケースではバリデーションは不要です：
 
-- **Avatar Selection Form** (`avatar-selection-form.tsx`): ラジオボタンでの選択のみ
-- **Account Linking Form** (`account-linking-form.tsx`): OAuthリンク処理のみ
+#### Avatar Selection Form (`avatar-selection-form.tsx`)
+
+- **内容**: ラジオボタンでアバターソースを選択
+- **入力**: ラジオボタン選択のみ（テキスト入力なし）
+- **バリデーション**: 不要（選択値はサーバーサイドで検証）
+- **結論**: Zodバリデーション追加は不要
+
+#### Account Linking Form (`account-linking-form.tsx`)
+
+- **内容**: OAuthプロバイダーのリンク/アンリンク処理
+- **入力**: ボタンクリックのみ（テキスト入力なし）
+- **バリデーション**: 不要（OAuth認証フローで処理）
+- **結論**: バリデーション追加は不要
+
+### フォーム判断基準
+
+フォームバリデーションが必要かどうかの判断基準：
+
+✅ **バリデーション必要**:
+
+- テキスト入力フィールドがある
+- 数値入力がある
+- メール、URL等の形式チェックが必要
+- 必須項目がある
+- 文字数制限がある
+
+❌ **バリデーション不要**:
+
+- ラジオボタン/チェックボックスのみの選択フォーム
+- OAuth認証フロー（ボタンクリックのみ）
+- ファイルアップロード（react-dropzone等の専用バリデーター使用）
+- サーバーサイドでのみ検証が必要な場合
 
 ## 移行手順
 
