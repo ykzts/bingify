@@ -569,6 +569,14 @@
     "uploadButton": "アップロード",
     "uploading": "アップロード中..."
   },
+  "ConfirmationEmail": {
+    "buttonText": "メールアドレスを確認",
+    "greeting": "こんにちは！",
+    "ignoredMessage": "このメールに心当たりがない場合は、無視していただいて構いません。",
+    "subject": "メールアドレスの確認",
+    "title": "Bingifyへようこそ",
+    "welcomeText": "Bingifyへのご登録ありがとうございます。以下のボタンをクリックして、メールアドレスを確認してください。"
+  },
   "Contact": {
     "autoFillButton": "自分の情報を入力",
     "autoFillLoginPrompt": "自分の情報を自動入力するには、ログインしてください",
@@ -591,6 +599,14 @@
     "namePlaceholder": "山田 太郎",
     "sendAnother": "もう一度送信する",
     "submitButton": "送信する",
+    "title": "お問い合わせ"
+  },
+  "ContactFormEmail": {
+    "emailLabel": "メールアドレス:",
+    "messageLabel": "本文:",
+    "nameLabel": "名前:",
+    "preview": "{name}様からお問い合わせがありました",
+    "subject": "【お問い合わせ】{name}様より",
     "title": "お問い合わせ"
   },
   "CreateSpace": {
@@ -699,6 +715,24 @@
     "urlTab": "URL管理",
     "viewingUrlLabel": "公開閲覧用URL"
   },
+  "EmailChangedNotificationEmail": {
+    "accountSecurityLabel": "アカウントセキュリティ",
+    "checklistItem1": "アカウント設定で二要素認証を有効にする",
+    "checklistItem2": "最近のログイン履歴を確認する",
+    "checklistItem3": "セキュリティ設定を更新する",
+    "greeting": "こんにちは、",
+    "newEmailMessage": "新しいメールアドレス：{newEmail}",
+    "subject": "メールアドレスが変更されました",
+    "successMessage": "メールアドレスが正常に変更されました。新しいメールアドレスを使用してサインインできるようになりました。"
+  },
+  "EmailChangeEmail": {
+    "buttonText": "メールアドレス変更を確認",
+    "greeting": "こんにちは、",
+    "ignoredMessage": "このメールに心当たりがない場合は、無視していただいて構いません。",
+    "securityWarning": "Bingifyアカウントに関連付けられたメールアドレスを変更するリクエストが検出されました。これに心当たりがない場合は、すぐにアカウントを保護してください。",
+    "subject": "メールアドレス変更の確認",
+    "warningTitle": "メールアドレス変更リクエスト"
+  },
   "EmailChangeSettings": {
     "changeButton": "メールアドレス変更をリクエスト",
     "changing": "処理中...",
@@ -718,140 +752,9 @@
     "noEmailRegistered": "メールアドレスが登録されていません",
     "title": "メールアドレス設定"
   },
-  "EmailTemplateConfirmation": {
-    "buttonText": "メールアドレスを確認",
-    "greeting": "こんにちは！",
-    "ignoredMessage": "このメールに心当たりがない場合は、無視していただいて構いません。",
-    "subject": "メールアドレスの確認",
-    "title": "Bingifyへようこそ",
-    "welcomeText": "Bingifyへのご登録ありがとうございます。以下のボタンをクリックして、メールアドレスを確認してください。"
-  },
-  "EmailTemplateContactForm": {
-    "emailLabel": "メールアドレス:",
-    "messageLabel": "本文:",
-    "nameLabel": "名前:",
-    "preview": "{name}様からお問い合わせがありました",
-    "subject": "【お問い合わせ】{name}様より",
-    "title": "お問い合わせ"
-  },
-  "EmailTemplateEmailChange": {
-    "buttonText": "メールアドレス変更を確認",
-    "greeting": "こんにちは、",
-    "ignoredMessage": "このメールに心当たりがない場合は、無視していただいて構いません。",
-    "securityWarning": "Bingifyアカウントに関連付けられたメールアドレスを変更するリクエストが検出されました。これに心当たりがない場合は、すぐにアカウントを保護してください。",
-    "subject": "メールアドレス変更の確認",
-    "warningTitle": "メールアドレス変更リクエスト"
-  },
-  "EmailTemplateEmailChangedNotification": {
-    "accountSecurityLabel": "アカウントセキュリティ",
-    "checklistItem1": "アカウント設定で二要素認証を有効にする",
-    "checklistItem2": "最近のログイン履歴を確認する",
-    "checklistItem3": "セキュリティ設定を更新する",
-    "greeting": "こんにちは、",
-    "newEmailMessage": "新しいメールアドレス：{newEmail}",
-    "subject": "メールアドレスが変更されました",
-    "successMessage": "メールアドレスが正常に変更されました。新しいメールアドレスを使用してサインインできるようになりました。"
-  },
-  "EmailTemplateFooter": {
+  "EmailFooter": {
     "description": "Bingifyは友人や家族とビンゴゲームを共有できるサービスです。",
     "rights": "All rights reserved"
-  },
-  "EmailTemplateIdentityLinkedNotification": {
-    "greeting": "こんにちは、",
-    "nextStep1": "このプロバイダーを使用してサインインできるようになりました",
-    "nextStep2": "アカウント設定でリンク済みプロバイダーを管理できます",
-    "nextStep3": "必要に応じていつでもこのプロバイダーのリンクを解除できます",
-    "nextStepsTitle": "できること",
-    "providerLabel": "プロバイダー：",
-    "securityNoticeTitle": "セキュリティのお知らせ",
-    "securityWarning": "このプロバイダーのリンクに心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
-    "subject": "外部プロバイダーがリンクされました",
-    "successMessage": "外部認証プロバイダーがアカウントにリンクされました。"
-  },
-  "EmailTemplateIdentityUnlinkedNotification": {
-    "accountAccessInfo": "引き続きメールアドレスとパスワード、または他のリンク済みプロバイダーを使用してサインインできます。",
-    "greeting": "こんにちは、",
-    "providerLabel": "プロバイダー：",
-    "securityNoticeTitle": "セキュリティのお知らせ",
-    "securityWarning": "このプロバイダーのリンク解除に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
-    "subject": "外部プロバイダーのリンクが解除されました",
-    "successMessage": "外部認証プロバイダーがアカウントからリンク解除されました。"
-  },
-  "EmailTemplateInvite": {
-    "buttonText": "Bingifyに参加する",
-    "feature1": "リアルタイムでビンゴゲームを作成して共有",
-    "feature2": "配信者とコミュニティに最適",
-    "feature3": "美しく直感的なインターフェース",
-    "featuresTitle": "Bingifyの機能",
-    "greeting": "こんにちは！",
-    "ignoredMessage": "このメールに心当たりがない場合は、無視していただいて構いません。",
-    "joinMessage": "Bingifyへのご招待をお受けいただきました。以下のボタンをクリックして、ご招待をお受け入れいただき、アカウントを作成してください。",
-    "subject": "Bingifyへのご招待",
-    "title": "Bingifyへのご招待"
-  },
-  "EmailTemplateMagicLink": {
-    "buttonText": "ログイン",
-    "expirationNote": "このリンクは1時間後に有効期限が切れます。期限切れの場合は、再度ログインをリクエストしてください。",
-    "greeting": "こんにちは、",
-    "securityNote": "このリクエストに心当たりがない場合は、このメールを無視してください。",
-    "subject": "Bingifyにログイン",
-    "text": "ログインリクエストを受け付けました。以下のボタンをクリックしてログインしてください。"
-  },
-  "EmailTemplateMfaEnrolledNotification": {
-    "factorTypeLabel": "ファクタータイプ：",
-    "greeting": "こんにちは、",
-    "securityInfoTitle": "セキュリティの強化",
-    "securityNoticeTitle": "セキュリティのお知らせ",
-    "securityTip1": "アカウントに追加のセキュリティレイヤーが適用されました",
-    "securityTip2": "サインイン時に確認コードの入力が求められます",
-    "securityTip3": "認証デバイスまたはバックアップコードを安全な場所に保管してください",
-    "securityWarning": "MFAの有効化に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
-    "subject": "多要素認証が有効になりました",
-    "successMessage": "アカウントで多要素認証(MFA)が正常に有効化されました。"
-  },
-  "EmailTemplateMfaUnenrolledNotification": {
-    "factorTypeLabel": "ファクタータイプ：",
-    "greeting": "こんにちは、",
-    "recommendation": "アカウントセキュリティを強化するため、MFAを有効にしておくことを強くお勧めします。アカウント設定でいつでも再度有効にできます。",
-    "recommendationTitle": "セキュリティ推奨事項",
-    "securityNoticeTitle": "セキュリティのお知らせ",
-    "securityWarning": "MFAの無効化に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
-    "subject": "多要素認証が無効になりました",
-    "warningMessage": "アカウントで多要素認証(MFA)が無効化されました。"
-  },
-  "EmailTemplatePasswordChangedNotification": {
-    "greeting": "こんにちは、",
-    "passwordSecurityLabel": "パスワードセキュリティのコツ",
-    "securityTip1": "強力なパスワードを使用(8文字以上、大文字と小文字、数字、記号を含める)",
-    "securityTip2": "パスワードを誰とも共有しない",
-    "securityTip3": "セキュリティを強化するために二要素認証を有効にする",
-    "subject": "パスワードが変更されました",
-    "successMessage": "パスワードが正常に変更されました。新しいパスワードでサインインできるようになりました。"
-  },
-  "EmailTemplatePhoneChangedNotification": {
-    "greeting": "こんにちは、",
-    "oldPhoneLabel": "変更前の電話番号：",
-    "securityNoticeTitle": "セキュリティのお知らせ",
-    "securityWarning": "この変更に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
-    "subject": "電話番号が変更されました",
-    "successMessage": "電話番号が正常に変更されました。"
-  },
-  "EmailTemplateReauthentication": {
-    "expirationNote": "このコードは5分後に有効期限が切れます。",
-    "greeting": "こんにちは、",
-    "securityWarning": "このリクエストに心当たりがない場合は、誰かがあなたのアカウントにアクセスしようとしている可能性があります。このメールを無視し、パスワードを変更することをお勧めします。",
-    "subject": "本人確認が必要です",
-    "text": "本人確認が必要な操作のリクエストを受け付けました。続行するには、以下の確認コードをご使用ください。",
-    "title": "再認証が必要です"
-  },
-  "EmailTemplateRecovery": {
-    "buttonText": "パスワードをリセット",
-    "expirationNote": "このリンクは1時間後に有効期限が切れます。期限切れの場合は、再度パスワードリセットをリクエストしてください。",
-    "greeting": "こんにちは、",
-    "securityNoticeTitle": "セキュリティのお知らせ",
-    "securityWarning": "このリクエストに心当たりがない場合は、誰かがあなたのアカウントにアクセスしようとしている可能性があります。このメールを無視し、パスワードを変更することをお勧めします。",
-    "subject": "パスワードのリセット",
-    "text": "パスワードのリセットリクエストを受け付けました。以下のボタンをクリックして、新しいパスワードを設定してください。"
   },
   "Errors": {
     "authRequired": "認証が必要です",
@@ -941,6 +844,27 @@
     "title": "すべての画面を、",
     "titleHighlight": "熱狂の会場に。"
   },
+  "IdentityLinkedNotificationEmail": {
+    "greeting": "こんにちは、",
+    "nextStep1": "このプロバイダーを使用してサインインできるようになりました",
+    "nextStep2": "アカウント設定でリンク済みプロバイダーを管理できます",
+    "nextStep3": "必要に応じていつでもこのプロバイダーのリンクを解除できます",
+    "nextStepsTitle": "できること",
+    "providerLabel": "プロバイダー：",
+    "securityNoticeTitle": "セキュリティのお知らせ",
+    "securityWarning": "このプロバイダーのリンクに心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
+    "subject": "外部プロバイダーがリンクされました",
+    "successMessage": "外部認証プロバイダーがアカウントにリンクされました。"
+  },
+  "IdentityUnlinkedNotificationEmail": {
+    "accountAccessInfo": "引き続きメールアドレスとパスワード、または他のリンク済みプロバイダーを使用してサインインできます。",
+    "greeting": "こんにちは、",
+    "providerLabel": "プロバイダー：",
+    "securityNoticeTitle": "セキュリティのお知らせ",
+    "securityWarning": "このプロバイダーのリンク解除に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
+    "subject": "外部プロバイダーのリンクが解除されました",
+    "successMessage": "外部認証プロバイダーがアカウントからリンク解除されました。"
+  },
   "ImageCropper": {
     "cancelButton": "キャンセル",
     "cropButton": "トリミングして使用",
@@ -949,6 +873,18 @@
     "processing": "処理中...",
     "title": "画像をトリミング",
     "zoomLabel": "ズーム"
+  },
+  "InviteEmail": {
+    "buttonText": "Bingifyに参加する",
+    "feature1": "リアルタイムでビンゴゲームを作成して共有",
+    "feature2": "配信者とコミュニティに最適",
+    "feature3": "美しく直感的なインターフェース",
+    "featuresTitle": "Bingifyの機能",
+    "greeting": "こんにちは！",
+    "ignoredMessage": "このメールに心当たりがない場合は、無視していただいて構いません。",
+    "joinMessage": "Bingifyへのご招待をお受けいただきました。以下のボタンをクリックして、ご招待をお受け入れいただき、アカウントを作成してください。",
+    "subject": "Bingifyへのご招待",
+    "title": "Bingifyへのご招待"
   },
   "LanguageSwitcher": {
     "label": "言語",
@@ -977,10 +913,40 @@
     "titleSpace": "スペースに参加",
     "twitchButton": "Twitchでログイン"
   },
+  "MagicLinkEmail": {
+    "buttonText": "ログイン",
+    "expirationNote": "このリンクは1時間後に有効期限が切れます。期限切れの場合は、再度ログインをリクエストしてください。",
+    "greeting": "こんにちは、",
+    "securityNote": "このリクエストに心当たりがない場合は、このメールを無視してください。",
+    "subject": "Bingifyにログイン",
+    "text": "ログインリクエストを受け付けました。以下のボタンをクリックしてログインしてください。"
+  },
   "Metadata": {
     "description": "リアルタイムで盛り上がる、新しいビンゴ体験。OAuthログインで簡単に始められます。",
     "ogSpaceSubtitle": "このビンゴスペースに参加",
     "title": "Bingify - すべての画面を、熱狂の会場に。"
+  },
+  "MfaEnrolledNotificationEmail": {
+    "factorTypeLabel": "ファクタータイプ：",
+    "greeting": "こんにちは、",
+    "securityInfoTitle": "セキュリティの強化",
+    "securityNoticeTitle": "セキュリティのお知らせ",
+    "securityTip1": "アカウントに追加のセキュリティレイヤーが適用されました",
+    "securityTip2": "サインイン時に確認コードの入力が求められます",
+    "securityTip3": "認証デバイスまたはバックアップコードを安全な場所に保管してください",
+    "securityWarning": "MFAの有効化に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
+    "subject": "多要素認証が有効になりました",
+    "successMessage": "アカウントで多要素認証(MFA)が正常に有効化されました。"
+  },
+  "MfaUnenrolledNotificationEmail": {
+    "factorTypeLabel": "ファクタータイプ：",
+    "greeting": "こんにちは、",
+    "recommendation": "アカウントセキュリティを強化するため、MFAを有効にしておくことを強くお勧めします。アカウント設定でいつでも再度有効にできます。",
+    "recommendationTitle": "セキュリティ推奨事項",
+    "securityNoticeTitle": "セキュリティのお知らせ",
+    "securityWarning": "MFAの無効化に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
+    "subject": "多要素認証が無効になりました",
+    "warningMessage": "アカウントで多要素認証(MFA)が無効化されました。"
   },
   "NotFound": {
     "backHome": "ホームに戻る",
@@ -1044,9 +1010,43 @@
     "errorTokenExpired": "OAuthトークンの有効期限が切れているか、取り消されています。アカウントを再接続してください。",
     "errorUnknown": "OAuth確認中に予期しないエラーが発生しました。もう一度お試しください。"
   },
+  "PasswordChangedNotificationEmail": {
+    "greeting": "こんにちは、",
+    "passwordSecurityLabel": "パスワードセキュリティのコツ",
+    "securityTip1": "強力なパスワードを使用(8文字以上、大文字と小文字、数字、記号を含める)",
+    "securityTip2": "パスワードを誰とも共有しない",
+    "securityTip3": "セキュリティを強化するために二要素認証を有効にする",
+    "subject": "パスワードが変更されました",
+    "successMessage": "パスワードが正常に変更されました。新しいパスワードでサインインできるようになりました。"
+  },
+  "PhoneChangedNotificationEmail": {
+    "greeting": "こんにちは、",
+    "oldPhoneLabel": "変更前の電話番号：",
+    "securityNoticeTitle": "セキュリティのお知らせ",
+    "securityWarning": "この変更に心当たりがない場合は、直ちにサポートチームにご連絡いただき、アカウントを保護してください。",
+    "subject": "電話番号が変更されました",
+    "successMessage": "電話番号が正常に変更されました。"
+  },
   "Privacy": {
     "metaDescription": "Bingifyのプライバシーポリシーをご覧ください。個人情報の収集、利用、保護の方法について説明しています。",
     "metaTitle": "プライバシーポリシー"
+  },
+  "ReauthenticationEmail": {
+    "expirationNote": "このコードは5分後に有効期限が切れます。",
+    "greeting": "こんにちは、",
+    "securityWarning": "このリクエストに心当たりがない場合は、誰かがあなたのアカウントにアクセスしようとしている可能性があります。このメールを無視し、パスワードを変更することをお勧めします。",
+    "subject": "本人確認が必要です",
+    "text": "本人確認が必要な操作のリクエストを受け付けました。続行するには、以下の確認コードをご使用ください。",
+    "title": "再認証が必要です"
+  },
+  "RecoveryEmail": {
+    "buttonText": "パスワードをリセット",
+    "expirationNote": "このリンクは1時間後に有効期限が切れます。期限切れの場合は、再度パスワードリセットをリクエストしてください。",
+    "greeting": "こんにちは、",
+    "securityNoticeTitle": "セキュリティのお知らせ",
+    "securityWarning": "このリクエストに心当たりがない場合は、誰かがあなたのアカウントにアクセスしようとしている可能性があります。このメールを無視し、パスワードを変更することをお勧めします。",
+    "subject": "パスワードのリセット",
+    "text": "パスワードのリセットリクエストを受け付けました。以下のボタンをクリックして、新しいパスワードを設定してください。"
   },
   "ScreenSettingsActions": {
     "errorGeneric": "エラーが発生しました",

@@ -21,7 +21,7 @@ export async function ReauthenticationEmail({
 }: ReauthenticationEmailProps) {
   const t = await getTranslations({
     locale,
-    namespace: "EmailTemplateReauthentication",
+    namespace: "ReauthenticationEmail",
   });
 
   return (

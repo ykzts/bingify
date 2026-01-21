@@ -23,7 +23,7 @@ export async function RecoveryEmail({
 }: RecoveryEmailProps) {
   const t = await getTranslations({
     locale,
-    namespace: "EmailTemplateRecovery",
+    namespace: "RecoveryEmail",
   });
 
   return (

@@ -23,7 +23,7 @@ export async function InviteEmail({
 }: InviteEmailProps) {
   const t = await getTranslations({
     locale,
-    namespace: "EmailTemplateInvite",
+    namespace: "InviteEmail",
   });
 
   return (

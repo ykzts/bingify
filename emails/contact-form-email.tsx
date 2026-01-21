@@ -29,7 +29,7 @@ export async function ContactFormEmail({
 }: ContactFormEmailProps) {
   const t = await getTranslations({
     locale,
-    namespace: "EmailTemplateContactForm",
+    namespace: "ContactFormEmail",
   });
 
   // プレビューテキスト: メールクライアントのプレビューに表示される

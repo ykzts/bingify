@@ -18,7 +18,7 @@ export async function EmailFooter({
 }: EmailFooterProps) {
   const t = await getTranslations({
     locale,
-    namespace: "EmailTemplateFooter",
+    namespace: "EmailFooter",
   });
 
   return (

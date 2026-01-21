@@ -20,7 +20,7 @@ export async function MfaUnenrolledNotificationEmail({
 }: MfaUnenrolledNotificationEmailProps) {
   const t = await getTranslations({
     locale,
-    namespace: "EmailTemplateMfaUnenrolledNotification",
+    namespace: "MfaUnenrolledNotificationEmail",
   });
 
   return (

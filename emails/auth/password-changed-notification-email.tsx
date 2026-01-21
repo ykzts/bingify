@@ -18,7 +18,7 @@ export async function PasswordChangedNotificationEmail({
 }: PasswordChangedNotificationEmailProps) {
   const t = await getTranslations({
     locale,
-    namespace: "EmailTemplatePasswordChangedNotification",
+    namespace: "PasswordChangedNotificationEmail",
   });
 
   return (
