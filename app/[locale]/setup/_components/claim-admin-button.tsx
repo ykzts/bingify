@@ -6,6 +6,14 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
 import { claimAdmin } from "../../admin/_actions/admin-operations";
 
+// Helper to convert error code to translation key
+// e.g., "errorGeneric" -> "errorsGeneric"
+const ERROR_PREFIX_REGEX = /^error/;
+function getErrorKey(errorCode: string): string {
+  const withoutPrefix = errorCode.replace(ERROR_PREFIX_REGEX, "");
+  return `errors${withoutPrefix.charAt(0).toUpperCase()}${withoutPrefix.slice(1)}`;
+}
+
 export function ClaimAdminButton() {
   const t = useTranslations("Setup");
   const router = useRouter();
@@ -26,7 +34,7 @@ export function ClaimAdminButton() {
       {state.error && (
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950">
           <p className="text-red-800 text-sm dark:text-red-200">
-            {t(`errors.${state.error}`, { default: t("errors.errorGeneric") })}
+            {t(getErrorKey(state.error))}
           </p>
         </div>
       )}

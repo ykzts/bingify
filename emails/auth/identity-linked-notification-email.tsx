@@ -20,7 +20,7 @@ export async function IdentityLinkedNotificationEmail({
 }: IdentityLinkedNotificationEmailProps) {
   const t = await getTranslations({
     locale,
-    namespace: "EmailTemplates.identityLinkedNotification",
+    namespace: "IdentityLinkedNotificationEmail",
   });
 
   return (

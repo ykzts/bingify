@@ -23,7 +23,7 @@ export async function ConfirmationEmail({
 }: ConfirmationEmailProps) {
   const t = await getTranslations({
     locale,
-    namespace: "EmailTemplates.confirmation",
+    namespace: "ConfirmationEmail",
   });
 
   return (

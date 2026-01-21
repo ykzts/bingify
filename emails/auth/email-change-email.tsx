@@ -23,7 +23,7 @@ export async function EmailChangeEmail({
 }: EmailChangeEmailProps) {
   const t = await getTranslations({
     locale,
-    namespace: "EmailTemplates.emailChange",
+    namespace: "EmailChangeEmail",
   });
 
   return (

@@ -20,7 +20,7 @@ export async function PhoneChangedNotificationEmail({
 }: PhoneChangedNotificationEmailProps) {
   const t = await getTranslations({
     locale,
-    namespace: "EmailTemplates.phoneChangedNotification",
+    namespace: "PhoneChangedNotificationEmail",
   });
 
   return (

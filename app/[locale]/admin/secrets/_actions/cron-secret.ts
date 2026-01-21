@@ -18,7 +18,7 @@ interface AdminCheckResult {
  * @returns Object with either user or error
  */
 async function ensureAdminOrError(): Promise<AdminCheckResult> {
-  const t = await getTranslations("AdminSecrets.cron");
+  const t = await getTranslations("AdminSecretsCron");
   const supabase = await createClient();
 
   const {
@@ -26,7 +26,7 @@ async function ensureAdminOrError(): Promise<AdminCheckResult> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: t("cronErrorUnauthorized") };
+    return { error: t("errorUnauthorized") };
   }
 
   const { data: profile } = await supabase
@@ -54,7 +54,7 @@ export interface GetCronSecretResult {
  * Note: Secret value is not returned for security - only existence and metadata
  */
 export async function getCronSecret(): Promise<GetCronSecretResult> {
-  const t = await getTranslations("AdminSecrets.cron");
+  const t = await getTranslations("AdminSecretsCron");
 
   try {
     // Admin check required
@@ -101,7 +101,7 @@ export async function getCronSecret(): Promise<GetCronSecretResult> {
   } catch (error) {
     console.error("Error in getCronSecret:", error);
     const isSetInEnv = !!process.env.CRON_SECRET;
-    return { error: t("cronErrorGeneric"), isSetInEnv };
+    return { error: t("errorGeneric"), isSetInEnv };
   }
 }
 
@@ -116,7 +116,7 @@ export interface UpsertCronSecretResult {
 export async function upsertCronSecret(
   secret: string
 ): Promise<UpsertCronSecretResult> {
-  const t = await getTranslations("AdminSecrets.cron");
+  const t = await getTranslations("AdminSecretsCron");
 
   try {
     // Admin check required
@@ -156,7 +156,7 @@ export async function upsertCronSecret(
     return { success: true };
   } catch (error) {
     console.error("Error in upsertCronSecret:", error);
-    return { error: t("cronErrorGeneric") };
+    return { error: t("errorGeneric") };
   }
 }
 
@@ -169,7 +169,7 @@ export interface DeleteCronSecretResult {
  * Delete the cron secret (admin only)
  */
 export async function deleteCronSecret(): Promise<DeleteCronSecretResult> {
-  const t = await getTranslations("AdminSecrets.cron");
+  const t = await getTranslations("AdminSecretsCron");
 
   try {
     // Admin check required
@@ -200,6 +200,6 @@ export async function deleteCronSecret(): Promise<DeleteCronSecretResult> {
     return { success: true };
   } catch (error) {
     console.error("Error in deleteCronSecret:", error);
-    return { error: t("cronErrorGeneric") };
+    return { error: t("errorGeneric") };
   }
 }

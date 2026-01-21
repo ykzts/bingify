@@ -18,7 +18,7 @@ interface AdminCheckResult {
  * @returns Object with either user or error
  */
 async function ensureAdminOrError(): Promise<AdminCheckResult> {
-  const t = await getTranslations("AdminSecrets.authHooks");
+  const t = await getTranslations("AdminSecretsAuthHooks");
   const supabase = await createClient();
 
   const {
@@ -36,7 +36,7 @@ async function ensureAdminOrError(): Promise<AdminCheckResult> {
     .single();
 
   if (profile?.role !== "admin") {
-    return { error: t("authHooksErrorNoPermission") };
+    return { error: t("errorNoPermission") };
   }
 
   return { user };
@@ -54,7 +54,7 @@ export interface GetSendEmailHookSecretResult {
  * Note: Secret value is not returned for security - only existence and metadata
  */
 export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretResult> {
-  const t = await getTranslations("AdminSecrets.authHooks");
+  const t = await getTranslations("AdminSecretsAuthHooks");
 
   try {
     // Admin check required
@@ -103,7 +103,7 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
   } catch (error) {
     console.error("Error in getSendEmailHookSecret:", error);
     const isSetInEnv = !!process.env.SEND_EMAIL_HOOK_SECRET;
-    return { error: t("authHooksErrorGeneric"), isSetInEnv };
+    return { error: t("errorGeneric"), isSetInEnv };
   }
 }
 
@@ -118,7 +118,7 @@ export interface UpsertSendEmailHookSecretResult {
 export async function upsertSendEmailHookSecret(
   secret: string
 ): Promise<UpsertSendEmailHookSecretResult> {
-  const t = await getTranslations("AdminSecrets.authHooks");
+  const t = await getTranslations("AdminSecretsAuthHooks");
 
   try {
     // Admin check required
@@ -163,7 +163,7 @@ export async function upsertSendEmailHookSecret(
     return { success: true };
   } catch (error) {
     console.error("Error in upsertSendEmailHookSecret:", error);
-    return { error: t("authHooksErrorGeneric") };
+    return { error: t("errorGeneric") };
   }
 }
 
@@ -176,7 +176,7 @@ export interface DeleteSendEmailHookSecretResult {
  * Delete the send email hook secret (admin only)
  */
 export async function deleteSendEmailHookSecret(): Promise<DeleteSendEmailHookSecretResult> {
-  const t = await getTranslations("AdminSecrets.authHooks");
+  const t = await getTranslations("AdminSecretsAuthHooks");
 
   try {
     // Admin check required
@@ -209,6 +209,6 @@ export async function deleteSendEmailHookSecret(): Promise<DeleteSendEmailHookSe
     return { success: true };
   } catch (error) {
     console.error("Error in deleteSendEmailHookSecret:", error);
-    return { error: t("authHooksErrorGeneric") };
+    return { error: t("errorGeneric") };
   }
 }
