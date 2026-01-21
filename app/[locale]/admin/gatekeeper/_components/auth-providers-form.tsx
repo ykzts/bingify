@@ -103,9 +103,9 @@ export function AuthProvidersForm({ initialSettings }: Props) {
 
       <div className="space-y-4">
         <h4 className="font-semibold text-base">{t("featureFlagsTitle")}</h4>
-        <p className="text-gray-600 text-sm">{t("featureFlagsDescription")}</p>
+        <p className="text-gray-600 text-sm dark:text-gray-400">{t("featureFlagsDescription")}</p>
 
-        <div className="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <div className="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
           <h5 className="font-medium text-sm">
             {t("gatekeeperFeaturesTitle")}
           </h5>
@@ -137,7 +137,7 @@ export function AuthProvidersForm({ initialSettings }: Props) {
 
             {/* YouTube Requirement Types */}
             {youtubeEnabled && (
-              <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4">
+              <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4 dark:border-gray-700">
                 <form.Field name="features.gatekeeper.youtube.member.enabled">
                   {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
                   {(field: any) => (
@@ -214,7 +214,7 @@ export function AuthProvidersForm({ initialSettings }: Props) {
 
             {/* Twitch Requirement Types */}
             {twitchEnabled && (
-              <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4">
+              <div className="ml-6 space-y-2 border-gray-200 border-l-2 pl-4 dark:border-gray-700">
                 <form.Field name="features.gatekeeper.twitch.follower.enabled">
                   {/* biome-ignore lint/suspicious/noExplicitAny: TanStack Form field type */}
                   {(field: any) => (

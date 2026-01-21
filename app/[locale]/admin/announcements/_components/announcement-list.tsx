@@ -157,51 +157,51 @@ export function AnnouncementList({
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-200 bg-white">
-          <thead className="bg-gray-50">
+        <table className="min-w-full border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+          <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
               <th
-                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider dark:text-gray-400"
                 scope="col"
               >
                 {t("announcementTitle")}
               </th>
               <th
-                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider dark:text-gray-400"
                 scope="col"
               >
                 {t("announcementLocaleLabel")}
               </th>
               <th
-                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider dark:text-gray-400"
                 scope="col"
               >
                 {t("announcementPriority")}
               </th>
               <th
-                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider dark:text-gray-400"
                 scope="col"
               >
                 {t("announcementPublished")}
               </th>
               <th
-                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider dark:text-gray-400"
                 scope="col"
               >
                 {t("announcementDateRange")}
               </th>
               <th
-                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider"
+                className="px-6 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider dark:text-gray-400"
                 scope="col"
               >
                 {t("actions")}
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white">
+          <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
             {announcements.length === 0 ? (
               <tr>
-                <td className="px-6 py-4 text-center text-gray-500" colSpan={6}>
+                <td className="px-6 py-4 text-center text-gray-500 dark:text-gray-400" colSpan={6}>
                   {t("announcementNoData")}
                 </td>
               </tr>
@@ -234,7 +234,7 @@ export function AnnouncementList({
                         : t("announcementPublishedNo")}
                     </Badge>
                   </td>
-                  <td className="px-6 py-4 text-gray-500 text-sm">
+                  <td className="px-6 py-4 text-gray-500 text-sm dark:text-gray-400">
                     {announcement.starts_at && (
                       <div>{formatDate(announcement.starts_at, locale)}</div>
                     )}

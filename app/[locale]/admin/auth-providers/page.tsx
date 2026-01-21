@@ -44,15 +44,15 @@ export default async function AdminAuthProvidersPage({
     <div>
       <div className="mb-6">
         <h2 className="font-bold text-2xl">{t("title")}</h2>
-        <p className="mt-2 text-gray-600">{t("description")}</p>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">{t("description")}</p>
       </div>
 
       {warnings && warnings.length > 0 && (
-        <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-          <p className="font-medium text-yellow-800">
+        <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+          <p className="font-medium text-yellow-800 dark:text-yellow-400">
             {t("warningInvalidFields")}
           </p>
-          <p className="mt-1 text-sm text-yellow-700">
+          <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
             {t("warningInvalidFieldsDescription", {
               fields: warnings.join(", "),
             })}
