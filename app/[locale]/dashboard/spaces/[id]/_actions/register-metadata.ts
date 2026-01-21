@@ -41,6 +41,14 @@ export async function registerYouTubeChannelMetadata(channelId: string) {
       user.id
     );
 
+    // If helper function returns an error, translate it
+    if (!result.success && result.error) {
+      return {
+        error: t("errorGeneric"),
+        success: false,
+      };
+    }
+
     return result;
   } catch (error) {
     console.error("Error registering YouTube metadata:", error);
@@ -83,6 +91,14 @@ export async function registerTwitchBroadcasterMetadata(broadcasterId: string) {
       tokenResult.access_token,
       user.id
     );
+
+    // If helper function returns an error, translate it
+    if (!result.success && result.error) {
+      return {
+        error: t("errorGeneric"),
+        success: false,
+      };
+    }
 
     return result;
   } catch (error) {
