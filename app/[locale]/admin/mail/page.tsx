@@ -12,7 +12,16 @@ export default async function MailSettingsPage({
 
   const t = await getTranslations("AdminSmtp");
 
-  const { settings, error } = await getSmtpSettings();
+  const {
+    settings,
+    error,
+    isSmtpHostSetInEnv,
+    isSmtpPortSetInEnv,
+    isSmtpUserSetInEnv,
+    isSmtpPasswordSetInEnv,
+    isSmtpSecureSetInEnv,
+    isMailFromSetInEnv,
+  } = await getSmtpSettings();
 
   if (error) {
     return (
@@ -39,7 +48,15 @@ export default async function MailSettingsPage({
       )}
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <SmtpSettingsForm initialSettings={settings} />
+        <SmtpSettingsForm
+          initialSettings={settings}
+          isMailFromSetInEnv={isMailFromSetInEnv}
+          isSmtpHostSetInEnv={isSmtpHostSetInEnv}
+          isSmtpPasswordSetInEnv={isSmtpPasswordSetInEnv}
+          isSmtpPortSetInEnv={isSmtpPortSetInEnv}
+          isSmtpSecureSetInEnv={isSmtpSecureSetInEnv}
+          isSmtpUserSetInEnv={isSmtpUserSetInEnv}
+        />
       </div>
     </div>
   );

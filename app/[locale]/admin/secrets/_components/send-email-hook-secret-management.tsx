@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/confirm-provider";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,16 +17,41 @@ import {
 
 interface Props {
   hasSecret?: boolean;
+  isSetInEnv?: boolean;
   updatedAt?: string;
 }
 
-export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
+export function SendEmailHookSecretManagement({
+  hasSecret,
+  isSetInEnv,
+  updatedAt,
+}: Props) {
   const t = useTranslations("AdminSecrets");
   const confirm = useConfirm();
   const [secret, setSecret] = useState("");
   const [showSecret, setShowSecret] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const getPlaceholder = () => {
+    if (isSetInEnv) {
+      return t("authHooksSecretPlaceholderEnvSet");
+    }
+    if (hasSecret) {
+      return t("authHooksSecretPlaceholderReplace");
+    }
+    return "v1,whsec_...";
+  };
+
+  const getHelpText = () => {
+    if (isSetInEnv) {
+      return t("authHooksSecretHelpEnvSet");
+    }
+    if (hasSecret) {
+      return t("authHooksSecretHelpReplace");
+    }
+    return t("authHooksSecretHelp");
+  };
 
   const handleSave = async () => {
     setIsUpdating(true);
@@ -103,24 +129,25 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
       {/* Secret Input Form */}
       <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <div className="space-y-2">
-          <Label htmlFor="secret">{t("authHooksSecretLabel")}</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="secret">{t("authHooksSecretLabel")}</Label>
+            {isSetInEnv && (
+              <Badge variant="secondary">{t("authHooksEnvVarBadge")}</Badge>
+            )}
+          </div>
           <div className="relative">
             <Input
               className="pr-10 font-mono text-sm"
-              disabled={isUpdating || isDeleting}
+              disabled={isUpdating || isDeleting || isSetInEnv}
               id="secret"
               onChange={(e) => setSecret(e.target.value)}
-              placeholder={
-                hasSecret
-                  ? t("authHooksSecretPlaceholderReplace")
-                  : "v1,whsec_..."
-              }
+              placeholder={getPlaceholder()}
               type={showSecret ? "text" : "password"}
               value={secret}
             />
             <Button
               className="absolute top-1/2 right-2 -translate-y-1/2"
-              disabled={isUpdating || isDeleting}
+              disabled={isUpdating || isDeleting || isSetInEnv}
               onClick={() => setShowSecret(!showSecret)}
               size="icon"
               type="button"
@@ -138,11 +165,7 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
               </span>
             </Button>
           </div>
-          <p className="text-gray-600 text-sm">
-            {hasSecret
-              ? t("authHooksSecretHelpReplace")
-              : t("authHooksSecretHelp")}
-          </p>
+          <p className="text-gray-600 text-sm">{getHelpText()}</p>
         </div>
 
         {/* Validation Error */}
@@ -175,7 +198,8 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
             disabled={
               !(secret && isSecretValid && hasChanges) ||
               isUpdating ||
-              isDeleting
+              isDeleting ||
+              isSetInEnv
             }
             onClick={handleSave}
             type="button"
@@ -183,7 +207,7 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
             {getButtonLabel()}
           </Button>
 
-          {hasSecret && (
+          {hasSecret && !isSetInEnv && (
             <Button
               disabled={isUpdating || isDeleting}
               onClick={handleDelete}
@@ -197,15 +221,17 @@ export function SendEmailHookSecretManagement({ hasSecret, updatedAt }: Props) {
       </div>
 
       {/* Environment Variable Warning */}
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          <div className="space-y-2">
-            <p className="font-semibold">{t("envWarningTitle")}</p>
-            <p>{t("envWarningDescription")}</p>
-          </div>
-        </AlertDescription>
-      </Alert>
+      {isSetInEnv && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <div className="space-y-2">
+              <p className="font-semibold">{t("authHooksEnvWarningTitle")}</p>
+              <p>{t("authHooksEnvWarningDescription")}</p>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 }

@@ -15,6 +15,12 @@ export interface SmtpSettingsData {
 
 export interface GetSmtpSettingsResult {
   error?: string;
+  isMailFromSetInEnv?: boolean;
+  isSmtpHostSetInEnv?: boolean;
+  isSmtpPasswordSetInEnv?: boolean;
+  isSmtpPortSetInEnv?: boolean;
+  isSmtpSecureSetInEnv?: boolean;
+  isSmtpUserSetInEnv?: boolean;
   settings?: SmtpSettingsData | null;
 }
 
@@ -27,18 +33,38 @@ export async function getSmtpSettings(): Promise<GetSmtpSettingsResult> {
     const t = await getTranslations("AdminSmtp");
     const supabase = await createClient();
 
+    // Check if environment variables are set
+    const isSmtpHostSetInEnv = !!process.env.SMTP_HOST;
+    const isSmtpPortSetInEnv = !!process.env.SMTP_PORT;
+    const isSmtpUserSetInEnv = !!process.env.SMTP_USER;
+    const isSmtpPasswordSetInEnv = !!process.env.SMTP_PASS;
+    const isSmtpSecureSetInEnv = !!process.env.SMTP_SECURE;
+    const isMailFromSetInEnv = !!process.env.MAIL_FROM;
+
     const { data, error } = await supabase.rpc("get_smtp_settings");
 
     if (error) {
       console.error("Error fetching SMTP settings:", error);
       return {
         error: t("errorFetchFailed"),
+        isMailFromSetInEnv,
+        isSmtpHostSetInEnv,
+        isSmtpPasswordSetInEnv,
+        isSmtpPortSetInEnv,
+        isSmtpSecureSetInEnv,
+        isSmtpUserSetInEnv,
       };
     }
 
     if (!data) {
       return {
         error: t("errorGeneric"),
+        isMailFromSetInEnv,
+        isSmtpHostSetInEnv,
+        isSmtpPasswordSetInEnv,
+        isSmtpPortSetInEnv,
+        isSmtpSecureSetInEnv,
+        isSmtpUserSetInEnv,
       };
     }
 
@@ -47,6 +73,12 @@ export async function getSmtpSettings(): Promise<GetSmtpSettingsResult> {
       console.error("RPC error:", data.error);
       return {
         error: t("errorGeneric"),
+        isMailFromSetInEnv,
+        isSmtpHostSetInEnv,
+        isSmtpPasswordSetInEnv,
+        isSmtpPortSetInEnv,
+        isSmtpSecureSetInEnv,
+        isSmtpUserSetInEnv,
       };
     }
 
@@ -57,6 +89,12 @@ export async function getSmtpSettings(): Promise<GetSmtpSettingsResult> {
         : null;
 
     return {
+      isMailFromSetInEnv,
+      isSmtpHostSetInEnv,
+      isSmtpPasswordSetInEnv,
+      isSmtpPortSetInEnv,
+      isSmtpSecureSetInEnv,
+      isSmtpUserSetInEnv,
       settings,
     };
   } catch (error) {
@@ -64,6 +102,12 @@ export async function getSmtpSettings(): Promise<GetSmtpSettingsResult> {
     const t = await getTranslations("AdminSmtp");
     return {
       error: t("errorGeneric"),
+      isMailFromSetInEnv: !!process.env.MAIL_FROM,
+      isSmtpHostSetInEnv: !!process.env.SMTP_HOST,
+      isSmtpPasswordSetInEnv: !!process.env.SMTP_PASS,
+      isSmtpPortSetInEnv: !!process.env.SMTP_PORT,
+      isSmtpSecureSetInEnv: !!process.env.SMTP_SECURE,
+      isSmtpUserSetInEnv: !!process.env.SMTP_USER,
     };
   }
 }

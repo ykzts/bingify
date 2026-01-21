@@ -45,6 +45,7 @@ async function ensureAdminOrError(): Promise<AdminCheckResult> {
 export interface GetSendEmailHookSecretResult {
   error?: string;
   hasSecret?: boolean;
+  isSetInEnv?: boolean;
   updatedAt?: string;
 }
 
@@ -62,6 +63,11 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
       return { error: adminCheck.error };
     }
 
+    // Check if environment variable is set
+    const isSetInEnv = !!(
+      process.env.SEND_EMAIL_HOOK_SECRET || process.env.SEND_EMAIL_HOOK_SECRETS
+    );
+
     const supabase = await createClient();
 
     const { data, error } = await supabase.rpc("get_auth_hook_secret", {
@@ -70,7 +76,7 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
 
     if (error) {
       console.error("Error fetching send email hook secret:", error);
-      return { error: t("errorFetchFailed") };
+      return { error: t("errorFetchFailed"), isSetInEnv };
     }
 
     // Type assertion for the RPC result
@@ -80,19 +86,28 @@ export async function getSendEmailHookSecret(): Promise<GetSendEmailHookSecretRe
 
     if (!result?.success) {
       // Secret not found is not an error - it just means it hasn't been set yet
-      if (result?.error === AUTH_HOOK_SECRET_NOT_FOUND) {
-        return { hasSecret: false };
+      if ("error" in result && result.error === AUTH_HOOK_SECRET_NOT_FOUND) {
+        return { hasSecret: false, isSetInEnv };
       }
-      return { error: result?.error || t("errorFetchFailed") };
+      return {
+        error:
+          ("error" in result ? result.error : undefined) ||
+          t("errorFetchFailed"),
+        isSetInEnv,
+      };
     }
 
     return {
       hasSecret: true,
+      isSetInEnv,
       updatedAt: result.data?.updated_at,
     };
   } catch (error) {
     console.error("Error in getSendEmailHookSecret:", error);
-    return { error: t("authHooksErrorGeneric") };
+    const isSetInEnv = !!(
+      process.env.SEND_EMAIL_HOOK_SECRET || process.env.SEND_EMAIL_HOOK_SECRETS
+    );
+    return { error: t("authHooksErrorGeneric"), isSetInEnv };
   }
 }
 
