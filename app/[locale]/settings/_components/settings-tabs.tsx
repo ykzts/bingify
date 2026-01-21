@@ -29,6 +29,11 @@ export function SettingsTabs() {
       label: t("avatarTab"),
       segment: "/settings/avatar",
     },
+    {
+      href: "/settings/account" as const,
+      label: t("accountTab"),
+      segment: "/settings/account",
+    },
   ];
 
   // Check if the current pathname matches a tab
