@@ -95,8 +95,8 @@ export function TwitchBroadcasterIdField({
       );
 
       if (result.error) {
-        // Translate error key
-        setTwitchIdError(t(result.error));
+        // Error is already translated from server
+        setTwitchIdError(result.error);
         setTwitchIdConverting(false);
         return;
       }
@@ -135,8 +135,8 @@ export function TwitchBroadcasterIdField({
       const result = await getOperatorTwitchBroadcasterId();
 
       if (result.error || !result.channelId) {
-        // エラーキーを翻訳
-        setTwitchIdError(t(result.error || "twitchBroadcasterIdConvertError"));
+        // Error is already translated from server, fallback to local translation if undefined
+        setTwitchIdError(result.error || t("twitchBroadcasterIdConvertError"));
         return;
       }
 
