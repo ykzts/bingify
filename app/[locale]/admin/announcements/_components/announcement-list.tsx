@@ -211,7 +211,7 @@ export function AnnouncementList({
             ) : (
               announcements.map((announcement) => (
                 <tr key={announcement.id}>
-                  <td className="px-6 py-4 text-gray-900 text-sm">
+                  <td className="px-6 py-4 text-gray-900 text-sm dark:text-gray-100">
                     {announcement.title}
                   </td>
                   <td className="px-6 py-4 text-sm">
