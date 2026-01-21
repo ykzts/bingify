@@ -87,7 +87,8 @@ export function OAuthConfigForm({ provider }: Props) {
     }
 
     loadConfig();
-  }, [provider, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [provider]);
 
   const handleSave = async () => {
     // Validate using TanStack Form validators
