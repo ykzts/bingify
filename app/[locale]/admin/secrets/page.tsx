@@ -15,8 +15,8 @@ export default async function AdminSecretsPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("AdminSecrets");
-  const tAuthHooks = await getTranslations("AdminSecretsAuthHooks");
-  const tCron = await getTranslations("AdminSecretsCron");
+  const tAuthHooks = await getTranslations("SendEmailHookSecretManagement");
+  const tCron = await getTranslations("CronSecretManagement");
 
   // Fetch both secrets data
   const authHookData = await getSendEmailHookSecret();

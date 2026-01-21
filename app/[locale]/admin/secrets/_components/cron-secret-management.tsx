@@ -23,7 +23,7 @@ export function CronSecretManagement({
   isSetInEnv,
   updatedAt,
 }: Props) {
-  const t = useTranslations("AdminSecretsCron");
+  const t = useTranslations("CronSecretManagement");
   const confirm = useConfirm();
   const [secret, setSecret] = useState("");
   const [showSecret, setShowSecret] = useState(false);

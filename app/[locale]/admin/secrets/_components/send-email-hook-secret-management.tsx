@@ -26,7 +26,7 @@ export function SendEmailHookSecretManagement({
   isSetInEnv,
   updatedAt,
 }: Props) {
-  const t = useTranslations("AdminSecretsAuthHooks");
+  const t = useTranslations("SendEmailHookSecretManagement");
   const confirm = useConfirm();
   const [secret, setSecret] = useState("");
   const [showSecret, setShowSecret] = useState(false);
