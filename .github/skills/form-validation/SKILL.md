@@ -82,9 +82,9 @@ export function ContactForm() {
           </div>
         )}
       </form.Field>
-      
+
       {/* 他のフィールド */}
-      
+
       <button type="submit">送信</button>
     </form>
   );
@@ -101,7 +101,7 @@ import { revalidateLogic } from "@tanstack/react-form";
 const form = useForm({
   ...contactFormOpts,
   validationLogic: revalidateLogic({
-    mode: "submit",              // 初回は送信時にバリデーション
+    mode: "submit", // 初回は送信時にバリデーション
     modeAfterSubmission: "change", // 送信後は変更時にバリデーション
   }),
   validators: {
@@ -118,7 +118,7 @@ const form = useForm({
 // 悪い例: 手動でsafeParseを呼び出す
 const handleSubmit = (e: React.FormEvent) => {
   e.preventDefault();
-  
+
   const result = emailSchema.safeParse({ email });
   if (!result.success) {
     setError("エラー");
@@ -129,6 +129,7 @@ const handleSubmit = (e: React.FormEvent) => {
 ```
 
 **問題点**:
+
 - TanStack Formの型安全性が失われる
 - エラーハンドリングが手動になり、コードが冗長
 - フィールド単位のエラー表示が困難
@@ -142,17 +143,18 @@ const handleSave = async () => {
     toast.error("Client IDは必須です");
     return;
   }
-  
+
   if (clientSecret.length > 0 && clientSecret.length < 8) {
     toast.error("Client Secretは8文字以上必要です");
     return;
   }
-  
+
   // ...
 };
 ```
 
 **問題点**:
+
 - バリデーションロジックが分散し、保守性が低下
 - 型安全性がない
 - 再利用性がない
@@ -166,12 +168,13 @@ function LoginForm() {
   const emailSchema = z.object({
     email: z.string().email(),
   });
-  
+
   // ...
 }
 ```
 
 **問題点**:
+
 - レンダリングごとにスキーマが再作成される
 - 他のコンポーネントで再利用できない
 - テストが困難
@@ -232,10 +235,10 @@ export const contactFormSchema = z.object({
 
 ```typescript
 // 良い例
-z.string().min(10, "本文は10文字以上入力してください")
+z.string().min(10, "本文は10文字以上入力してください");
 
 // 悪い例
-z.string().min(10, "文字数が足りません")
+z.string().min(10, "文字数が足りません");
 ```
 
 ## 既存フォームの例
