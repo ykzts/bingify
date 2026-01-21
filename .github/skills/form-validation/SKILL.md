@@ -27,12 +27,9 @@ import { z } from "zod";
 
 // Zodスキーマ: [フォーム名]Schema の形式で命名
 export const contactFormSchema = z.object({
-  name: z.string().min(1, "名前を入力してください"),
-  email: z
-    .string()
-    .min(1, "メールアドレスを入力してください")
-    .email("有効なメールアドレスを入力してください"),
-  message: z.string().min(10, "本文は10文字以上入力してください"),
+  name: z.string().min(1, "Name is required"),
+  email: z.string().min(1, "Email is required").email("Invalid email format"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
 // TypeScript型推論
@@ -140,12 +137,12 @@ const handleSubmit = (e: React.FormEvent) => {
 // 悪い例: if文で手動チェック
 const handleSave = async () => {
   if (!clientId.trim()) {
-    toast.error("Client IDは必須です");
+    toast.error("Client ID is required");
     return;
   }
 
   if (clientSecret.length > 0 && clientSecret.length < 8) {
-    toast.error("Client Secretは8文字以上必要です");
+    toast.error("Client Secret must be at least 8 characters");
     return;
   }
 
@@ -201,85 +198,44 @@ app/[locale]/contact/
 
 ## エラーメッセージのガイドライン
 
-### 1. 日本語メッセージを直接定義
+### Zodバリデーションでのエラーメッセージ
+
+バリデーションメッセージは、コンポーネント側でi18n翻訳を適用する前提で、簡潔な識別可能な文字列を使用します。
 
 ```typescript
+// 推奨: 簡潔でわかりやすいメッセージ
 export const contactFormSchema = z.object({
-  email: z
-    .string()
-    .min(1, "メールアドレスを入力してください")
-    .email("有効なメールアドレスを入力してください"),
+  email: z.string().min(1, "Email is required").email("Invalid email format"),
+  name: z.string().min(1, "Name is required"),
 });
 ```
 
-### 2. i18nキーの使用（国際化が必要な場合）
+エラー表示時にi18n翻訳が必要な場合は、コンポーネント側で`getErrorMessage()`などの変換関数を適用します。
 
 ```typescript
-// メッセージキーを返す
-export const contactFormSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Contact.errors.emailRequired")
-    .email("Contact.errors.emailInvalid"),
-});
-
-// コンポーネント側でi18n変換
+// コンポーネント側での使用例
 <FieldError
   errors={field.state.meta.errors.map((msg) => ({
-    message: getErrorMessage(msg), // i18n変換関数
+    message: getErrorMessage(msg),
   }))}
 />
 ```
 
-### 3. 明確で具体的なエラーメッセージ
-
-```typescript
-// 良い例
-z.string().min(10, "本文は10文字以上入力してください");
-
-// 悪い例
-z.string().min(10, "文字数が足りません");
-```
-
 ## 既存フォームの例
 
-### 統一済みフォーム（参考実装）
+推奨パターンで実装されているフォームは、以下のディレクトリ構造に従っています：
 
-以下のフォームは推奨パターンで実装されています：
+```
+app/[locale]/[route]/
+├── _lib/
+│   └── form-options.ts     # Zodスキーマとフォームオプション
+├── _components/
+│   └── example-form.tsx    # フォームコンポーネント
+└── _actions/
+    └── example.ts          # Server Actions
+```
 
-1. **Contact Form**
-   - スキーマ: `app/[locale]/contact/_lib/form-options.ts`
-   - コンポーネント: `app/[locale]/contact/_components/contact-form.tsx`
-
-2. **Create Space Form**
-   - スキーマ: `app/[locale]/dashboard/_lib/form-options.ts`
-   - コンポーネント: `app/[locale]/dashboard/_components/create-space-form.tsx`
-
-3. **Email Change Form**
-   - スキーマ: `app/[locale]/settings/profile/_lib/form-options.ts`
-   - コンポーネント: `app/[locale]/settings/profile/_components/email-change-form.tsx`
-
-4. **Username Form**
-   - スキーマ: `app/[locale]/settings/profile/_lib/form-options.ts`
-   - コンポーネント: `app/[locale]/settings/profile/_components/username-form.tsx`
-
-5. **Announcement Form**
-   - スキーマ: `app/[locale]/admin/announcements/_lib/form-options.ts`
-   - コンポーネント: `app/[locale]/admin/announcements/_components/announcement-form.tsx`
-
-### 移行済みフォーム（2024年1月完了）
-
-以下のフォームは旧パターンから標準パターンへ移行されました：
-
-1. **Login Form** (`app/[locale]/login/_components/login-form.tsx`)
-   - 移行前: インラインZodスキーマ、手動`safeParse`使用
-   - 移行後: `_lib/form-options.ts`にスキーマ定義、TanStack Form validators使用
-   - PR: 該当PRへのリンク
-
-2. **OAuth Config Form** (`app/[locale]/admin/auth-providers/_components/oauth-config-form.tsx`)
-   - 移行前: if文による手動バリデーション
-   - 移行後: `_lib/form-options.ts`にZodスキーマ定義、TanStack Form validators使用
-   - PR: 該当PRへのリンク
+具体的な実装例は、プロジェクト内の既存のフォームコンポーネントを参照してください。
 
 ## 特殊なケース
 
@@ -318,27 +274,27 @@ const { getRootProps, getInputProps } = useDropzone({
 
 ### 入力フォームがないケース
 
-以下のようなケースではバリデーションは不要です：
+以下のようなケースでは、クライアントサイドでのZodバリデーションは通常不要です（サーバーサイドで必ず検証すること）：
 
-#### Avatar Selection Form (`avatar-selection-form.tsx`)
+#### Avatar Selection Form
 
 - **内容**: ラジオボタンでアバターソースを選択
-- **入力**: ラジオボタン選択のみ（テキスト入力なし）
-- **バリデーション**: 不要（選択値はサーバーサイドで検証）
-- **結論**: Zodバリデーション追加は不要
+- **クライアント検証**: 限定的な選択肢のみのため、通常は不要
+- **サーバー検証**: 必須（送信された値が許可された選択肢に含まれるか検証）
+- **結論**: クライアント側のZodバリデーションは省略可能だが、サーバー側では必ず検証
 
-#### Account Linking Form (`account-linking-form.tsx`)
+#### Account Linking Form
 
 - **内容**: OAuthプロバイダーのリンク/アンリンク処理
-- **入力**: ボタンクリックのみ（テキスト入力なし）
-- **バリデーション**: 不要（OAuth認証フローで処理）
+- **クライアント検証**: ボタンクリックのみのため不要
+- **サーバー検証**: OAuth認証フローで処理
 - **結論**: バリデーション追加は不要
 
 ### フォーム判断基準
 
-フォームバリデーションが必要かどうかの判断基準：
+クライアントサイドでZodバリデーションが必要かどうかの判断基準：
 
-✅ **バリデーション必要**:
+✅ **クライアント側バリデーション推奨**:
 
 - テキスト入力フィールドがある
 - 数値入力がある
@@ -346,12 +302,13 @@ const { getRootProps, getInputProps } = useDropzone({
 - 必須項目がある
 - 文字数制限がある
 
-❌ **バリデーション不要**:
+❌ **クライアント側バリデーション通常不要**:
 
-- ラジオボタン/チェックボックスのみの選択フォーム
+- ラジオボタン/チェックボックスのみの選択フォーム（サーバー側検証は必須）
 - OAuth認証フロー（ボタンクリックのみ）
 - ファイルアップロード（react-dropzone等の専用バリデーター使用）
-- サーバーサイドでのみ検証が必要な場合
+
+**重要**: クライアント側のバリデーションの有無に関わらず、サーバー側では必ずすべての入力値を検証すること。
 
 ## 移行手順
 
