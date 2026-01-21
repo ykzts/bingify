@@ -57,7 +57,7 @@ pnpm format:docs       # Markdown フォーマット
 
 → `.github/skills/development/SKILL.md`
 
-### フォームバリデーション (Zod + TanStack Form)
+### フォームバリデーション(Zod + TanStack Form)
 
 → `.github/skills/form-validation/SKILL.md`
 

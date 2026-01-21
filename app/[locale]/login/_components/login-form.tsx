@@ -146,7 +146,7 @@ export function LoginForm({ providers, systemSettings }: Props) {
     setEmailSuccess(false);
 
     // Validate using TanStack Form validators
-    form.validateAllFields("submit");
+    await form.validateAllFields("submit");
 
     const emailField = form.getFieldMeta("email");
     if (emailField?.errors && emailField.errors.length > 0) {

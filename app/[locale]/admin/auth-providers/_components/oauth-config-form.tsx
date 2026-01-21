@@ -92,7 +92,7 @@ export function OAuthConfigForm({ provider }: Props) {
 
   const handleSave = async () => {
     // Validate using TanStack Form validators
-    form.validateAllFields("submit");
+    await form.validateAllFields("submit");
 
     const clientIdField = form.getFieldMeta("clientId");
     if (clientIdField?.errors && clientIdField.errors.length > 0) {
