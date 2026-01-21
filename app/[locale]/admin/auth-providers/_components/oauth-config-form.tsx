@@ -1,5 +1,6 @@
 "use client";
 
+import { useForm } from "@tanstack/react-form-nextjs";
 import { Eye, EyeOff, Loader2, Save } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -12,6 +13,10 @@ import {
   getProviderOAuthConfig,
   updateProviderOAuthConfig,
 } from "../_actions/auth-providers";
+import {
+  oauthConfigFormOpts,
+  oauthConfigFormSchema,
+} from "../_lib/form-options";
 
 interface Props {
   provider: string;
@@ -19,14 +24,20 @@ interface Props {
 
 export function OAuthConfigForm({ provider }: Props) {
   const t = useTranslations("AdminAuthProviders");
-  const [clientId, setClientId] = useState("");
-  const [clientSecret, setClientSecret] = useState("");
   const [showSecret, setShowSecret] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hasExistingSecret, setHasExistingSecret] = useState(false);
   const [isClientIdSetInEnv, setIsClientIdSetInEnv] = useState(false);
   const [isClientSecretSetInEnv, setIsClientSecretSetInEnv] = useState(false);
+
+  // Use TanStack Form for validation
+  const form = useForm({
+    ...oauthConfigFormOpts,
+    validators: {
+      onChange: oauthConfigFormSchema,
+    },
+  });
 
   const getClientSecretPlaceholder = () => {
     if (isClientSecretSetInEnv) {
@@ -66,7 +77,7 @@ export function OAuthConfigForm({ provider }: Props) {
         }
         toast.error(result.error);
       } else {
-        setClientId(result.clientId || "");
+        form.setFieldValue("clientId", result.clientId || "");
         setHasExistingSecret(!!result.hasSecret);
         setIsClientIdSetInEnv(!!result.isClientIdSetInEnv);
         setIsClientSecretSetInEnv(!!result.isClientSecretSetInEnv);
@@ -76,15 +87,22 @@ export function OAuthConfigForm({ provider }: Props) {
     }
 
     loadConfig();
-  }, [provider]);
+  }, [provider, form]);
 
   const handleSave = async () => {
-    if (!clientId.trim()) {
-      toast.error(t("errorClientIdRequired"));
+    // Validate using TanStack Form validators
+    form.validateAllFields("submit");
+
+    const clientIdField = form.getFieldMeta("clientId");
+    if (clientIdField?.errors && clientIdField.errors.length > 0) {
+      toast.error(clientIdField.errors[0]);
       return;
     }
 
     setIsSaving(true);
+
+    const clientId = form.getFieldValue("clientId") as string;
+    const clientSecret = form.getFieldValue("clientSecret") as string;
 
     // Only send client secret if it's been modified
     const secretToSend = clientSecret.trim() ? clientSecret : undefined;
@@ -102,7 +120,7 @@ export function OAuthConfigForm({ provider }: Props) {
       // If we saved a new secret, update the flag
       if (secretToSend) {
         setHasExistingSecret(true);
-        setClientSecret(""); // Clear the input after successful save
+        form.setFieldValue("clientSecret", ""); // Clear the input after successful save
       }
     }
 
@@ -120,6 +138,9 @@ export function OAuthConfigForm({ provider }: Props) {
     );
   }
 
+  const clientId = form.getFieldValue("clientId") as string;
+  const clientSecret = form.getFieldValue("clientSecret") as string;
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -132,7 +153,7 @@ export function OAuthConfigForm({ provider }: Props) {
         <Input
           disabled={isClientIdSetInEnv}
           id={`${provider}-client-id`}
-          onChange={(e) => setClientId(e.target.value)}
+          onChange={(e) => form.setFieldValue("clientId", e.target.value)}
           placeholder={
             isClientIdSetInEnv
               ? t("clientIdPlaceholderEnvSet")
@@ -161,7 +182,9 @@ export function OAuthConfigForm({ provider }: Props) {
           <Input
             disabled={isClientSecretSetInEnv}
             id={`${provider}-client-secret`}
-            onChange={(e) => setClientSecret(e.target.value)}
+            onChange={(e) =>
+              form.setFieldValue("clientSecret", e.target.value)
+            }
             placeholder={getClientSecretPlaceholder()}
             type={showSecret ? "text" : "password"}
             value={clientSecret}
