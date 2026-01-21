@@ -185,7 +185,7 @@ export function IntegratedAuthProvidersForm({
         </div>
 
         {hasOAuthConfig("google") && expandedProvider === "google" && (
-          <div className="border-gray-200 border-t bg-gray-50 dark:border-gray-700 dark:bg-gray-900 p-4">
+          <div className="border-gray-200 border-t bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
             <h4 className="mb-3 font-medium text-sm">
               {t("oauthConfigTitle")}
             </h4>
@@ -193,7 +193,7 @@ export function IntegratedAuthProvidersForm({
           </div>
         )}
 
-        <div className="space-y-4 border-gray-200 border-t p-6 dark:border-gray-700 pt-4">
+        <div className="space-y-4 border-gray-200 border-t p-6 pt-4 dark:border-gray-700">
           <h4 className="font-medium text-sm">
             {t("gatekeeperRequirementsTitle")}
           </h4>
@@ -294,7 +294,7 @@ export function IntegratedAuthProvidersForm({
         </div>
 
         {hasOAuthConfig("twitch") && expandedProvider === "twitch" && (
-          <div className="border-gray-200 border-t bg-gray-50 dark:border-gray-700 dark:bg-gray-900 p-4">
+          <div className="border-gray-200 border-t bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
             <h4 className="mb-3 font-medium text-sm">
               {t("oauthConfigTitle")}
             </h4>
@@ -302,7 +302,7 @@ export function IntegratedAuthProvidersForm({
           </div>
         )}
 
-        <div className="space-y-4 border-gray-200 border-t p-6 dark:border-gray-700 pt-4">
+        <div className="space-y-4 border-gray-200 border-t p-6 pt-4 dark:border-gray-700">
           <h4 className="font-medium text-sm">
             {t("gatekeeperRequirementsTitle")}
           </h4>
@@ -378,7 +378,7 @@ export function IntegratedAuthProvidersForm({
           </div>
         </div>
 
-        <div className="space-y-4 border-gray-200 border-t p-6 dark:border-gray-700 pt-4">
+        <div className="space-y-4 border-gray-200 border-t p-6 pt-4 dark:border-gray-700">
           <h4 className="font-medium text-sm">
             {t("gatekeeperRequirementsTitle")}
           </h4>

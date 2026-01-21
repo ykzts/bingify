@@ -41,7 +41,9 @@ function OverviewCards() {
 
       <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
         <h2 className="mb-2 font-semibold text-lg">{t("overviewUsersCard")}</h2>
-        <p className="text-gray-600 text-sm dark:text-gray-400">{t("overviewUsersDescription")}</p>
+        <p className="text-gray-600 text-sm dark:text-gray-400">
+          {t("overviewUsersDescription")}
+        </p>
       </div>
     </div>
   );

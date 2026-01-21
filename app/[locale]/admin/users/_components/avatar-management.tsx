@@ -231,7 +231,9 @@ export function AvatarManagement({
           )}
 
           {userProfile.avatar_source === "default" && (
-            <p className="text-gray-500 text-sm dark:text-gray-400">{t("avatarIsDefault")}</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">
+              {t("avatarIsDefault")}
+            </p>
           )}
         </div>
       </div>

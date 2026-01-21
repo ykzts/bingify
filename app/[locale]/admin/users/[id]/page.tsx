@@ -77,7 +77,9 @@ export default async function AdminUserDetailPage({
         <h3 className="mb-4 font-semibold text-lg">{t("basicInfo")}</h3>
         <dl className="space-y-3">
           <div>
-            <dt className="font-medium text-gray-700 text-sm dark:text-gray-300">{t("email")}</dt>
+            <dt className="font-medium text-gray-700 text-sm dark:text-gray-300">
+              {t("email")}
+            </dt>
             <dd className="mt-1 text-gray-900 dark:text-gray-100">
               {profile.email || t("notAvailable")}
             </dd>
@@ -91,8 +93,12 @@ export default async function AdminUserDetailPage({
             </dd>
           </div>
           <div>
-            <dt className="font-medium text-gray-700 text-sm dark:text-gray-300">{t("role")}</dt>
-            <dd className="mt-1 text-gray-900 dark:text-gray-100">{profile.role}</dd>
+            <dt className="font-medium text-gray-700 text-sm dark:text-gray-300">
+              {t("role")}
+            </dt>
+            <dd className="mt-1 text-gray-900 dark:text-gray-100">
+              {profile.role}
+            </dd>
           </div>
           <div>
             <dt className="font-medium text-gray-700 text-sm dark:text-gray-300">

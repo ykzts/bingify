@@ -144,7 +144,10 @@ export function UserList({
           <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
             {users.length === 0 ? (
               <tr>
-                <td className="px-6 py-4 text-center text-gray-500 dark:text-gray-400" colSpan={6}>
+                <td
+                  className="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
+                  colSpan={6}
+                >
                   {t("noUsers")}
                 </td>
               </tr>

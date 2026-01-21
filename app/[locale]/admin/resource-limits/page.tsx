@@ -28,7 +28,9 @@ export default async function ResourceLimitsPage({
     <div>
       <div className="mb-6">
         <h2 className="font-bold text-2xl">{t("resourceLimitsTitle")}</h2>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">{t("resourceLimitsDescription")}</p>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">
+          {t("resourceLimitsDescription")}
+        </p>
       </div>
 
       {warnings && warnings.length > 0 && (

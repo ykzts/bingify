@@ -44,7 +44,9 @@ export default async function AdminAuthProvidersPage({
     <div>
       <div className="mb-6">
         <h2 className="font-bold text-2xl">{t("title")}</h2>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">{t("description")}</p>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">
+          {t("description")}
+        </p>
       </div>
 
       {warnings && warnings.length > 0 && (

@@ -28,7 +28,9 @@ export default async function GatekeeperPage({
     <div>
       <div className="mb-6">
         <h2 className="font-bold text-2xl">{t("gatekeeperTitle")}</h2>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">{t("gatekeeperDescription")}</p>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">
+          {t("gatekeeperDescription")}
+        </p>
       </div>
 
       {warnings && warnings.length > 0 && (

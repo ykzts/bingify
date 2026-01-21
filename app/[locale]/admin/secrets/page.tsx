@@ -24,7 +24,9 @@ export default async function AdminSecretsPage({
     <div>
       <div className="mb-6">
         <h2 className="font-bold text-2xl">{t("title")}</h2>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">{t("description")}</p>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">
+          {t("description")}
+        </p>
       </div>
 
       <div className="space-y-8">
@@ -55,7 +57,9 @@ export default async function AdminSecretsPage({
         <section>
           <div className="mb-4">
             <h3 className="font-bold text-xl">{t("cronTitle")}</h3>
-            <p className="mt-1 text-gray-600 text-sm dark:text-gray-400">{t("cronDescription")}</p>
+            <p className="mt-1 text-gray-600 text-sm dark:text-gray-400">
+              {t("cronDescription")}
+            </p>
           </div>
 
           {cronData.error ? (

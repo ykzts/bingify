@@ -164,7 +164,9 @@ export function CronSecretManagement({
               </span>
             </Button>
           </div>
-          <p className="text-gray-600 text-sm dark:text-gray-400">{getHelpText()}</p>
+          <p className="text-gray-600 text-sm dark:text-gray-400">
+            {getHelpText()}
+          </p>
         </div>
 
         {/* Secret Status */}
