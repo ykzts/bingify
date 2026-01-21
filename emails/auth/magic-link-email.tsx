@@ -23,7 +23,7 @@ export async function MagicLinkEmail({
 }: MagicLinkEmailProps) {
   const t = await getTranslations({
     locale,
-    namespace: "EmailTemplates.magicLink",
+    namespace: "EmailTemplateMagicLink",
   });
 
   return (

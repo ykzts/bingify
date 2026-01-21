@@ -56,7 +56,7 @@ export default async function AnnouncementDetailPage({
       case "error":
         return {
           icon: <AlertCircle className="size-4" />,
-          label: t("priority.error"),
+          label: t("priorityError"),
           variant: "destructive" as const,
         };
       case "warning":
@@ -64,13 +64,13 @@ export default async function AnnouncementDetailPage({
           className:
             "border-amber-500/50 bg-amber-50 text-amber-900 dark:border-amber-500/50 dark:bg-amber-950 dark:text-amber-50",
           icon: <TriangleAlert className="size-4" />,
-          label: t("priority.warning"),
+          label: t("priorityWarning"),
           variant: "default" as const,
         };
       default:
         return {
           icon: <InfoIcon className="size-4" />,
-          label: t("priority.info"),
+          label: t("priorityInfo"),
           variant: "default" as const,
         };
     }
@@ -101,7 +101,7 @@ export default async function AnnouncementDetailPage({
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
               <dt className="font-medium text-gray-600 dark:text-gray-400">
-                {t("priority.label")}
+                {t("priorityLabel")}
               </dt>
               <dd className="text-gray-900 dark:text-gray-100">{label}</dd>
             </div>
