@@ -429,7 +429,7 @@ Bingifyの動作に必要な環境変数の詳細です。`.env.local.example` �
 | 変数名                         | 説明                       | デフォルト | 例                |
 | :----------------------------- | :------------------------- | :--------- | :---------------- |
 | `NEXT_PUBLIC_SHOW_BETA_BANNER` | ベータ版バナーの表示制御   | `true`     | `false`           |
-| `SEND_EMAIL_HOOK_SECRETS`      | Supabase Auth Hook署名検証 | -          | `v1,whsec_xxx...` |
+| `SEND_EMAIL_HOOK_SECRET`       | Supabase Auth Hook署名検証 | -          | `v1,whsec_xxx...` |
 
 ### SMTP設定 (お問い合わせフォーム)
 
