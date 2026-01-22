@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
+import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import {
   getMessages,
@@ -25,6 +26,9 @@ const nunito = Nunito({
   variable: "--font-nunito",
 });
 
+// Regex for parsing Link header URLs - defined at top level for performance
+const LINK_URL_REGEX = /<([^>]+)>/;
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
@@ -35,7 +39,58 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Metadata" });
 
+  // Extract current pathname from headers to build hreflang alternates
+  const headersList = await headers();
+
+  // Parse the Link header that next-intl middleware sets
+  // Format: <http://localhost:3001/path>; rel="alternate"; hreflang="en", ...
+  const linkHeader = headersList.get("link") || "";
+
+  // Extract pathname from the first link (current locale's URL)
+  let currentPath = "/";
+  const linkMatch = linkHeader.match(LINK_URL_REGEX);
+  if (linkMatch) {
+    try {
+      const url = new URL(linkMatch[1]);
+      currentPath = url.pathname;
+    } catch {
+      // Fallback to root if parsing fails
+      currentPath = "/";
+    }
+  }
+
+  // Remove locale prefix from pathname to get the base path
+  let pathWithoutLocale = currentPath;
+  for (const loc of routing.locales) {
+    const localePrefix = `/${loc}`;
+    if (
+      currentPath.startsWith(`${localePrefix}/`) ||
+      currentPath === localePrefix
+    ) {
+      pathWithoutLocale = currentPath.slice(localePrefix.length) || "/";
+      break;
+    }
+  }
+
+  // Generate alternate URLs for each locale
+  const languages: Record<string, string> = {};
+  for (const loc of routing.locales) {
+    if (loc === routing.defaultLocale) {
+      // Default locale: no prefix
+      languages[loc] = pathWithoutLocale;
+    } else {
+      // Non-default locale: add prefix
+      languages[loc] = `/${loc}${pathWithoutLocale}`;
+    }
+  }
+
+  // x-default should point to the default locale version
+  languages["x-default"] = pathWithoutLocale;
+
   return {
+    alternates: {
+      languages,
+    },
     description: t("description"),
     metadataBase: new URL(getAbsoluteUrl()),
     title: {
