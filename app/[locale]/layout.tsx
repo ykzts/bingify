@@ -44,9 +44,10 @@ export async function generateMetadata({
 
   // Parse the Link header that next-intl middleware sets
   // Format: <http://localhost:3001/path>; rel="alternate"; hreflang="en", ...
+  // The first URL in the Link header is the current locale's URL
   const linkHeader = headersList.get("link") || "";
 
-  // Extract pathname from the first link (current locale's URL)
+  // Extract pathname from the first link URL
   let currentPath = "/";
   const linkMatch = linkHeader.match(LINK_URL_REGEX);
   if (linkMatch) {
@@ -79,8 +80,9 @@ export async function generateMetadata({
       // Default locale: no prefix
       languages[loc] = pathWithoutLocale;
     } else {
-      // Non-default locale: add prefix
-      languages[loc] = `/${loc}${pathWithoutLocale}`;
+      // Non-default locale: add prefix, normalizing root path
+      languages[loc] =
+        pathWithoutLocale === "/" ? `/${loc}` : `/${loc}${pathWithoutLocale}`;
     }
   }
 
