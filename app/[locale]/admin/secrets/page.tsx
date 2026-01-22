@@ -15,6 +15,8 @@ export default async function AdminSecretsPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("AdminSecrets");
+  const tAuthHooks = await getTranslations("SendEmailHookSecretManagement");
+  const tCron = await getTranslations("CronSecretManagement");
 
   // Fetch both secrets data
   const authHookData = await getSendEmailHookSecret();
@@ -33,9 +35,9 @@ export default async function AdminSecretsPage({
         {/* Auth Hooks Section */}
         <section>
           <div className="mb-4">
-            <h3 className="font-bold text-xl">{t("authHooksTitle")}</h3>
+            <h3 className="font-bold text-xl">{tAuthHooks("title")}</h3>
             <p className="mt-1 text-gray-600 text-sm dark:text-gray-400">
-              {t("authHooksDescription")}
+              {tAuthHooks("description")}
             </p>
           </div>
 
@@ -56,9 +58,9 @@ export default async function AdminSecretsPage({
         {/* Cron Jobs Section */}
         <section>
           <div className="mb-4">
-            <h3 className="font-bold text-xl">{t("cronTitle")}</h3>
+            <h3 className="font-bold text-xl">{tCron("title")}</h3>
             <p className="mt-1 text-gray-600 text-sm dark:text-gray-400">
-              {t("cronDescription")}
+              {tCron("description")}
             </p>
           </div>
 

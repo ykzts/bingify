@@ -23,7 +23,7 @@ export function CronSecretManagement({
   isSetInEnv,
   updatedAt,
 }: Props) {
-  const t = useTranslations("AdminSecrets");
+  const t = useTranslations("CronSecretManagement");
   const confirm = useConfirm();
   const [secret, setSecret] = useState("");
   const [showSecret, setShowSecret] = useState(false);
@@ -32,22 +32,22 @@ export function CronSecretManagement({
 
   const getPlaceholder = () => {
     if (isSetInEnv) {
-      return t("cronSecretPlaceholderEnvSet");
+      return t("secretPlaceholderEnvSet");
     }
     if (hasSecret) {
-      return t("cronSecretPlaceholderReplace");
+      return t("secretPlaceholderReplace");
     }
-    return t("cronSecretPlaceholder");
+    return t("secretPlaceholder");
   };
 
   const getHelpText = () => {
     if (isSetInEnv) {
-      return t("cronSecretHelpEnvSet");
+      return t("secretHelpEnvSet");
     }
     if (hasSecret) {
-      return t("cronSecretHelpReplace");
+      return t("secretHelpReplace");
     }
-    return t("cronSecretHelp");
+    return t("secretHelp");
   };
 
   const handleSave = async () => {
@@ -59,7 +59,7 @@ export function CronSecretManagement({
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(t("cronSaveSuccess"));
+        toast.success(t("saveSuccess"));
         setSecret("");
       }
     } finally {
@@ -74,8 +74,8 @@ export function CronSecretManagement({
 
     if (
       !(await confirm({
-        description: t("cronDeleteConfirm"),
-        title: t("cronDeleteButton"),
+        description: t("deleteConfirm"),
+        title: t("deleteButton"),
         variant: "destructive",
       }))
     ) {
@@ -90,7 +90,7 @@ export function CronSecretManagement({
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(t("cronDeleteSuccess"));
+        toast.success(t("deleteSuccess"));
         setSecret("");
       }
     } finally {
@@ -102,12 +102,12 @@ export function CronSecretManagement({
 
   const getButtonLabel = () => {
     if (isUpdating) {
-      return t("cronSaving");
+      return t("saving");
     }
     if (hasSecret) {
-      return t("cronReplaceButton");
+      return t("replaceButton");
     }
-    return t("cronSaveButton");
+    return t("saveButton");
   };
 
   return (
@@ -117,10 +117,10 @@ export function CronSecretManagement({
         <Info className="h-4 w-4" />
         <AlertDescription>
           <div className="space-y-2">
-            <p>{t("cronInfoDescription")}</p>
+            <p>{t("infoDescription")}</p>
             <ul className="ml-4 list-disc space-y-1 text-sm">
-              <li>{t("cronInfoVaultEncryption")}</li>
-              <li>{t("cronInfoEnvFallback")}</li>
+              <li>{t("infoVaultEncryption")}</li>
+              <li>{t("infoEnvFallback")}</li>
             </ul>
           </div>
         </AlertDescription>
@@ -130,9 +130,9 @@ export function CronSecretManagement({
       <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Label htmlFor="secret">{t("cronSecretLabel")}</Label>
+            <Label htmlFor="secret">{t("secretLabel")}</Label>
             {isSetInEnv && (
-              <Badge variant="secondary">{t("cronEnvVarBadge")}</Badge>
+              <Badge variant="secondary">{t("envVarBadge")}</Badge>
             )}
           </div>
           <div className="relative">
@@ -160,7 +160,7 @@ export function CronSecretManagement({
                 <Eye className="h-4 w-4" />
               )}
               <span className="sr-only">
-                {showSecret ? t("cronHideSecret") : t("cronShowSecret")}
+                {showSecret ? t("hideSecret") : t("showSecret")}
               </span>
             </Button>
           </div>
@@ -173,10 +173,10 @@ export function CronSecretManagement({
         {hasSecret && updatedAt && (
           <div className="rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
             <p className="font-medium text-green-800 text-sm dark:text-green-400">
-              {t("cronSecretConfigured")}
+              {t("secretConfigured")}
             </p>
             <p className="mt-1 text-green-700 text-xs dark:text-green-300">
-              {t("cronLastUpdated", {
+              {t("lastUpdated", {
                 date: new Date(updatedAt).toLocaleString(),
               })}
             </p>
@@ -200,7 +200,7 @@ export function CronSecretManagement({
               type="button"
               variant="destructive"
             >
-              {isDeleting ? t("cronDeleting") : t("cronDeleteButton")}
+              {isDeleting ? t("deleting") : t("deleteButton")}
             </Button>
           )}
         </div>
@@ -212,8 +212,8 @@ export function CronSecretManagement({
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             <div className="space-y-2">
-              <p className="font-semibold">{t("cronEnvWarningTitle")}</p>
-              <p>{t("cronEnvWarningDescription")}</p>
+              <p className="font-semibold">{t("envWarningTitle")}</p>
+              <p>{t("envWarningDescription")}</p>
             </div>
           </AlertDescription>
         </Alert>

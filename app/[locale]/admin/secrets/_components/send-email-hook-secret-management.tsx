@@ -26,7 +26,7 @@ export function SendEmailHookSecretManagement({
   isSetInEnv,
   updatedAt,
 }: Props) {
-  const t = useTranslations("AdminSecrets");
+  const t = useTranslations("SendEmailHookSecretManagement");
   const confirm = useConfirm();
   const [secret, setSecret] = useState("");
   const [showSecret, setShowSecret] = useState(false);
@@ -35,22 +35,22 @@ export function SendEmailHookSecretManagement({
 
   const getPlaceholder = () => {
     if (isSetInEnv) {
-      return t("authHooksSecretPlaceholderEnvSet");
+      return t("secretPlaceholderEnvSet");
     }
     if (hasSecret) {
-      return t("authHooksSecretPlaceholderReplace");
+      return t("secretPlaceholderReplace");
     }
     return "v1,whsec_...";
   };
 
   const getHelpText = () => {
     if (isSetInEnv) {
-      return t("authHooksSecretHelpEnvSet");
+      return t("secretHelpEnvSet");
     }
     if (hasSecret) {
-      return t("authHooksSecretHelpReplace");
+      return t("secretHelpReplace");
     }
-    return t("authHooksSecretHelp");
+    return t("secretHelp");
   };
 
   const handleSave = async () => {
@@ -61,7 +61,7 @@ export function SendEmailHookSecretManagement({
     if (result.error) {
       toast.error(result.error);
     } else {
-      toast.success(t("authHooksSaveSuccess"));
+      toast.success(t("saveSuccess"));
     }
 
     setIsUpdating(false);
@@ -74,8 +74,8 @@ export function SendEmailHookSecretManagement({
 
     if (
       !(await confirm({
-        description: t("authHooksDeleteConfirm"),
-        title: t("authHooksDeleteButton"),
+        description: t("deleteConfirm"),
+        title: t("deleteButton"),
         variant: "destructive",
       }))
     ) {
@@ -89,7 +89,7 @@ export function SendEmailHookSecretManagement({
     if (result.error) {
       toast.error(result.error);
     } else {
-      toast.success(t("authHooksDeleteSuccess"));
+      toast.success(t("deleteSuccess"));
       setSecret("");
     }
 
@@ -101,12 +101,12 @@ export function SendEmailHookSecretManagement({
 
   const getButtonLabel = () => {
     if (isUpdating) {
-      return t("authHooksSaving");
+      return t("saving");
     }
     if (hasSecret) {
-      return t("authHooksReplaceButton");
+      return t("replaceButton");
     }
-    return t("authHooksSaveButton");
+    return t("saveButton");
   };
 
   return (
@@ -116,11 +116,11 @@ export function SendEmailHookSecretManagement({
         <Info className="h-4 w-4" />
         <AlertDescription>
           <div className="space-y-2">
-            <p>{t("authHooksInfoDescription")}</p>
+            <p>{t("infoDescription")}</p>
             <ul className="ml-4 list-disc space-y-1 text-sm">
-              <li>{t("authHooksInfoVaultEncryption")}</li>
-              <li>{t("authHooksInfoEnvFallback")}</li>
-              <li>{t("authHooksInfoFormat")}</li>
+              <li>{t("infoVaultEncryption")}</li>
+              <li>{t("infoEnvFallback")}</li>
+              <li>{t("infoFormat")}</li>
             </ul>
           </div>
         </AlertDescription>
@@ -130,9 +130,9 @@ export function SendEmailHookSecretManagement({
       <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Label htmlFor="secret">{t("authHooksSecretLabel")}</Label>
+            <Label htmlFor="secret">{t("secretLabel")}</Label>
             {isSetInEnv && (
-              <Badge variant="secondary">{t("authHooksEnvVarBadge")}</Badge>
+              <Badge variant="secondary">{t("envVarBadge")}</Badge>
             )}
           </div>
           <div className="relative">
@@ -159,9 +159,7 @@ export function SendEmailHookSecretManagement({
                 <Eye className="h-4 w-4" />
               )}
               <span className="sr-only">
-                {showSecret
-                  ? t("authHooksHideSecret")
-                  : t("authHooksShowSecret")}
+                {showSecret ? t("hideSecret") : t("showSecret")}
               </span>
             </Button>
           </div>
@@ -174,9 +172,7 @@ export function SendEmailHookSecretManagement({
         {secret && !isSecretValid && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {t("authHooksErrorInvalidFormat")}
-            </AlertDescription>
+            <AlertDescription>{t("errorInvalidFormat")}</AlertDescription>
           </Alert>
         )}
 
@@ -184,10 +180,10 @@ export function SendEmailHookSecretManagement({
         {hasSecret && updatedAt && (
           <div className="rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
             <p className="font-medium text-green-800 text-sm dark:text-green-400">
-              {t("authHooksSecretConfigured")}
+              {t("secretConfigured")}
             </p>
             <p className="mt-1 text-green-700 text-xs dark:text-green-300">
-              {t("authHooksLastUpdated", {
+              {t("lastUpdated", {
                 date: new Date(updatedAt).toLocaleString(),
               })}
             </p>
@@ -216,7 +212,7 @@ export function SendEmailHookSecretManagement({
               type="button"
               variant="destructive"
             >
-              {isDeleting ? t("authHooksDeleting") : t("authHooksDeleteButton")}
+              {isDeleting ? t("deleting") : t("deleteButton")}
             </Button>
           )}
         </div>
@@ -228,8 +224,8 @@ export function SendEmailHookSecretManagement({
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             <div className="space-y-2">
-              <p className="font-semibold">{t("authHooksEnvWarningTitle")}</p>
-              <p>{t("authHooksEnvWarningDescription")}</p>
+              <p className="font-semibold">{t("envWarningTitle")}</p>
+              <p>{t("envWarningDescription")}</p>
             </div>
           </AlertDescription>
         </Alert>
