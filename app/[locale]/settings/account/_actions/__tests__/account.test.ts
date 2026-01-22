@@ -9,6 +9,10 @@ vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: vi.fn(),
 }));
 
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(() => (key: string) => key),
+}));
+
 // Import after mocks
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -52,7 +56,7 @@ describe("Account Deletion", () => {
       const result = await deleteAccount();
 
       expect(result.success).toBe(true);
-      expect(result.errorKey).toBeUndefined();
+      expect(result.error).toBeUndefined();
       expect(mockAdminClient.auth.admin.deleteUser).toHaveBeenCalledWith(
         userId
       );
@@ -85,7 +89,7 @@ describe("Account Deletion", () => {
       const result = await deleteAccount();
 
       expect(result.success).toBe(false);
-      expect(result.errorKey).toBe("errorAdminCannotDelete");
+      expect(result.error).toBe("errorAdminCannotDelete");
     });
 
     it("should return error when user is not authenticated", async () => {
@@ -102,7 +106,7 @@ describe("Account Deletion", () => {
       const result = await deleteAccount();
 
       expect(result.success).toBe(false);
-      expect(result.errorKey).toBe("errorUnauthorized");
+      expect(result.error).toBe("errorUnauthorized");
     });
 
     it("should handle deletion errors", async () => {
@@ -142,7 +146,7 @@ describe("Account Deletion", () => {
       const result = await deleteAccount();
 
       expect(result.success).toBe(false);
-      expect(result.errorKey).toBe("errorDeleteFailed");
+      expect(result.error).toBe("errorDeleteFailed");
     });
 
     it("should handle organizer users", async () => {
@@ -184,6 +188,35 @@ describe("Account Deletion", () => {
       expect(mockAdminClient.auth.admin.deleteUser).toHaveBeenCalledWith(
         userId
       );
+    });
+
+    it("should handle profile query errors", async () => {
+      const userId = "test-user-id";
+
+      const mockClient = {
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: userId } },
+          }),
+        },
+        from: vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
+                data: null,
+                error: { message: "Profile not found" },
+              }),
+            }),
+          }),
+        }),
+      };
+
+      vi.mocked(createClient).mockResolvedValue(mockClient as any);
+
+      const result = await deleteAccount();
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("errorGeneric");
     });
   });
 });

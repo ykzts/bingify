@@ -1,11 +1,11 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export interface DeleteAccountState {
   error?: string;
-  errorKey?: string;
   success: boolean;
 }
 
@@ -14,6 +14,8 @@ export interface DeleteAccountState {
  * This will permanently delete the user's account and all associated data
  */
 export async function deleteAccount(): Promise<DeleteAccountState> {
+  const t = await getTranslations("AccountSettings");
+
   try {
     const supabase = await createClient();
 
@@ -24,21 +26,29 @@ export async function deleteAccount(): Promise<DeleteAccountState> {
 
     if (!user) {
       return {
-        errorKey: "errorUnauthorized",
+        error: t("errorUnauthorized"),
         success: false,
       };
     }
 
     // Check if the user is an admin - prevent admin self-deletion
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
       .single();
 
+    if (profileError) {
+      console.error("Failed to fetch user profile:", profileError);
+      return {
+        error: t("errorGeneric"),
+        success: false,
+      };
+    }
+
     if (profile?.role === "admin") {
       return {
-        errorKey: "errorAdminCannotDelete",
+        error: t("errorAdminCannotDelete"),
         success: false,
       };
     }
@@ -51,7 +61,7 @@ export async function deleteAccount(): Promise<DeleteAccountState> {
     if (error) {
       console.error("Failed to delete account:", error);
       return {
-        errorKey: "errorDeleteFailed",
+        error: t("errorDeleteFailed"),
         success: false,
       };
     }
@@ -65,7 +75,7 @@ export async function deleteAccount(): Promise<DeleteAccountState> {
   } catch (error) {
     console.error("Error deleting account:", error);
     return {
-      errorKey: "errorGeneric",
+      error: t("errorGeneric"),
       success: false,
     };
   }

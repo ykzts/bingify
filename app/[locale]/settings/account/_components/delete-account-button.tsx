@@ -46,9 +46,7 @@ export function DeleteAccountButton() {
         // Redirect to home page after successful deletion
         router.push(`/${locale}`);
       } else {
-        const errorKey = result.errorKey || "errorGeneric";
-        const errorMessage = t(errorKey);
-        toast.error(errorMessage);
+        toast.error(result.error || t("errorGeneric"));
         setIsDeleting(false);
         setShowDialog(false);
       }
