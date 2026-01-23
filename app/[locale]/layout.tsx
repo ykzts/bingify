@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
-import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import {
   getMessages,
@@ -26,9 +25,6 @@ const nunito = Nunito({
   variable: "--font-nunito",
 });
 
-// Regex for parsing Link header URLs - defined at top level for performance
-const LINK_URL_REGEX = /<([^>]+)>/;
-
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
@@ -39,55 +35,23 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Metadata" });
 
-  // Extract current pathname from headers to build hreflang alternates
-  const headersList = await headers();
-
-  // Parse the Link header that next-intl middleware sets
-  // Format: <http://localhost:3001/path>; rel="alternate"; hreflang="en", ...
-  // The first URL in the Link header is the current locale's URL
-  const linkHeader = headersList.get("link") || "";
-
-  // Extract pathname from the first link URL
-  let currentPath = "/";
-  const linkMatch = linkHeader.match(LINK_URL_REGEX);
-  if (linkMatch) {
-    try {
-      const url = new URL(linkMatch[1]);
-      currentPath = url.pathname;
-    } catch {
-      // Fallback to root if parsing fails
-      currentPath = "/";
-    }
-  }
-
-  // Remove locale prefix from pathname to get the base path
-  let pathWithoutLocale = currentPath;
-  for (const loc of routing.locales) {
-    const localePrefix = `/${loc}`;
-    if (
-      currentPath.startsWith(`${localePrefix}/`) ||
-      currentPath === localePrefix
-    ) {
-      pathWithoutLocale = currentPath.slice(localePrefix.length) || "/";
-      break;
-    }
-  }
-
-  // Generate alternate URLs for each locale
+  // Generate hreflang alternate URLs for each locale
+  // Note: This generates alternates based on the locale parameter only.
+  // Individual pages can override this metadata to provide page-specific alternates.
   const languages: Record<string, string> = {};
+
   for (const loc of routing.locales) {
     if (loc === routing.defaultLocale) {
-      // Default locale: no prefix
-      languages[loc] = pathWithoutLocale;
+      // Default locale: root path without prefix
+      languages[loc] = "/";
     } else {
-      // Non-default locale: add prefix, normalizing root path
-      languages[loc] =
-        pathWithoutLocale === "/" ? `/${loc}` : `/${loc}${pathWithoutLocale}`;
+      // Non-default locale: root path with locale prefix
+      languages[loc] = `/${loc}`;
     }
   }
 
-  // x-default should point to the default locale version
-  languages["x-default"] = pathWithoutLocale;
+  // x-default points to the default locale
+  languages["x-default"] = "/";
 
   return {
     alternates: {
