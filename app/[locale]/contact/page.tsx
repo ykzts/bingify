@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { generateAlternateLanguages } from "@/lib/utils/url";
 import { ContactForm } from "./_components/contact-form";
 
 export async function generateMetadata({
@@ -9,6 +10,10 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "Contact" });
 
   return {
+    alternates: {
+      canonical: "/contact",
+      languages: generateAlternateLanguages("/contact"),
+    },
     description: t("metaDescription"),
     openGraph: {
       description: t("metaDescription"),
