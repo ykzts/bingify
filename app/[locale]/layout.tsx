@@ -35,28 +35,7 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Metadata" });
 
-  // Generate hreflang alternate URLs for each locale
-  // Note: This generates alternates based on the locale parameter only.
-  // Individual pages can override this metadata to provide page-specific alternates.
-  const languages: Record<string, string> = {};
-
-  for (const loc of routing.locales) {
-    if (loc === routing.defaultLocale) {
-      // Default locale: root path without prefix
-      languages[loc] = "/";
-    } else {
-      // Non-default locale: root path with locale prefix
-      languages[loc] = `/${loc}`;
-    }
-  }
-
-  // x-default points to the default locale
-  languages["x-default"] = "/";
-
   return {
-    alternates: {
-      languages,
-    },
     description: t("description"),
     metadataBase: new URL(getAbsoluteUrl()),
     title: {
