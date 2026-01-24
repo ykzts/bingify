@@ -2,6 +2,8 @@
  * Vercel環境サポート付きURL生成ユーティリティ
  */
 
+import { routing } from "@/i18n/routing";
+
 /**
  * 以下の優先順位でアプリケーションのベースURLを取得する:
  * 1. NEXT_PUBLIC_SITE_URL（明示的に定義）
@@ -57,6 +59,32 @@ export function getAbsoluteUrl(path = ""): string {
     console.error("Failed to construct URL:", e);
     return baseUrl;
   }
+}
+
+/**
+ * ページの言語別代替URL（hreflang）を生成する
+ * @param pagePath - ページのパス（ロケールなし、例: "/privacy"）
+ * @returns 各ロケールの代替URLを含むオブジェクト
+ */
+export function generateAlternateLanguages(
+  pagePath: string
+): Record<string, string> {
+  const languages: Record<string, string> = {};
+
+  for (const locale of routing.locales) {
+    if (locale === routing.defaultLocale) {
+      // デフォルトロケール: プレフィックスなし
+      languages[locale] = pagePath;
+    } else {
+      // 非デフォルトロケール: ロケールプレフィックスを追加
+      languages[locale] = `/${locale}${pagePath}`;
+    }
+  }
+
+  // x-defaultはデフォルトロケールを指す
+  languages["x-default"] = pagePath;
+
+  return languages;
 }
 
 const PROTOCOL_PATTERN = /^[a-zA-Z][a-zA-Z0-9+.-]*:/;

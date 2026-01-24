@@ -6,7 +6,10 @@ import { getEnabledAuthProviders } from "@/lib/data/auth-providers";
 import { getSystemSettings } from "@/lib/data/system-settings";
 import { DEFAULT_SYSTEM_SETTINGS } from "@/lib/schemas/system-settings";
 import { createClient } from "@/lib/supabase/server";
-import { validateRedirectPath } from "@/lib/utils/url";
+import {
+  generateAlternateLanguages,
+  validateRedirectPath,
+} from "@/lib/utils/url";
 import { LoginForm } from "./_components/login-form";
 
 export async function generateMetadata({
@@ -16,6 +19,10 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "Login" });
 
   return {
+    alternates: {
+      canonical: "/login",
+      languages: generateAlternateLanguages("/login"),
+    },
     description: t("metaDescription"),
     openGraph: {
       description: t("metaDescription"),

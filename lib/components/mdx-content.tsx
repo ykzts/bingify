@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { generateAlternateLanguages } from "@/lib/utils/url";
 
 interface MDXModule {
   default: React.ComponentType;
@@ -72,7 +73,14 @@ export async function getMDXMetadata(
   const module = await loadMDXContent(locale, contentPath);
   const title = module.metadata?.title;
 
+  // ページパスを構築（ロケールなし）
+  const pagePath = `/${contentPath}`;
+
   return {
+    alternates: {
+      canonical: pagePath,
+      languages: generateAlternateLanguages(pagePath),
+    },
     title: title || "Bingify",
   };
 }
