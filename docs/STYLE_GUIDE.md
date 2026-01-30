@@ -159,15 +159,15 @@
 
 **例:**
 
-| ❌ 誤り      | ✅ 正しい      |
-| ------------ | -------------- |
+| ❌ 誤り        | ✅ 正しい      |
+| -------------- | -------------- |
 | ユーザー       | ユーザー       |
 | サーバー       | サーバー       |
-| エラー       | エラー         |
+| エラー         | エラー         |
 | ブラウザー     | ブラウザー     |
 | コンピューター | コンピューター |
 | プロバイダー   | プロバイダー   |
-| メンバー     | メンバー       |
+| メンバー       | メンバー       |
 
 **例外 (長音符なし):**
 
@@ -456,7 +456,9 @@ pnpm textlint path/to/file.md
 
 ```markdown
 <!-- textlint-disable -->
+
 この部分はチェックされません
+
 <!-- textlint-enable -->
 ```
 
@@ -464,7 +466,9 @@ pnpm textlint path/to/file.md
 
 ```markdown
 <!-- textlint-disable ja-technical-writing/sentence-length -->
+
 長い文章でもエラーになりません
+
 <!-- textlint-enable ja-technical-writing/sentence-length -->
 ```
 
@@ -483,7 +487,7 @@ pnpm textlint path/to/file.md
 
 ## 更新履歴
 
-| 日付       | 変更内容                   | 変更者         |
-| ---------- | -------------------------- | -------------- |
-| 2026-01-11 | 初版作成                   | GitHub Copilot |
-| 2026-01-17 | textlint自動チェック追加   | GitHub Copilot |
+| 日付       | 変更内容                 | 変更者         |
+| ---------- | ------------------------ | -------------- |
+| 2026-01-11 | 初版作成                 | GitHub Copilot |
+| 2026-01-17 | textlint自動チェック追加 | GitHub Copilot |
