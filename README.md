@@ -383,3 +383,14 @@ type BingoCard = Tables<"bingo_cards">;
 import { createClient } from "@supabase/supabase-js";
 const supabase = createClient<Database>(url, key);
 ```
+
+## ドキュメント
+
+Bingifyの開発・運用に関する詳細なドキュメントは、以下を参照してください：
+
+- **[Figma Make用サービス仕様書](docs/FIGMA_MAKE_SPECIFICATION.md)** - UI/UXデザイン作成に必要な全情報を網羅した詳細仕様書
+- **[Vercelデプロイガイド](docs/VERCEL_DEPLOY.md)** - Vercelへのデプロイ手順
+- **[セルフホスティングガイド](docs/SELF_HOSTED.md)** - Docker、VPS、クラウドサーバーでの運用方法
+- **[マイグレーションガイド](docs/MIGRATIONS.md)** - データベースマイグレーションの詳細
+- **[スタイルガイド](docs/STYLE_GUIDE.md)** - コード規約とドキュメント表記ルール
+- **[用語集](docs/GLOSSARY.md)** - プロジェクト内で使用される用語の定義
