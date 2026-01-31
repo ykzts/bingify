@@ -22,38 +22,50 @@ export function Hero({
   titleHighlight,
 }: HeroProps) {
   return (
-    <section className="flex min-h-[70vh] flex-col items-center justify-center px-6 py-16 text-center">
-      <div className="max-w-3xl">
-        <div className="mb-6 flex justify-center">
-          <Image
-            alt="Bingify"
-            className="h-12 w-auto sm:h-14"
-            fetchPriority="high"
-            height={56}
-            loading="eager"
-            src="/logo.svg"
-            width={212}
-          />
+    <section className="relative flex min-h-[75vh] flex-col items-center justify-center overflow-hidden px-6 py-20 text-center">
+      {/* Decorative background elements */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-accent/30 blur-3xl" />
+      </div>
+      
+      <div className="relative z-10 max-w-3xl">
+        <div className="mb-8 flex justify-center">
+          <div className="rounded-2xl bg-card p-4 shadow-lg ring-1 ring-border/50">
+            <Image
+              alt="Bingify"
+              className="h-10 w-auto sm:h-12"
+              fetchPriority="high"
+              height={48}
+              loading="eager"
+              src="/logo.svg"
+              width={182}
+            />
+          </div>
         </div>
 
-        <h1 className="mb-4 font-semibold text-3xl text-foreground tracking-tight sm:text-4xl md:text-5xl">
+        <h1 className="mb-6 font-bold text-4xl text-foreground tracking-tight text-balance sm:text-5xl md:text-6xl">
           {title}
           <br />
-          <span className="text-primary">{titleHighlight}</span>
+          <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            {titleHighlight}
+          </span>
         </h1>
 
-        <p className="mx-auto mb-8 max-w-xl text-base text-muted-foreground sm:text-lg">
+        <p className="mx-auto mb-10 max-w-xl text-lg text-muted-foreground leading-relaxed text-balance sm:text-xl">
           {description}
           <br className="hidden sm:block" />
           {descriptionLine2}
         </p>
 
-        <Button asChild size="lg">
-          <Link href="/dashboard">
-            {ctaButton}
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <Button asChild size="lg" className="min-w-[200px] text-base">
+            <Link href="/dashboard">
+              {ctaButton}
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </Button>
+        </div>
       </div>
     </section>
   );
