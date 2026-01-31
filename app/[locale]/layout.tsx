@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
+import { Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import {
   getMessages,
@@ -19,10 +19,10 @@ import { Footer } from "./_components/footer";
 import { HeaderMenuWrapper } from "./_components/header-menu-wrapper";
 import { MobileFooterNavWrapper } from "./_components/mobile-footer-nav-wrapper";
 
-const nunito = Nunito({
+const inter = Inter({
   display: "swap",
   subsets: ["latin"],
-  variable: "--font-nunito",
+  variable: "--font-inter",
 });
 
 export function generateStaticParams() {
@@ -56,7 +56,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${nunito.variable} antialiased`}>
+      <body className={`${inter.variable} antialiased`}>
         <ThemeProvider>
           <NextIntlClientProvider locale={locale} messages={messages}>
             <ConfirmProvider>
@@ -65,7 +65,7 @@ export default async function LocaleLayout({
                   <AnnouncementBanner />
                 </Suspense>
                 <ConditionalHeader>
-                  <header className="sticky top-0 z-50 border-gray-200 border-b bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/80">
+                  <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
                     <div className="container mx-auto flex h-16 items-center justify-between px-4">
                       <HeaderMenuWrapper />
                     </div>
