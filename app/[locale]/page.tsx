@@ -1,5 +1,7 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { generateAlternateLanguages } from "@/lib/utils/url";
 import { FaqWrapper } from "./_components/faq-wrapper";
 import { Features } from "./_components/features";
 import { FloatingParticles } from "./_components/floating-particles";
@@ -8,6 +10,15 @@ import { Support } from "./_components/support";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    alternates: {
+      canonical: "/",
+      languages: generateAlternateLanguages("/"),
+    },
+  };
 }
 
 export default async function Home({ params }: PageProps<"/[locale]">) {
