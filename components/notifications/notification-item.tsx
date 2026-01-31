@@ -86,13 +86,13 @@ export function NotificationItem({
         <div
           className={cn(
             "flex h-10 w-10 items-center justify-center rounded-full",
-            notification.read ? "bg-gray-100" : "bg-purple-100"
+            notification.read ? "bg-muted" : "bg-primary/10"
           )}
         >
           <Icon
             className={cn(
               "h-5 w-5",
-              notification.read ? "text-gray-500" : "text-purple-600"
+              notification.read ? "text-muted-foreground" : "text-primary"
             )}
           />
         </div>
@@ -104,24 +104,24 @@ export function NotificationItem({
             className={cn(
               "text-sm",
               notification.read
-                ? "text-gray-900"
-                : "font-semibold text-gray-900"
+                ? "text-foreground"
+                : "font-semibold text-foreground"
             )}
           >
             {notification.title}
           </p>
           {!notification.read && (
-            <span className="h-2 w-2 flex-shrink-0 rounded-full bg-purple-500" />
+            <span className="h-2 w-2 flex-shrink-0 rounded-full bg-primary" />
           )}
         </div>
 
         {notification.content && variant === "expanded" && (
-          <p className="line-clamp-2 text-gray-600 text-sm">
+          <p className="line-clamp-2 text-muted-foreground text-sm">
             {notification.content}
           </p>
         )}
 
-        <p className="text-gray-400 text-xs">
+        <p className="text-muted-foreground/70 text-xs">
           {formatRelativeTime(notification.created_at || "", locale)}
         </p>
       </div>
@@ -157,8 +157,8 @@ export function NotificationItem({
     return (
       <Link
         className={cn(
-          "group relative flex w-full gap-4 rounded-lg border p-4 text-left transition-colors hover:bg-gray-50",
-          !notification.read && "border-purple-200 bg-purple-50/50"
+          "group relative flex w-full gap-4 rounded-lg border border-border p-4 text-left transition-colors hover:bg-accent",
+          !notification.read && "border-primary/20 bg-primary/5"
         )}
         href={linkUrl}
         onClick={() => {
@@ -175,8 +175,8 @@ export function NotificationItem({
   return (
     <div
       className={cn(
-        "group relative flex w-full gap-4 rounded-lg border p-4 text-left transition-colors",
-        !notification.read && "border-purple-200 bg-purple-50/50"
+        "group relative flex w-full gap-4 rounded-lg border border-border p-4 text-left transition-colors",
+        !notification.read && "border-primary/20 bg-primary/5"
       )}
     >
       {content}

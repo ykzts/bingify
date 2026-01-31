@@ -44,21 +44,21 @@ export function SettingsTabs() {
   };
 
   return (
-    <nav className="border-gray-200 border-b">
+    <nav className="border-border border-b">
       <div className="flex gap-8">
         {tabs.map((tab) => {
           const active = isActive(tab.segment);
           return (
             <Link
-              className={`relative pb-4 font-medium text-sm transition-colors hover:text-purple-600 ${
-                active ? "text-purple-600" : "text-gray-700"
+              className={`relative pb-4 font-medium text-sm transition-colors hover:text-primary ${
+                active ? "text-primary" : "text-muted-foreground"
               }`}
               href={tab.href}
               key={tab.segment}
             >
               {tab.label}
               <span
-                className={`absolute bottom-0 left-0 h-0.5 w-full bg-purple-600 transition-transform ${
+                className={`absolute bottom-0 left-0 h-0.5 w-full bg-primary transition-transform ${
                   active ? "scale-x-100" : "scale-x-0"
                 }`}
               />
