@@ -61,10 +61,10 @@ function LoadingSkeleton() {
     <div className="space-y-1 p-2">
       {SKELETON_ITEMS.map((i) => (
         <div className="flex gap-3 p-2" key={i}>
-          <div className="size-8 animate-pulse rounded-full bg-gray-200" />
+          <div className="size-8 animate-pulse rounded-full bg-muted" />
           <div className="flex-1 space-y-2">
-            <div className="h-3 w-3/4 animate-pulse rounded bg-gray-200" />
-            <div className="h-2 w-1/2 animate-pulse rounded bg-gray-200" />
+            <div className="h-3 w-3/4 animate-pulse rounded bg-muted" />
+            <div className="h-2 w-1/2 animate-pulse rounded bg-muted" />
           </div>
         </div>
       ))}
@@ -80,8 +80,8 @@ function EmptyState() {
 
   return (
     <div className="p-6 text-center">
-      <Bell className="mx-auto mb-2 size-8 text-gray-400" />
-      <p className="text-gray-500 text-sm">{t("empty")}</p>
+      <Bell className="mx-auto mb-2 size-8 text-muted-foreground" />
+      <p className="text-muted-foreground text-sm">{t("empty")}</p>
     </div>
   );
 }
@@ -131,13 +131,13 @@ function NotificationDropdownItem({
         <div
           className={cn(
             "flex size-8 items-center justify-center rounded-full",
-            notification.read ? "bg-gray-100" : "bg-purple-100"
+            notification.read ? "bg-muted" : "bg-primary/10"
           )}
         >
           <Icon
             className={cn(
               "size-4",
-              notification.read ? "text-gray-500" : "text-purple-600"
+              notification.read ? "text-muted-foreground" : "text-primary"
             )}
           />
         </div>
@@ -149,18 +149,18 @@ function NotificationDropdownItem({
             className={cn(
               "text-sm leading-tight",
               notification.read
-                ? "text-gray-900"
-                : "font-semibold text-gray-900"
+                ? "text-foreground"
+                : "font-semibold text-foreground"
             )}
           >
             {notification.title}
           </p>
           {!notification.read && (
-            <span className="mt-1 size-2 flex-shrink-0 rounded-full bg-purple-500" />
+            <span className="mt-1 size-2 flex-shrink-0 rounded-full bg-primary" />
           )}
         </div>
 
-        <p className="text-gray-400 text-xs">
+        <p className="text-muted-foreground/70 text-xs">
           {formatDateShort(notification.created_at, locale)}
         </p>
       </div>
@@ -217,7 +217,7 @@ export function NotificationDropdown({
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
-            className="cursor-pointer justify-center font-medium text-purple-600 text-sm"
+            className="cursor-pointer justify-center font-medium text-primary text-sm"
             onClick={handleViewAll}
           >
             {t("viewAll")}

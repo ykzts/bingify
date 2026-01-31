@@ -193,8 +193,8 @@ export function LoginForm({ providers, systemSettings }: Props) {
   return (
     <div className="mx-auto max-w-md space-y-6 p-8">
       <div className="space-y-2 text-center">
-        <h1 className="font-bold text-3xl dark:text-gray-100">{t("title")}</h1>
-        <p className="text-gray-600 dark:text-gray-400">{t("description")}</p>
+        <h1 className="font-bold text-3xl text-foreground">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("description")}</p>
       </div>
 
       {displayError && (
@@ -222,7 +222,7 @@ export function LoginForm({ providers, systemSettings }: Props) {
       {providers.length > 0 && (
         <div className="flex items-center gap-4">
           <Separator className="flex-1" />
-          <span className="text-gray-500 text-sm dark:text-gray-400">
+          <span className="text-muted-foreground text-sm">
             {t("orDivider")}
           </span>
           <Separator className="flex-1" />
@@ -269,11 +269,11 @@ export function LoginForm({ providers, systemSettings }: Props) {
         </Card>
       )}
 
-      <p className="text-center text-gray-500 text-sm dark:text-gray-400">
+      <p className="text-center text-muted-foreground text-sm">
         {t.rich("agreeToTerms", {
           privacyLink: (chunks) => (
             <Link
-              className="text-purple-600 underline hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+              className="text-primary underline hover:text-primary/80"
               href="/privacy"
             >
               {chunks}
@@ -281,7 +281,7 @@ export function LoginForm({ providers, systemSettings }: Props) {
           ),
           termsLink: (chunks) => (
             <Link
-              className="text-purple-600 underline hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+              className="text-primary underline hover:text-primary/80"
               href="/terms"
             >
               {chunks}
