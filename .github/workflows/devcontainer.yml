@@ -4,10 +4,12 @@ on:
   pull_request:
     paths:
       - ".devcontainer/**"
+      - ".github/workflows/devcontainer.yml"
   push:
     branches: [main]
     paths:
       - ".devcontainer/**"
+      - ".github/workflows/devcontainer.yml"
 
 jobs:
   test:
