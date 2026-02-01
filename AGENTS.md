@@ -1,6 +1,6 @@
 # AGENTS
 
-AIエージェント向けプロジェクトガイド。詳細な技術情報は各ドキュメントを参照してください。
+AIエージェント向けプロジェクトガイド。
 
 ## WHAT（プロジェクト構成）
 
@@ -47,59 +47,19 @@ pnpm format:docs       # Markdown フォーマット
 
 ## 詳細ドキュメント
 
-段階的開示：タスクに応じて以下を参照してください。
+**Bingifyを開発する際は必ず `.github/skills/bingify-project-guide/SKILL.md` を参照してください。**
 
-### 認証・セッション管理
+以下の外部スキルも参照してください：
 
-→ `.github/skills/authentication/SKILL.md`
+- **Supabase Postgres ベストプラクティス** → `.github/skills/supabase-postgres-best-practices/SKILL.md`
+- **React ベストプラクティス** → `.github/skills/vercel-react-best-practices/SKILL.md`
+- **ウェブデザインガイドライン** → `.github/skills/web-design-guidelines/SKILL.md`
 
-### 開発環境・コード規約
+その他：
 
-→ `.github/skills/development/SKILL.md`
-
-### フォームバリデーション(Zod + TanStack Form)
-
-→ `.github/skills/form-validation/SKILL.md`
-
-### GitHub ワークフロー・Conventional Commits
-
-→ `.github/skills/github-workflow/SKILL.md`
-
-### 国際化 (i18n) & メッセージ管理
-
-→ `.github/skills/internationalization/SKILL.md`
-
-### ローカルメールテスト
-
-→ `.github/skills/mailpit-testing/SKILL.md`
-
-### Supabase セットアップ・マイグレーション
-
-→ `.github/skills/supabase-setup/SKILL.md`
-
-### Supabase Postgres ベストプラクティス
-
-→ `.github/skills/supabase-postgres-best-practices/SKILL.md`
-
-### テスト・コード品質
-
-→ `.github/skills/testing/SKILL.md`
-
-### React ベストプラクティス
-
-→ `.github/skills/vercel-react-best-practices/SKILL.md`
-
-### 表記ルール（日本語・英語）
-
-→ `docs/STYLE_GUIDE.md`
-
-### 用語定義
-
-→ `docs/GLOSSARY.md`
-
-### コミット規約・貢献ガイドライン
-
-→ `CONTRIBUTING.md`
+- [STYLE_GUIDE.md](docs/STYLE_GUIDE.md) - 表記ルール
+- [GLOSSARY.md](docs/GLOSSARY.md) - 用語定義
+- [CONTRIBUTING.md](CONTRIBUTING.md) - コミット規約・貢献ガイドライン
 
 ## 実行ポリシー（エージェント必須）
 

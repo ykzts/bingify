@@ -1,18 +1,6 @@
----
-name: internationalization
-description: Implement i18n using next-intl. Manage multilingual content in en.json and ja.json. Apply translation patterns for UI and dynamic content.
-metadata:
-  author: Bingify
-  version: "1.0"
----
-
 # Internationalization (i18n)
 
-このスキルは、Bingifyの多言語対応とメッセージ管理をカバーします。
-
-## 概要
-
-Bingifyはnext-intlを使用して、英語 (en) と日本語 (ja) をサポートしています。
+Bingifyの多言語対応とメッセージ管理をカバーします。
 
 ## ロケール別ルート
 
@@ -25,7 +13,7 @@ Bingifyはnext-intlを使用して、英語 (en) と日本語 (ja) をサポー�
 
 ## メッセージファイル
 
-### messages/ja.JSON
+### messages/ja.json
 
 ```json
 {
@@ -82,5 +70,5 @@ export function LanguageSwitcher() {
 ## 参考
 
 - [next-intl公式ドキュメント](https://next-intl.dev/)
-- [STYLE_GUIDE.md](../../../docs/STYLE_GUIDE.md)
-- [GLOSSARY.md](../../../docs/GLOSSARY.md)
+- [STYLE_GUIDE.md](../../../../docs/STYLE_GUIDE.md)
+- [GLOSSARY.md](../../../../docs/GLOSSARY.md)

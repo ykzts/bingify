@@ -1,18 +1,6 @@
----
-name: mailpit-testing
-description: Use Mailpit to test emails in local development. Understand email verification workflows and inspect outgoing emails without external services.
-metadata:
-  author: Bingify
-  version: "1.0"
----
-
 # Mailpit Local Email Testing
 
-このスキルは、Bingifyプロジェクトでのメール機能のローカル開発・テストをカバーします。
-
-## 概要
-
-BingifyはMailpitを使用して、ローカル開発環境でメール送信のテストを行います。
+Bingifyプロジェクトでのメール機能のローカル開発・テストをカバーします。
 
 ## Mailpit WebUIへのアクセス
 
@@ -67,7 +55,7 @@ export async function submitContactForm(data: unknown) {
 curl http://localhost:54324/api/v1/messages
 ```
 
-## メールをクリア
+メールをクリア：
 
 ```bash
 curl -X DELETE http://localhost:54324/api/v1/messages

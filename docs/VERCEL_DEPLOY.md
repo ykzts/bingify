@@ -345,13 +345,13 @@ Bingifyの動作に必要な環境変数の完全なリストです。
 
 これらの環境変数は必ず設定してください。
 
-| 変数名                            | 説明                                    | 例                                  | 取得方法                                    |
-| :-------------------------------- | :-------------------------------------- | :---------------------------------- | :------------------------------------------ |
+| 変数名                          | 説明                                    | 例                                | 取得方法                                    |
+| :------------------------------ | :-------------------------------------- | :-------------------------------- | :------------------------------------------ |
 | `NEXT_PUBLIC_SUPABASE_URL`      | SupabaseプロジェクトURL                 | `https://xxx.supabase.co`         | Supabase Dashboard → Settings → API         |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase匿名キー (公開用)               | `eyJhbGciOiJIUzI1NiIsInR5cCI6...` | Supabase Dashboard → Settings → API         |
 | `SUPABASE_SERVICE_ROLE_KEY`     | Supabaseサービスロールキー (⚠️秘密情報) | `eyJhbGciOiJIUzI1NiIsInR5cCI6...` | Supabase Dashboard → Settings → API         |
 | `NEXT_PUBLIC_SITE_URL`          | サイトURL (OAuth リダイレクト用)        | `https://example.com`             | Vercel のデプロイURL またはカスタムドメイン |
-| `CRON_SECRET`                   | Cronジョブ認証用シークレット            | `your-random-secret-string`       | `openssl rand -base64 32` で生成          |
+| `CRON_SECRET`                   | Cronジョブ認証用シークレット            | `your-random-secret-string`       | `openssl rand -base64 32` で生成            |
 
 **重要**:
 
@@ -363,15 +363,15 @@ Bingifyの動作に必要な環境変数の完全なリストです。
 
 本番環境では以下の設定を推奨します。
 
-| 変数名                           | 説明                       | デフォルト | 例                  |
-| :------------------------------- | :------------------------- | :--------- | :------------------ |
-| `NEXT_PUBLIC_SHOW_BETA_BANNER` | ベータ版バナーの表示制御   | `true`   | `false`           |
+| 変数名                         | 説明                       | デフォルト | 例                |
+| :----------------------------- | :------------------------- | :--------- | :---------------- |
+| `NEXT_PUBLIC_SHOW_BETA_BANNER` | ベータ版バナーの表示制御   | `true`     | `false`           |
 | `SEND_EMAIL_HOOK_SECRET`       | Supabase Auth Hook署名検証 | -          | `v1,whsec_xxx...` |
 
 **SMTP設定 (お問い合わせフォーム)**:
 
-| 変数名          | 説明                 | 例                      |
-| :-------------- | :------------------- | :---------------------- |
+| 変数名        | 説明                 | 例                    |
+| :------------ | :------------------- | :-------------------- |
 | `SMTP_HOST`   | SMTPサーバーホスト   | `smtp.example.com`    |
 | `SMTP_PORT`   | SMTPポート           | `587`                 |
 | `SMTP_USER`   | SMTPユーザー名       | `user`                |
@@ -387,8 +387,8 @@ Bingifyの動作に必要な環境変数の完全なリストです。
 
 **OAuth認証設定**:
 
-| 変数名                                      | 説明                        | 取得方法                                                       |
-| :------------------------------------------ | :-------------------------- | :------------------------------------------------------------- |
+| 変数名                                    | 説明                        | 取得方法                                                       |
+| :---------------------------------------- | :-------------------------- | :------------------------------------------------------------- |
 | `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` | Google OAuth クライアントID | [Google Cloud Console](https://console.cloud.google.com/)      |
 | `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET`    | Google OAuth シークレット   | Google Cloud Console                                           |
 | `SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID` | Twitch OAuth クライアントID | [Twitch Developer Console](https://dev.twitch.tv/console/apps) |
@@ -396,9 +396,9 @@ Bingifyの動作に必要な環境変数の完全なリストです。
 
 **アクセス制御**:
 
-| 変数名                  | 説明                    | デフォルト | 例           |
-| :---------------------- | :---------------------- | :--------- | :----------- |
-| `ENABLE_BASIC_AUTH`   | Basic認証の有効化フラグ | `false`  | `true`     |
+| 変数名                | 説明                    | デフォルト | 例         |
+| :-------------------- | :---------------------- | :--------- | :--------- |
+| `ENABLE_BASIC_AUTH`   | Basic認証の有効化フラグ | `false`    | `true`     |
 | `BASIC_AUTH_USER`     | Basic認証ユーザー名     | -          | `admin`    |
 | `BASIC_AUTH_PASSWORD` | Basic認証パスワード     | -          | `password` |
 
@@ -406,8 +406,8 @@ Basic認証は公開前の制限やステージング環境の保護に使用で
 
 **分析・セキュリティ機能**:
 
-| 変数名                             | 説明                             | 取得方法                                             |
-| :--------------------------------- | :------------------------------- | :--------------------------------------------------- |
+| 変数名                           | 説明                             | 取得方法                                             |
+| :------------------------------- | :------------------------------- | :--------------------------------------------------- |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstileサイトキー   | [Cloudflare Dashboard](https://dash.cloudflare.com/) |
 | `TURNSTILE_SECRET_KEY`           | Cloudflare Turnstileシークレット | Cloudflare Dashboard                                 |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | Google Analytics測定ID           | [Google Analytics](https://analytics.google.com/)    |
@@ -587,8 +587,8 @@ Vercelは以下のドメインタイプをサポートします:
 
 **CNAME レコードを追加**:
 
-| Type  | Name        | Value                     |
-| :---- | :---------- | :------------------------ |
+| Type  | Name      | Value                   |
+| :---- | :-------- | :---------------------- |
 | CNAME | `bingify` | `cname.vercel-dns.com.` |
 
 ドメインレジストラー (例: Cloudflare, GoDaddy, Namecheap) のDNS管理画面で上記のレコードを追加します。
@@ -597,9 +597,9 @@ Vercelは以下のドメインタイプをサポートします:
 
 **A レコードを追加**:
 
-| Type | Name  | Value           |
-| :--- | :---- | :-------------- |
-| A    | `@` | `76.76.21.21` |
+| Type | Name | Value         |
+| :--- | :--- | :------------ |
+| A    | `@`  | `76.76.21.21` |
 
 **注意**: 一部のDNSプロバイダーはCNAME FlatteningまたはANAME/ALIASレコードをサポートしています。詳細はVercelのドキュメントを参照してください。
 
@@ -940,16 +940,16 @@ Bingifyには以下のCronジョブが設定されています (`vercel.json`):
 
 ```json
 {
-"crons":[
-{
-"path": "/api/cron/cleanup",
-"schedule": "0 18 * * *"
-},
-{
-"path": "/api/cron/token-refresh",
-"schedule": "*/5 * * * *"
-}
-]
+  "crons": [
+    {
+      "path": "/api/cron/cleanup",
+      "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/token-refresh",
+      "schedule": "*/5 * * * *"
+    }
+  ]
 }
 ```
 
