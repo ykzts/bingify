@@ -92,7 +92,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
       <nav className="hidden items-center gap-2 md:flex">
         <Link
           aria-current={isActivePath("/dashboard") ? "page" : undefined}
-          className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
+          className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:bg-accent aria-[current=page]:bg-primary/10 aria-[current=page]:text-primary"
           href="/dashboard"
         >
           <LayoutDashboard className="h-4 w-4" />
@@ -102,7 +102,7 @@ export function HeaderMenu({ user }: HeaderMenuProps) {
         {user.role === "admin" && (
           <Link
             aria-current={isActivePath("/admin") ? "page" : undefined}
-            className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 aria-[current=page]:bg-purple-100 aria-[current=page]:text-purple-900 dark:text-gray-300 dark:aria-[current=page]:bg-purple-900/30 dark:aria-[current=page]:text-purple-100 dark:hover:bg-gray-800"
+            className="flex items-center gap-2 rounded-md px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:bg-accent aria-[current=page]:bg-primary/10 aria-[current=page]:text-primary"
             href="/admin"
           >
             <Shield className="h-4 w-4" />
