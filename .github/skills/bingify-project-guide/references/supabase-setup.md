@@ -1,30 +1,14 @@
----
-name: supabase-setup
-description: Initialize Supabase locally, manage database migrations, and configure Row Level Security. Use when setting up databases, creating tables, or managing schemas.
-metadata:
-  author: Bingify
-  version: "1.0"
----
-
 # Supabase Setup & Database Management
 
-このスキルは、Bingifyプロジェクトのデータベース初期化とマイグレーション管理をカバーします。
-
-## 概要
-
-BingifyはSupabaseをバックエンドデータベースとして使用します。ローカル開発ではSupabase CLIで完全なPostgreSQLの環境を提供します。
+Bingifyプロジェクトのデータベース初期化とマイグレーション管理をカバーします。
 
 ## ローカルセットアップ
 
 ### Supabaseの起動
 
-ローカル開発環境の完全なセットアップ：
-
 ```bash
 pnpm local:setup
 ```
-
-詳細は [development スキル](../development/SKILL.md) を参照してください。
 
 ### Supabase Studioへのアクセス
 
@@ -92,5 +76,4 @@ supabase seed run
 
 ## 参考
 
-- [docs/MIGRATIONS.md](../../../docs/MIGRATIONS.md) - マイグレーション運用ガイド
-- [development スキル](../development/SKILL.md) - セットアップ全体の流れ
+- [docs/MIGRATIONS.md](../../../../docs/MIGRATIONS.md) - マイグレーション運用ガイド

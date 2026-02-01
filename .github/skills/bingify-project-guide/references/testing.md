@@ -1,18 +1,6 @@
----
-name: testing
-description: Write and run tests using Vitest. Understand linting and formatting with Biome. Apply testing patterns for components, utilities, and Server Actions.
-metadata:
-  author: Bingify
-  version: "1.0"
----
-
 # Testing & Code Quality
 
-このスキルは、Bingifyプロジェクトのテスト戦略とコード品質管理をカバーします。
-
-## 概要
-
-BingifyはVitestでテストを実行し、Biomeでリント・フォーマットを管理します。
+Bingifyプロジェクトのテスト戦略とコード品質管理をカバーします。
 
 ## テストファイルの配置
 
@@ -53,8 +41,36 @@ pnpm test -- --watch
 pnpm test -- --coverage
 ```
 
+## Biome: Lint & Format
+
+Biomeでコードを自動検査・フォーマット：
+
+```bash
+# 検査とフォーマット
+pnpm check
+
+# 単一ファイルの検査
+pnpm format path/to/file.tsx
+```
+
+## File-scoped コマンド優先
+
+型チェック・フォーマット・テストは **ファイル単位** で実行：
+
+```bash
+# 単一ファイルの型チェック
+pnpm type-check path/to/file.tsx
+
+# 単一ファイルのフォーマット
+pnpm format path/to/file.tsx
+
+# 単一ファイルのテスト
+pnpm test path/to/file.test.ts
+```
+
+プロジェクト全体ビルドは明示的に指示された場合のみ。
+
 ## 参考
 
 - [Vitest公式ドキュメント](https://vitest.dev/)
 - [Biomejs公式ドキュメント](https://biomejs.dev/)
-- [github-workflow スキル](../github-workflow/SKILL.md) - CI/CDチェックの詳細
