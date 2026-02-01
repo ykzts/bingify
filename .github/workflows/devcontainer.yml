@@ -33,9 +33,4 @@ jobs:
             pnpm exec supabase start
             pnpm exec supabase db reset
             pnpm exec supabase stop
-          env: |
-            SEND_EMAIL_HOOK_SECRET
-            SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID
-            SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET
-            SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID
-            SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET
+          inheritEnv: true
