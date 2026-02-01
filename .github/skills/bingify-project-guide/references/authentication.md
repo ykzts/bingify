@@ -58,15 +58,13 @@ const { error } = await supabase.auth.signInWithOtp({
 
 ### 3. OAuth認証フロー (例：Google OAuth)
 
-### 3. OAuth認証フロー (例：Google OAuth)
-
 ```tsx
 // app/[locale]/login/_components/login-form.tsx
 "use client";
 
 const handleOAuthLogin = async (provider: string) => {
   const supabase = createClient();
-  
+
   const { error } = await supabase.auth.signInWithOAuth({
     provider: provider as "google" | "twitch",
     options: {

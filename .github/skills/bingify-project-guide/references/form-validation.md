@@ -4,7 +4,7 @@ Bingifyにおけるフォームバリデーションの統一パターンを説�
 
 ## 推奨パターン
 
-### 1. Zodスキーマの定義 (`form-options.ts`)
+### 1. Zodスキーマの定義 (`_lib/form-options.ts`)
 
 ```typescript
 // app/[locale]/contact/_lib/form-options.ts
@@ -56,7 +56,9 @@ export function ContactForm() {
               onChange={(e) => field.handleChange(e.target.value)}
             />
             {field.state.meta.errors.length > 0 && (
-              <span>{field.state.meta.errors[0]}</span>
+              <p className="text-destructive border border-destructive rounded p-2">
+                {field.state.meta.errors[0]}
+              </p>
             )}
           </div>
         )}
@@ -69,14 +71,14 @@ export function ContactForm() {
 
 ## ファイル配置ルール
 
-```
+```text
 app/[locale]/contact/
 ├── _lib/
-│   └── form-options.ts     # Zodスキーマとフォームオプション
+│   └── form-options.ts         # Zodスキーマとフォームオプション
 ├── _components/
-│   └── contact-form.tsx    # フォームコンポーネント
+│   └── contact-form.tsx        # フォームコンポーネント
 └── _actions/
-    └── contact.ts          # Server Actions
+    └── contact.ts              # Server Actions
 ```
 
 ## 命名規則

@@ -70,12 +70,18 @@ pnpm local:setup  # Supabase起動
 ```typescript
 // クライアント側
 const supabase = createClient();
-const { data: { user }, error } = await supabase.auth.getUser();
+const {
+  data: { user },
+  error,
+} = await supabase.auth.getUser();
 if (user) console.log("Logged in as:", user.email);
 
 // サーバー側(Server Actions)
 const supabase = await createClient();
-const { data: { user }, error } = await supabase.auth.getUser();
+const {
+  data: { user },
+  error,
+} = await supabase.auth.getUser();
 ```
 
 ## よくあるデバッグシナリオ

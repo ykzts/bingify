@@ -47,7 +47,7 @@ pnpm format:docs       # Markdown フォーマット
 
 ## 詳細ドキュメント
 
-**Bingifyの開発を行う際は必ず `.github/skills/bingify-project-guide/SKILL.md` を参照してください。**
+**Bingifyを開発する際は必ず `.github/skills/bingify-project-guide/SKILL.md` を参照してください。**
 
 以下の外部スキルも参照してください：
 

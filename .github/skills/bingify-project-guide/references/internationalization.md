@@ -62,9 +62,7 @@ export function LanguageSwitcher() {
   const router = useRouter();
 
   return (
-    <button onClick={() => router.push("/", { locale: "ja" })}>
-      日本語
-    </button>
+    <button onClick={() => router.push("/", { locale: "ja" })}>日本語</button>
   );
 }
 ```
