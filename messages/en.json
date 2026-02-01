@@ -822,9 +822,6 @@
     "userAvatar": "User"
   },
   "Hero": {
-    "badge1": "Start for free",
-    "badge2": "OAuth Sign-in",
-    "badge3": "Real-time sync",
     "ctaButton": "Create Bingo Space",
     "description": "Experience a new kind of bingo that brings everyone together in real-time.",
     "descriptionLine2": "Sign in with Google or Twitch and get started instantly.",
