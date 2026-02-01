@@ -113,7 +113,8 @@ describe("NotificationItem", () => {
         { wrapper: createWrapper() }
       );
 
-      const timeElement = container.querySelector(".text-xs.text-gray-400");
+      // text-muted-foreground/70 クラスを持つ要素を検索
+      const timeElement = container.querySelector("[class*='text-muted-foreground'][class*='text-xs']");
       expect(timeElement).toBeInTheDocument();
       expect(timeElement?.textContent).toBeTruthy();
     });
@@ -133,7 +134,7 @@ describe("NotificationItem", () => {
       const title = screen.getByText(notification.title);
       expect(title).toHaveClass("font-semibold");
 
-      const dot = container.querySelector(".bg-purple-500");
+      const dot = container.querySelector(".bg-primary");
       expect(dot).toBeInTheDocument();
     });
 
@@ -150,7 +151,7 @@ describe("NotificationItem", () => {
       const title = screen.getByText(notification.title);
       expect(title).not.toHaveClass("font-semibold");
 
-      const dot = container.querySelector(".bg-purple-500");
+      const dot = container.querySelector(".bg-primary");
       expect(dot).not.toBeInTheDocument();
     });
 
@@ -164,7 +165,8 @@ describe("NotificationItem", () => {
         { wrapper: createWrapper() }
       );
 
-      const itemContainer = container.querySelector(".bg-purple-50\\/50");
+      // 未読通知にはbg-primary/5のクラスが適用される
+      const itemContainer = container.querySelector("[class*='bg-primary']");
       expect(itemContainer).toBeInTheDocument();
     });
   });
