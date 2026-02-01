@@ -8,7 +8,7 @@ Bingifyの継続的インテグレーション・継続的デリバリーと Git
 
 - **Lint & Format**: `pnpm check` （Biome）
 - **型チェック**: `pnpm type-check` （TypeScript）
-- **テスト**: `pnpm test -- --run` （Vitest、1回実行モード）
+- **テスト**: `pnpm test --run` （Vitest、1回実行モード）
 
 詳細は [testing.md](testing.md) を参照してください。
 

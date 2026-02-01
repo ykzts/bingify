@@ -35,10 +35,10 @@ describe("ユーティリティ関数", () => {
 pnpm test
 
 # ウォッチモード
-pnpm test -- --watch
+pnpm test --watch
 
 # カバレッジ
-pnpm test -- --coverage
+pnpm test --coverage
 ```
 
 ## Biome: Lint & Format

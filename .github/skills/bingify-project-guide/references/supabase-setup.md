@@ -19,10 +19,10 @@ http://localhost:54323
 ### PostgreSQLへのアクセス
 
 - Host: localhost
-- Port: 5432
-- User: PostgreSQL
-- Password: PostgreSQL
-- Database: PostgreSQL
+- Port: 54322
+- User: postgres
+- Password: postgres
+- Database: postgres
 
 ## マイグレーション管理
 
