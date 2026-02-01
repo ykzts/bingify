@@ -189,7 +189,7 @@ export default async function DashboardPage({
         ) : (
           <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-border bg-muted text-muted-foreground">
+              <thead className="border-border border-b bg-muted text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">
                     {t("historySpaceName")}

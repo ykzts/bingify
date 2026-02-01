@@ -73,7 +73,8 @@
   --timing-ease-out: ease-out;
 
   /* Tailwind animate-* utilities - minimal */
-  --animate-fade-in: fade-in var(--duration-fade-in) var(--timing-ease-out) forwards;
+  --animate-fade-in: fade-in var(--duration-fade-in) var(--timing-ease-out)
+    forwards;
 
   /* Keyframe animations - simplified */
   @keyframes fade-in {

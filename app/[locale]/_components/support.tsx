@@ -9,7 +9,7 @@ interface SupportProps {
 
 export function Support({ description, heading, sponsorButton }: SupportProps) {
   return (
-    <section className="border-t border-border px-6 py-16">
+    <section className="border-border border-t px-6 py-16">
       <div className="mx-auto max-w-2xl text-center">
         <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
           <Heart className="h-6 w-6 text-primary" />
@@ -19,9 +19,7 @@ export function Support({ description, heading, sponsorButton }: SupportProps) {
           {heading}
         </h2>
 
-        <p className="mb-6 text-muted-foreground">
-          {description}
-        </p>
+        <p className="mb-6 text-muted-foreground">{description}</p>
 
         <Button asChild variant="outline">
           <a

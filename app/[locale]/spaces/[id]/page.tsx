@@ -90,13 +90,8 @@ export default async function UserSpacePage({
           <h1 className="mb-4 font-bold text-2xl text-foreground">
             {t("draftTitle")}
           </h1>
-          <p className="mb-6 text-muted-foreground">
-            {t("draftMessage")}
-          </p>
-          <Link
-            className="text-primary hover:underline"
-            href="/"
-          >
+          <p className="mb-6 text-muted-foreground">{t("draftMessage")}</p>
+          <Link className="text-primary hover:underline" href="/">
             {t("backToHome")}
           </Link>
         </div>

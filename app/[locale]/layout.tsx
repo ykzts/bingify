@@ -65,7 +65,7 @@ export default async function LocaleLayout({
                   <AnnouncementBanner />
                 </Suspense>
                 <ConditionalHeader>
-                  <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
+                  <header className="sticky top-0 z-50 border-border border-b bg-background/95 backdrop-blur-sm">
                     <div className="container mx-auto flex h-16 items-center justify-between px-4">
                       <HeaderMenuWrapper />
                     </div>

@@ -40,7 +40,7 @@ export function Features({
   ];
 
   return (
-    <section className="border-t border-border bg-muted/30 px-6 py-16">
+    <section className="border-border border-t bg-muted/30 px-6 py-16">
       <div className="mx-auto max-w-5xl">
         <div className="mb-10 text-center">
           <h2 className="mb-2 font-semibold text-2xl text-foreground sm:text-3xl">
@@ -54,9 +54,9 @@ export function Features({
             const Icon = feature.icon;
             return (
               <article
-                key={feature.title}
                 aria-labelledby={`feature-title-${index}`}
                 className="rounded-xl border border-border bg-card p-6"
+                key={feature.title}
               >
                 <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <Icon className="h-5 w-5 text-primary" />

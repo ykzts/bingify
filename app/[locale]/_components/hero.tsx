@@ -28,7 +28,7 @@ export function Hero({
         <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
         <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-accent/30 blur-3xl" />
       </div>
-      
+
       <div className="relative z-10 max-w-3xl">
         <div className="mb-8 flex justify-center">
           <div className="rounded-2xl bg-card p-4 shadow-lg ring-1 ring-border/50">
@@ -44,7 +44,7 @@ export function Hero({
           </div>
         </div>
 
-        <h1 className="mb-6 font-bold text-4xl text-foreground tracking-tight text-balance sm:text-5xl md:text-6xl">
+        <h1 className="mb-6 text-balance font-bold text-4xl text-foreground tracking-tight sm:text-5xl md:text-6xl">
           {title}
           <br />
           <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
@@ -52,14 +52,14 @@ export function Hero({
           </span>
         </h1>
 
-        <p className="mx-auto mb-10 max-w-xl text-lg text-muted-foreground leading-relaxed text-balance sm:text-xl">
+        <p className="mx-auto mb-10 max-w-xl text-balance text-lg text-muted-foreground leading-relaxed sm:text-xl">
           {description}
           <br className="hidden sm:block" />
           {descriptionLine2}
         </p>
 
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <Button asChild size="lg" className="min-w-[200px] text-base">
+          <Button asChild className="min-w-[200px] text-base" size="lg">
             <Link href="/dashboard">
               {ctaButton}
               <ArrowRight className="ml-2 h-5 w-5" />
