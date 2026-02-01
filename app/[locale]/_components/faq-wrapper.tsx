@@ -54,18 +54,18 @@ async function FaqData() {
 
 function FaqSkeleton() {
   return (
-    <section className="px-6 py-20">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-12 text-center">
-          <div className="mx-auto mb-4 h-10 w-64 animate-pulse rounded bg-muted" />
+    <section className="px-6 py-16">
+      <div className="mx-auto max-w-3xl">
+        <div className="mb-8 text-center">
+          <div className="mx-auto h-8 w-48 animate-pulse rounded bg-muted" />
         </div>
-        <div className="space-y-6">
+        <div className="space-y-4">
           {[1, 2, 3, 4, 5].map((i) => (
             <div
-              className="overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm"
+              className="rounded-lg border border-border bg-card p-5"
               key={i}
             >
-              <div className="mb-3 h-6 w-3/4 animate-pulse rounded bg-muted" />
+              <div className="mb-2 h-5 w-3/4 animate-pulse rounded bg-muted" />
               <div className="h-4 w-full animate-pulse rounded bg-muted" />
             </div>
           ))}

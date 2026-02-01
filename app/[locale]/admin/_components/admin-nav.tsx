@@ -72,9 +72,9 @@ export function AdminNav({ locale }: Props) {
                     <SheetClose asChild>
                       <Link
                         className={cn(
-                          "block rounded-xs px-4 py-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700",
+                          "block rounded-xs px-4 py-2 transition-colors hover:bg-accent",
                           isActive(item.href) &&
-                            "bg-purple-50 font-semibold text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
+                            "bg-primary/10 font-semibold text-primary"
                         )}
                         href={item.href}
                         onClick={() => setOpen(false)}
@@ -91,14 +91,14 @@ export function AdminNav({ locale }: Props) {
       </div>
 
       {/* デスクトップナビゲーション (md以上) */}
-      <nav className="mb-8 hidden border-gray-200 border-b md:block dark:border-gray-700">
+      <nav className="mb-8 hidden border-border border-b md:block">
         <ul className="flex gap-6">
           {navItems.map((item) => (
             <li key={item.href}>
               <Link
                 className={cn(
-                  "inline-block border-transparent border-b-2 pb-4 transition-colors hover:border-purple-500",
-                  isActive(item.href) && "border-purple-600 font-semibold"
+                  "inline-block border-transparent border-b-2 pb-4 transition-colors hover:border-primary/50",
+                  isActive(item.href) && "border-primary font-semibold"
                 )}
                 href={item.href}
               >

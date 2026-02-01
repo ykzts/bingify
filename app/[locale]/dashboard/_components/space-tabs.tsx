@@ -48,7 +48,7 @@ function SpaceTable({
             >
               <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
                 <Link
-                  className="flex flex-col gap-1 transition-colors hover:text-purple-600 dark:hover:text-purple-400"
+                  className="flex flex-col gap-1 transition-colors hover:text-primary"
                   href={`/dashboard/spaces/${space.id}`}
                 >
                   <div className="flex items-center gap-2">

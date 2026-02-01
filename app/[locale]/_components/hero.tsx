@@ -1,13 +1,9 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import { AnimateOnScroll } from "@/components/animate-on-scroll";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 
 interface HeroProps {
-  badge1: string;
-  badge2: string;
-  badge3: string;
   ctaButton: string;
   description: string;
   descriptionLine2: string;
@@ -16,9 +12,6 @@ interface HeroProps {
 }
 
 export function Hero({
-  badge1,
-  badge2,
-  badge3,
   ctaButton,
   description,
   descriptionLine2,
@@ -26,66 +19,51 @@ export function Hero({
   titleHighlight,
 }: HeroProps) {
   return (
-    <section className="relative flex min-h-[80vh] flex-col items-center justify-center px-6 py-20 text-center">
-      <AnimateOnScroll className="max-w-4xl animate-fade-in-up [animation-delay:200ms]">
-        <AnimateOnScroll className="mb-8 flex animate-fade-in-scale justify-center [animation-delay:100ms]">
-          <Image
-            alt="Bingify"
-            className="h-16 w-auto sm:h-20"
-            fetchPriority="high"
-            height={80}
-            loading="eager"
-            src="/logo.svg"
-            width={304}
-          />
-        </AnimateOnScroll>
+    <section className="relative flex min-h-[75vh] flex-col items-center justify-center overflow-hidden px-6 py-20 text-center">
+      {/* Decorative background elements */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-accent/30 blur-3xl" />
+      </div>
 
-        <AnimateOnScroll className="animate-fade-in-up [animation-delay:300ms]">
-          <h1 className="mb-6 font-bold text-4xl text-text-main sm:text-5xl md:text-6xl">
-            {title}
-            <br />
-            <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
-              {titleHighlight}
-            </span>
-          </h1>
-        </AnimateOnScroll>
+      <div className="relative z-10 max-w-3xl">
+        <div className="mb-8 flex justify-center">
+          <div className="rounded-2xl bg-card p-4 shadow-lg ring-1 ring-border/50">
+            <Image
+              alt="Bingify"
+              className="h-10 w-auto sm:h-12"
+              fetchPriority="high"
+              height={48}
+              loading="eager"
+              src="/logo.svg"
+              width={182}
+            />
+          </div>
+        </div>
 
-        <AnimateOnScroll className="mb-10 animate-fade-in-up [animation-delay:500ms]">
-          <p className="text-lg text-text-muted sm:text-xl">
-            {description}
-            <br />
-            {descriptionLine2}
-          </p>
-        </AnimateOnScroll>
+        <h1 className="mb-6 text-balance font-bold text-4xl text-foreground tracking-tight sm:text-5xl md:text-6xl">
+          {title}
+          <br />
+          <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            {titleHighlight}
+          </span>
+        </h1>
 
-        <AnimateOnScroll className="animate-fade-in-up [animation-delay:700ms]">
-          <Button asChild className="rounded-full px-8 py-4 text-lg" size="lg">
+        <p className="mx-auto mb-10 max-w-xl text-balance text-lg text-muted-foreground leading-relaxed sm:text-xl">
+          {description}
+          <br className="hidden sm:block" />
+          {descriptionLine2}
+        </p>
+
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <Button asChild className="min-w-[200px] text-base" size="lg">
             <Link href="/dashboard">
-              <span className="inline-flex items-center gap-2">
-                {ctaButton}
-                <span className="inline-block animate-arrow-bounce motion-reduce:animate-none">
-                  <ArrowRight className="h-5 w-5" />
-                </span>
-              </span>
+              {ctaButton}
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
-        </AnimateOnScroll>
-
-        <AnimateOnScroll className="mt-8 flex animate-fade-in-up flex-wrap items-center justify-center gap-4 text-sm text-text-muted [animation-delay:900ms]">
-          <span className="inline-flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 rounded-full bg-accent" />
-            {badge1}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 rounded-full bg-secondary" />
-            {badge2}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 rounded-full bg-primary" />
-            {badge3}
-          </span>
-        </AnimateOnScroll>
-      </AnimateOnScroll>
+        </div>
+      </div>
     </section>
   );
 }

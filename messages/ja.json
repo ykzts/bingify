@@ -822,9 +822,6 @@
     "userAvatar": "ユーザー"
   },
   "Hero": {
-    "badge1": "無料で始める",
-    "badge2": "OAuthログイン",
-    "badge3": "リアルタイム同期",
     "ctaButton": "ビンゴ会場を作る",
     "description": "リアルタイムで盛り上がる、新しいビンゴ体験。",
     "descriptionLine2": "Google または Twitchでログインして、すぐに始められます。",

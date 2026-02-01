@@ -95,7 +95,7 @@ export async function MDXContent({ contentPath, locale }: MDXContentProps) {
       <div className="px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <Link
-            className="mb-8 inline-flex items-center text-gray-600 text-sm transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+            className="mb-8 inline-flex items-center text-muted-foreground text-sm transition-colors hover:text-foreground"
             href="/"
           >
             <svg

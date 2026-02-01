@@ -204,11 +204,11 @@ describe("NotificationDropdown", () => {
     await waitFor(() => {
       // 未読通知のタイトルが太字で表示されることを確認
       expect(screen.getByText("Unread Notification")).toBeInTheDocument();
-      // 紫色の背景アイコンを確認（未読通知のインジケーター）
-      const purpleBackgrounds = document.querySelectorAll(
-        ".bg-purple-100, .bg-purple-500"
+      // primary色の背景アイコンを確認（未読通知のインジケーター）
+      const primaryBackgrounds = document.querySelectorAll(
+        ".bg-primary\\/10, .bg-primary"
       );
-      expect(purpleBackgrounds.length).toBeGreaterThan(0);
+      expect(primaryBackgrounds.length).toBeGreaterThan(0);
     });
   });
 

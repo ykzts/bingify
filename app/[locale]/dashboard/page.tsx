@@ -46,16 +46,16 @@ export default async function DashboardPage({
       {/* --- SECTION 1: Create Form --- */}
       <section>
         <div className="mb-6">
-          <h1 className="font-bold text-2xl text-gray-900 dark:text-gray-100">
+          <h1 className="font-bold text-2xl text-foreground">
             {t("createFormTitle")}
           </h1>
-          <p className="text-gray-500 text-sm dark:text-gray-400">
+          <p className="text-muted-foreground text-sm">
             {t("createFormDescription")}
           </p>
         </div>
 
         {/* Form area with card style */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
           <CreateSpaceForm />
         </div>
       </section>
@@ -63,10 +63,10 @@ export default async function DashboardPage({
       {/* --- Divider --- */}
       <div className="relative">
         <div aria-hidden="true" className="absolute inset-0 flex items-center">
-          <div className="w-full border-gray-200 border-t dark:border-gray-700" />
+          <div className="w-full border-border border-t" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-gray-50 px-2 text-gray-500 text-sm dark:bg-gray-900 dark:text-gray-400">
+          <span className="bg-background px-2 text-muted-foreground text-sm">
             {t("dividerText")}
           </span>
         </div>
@@ -181,15 +181,15 @@ export default async function DashboardPage({
       <section>
         <SectionHeader icon={FileText}>{t("draftSectionTitle")}</SectionHeader>
         {draftHostedSpaces.length === 0 ? (
-          <div className="overflow-hidden rounded-lg border bg-white p-8 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
-            <p className="text-gray-500 text-sm dark:text-gray-400">
+          <div className="overflow-hidden rounded-lg border border-border bg-card p-8 text-center shadow-sm">
+            <p className="text-muted-foreground text-sm">
               {t("draftSpacesEmpty")}
             </p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-lg border bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+          <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
             <table className="w-full text-left text-sm">
-              <thead className="border-b bg-gray-50 text-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400">
+              <thead className="border-border border-b bg-muted text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">
                     {t("historySpaceName")}
@@ -203,15 +203,15 @@ export default async function DashboardPage({
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+              <tbody className="divide-y divide-border">
                 {draftHostedSpaces.map((space) => (
                   <tr
-                    className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="transition-colors hover:bg-accent"
                     key={space.id}
                   >
-                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
+                    <td className="px-4 py-3 font-medium text-foreground">
                       <Link
-                        className="transition-colors hover:text-purple-600 dark:hover:text-purple-400"
+                        className="transition-colors hover:text-primary"
                         href={`/dashboard/spaces/${space.id}`}
                       >
                         {space.title || space.share_key}
@@ -222,14 +222,14 @@ export default async function DashboardPage({
                         {t("statusDraft")}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
+                    <td className="px-4 py-3 text-muted-foreground">
                       {space.created_at
                         ? new Date(space.created_at).toLocaleDateString(locale)
                         : ""}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link
-                        className="rounded border border-gray-200 bg-white px-3 py-1.5 text-gray-700 text-sm shadow-sm transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                        className="rounded border border-border bg-card px-3 py-1.5 text-foreground text-sm shadow-sm transition hover:bg-accent"
                         href={`/dashboard/spaces/${space.id}`}
                       >
                         {t("manageAction")}
