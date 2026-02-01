@@ -114,7 +114,9 @@ describe("NotificationItem", () => {
       );
 
       // text-muted-foreground/70 クラスを持つ要素を検索
-      const timeElement = container.querySelector("[class*='text-muted-foreground'][class*='text-xs']");
+      const timeElement = container.querySelector(
+        "[class*='text-muted-foreground'][class*='text-xs']"
+      );
       expect(timeElement).toBeInTheDocument();
       expect(timeElement?.textContent).toBeTruthy();
     });
