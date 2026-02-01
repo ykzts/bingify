@@ -80,7 +80,7 @@ const handleOAuthLogin = async (provider: string) => {
 1. ユーザーが OAuth プロバイダー (Google、Twitchなど) のボタンをクリック
 2. `supabase.auth.signInWithOAuth()` でプロバイダーのログインページへリダイレクト
 3. ユーザーが認可を完了
-4. プロバイダーが `auth_code` とともに `/auth/[provider]/callback` へリダイレクト
+4. プロバイダーが `code` とともに `/auth/[provider]/callback` へリダイレクト
 
 ### 4. コールバック処理 (コード→セッション交換)
 
