@@ -77,6 +77,10 @@ pnpm format:docs       # Markdown フォーマット
 
 → `.github/skills/supabase-setup/SKILL.md`
 
+### Supabase Postgres ベストプラクティス
+
+→ `.github/skills/supabase-postgres-best-practices/SKILL.md`
+
 ### テスト・コード品質
 
 → `.github/skills/testing/SKILL.md`

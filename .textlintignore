@@ -20,6 +20,7 @@ package-lock.json
 
 # Skills and agent documentation (internal) - machine-generated files
 .github/skills/vercel-react-best-practices/
+.github/skills/supabase-postgres-best-practices/
 
 # Auto-generated documentation
 types/
