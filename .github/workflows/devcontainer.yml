@@ -20,6 +20,14 @@ jobs:
 
       - name: Build and test Dev Container
         uses: devcontainers/ci@8bf61b26e9c3a98f69cb6ce2f88d24ff59b785c6 # v0.3.1900000417
+        env:
+          # Supabase環境変数（CI用ダミー値）
+          # 本番環境とローカル開発では .env から読み込まれる実際の値を使用
+          SEND_EMAIL_HOOK_SECRET: v1,whsec_dummysecretforci1234567890abcdef
+          SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID: dummy-google-client-id
+          SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET: dummy-google-secret
+          SUPABASE_AUTH_EXTERNAL_TWITCH_CLIENT_ID: dummy-twitch-client-id
+          SUPABASE_AUTH_EXTERNAL_TWITCH_SECRET: dummy-twitch-secret
         with:
           runCmd: |
             pnpm exec supabase start
