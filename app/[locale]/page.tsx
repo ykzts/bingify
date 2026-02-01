@@ -31,9 +31,6 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
   return (
     <div className="min-h-screen bg-background">
       <Hero
-        badge1={tHero("badge1")}
-        badge2={tHero("badge2")}
-        badge3={tHero("badge3")}
         ctaButton={tHero("ctaButton")}
         description={tHero("description")}
         descriptionLine2={tHero("descriptionLine2")}

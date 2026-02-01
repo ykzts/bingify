@@ -4,9 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 
 interface HeroProps {
-  badge1: string;
-  badge2: string;
-  badge3: string;
   ctaButton: string;
   description: string;
   descriptionLine2: string;
