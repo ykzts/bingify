@@ -137,10 +137,10 @@ TypeScript エラーを確認。
 
 ```bash
 # 1回実行モード（コーディングエージェント用）
-pnpm test -- --run --reporter=verbose
+pnpm test --run --reporter=verbose
 
 # ウォッチモード（開発中の連続テスト）
-pnpm test -- --watch --reporter=verbose
+pnpm test --watch --reporter=verbose
 ```
 
 テスト失敗のスタックトレースを確認。
