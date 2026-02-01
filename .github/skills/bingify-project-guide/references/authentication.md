@@ -4,7 +4,7 @@ Bingifyの認証実装とセッション管理をカバーします。
 
 ## 概要
 
-BingifyはSupabaseAuth を使用し、以下の認証方式に対応：
+BingifyはSupabase Auth を使用し、以下の認証方式に対応：
 
 - **マジックリンク認証**: メール送信 → メール内のリンククリック → 自動ログイン
 - **OAuth認証**: Google、Twitchなどのプロバイダーによる認証
