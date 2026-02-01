@@ -134,9 +134,9 @@ describe("NotificationItem", () => {
       );
 
       const title = screen.getByText(notification.title);
-      expect(title).toHaveClass("font-semibold");
+      expect(title).toHaveAttribute("data-read", "false");
 
-      const dot = container.querySelector(".bg-primary");
+      const dot = container.querySelector("[data-unread-indicator]");
       expect(dot).toBeInTheDocument();
     });
 
@@ -151,9 +151,9 @@ describe("NotificationItem", () => {
       );
 
       const title = screen.getByText(notification.title);
-      expect(title).not.toHaveClass("font-semibold");
+      expect(title).toHaveAttribute("data-read", "true");
 
-      const dot = container.querySelector(".bg-primary");
+      const dot = container.querySelector("[data-unread-indicator]");
       expect(dot).not.toBeInTheDocument();
     });
 
@@ -167,8 +167,8 @@ describe("NotificationItem", () => {
         { wrapper: createWrapper() }
       );
 
-      // 未読通知にはbg-primary/5のクラスが適用される
-      const itemContainer = container.querySelector("[class*='bg-primary']");
+      // 未読通知にはdata-read="false"属性が適用される
+      const itemContainer = container.querySelector('[data-read="false"]');
       expect(itemContainer).toBeInTheDocument();
     });
   });

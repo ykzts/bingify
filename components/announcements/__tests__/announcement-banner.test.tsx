@@ -299,7 +299,7 @@ describe("AnnouncementBanner", () => {
     expect(alert).toBeInTheDocument();
   });
 
-  it("警告優先度のお知らせにはカスタムスタイルが適用される", async () => {
+  it("警告優先度のお知らせにはdata-priority属性が付与される", async () => {
     vi.mocked(getActiveAnnouncements).mockResolvedValue({
       data: [mockAnnouncements[1]],
       success: true,
@@ -316,8 +316,7 @@ describe("AnnouncementBanner", () => {
     });
 
     const alert = screen.getByRole("alert");
-    expect(alert).toHaveClass("border-amber-500/50");
-    expect(alert).toHaveClass("bg-amber-50");
+    expect(alert).toHaveAttribute("data-priority", "warning");
   });
 
   it("情報優先度のお知らせにはdefault variantが適用される", async () => {

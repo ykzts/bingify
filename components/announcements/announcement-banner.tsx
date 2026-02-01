@@ -111,6 +111,7 @@ export function AnnouncementBanner() {
     switch (announcement.priority) {
       case "error":
         return {
+          dataState: "error",
           icon: <AlertCircle className="size-4" />,
           variant: "destructive" as const,
         };
@@ -118,18 +119,20 @@ export function AnnouncementBanner() {
         return {
           className:
             "border-amber-500/50 bg-amber-50 text-amber-900 dark:border-amber-500/50 dark:bg-amber-950 dark:text-amber-50",
+          dataState: "warning",
           icon: <TriangleAlert className="size-4" />,
           variant: "default" as const,
         };
       default:
         return {
+          dataState: "info",
           icon: <InfoIcon className="size-4" />,
           variant: "default" as const,
         };
     }
   };
 
-  const { variant, icon, className } = getVariantStyles();
+  const { variant, icon, className, dataState } = getVariantStyles();
 
   return (
     <section
@@ -137,7 +140,7 @@ export function AnnouncementBanner() {
       aria-live="polite"
       className="animate-slide-down-fade-in"
     >
-      <Alert className={className} variant={variant}>
+      <Alert className={className} data-priority={dataState} variant={variant}>
         {icon}
         <AlertTitle>{announcement.title}</AlertTitle>
         <AlertDescription className="flex items-center gap-2">

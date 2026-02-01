@@ -198,8 +198,7 @@ describe("SpaceAnnouncementList", () => {
       const pinnedCard = screen
         .getByText("ピン留めされたお知らせ")
         .closest("[data-slot='card']");
-      expect(pinnedCard).toHaveClass("border-primary");
-      expect(pinnedCard).toHaveClass("border-2");
+      expect(pinnedCard).toHaveAttribute("data-pinned", "true");
     });
   });
 
