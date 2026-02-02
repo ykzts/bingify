@@ -124,7 +124,7 @@ gh api /repos/ykzts/bingify/pulls/{PR_NUMBER}/requested_reviewers \
 
 ```bash
 # レビューコメントに返信（comment_id は gh api で取得可能）
-gh api /repos/ykzts/bingify/pulls/comments/{comment_id}/replies \
+gh api /repos/ykzts/bingify/pulls/{PR_NUMBER}/comments/{comment_id}/replies \
   -X POST -f "body=Thank you for the feedback. Fixed in abc123."
 ```
 
