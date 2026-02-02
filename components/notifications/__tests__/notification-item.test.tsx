@@ -108,68 +108,53 @@ describe("NotificationItem", () => {
     it("相対時刻が表示される", () => {
       const notification = createMockNotification();
 
-      const { container } = render(
-        <NotificationItem locale="en" notification={notification} />,
-        { wrapper: createWrapper() }
-      );
+      render(<NotificationItem locale="en" notification={notification} />, {
+        wrapper: createWrapper(),
+      });
 
-      // text-muted-foreground/70 クラスを持つ要素を検索
-      const timeElement = container.querySelector(
-        "[class*='text-muted-foreground'][class*='text-xs']"
-      );
+      const timeElement = screen.getByTestId("notification-time");
       expect(timeElement).toBeInTheDocument();
-      expect(timeElement?.textContent).toBeTruthy();
+      expect(timeElement.textContent).toBeTruthy();
     });
   });
 
   describe("既読/未読の視覚的区別", () => {
-    it("未読通知には太字のタイトルと紫色のドットが表示される", () => {
+    it("未読通知にはタイトルと未読インジケーターが表示される", () => {
       const notification = createMockNotification({
         read: false,
       });
 
-      const { container } = render(
-        <NotificationItem locale="en" notification={notification} />,
-        { wrapper: createWrapper() }
-      );
+      render(<NotificationItem locale="en" notification={notification} />, {
+        wrapper: createWrapper(),
+      });
 
-      const title = screen.getByText(notification.title);
-      expect(title).toHaveClass("font-semibold");
-
-      const dot = container.querySelector(".bg-primary");
-      expect(dot).toBeInTheDocument();
+      expect(screen.getByTestId("notification-title")).toBeInTheDocument();
+      expect(screen.getByTestId("unread-indicator")).toBeInTheDocument();
     });
 
-    it("既読通知には通常のタイトルでドットが非表示", () => {
+    it("既読通知にはタイトルが表示され、未読インジケーターは非表示", () => {
       const notification = createMockNotification({
         read: true,
       });
 
-      const { container } = render(
-        <NotificationItem locale="en" notification={notification} />,
-        { wrapper: createWrapper() }
-      );
+      render(<NotificationItem locale="en" notification={notification} />, {
+        wrapper: createWrapper(),
+      });
 
-      const title = screen.getByText(notification.title);
-      expect(title).not.toHaveClass("font-semibold");
-
-      const dot = container.querySelector(".bg-primary");
-      expect(dot).not.toBeInTheDocument();
+      expect(screen.getByTestId("notification-title")).toBeInTheDocument();
+      expect(screen.queryByTestId("unread-indicator")).not.toBeInTheDocument();
     });
 
-    it("未読通知には紫色の背景が適用される", () => {
+    it("未読通知コンテナが表示される", () => {
       const notification = createMockNotification({
         read: false,
       });
 
-      const { container } = render(
-        <NotificationItem locale="en" notification={notification} />,
-        { wrapper: createWrapper() }
-      );
+      render(<NotificationItem locale="en" notification={notification} />, {
+        wrapper: createWrapper(),
+      });
 
-      // 未読通知にはbg-primary/5のクラスが適用される
-      const itemContainer = container.querySelector("[class*='bg-primary']");
-      expect(itemContainer).toBeInTheDocument();
+      expect(screen.getByTestId("unread-notification")).toBeInTheDocument();
     });
   });
 

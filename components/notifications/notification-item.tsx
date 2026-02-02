@@ -107,11 +107,15 @@ export function NotificationItem({
                 ? "text-foreground"
                 : "font-semibold text-foreground"
             )}
+            data-testid="notification-title"
           >
             {notification.title}
           </p>
           {!notification.read && (
-            <span className="h-2 w-2 flex-shrink-0 rounded-full bg-primary" />
+            <span
+              className="h-2 w-2 flex-shrink-0 rounded-full bg-primary"
+              data-testid="unread-indicator"
+            />
           )}
         </div>
 
@@ -121,7 +125,10 @@ export function NotificationItem({
           </p>
         )}
 
-        <p className="text-muted-foreground/70 text-xs">
+        <p
+          className="text-muted-foreground/70 text-xs"
+          data-testid="notification-time"
+        >
           {formatRelativeTime(notification.created_at || "", locale)}
         </p>
       </div>
@@ -160,6 +167,9 @@ export function NotificationItem({
           "group relative flex w-full gap-4 rounded-lg border border-border p-4 text-left transition-colors hover:bg-accent",
           !notification.read && "border-primary/20 bg-primary/5"
         )}
+        data-testid={
+          notification.read ? "read-notification" : "unread-notification"
+        }
         href={linkUrl}
         onClick={() => {
           if (!notification.read && onMarkRead) {
@@ -178,6 +188,9 @@ export function NotificationItem({
         "group relative flex w-full gap-4 rounded-lg border border-border p-4 text-left transition-colors",
         !notification.read && "border-primary/20 bg-primary/5"
       )}
+      data-testid={
+        notification.read ? "read-notification" : "unread-notification"
+      }
     >
       {content}
     </div>

@@ -137,7 +137,11 @@ export function AnnouncementBanner() {
       aria-live="polite"
       className="animate-slide-down-fade-in"
     >
-      <Alert className={className} variant={variant}>
+      <Alert
+        className={className}
+        data-testid={`announcement-${announcement.priority}`}
+        variant={variant}
+      >
         {icon}
         <AlertTitle>{announcement.title}</AlertTitle>
         <AlertDescription className="flex items-center gap-2">

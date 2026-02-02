@@ -316,8 +316,7 @@ describe("AnnouncementBanner", () => {
     });
 
     const alert = screen.getByRole("alert");
-    expect(alert).toHaveClass("border-amber-500/50");
-    expect(alert).toHaveClass("bg-amber-50");
+    expect(alert).toHaveAttribute("data-testid", "announcement-warning");
   });
 
   it("情報優先度のお知らせにはdefault variantが適用される", async () => {

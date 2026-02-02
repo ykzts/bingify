@@ -21,7 +21,10 @@ export const FormattedText = ({ text, className }: FormattedTextProps) => {
   const paragraphs = normalized.split(PARAGRAPH_REGEX);
 
   return (
-    <div className={cn("prose max-w-none", className)}>
+    <div
+      className={cn("prose max-w-none", className)}
+      data-testid="formatted-text"
+    >
       {paragraphs.map((paragraph, i) => (
         <p key={`p-${i}-${paragraph.slice(0, 20)}`}>
           {paragraph.split("\n").map((line, j, arr) => (
