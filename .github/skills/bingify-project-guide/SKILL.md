@@ -45,6 +45,7 @@ pnpm test        # テスト
 | **code-conventions.md**     | 日々のコーディング               | TypeScriptパターン、shadcn/ui管理、Server Actions          |
 | **form-validation.md**      | フォーム実装                     | Zod + TanStack Form統一パターン、命名規則                  |
 | **github-workflow.md**      | コミット・PR作成                 | Conventional Commits、ブランチ戦略、PRタイトル規約         |
+| **review-response.md**      | PRレビュー対応                   | 行単位レビューコメント取得、レビュー対応ワークフロー       |
 | **internationalization.md** | 多言語対応・i18n実装             | next-intl設定、locale-based routing、メッセージ管理        |
 | **mailpit-testing.md**      | メール機能のテスト・確認         | Mailpit UIアクセス、メール送信検証                         |
 | **supabase-setup.md**       | DB初期化・マイグレーション・RLS  | Supabase CLIコマンド、migration管理、RLSポリシー           |
