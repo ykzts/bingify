@@ -186,7 +186,7 @@ export function SpaceAnnouncementList({
                 isPinned &&
                   "border-2 border-primary bg-primary/5 dark:bg-primary/10"
               )}
-              data-pinned={isPinned ? "true" : "false"}
+              data-testid={isPinned ? "pinned-announcement" : "announcement"}
               key={announcement.announcement_id}
             >
               <CardHeader className="pb-3">

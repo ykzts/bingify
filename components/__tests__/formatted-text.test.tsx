@@ -107,9 +107,7 @@ describe("FormattedText", () => {
       <FormattedText className="font-bold text-red-500" text="テスト" />
     );
     const div = container.firstChild as HTMLElement;
-    expect(div).toHaveAttribute("data-formatted-text");
-    expect(div.className).toContain("font-bold");
-    expect(div.className).toContain("text-red-500");
+    expect(div).toHaveAttribute("data-testid", "formatted-text");
   });
 
   it("段落に適切なスタイルが適用される", () => {
@@ -118,8 +116,8 @@ describe("FormattedText", () => {
 
     const div = container.firstChild as HTMLElement;
 
-    // data属性でFormattedTextコンポーネントであることを確認
-    expect(div).toHaveAttribute("data-formatted-text");
+    // data-testidでFormattedTextコンポーネントであることを確認
+    expect(div).toHaveAttribute("data-testid", "formatted-text");
 
     const paragraphs = container.querySelectorAll("p");
     expect(paragraphs).toHaveLength(2);

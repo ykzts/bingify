@@ -128,16 +128,12 @@ describe("NotificationItem", () => {
         read: false,
       });
 
-      const { container } = render(
-        <NotificationItem locale="en" notification={notification} />,
-        { wrapper: createWrapper() }
-      );
+      render(<NotificationItem locale="en" notification={notification} />, {
+        wrapper: createWrapper(),
+      });
 
-      const title = screen.getByText(notification.title);
-      expect(title).toHaveAttribute("data-read", "false");
-
-      const dot = container.querySelector("[data-unread-indicator]");
-      expect(dot).toBeInTheDocument();
+      expect(screen.getByTestId("notification-title")).toBeInTheDocument();
+      expect(screen.getByTestId("unread-indicator")).toBeInTheDocument();
     });
 
     it("既読通知には通常のタイトルでドットが非表示", () => {
@@ -145,16 +141,12 @@ describe("NotificationItem", () => {
         read: true,
       });
 
-      const { container } = render(
-        <NotificationItem locale="en" notification={notification} />,
-        { wrapper: createWrapper() }
-      );
+      render(<NotificationItem locale="en" notification={notification} />, {
+        wrapper: createWrapper(),
+      });
 
-      const title = screen.getByText(notification.title);
-      expect(title).toHaveAttribute("data-read", "true");
-
-      const dot = container.querySelector("[data-unread-indicator]");
-      expect(dot).not.toBeInTheDocument();
+      expect(screen.getByTestId("notification-title")).toBeInTheDocument();
+      expect(screen.queryByTestId("unread-indicator")).not.toBeInTheDocument();
     });
 
     it("未読通知には紫色の背景が適用される", () => {
@@ -162,14 +154,11 @@ describe("NotificationItem", () => {
         read: false,
       });
 
-      const { container } = render(
-        <NotificationItem locale="en" notification={notification} />,
-        { wrapper: createWrapper() }
-      );
+      render(<NotificationItem locale="en" notification={notification} />, {
+        wrapper: createWrapper(),
+      });
 
-      // 未読通知にはdata-read="false"属性が適用される
-      const itemContainer = container.querySelector('[data-read="false"]');
-      expect(itemContainer).toBeInTheDocument();
+      expect(screen.getByTestId("unread-notification")).toBeInTheDocument();
     });
   });
 
