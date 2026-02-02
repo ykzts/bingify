@@ -5,6 +5,12 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  compiler: {
+    reactRemoveProperties:
+      process.env.NODE_ENV === "production"
+        ? { properties: ["^data-testid$"] }
+        : false,
+  },
   experimental: {
     globalNotFound: true,
     serverActions: {

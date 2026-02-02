@@ -125,7 +125,10 @@ export function NotificationItem({
           </p>
         )}
 
-        <p className="text-muted-foreground/70 text-xs">
+        <p
+          className="text-muted-foreground/70 text-xs"
+          data-testid="notification-time"
+        >
           {formatRelativeTime(notification.created_at || "", locale)}
         </p>
       </div>
