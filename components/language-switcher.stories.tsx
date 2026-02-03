@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const meta = {
   component: LanguageSwitcher,
@@ -39,14 +40,10 @@ export const InNavigation: Story = {
 };
 
 export const WithThemeToggle: Story = {
-  render: () => {
-    // Dynamically import ThemeToggle to avoid circular dependencies
-    const { ThemeToggle } = require("@/components/theme-toggle");
-    return (
-      <div className="flex items-center gap-2">
-        <LanguageSwitcher />
-        <ThemeToggle />
-      </div>
-    );
-  },
+  render: () => (
+    <div className="flex items-center gap-2">
+      <LanguageSwitcher />
+      <ThemeToggle />
+    </div>
+  ),
 };
