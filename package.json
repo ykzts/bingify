@@ -140,8 +140,7 @@
     "test:ci": "vitest run",
     "test:ui": "vitest --ui",
     "type-check": "tsc --noEmit",
-    "typegen": "next typegen",
-    "storybook": "storybook dev -p 6006"
+    "typegen": "next typegen"
   },
   "type": "module",
   "version": "0.1.0"
