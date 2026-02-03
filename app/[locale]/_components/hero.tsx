@@ -28,17 +28,15 @@ export function Hero({
 
       <div className="relative z-10 max-w-3xl">
         <div className="mb-8 flex justify-center">
-          <div className="rounded-2xl bg-card p-4 shadow-lg ring-1 ring-border/50">
-            <Image
-              alt="Bingify"
-              className="h-10 w-auto sm:h-12"
-              fetchPriority="high"
-              height={48}
-              loading="eager"
-              src="/logo.svg"
-              width={182}
-            />
-          </div>
+          <Image
+            alt="Bingify"
+            className="h-10 w-auto sm:h-12"
+            fetchPriority="high"
+            height={48}
+            loading="eager"
+            src="/logo.svg"
+            width={182}
+          />
         </div>
 
         <h1 className="mb-6 text-balance font-bold text-4xl text-foreground tracking-tight sm:text-5xl md:text-6xl">
