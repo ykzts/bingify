@@ -12,7 +12,7 @@ describe("Email Hook Secret Retrieval", () => {
     // Read the source file to verify the import
     const fs = await import("node:fs");
     const path = await import("node:path");
-    const routePath = path.resolve(__dirname, "..", "route.ts");
+    const routePath = path.resolve(import.meta.dirname, "..", "route.ts");
     const routeSource = fs.readFileSync(routePath, "utf-8");
 
     // Verify that createAdminClient is imported from @/lib/supabase/admin
@@ -28,7 +28,7 @@ describe("Email Hook Secret Retrieval", () => {
     // Read the source file to verify the comments
     const fs = await import("node:fs");
     const path = await import("node:path");
-    const routePath = path.resolve(__dirname, "..", "route.ts");
+    const routePath = path.resolve(import.meta.dirname, "..", "route.ts");
     const routeSource = fs.readFileSync(routePath, "utf-8");
 
     // Verify that the comment explains the use of service role
