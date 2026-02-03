@@ -1,50 +1,50 @@
 # Bingify Storybook
 
-This directory contains the Storybook configuration for the Bingify design system.
+このディレクトリには、Bingify デザインシステムの Storybook 設定が含まれています。
 
-## Overview
+## 概要
 
-Bingify uses Storybook v10 with the Next.js Vite adapter to provide an interactive component catalog and design system documentation.
+Bingify では、Storybook v10 と Next.js Vite アダプターを使用して、インタラクティブなコンポーネントカタログとデザインシステムのドキュメントを提供しています。
 
-## Features
+## 機能
 
-- **30+ UI Components** - shadcn/ui components (Button, Card, Badge, etc.)
-- **60+ Business Components** - Application-specific components
-- **Dark Mode Support** - Toggle between light and dark themes
-- **Internationalization** - English and Japanese language support
-- **Accessibility Testing** - Built-in a11y addon for WCAG compliance
-- **Interactive Controls** - Modify component props in real-time
+- **30+ UI コンポーネント** - shadcn/ui コンポーネント（Button、Card、Badge など）
+- **60+ ビジネスコンポーネント** - アプリケーション固有のコンポーネント
+- **ダークモード対応** - ライトテーマとダークテーマを切り替え可能
+- **多言語対応** - 英語と日本語をサポート
+- **アクセシビリティテスト** - WCAG 準拠のための a11y アドオンを内蔵
+- **インタラクティブコントロール** - コンポーネントの props をリアルタイムで変更可能
 
-## Development
+## 開発
 
-Run Storybook locally:
+Storybook をローカルで実行：
 
-\`\`\`bash
+```bash
 pnpm dev:storybook
-\`\`\`
+```
 
-This will start Storybook at [http://localhost:6006](http://localhost:6006)
+これにより、[http://localhost:6006](http://localhost:6006) で Storybook が起動します。
 
-## Building
+## ビルド
 
-Build static Storybook:
+静的な Storybook をビルド：
 
-\`\`\`bash
+```bash
 pnpm build-storybook
-\`\`\`
+```
 
-Output will be in `storybook-static/` directory.
+出力は `storybook-static/` ディレクトリに生成されます。
 
-## Adding Stories
+## ストーリーの追加
 
-Stories should be placed in:
-- `components/**/*.stories.tsx` - For component stories
-- `stories/**/*.stories.tsx` - For dedicated story files
-- `stories/**/*.mdx` - For documentation pages
+ストーリーは以下に配置してください：
+- `components/**/*.stories.tsx` - コンポーネントストーリー用
+- `stories/**/*.stories.tsx` - 専用ストーリーファイル用
+- `stories/**/*.mdx` - ドキュメントページ用
 
-Example story structure:
+ストーリーの構造例：
 
-\`\`\`tsx
+```tsx
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Button } from "@/components/ui/button";
 
@@ -65,16 +65,16 @@ export const Default: Story = {
     children: "Button",
   },
 };
-\`\`\`
+```
 
-## Configuration
+## 設定
 
-- **Main config**: `.storybook/main.ts`
-- **Preview config**: `.storybook/preview.ts`
+- **メイン設定**: `.storybook/main.ts`
+- **プレビュー設定**: `.storybook/preview.tsx`
 
-## Addons
+## アドオン
 
-- `@storybook/addon-a11y` - Accessibility testing
-- `@storybook/addon-themes` - Theme switching
-- `@storybook/addon-docs` - Automatic documentation
-- `@chromatic-com/storybook` - Visual regression testing (optional)
+- `@storybook/addon-a11y` - アクセシビリティテスト
+- `@storybook/addon-themes` - テーマ切り替え
+- `@storybook/addon-docs` - 自動ドキュメント生成
+- `@chromatic-com/storybook` - ビジュアルリグレッションテスト（オプション）
