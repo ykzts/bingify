@@ -8,7 +8,7 @@ export async function Footer() {
   const t = await getTranslations("Footer");
 
   return (
-    <footer className="border-border border-t bg-background py-8">
+    <footer className="border-border border-t bg-background py-8 pb-16 md:pb-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <Link className="flex justify-center md:justify-start" href="/">
