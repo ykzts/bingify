@@ -59,7 +59,9 @@ export const Twitch: Story = {
 export const LoadingGoogle: Story = {
   args: {
     isLoading: true,
-    onClick: () => {},
+    onClick: () => {
+      // No-op for loading state demo
+    },
     provider: googleProvider,
   },
 };
@@ -67,7 +69,9 @@ export const LoadingGoogle: Story = {
 export const LoadingGitHub: Story = {
   args: {
     isLoading: true,
-    onClick: () => {},
+    onClick: () => {
+      // No-op for loading state demo
+    },
     provider: githubProvider,
   },
 };
@@ -75,12 +79,19 @@ export const LoadingGitHub: Story = {
 export const LoadingTwitch: Story = {
   args: {
     isLoading: true,
-    onClick: () => {},
+    onClick: () => {
+      // No-op for loading state demo
+    },
     provider: twitchProvider,
   },
 };
 
 export const AllProviders: Story = {
+  args: {
+    isLoading: false,
+    onClick: () => console.log("Provider clicked"),
+    provider: googleProvider,
+  },
   render: () => (
     <div className="flex w-80 flex-col gap-3">
       <OAuthButton
@@ -103,6 +114,11 @@ export const AllProviders: Story = {
 };
 
 export const LoginForm: Story = {
+  args: {
+    isLoading: false,
+    onClick: () => console.log("Provider clicked"),
+    provider: googleProvider,
+  },
   render: () => (
     <div className="w-96 space-y-4 rounded-lg border p-6">
       <div className="space-y-2 text-center">

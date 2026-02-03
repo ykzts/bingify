@@ -19,10 +19,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const baseNotification: Notification = {
+  content: "You've been invited to join 'Weekly Bingo Night'",
   created_at: new Date().toISOString(),
+  expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
   id: "1",
-  link: "/spaces/123",
-  message: "You've been invited to join 'Weekly Bingo Night'",
+  metadata: { action_url: "/spaces/123" },
   read: false,
   title: "New Space Invitation",
   type: "space_invitation",
@@ -53,7 +54,7 @@ export const SpaceInvitation: Story = {
     locale: "en",
     notification: {
       ...baseNotification,
-      message: "You've been invited to 'Friday Game Night'",
+      content: "You've been invited to 'Friday Game Night'",
       title: "Space Invitation",
       type: "space_invitation",
     },
@@ -66,8 +67,8 @@ export const BingoAchieved: Story = {
     locale: "en",
     notification: {
       ...baseNotification,
+      content: "Congratulations! You got a BINGO in 'Weekend Tournament'",
       id: "2",
-      message: "Congratulations! You got a BINGO in 'Weekend Tournament'",
       read: false,
       title: "Bingo!",
       type: "bingo_achieved",
@@ -81,8 +82,8 @@ export const AnnouncementPublished: Story = {
     locale: "en",
     notification: {
       ...baseNotification,
+      content: "Check out the latest updates from the Bingify team",
       id: "3",
-      message: "Check out the latest updates from the Bingify team",
       read: false,
       title: "New Announcement",
       type: "announcement_published",
@@ -96,8 +97,8 @@ export const SystemUpdate: Story = {
     locale: "en",
     notification: {
       ...baseNotification,
+      content: "Scheduled maintenance on Sunday at 2 AM UTC",
       id: "4",
-      message: "Scheduled maintenance on Sunday at 2 AM UTC",
       read: false,
       title: "System Maintenance",
       type: "system_update",
@@ -111,8 +112,8 @@ export const RoleChanged: Story = {
     locale: "en",
     notification: {
       ...baseNotification,
+      content: "You have been promoted to moderator in 'Main Hall'",
       id: "5",
-      message: "You have been promoted to moderator in 'Main Hall'",
       read: false,
       title: "Role Updated",
       type: "role_changed",
@@ -141,6 +142,11 @@ export const CompactRead: Story = {
 };
 
 export const NotificationList: Story = {
+  args: {
+    locale: "en",
+    notification: baseNotification,
+    variant: "expanded",
+  },
   render: () => (
     <div className="w-96 space-y-2">
       <NotificationItem
@@ -156,8 +162,8 @@ export const NotificationList: Story = {
         locale="en"
         notification={{
           ...baseNotification,
+          content: "You got a BINGO!",
           id: "2",
-          message: "You got a BINGO!",
           read: false,
           title: "Bingo!",
           type: "bingo_achieved",
@@ -168,8 +174,8 @@ export const NotificationList: Story = {
         locale="en"
         notification={{
           ...baseNotification,
+          content: "New features available",
           id: "3",
-          message: "New features available",
           read: true,
           title: "System Update",
           type: "system_update",

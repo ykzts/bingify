@@ -50,15 +50,15 @@ export const WithBingoLine: Story = {
   args: {
     bingoLines: [
       {
-        cells: [
-          [0, 0],
-          [1, 0],
-          [2, 0],
-          [3, 0],
-          [4, 0],
-        ],
         index: 0,
-        type: "column",
+        positions: [
+          { col: 0, row: 0 },
+          { col: 0, row: 1 },
+          { col: 0, row: 2 },
+          { col: 0, row: 3 },
+          { col: 0, row: 4 },
+        ],
+        type: "vertical",
       },
     ],
     calledNumbers: new Set([1, 2, 3, 4, 5]),
@@ -71,26 +71,26 @@ export const MultipleBingoLines: Story = {
   args: {
     bingoLines: [
       {
-        cells: [
-          [0, 0],
-          [1, 0],
-          [2, 0],
-          [3, 0],
-          [4, 0],
-        ],
         index: 0,
-        type: "column",
+        positions: [
+          { col: 0, row: 0 },
+          { col: 0, row: 1 },
+          { col: 0, row: 2 },
+          { col: 0, row: 3 },
+          { col: 0, row: 4 },
+        ],
+        type: "vertical",
       },
       {
-        cells: [
-          [0, 1],
-          [1, 1],
-          [2, 1],
-          [3, 1],
-          [4, 1],
-        ],
         index: 1,
-        type: "column",
+        positions: [
+          { col: 1, row: 0 },
+          { col: 1, row: 1 },
+          { col: 1, row: 2 },
+          { col: 1, row: 3 },
+          { col: 1, row: 4 },
+        ],
+        type: "vertical",
       },
     ],
     calledNumbers: new Set([1, 2, 3, 4, 5, 16, 17, 18, 19, 20]),
@@ -103,15 +103,15 @@ export const ReadOnly: Story = {
   args: {
     bingoLines: [
       {
-        cells: [
-          [0, 0],
-          [0, 1],
-          [0, 2],
-          [0, 3],
-          [0, 4],
-        ],
         index: 0,
-        type: "row",
+        positions: [
+          { col: 0, row: 0 },
+          { col: 1, row: 0 },
+          { col: 2, row: 0 },
+          { col: 3, row: 0 },
+          { col: 4, row: 0 },
+        ],
+        type: "horizontal",
       },
     ],
     calledNumbers: new Set([1, 16, 31, 46, 61]),
@@ -124,14 +124,14 @@ export const DiagonalBingo: Story = {
   args: {
     bingoLines: [
       {
-        cells: [
-          [0, 0],
-          [1, 1],
-          [2, 2],
-          [3, 3],
-          [4, 4],
-        ],
         index: 0,
+        positions: [
+          { col: 0, row: 0 },
+          { col: 1, row: 1 },
+          { col: 2, row: 2 },
+          { col: 3, row: 3 },
+          { col: 4, row: 4 },
+        ],
         type: "diagonal",
       },
     ],

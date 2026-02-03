@@ -30,7 +30,9 @@ export const InNavigation: Story = {
       <h2 className="font-semibold text-lg">Bingify</h2>
       <div className="flex items-center gap-2">
         <LanguageSwitcher />
-        <button className="rounded border px-3 py-2 text-sm">Login</button>
+        <button className="rounded border px-3 py-2 text-sm" type="button">
+          Login
+        </button>
       </div>
     </nav>
   ),

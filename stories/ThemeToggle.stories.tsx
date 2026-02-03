@@ -38,9 +38,13 @@ export const InHeader: Story = {
 export const WithOtherControls: Story = {
   render: () => (
     <div className="flex items-center gap-2">
-      <button className="rounded border px-3 py-2">Settings</button>
+      <button className="rounded border px-3 py-2" type="button">
+        Settings
+      </button>
       <ThemeToggle />
-      <button className="rounded border px-3 py-2">Profile</button>
+      <button className="rounded border px-3 py-2" type="button">
+        Profile
+      </button>
     </div>
   ),
 };

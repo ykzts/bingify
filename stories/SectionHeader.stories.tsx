@@ -68,6 +68,11 @@ export const BillingSection: Story = {
 };
 
 export const InSettingsPage: Story = {
+  args: {
+    children: "Settings Page",
+    description: "Example settings page",
+    icon: Users,
+  },
   render: () => (
     <div className="max-w-2xl space-y-8">
       <SectionHeader
@@ -78,17 +83,23 @@ export const InSettingsPage: Story = {
       </SectionHeader>
       <div className="space-y-4 rounded-lg border p-4">
         <div className="space-y-2">
-          <label className="font-medium text-sm">Display Name</label>
+          <label className="font-medium text-sm" htmlFor="display-name">
+            Display Name
+          </label>
           <input
             className="w-full rounded border px-3 py-2"
+            id="display-name"
             placeholder="John Doe"
             type="text"
           />
         </div>
         <div className="space-y-2">
-          <label className="font-medium text-sm">Email</label>
+          <label className="font-medium text-sm" htmlFor="email">
+            Email
+          </label>
           <input
             className="w-full rounded border px-3 py-2"
+            id="email"
             placeholder="john@example.com"
             type="email"
           />
@@ -116,7 +127,10 @@ export const InSettingsPage: Story = {
         Security
       </SectionHeader>
       <div className="rounded-lg border p-4">
-        <button className="rounded bg-primary px-4 py-2 text-primary-foreground text-sm">
+        <button
+          className="rounded bg-primary px-4 py-2 text-primary-foreground text-sm"
+          type="button"
+        >
           Change Password
         </button>
       </div>
