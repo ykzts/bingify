@@ -190,9 +190,106 @@ GitHub には以下の種類のコメントがあります：
 2. **Review Comment** (`gh api .../pulls/{PR}/comments` で取得可能): コード行に紐づいたコメント
 3. **Review** (`gh api .../pulls/{PR}/reviews` で取得可能): レビュー全体（複数のコメントを含む）
 
+## GitHub MCP を使用した代替方法
+
+`gh` コマンドが利用できない環境（GitHub Copilot Coding Agent等のコーディングエージェント環境、CI/CD環境、セキュリティ制限環境など）では、**GitHub MCP（Model Context Protocol）** を使用してPRレビュー対応を行うことができます。
+
+### GitHub MCP とは
+
+Model Context Protocol（MCP）を使用して、LLM（Large Language Model）から GitHub API を直接操作できるようにする仕組みです。コーディングエージェント環境で標準的に利用可能です。
+
+### 利用可能な環境
+
+- **GitHub Copilot Coding Agent**: デフォルトで有効（追加設定不要）
+- その他のMCP対応コーディングエージェント
+
+### セットアップ（必要に応じて）
+
+GitHub Copilot Coding Agent では MCP がデフォルトで有効になっており、通常は追加設定は不要です。
+
+パブリックリポジトリへのアクセスは認証なしで可能ですが、プライベートリポジトリや書き込み操作を行う場合は Personal Access Token（PAT）の設定が必要です：
+
+```bash
+# 環境変数を設定（必要に応じて）
+export COPILOT_MCP_GITHUB_PERSONAL_ACCESS_TOKEN=ghp_your_token_here
+```
+
+**権限スコープ**:
+
+- `repo`: リポジトリへのフルアクセス（プライベートリポジトリの読み取り・書き込みに必要）
+- `read:org`: 組織のプライベートリポジトリへのアクセス（組織リポジトリの場合）
+
+### 使用方法
+
+GitHub MCP を使用すると、自然言語でPRレビュー関連の操作を実行できます。コーディングエージェントに以下のような指示を出すだけで、必要な情報を取得したり操作を実行できます。
+
+#### レビューコメントの確認
+
+```
+このPRのレビューコメントを一覧表示して
+```
+
+```
+PR #{PR_NUMBER} の行単位のレビューコメントを表示して
+```
+
+```
+ファイル app/[locale]/page.tsx のレビューコメントだけを表示して
+```
+
+#### PRの差分確認
+
+```
+このPRの差分を表示して
+```
+
+```
+PR #{PR_NUMBER} で変更されたファイル一覧を表示して
+```
+
+#### レビューステータスの確認
+
+```
+このPRのレビューステータスを確認して
+```
+
+```
+最新のレビューが承認されているか確認して
+```
+
+#### その他の操作
+
+```
+このリポジトリのオープン中のissueを一覧表示して
+```
+
+```
+PR #{PR_NUMBER} のチェック状況を確認して
+```
+
+```
+ファイル lib/actions/auth.ts の内容を表示して
+```
+
+### GitHub MCP の利点
+
+- **自然言語での操作**: コマンドを覚える必要がなく、自然な日本語・英語で指示できる
+- **コンテキスト保持**: 前の会話を記憶して、関連する操作を続けて実行できる
+- **環境非依存**: CLIツールのインストールが不要で、コーディングエージェント環境でそのまま利用可能
+- **複合操作**: 複数のAPIを組み合わせた複雑な操作も1つの指示で実行可能
+
+### 制限事項
+
+- コーディングエージェント環境でのみ利用可能（ローカルCLIとしては使用不可）
+- 一部の高度な操作は `gh` コマンドの方が適している場合もある
+- レート制限は GitHub API の標準制限に従う
+
 ## 参考リンク
 
 - [GitHub REST API: Pull Request Review Comments](https://docs.github.com/en/rest/pulls/comments)
 - [GitHub CLI: gh api](https://cli.github.com/manual/gh_api)
 - [GitHub CLI: gh pr](https://cli.github.com/manual/gh_pr)
 - [Conventional Commits](https://www.conventionalcommits.org/)
+- [GitHub MCP Server](https://github.com/github/github-mcp-server)
+- [Model Context Protocol](https://modelcontextprotocol.io/)
+- [Using MCP with GitHub Copilot Coding Agent](https://docs.github.com/en/copilot/using-github-copilot/using-mcp-with-copilot-coding-agent)
