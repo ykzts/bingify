@@ -3,30 +3,30 @@ import { NotificationItem } from "@/components/notifications/notification-item";
 import type { Notification } from "@/lib/types/notification";
 
 const meta = {
-  title: "Business Components/Notifications/NotificationItem",
+  argTypes: {
+    onDelete: { action: "delete" },
+    onMarkRead: { action: "mark-read" },
+  },
   component: NotificationItem,
   parameters: {
     layout: "padded",
   },
   tags: ["autodocs"],
-  argTypes: {
-    onDelete: { action: "delete" },
-    onMarkRead: { action: "mark-read" },
-  },
+  title: "Business Components/Notifications/NotificationItem",
 } satisfies Meta<typeof NotificationItem>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 const baseNotification: Notification = {
-  id: "1",
-  user_id: "user-1",
-  type: "space_invitation",
-  title: "New Space Invitation",
-  message: "You've been invited to join 'Weekly Bingo Night'",
-  link: "/spaces/123",
-  read: false,
   created_at: new Date().toISOString(),
+  id: "1",
+  link: "/spaces/123",
+  message: "You've been invited to join 'Weekly Bingo Night'",
+  read: false,
+  title: "New Space Invitation",
+  type: "space_invitation",
+  user_id: "user-1",
 };
 
 export const Unread: Story = {
@@ -53,9 +53,9 @@ export const SpaceInvitation: Story = {
     locale: "en",
     notification: {
       ...baseNotification,
-      type: "space_invitation",
-      title: "Space Invitation",
       message: "You've been invited to 'Friday Game Night'",
+      title: "Space Invitation",
+      type: "space_invitation",
     },
     variant: "expanded",
   },
@@ -67,10 +67,10 @@ export const BingoAchieved: Story = {
     notification: {
       ...baseNotification,
       id: "2",
-      type: "bingo_achieved",
-      title: "Bingo!",
       message: "Congratulations! You got a BINGO in 'Weekend Tournament'",
       read: false,
+      title: "Bingo!",
+      type: "bingo_achieved",
     },
     variant: "expanded",
   },
@@ -82,10 +82,10 @@ export const AnnouncementPublished: Story = {
     notification: {
       ...baseNotification,
       id: "3",
-      type: "announcement_published",
-      title: "New Announcement",
       message: "Check out the latest updates from the Bingify team",
       read: false,
+      title: "New Announcement",
+      type: "announcement_published",
     },
     variant: "expanded",
   },
@@ -97,10 +97,10 @@ export const SystemUpdate: Story = {
     notification: {
       ...baseNotification,
       id: "4",
-      type: "system_update",
-      title: "System Maintenance",
       message: "Scheduled maintenance on Sunday at 2 AM UTC",
       read: false,
+      title: "System Maintenance",
+      type: "system_update",
     },
     variant: "expanded",
   },
@@ -112,10 +112,10 @@ export const RoleChanged: Story = {
     notification: {
       ...baseNotification,
       id: "5",
-      type: "role_changed",
-      title: "Role Updated",
       message: "You have been promoted to moderator in 'Main Hall'",
       read: false,
+      title: "Role Updated",
+      type: "role_changed",
     },
     variant: "expanded",
   },
@@ -157,10 +157,10 @@ export const NotificationList: Story = {
         notification={{
           ...baseNotification,
           id: "2",
-          type: "bingo_achieved",
-          title: "Bingo!",
           message: "You got a BINGO!",
           read: false,
+          title: "Bingo!",
+          type: "bingo_achieved",
         }}
         variant="expanded"
       />
@@ -169,10 +169,10 @@ export const NotificationList: Story = {
         notification={{
           ...baseNotification,
           id: "3",
-          type: "system_update",
-          title: "System Update",
           message: "New features available",
           read: true,
+          title: "System Update",
+          type: "system_update",
         }}
         variant="expanded"
       />

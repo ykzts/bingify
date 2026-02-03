@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
 const meta = {
-  title: "Business Components/LanguageSwitcher",
   component: LanguageSwitcher,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
+  title: "Business Components/LanguageSwitcher",
 } satisfies Meta<typeof LanguageSwitcher>;
 
 export default meta;
@@ -17,7 +17,7 @@ export const Default: Story = {
   render: () => (
     <div className="flex items-center gap-4">
       <LanguageSwitcher />
-      <p className="text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm">
         Click to switch between English and Japanese
       </p>
     </div>
@@ -26,11 +26,11 @@ export const Default: Story = {
 
 export const InNavigation: Story = {
   render: () => (
-    <nav className="flex items-center justify-between border rounded-lg p-4 w-[600px]">
-      <h2 className="text-lg font-semibold">Bingify</h2>
+    <nav className="flex w-[600px] items-center justify-between rounded-lg border p-4">
+      <h2 className="font-semibold text-lg">Bingify</h2>
       <div className="flex items-center gap-2">
         <LanguageSwitcher />
-        <button className="px-3 py-2 border rounded text-sm">Login</button>
+        <button className="rounded border px-3 py-2 text-sm">Login</button>
       </div>
     </nav>
   ),

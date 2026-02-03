@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { BingoCard } from "@/components/bingo/bingo-card";
 
 const meta = {
-  title: "Business Components/Bingo/BingoCard",
   component: BingoCard,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
+  title: "Business Components/Bingo/BingoCard",
 } satisfies Meta<typeof BingoCard>;
 
 export default meta;
@@ -24,36 +24,32 @@ const sampleCard = [
 
 export const Empty: Story = {
   args: {
-    cardNumbers: sampleCard,
     calledNumbers: new Set(),
+    cardNumbers: sampleCard,
     readonly: false,
   },
 };
 
 export const WithFewCalls: Story = {
   args: {
-    cardNumbers: sampleCard,
     calledNumbers: new Set([1, 16, 31, 32]),
+    cardNumbers: sampleCard,
     readonly: false,
   },
 };
 
 export const AlmostBingo: Story = {
   args: {
-    cardNumbers: sampleCard,
     calledNumbers: new Set([1, 2, 3, 4]),
+    cardNumbers: sampleCard,
     readonly: false,
   },
 };
 
 export const WithBingoLine: Story = {
   args: {
-    cardNumbers: sampleCard,
-    calledNumbers: new Set([1, 2, 3, 4, 5]),
     bingoLines: [
       {
-        type: "column",
-        index: 0,
         cells: [
           [0, 0],
           [1, 0],
@@ -61,20 +57,20 @@ export const WithBingoLine: Story = {
           [3, 0],
           [4, 0],
         ],
+        index: 0,
+        type: "column",
       },
     ],
+    calledNumbers: new Set([1, 2, 3, 4, 5]),
+    cardNumbers: sampleCard,
     readonly: false,
   },
 };
 
 export const MultipleBingoLines: Story = {
   args: {
-    cardNumbers: sampleCard,
-    calledNumbers: new Set([1, 2, 3, 4, 5, 16, 17, 18, 19, 20]),
     bingoLines: [
       {
-        type: "column",
-        index: 0,
         cells: [
           [0, 0],
           [1, 0],
@@ -82,10 +78,10 @@ export const MultipleBingoLines: Story = {
           [3, 0],
           [4, 0],
         ],
+        index: 0,
+        type: "column",
       },
       {
-        type: "column",
-        index: 1,
         cells: [
           [0, 1],
           [1, 1],
@@ -93,20 +89,20 @@ export const MultipleBingoLines: Story = {
           [3, 1],
           [4, 1],
         ],
+        index: 1,
+        type: "column",
       },
     ],
+    calledNumbers: new Set([1, 2, 3, 4, 5, 16, 17, 18, 19, 20]),
+    cardNumbers: sampleCard,
     readonly: false,
   },
 };
 
 export const ReadOnly: Story = {
   args: {
-    cardNumbers: sampleCard,
-    calledNumbers: new Set([1, 16, 31, 46, 61]),
     bingoLines: [
       {
-        type: "row",
-        index: 0,
         cells: [
           [0, 0],
           [0, 1],
@@ -114,20 +110,20 @@ export const ReadOnly: Story = {
           [0, 3],
           [0, 4],
         ],
+        index: 0,
+        type: "row",
       },
     ],
+    calledNumbers: new Set([1, 16, 31, 46, 61]),
+    cardNumbers: sampleCard,
     readonly: true,
   },
 };
 
 export const DiagonalBingo: Story = {
   args: {
-    cardNumbers: sampleCard,
-    calledNumbers: new Set([1, 17, 0, 49, 65]),
     bingoLines: [
       {
-        type: "diagonal",
-        index: 0,
         cells: [
           [0, 0],
           [1, 1],
@@ -135,8 +131,12 @@ export const DiagonalBingo: Story = {
           [3, 3],
           [4, 4],
         ],
+        index: 0,
+        type: "diagonal",
       },
     ],
+    calledNumbers: new Set([1, 17, 0, 49, 65]),
+    cardNumbers: sampleCard,
     readonly: false,
   },
 };

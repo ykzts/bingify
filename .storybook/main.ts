@@ -1,25 +1,23 @@
-import type { StorybookConfig } from '@storybook/nextjs-vite';
+import type { StorybookConfig } from "@storybook/nextjs-vite";
 
 const config: StorybookConfig = {
-  "stories": [
-    "../components/**/*.mdx",
-    "../components/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    "../stories/**/*.mdx",
-    "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"
-  ],
-  "addons": [
+  addons: [
     "@chromatic-com/storybook",
     "@storybook/addon-a11y",
     "@storybook/addon-themes",
-    "@storybook/addon-docs"
+    "@storybook/addon-docs",
   ],
-  "framework": "@storybook/nextjs-vite",
-  "staticDirs": [
-    "../public"
+  framework: "@storybook/nextjs-vite",
+  staticDirs: ["../public"],
+  stories: [
+    "../components/**/*.mdx",
+    "../components/**/*.stories.@(js|jsx|mjs|ts|tsx)",
+    "../stories/**/*.mdx",
+    "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)",
   ],
-  "typescript": {
-    "reactDocgen": "react-docgen-typescript",
-    "check": false
-  }
+  typescript: {
+    check: false,
+    reactDocgen: "react-docgen-typescript",
+  },
 };
 export default config;

@@ -1,34 +1,50 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { ChevronRight, Loader2, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Mail, ChevronRight, Loader2 } from "lucide-react";
 
 const meta = {
-  title: "UI Components/Button",
-  component: Button,
-  parameters: {
-    layout: "centered",
-  },
-  tags: ["autodocs"],
   argTypes: {
-    variant: {
-      control: "select",
-      options: ["default", "destructive", "outline", "secondary", "ghost", "link"],
-      description: "The visual style of the button",
-    },
-    size: {
-      control: "select",
-      options: ["default", "xs", "sm", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"],
-      description: "The size of the button",
+    asChild: {
+      control: "boolean",
+      description: "Render as a child component using Radix Slot",
     },
     disabled: {
       control: "boolean",
       description: "Whether the button is disabled",
     },
-    asChild: {
-      control: "boolean",
-      description: "Render as a child component using Radix Slot",
+    size: {
+      control: "select",
+      description: "The size of the button",
+      options: [
+        "default",
+        "xs",
+        "sm",
+        "lg",
+        "icon",
+        "icon-xs",
+        "icon-sm",
+        "icon-lg",
+      ],
+    },
+    variant: {
+      control: "select",
+      description: "The visual style of the button",
+      options: [
+        "default",
+        "destructive",
+        "outline",
+        "secondary",
+        "ghost",
+        "link",
+      ],
     },
   },
+  component: Button,
+  parameters: {
+    layout: "centered",
+  },
+  tags: ["autodocs"],
+  title: "UI Components/Button",
 } satisfies Meta<typeof Button>;
 
 export default meta;
@@ -37,8 +53,8 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     children: "Button",
-    variant: "default",
     size: "default",
+    variant: "default",
   },
 };
 
@@ -90,20 +106,21 @@ export const WithIcon: Story = {
 
 export const IconOnly: Story = {
   args: {
-    size: "icon",
+    "aria-label": "Next",
     children: <ChevronRight />,
+    size: "icon",
   },
 };
 
 export const Loading: Story = {
   args: {
-    disabled: true,
     children: (
       <>
         <Loader2 className="animate-spin" />
         Please wait
       </>
     ),
+    disabled: true,
   },
 };
 
@@ -139,10 +156,10 @@ export const Disabled: Story = {
   render: () => (
     <div className="flex gap-2">
       <Button disabled>Default</Button>
-      <Button variant="secondary" disabled>
+      <Button disabled variant="secondary">
         Secondary
       </Button>
-      <Button variant="outline" disabled>
+      <Button disabled variant="outline">
         Outline
       </Button>
     </div>

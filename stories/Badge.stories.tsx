@@ -1,21 +1,21 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { AlertCircle, Check, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Check, AlertCircle, Info } from "lucide-react";
 
 const meta = {
-  title: "UI Components/Badge",
+  argTypes: {
+    variant: {
+      control: "select",
+      description: "The visual style of the badge",
+      options: ["default", "secondary", "destructive", "outline"],
+    },
+  },
   component: Badge,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    variant: {
-      control: "select",
-      options: ["default", "secondary", "destructive", "outline"],
-      description: "The visual style of the badge",
-    },
-  },
+  title: "UI Components/Badge",
 } satisfies Meta<typeof Badge>;
 
 export default meta;
@@ -106,8 +106,8 @@ export const StatusBadges: Story = {
 export const InText: Story = {
   render: () => (
     <p className="text-sm">
-      This is a text with an inline{" "}
-      <Badge variant="secondary">NEW</Badge> badge.
+      This is a text with an inline <Badge variant="secondary">NEW</Badge>{" "}
+      badge.
     </p>
   ),
 };
