@@ -1,11 +1,17 @@
 "use client";
 
-import { LayoutDashboard, LogOut, Settings, Shield, User } from "lucide-react";
+import {
+  Bell,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  Shield,
+  User,
+} from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { NotificationBell } from "@/components/notifications/notification-bell";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useUnreadCount } from "@/hooks/use-unread-count";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -32,6 +39,7 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [open, setOpen] = useState(false);
+  const { count } = useUnreadCount();
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -88,22 +96,32 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
           </Link>
         )}
 
-        <div className="flex flex-1 flex-col items-center justify-center gap-1 py-2">
-          <div className="flex h-5 w-5 items-center justify-center">
-            <NotificationBell />
+        <Link
+          aria-current={isActivePath("/notifications") ? "page" : undefined}
+          aria-label={t("notifications")}
+          className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md py-2 text-muted-foreground text-xs transition-colors hover:bg-accent aria-[current=page]:text-primary"
+          href="/notifications"
+        >
+          <div className="relative flex h-5 w-5 items-center justify-center">
+            <Bell className="h-5 w-5" />
+            {count > 0 && (
+              <Badge
+                className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px]"
+                variant="destructive"
+              >
+                {count > 99 ? "99+" : count}
+              </Badge>
+            )}
           </div>
-          <span className="text-muted-foreground text-xs">
-            {t("notifications")}
-          </span>
-        </div>
+          <span>{t("notifications")}</span>
+        </Link>
 
         <DropdownMenu onOpenChange={setOpen} open={open}>
           <DropdownMenuTrigger asChild>
-            <Button
+            <button
               aria-label={t("menu")}
               className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md py-2 text-muted-foreground text-xs transition-colors hover:bg-accent"
               type="button"
-              variant="ghost"
             >
               <div className="flex h-5 w-5 items-center justify-center">
                 {user.avatar_url ? (
@@ -119,7 +137,7 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
                 )}
               </div>
               <span>{t("menu")}</span>
-            </Button>
+            </button>
           </DropdownMenuTrigger>
 
           <DropdownMenuPortal>
