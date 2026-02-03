@@ -2,26 +2,26 @@ import { Meta } from "@storybook/blocks";
 
 <Meta title="UI Components/shadcn/ui" />
 
-# shadcn/ui Components
+# shadcn/ui コンポーネント
 
-This project uses [shadcn/ui](https://ui.shadcn.com) as the UI component library.
+このプロジェクトでは、UIコンポーネントライブラリとして [shadcn/ui](https://ui.shadcn.com) を使用しています。
 
-## About shadcn/ui
+## shadcn/ui について
 
-shadcn/ui components are located in the `components/ui/` directory and are automatically managed by the shadcn/ui CLI.  
-**Please do not edit these files directly** to avoid conflicts with the CLI.
+shadcn/ui のコンポーネントは `components/ui/` ディレクトリに配置されており、shadcn/ui CLI によって自動管理されています。  
+**CLIとの競合を避けるため、これらのファイルを直接編集しないでください。**
 
-## Available Components
+## 利用可能なコンポーネント
 
-For complete documentation, interactive examples, and usage guidelines, please refer to the official shadcn/ui documentation:
+完全なドキュメント、インタラクティブな例、使用方法については、shadcn/ui 公式ドキュメントを参照してください：
 
-**👉 [shadcn/ui Components Documentation](https://ui.shadcn.com/docs/components)**
+**👉 [shadcn/ui コンポーネントドキュメント](https://ui.shadcn.com/docs/components)**
 
-### Component List
+### コンポーネント一覧
 
-The following shadcn/ui components are currently installed in this project:
+以下の shadcn/ui コンポーネントが現在このプロジェクトにインストールされています：
 
-#### Form Components
+#### フォームコンポーネント
 - [Accordion](https://ui.shadcn.com/docs/components/accordion)
 - [Checkbox](https://ui.shadcn.com/docs/components/checkbox)
 - [Form](https://ui.shadcn.com/docs/components/form)
@@ -33,7 +33,7 @@ The following shadcn/ui components are currently installed in this project:
 - [Switch](https://ui.shadcn.com/docs/components/switch)
 - [Textarea](https://ui.shadcn.com/docs/components/textarea)
 
-#### UI Components
+#### UI コンポーネント
 - [Alert](https://ui.shadcn.com/docs/components/alert)
 - [Alert Dialog](https://ui.shadcn.com/docs/components/alert-dialog)
 - [Avatar](https://ui.shadcn.com/docs/components/avatar)
@@ -51,41 +51,41 @@ The following shadcn/ui components are currently installed in this project:
 - [Toast](https://ui.shadcn.com/docs/components/toast)
 - [Tooltip](https://ui.shadcn.com/docs/components/tooltip)
 
-#### Navigation
+#### ナビゲーション
 - [Breadcrumb](https://ui.shadcn.com/docs/components/breadcrumb)
 - [Navigation Menu](https://ui.shadcn.com/docs/components/navigation-menu)
 
-#### Data Display
+#### データ表示
 - [Calendar](https://ui.shadcn.com/docs/components/calendar)
 - [Table](https://ui.shadcn.com/docs/components/table)
 
-## Project-Specific Components
+## プロジェクト固有のコンポーネント
 
-For custom business components built specifically for this project, please see the **Business Components** section in the sidebar.
+このプロジェクト専用に構築されたカスタムビジネスコンポーネントについては、サイドバーの **Business Components** セクションを参照してください。
 
-## Styling
+## スタイリング
 
-All shadcn/ui components use:
-- **Tailwind CSS** for styling
-- **CSS Variables** for theming
-- **Radix UI** as the underlying component library
+すべての shadcn/ui コンポーネントは以下を使用しています：
+- **Tailwind CSS** - スタイリング
+- **CSS Variables** - テーマ設定
+- **Radix UI** - 基盤となるコンポーネントライブラリ
 
-Theme configuration can be found in:
-- `app/globals.css` - Global styles and CSS variables
-- `tailwind.config.ts` - Tailwind configuration
-- `components.json` - shadcn/ui configuration
+テーマ設定は以下のファイルにあります：
+- `app/globals.css` - グローバルスタイルとCSS変数
+- `tailwind.config.ts` - Tailwind設定
+- `components.json` - shadcn/ui設定
 
-## Adding New Components
+## 新しいコンポーネントの追加
 
-To add a new shadcn/ui component to the project:
+プロジェクトに新しい shadcn/ui コンポーネントを追加するには：
 
 ```bash
 pnpm dlx shadcn@latest add [component-name]
 ```
 
-Example:
+例：
 ```bash
 pnpm dlx shadcn@latest add command
 ```
 
-This will automatically install the component in `components/ui/` with the correct configuration.
+これにより、正しい設定で `components/ui/` にコンポーネントが自動的にインストールされます。
