@@ -44,3 +44,6 @@ next-env.d.ts
 
 # nginx SSL certificates
 nginx/ssl/
+
+*storybook.log
+storybook-static
