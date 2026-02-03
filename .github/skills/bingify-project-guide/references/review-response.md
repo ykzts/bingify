@@ -203,21 +203,9 @@ Model Context Protocol（MCP）を使用して、LLM（Large Language Model）�
 - **GitHub Copilot Coding Agent**: デフォルトで有効（追加設定不要）
 - その他のMCP対応コーディングエージェント
 
-### セットアップ（必要に応じて）
+### セットアップ
 
-GitHub Copilot Coding Agent では MCP がデフォルトで有効になっており、通常は追加設定は不要です。
-
-パブリックリポジトリへのアクセスは認証なしで可能ですが、プライベートリポジトリや書き込み操作を行う場合は Personal Access Token（PAT）の設定が必要です：
-
-```bash
-# 環境変数を設定（必要に応じて）
-export COPILOT_MCP_GITHUB_PERSONAL_ACCESS_TOKEN=ghp_your_token_here
-```
-
-**権限スコープ**:
-
-- `repo`: リポジトリへのフルアクセス（プライベートリポジトリの読み取り・書き込みに必要）
-- `read:org`: 組織のプライベートリポジトリへのアクセス（組織リポジトリの場合）
+GitHub Copilot Coding Agent では MCP がデフォルトで有効になっており、追加設定は不要です。
 
 ### 使用方法
 
