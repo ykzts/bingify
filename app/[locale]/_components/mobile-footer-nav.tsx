@@ -13,7 +13,6 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -104,11 +103,10 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
           open={notificationsOpen}
         >
           <DropdownMenuTrigger asChild>
-            <Button
+            <button
               aria-label={t("notifications")}
               className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md py-2 text-muted-foreground text-xs transition-colors hover:bg-accent"
               type="button"
-              variant="ghost"
             >
               <div className="relative flex h-5 w-5 items-center justify-center">
                 <Bell className="h-5 w-5" />
@@ -122,7 +120,7 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
                 )}
               </div>
               <span>{t("notifications")}</span>
-            </Button>
+            </button>
           </DropdownMenuTrigger>
 
           <DropdownMenuPortal>
@@ -132,11 +130,10 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
 
         <DropdownMenu onOpenChange={setOpen} open={open}>
           <DropdownMenuTrigger asChild>
-            <Button
+            <button
               aria-label={t("menu")}
               className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md py-2 text-muted-foreground text-xs transition-colors hover:bg-accent"
               type="button"
-              variant="ghost"
             >
               <div className="flex h-5 w-5 items-center justify-center">
                 {user.avatar_url ? (
@@ -152,7 +149,7 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
                 )}
               </div>
               <span>{t("menu")}</span>
-            </Button>
+            </button>
           </DropdownMenuTrigger>
 
           <DropdownMenuPortal>
