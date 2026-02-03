@@ -11,7 +11,6 @@ import {
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -40,7 +39,6 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [open, setOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { count } = useUnreadCount();
 
   const handleLogout = async () => {
@@ -98,35 +96,25 @@ export function MobileFooterNav({ user }: MobileFooterNavProps) {
           </Link>
         )}
 
-        <DropdownMenu
-          onOpenChange={setNotificationsOpen}
-          open={notificationsOpen}
+        <Link
+          aria-current={isActivePath("/notifications") ? "page" : undefined}
+          aria-label={t("notifications")}
+          className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md py-2 text-muted-foreground text-xs transition-colors hover:bg-accent aria-[current=page]:text-primary"
+          href="/notifications"
         >
-          <DropdownMenuTrigger asChild>
-            <button
-              aria-label={t("notifications")}
-              className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md py-2 text-muted-foreground text-xs transition-colors hover:bg-accent"
-              type="button"
-            >
-              <div className="relative flex h-5 w-5 items-center justify-center">
-                <Bell className="h-5 w-5" />
-                {count > 0 && (
-                  <Badge
-                    className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px]"
-                    variant="destructive"
-                  >
-                    {count > 99 ? "99+" : count}
-                  </Badge>
-                )}
-              </div>
-              <span>{t("notifications")}</span>
-            </button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuPortal>
-            <NotificationDropdown onOpenChange={setNotificationsOpen} />
-          </DropdownMenuPortal>
-        </DropdownMenu>
+          <div className="relative flex h-5 w-5 items-center justify-center">
+            <Bell className="h-5 w-5" />
+            {count > 0 && (
+              <Badge
+                className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px]"
+                variant="destructive"
+              >
+                {count > 99 ? "99+" : count}
+              </Badge>
+            )}
+          </div>
+          <span>{t("notifications")}</span>
+        </Link>
 
         <DropdownMenu onOpenChange={setOpen} open={open}>
           <DropdownMenuTrigger asChild>
