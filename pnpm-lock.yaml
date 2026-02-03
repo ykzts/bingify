@@ -247,8 +247,8 @@ importers:
         specifier: 3.8.1
         version: 3.8.1
       shadcn:
-        specifier: 3.8.0
-        version: 3.8.0(@types/node@24.10.9)(hono@4.11.7)(typescript@5.9.3)
+        specifier: 3.8.1
+        version: 3.8.1(@types/node@24.10.9)(hono@4.11.7)(typescript@5.9.3)
       sharp:
         specifier: 0.34.5
         version: 0.34.5
@@ -256,8 +256,8 @@ importers:
         specifier: ^10.2.4
         version: 10.2.4(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       supabase:
-        specifier: 2.74.4
-        version: 2.74.4
+        specifier: 2.74.5
+        version: 2.74.5
       tailwindcss:
         specifier: 4.1.18
         version: 4.1.18
@@ -5851,8 +5851,8 @@ packages:
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
-  shadcn@3.8.0:
-    resolution: {integrity: sha512-PoMRpAYXD0jwppcZgoMwKx/8OKaHluWrmd9qEvWSiuRWJjPM/T9h0TveTASSVrghFR0/7ElftrfJPNh1WMuG6A==}
+  shadcn@3.8.1:
+    resolution: {integrity: sha512-3bu1gxtBvFrFnf55WzLX9QQuM6qik1sv0nXum1bhwgAfcJHDAENBPq2AYDaJaRlskETBqLH/8iacVhpPyyTr3A==}
     hasBin: true
 
   sharp@0.34.5:
@@ -6080,8 +6080,8 @@ packages:
       babel-plugin-macros:
         optional: true
 
-  supabase@2.74.4:
-    resolution: {integrity: sha512-6PyC0V95T7fNBsi1Wh5wTohw7HGXoBZzPnq5y0WPtu/mDv600nF+hN/eq/bZ05hFIUcIzdIAnPIo2gxNGadSOA==}
+  supabase@2.74.5:
+    resolution: {integrity: sha512-WKr5aZa4XHV9MgS6MvQWGDnVsK5A1TOswnJ1w8uCLDOpDyusmRwzaN3O1cIl7wX82xVmEZGaTHBitdbZwPb/qg==}
     engines: {npm: '>=8'}
     hasBin: true
 
@@ -12927,7 +12927,7 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shadcn@3.8.0(@types/node@24.10.9)(hono@4.11.7)(typescript@5.9.3):
+  shadcn@3.8.1(@types/node@24.10.9)(hono@4.11.7)(typescript@5.9.3):
     dependencies:
       '@antfu/ni': 25.0.0
       '@babel/core': 7.29.0
@@ -13249,7 +13249,7 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.29.0
 
-  supabase@2.74.4:
+  supabase@2.74.5:
     dependencies:
       bin-links: 6.0.0
       https-proxy-agent: 7.0.6
