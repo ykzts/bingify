@@ -256,8 +256,8 @@ importers:
         specifier: ^10.2.4
         version: 10.2.4(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       supabase:
-        specifier: 2.74.5
-        version: 2.74.5
+        specifier: 2.75.1
+        version: 2.75.1
       tailwindcss:
         specifier: 4.1.18
         version: 4.1.18
@@ -5940,8 +5940,8 @@ packages:
       babel-plugin-macros:
         optional: true
 
-  supabase@2.74.5:
-    resolution: {integrity: sha512-WKr5aZa4XHV9MgS6MvQWGDnVsK5A1TOswnJ1w8uCLDOpDyusmRwzaN3O1cIl7wX82xVmEZGaTHBitdbZwPb/qg==}
+  supabase@2.75.1:
+    resolution: {integrity: sha512-7cIOjjUSxNNaVFAmtrVc9hQAzzFYj+FHzRWe7dOfw5SPTcyjsKDRsQM3FTHW/8O33BQITxVKCL3S/oXsfMV2bA==}
     engines: {npm: '>=8'}
     hasBin: true
 
@@ -12857,7 +12857,7 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.29.0
 
-  supabase@2.74.5:
+  supabase@2.75.1:
     dependencies:
       bin-links: 6.0.0
       https-proxy-agent: 7.0.6
