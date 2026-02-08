@@ -89,7 +89,7 @@
     "shadcn": "3.8.2",
     "sharp": "0.34.5",
     "storybook": "^10.2.4",
-    "supabase": "2.75.1",
+    "supabase": "2.75.5",
     "tailwindcss": "4.1.18",
     "textlint": "15.5.1",
     "textlint-rule-ja-no-mixed-period": "3.0.2",
