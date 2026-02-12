@@ -107,7 +107,7 @@
   "homepage": "https://bingify.space/",
   "license": "MIT",
   "name": "bingify",
-  "packageManager": "pnpm@10.28.2",
+  "packageManager": "pnpm@10.29.2",
   "private": true,
   "repository": {
     "type": "git",
