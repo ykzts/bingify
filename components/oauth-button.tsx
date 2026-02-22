@@ -29,9 +29,9 @@ function isSupportedProvider(
 }
 
 export interface OAuthButtonProps {
-  provider: AuthProvider;
   isLoading: boolean;
   onClick: () => void;
+  provider: AuthProvider;
 }
 
 export function OAuthButton({

@@ -4,15 +4,15 @@
  */
 
 export interface BingoLine {
-  type: "horizontal" | "vertical" | "diagonal";
   index: number; // row/col index, or 0/1 for diagonals (0=top-left to bottom-right, 1=top-right to bottom-left)
   positions: Array<{ row: number; col: number }>;
+  type: "horizontal" | "vertical" | "diagonal";
 }
 
 export interface BingoCheckResult {
+  bingoLines: BingoLine[];
   hasBingo: boolean;
   hasReach: boolean;
-  bingoLines: BingoLine[];
   reachLines: BingoLine[];
 }
 

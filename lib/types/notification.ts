@@ -37,14 +37,14 @@ export type Notification = Tables<"notifications">;
  * 通知の追加情報を格納します
  */
 export interface NotificationMetadata {
-  /** スペースID */
-  space_id?: string;
+  /** カスタムアクションURL */
+  action_url?: string;
   /** アナウンスメントID */
   announcement_id?: string;
   /** 送信者のユーザーID */
   sender_id?: string;
-  /** カスタムアクションURL */
-  action_url?: string;
+  /** スペースID */
+  space_id?: string;
   /** その他のメタデータ */
   [key: string]: unknown;
 }

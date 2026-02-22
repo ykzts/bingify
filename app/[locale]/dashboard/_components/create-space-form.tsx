@@ -42,8 +42,8 @@ import {
 const SUGGESTION_REGEX = /提案: (.+)/;
 
 interface SuggestionDisplayProps {
-  state: unknown;
   onAcceptSuggestion: () => void;
+  state: unknown;
   t: (key: string) => string;
 }
 

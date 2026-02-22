@@ -27,11 +27,11 @@ import { registerTwitchBroadcasterMetadata } from "../_actions/register-metadata
 import { useTwitchMetadata } from "../_hooks/use-metadata";
 
 interface Props {
+  canUseSubscriber: boolean;
+  enteredBroadcasterId: string;
   // biome-ignore lint/suspicious/noExplicitAny: FieldApi type requires 23 generic parameters
   field: any;
   isPending: boolean;
-  canUseSubscriber: boolean;
-  enteredBroadcasterId: string;
   onOperatorIdFetched: (broadcasterId: string) => void;
 }
 

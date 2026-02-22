@@ -7,15 +7,15 @@ interface UseDrumRollOptions {
    */
   duration?: number;
   /**
-   * Minimum number in the range
-   * @default 1
-   */
-  min?: number;
-  /**
    * Maximum number in the range
    * @default 75
    */
   max?: number;
+  /**
+   * Minimum number in the range
+   * @default 1
+   */
+  min?: number;
 }
 
 interface UseDrumRollReturn {
