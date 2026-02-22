@@ -8,8 +8,8 @@ import { SectionHeader } from "@/components/section-header";
 import { Button } from "@/components/ui/button";
 
 interface ProfileSettingsFormCardProps {
-  action: (payload: FormData) => void;
   aboveFields?: ReactNode;
+  action: (payload: FormData) => void;
   canSubmit: boolean;
   children: ReactNode;
   description: string;

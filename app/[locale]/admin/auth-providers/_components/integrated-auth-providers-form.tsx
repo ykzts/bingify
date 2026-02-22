@@ -27,8 +27,8 @@ import { updateAuthProvider } from "../_actions/auth-providers";
 import { OAuthConfigForm } from "./oauth-config-form";
 
 interface Props {
-  providers: AuthProviderRow[];
   initialSettings?: SystemSettings;
+  providers: AuthProviderRow[];
 }
 
 export function IntegratedAuthProvidersForm({

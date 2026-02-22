@@ -12,8 +12,8 @@ export interface UserChannelResult {
 }
 
 export interface VerifiedSocialChannels {
-  youtube?: string;
   twitch?: string;
+  youtube?: string;
 }
 
 /**

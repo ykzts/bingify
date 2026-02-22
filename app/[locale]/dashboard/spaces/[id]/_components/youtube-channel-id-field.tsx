@@ -25,10 +25,10 @@ import { registerYouTubeChannelMetadata } from "../_actions/register-metadata";
 import { useYouTubeMetadata } from "../_hooks/use-metadata";
 
 interface Props {
+  enteredChannelId: string;
   // biome-ignore lint/suspicious/noExplicitAny: FieldApi type requires 23 generic parameters
   field: any;
   isPending: boolean;
-  enteredChannelId: string;
   onOperatorIdFetched: (channelId: string) => void;
 }
 

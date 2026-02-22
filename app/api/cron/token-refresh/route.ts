@@ -19,10 +19,10 @@ interface RefreshSummary {
   refreshed: number;
   /** スキップされた数 */
   skipped: number;
-  /** 合計処理数 */
-  total: number;
   /** 無効なトークンとして削除された数 */
   tokensDeleted: number;
+  /** 合計処理数 */
+  total: number;
 }
 
 /**

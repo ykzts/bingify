@@ -24,9 +24,9 @@ import {
 import { cn } from "@/lib/utils";
 
 interface SpaceAnnouncementListProps {
-  spaceId: string;
   /** 現在のユーザーがオーナーまたは管理者かどうか */
   isAdmin: boolean;
+  spaceId: string;
 }
 
 /**

@@ -27,14 +27,14 @@ export type OAuthErrorType =
 export interface ErrorHandlingResult {
   /** エラーの種類 */
   errorType: OAuthErrorType;
-  /** トークンが削除されたかどうか */
-  tokenDeleted: boolean;
-  /** ユーザーに再認証が必要かどうか */
-  requiresReauth: boolean;
   /** エラーメッセージ（ログ用） */
   message: string;
   /** プロバイダー名 */
   provider: OAuthProvider;
+  /** ユーザーに再認証が必要かどうか */
+  requiresReauth: boolean;
+  /** トークンが削除されたかどうか */
+  tokenDeleted: boolean;
 }
 
 /**

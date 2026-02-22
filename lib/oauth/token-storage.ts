@@ -14,10 +14,10 @@ export interface OAuthToken {
 }
 
 export interface UpsertTokenParams {
-  provider: OAuthProvider;
   access_token: string;
-  refresh_token?: string | null;
   expires_at?: string | null;
+  provider: OAuthProvider;
+  refresh_token?: string | null;
 }
 
 export interface TokenResult {
