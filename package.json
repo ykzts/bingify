@@ -91,7 +91,7 @@
     "storybook": "^10.2.4",
     "supabase": "2.76.11",
     "tailwindcss": "4.2.0",
-    "textlint": "15.5.1",
+    "textlint": "15.5.2",
     "textlint-rule-ja-no-mixed-period": "3.0.2",
     "textlint-rule-ja-no-weak-phrase": "2.0.0",
     "textlint-rule-preset-ja-spacing": "2.4.3",
