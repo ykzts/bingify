@@ -289,8 +289,8 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
       ultracite:
-        specifier: 7.2.3
-        version: 7.2.3
+        specifier: 7.2.4
+        version: 7.2.4
       vite:
         specifier: ^7.3.1
         version: 7.3.1(@types/node@24.10.15)(jiti@2.6.1)(lightningcss@1.31.1)
@@ -6253,8 +6253,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  ultracite@7.2.3:
-    resolution: {integrity: sha512-WKNS2sKAZe4BHu+JGbZebXvy/A1QagDaBnndrK/zwOJAze/mQ8jeHfdG2bPlv3qcJ5fdS3w2Kd7c/eIcH78HvA==}
+  ultracite@7.2.4:
+    resolution: {integrity: sha512-3b2g2pwZMDSd+PBK8pxYCjEoYaqVSgXD22HS22BxR8GfbmRXJ3VpNu5Z5lNywIxZXsJleWdpGPHibOPYr/xmKg==}
     hasBin: true
     peerDependencies:
       oxlint: ^1.0.0
@@ -13330,7 +13330,7 @@ snapshots:
 
   typescript@5.9.3: {}
 
-  ultracite@7.2.3:
+  ultracite@7.2.4:
     dependencies:
       '@clack/prompts': 1.0.1
       commander: 14.0.3
