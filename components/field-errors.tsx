@@ -28,11 +28,15 @@ export function FieldErrors({ className, errors }: FieldErrorsProps) {
     return null;
   }
 
-  const errorMessages = errors
-    .map((error) => getErrorMessage(error))
-    .filter(
-      (message) => message.trim() !== "" && message !== "[object Object]"
-    );
+  const errorMessages = [
+    ...new Set(
+      errors
+        .map((error) => getErrorMessage(error))
+        .filter(
+          (message) => message.trim() !== "" && message !== "[object Object]"
+        )
+    ),
+  ];
 
   if (errorMessages.length === 0) {
     return null;
@@ -47,11 +51,8 @@ export function FieldErrors({ className, errors }: FieldErrorsProps) {
       )}
       role="alert"
     >
-      {errorMessages.map((message, index) => (
-        <p
-          className="text-red-800 text-sm"
-          key={`${message.slice(0, 20)}-${index}`}
-        >
+      {errorMessages.map((message) => (
+        <p className="text-red-800 text-sm" key={message}>
           {message}
         </p>
       ))}
