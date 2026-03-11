@@ -161,10 +161,10 @@ export function AvatarSelectionForm({
           )}
 
           {/* プロバイダーアバター */}
-          {availableAvatars.map((avatar, index) => (
+          {availableAvatars.map((avatar) => (
             <div
               className="flex items-center gap-4 rounded-lg border border-input p-4 transition-colors hover:border-primary"
-              key={`${avatar.provider}-${index}`}
+              key={`${avatar.provider}-${avatar.avatar_url}`}
             >
               <RadioGroupItem id={avatar.provider} value={avatar.provider} />
               <Label

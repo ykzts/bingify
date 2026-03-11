@@ -13,7 +13,7 @@ interface FormErrorsProps {
  * Reusable component for displaying form-level validation errors
  * Uses shadcn/ui Alert component for consistent styling
  * Filters out empty and malformed error messages
- * Uses composite keys (message + index) to handle potential duplicates while maintaining stability
+ * Deduplicates identical messages and uses message text as stable keys
  */
 export function FormErrors({
   className = "",
@@ -21,11 +21,15 @@ export function FormErrors({
   title,
   variant = "default",
 }: FormErrorsProps) {
-  const errorMessages = errors
-    .map((error) => getErrorMessage(error))
-    .filter(
-      (message) => message.trim() !== "" && message !== "[object Object]"
-    );
+  const errorMessages = [
+    ...new Set(
+      errors
+        .map((error) => getErrorMessage(error))
+        .filter(
+          (message) => message.trim() !== "" && message !== "[object Object]"
+        )
+    ),
+  ];
 
   if (errorMessages.length === 0) {
     return null;
@@ -38,8 +42,8 @@ export function FormErrors({
         {title && <AlertTitle>{title}</AlertTitle>}
         <AlertDescription>
           <div className="flex flex-col gap-1">
-            {errorMessages.map((message, index) => (
-              <span key={`${message.slice(0, 20)}-${index}`}>{message}</span>
+            {errorMessages.map((message) => (
+              <span key={message}>{message}</span>
             ))}
           </div>
         </AlertDescription>
@@ -50,8 +54,8 @@ export function FormErrors({
   return (
     <Alert className={className} variant="destructive">
       <AlertDescription>
-        {errorMessages.map((message, index) => (
-          <p key={`${message.slice(0, 20)}-${index}`}>{message}</p>
+        {errorMessages.map((message) => (
+          <p key={message}>{message}</p>
         ))}
       </AlertDescription>
     </Alert>
