@@ -408,7 +408,33 @@ export function ScreenDisplay({
       {isMinimal ? (
         /* Minimal Mode: Current Number Only */
         <div className="flex h-screen w-full items-center justify-center">
-          {displayNumber !== null ? (
+          {displayNumber === null ? (
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <p
+                className={cn(
+                  "font-bold text-[clamp(2rem,5vw,4rem)] leading-tight",
+                  textColor
+                )}
+                style={{
+                  textShadow:
+                    theme === "light"
+                      ? "0 2px 8px rgba(0,0,0,0.12)"
+                      : "0 2px 8px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.5)",
+                  WebkitTextStroke:
+                    theme === "light"
+                      ? "1px rgba(0,0,0,0.1)"
+                      : "1px rgba(0,0,0,0.6)",
+                }}
+              >
+                {t("waitingForNumbers")}
+              </p>
+            </motion.div>
+          ) : (
             <motion.h1
               animate={{ opacity: 1, scale: 1 }}
               className={cn(
@@ -435,32 +461,6 @@ export function ScreenDisplay({
             >
               {displayNumber}
             </motion.h1>
-          ) : (
-            <motion.div
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center"
-              initial={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-            >
-              <p
-                className={cn(
-                  "font-bold text-[clamp(2rem,5vw,4rem)] leading-tight",
-                  textColor
-                )}
-                style={{
-                  textShadow:
-                    theme === "light"
-                      ? "0 2px 8px rgba(0,0,0,0.12)"
-                      : "0 2px 8px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.5)",
-                  WebkitTextStroke:
-                    theme === "light"
-                      ? "1px rgba(0,0,0,0.1)"
-                      : "1px rgba(0,0,0,0.6)",
-                }}
-              >
-                {t("waitingForNumbers")}
-              </p>
-            </motion.div>
           )}
         </div>
       ) : (
@@ -470,7 +470,33 @@ export function ScreenDisplay({
           <div className="flex flex-col items-center justify-center gap-8 lg:w-[40%] lg:gap-10">
             {/* Current Number */}
             <div className="flex flex-1 items-center justify-center">
-              {displayNumber !== null ? (
+              {displayNumber === null ? (
+                <motion.div
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                >
+                  <p
+                    className={cn(
+                      "font-bold text-[clamp(2rem,4vw,3.5rem)] leading-tight lg:text-[clamp(2.5rem,4vh,4rem)]",
+                      textColor
+                    )}
+                    style={{
+                      textShadow:
+                        theme === "light"
+                          ? "0 2px 8px rgba(0,0,0,0.12)"
+                          : "0 2px 8px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.5)",
+                      WebkitTextStroke:
+                        theme === "light"
+                          ? "1px rgba(0,0,0,0.1)"
+                          : "1px rgba(0,0,0,0.6)",
+                    }}
+                  >
+                    {t("waitingForNumbers")}
+                  </p>
+                </motion.div>
+              ) : (
                 <motion.h1
                   animate={{ opacity: 1, scale: 1 }}
                   className={cn(
@@ -497,32 +523,6 @@ export function ScreenDisplay({
                 >
                   {displayNumber}
                 </motion.h1>
-              ) : (
-                <motion.div
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center"
-                  initial={{ opacity: 0, y: 20 }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                >
-                  <p
-                    className={cn(
-                      "font-bold text-[clamp(2rem,4vw,3.5rem)] leading-tight lg:text-[clamp(2.5rem,4vh,4rem)]",
-                      textColor
-                    )}
-                    style={{
-                      textShadow:
-                        theme === "light"
-                          ? "0 2px 8px rgba(0,0,0,0.12)"
-                          : "0 2px 8px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.5)",
-                      WebkitTextStroke:
-                        theme === "light"
-                          ? "1px rgba(0,0,0,0.1)"
-                          : "1px rgba(0,0,0,0.6)",
-                    }}
-                  >
-                    {t("waitingForNumbers")}
-                  </p>
-                </motion.div>
               )}
             </div>
 

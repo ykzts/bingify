@@ -56,11 +56,10 @@ export function SpaceSettingsSheet({
 
     if (shouldOpen) {
       // 開く場合：既に"settings"でなければ設定
-      if (currentOpenValue !== "settings") {
-        params.set("open", "settings");
-      } else {
+      if (currentOpenValue === "settings") {
         return; // 既に設定済みの場合は何もしない
       }
+      params.set("open", "settings");
     } else if (currentOpenValue === "settings") {
       // 閉じる場合：現在の値が"settings"の場合のみ削除
       params.delete("open");

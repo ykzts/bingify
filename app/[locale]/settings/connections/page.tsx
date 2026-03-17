@@ -56,7 +56,6 @@ export default async function ConnectionsSettingsPage({
   return (
     <Suspense
       fallback={
-        // biome-ignore lint/a11y/useSemanticElements: role="status" is appropriate for loading indicators
         <div
           aria-label="Loading"
           className="flex items-center justify-center py-12"

@@ -94,21 +94,21 @@ export function ParticipantsTable({
     <Card>
       <CardHeader>
         <CardTitle>
-          {maxParticipants !== undefined
-            ? t("participantsListTitle", {
+          {maxParticipants === undefined
+            ? t("participantsTitle")
+            : t("participantsListTitle", {
                 count: participants.length,
                 max: maxParticipants,
-              })
-            : t("participantsTitle")}
+              })}
         </CardTitle>
         <CardDescription>
-          {maxParticipants !== undefined
+          {maxParticipants === undefined
             ? t("participantsDescription", {
                 count: participants.length,
-                max: maxParticipants,
               })
             : t("participantsDescription", {
                 count: participants.length,
+                max: maxParticipants,
               })}
           {bingoCount > 0 && (
             <span className="ml-2">
