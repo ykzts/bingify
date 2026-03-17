@@ -472,10 +472,10 @@ const main = async () => {
 
 // Export functions for testing
 export {
-  LINE_SPLIT_REGEX,
-  QUOTED_VALUE_REGEX,
   generateEnvFile,
+  LINE_SPLIT_REGEX,
   parseEnvTemplate,
+  QUOTED_VALUE_REGEX,
   validateRequired,
   wrapWithTemplateQuotes,
 };
