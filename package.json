@@ -100,7 +100,7 @@
     "textlint-rule-terminology": "5.2.16",
     "to-ico": "1.1.5",
     "typescript": "5.9.3",
-    "ultracite": "7.4.3",
+    "ultracite": "7.4.4",
     "vite": "^8.0.0",
     "vitest": "4.1.3"
   },
