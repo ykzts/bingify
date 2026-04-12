@@ -78,8 +78,8 @@ importers:
         specifier: 2.0.5
         version: 2.0.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@supabase/ssr':
-        specifier: 0.9.0
-        version: 0.9.0(@supabase/supabase-js@2.102.1)
+        specifier: 0.10.2
+        version: 0.10.2(@supabase/supabase-js@2.102.1)
       '@supabase/supabase-js':
         specifier: 2.102.1
         version: 2.102.1
@@ -2242,10 +2242,10 @@ packages:
     resolution: {integrity: sha512-h2fCumib/v6u7XMwSPgxnpfimjX4xCEayUHrxWLC7UurfQjUZJ0pmJDgm6yj80DnUerxuulRghwm5zXYysFG/Q==}
     engines: {node: '>=20.0.0'}
 
-  '@supabase/ssr@0.9.0':
-    resolution: {integrity: sha512-UFY6otYV3yqCgV+AyHj80vNkTvbf1Gas2LW4dpbQ4ap6p6v3eB2oaDfcI99jsuJzwVBCFU4BJI+oDYyhNk1z0Q==}
+  '@supabase/ssr@0.10.2':
+    resolution: {integrity: sha512-JFbchN63CXLFHJRNT7udec4/RoD9PmXkSGko3QSO6vUuqGBtSzdmxR7FPfQNr7SuFd65I7Xv46q66ALjEN1cgQ==}
     peerDependencies:
-      '@supabase/supabase-js': ^2.97.0
+      '@supabase/supabase-js': ^2.102.1
 
   '@supabase/storage-js@2.102.1':
     resolution: {integrity: sha512-eCL9T4Xpe40nmKlkUJ7Zq/hk34db1xPiT0WL3Iv5MbJqHuCAe5TxhV8Rjqd6DNZrzjtfYObZtYl9jKJaHrivqw==}
@@ -8542,7 +8542,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@supabase/ssr@0.9.0(@supabase/supabase-js@2.102.1)':
+  '@supabase/ssr@0.10.2(@supabase/supabase-js@2.102.1)':
     dependencies:
       '@supabase/supabase-js': 2.102.1
       cookie: 1.1.1
