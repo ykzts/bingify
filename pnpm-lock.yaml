@@ -289,8 +289,8 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
       ultracite:
-        specifier: 7.3.0
-        version: 7.3.0
+        specifier: 7.4.3
+        version: 7.4.3
       vite:
         specifier: ^8.0.0
         version: 8.0.0(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)
@@ -6299,8 +6299,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  ultracite@7.3.0:
-    resolution: {integrity: sha512-lnzknmRmaLNPk2cYCpT+dI78Jyz+0Or1o8XOjHNxeIrBGrbQXZOTNwQjcFeYaQ1Ov5HK1NqPQirmzyMgA4lJSw==}
+  ultracite@7.4.3:
+    resolution: {integrity: sha512-HMnd21OpSSwi/YtNqXUP/798dlTQ2GlXh0wR+8rIVY9uCTTQiOiRthdLlRaAo6IqUT0l29hiRl+ShsO0r81LtQ==}
     hasBin: true
     peerDependencies:
       oxlint: ^1.0.0
@@ -13391,10 +13391,11 @@ snapshots:
 
   typescript@5.9.3: {}
 
-  ultracite@7.3.0:
+  ultracite@7.4.3:
     dependencies:
       '@clack/prompts': 1.1.0
       commander: 14.0.3
+      cross-spawn: 7.0.6
       deepmerge: 4.3.1
       glob: 13.0.6
       jsonc-parser: 3.3.1
