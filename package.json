@@ -61,7 +61,7 @@
   "description": "Real-time bingo application for streamers and communities.",
   "devDependencies": {
     "@biomejs/biome": "2.4.7",
-    "@chromatic-com/storybook": "5.1.1",
+    "@chromatic-com/storybook": "5.3.0",
     "@storybook/addon-a11y": "10.3.5",
     "@storybook/addon-docs": "10.3.5",
     "@storybook/addon-onboarding": "10.3.5",
