@@ -28,7 +28,7 @@
     "@react-email/components": "1.0.11",
     "@react-email/render": "2.0.5",
     "@supabase/ssr": "0.10.2",
-    "@supabase/supabase-js": "2.103.0",
+    "@supabase/supabase-js": "2.112.3",
     "@tailwindcss/typography": "0.5.19",
     "@tanstack/react-form": "1.28.6",
     "@tanstack/react-form-nextjs": "1.28.6",
