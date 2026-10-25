@@ -18,7 +18,7 @@ on:
 
 jobs:
   test-migrations:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     env:
       # Supabase config.toml で参照される環境変数のダミー値

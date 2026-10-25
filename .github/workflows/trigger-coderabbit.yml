@@ -10,7 +10,7 @@ permissions:
 jobs:
   trigger:
     if: github.event.pull_request.user.login == 'Copilot' && !github.event.pull_request.draft
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Request CodeRabbit Review
         env:
