@@ -29,7 +29,7 @@
     "@react-email/render": "2.0.5",
     "@supabase/ssr": "0.10.2",
     "@supabase/supabase-js": "2.103.0",
-    "@tailwindcss/typography": "0.5.19",
+    "@tailwindcss/typography": "0.5.20",
     "@tanstack/react-form": "1.28.6",
     "@tanstack/react-form-nextjs": "1.28.6",
     "@tanstack/react-query": "5.97.0",
